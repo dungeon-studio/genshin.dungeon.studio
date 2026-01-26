@@ -14,6 +14,6 @@ Chat with an AI assistant about YOUR collection to get personalized team recomme
 
 ---
 
-**Tech Stack**: React 19, TypeScript, Bun, Hono, Claude MCP, Firestore
+**Tech Stack**: React 19, TypeScript, Hono, Claude MCP, Firestore
 
 **Hosting**: [genshin.dungeon.studio](https://genshin.dungeon.studio) (coming soon)
