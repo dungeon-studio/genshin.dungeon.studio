@@ -1,2 +1,19 @@
-# genshin.dungeon.studio
-AI-powered Genshin Impact team builder with chat interface—track your collection and get personalized recommendations based on YOUR characters.
+# Genshin Team Builder
+
+AI-powered team building companion for Genshin Impact.
+
+> **Status**: 🚧 Under active development
+
+Chat with an AI assistant about YOUR collection to get personalized team recommendations.
+
+## Coming Soon
+
+- Character collection management
+- AI-powered team suggestions
+- Progressive Web App
+
+---
+
+**Tech Stack**: React 19, TypeScript, Hono, Claude MCP, Firestore
+
+**Hosting**: [genshin.dungeon.studio](https://genshin.dungeon.studio) (coming soon)

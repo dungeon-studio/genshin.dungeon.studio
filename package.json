@@ -1,0 +1,29 @@
+{
+  "name": "genshin-dungeon-studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-powered Genshin Impact team building companion",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dungeon-studio/genshin.dungeon.studio.git"
+  },
+  "license": "MIT",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "clean": "turbo run clean"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "prettier": "^3.4.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.3"
+  },
+  "packageManager": "pnpm@9.15.4",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
