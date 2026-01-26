@@ -137,3 +137,43 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# === Custom additions for this project ===
+
+# Build outputs
+build/
+
+# Turborepo
+.turbo/
+
+# Testing
+coverage/
+
+# Environment variables (extra protection)
+**/.env
+.env.local
+.env.*.local
+
+# GCP
+.gcp/
+service-account*.json
+
+# Firebase
+firebase-debug.log
+firestore-debug.log
+
+# IDEs
+.vscode/settings.json
+.vscode/launch.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+pnpm-debug.log*
+
+# Temporary
+temp/
+tmp/
