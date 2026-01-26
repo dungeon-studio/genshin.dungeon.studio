@@ -17,4 +17,3 @@ Chat with an AI assistant about YOUR collection to get personalized team recomme
 **Tech Stack**: React 19, TypeScript, Bun, Hono, Claude MCP, Firestore
 
 **Hosting**: [genshin.dungeon.studio](https://genshin.dungeon.studio) (coming soon)
-AI-powered Genshin Impact team builder with chat interface—track your collection and get personalized recommendations based on YOUR characters.
