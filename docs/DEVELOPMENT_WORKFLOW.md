@@ -355,14 +355,24 @@ const batch = firestore.batch();
 
 **"Module not found"**
 ```bash
-rm -rf node_modules pnpm-lock.yaml
+# Cross-platform solution
+pnpm dlx rimraf node_modules pnpm-lock.yaml
 pnpm install
 ```
 
 **"Port already in use"**
 ```bash
+# Unix/Linux/macOS
 lsof -ti:5173 | xargs kill  # Frontend
 lsof -ti:8080 | xargs kill  # Backend
+
+# Windows (PowerShell)
+Get-Process -Id (Get-NetTCPConnection -LocalPort 5173).OwningProcess | Stop-Process
+Get-Process -Id (Get-NetTCPConnection -LocalPort 8080).OwningProcess | Stop-Process
+
+# Windows (Command Prompt)
+for /f "tokens=5" %a in ('netstat -ano ^| findstr :5173') do taskkill /F /PID %a
+for /f "tokens=5" %a in ('netstat -ano ^| findstr :8080') do taskkill /F /PID %a
 ```
 
 **"Test fails but code works"**

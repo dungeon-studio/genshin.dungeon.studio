@@ -11,7 +11,6 @@ Ensure you have these installed:
 ```bash
 node --version    # v20+ required
 pnpm --version    # v9+ required
-bun --version     # v1.0+ required
 gcloud --version  # Latest
 gh --version      # GitHub CLI
 ```
@@ -21,12 +20,11 @@ Install missing tools:
 # pnpm
 npm install -g pnpm
 
-# Bun
-curl -fsSL https://bun.sh/install | bash
-
 # GitHub CLI (Linux)
 sudo apt install gh
 ```
+
+**Note**: Bun is planned for future phases but not currently used in the project.
 
 ---
 
