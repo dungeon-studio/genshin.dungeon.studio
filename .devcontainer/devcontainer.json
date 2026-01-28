@@ -17,8 +17,7 @@
         "bradlc.vscode-tailwindcss",
         "usernamehw.errorlens",
         "eamodio.gitlens",
-        "rangav.vscode-thunder-client",
-        "vitest.explorer"
+        "rangav.vscode-thunder-client"
       ],
       "settings": {
         "editor.formatOnSave": true,

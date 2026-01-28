@@ -60,6 +60,7 @@ export function CharacterCard({ character }) {
 ```
 
 Run tests:
+
 ```bash
 pnpm test
 ```
@@ -76,6 +77,7 @@ git commit -m "feat(collection): add character card component
 ```
 
 **Commit types:**
+
 - `feat:` - New feature
 - `fix:` - Bug fix
 - `docs:` - Documentation changes
@@ -96,7 +98,7 @@ gh pr create --title "feat: Add character collection grid" \
   - CharacterCard component
   - Grid layout with Tailwind
   - Tests for rendering
-  
+
   Closes #5"
 
 # Or create PR in GitHub UI
@@ -202,6 +204,7 @@ export default app;
 ```
 
 Register in main:
+
 ```typescript
 // apps/api/src/main.ts
 import collection from './routes/collection';
@@ -226,6 +229,7 @@ export type Element = 'Pyro' | 'Hydro' | 'Cryo' | 'Electro' | 'Anemo' | 'Geo' | 
 ```
 
 Use in apps:
+
 ```typescript
 import type { Character } from '@genshin/types';
 ```
@@ -273,8 +277,9 @@ pnpm lint
 ### Test Coverage
 
 Aim for:
+
 - **Critical paths**: 80%+ coverage
-- **Utilities**: 90%+ coverage  
+- **Utilities**: 90%+ coverage
 - **UI components**: Test user interactions, not implementation details
 
 ---
@@ -323,10 +328,7 @@ screen.debug(); // Prints DOM to console
 const ChatPage = lazy(() => import('./features/chat/ChatPage'));
 
 // Memoize expensive computations
-const optimalTeam = useMemo(() => 
-  calculateOptimalTeam(characters), 
-  [characters]
-);
+const optimalTeam = useMemo(() => calculateOptimalTeam(characters), [characters]);
 ```
 
 ### Backend
@@ -354,6 +356,7 @@ const batch = firestore.batch();
 ### Common Issues
 
 **"Module not found"**
+
 ```bash
 # Cross-platform solution
 pnpm dlx rimraf node_modules pnpm-lock.yaml
@@ -361,6 +364,7 @@ pnpm install
 ```
 
 **"Port already in use"**
+
 ```bash
 # Unix/Linux/macOS
 lsof -ti:5173 | xargs kill  # Frontend
@@ -376,6 +380,7 @@ for /f "tokens=5" %a in ('netstat -ano ^| findstr :8080') do taskkill /F /PID %a
 ```
 
 **"Test fails but code works"**
+
 - Check test setup in `src/test/setup.ts`
 - Ensure you're importing from '@testing-library/react'
 - Verify mocks are properly configured

@@ -16,6 +16,7 @@ gh --version      # GitHub CLI
 ```
 
 Install missing tools:
+
 ```bash
 # pnpm
 npm install -g pnpm
@@ -31,6 +32,7 @@ sudo apt install gh
 ## Phase 1: Monorepo Setup ✅ (COMPLETED)
 
 Initial structure has been set up via PR #3:
+
 - Turborepo build orchestration
 - pnpm workspace configuration
 - Directory structure (apps, packages, infrastructure)
@@ -38,7 +40,10 @@ Initial structure has been set up via PR #3:
 
 ---
 
-## Phase 2: Frontend Setup (apps/web)
+## Phase 2: Frontend Setup (apps/web) ⚙️ (IN PROGRESS)
+
+**Completed**: Basic Vite + React 19 + TypeScript setup (PR #80)  
+**Remaining**: Core dependencies, Tailwind CSS, shadcn/ui (Issues #22, #20, #21)
 
 Initialize React app with Vite:
 
@@ -78,18 +83,18 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src')
-    }
+      '@': path.resolve(__dirname, './src'),
+    },
   },
   server: {
     port: 5173,
     proxy: {
       '/api': {
         target: 'http://localhost:8080',
-        changeOrigin: true
-      }
-    }
-  }
+        changeOrigin: true,
+      },
+    },
+  },
 });
 ```
 
@@ -126,8 +131,6 @@ function App() {
     </div>
   );
 }
-
-export default App;
 ```
 
 ### Test it runs
@@ -207,16 +210,19 @@ import { cors } from 'hono/cors';
 const app = new Hono();
 
 // Enable CORS for local development
-app.use('*', cors({
-  origin: 'http://localhost:5173',
-  credentials: true,
-}));
+app.use(
+  '*',
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  })
+);
 
 app.get('/', (c) => {
-  return c.json({ 
+  return c.json({
     message: 'Genshin API',
     version: '0.1.0',
-    status: 'running'
+    status: 'running',
   });
 });
 
@@ -227,9 +233,9 @@ app.get('/api/health', (c) => {
 const port = Number(process.env.PORT) || 8080;
 console.log(`🚀 Server running on http://localhost:${port}`);
 
-serve({ 
-  fetch: app.fetch, 
-  port 
+serve({
+  fetch: app.fetch,
+  port,
 });
 
 export default app;
@@ -281,9 +287,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src')
-    }
-  }
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
 });
 ```
 
@@ -345,7 +351,7 @@ describe('API', () => {
   it('returns genshin api message on root', async () => {
     const res = await app.request('/', { method: 'GET' });
     const data = await res.json();
-    
+
     expect(res.status).toBe(200);
     expect(data.message).toBe('Genshin API');
   });
@@ -353,7 +359,7 @@ describe('API', () => {
   it('health check returns healthy status', async () => {
     const res = await app.request('/api/health', { method: 'GET' });
     const data = await res.json();
-    
+
     expect(res.status).toBe(200);
     expect(data.status).toBe('healthy');
     expect(data.timestamp).toBeDefined();
