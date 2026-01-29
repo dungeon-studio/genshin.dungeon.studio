@@ -8,7 +8,7 @@ Before contributing, please:
 
 1. **Read the [Setup Guide](docs/SETUP_GUIDE.md)** for environment setup
 2. **Check existing [GitHub Issues](https://github.com/dungeon-studio/genshin.dungeon.studio/issues)** to see what's needed
-3. **Review the [Copilot Instructions](.github/copilot-instructions.md)** for code style and architecture guidelines
+3. **Run linters and formatters** before committing - they'll enforce code style automatically
 
 ## Code of Conduct
 
