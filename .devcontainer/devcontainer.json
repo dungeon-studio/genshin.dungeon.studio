@@ -44,6 +44,16 @@
   },
 
   "postCreateCommand": "npm install -g pnpm@9.15.4 && pnpm install",
+  "updateContentCommand": "pnpm install",
+  "postAttachCommand": "echo '✅ Ready | Node $(node --version) | pnpm $(pnpm --version)'",
+
+  "containerEnv": {
+    "NODE_ENV": "development"
+  },
+
+  "mounts": [
+    "source=genshin-pnpm-store,target=${containerWorkspaceFolder}/.pnpm-store,type=volume"
+  ],
 
   "remoteUser": "node"
 }
