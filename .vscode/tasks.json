@@ -99,7 +99,7 @@
     },
 
     // ============================================
-    // Testing Tasks (Ready for Vitest)
+    // Testing Tasks (Placeholder - Vitest not installed yet)
     // ============================================
     {
       "label": "test: all",

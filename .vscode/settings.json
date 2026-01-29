@@ -69,12 +69,13 @@
   // Prettier (redundant with .prettierrc but explicit for clarity)
   "prettier.requireConfig": true,
 
-  // CSS/Tailwind (when Issue #20 is implemented)
-  "css.validate": true,
-  "tailwindCSS.experimental.classRegex": [
-    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
-    ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
-  ],
+  // CSS/Tailwind - DISABLED until Issue #20 is implemented
+  "css.validate": true
+  // Uncomment when Tailwind is installed:
+  // "tailwindCSS.experimental.classRegex": [
+  //   ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+  //   ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+  // ]
 
   // Testing - DISABLED until Vitest is installed (Phase 4)
   // Uncomment these settings when Vitest is added to package.json
