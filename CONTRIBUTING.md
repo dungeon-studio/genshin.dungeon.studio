@@ -121,8 +121,8 @@ gh pr create --title "feat: Add character collection grid" \
 Once tests pass and code is reviewed:
 
 ```bash
-# Merge via CLI (squash for clean history)
-gh pr merge --squash
+# Merge via CLI
+gh pr merge
 
 # Or use GitHub UI merge button
 ```
