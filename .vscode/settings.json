@@ -4,7 +4,7 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
-    "source.organizeImports": "never"
+    "source.organizeImports": "explicit"
   },
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
@@ -34,7 +34,7 @@
   // TypeScript
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.preferences.importModuleSpecifier": "shortest",
   "typescript.updateImportsOnFileMove.enabled": "always",
 
   // ESLint
@@ -76,7 +76,8 @@
     ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
   ],
 
-  // Testing (when Vitest is fully configured)
-  "vitest.enable": true,
-  "vitest.commandLine": "pnpm test"
+  // Testing - DISABLED until Vitest is installed (Phase 4)
+  // Uncomment these settings when Vitest is added to package.json
+  // "vitest.enable": true,
+  // "vitest.commandLine": "pnpm test"
 }
