@@ -3,6 +3,7 @@
 ## Project Overview
 
 This is an AI-powered team building companion for Genshin Impact. Users can:
+
 - Track their character collection
 - Build and save team compositions
 - Get personalized team recommendations via AI chat interface (Claude MCP)
@@ -15,15 +16,19 @@ This is an AI-powered team building companion for Genshin Impact. Users can:
 
 ## Tech Stack
 
-### Current (Phase 1 - Infrastructure)
-- **Monorepo**: Turborepo + pnpm workspaces
-- **Language**: TypeScript (strict mode)
-- **Package Manager**: pnpm
-- **Runtime**: Node.js 20+
-- **Code Formatting**: Prettier
+### Current (Phase 1-2 Completed)
 
-### Planned (Phase 2+)
-- **Frontend**: React 19, Vite, Tailwind CSS, shadcn/ui
+- **Monorepo**: Turborepo 2.7.6 + pnpm 9.15.4 workspaces
+- **Language**: TypeScript 5.9.3 (strict mode)
+- **Package Manager**: pnpm 9+
+- **Runtime**: Node.js 20+
+- **Code Formatting**: Prettier 3.8
+- **Frontend**: React 19.2 + Vite 7.3 + TypeScript (basic setup complete)
+- **Linting**: ESLint 9.39 with flat config format
+
+### Planned (Phase 3+)
+
+- **Frontend Libraries**: Tailwind CSS, shadcn/ui, react-router-dom, zustand
 - **Backend**: Hono (Node.js server), may migrate to Bun runtime later
 - **Database**: Firestore
 - **Auth**: Firebase Authentication
@@ -31,7 +36,10 @@ This is an AI-powered team building companion for Genshin Impact. Users can:
 - **Hosting**: GCP (Cloud Run for API, Cloud Storage for frontend)
 - **Testing**: Vitest, React Testing Library
 
-**Important**: Do NOT suggest Bun-specific code yet. It's listed in plans but not implemented.
+**Important**:
+
+- Do NOT suggest Bun-specific code yet. It's listed in plans but not implemented.
+- ESLint 9.x uses flat config format - no `extends` property, use array spreading instead.
 
 ---
 
@@ -55,14 +63,25 @@ genshin.dungeon.studio/
 ## Code Style Guidelines
 
 ### TypeScript
+
 - ✅ **Strict mode enabled** - No implicit any, strict null checks
 - ✅ **No `any` types** - Use `unknown` and type guards instead
 - ✅ **Explicit types for function returns** - Especially for exported functions
 - ✅ **Use type imports** - `import type { ... }` for types-only imports
+- ✅ **No non-null assertions** - Use proper null checks instead of `!`
+- ✅ **Path aliases configured** - Use `@/` for src imports (configured in tsconfig + vite)
 - ❌ **No class components** - Use functional components only
 - ❌ **No enums** - Use const objects or union types instead
 
+### ESLint (v9.x Flat Config)
+
+- ✅ **Use array export** - `export default [...]` not `defineConfig([...])`
+- ✅ **Spread configs** - `...tseslint.configs.recommended` not `extends: [...]`
+- ✅ **Use `ignores`** - Top-level `{ ignores: ['dist'] }` not `globalIgnores()`
+- ❌ **No `eslint/config` imports** - These don't exist in ESLint 9.x
+
 ### React
+
 - ✅ **Functional components** with TypeScript interfaces for props
 - ✅ **Named exports** - `export function ComponentName()`
 - ✅ **Props interfaces** named `ComponentNameProps`
@@ -70,12 +89,14 @@ genshin.dungeon.studio/
 - ✅ **Early returns** for conditional rendering
 
 ### File Naming
+
 - `kebab-case.tsx` for files
 - `PascalCase` for components
 - `camelCase` for functions, variables
 - `SCREAMING_SNAKE_CASE` for constants
 
 ### Code Organization
+
 - Keep functions small and focused (< 50 lines ideally)
 - One component per file
 - Co-locate tests with source files: `Component.tsx` + `Component.test.tsx`
@@ -86,21 +107,25 @@ genshin.dungeon.studio/
 ## Testing Requirements
 
 ### Approach: Test-Driven Development (TDD)
+
 1. Write test first (or alongside implementation)
 2. Implement feature to make test pass
 3. Refactor while keeping tests green
 
 ### Testing Framework
+
 - **Test runner**: Vitest
 - **React testing**: @testing-library/react
 - **Assertions**: Vitest matchers + @testing-library/jest-dom
 
 ### Coverage Expectations
+
 - **Critical paths**: 80%+ coverage
 - **Utilities/helpers**: 90%+ coverage
 - **UI components**: Test user interactions, not implementation details
 
 ### Test Structure
+
 ```typescript
 describe('ComponentName', () => {
   it('does expected behavior', () => {
@@ -124,6 +149,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 ```
 
 ### Types
+
 - `feat:` - New feature
 - `fix:` - Bug fix
 - `docs:` - Documentation changes
@@ -133,6 +159,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `chore:` - Maintenance tasks, dependencies
 
 ### Examples
+
 ```
 feat(collection): add character card component
 fix(api): handle missing Firebase credentials gracefully
@@ -145,12 +172,14 @@ docs: update setup guide with testing phase
 ## Pull Request Workflow
 
 ### Branch Naming
+
 - `feature/description` - New features
 - `fix/description` - Bug fixes
 - `chore/description` - Maintenance
 - `docs/description` - Documentation
 
 ### PR Guidelines
+
 1. **One PR = One Feature** - Keep PRs focused and atomic
 2. **Good PR Titles** - Use conventional commit format (becomes commit message)
 3. **Descriptive Body** - Bullet points of what changed and why
@@ -158,11 +187,13 @@ docs: update setup guide with testing phase
 5. **Self-Review** - Review your own PR before requesting review
 
 ### Merge Strategy
+
 - **Squash and merge** - All PR commits become one commit on develop
 - PR title + body become the final commit message
 - Keep commit history clean: 1 feature = 1 commit
 
 ### Before Merging
+
 - ✅ All tests pass
 - ✅ No linting errors
 - ✅ TypeScript compiles without errors
@@ -176,12 +207,14 @@ docs: update setup guide with testing phase
 **Critical**: This project must work on Windows, macOS, and Linux.
 
 ### ❌ NEVER Use
+
 - `rm -rf` (use Turborepo clean or cross-platform tools)
 - `&&` for sequential commands (use pnpm scripts instead)
 - Hardcoded paths with `/` or `\`
 - OS-specific environment variables
 
 ### ✅ ALWAYS Use
+
 - Node.js `path` module for paths
 - Cross-platform packages (e.g., `rimraf`, `del-cli`) if shell commands needed
 - pnpm scripts for task orchestration
@@ -222,17 +255,25 @@ When reviewing code or PRs, pay special attention to:
    - Matches existing code style
    - Uses shared types from packages/types
 
+7. **Documentation Accuracy**
+   - Code examples in docs match actual implementation
+   - Export patterns are consistent (prefer named exports)
+   - Phase/status markers are up-to-date
+   - Cross-platform commands in all documentation
+
 ---
 
 ## Common Patterns
 
 ### Shared Types
+
 ```typescript
 // Import from shared package
 import type { Character, Team } from '@genshin/types';
 ```
 
 ### API Client Calls
+
 ```typescript
 // Use try-catch for error handling
 try {
@@ -244,6 +285,7 @@ try {
 ```
 
 ### React Components
+
 ```typescript
 interface CharacterCardProps {
   character: Character;
@@ -264,6 +306,7 @@ export function CharacterCard({ character, onClick }: CharacterCardProps) {
 ## When Suggesting Code
 
 ### Do
+
 - ✅ Suggest tests alongside implementation
 - ✅ Use TypeScript strictly
 - ✅ Follow existing project structure
@@ -272,6 +315,7 @@ export function CharacterCard({ character, onClick }: CharacterCardProps) {
 - ✅ Keep suggestions focused and minimal
 
 ### Don't
+
 - ❌ Suggest libraries not in package.json without asking
 - ❌ Use deprecated React patterns (classes, lifecycle methods)
 - ❌ Skip error handling
@@ -281,26 +325,46 @@ export function CharacterCard({ character, onClick }: CharacterCardProps) {
 
 ---
 
-## Current Phase: Infrastructure Setup
+## Current Phase: Frontend Dependencies
 
-We're currently in **Phase 1** - establishing monorepo foundation.
+We're currently in **Phase 2** - basic frontend is set up, now adding dependencies.
 
-**Next steps** (don't implement these yet, but be aware):
-1. Set up frontend with Vite + React
-2. Set up backend with Hono
-3. Add testing framework
-4. Implement authentication
-5. Build collection management
-6. Create team builder UI
-7. Integrate AI chat
+**Completed**:
+
+- ✅ Phase 1: Monorepo infrastructure (Turborepo + pnpm)
+- ✅ Phase 2a: Basic Vite + React 19 + TypeScript setup (PR #80)
+
+**Next steps** (in priority order):
+
+1. Issue #81: Configure Dependabot for dependency management
+2. Issue #22: Install core frontend dependencies (react-router, zustand, etc.)
+3. Issue #20: Configure Tailwind CSS
+4. Issue #21: Set up shadcn/ui
+5. Set up backend with Hono
+6. Add testing framework (Vitest)
+7. Implement authentication
+8. Build collection management
+9. Create team builder UI
+10. Integrate AI chat
 
 **When suggesting features**: Always check if dependencies/infrastructure exist first. If suggesting a feature from later phases, mention prerequisites.
 
 ---
 
+## Handling PR Reviews
+
+When addressing Copilot PR review comments:
+
+1. **Fetch inline comments** - Use `gh api repos/.../pulls/{pr}/comments` to see all review feedback
+2. **Prioritize issues** - Critical (breaks build) > Consistency > Suggestions
+3. **Batch fixes** - Group related changes in single commits
+4. **Verify changes** - Run `pnpm build` and `pnpm lint` after fixes
+5. **Update docs** - If code examples in docs are wrong, fix them too
+
 ## Questions to Ask
 
 If you're unsure about:
+
 - New dependencies → Ask before suggesting
 - Architecture decisions → Reference docs/SETUP_GUIDE.md
 - Breaking changes → Explain trade-offs
@@ -311,6 +375,7 @@ If you're unsure about:
 ## Success Metrics
 
 Good code in this project:
+
 - ✅ Has tests that pass
 - ✅ Is type-safe (TypeScript strict mode)
 - ✅ Works on all platforms
@@ -320,4 +385,4 @@ Good code in this project:
 
 ---
 
-*These instructions will evolve as the project matures. Last updated: Phase 1 (Infrastructure Setup)*
+_These instructions will evolve as the project matures. Last updated: Phase 2 (Basic Frontend Setup Complete - PR #80)_
