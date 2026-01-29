@@ -1,5 +1,13 @@
 # GitHub Copilot Instructions for genshin.dungeon.studio
 
+> **⚠️ NOTE:** This file is FOR AI ASSISTANTS ONLY. Human contributors should not read this for code style or contribution guidelines. Instead:
+>
+> - See [CONTRIBUTING.md](../CONTRIBUTING.md) for contribution workflow
+> - See [docs/](../docs/) for human-readable documentation
+> - Rely on linters (ESLint, Prettier) and formatters for code style
+
+---
+
 ## Project Overview
 
 This is an AI-powered team building companion for Genshin Impact. Users can:
@@ -40,6 +48,32 @@ This is an AI-powered team building companion for Genshin Impact. Users can:
 
 - Do NOT suggest Bun-specific code yet. It's listed in plans but not implemented.
 - ESLint 9.x uses flat config format - no `extends` property, use array spreading instead.
+
+---
+
+## Documentation Structure
+
+This project follows the [Diátaxis framework](https://diataxis.fr/) for documentation organization:
+
+- **Tutorials** (learning-oriented): Step-by-step learning experiences - not yet implemented
+- **How-To Guides** (goal-oriented): Task-focused instructions → `docs/how-tos/`
+- **Reference** (information-oriented): Technical descriptions → API docs, type references (future)
+- **Explanation** (understanding-oriented): Conceptual discussion → Architecture docs (future)
+
+### Documentation Locations
+
+- `CONTRIBUTING.md` (root): Contribution workflow - focused on the "story" of contributing, not detailed tasks
+- `docs/SETUP_GUIDE.md`: Initial setup tutorial
+- `docs/how-tos/`: Task-specific guides (e.g., "How to add UI components")
+- `docs/reference/`: Technical reference material (future)
+- `docs/explanation/`: Conceptual/architectural documentation (future)
+
+### When Creating/Updating Documentation
+
+1. **Determine the type**: Is this teaching, task-solving, reference, or explaining?
+2. **Place accordingly**: Use the Diátaxis structure
+3. **Link, don't duplicate**: Reference external docs (like Diátaxis itself) rather than summarizing
+4. **Keep CONTRIBUTING.md focused**: Extract detailed tasks to how-tos, link back
 
 ---
 
