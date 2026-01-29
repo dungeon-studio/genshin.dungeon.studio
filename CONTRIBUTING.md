@@ -123,6 +123,7 @@ Once tests pass and code is reviewed:
 ```bash
 # Merge via CLI
 gh pr merge
+# Note: Repository is configured to enforce squash merge automatically
 
 # Or use GitHub UI merge button
 ```
@@ -167,21 +168,13 @@ Aim for:
 
 ## Need Help?
 
-**For specific tasks:**
-
-- [How to Add UI Components](docs/how-tos/add-ui-components.md)
-- [How to Add API Endpoints](docs/how-tos/add-api-endpoints.md)
-- [How to Add Shared Types](docs/how-tos/add-shared-types.md)
-- [How to Run Tests](docs/how-tos/run-tests.md)
-- [How to Debug Code](docs/how-tos/debugging.md)
-- [How to Optimize Performance](docs/how-tos/optimize-performance.md)
-- [Troubleshooting Common Issues](docs/how-tos/troubleshooting.md)
-
 **For questions or issues:**
 
-- Review [Troubleshooting Guide](docs/how-tos/troubleshooting.md)
-- Open a [GitHub Discussion](https://github.com/dungeon-studio/genshin.dungeon.studio/discussions)
+- Review [Troubleshooting Guide](docs/how-tos/troubleshooting.md) for common problems
+- Open a [GitHub Discussion](https://github.com/dungeon-studio/genshin.dungeon.studio/discussions) for questions
 - Report bugs via [GitHub Issues](https://github.com/dungeon-studio/genshin.dungeon.studio/issues)
+
+**Task-specific guides will be added as features are implemented.**
 
 ---
 
