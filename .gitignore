@@ -162,9 +162,15 @@ service-account*.json
 firebase-debug.log
 firestore-debug.log
 
-# IDEs
-.vscode/settings.json
+# IDEs - VS Code
+# Keep workspace settings, ignore user-specific ones
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/tasks.json
 .vscode/launch.json
+
+# Other IDEs
 .idea/
 *.swp
 *.swo

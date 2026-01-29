@@ -1,0 +1,238 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    // ============================================
+    // Development Tasks
+    // ============================================
+    {
+      "label": "dev: all",
+      "type": "shell",
+      "command": "pnpm dev",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^([^\\s].*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "message": 5
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*VITE.*preparing",
+          "endsPattern": "^.*Local:.*http"
+        }
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": false
+      }
+    },
+    {
+      "label": "dev: web",
+      "type": "shell",
+      "command": "pnpm --filter @genshin/web dev",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^([^\\s].*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "message": 5
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*VITE.*preparing",
+          "endsPattern": "^.*Local:.*http"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": false
+      }
+    },
+    // Placeholder for future backend dev task
+    // {
+    //   "label": "dev: api",
+    //   "type": "shell",
+    //   "command": "pnpm --filter @genshin/api dev",
+    //   "isBackground": true,
+    //   "presentation": {
+    //     "reveal": "always",
+    //     "panel": "dedicated"
+    //   }
+    // },
+
+    // ============================================
+    // Build Tasks
+    // ============================================
+    {
+      "label": "build: all",
+      "type": "shell",
+      "command": "pnpm build",
+      "problemMatcher": ["$tsc", "$eslint-stylish"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "build: web",
+      "type": "shell",
+      "command": "pnpm --filter @genshin/web build",
+      "problemMatcher": ["$tsc"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+
+    // ============================================
+    // Testing Tasks (Ready for Vitest)
+    // ============================================
+    {
+      "label": "test: all",
+      "type": "shell",
+      "command": "pnpm test",
+      "problemMatcher": [],
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "test: watch",
+      "type": "shell",
+      "command": "pnpm test -- --watch",
+      "isBackground": true,
+      "problemMatcher": [],
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": false
+      }
+    },
+    {
+      "label": "test: web",
+      "type": "shell",
+      "command": "pnpm --filter @genshin/web test",
+      "problemMatcher": [],
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    // Placeholder for future test tasks
+    // {
+    //   "label": "test: api",
+    //   "type": "shell",
+    //   "command": "pnpm --filter @genshin/api test",
+    //   "group": "test"
+    // },
+
+    // ============================================
+    // Linting & Formatting
+    // ============================================
+    {
+      "label": "lint: all",
+      "type": "shell",
+      "command": "pnpm lint",
+      "problemMatcher": ["$eslint-stylish"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "lint: web",
+      "type": "shell",
+      "command": "pnpm --filter @genshin/web lint",
+      "problemMatcher": ["$eslint-stylish"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "format: all",
+      "type": "shell",
+      "command": "pnpm format",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      }
+    },
+
+    // ============================================
+    // Cleanup Tasks
+    // ============================================
+    {
+      "label": "clean: all",
+      "type": "shell",
+      "command": "pnpm clean",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      }
+    },
+
+    // ============================================
+    // Package Management
+    // ============================================
+    {
+      "label": "install: dependencies",
+      "type": "shell",
+      "command": "pnpm install",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+
+    // ============================================
+    // Future: AI/MCP Development (Phase 9)
+    // ============================================
+    // {
+    //   "label": "dev: mcp-server",
+    //   "type": "shell",
+    //   "command": "pnpm --filter @genshin/mcp dev",
+    //   "isBackground": true
+    // },
+
+    // ============================================
+    // Future: Database/Infrastructure (Phase 5+)
+    // ============================================
+    // {
+    //   "label": "db: setup-local",
+    //   "type": "shell",
+    //   "command": "pnpm db:setup"
+    // },
+
+    // ============================================
+    // Future: Deployment (Phase 11)
+    // ============================================
+    // {
+    //   "label": "deploy: frontend",
+    //   "type": "shell",
+    //   "command": "pnpm deploy:frontend"
+    // }
+  ]
+}

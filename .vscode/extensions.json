@@ -1,0 +1,27 @@
+{
+  "recommendations": [
+    // Core language support
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+
+    // TypeScript enhancements
+    "yoavbls.pretty-ts-errors",
+
+    // Developer experience
+    "usernamehw.errorlens",
+    "eamodio.gitlens",
+    "streetsidesoftware.code-spell-checker",
+    "meganrogge.template-string-converter",
+
+    // Testing
+    "vitest.explorer"
+  ],
+  "unwantedRecommendations": [
+    // Conflicts with ESLint
+    "hookyqr.beautify",
+    "dbaeumer.jshint",
+
+    // Conflicts with Prettier
+    "editorconfig.editorconfig"
+  ]
+}
