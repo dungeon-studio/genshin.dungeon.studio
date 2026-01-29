@@ -1,7 +1,7 @@
 {
   "name": "Genshin Team Builder",
   "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
-  
+
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers/features/node:1": {
@@ -12,21 +12,22 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        // Language support
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "bradlc.vscode-tailwindcss",
+
+        // TypeScript enhancements
+        "yoavbls.pretty-ts-errors",
+
+        // Developer experience
         "usernamehw.errorlens",
         "eamodio.gitlens",
-        "rangav.vscode-thunder-client"
-      ],
-      "settings": {
-        "editor.formatOnSave": true,
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.codeActionsOnSave": {
-          "source.fixAll.eslint": "explicit"
-        },
-        "typescript.tsdk": "node_modules/typescript/lib"
-      }
+        "streetsidesoftware.code-spell-checker",
+        "meganrogge.template-string-converter",
+
+        // Testing (when Vitest is fully configured)
+        "vitest.explorer"
+      ]
     }
   },
 
@@ -43,6 +44,16 @@
   },
 
   "postCreateCommand": "npm install -g pnpm@9.15.4 && pnpm install",
+  "updateContentCommand": "pnpm install",
+  "postAttachCommand": "echo '✅ Ready | Node $(node --version) | pnpm $(pnpm --version)'",
+
+  "containerEnv": {
+    "NODE_ENV": "development"
+  },
+
+  "mounts": [
+    "source=genshin-pnpm-store,target=${containerWorkspaceFolder}/.pnpm-store,type=volume"
+  ],
 
   "remoteUser": "node"
 }
