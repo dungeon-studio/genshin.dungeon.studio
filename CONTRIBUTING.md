@@ -1,6 +1,18 @@
-# Development Workflow
+# Contributing to Genshin Dungeon Studio
 
-How to work on this project efficiently using a pull request model.
+Thank you for your interest in contributing! This project is an AI-powered team building companion for Genshin Impact, and we welcome contributions of all kinds.
+
+## Getting Started
+
+Before contributing, please:
+
+1. **Read the [Setup Guide](docs/SETUP_GUIDE.md)** for environment setup
+2. **Check existing [GitHub Issues](https://github.com/dungeon-studio/genshin.dungeon.studio/issues)** to see what's needed
+3. **Review the [Copilot Instructions](.github/copilot-instructions.md)** for code style and architecture guidelines
+
+## Code of Conduct
+
+We are committed to providing a welcoming and inclusive environment. Please be respectful and constructive in all interactions.
 
 ---
 
@@ -410,11 +422,20 @@ for /f "tokens=5" %a in ('netstat -ano ^| findstr :8080') do taskkill /F /PID %a
 
 ---
 
-## Next Steps
+## Licensing
 
-Once you're comfortable with the workflow:
+By contributing to this project, you agree that your contributions will be licensed under the [MIT License](LICENSE).
 
-1. Review [SETUP_GUIDE.md](./SETUP_GUIDE.md) for technical setup
-2. Check [ARCHITECTURE.md](./ARCHITECTURE.md) for system design (when created)
-3. See GitHub issues for tasks to work on
-4. Start building features!
+---
+
+## Questions?
+
+- **Have questions about contributing?** Open a [GitHub Discussion](https://github.com/dungeon-studio/genshin.dungeon.studio/discussions)
+- **Found a bug?** Open a [GitHub Issue](https://github.com/dungeon-studio/genshin.dungeon.studio/issues)
+- **Security vulnerability?** Please email security concerns privately rather than opening a public issue
+
+---
+
+## Recognition
+
+All contributors will be recognized in the project. Thank you for helping make this project better! 🎉
