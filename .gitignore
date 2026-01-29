@@ -177,3 +177,4 @@ pnpm-debug.log*
 # Temporary
 temp/
 tmp/
+.pnpm-store/
