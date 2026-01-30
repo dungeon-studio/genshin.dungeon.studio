@@ -19,12 +19,11 @@
       "persistent": true
     },
     "lint": {
-      "inputs": ["src/**/*.{ts,tsx}", "eslint.config.*"]
+      "inputs": ["**/*.{ts,tsx}", "eslint.config.*"]
     },
     "test": {
       "inputs": [
-        "src/**/*.{ts,tsx}",
-        "**/*.test.ts",
+        "src/**",
         "package.json",
         "vite.config.*",
         "vitest.config.*",
@@ -32,7 +31,7 @@
       ]
     },
     "typecheck": {
-      "inputs": ["src/**/*.{ts,tsx}", "tsconfig*.json"]
+      "inputs": ["src/**/*.{ts,tsx}", "vite.config.*", "tsconfig*.json"]
     },
     "clean": {
       "cache": false
