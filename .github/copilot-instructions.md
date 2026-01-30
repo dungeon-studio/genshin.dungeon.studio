@@ -453,6 +453,76 @@ export function CharacterCard({ character, onClick }: CharacterCardProps) {
 
 ---
 
+## Code Comments and Local Documentation
+
+**Philosophy**: Prefer inline comments in code over external documentation for explaining decisions, trade-offs, and non-obvious logic. Documentation should live close to the code it describes.
+
+### When to Comment
+
+Comment liberally for:
+
+- **Decisions and trade-offs**: Explain why you chose one approach over another
+- **Non-obvious logic**: Complex algorithms, business rules, or unintuitive implementations
+- **Workarounds**: Temporary fixes or browser quirks with issue/ticket references
+- **Performance considerations**: Why certain patterns are used (memoization, lazy loading, etc.)
+- **External dependencies**: Integration points or third-party API quirks
+
+**Examples**:
+
+```typescript
+// Memoize to prevent unnecessary re-renders since characters array changes frequently
+// from Firebase updates. This is a known bottleneck for large collections (100+ chars).
+const memoizedCharacters = useMemo(() => characters.map((c) => new Character(c)), [characters]);
+
+// Firebase listener doesn't trigger on subcollection changes, so we need to
+// manually refetch when teams change. See: https://github.com/firebase/firebase-js-sdk/issues/1234
+const handleTeamUpdate = useCallback(async () => {
+  await refetchCharacters();
+}, []);
+
+// Work around Vite's CommonJS plugin limitation with dynamic imports.
+// Can be removed once we upgrade to Vite 6+
+const config = await import('./config.js').then((m) => m.default);
+```
+
+### When NOT to Comment
+
+Don't comment for:
+
+- **Self-documenting code**: `const isValidEmail = email.includes('@')` needs no comment
+- **Simple iterations or assignments**: `teams.map(t => t.characters)` is clear
+- **Obvious type information**: TypeScript types already document intent
+- **Trivial error handling**: Standard try-catch patterns don't need explanation
+
+**Bad examples** (unnecessary comments):
+
+```typescript
+// ❌ Loop through teams
+teams.forEach(team => {
+  // ❌ Render team card
+  return <TeamCard key={team.id} />;
+});
+
+// ❌ Set loading state
+setLoading(true);
+```
+
+### Comment Format
+
+Use clear, conversational English:
+
+```typescript
+// Bad: Too terse
+// calc avg dmg from artifacts
+
+// Good: Explains the why and what clearly
+// Calculate average damage across all artifacts to handle Firestore
+// pagination limit of 20 docs. See performanceTests.md for benchmarks.
+const avgDamage = calculateAverageDamage(artifacts);
+```
+
+---
+
 ## When Suggesting Code
 
 ### Do
