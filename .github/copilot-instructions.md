@@ -570,28 +570,19 @@ const avgDamage = calculateAverageDamage(artifacts);
 
 ---
 
-## Current Phase: Frontend Dependencies
+## Project Phase Status
 
-We're currently in **Phase 2** - basic frontend is set up, now adding dependencies.
+We're currently in **Phase 2: Frontend Foundation** - basic frontend is set up, now adding dependencies and UI libraries.
 
-**Completed**:
+**Completed Phases**:
+- ✅ Phase 0: Prerequisites & Setup
+- ✅ Phase 1: Repository & Monorepo Foundation
 
-- ✅ Phase 1: Monorepo infrastructure (Turborepo + pnpm)
-- ✅ Phase 2a: Basic Vite + React 19 + TypeScript setup (PR #80)
+**Current Phase Work**:
+- ✅ Phase 2a: Basic Vite + React 19 + TypeScript setup
+- In progress: Dependabot, Code Scanning, Tailwind CSS, shadcn/ui setup
 
-**Next steps** (in priority order):
-
-1. Issue #81: Configure Dependabot for dependency management ✅ COMPLETED
-2. Issue #82: Configure GitHub Code Scanning
-3. Issue #22: Install core frontend dependencies (react-router, zustand, etc.)
-4. Issue #20: Configure Tailwind CSS
-5. Issue #21: Set up shadcn/ui
-6. Set up backend with Hono
-7. Add testing framework (Vitest)
-8. Implement authentication
-9. Build collection management
-10. Create team builder UI
-11. Integrate AI chat
+See [GitHub Milestones](https://github.com/dungeon-studio/genshin.dungeon.studio/milestones) for detailed phase planning and task tracking.
 
 ### Dependabot Maintenance
 
@@ -603,7 +594,7 @@ We're currently in **Phase 2** - basic frontend is set up, now adding dependenci
 
 See the maintenance section in `.github/dependabot.yml` for detailed instructions and examples. Without updating Dependabot, new workspaces won't get automated dependency updates.
 
-**When suggesting features**: Always check if dependencies/infrastructure exist first. If suggesting a feature from later phases, mention prerequisites.
+**When suggesting features**: Always check if dependencies/infrastructure exist first. Reference GitHub Issues/Milestones for current phase requirements and blocking dependencies.
 
 ---
 
