@@ -63,12 +63,36 @@ This project follows the [Diátaxis framework](https://diataxis.fr/) for documen
 
 ### Documentation Locations
 
-- `README.md` (root): Quick start - emphasizes DevContainers as primary path
+- `README.md` (root): **For users deciding if the project fits their needs** — see README Standard below
 - `CONTRIBUTING.md` (root): Contribution workflow - focused on the "story" of contributing, not detailed tasks
 - `docs/how-tos/`: Task-specific guides (e.g., "How to set up manually without DevContainers")
 - `docs/reference/`: Technical reference material (future)
 - `docs/explanation/`: Conceptual/architectural documentation (future)
 - **GitHub Issues/Milestones**: Source of truth for planning, phases, and implementation roadmap
+
+### README Standard
+
+The README should help humans **identify, evaluate, and use** the project. Follow [ddbeck's README checklist](https://github.com/ddbeck/readme-checklist):
+
+1. **Identify**: Project name, URL, and author at top
+2. **Evaluate**: What does it do? (benefit-focused, not tech stack). Who's it for? What's the status/maturity?
+3. **Use**: Quick start (emphasize DevContainers). Prerequisites if any.
+4. **Engage**: Links to docs, support, and contributing. License.
+
+**Key principle**: README is **not** for development roadmaps, architecture details, or tech stack justification. Those belong in:
+
+- **Tech details**: copilot-instructions.md or docs/explanation/
+- **Development roadmap**: GitHub Issues/Milestones
+- **Code organization**: CONTRIBUTING.md or GitHub repo browser
+- **Setup complexity**: docs/how-tos/
+
+**What NOT to put in README**:
+
+- ❌ "Features (Planned)" checklists
+- ❌ Project structure diagrams
+- ❌ Tech stack decisions (save for architecture docs)
+- ❌ Development phase descriptions
+- ✅ Instead, link to GitHub Issues for roadmap and CONTRIBUTING.md for setup
 
 ### When Creating/Updating Documentation
 
