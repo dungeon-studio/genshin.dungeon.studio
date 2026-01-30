@@ -26,7 +26,7 @@ Chat with an AI assistant about YOUR collection to get personalized team recomme
 3. Done! Everything is pre-configured
 
 The frontend will be available at http://localhost:5173
-The backend will be available at http://localhost:8080
+The backend will be available at http://localhost:8080 (when implemented)
 
 ### Manual Setup (Alternative)
 

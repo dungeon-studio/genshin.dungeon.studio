@@ -43,20 +43,18 @@ pnpm dev
 ```
 
 The frontend will be available at http://localhost:5173
-The backend will be available at http://localhost:8080
+The backend will be available at http://localhost:8080 (when implemented)
 
 ---
 
 ## Verify Your Setup
 
 ```bash
-# Check that everything is running
-curl http://localhost:5173  # Frontend
-curl http://localhost:8080  # Backend API
-
-# Run tests
-pnpm test
+# Check that the frontend is running
+curl http://localhost:5173
 ```
+
+Backend health checks and test runs will be added once those systems are implemented.
 
 For more detailed development instructions, see [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
