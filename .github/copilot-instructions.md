@@ -91,7 +91,7 @@ The README should help humans **identify, evaluate, and use** the project. Follo
 - ❌ "Features (Planned)" checklists
 - ❌ Project structure diagrams
 - ❌ Tech stack decisions (save for architecture docs)
-- ❌ Development phase descriptions
+- ❌ Detailed development phase / roadmap sections (beyond a short status like "Pre-Alpha")
 - ✅ Instead, link to GitHub Issues for roadmap and CONTRIBUTING.md for setup
 
 ### When Creating/Updating Documentation

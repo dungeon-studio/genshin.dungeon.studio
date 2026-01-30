@@ -8,7 +8,7 @@ By [Alex Brandt](https://github.com/alunduil) · [Repository](https://github.com
 
 ## What is it?
 
-Experiment with team compositions without the spreadsheets. Genshin Team Builder lets you describe your character collection to an AI assistant and get personalized team recommendations instantly. Whether you're optimizing for Abyss clears or just want to try new playstyles, get instant suggestions tailored to _your_ roster.
+Experiment with team compositions without the spreadsheets. Genshin Team Builder is an early-stage project that aims to let you describe your character collection to an AI assistant and, when implemented, get personalized team recommendations. Whether you're optimizing for Abyss clears or just want to try new playstyles, the goal is to provide suggestions tailored to _your_ roster.
 
 ## Who's it for?
 
@@ -41,4 +41,4 @@ See the [Manual Setup Guide](./docs/how-tos/manual-setup.md) for Node.js 20+ and
 
 ## License
 
-MIT — You're free to copy, modify, and distribute this project with attribution. See [LICENSE](./LICENSE) for details.
+MIT — You're free to copy, modify, and distribute this project as long as you include the copyright and license notice. See [LICENSE](./LICENSE) for details.
