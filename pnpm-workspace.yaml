@@ -1,3 +1,7 @@
 packages:
-  - "apps/*"
-  - "packages/*"
+  - 'apps/*'
+  - 'packages/*'
+
+# Ensure pnpm version compatibility
+engines:
+  pnpm: '>=9.15.4'
