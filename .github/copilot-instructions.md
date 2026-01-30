@@ -75,7 +75,7 @@ This project follows the [Diátaxis framework](https://diataxis.fr/) for documen
 2. **Place accordingly**: Use the Diátaxis structure
 3. **Link, don't duplicate**: Reference external docs (like Diátaxis itself) rather than summarizing
 4. **Keep CONTRIBUTING.md focused**: Extract detailed tasks to how-tos, link back
-5. **Planning vs. Documentation**: 
+5. **Planning vs. Documentation**:
    - ❌ Don't document development phases, implementation plans, or future features in markdown docs
    - ✅ Track phases and planning in GitHub Issues and Milestones
    - ✅ Documentation should describe what **exists now**, not what's planned
@@ -182,19 +182,66 @@ describe('ComponentName', () => {
 
 ---
 
-## Commit Message Convention
+## Detailed Contribution Workflow
+
+This section provides technical guidance for implementing features and fixes.
+
+### 1. Feature Development Process
+
+**Branch Creation**
+
+```bash
+git checkout -b feature/description  # Use kebab-case
+```
+
+**Test-Driven Development (TDD)**
+Write tests before or alongside implementation:
+
+```typescript
+// apps/web/src/features/[feature]/ComponentName.test.tsx
+describe('ComponentName', () => {
+  it('expected behavior description', () => {
+    // Arrange
+    const data = { /* test data */ };
+    // Act
+    render(<ComponentName {...data} />);
+    // Assert
+    expect(screen.getByRole('heading', { name: /name/i })).toBeInTheDocument();
+  });
+});
+```
+
+Then implement to make the test pass:
+
+```typescript
+// apps/web/src/features/[feature]/ComponentName.tsx
+export function ComponentName(props: ComponentNameProps) {
+  return <div>{/* implementation */}</div>;
+}
+```
+
+**Quality Checks** (before committing)
+
+```bash
+pnpm format                # Auto-format code with Prettier
+pnpm tsc --noEmit         # Type check without emitting
+pnpm test                 # Run all tests
+pnpm lint                 # Run ESLint
+```
+
+### 2. Commit Message Convention
 
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
 <type>(<scope>): <description>
 
-[optional body]
+[optional body explaining why]
 
-[optional footer]
+[optional footer: Closes #123]
 ```
 
-### Types
+**Types**:
 
 - `feat:` - New feature
 - `fix:` - Bug fix
@@ -204,13 +251,70 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `style:` - Formatting, no code change
 - `chore:` - Maintenance tasks, dependencies
 
-### Examples
+**Examples**:
 
 ```
 feat(collection): add character card component
+
+- Creates reusable CharacterCard component
+- Styled with Tailwind CSS
+- Includes test coverage
+
+Closes #42
+```
+
+```
 fix(api): handle missing Firebase credentials gracefully
-test(teams): add tests for team validation logic
-docs: update setup guide with testing phase
+
+Throws helpful error message instead of crashing.
+```
+
+### 3. Pull Request Workflow
+
+**Push and Create PR**
+
+```bash
+git push -u origin feature/description
+gh pr create --title "feat: Add character card component" \
+  --body "Addresses #42
+
+Changes:
+- ComponentName component
+- Tests for user interactions
+- Integration with existing code"
+```
+
+**PR Title Format**: Should match commit message format (becomes squash merge commit on merge)
+
+**Merge Strategy**: Repository uses squash merge (all PR commits become one commit)
+
+**Before Merge Checklist**:
+
+- ✅ All tests passing
+- ✅ No TypeScript errors
+- ✅ No linting errors
+- ✅ Code formatted with Prettier
+- ✅ Tests cover critical paths (80%+)
+- ✅ PR description is accurate
+
+### 4. Testing Standards
+
+**Coverage Targets**:
+
+- **Critical paths** (core business logic): 80%+ coverage
+- **Utilities/helpers**: 90%+ coverage
+- **UI components**: Test user interactions and accessibility, not implementation details
+
+**Testing Philosophy**: Use [React Testing Library](https://testing-library.com/) — query by how users interact, not by internal structure
+
+```typescript
+// ❌ Bad: testing implementation details
+container.querySelector('.character-card');
+getByTestId('card-wrapper');
+
+// ✅ Good: testing user experience
+screen.getByRole('heading', { name: /character name/i });
+screen.getByText('Pyro');
 ```
 
 ---
