@@ -581,16 +581,27 @@ We're currently in **Phase 2** - basic frontend is set up, now adding dependenci
 
 **Next steps** (in priority order):
 
-1. Issue #81: Configure Dependabot for dependency management
-2. Issue #22: Install core frontend dependencies (react-router, zustand, etc.)
-3. Issue #20: Configure Tailwind CSS
-4. Issue #21: Set up shadcn/ui
-5. Set up backend with Hono
-6. Add testing framework (Vitest)
-7. Implement authentication
-8. Build collection management
-9. Create team builder UI
-10. Integrate AI chat
+1. Issue #81: Configure Dependabot for dependency management ✅ COMPLETED
+2. Issue #82: Configure GitHub Code Scanning
+3. Issue #22: Install core frontend dependencies (react-router, zustand, etc.)
+4. Issue #20: Configure Tailwind CSS
+5. Issue #21: Set up shadcn/ui
+6. Set up backend with Hono
+7. Add testing framework (Vitest)
+8. Implement authentication
+9. Build collection management
+10. Create team builder UI
+11. Integrate AI chat
+
+### Dependabot Maintenance
+
+**Important**: When adding new workspaces/packages to the monorepo, update `.github/dependabot.yml` to include them:
+
+- **New app (e.g., `apps/api`)**: Add npm entry with directory path and appropriate semantic groups
+- **New package (e.g., `packages/utils`)**: Add npm entry under `packages/{name}`
+- **New language/ecosystem**: Add new package-ecosystem entry (e.g., Python, Go, etc.)
+
+See the maintenance section in `.github/dependabot.yml` for detailed instructions and examples. Without updating Dependabot, new workspaces won't get automated dependency updates.
 
 **When suggesting features**: Always check if dependencies/infrastructure exist first. If suggesting a feature from later phases, mention prerequisites.
 
