@@ -22,7 +22,7 @@ Chat with an AI assistant about YOUR collection to get personalized team recomme
 **Using VS Code with DevContainers** (easiest):
 
 1. Clone and open in VS Code
-2. Click "Reopen in Container" when prompted
+2. Click **"Reopen in Container"** when prompted
 3. Done! Everything is pre-configured
 
 The frontend will be available at http://localhost:5173
