@@ -80,6 +80,14 @@ pnpm lint     # Check for linting issues
 - `style:` — Formatting
 - `chore:` — Maintenance
 
+### Project Consistency
+
+**When updating project descriptions**, ensure consistency across:
+
+- [package.json](package.json) — `"description"` field
+- [README.md](README.md) — One-line tagline
+- GitHub repository description (update via repo settings)
+
 ### Detailed Guides
 
 For step-by-step instructions and technical details:
