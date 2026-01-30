@@ -1,7 +1,7 @@
 version: 2
 updates:
   # ==========================================================================
-  # ROOT WORKSPACE - Regular Updates (Weekly)
+  # ROOT WORKSPACE
   # ==========================================================================
   - package-ecosystem: 'npm'
     directory: '/'
@@ -46,29 +46,7 @@ updates:
           - '@types/node'
 
   # ==========================================================================
-  # ROOT WORKSPACE - Security Updates (Daily)
-  # ==========================================================================
-  - package-ecosystem: 'npm'
-    directory: '/'
-    schedule:
-      interval: 'daily'
-      time: '18:00'
-      timezone: 'Europe/London'
-    allow:
-      - dependency-type: 'direct'
-      - dependency-type: 'indirect'
-    open-pull-requests-limit: 10
-    pull-request-branch-name:
-      separator: '/'
-    reviewers:
-      - 'alunduil'
-    labels:
-      - 'dependencies'
-      - 'automated'
-      - 'security'
-
-  # ==========================================================================
-  # FRONTEND APP (apps/web) - Regular Updates (Weekly)
+  # FRONTEND APP (apps/web)
   # ==========================================================================
   - package-ecosystem: 'npm'
     directory: '/apps/web'
@@ -131,29 +109,6 @@ updates:
           - 'prettier*'
 
   # ==========================================================================
-  # FRONTEND APP (apps/web) - Security Updates (Daily)
-  # ==========================================================================
-  - package-ecosystem: 'npm'
-    directory: '/apps/web'
-    schedule:
-      interval: 'daily'
-      time: '18:00'
-      timezone: 'Europe/London'
-    allow:
-      - dependency-type: 'direct'
-      - dependency-type: 'indirect'
-    open-pull-requests-limit: 10
-    pull-request-branch-name:
-      separator: '/'
-    reviewers:
-      - 'alunduil'
-    labels:
-      - 'dependencies'
-      - 'frontend'
-      - 'automated'
-      - 'security'
-
-  # ==========================================================================
   # DEVCONTAINER
   # ==========================================================================
   - package-ecosystem: 'devcontainers'
@@ -178,11 +133,16 @@ updates:
 # ============================================================================
 # When adding new workspaces/packages to this monorepo:
 #
-# NOTE: Dependabot does NOT support YAML anchors/aliases - all config must be explicit.
+# NOTE: Dependabot does NOT support:
+#  - YAML anchors/aliases (all config must be explicit)
+#  - Duplicate package-ecosystem + directory combinations
 #
-# 1. Add TWO entries per npm workspace (regular + security):
+# Security updates are automatic and immediate (triggered by GitHub Security
+# Advisories), independent of the schedule configured here. The schedule only
+# controls version updates.
 #
-#    # Regular updates (weekly, with semantic grouping)
+# Add one entry per workspace:
+#
 #    - package-ecosystem: "npm"
 #      directory: "/apps/{name}"
 #      schedule:
@@ -204,32 +164,10 @@ updates:
 #        - "automated"
 #      groups: { ... }
 #
-#    # Security updates (daily, NO grouping for urgency)
-#    - package-ecosystem: "npm"
-#      directory: "/apps/{name}"
-#      schedule:
-#        interval: "daily"
-#        time: "18:00"
-#        timezone: "Europe/London"
-#      allow:
-#        - dependency-type: "direct"
-#        - dependency-type: "indirect"
-#      open-pull-requests-limit: 10
-#      pull-request-branch-name:
-#        separator: "/"
-#      reviewers:
-#        - "alunduil"
-#      labels:
-#        - "dependencies"
-#        - "{name}"
-#        - "automated"
-#        - "security"
-#
-# 2. Keep semantic grouping consistent across workspaces (regular updates only)
-# 3. Security updates should have higher PR limits (10 vs 5) and NO groups
+# Keep semantic grouping consistent across workspaces for clarity.
 #
 # Current coverage:
-#  ✓ Root workspace (weekly regular + daily security)
-#  ✓ apps/web (weekly regular + daily security)
-#  ✓ DevContainer (weekly only, security not applicable to images)
+#  ✓ Root workspace (weekly, limit: 5)
+#  ✓ apps/web (weekly, limit: 5)
+#  ✓ DevContainer (weekly, limit: 5)
 # ============================================================================
