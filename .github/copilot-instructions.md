@@ -81,7 +81,7 @@ The README should help humans **identify, evaluate, and use** the project. Follo
 
 **Key principle**: README is **not** for development roadmaps, architecture details, or tech stack justification. Those belong in:
 
-- **Tech details**: copilot-instructions.md or docs/explanation/
+- **Tech details**: copilot-instructions.md or docs/explanation/ (future, when that directory exists)
 - **Development roadmap**: GitHub Issues/Milestones
 - **Code organization**: CONTRIBUTING.md or GitHub repo browser
 - **Setup complexity**: docs/how-tos/
