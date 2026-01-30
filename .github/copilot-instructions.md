@@ -56,7 +56,7 @@ This is an AI-powered team building companion for Genshin Impact. Users can:
 
 This project follows the [Diátaxis framework](https://diataxis.fr/) for documentation organization:
 
-- **Tutorials** (learning-oriented): Step-by-step learning experiences - not yet implemented
+- **Tutorials** (learning-oriented): Step-by-step learning experiences (future)
 - **How-To Guides** (goal-oriented): Task-focused instructions → `docs/how-tos/`
 - **Reference** (information-oriented): Technical descriptions → API docs, type references (future)
 - **Explanation** (understanding-oriented): Conceptual discussion → Architecture docs (future)
@@ -81,7 +81,7 @@ The README should help humans **identify, evaluate, and use** the project. Follo
 
 **Key principle**: README is **not** for development roadmaps, architecture details, or tech stack justification. Those belong in:
 
-- **Tech details**: copilot-instructions.md or docs/explanation/ (future, when that directory exists)
+- **Tech details**: copilot-instructions.md or docs/explanation/ (future)
 - **Development roadmap**: GitHub Issues/Milestones
 - **Code organization**: CONTRIBUTING.md or GitHub repo browser
 - **Setup complexity**: docs/how-tos/
