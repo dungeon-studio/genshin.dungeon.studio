@@ -1,6 +1,6 @@
 # Genshin Team Builder
 
-AI-powered team building companion for Genshin Impact.
+AI-powered team building companion for Genshin Impact
 
 > **Status**: 🚧 Under active development
 
