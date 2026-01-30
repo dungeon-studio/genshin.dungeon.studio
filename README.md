@@ -17,27 +17,31 @@ Chat with an AI assistant about YOUR collection to get personalized team recomme
 
 ## Getting Started
 
-### Prerequisites
+### Quick Start (Recommended) 🚀
 
-- Node.js 20+
-- pnpm 9+
+**Using VS Code with DevContainers** (easiest):
 
-### Installation
+1. Clone and open in VS Code
+2. Click **"Reopen in Container"** when prompted
+3. Done! Everything is pre-configured
+
+The frontend will be available at http://localhost:5173
+The backend will be available at http://localhost:8080 (when implemented)
+
+### Manual Setup (Alternative)
+
+If you prefer not to use DevContainers:
+
+- **Prerequisites**: Node.js 20+, pnpm 9+
+- **See**: [Manual Setup Guide](./docs/how-tos/manual-setup.md)
 
 ```bash
-# Clone the repository
+# Terminal setup (no VS Code or DevContainers required)
 git clone https://github.com/dungeon-studio/genshin.dungeon.studio.git
 cd genshin.dungeon.studio
-
-# Install dependencies
 pnpm install
-
-# Start development servers
 pnpm dev
 ```
-
-The frontend will be available at http://localhost:5173  
-The backend will be available at http://localhost:8080 (when implemented)
 
 ### Project Structure
 
@@ -55,9 +59,7 @@ genshin.dungeon.studio/
 
 ## Development
 
-See [DEVELOPMENT_WORKFLOW.md](./docs/DEVELOPMENT_WORKFLOW.md) for detailed development guidelines.
-
-See [SETUP_GUIDE.md](./docs/SETUP_GUIDE.md) for setup instructions.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution workflow and daily development practices.
 
 ## Features (Planned)
 
