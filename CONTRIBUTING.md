@@ -59,7 +59,7 @@ Before committing:
 
 ```bash
 pnpm format     # Format code with Prettier
-pnpm typecheck  # Type check without emitting
+pnpm typecheck  # Type check using TypeScript build mode
 pnpm test       # Run tests
 pnpm lint       # Check for linting issues
 ```
