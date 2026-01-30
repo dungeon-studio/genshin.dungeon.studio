@@ -113,8 +113,8 @@ updates:
   # ============================================================================
   # DEVCONTAINER
   # ============================================================================
-  - package-ecosystem: 'docker'
-    directory: '/.devcontainer'
+  - package-ecosystem: 'devcontainers'
+    directory: '/'
     schedule:
       interval: 'weekly'
       day: 'saturday'
