@@ -1,0 +1,160 @@
+version: 2
+updates:
+  # ==========================================================================
+  # ROOT WORKSPACE
+  # ==========================================================================
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'automated'
+    groups:
+      # Linting & formatting
+      eslint:
+        patterns:
+          - 'eslint*'
+          - '@eslint/*'
+          - 'typescript-eslint'
+      # TypeScript
+      typescript:
+        patterns:
+          - 'typescript'
+      # Turborepo
+      turborepo:
+        patterns:
+          - 'turbo'
+      # Prettier
+      prettier:
+        patterns:
+          - 'prettier*'
+      # Node types
+      types-node:
+        patterns:
+          - '@types/node'
+
+  # ==========================================================================
+  # FRONTEND APP (apps/web)
+  # ==========================================================================
+  - package-ecosystem: 'npm'
+    directory: '/apps/web'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'frontend'
+      - 'automated'
+    groups:
+      # React & related
+      react:
+        patterns:
+          - 'react*'
+          - '@react*'
+      # Types for React
+      react-types:
+        patterns:
+          - '@types/react*'
+      # Testing libraries
+      testing:
+        patterns:
+          - 'vitest'
+          - '@testing-library/*'
+          - '@vitest/*'
+      # Vite & build
+      vite:
+        patterns:
+          - 'vite*'
+          - '@vitejs/*'
+      # Linting & formatting
+      eslint:
+        patterns:
+          - 'eslint*'
+          - '@eslint/*'
+          - 'typescript-eslint'
+          - 'eslint-plugin-*'
+      # TypeScript
+      typescript:
+        patterns:
+          - 'typescript'
+      # Types packages
+      types:
+        patterns:
+          - '@types/*'
+      # Prettier
+      prettier:
+        patterns:
+          - 'prettier*'
+
+  # ==========================================================================
+  # DEVCONTAINER
+  # ==========================================================================
+  - package-ecosystem: 'devcontainers'
+    directory: '/.devcontainer'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'devcontainer'
+      - 'automated'
+
+# ============================================================================
+# MAINTENANCE NOTES
+# ============================================================================
+# When adding new workspaces/packages to this monorepo:
+#
+# NOTE: Dependabot does NOT support:
+#  - YAML anchors/aliases (all config must be explicit)
+#  - Duplicate package-ecosystem + directory combinations
+#
+# Security updates are automatic and immediate (triggered by GitHub Security
+# Advisories), independent of the schedule configured here. The schedule only
+# controls version updates.
+#
+# Add one entry per workspace:
+#
+#    - package-ecosystem: "npm"
+#      directory: "/apps/{name}"
+#      schedule:
+#        interval: "weekly"
+#        day: "friday"
+#        time: "18:00"
+#        timezone: "Europe/London"
+#      pull-request-branch-name:
+#        separator: "/"
+#      reviewers:
+#        - "alunduil"
+#      labels:
+#        - "dependencies"
+#        - "{name}"
+#        - "automated"
+#      groups: { ... }
+#
+# Keep semantic grouping consistent across workspaces for clarity.
+#
+# Current coverage:
+#  ✓ Root workspace (weekly)
+#  ✓ apps/web (weekly)
+#  ✓ DevContainer (weekly)
+# ============================================================================

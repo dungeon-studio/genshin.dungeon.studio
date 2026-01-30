@@ -570,29 +570,17 @@ const avgDamage = calculateAverageDamage(artifacts);
 
 ---
 
-## Current Phase: Frontend Dependencies
+## Dependabot Maintenance
 
-We're currently in **Phase 2** - basic frontend is set up, now adding dependencies.
+**Important**: When adding new workspaces/packages to the monorepo, update `.github/dependabot.yml` to include them:
 
-**Completed**:
+- **New app (e.g., `apps/api`)**: Add npm entry with directory path like `/apps/api` and appropriate semantic groups
+- **New package (e.g., `packages/utils`)**: Add npm entry with directory `/packages/{name}`
+- **New language/ecosystem**: Add new package-ecosystem entry (e.g., Python, Go, etc.)
 
-- ✅ Phase 1: Monorepo infrastructure (Turborepo + pnpm)
-- ✅ Phase 2a: Basic Vite + React 19 + TypeScript setup (PR #80)
+See the maintenance section in `.github/dependabot.yml` for detailed instructions and examples. Without updating Dependabot, new workspaces won't get automated dependency updates.
 
-**Next steps** (in priority order):
-
-1. Issue #81: Configure Dependabot for dependency management
-2. Issue #22: Install core frontend dependencies (react-router, zustand, etc.)
-3. Issue #20: Configure Tailwind CSS
-4. Issue #21: Set up shadcn/ui
-5. Set up backend with Hono
-6. Add testing framework (Vitest)
-7. Implement authentication
-8. Build collection management
-9. Create team builder UI
-10. Integrate AI chat
-
-**When suggesting features**: Always check if dependencies/infrastructure exist first. If suggesting a feature from later phases, mention prerequisites.
+**When suggesting features**: Always check if dependencies/infrastructure exist first. Reference GitHub Issues/Milestones for current phase requirements and blocking dependencies.
 
 ---
 
