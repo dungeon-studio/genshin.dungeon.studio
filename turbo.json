@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build", "typecheck"],
-      "inputs": ["src/**", "package.json"],
+      "inputs": ["src/**", "public/**", "package.json", "vite.config.*", "index.html", "tsconfig*.json"],
       "outputs": ["dist/**", ".next/**", "build/**"]
     },
     "dev": {
@@ -12,13 +12,13 @@
       "persistent": true
     },
     "lint": {
-      "inputs": ["src/**/*.{ts,tsx}", ".eslintrc.js"]
+      "inputs": ["src/**/*.{ts,tsx}", "eslint.config.*"]
     },
     "test": {
-      "inputs": ["src/**/*.{ts,tsx}", "**/*.test.ts"]
+      "inputs": ["src/**/*.{ts,tsx}", "**/*.test.ts", "vite.config.*", "vitest.config.*", "tsconfig*.json"]
     },
     "typecheck": {
-      "inputs": ["src/**/*.ts", "tsconfig.json"]
+      "inputs": ["src/**/*.{ts,tsx}", "tsconfig*.json"]
     },
     "clean": {
       "cache": false
