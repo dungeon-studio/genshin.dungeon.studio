@@ -3,16 +3,23 @@
   "globalDependencies": ["**/.env.*.local"],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "typecheck"],
+      "inputs": ["src/**", "package.json"],
       "outputs": ["dist/**", ".next/**", "build/**"]
     },
     "dev": {
       "cache": false,
       "persistent": true
     },
-    "lint": {},
-    "test": {},
-    "typecheck": {},
+    "lint": {
+      "inputs": ["src/**/*.{ts,tsx}", ".eslintrc.js"]
+    },
+    "test": {
+      "inputs": ["src/**/*.{ts,tsx}", "**/*.test.ts"]
+    },
+    "typecheck": {
+      "inputs": ["src/**/*.ts", "tsconfig.json"]
+    },
     "clean": {
       "cache": false
     }
