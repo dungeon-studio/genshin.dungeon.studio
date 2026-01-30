@@ -62,11 +62,12 @@ This project follows the [Diátaxis framework](https://diataxis.fr/) for documen
 
 ### Documentation Locations
 
+- `README.md` (root): Quick start - emphasizes DevContainers as primary path
 - `CONTRIBUTING.md` (root): Contribution workflow - focused on the "story" of contributing, not detailed tasks
-- `docs/SETUP_GUIDE.md`: Initial setup tutorial
-- `docs/how-tos/`: Task-specific guides (e.g., "How to add UI components")
+- `docs/how-tos/`: Task-specific guides (e.g., "How to set up manually without DevContainers")
 - `docs/reference/`: Technical reference material (future)
 - `docs/explanation/`: Conceptual/architectural documentation (future)
+- **GitHub Issues/Milestones**: Source of truth for planning, phases, and implementation roadmap
 
 ### When Creating/Updating Documentation
 
@@ -74,6 +75,17 @@ This project follows the [Diátaxis framework](https://diataxis.fr/) for documen
 2. **Place accordingly**: Use the Diátaxis structure
 3. **Link, don't duplicate**: Reference external docs (like Diátaxis itself) rather than summarizing
 4. **Keep CONTRIBUTING.md focused**: Extract detailed tasks to how-tos, link back
+5. **Planning vs. Documentation**: 
+   - ❌ Don't document development phases, implementation plans, or future features in markdown docs
+   - ✅ Track phases and planning in GitHub Issues and Milestones
+   - ✅ Documentation should describe what **exists now**, not what's planned
+6. **Unimplemented Features**:
+   - ❌ Don't document features as working if they're not implemented yet
+   - ✅ Either omit them entirely or clearly mark as "(when implemented)" with a link to the relevant issue
+   - ✅ If suggesting a feature that doesn't exist, create or reference the GitHub issue for it
+7. **DevContainers Priority**:
+   - ✅ When DevContainers are configured, emphasize them as the primary recommended path
+   - ✅ Manual setup should be documented as an alternative in `docs/how-tos/manual-setup.md`
 
 ---
 
