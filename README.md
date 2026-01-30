@@ -1,79 +1,44 @@
 # Genshin Team Builder
 
-AI-powered team building companion for Genshin Impact
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **Status**: 🚧 Under active development
+By [Alex Brandt](https://github.com/alunduil) · [Repository](https://github.com/dungeon-studio/genshin.dungeon.studio)
 
-Chat with an AI assistant about YOUR collection to get personalized team recommendations.
+🚧 **Pre-Alpha** — Not yet ready for general use, but contributors are welcome!
 
-## Tech Stack
+## What is it?
 
-- **Frontend**: React 19 + TypeScript + Vite
-- **Backend**: Hono (Node.js)
-- **AI**: Claude (Anthropic) via Model Context Protocol
-- **Database**: Firestore
-- **Auth**: Firebase Authentication
-- **Hosting**: GCP (Cloud Run + Cloud Storage)
+Experiment with team compositions without the spreadsheets. Genshin Team Builder is an early-stage project that aims to let you describe your character collection to an AI assistant and, when implemented, get personalized team recommendations. Whether you're optimizing for Abyss clears or just want to try new playstyles, the goal is to provide suggestions tailored to _your_ roster.
+
+## Who's it for?
+
+Anyone who plays Genshin Impact and wants to:
+
+- Discover team compositions that work for _your_ characters (not tier lists)
+- Experiment with different team combinations quickly
+- Get AI-powered suggestions based on your actual roster
+- Explore synergies without manual research
 
 ## Getting Started
 
-### Quick Start (Recommended) 🚀
+The quickest way to explore the project (or contribute) is to use VS Code with DevContainers:
 
-**Using VS Code with DevContainers** (easiest):
-
-1. Clone and open in VS Code
+1. **Clone and open** in VS Code
 2. Click **"Reopen in Container"** when prompted
-3. Done! Everything is pre-configured
+3. Run `pnpm dev` to start development servers
 
 The frontend will be available at http://localhost:5173
-The backend will be available at http://localhost:8080 (when implemented)
 
-### Manual Setup (Alternative)
+### Without DevContainers
 
-If you prefer not to use DevContainers:
+See the [Manual Setup Guide](./docs/how-tos/manual-setup.md) for Node.js 20+ and pnpm 9+ setup.
 
-- **Prerequisites**: Node.js 20+, pnpm 9+
-- **See**: [Manual Setup Guide](./docs/how-tos/manual-setup.md)
+## Learn More
 
-```bash
-# Terminal setup (no VS Code or DevContainers required)
-git clone https://github.com/dungeon-studio/genshin.dungeon.studio.git
-cd genshin.dungeon.studio
-pnpm install
-pnpm dev
-```
-
-### Project Structure
-
-```
-genshin.dungeon.studio/
-├── apps/
-│   ├── web/          # React frontend (Vite)
-│   └── api/          # Hono backend
-├── packages/
-│   ├── types/        # Shared TypeScript types
-│   └── game-data/    # Static game data
-├── docs/             # Project documentation
-└── infrastructure/   # Deployment scripts
-```
-
-## Development
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution workflow and daily development practices.
-
-## Features (Planned)
-
-- ✅ Monorepo structure with Turborepo
-- ✅ Frontend with React 19 + Vite + TypeScript
-- 🚧 Character collection management
-- 🚧 AI-powered team recommendations
-- 🚧 Team builder interface
-- 🚧 Progressive Web App support
-
-## Contributing
-
-This project follows test-driven development and conventional commits. See our [documentation](./docs/) for guidelines.
+- **Contributing**: See [CONTRIBUTING.md](./CONTRIBUTING.md) for development workflow and how to help
+- **Troubleshooting**: Check [docs/how-tos/troubleshooting.md](./docs/how-tos/troubleshooting.md) for common issues
+- **Planning & Roadmap**: See [GitHub Issues & Milestones](https://github.com/dungeon-studio/genshin.dungeon.studio/milestones) for what's next
 
 ## License
 
-MIT
+MIT — You're free to copy, modify, and distribute this project as long as you include the copyright and license notice. See [LICENSE](./LICENSE) for details.
