@@ -22,10 +22,6 @@ updates:
     labels:
       - 'dependencies'
       - 'automated'
-    # Commit message format
-    commit-message:
-      prefix: 'chore(deps)'
-      prefix-scope: 'root'
     # Group semantically by package type
     groups:
       # Linting & formatting
@@ -73,9 +69,6 @@ updates:
       - 'dependencies'
       - 'frontend'
       - 'automated'
-    commit-message:
-      prefix: 'chore(deps)'
-      prefix-scope: 'web'
     groups:
       # React & related
       react:
@@ -136,9 +129,6 @@ updates:
       - 'dependencies'
       - 'devcontainer'
       - 'automated'
-    commit-message:
-      prefix: 'chore(devcontainer)'
-      include: 'scope'
 
 # ============================================================================
 # MAINTENANCE NOTES
@@ -154,13 +144,11 @@ updates:
 #   - directory: "/apps/{name}"
 #   - Add appropriate groups (likely react + testing if frontend)
 #   - Labels: "dependencies", "{name}", "automated"
-#   - Commit prefix: "chore(deps)" with prefix-scope: "{name}"
 #
 # For packages/* additions:
 #   - package-ecosystem: "npm"
 #   - directory: "/packages/{name}"
 #   - Labels: "dependencies", "packages", "automated"
-#   - Commit prefix: "chore(deps)" with prefix-scope: "{name}"
 #
 # For GitHub Actions workflows (when added):
 #   - package-ecosystem: "github-actions"
