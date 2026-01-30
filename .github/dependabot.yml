@@ -10,10 +10,6 @@ updates:
       day: 'friday'
       time: '18:00'
       timezone: 'Europe/London'
-    allow:
-      - dependency-type: 'direct'
-      - dependency-type: 'indirect'
-    open-pull-requests-limit: 5
     pull-request-branch-name:
       separator: '/'
     reviewers:
@@ -55,10 +51,6 @@ updates:
       day: 'friday'
       time: '18:00'
       timezone: 'Europe/London'
-    allow:
-      - dependency-type: 'direct'
-      - dependency-type: 'indirect'
-    open-pull-requests-limit: 5
     pull-request-branch-name:
       separator: '/'
     reviewers:
@@ -118,7 +110,6 @@ updates:
       day: 'friday'
       time: '18:00'
       timezone: 'Europe/London'
-    open-pull-requests-limit: 5
     pull-request-branch-name:
       separator: '/'
     reviewers:
@@ -150,10 +141,6 @@ updates:
 #        day: "friday"
 #        time: "18:00"
 #        timezone: "Europe/London"
-#      allow:
-#        - dependency-type: "direct"
-#        - dependency-type: "indirect"
-#      open-pull-requests-limit: 5
 #      pull-request-branch-name:
 #        separator: "/"
 #      reviewers:
@@ -167,7 +154,7 @@ updates:
 # Keep semantic grouping consistent across workspaces for clarity.
 #
 # Current coverage:
-#  ✓ Root workspace (weekly, limit: 5)
-#  ✓ apps/web (weekly, limit: 5)
-#  ✓ DevContainer (weekly, limit: 5)
+#  ✓ Root workspace (weekly)
+#  ✓ apps/web (weekly)
+#  ✓ DevContainer (weekly)
 # ============================================================================
