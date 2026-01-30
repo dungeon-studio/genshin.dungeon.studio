@@ -570,21 +570,7 @@ const avgDamage = calculateAverageDamage(artifacts);
 
 ---
 
-## Project Phase Status
-
-We're currently in **Phase 2: Frontend Foundation** - basic frontend is set up, now adding dependencies and UI libraries.
-
-**Completed Phases**:
-- ✅ Phase 0: Prerequisites & Setup
-- ✅ Phase 1: Repository & Monorepo Foundation
-
-**Current Phase Work**:
-- ✅ Phase 2a: Basic Vite + React 19 + TypeScript setup
-- In progress: Dependabot, Code Scanning, Tailwind CSS, shadcn/ui setup
-
-See [GitHub Milestones](https://github.com/dungeon-studio/genshin.dungeon.studio/milestones) for detailed phase planning and task tracking.
-
-### Dependabot Maintenance
+## Dependabot Maintenance
 
 **Important**: When adding new workspaces/packages to the monorepo, update `.github/dependabot.yml` to include them:
 
