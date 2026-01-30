@@ -1,48 +1,26 @@
 version: 2
-
-# ============================================================================
-# YAML ANCHORS - Reusable configuration blocks
-# ============================================================================
-x-schedules:
-  weekly: &weekly-schedule
-    interval: 'weekly'
-    day: 'saturday'
-    time: '09:00'
-    timezone: 'UTC'
-
-  daily: &daily-schedule
-    interval: 'daily'
-    time: '09:00'
-    timezone: 'UTC'
-
-x-common: &common-settings
-  open-pull-requests-limit: 5
-  pull-request-branch-name:
-    separator: '/'
-  reviewers:
-    - 'alunduil'
-
-x-dependency-types: &all-dependency-types
-  - dependency-type: 'direct'
-  - dependency-type: 'indirect'
-
-x-base-labels: &base-labels
-  - 'dependencies'
-  - 'automated'
-
-# ============================================================================
-# UPDATES
-# ============================================================================
 updates:
   # ==========================================================================
-  # ROOT WORKSPACE - Regular Updates
+  # ROOT WORKSPACE - Regular Updates (Weekly)
   # ==========================================================================
   - package-ecosystem: 'npm'
     directory: '/'
-    schedule: *weekly-schedule
-    <<: *common-settings
-    allow: *all-dependency-types
-    labels: *base-labels
+    schedule:
+      interval: 'weekly'
+      day: 'saturday'
+      time: '09:00'
+      timezone: 'UTC'
+    allow:
+      - dependency-type: 'direct'
+      - dependency-type: 'indirect'
+    open-pull-requests-limit: 5
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'automated'
     groups:
       # Linting & formatting
       eslint:
@@ -72,21 +50,41 @@ updates:
   # ==========================================================================
   - package-ecosystem: 'npm'
     directory: '/'
-    schedule: *daily-schedule
-    <<: *common-settings
-    allow: *all-dependency-types
-    labels: *base-labels
+    schedule:
+      interval: 'daily'
+      time: '09:00'
+      timezone: 'UTC'
+    allow:
+      - dependency-type: 'direct'
+      - dependency-type: 'indirect'
     open-pull-requests-limit: 10
-    # Security updates bypass groups and create individual PRs
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'automated'
+      - 'security'
 
   # ==========================================================================
-  # FRONTEND APP (apps/web) - Regular Updates
+  # FRONTEND APP (apps/web) - Regular Updates (Weekly)
   # ==========================================================================
   - package-ecosystem: 'npm'
     directory: '/apps/web'
-    schedule: *weekly-schedule
-    <<: *common-settings
-    allow: *all-dependency-types
+    schedule:
+      interval: 'weekly'
+      day: 'saturday'
+      time: '09:00'
+      timezone: 'UTC'
+    allow:
+      - dependency-type: 'direct'
+      - dependency-type: 'indirect'
+    open-pull-requests-limit: 5
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
     labels:
       - 'dependencies'
       - 'frontend'
@@ -137,23 +135,39 @@ updates:
   # ==========================================================================
   - package-ecosystem: 'npm'
     directory: '/apps/web'
-    schedule: *daily-schedule
-    <<: *common-settings
-    allow: *all-dependency-types
+    schedule:
+      interval: 'daily'
+      time: '09:00'
+      timezone: 'UTC'
+    allow:
+      - dependency-type: 'direct'
+      - dependency-type: 'indirect'
+    open-pull-requests-limit: 10
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
     labels:
       - 'dependencies'
       - 'frontend'
       - 'automated'
       - 'security'
-    open-pull-requests-limit: 10
 
   # ==========================================================================
   # DEVCONTAINER
   # ==========================================================================
   - package-ecosystem: 'devcontainers'
     directory: '/'
-    schedule: *weekly-schedule
-    <<: *common-settings
+    schedule:
+      interval: 'weekly'
+      day: 'saturday'
+      time: '09:00'
+      timezone: 'UTC'
+    open-pull-requests-limit: 5
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
     labels:
       - 'dependencies'
       - 'devcontainer'
@@ -164,31 +178,58 @@ updates:
 # ============================================================================
 # When adding new workspaces/packages to this monorepo:
 #
+# NOTE: Dependabot does NOT support YAML anchors/aliases - all config must be explicit.
+#
 # 1. Add TWO entries per npm workspace (regular + security):
 #
-#    # Regular updates (weekly, with groups)
+#    # Regular updates (weekly, with semantic grouping)
 #    - package-ecosystem: "npm"
 #      directory: "/apps/{name}"
-#      schedule: *weekly-schedule
-#      <<: *common-settings
-#      allow: *all-dependency-types
-#      labels: [*base-labels, "{name}"]
+#      schedule:
+#        interval: "weekly"
+#        day: "saturday"
+#        time: "09:00"
+#        timezone: "UTC"
+#      allow:
+#        - dependency-type: "direct"
+#        - dependency-type: "indirect"
+#      open-pull-requests-limit: 5
+#      pull-request-branch-name:
+#        separator: "/"
+#      reviewers:
+#        - "alunduil"
+#      labels:
+#        - "dependencies"
+#        - "{name}"
+#        - "automated"
 #      groups: { ... }
 #
-#    # Security updates (daily, no groups)
+#    # Security updates (daily, NO grouping for urgency)
 #    - package-ecosystem: "npm"
 #      directory: "/apps/{name}"
-#      schedule: *daily-schedule
-#      <<: *common-settings
-#      allow: *all-dependency-types
-#      labels: [*base-labels, "{name}", "security"]
+#      schedule:
+#        interval: "daily"
+#        time: "09:00"
+#        timezone: "UTC"
+#      allow:
+#        - dependency-type: "direct"
+#        - dependency-type: "indirect"
 #      open-pull-requests-limit: 10
+#      pull-request-branch-name:
+#        separator: "/"
+#      reviewers:
+#        - "alunduil"
+#      labels:
+#        - "dependencies"
+#        - "{name}"
+#        - "automated"
+#        - "security"
 #
-# 2. Use YAML anchors (*weekly-schedule, *common-settings, etc.) to reduce duplication
-# 3. Security updates should have higher PR limits and no grouping for urgency
+# 2. Keep semantic grouping consistent across workspaces (regular updates only)
+# 3. Security updates should have higher PR limits (10 vs 5) and NO groups
 #
 # Current coverage:
-#  ✓ Root workspace (regular + security)
-#  ✓ apps/web (regular + security)
-#  ✓ DevContainer (weekly only, no security-specific config needed)
+#  ✓ Root workspace (weekly regular + daily security)
+#  ✓ apps/web (weekly regular + daily security)
+#  ✓ DevContainer (weekly only, security not applicable to images)
 # ============================================================================
