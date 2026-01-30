@@ -4,11 +4,21 @@ Thank you for your interest in contributing! This project is an AI-powered team 
 
 ## Getting Started
 
-Before contributing, please:
+### Quickest Path (Recommended)
 
-1. **Read the [Setup Guide](docs/SETUP_GUIDE.md)** for environment setup
-2. **Check existing [GitHub Issues](https://github.com/dungeon-studio/genshin.dungeon.studio/issues)** to see what's needed
-3. **Run linters and formatters** before committing - they'll enforce code style automatically
+1. Open the repository in VS Code
+2. Click **"Reopen in Container"** when prompted (DevContainers extension required)
+3. Wait for container setup (~2-3 minutes on first run)
+4. ✅ You're ready to develop!
+
+### Alternative: Manual Setup
+
+If not using DevContainers, see [Manual Setup Guide](docs/how-tos/manual-setup.md).
+
+### Before Contributing
+
+- **Check existing [GitHub Issues](https://github.com/dungeon-studio/genshin.dungeon.studio/issues)** to see what's needed
+- **Run linters and formatters** before committing - they'll enforce code style automatically
 
 ## Code of Conduct
 
