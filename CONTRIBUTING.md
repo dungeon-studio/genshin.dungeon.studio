@@ -43,7 +43,8 @@ Once your environment is set up:
 
 ```bash
 # Ensure you're on develop and pull latest
-git checkout develop && git pull origin develop
+git checkout develop
+git pull origin develop
 
 # Install dependencies
 pnpm install
