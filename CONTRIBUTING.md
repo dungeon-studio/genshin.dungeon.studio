@@ -26,153 +26,66 @@ We are committed to providing a welcoming and inclusive environment. Please be r
 
 ---
 
-## Daily Development Flow
+## Development Workflow Overview
 
-### Starting Work
+Our contribution process follows these principles:
+
+1. **Check Issues First** — Browse [existing issues](https://github.com/dungeon-studio/genshin.dungeon.studio/issues) to see what needs work
+2. **Create a Feature Branch** — Use naming convention: `feature/description` or `fix/description`
+3. **Develop with TDD** — Write tests alongside (or before) implementation
+4. **Commit with Conventional Commits** — Follow the standard format
+5. **Open a PR** — Reference the issue it addresses
+6. **Iterate** — Address review feedback, tests pass, merge when ready
+
+### Quick Start Commands
+
+Once your environment is set up:
 
 ```bash
-# 1. Ensure you're on develop
+# Ensure you're on develop and pull latest
 git checkout develop
-
-# 2. Pull latest changes
 git pull origin develop
 
-# 3. Install any new dependencies
+# Install dependencies
 pnpm install
 
-# 4. Start dev servers (from root)
+# Start dev servers
 pnpm dev
-# Frontend: http://localhost:5173
-# Backend: http://localhost:8080
 ```
 
----
+### Code Quality Standards
 
-## Feature Development Workflow
-
-### 1. Create Feature Branch
+Before committing:
 
 ```bash
-# Naming convention: feature/description or fix/description
-git checkout -b feature/character-collection
+pnpm format   # Format code with Prettier
+pnpm tsc --noEmit  # Type check without emitting
+pnpm test     # Run tests
+pnpm lint     # Check for linting issues
 ```
 
-### 2. Develop with TDD
+**Test coverage targets:**
 
-Write test first, then implement:
+- Critical paths: 80%+
+- Utilities: 90%+
+- UI components: Focus on user interactions, not implementation details
 
-```typescript
-// apps/web/src/features/collection/CharacterCard.test.tsx
-describe('CharacterCard', () => {
-  it('displays character name', () => {
-    const character = { name: 'Hu Tao', element: 'Pyro' };
-    render(<CharacterCard character={character} />);
-    expect(screen.getByText('Hu Tao')).toBeInTheDocument();
-  });
-});
-```
+**Commit types** (use these prefixes in your commit messages):
 
-Then implement:
+- `feat:` — New feature
+- `fix:` — Bug fix
+- `docs:` — Documentation
+- `test:` — Adding/updating tests
+- `refactor:` — Code restructuring
+- `style:` — Formatting
+- `chore:` — Maintenance
 
-```typescript
-// apps/web/src/features/collection/CharacterCard.tsx
-export function CharacterCard({ character }) {
-  return <div>{character.name}</div>;
-}
-```
+### Detailed Guides
 
-Run tests:
+For step-by-step instructions and technical details:
 
-```bash
-pnpm test
-```
-
-### 3. Commit with Conventional Commits
-
-```bash
-git add .
-git commit -m "feat(collection): add character card component
-
-- Create CharacterCard component
-- Add tests for character display
-- Style with Tailwind CSS"
-```
-
-**Commit types:**
-
-- `feat:` - New feature
-- `fix:` - Bug fix
-- `docs:` - Documentation changes
-- `test:` - Adding or updating tests
-- `refactor:` - Code restructuring
-- `style:` - Formatting, no code change
-- `chore:` - Maintenance tasks
-
-### 4. Push and Create PR
-
-```bash
-# Push branch
-git push -u origin feature/character-collection
-
-# Create PR via CLI
-gh pr create --title "feat: Add character collection grid" \
-  --body "Implements character collection view with:
-  - CharacterCard component
-  - Grid layout with Tailwind
-  - Tests for rendering
-
-  Closes #5"
-
-# Or create PR in GitHub UI
-```
-
-### 5. Review and Merge
-
-Once tests pass and code is reviewed:
-
-```bash
-# Merge via CLI
-gh pr merge
-# Note: Repository is configured to enforce squash merge automatically
-
-# Or use GitHub UI merge button
-```
-
-### 6. Update Local
-
-```bash
-git checkout develop
-git pull origin develop
-git branch -d feature/character-collection
-```
-
----
-
-## Code Quality
-
-### Before Committing
-
-```bash
-# Format code
-pnpm format
-
-# Type check
-pnpm tsc --noEmit
-
-# Run tests
-pnpm test
-
-# Lint (if configured)
-pnpm lint
-```
-
-### Test Coverage
-
-Aim for:
-
-- **Critical paths**: 80%+ coverage
-- **Utilities**: 90%+ coverage
-- **UI components**: Test user interactions, not implementation details
+- [Manual Setup Guide](docs/how-tos/manual-setup.md) — Development environment setup without DevContainers
+- [Troubleshooting Guide](docs/how-tos/troubleshooting.md) — Solutions for common issues
 
 ---
 
@@ -183,8 +96,6 @@ Aim for:
 - Review [Troubleshooting Guide](docs/how-tos/troubleshooting.md) for common problems
 - Open a [GitHub Discussion](https://github.com/dungeon-studio/genshin.dungeon.studio/discussions) for questions
 - Report bugs via [GitHub Issues](https://github.com/dungeon-studio/genshin.dungeon.studio/issues)
-
-**Task-specific guides will be added as features are implemented.**
 
 ---
 
