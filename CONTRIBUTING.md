@@ -58,10 +58,10 @@ pnpm dev
 Before committing:
 
 ```bash
-pnpm format   # Format code with Prettier
-pnpm tsc --noEmit  # Type check without emitting
-pnpm test     # Run tests
-pnpm lint     # Check for linting issues
+pnpm format     # Format code with Prettier
+pnpm typecheck  # Type check using TypeScript build mode
+pnpm test       # Run tests
+pnpm lint       # Check for linting issues
 ```
 
 **Test coverage targets:**
@@ -79,6 +79,14 @@ pnpm lint     # Check for linting issues
 - `refactor:` — Code restructuring
 - `style:` — Formatting
 - `chore:` — Maintenance
+
+### Project Consistency
+
+**When updating project descriptions**, ensure consistency across:
+
+- [package.json](package.json) — `"description"` field
+- [README.md](README.md) — One-line tagline
+- GitHub repository description (maintainers only; update via repo settings)
 
 ### Detailed Guides
 
