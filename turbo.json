@@ -1,6 +1,11 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*.local", "pnpm-lock.yaml", "pnpm-workspace.yaml"],
+  "globalDependencies": [
+    "**/.env*",
+    "!**/.env.example",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build", "typecheck"],
@@ -22,13 +27,7 @@
       "inputs": ["**/*.{ts,tsx}", "eslint.config.*"]
     },
     "test": {
-      "inputs": [
-        "src/**",
-        "package.json",
-        "vite.config.*",
-        "vitest.config.*",
-        "tsconfig*.json"
-      ]
+      "inputs": ["src/**", "package.json", "vite.config.*", "vitest.config.*", "tsconfig*.json"]
     },
     "typecheck": {
       "inputs": ["src/**/*.{ts,tsx}", "vite.config.*", "tsconfig*.json"]
