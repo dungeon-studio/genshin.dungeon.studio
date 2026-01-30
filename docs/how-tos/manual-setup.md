@@ -22,8 +22,8 @@ gh --version      # GitHub CLI
 # pnpm
 npm install -g pnpm
 
-# GitHub CLI (Linux)
-sudo apt install gh
+# GitHub CLI - See https://cli.github.com/manual/installation
+# (Installation instructions vary by OS)
 ```
 
 ---
@@ -43,6 +43,7 @@ pnpm dev
 ```
 
 The frontend will be available at http://localhost:5173
+
 The backend will be available at http://localhost:8080 (when implemented)
 
 ---
