@@ -104,7 +104,7 @@ updates:
   # DEVCONTAINER
   # ==========================================================================
   - package-ecosystem: 'devcontainers'
-    directory: '/'
+    directory: '/.devcontainer'
     schedule:
       interval: 'weekly'
       day: 'friday'

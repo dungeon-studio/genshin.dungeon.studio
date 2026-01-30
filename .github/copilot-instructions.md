@@ -574,8 +574,8 @@ const avgDamage = calculateAverageDamage(artifacts);
 
 **Important**: When adding new workspaces/packages to the monorepo, update `.github/dependabot.yml` to include them:
 
-- **New app (e.g., `apps/api`)**: Add npm entry with directory path and appropriate semantic groups
-- **New package (e.g., `packages/utils`)**: Add npm entry under `packages/{name}`
+- **New app (e.g., `apps/api`)**: Add npm entry with directory path like `/apps/api` and appropriate semantic groups
+- **New package (e.g., `packages/utils`)**: Add npm entry with directory `/packages/{name}`
 - **New language/ecosystem**: Add new package-ecosystem entry (e.g., Python, Go, etc.)
 
 See the maintenance section in `.github/dependabot.yml` for detailed instructions and examples. Without updating Dependabot, new workspaces won't get automated dependency updates.
