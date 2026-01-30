@@ -1,28 +1,48 @@
 version: 2
+
+# ============================================================================
+# YAML ANCHORS - Reusable configuration blocks
+# ============================================================================
+x-schedules:
+  weekly: &weekly-schedule
+    interval: 'weekly'
+    day: 'saturday'
+    time: '09:00'
+    timezone: 'UTC'
+
+  daily: &daily-schedule
+    interval: 'daily'
+    time: '09:00'
+    timezone: 'UTC'
+
+x-common: &common-settings
+  open-pull-requests-limit: 5
+  pull-request-branch-name:
+    separator: '/'
+  reviewers:
+    - 'alunduil'
+
+x-dependency-types: &all-dependency-types
+  - dependency-type: 'direct'
+  - dependency-type: 'indirect'
+
+x-base-labels: &base-labels
+  - 'dependencies'
+  - 'automated'
+
+# ============================================================================
+# UPDATES
+# ============================================================================
 updates:
-  # ============================================================================
-  # ROOT WORKSPACE
-  # ============================================================================
+  # ==========================================================================
+  # ROOT WORKSPACE - Regular Updates
+  # ==========================================================================
   - package-ecosystem: 'npm'
     directory: '/'
-    schedule:
-      interval: 'weekly'
-      day: 'saturday'
-      time: '09:00'
-      timezone: 'UTC'
-    # Security updates: more frequent (hourly checks)
-    allow:
-      - dependency-type: 'direct'
-      - dependency-type: 'indirect'
-    open-pull-requests-limit: 5
-    pull-request-branch-name:
-      separator: '/'
-    reviewers:
-      - 'alunduil'
-    labels:
-      - 'dependencies'
-      - 'automated'
-    # Group semantically by package type
+    schedule: *weekly-schedule
+    <<: *common-settings
+    allow: *all-dependency-types
+    labels: *base-labels
     groups:
       # Linting & formatting
       eslint:
@@ -47,24 +67,26 @@ updates:
         patterns:
           - '@types/node'
 
-  # ============================================================================
-  # FRONTEND APP (apps/web)
-  # ============================================================================
+  # ==========================================================================
+  # ROOT WORKSPACE - Security Updates (Daily)
+  # ==========================================================================
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule: *daily-schedule
+    <<: *common-settings
+    allow: *all-dependency-types
+    labels: *base-labels
+    open-pull-requests-limit: 10
+    # Security updates bypass groups and create individual PRs
+
+  # ==========================================================================
+  # FRONTEND APP (apps/web) - Regular Updates
+  # ==========================================================================
   - package-ecosystem: 'npm'
     directory: '/apps/web'
-    schedule:
-      interval: 'weekly'
-      day: 'saturday'
-      time: '09:00'
-      timezone: 'UTC'
-    allow:
-      - dependency-type: 'direct'
-      - dependency-type: 'indirect'
-    open-pull-requests-limit: 5
-    pull-request-branch-name:
-      separator: '/'
-    reviewers:
-      - 'alunduil'
+    schedule: *weekly-schedule
+    <<: *common-settings
+    allow: *all-dependency-types
     labels:
       - 'dependencies'
       - 'frontend'
@@ -110,21 +132,28 @@ updates:
         patterns:
           - 'prettier*'
 
-  # ============================================================================
+  # ==========================================================================
+  # FRONTEND APP (apps/web) - Security Updates (Daily)
+  # ==========================================================================
+  - package-ecosystem: 'npm'
+    directory: '/apps/web'
+    schedule: *daily-schedule
+    <<: *common-settings
+    allow: *all-dependency-types
+    labels:
+      - 'dependencies'
+      - 'frontend'
+      - 'automated'
+      - 'security'
+    open-pull-requests-limit: 10
+
+  # ==========================================================================
   # DEVCONTAINER
-  # ============================================================================
+  # ==========================================================================
   - package-ecosystem: 'devcontainers'
     directory: '/'
-    schedule:
-      interval: 'weekly'
-      day: 'saturday'
-      time: '09:00'
-      timezone: 'UTC'
-    open-pull-requests-limit: 5
-    pull-request-branch-name:
-      separator: '/'
-    reviewers:
-      - 'alunduil'
+    schedule: *weekly-schedule
+    <<: *common-settings
     labels:
       - 'dependencies'
       - 'devcontainer'
@@ -134,29 +163,32 @@ updates:
 # MAINTENANCE NOTES
 # ============================================================================
 # When adding new workspaces/packages to this monorepo:
-# 1. Add a new entry in .github/dependabot.yml following the pattern above
-# 2. Set the directory path to the workspace root (e.g., "/apps/api")
-# 3. Keep semantic grouping consistent across all entries
-# 4. Reference this comment in commit messages when making updates
 #
-# For apps/api or any new apps/:
-#   - package-ecosystem: "npm"
-#   - directory: "/apps/{name}"
-#   - Add appropriate groups (likely react + testing if frontend)
-#   - Labels: "dependencies", "{name}", "automated"
+# 1. Add TWO entries per npm workspace (regular + security):
 #
-# For packages/* additions:
-#   - package-ecosystem: "npm"
-#   - directory: "/packages/{name}"
-#   - Labels: "dependencies", "packages", "automated"
+#    # Regular updates (weekly, with groups)
+#    - package-ecosystem: "npm"
+#      directory: "/apps/{name}"
+#      schedule: *weekly-schedule
+#      <<: *common-settings
+#      allow: *all-dependency-types
+#      labels: [*base-labels, "{name}"]
+#      groups: { ... }
 #
-# For GitHub Actions workflows (when added):
-#   - package-ecosystem: "github-actions"
-#   - directory: "/"
-#   - Labels: "dependencies", "ci/cd", "automated"
+#    # Security updates (daily, no groups)
+#    - package-ecosystem: "npm"
+#      directory: "/apps/{name}"
+#      schedule: *daily-schedule
+#      <<: *common-settings
+#      allow: *all-dependency-types
+#      labels: [*base-labels, "{name}", "security"]
+#      open-pull-requests-limit: 10
+#
+# 2. Use YAML anchors (*weekly-schedule, *common-settings, etc.) to reduce duplication
+# 3. Security updates should have higher PR limits and no grouping for urgency
 #
 # Current coverage:
-#  ✓ Root workspace (root package.json)
-#  ✓ apps/web (frontend)
-#  ✓ DevContainer (Docker)
+#  ✓ Root workspace (regular + security)
+#  ✓ apps/web (regular + security)
+#  ✓ DevContainer (weekly only, no security-specific config needed)
 # ============================================================================
