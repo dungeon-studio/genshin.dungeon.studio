@@ -1,11 +1,6 @@
 packages:
   - 'apps/*'
   - 'packages/*'
-# Lock critical tool versions across all workspaces
-overrides:
-  typescript: '5.9.3'
-  prettier: '3.8'
-  eslint: '9.39'
 
 # Ensure pnpm version compatibility
 engines:

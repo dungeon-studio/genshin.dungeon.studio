@@ -46,6 +46,7 @@ This is an AI-powered team building companion for Genshin Impact. Users can:
 
 **Important**:
 
+- **Canonical Version Source**: Tool versions are declared in [package.json](../package.json) devDependencies, not pnpm-workspace.yaml. Refer to `package.json` as the source of truth for TypeScript, ESLint, and Prettier versions.
 - Do NOT suggest Bun-specific code yet. It's listed in plans but not implemented.
 - ESLint 9.x uses flat config format - no `extends` property, use array spreading instead.
 
