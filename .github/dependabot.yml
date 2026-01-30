@@ -7,9 +7,9 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
-      day: 'saturday'
-      time: '09:00'
-      timezone: 'UTC'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
     allow:
       - dependency-type: 'direct'
       - dependency-type: 'indirect'
@@ -52,8 +52,8 @@ updates:
     directory: '/'
     schedule:
       interval: 'daily'
-      time: '09:00'
-      timezone: 'UTC'
+      time: '18:00'
+      timezone: 'Europe/London'
     allow:
       - dependency-type: 'direct'
       - dependency-type: 'indirect'
@@ -74,9 +74,9 @@ updates:
     directory: '/apps/web'
     schedule:
       interval: 'weekly'
-      day: 'saturday'
-      time: '09:00'
-      timezone: 'UTC'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
     allow:
       - dependency-type: 'direct'
       - dependency-type: 'indirect'
@@ -137,8 +137,8 @@ updates:
     directory: '/apps/web'
     schedule:
       interval: 'daily'
-      time: '09:00'
-      timezone: 'UTC'
+      time: '18:00'
+      timezone: 'Europe/London'
     allow:
       - dependency-type: 'direct'
       - dependency-type: 'indirect'
@@ -160,9 +160,9 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
-      day: 'saturday'
-      time: '09:00'
-      timezone: 'UTC'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
     open-pull-requests-limit: 5
     pull-request-branch-name:
       separator: '/'
@@ -187,9 +187,9 @@ updates:
 #      directory: "/apps/{name}"
 #      schedule:
 #        interval: "weekly"
-#        day: "saturday"
-#        time: "09:00"
-#        timezone: "UTC"
+#        day: "friday"
+#        time: "18:00"
+#        timezone: "Europe/London"
 #      allow:
 #        - dependency-type: "direct"
 #        - dependency-type: "indirect"
@@ -209,8 +209,8 @@ updates:
 #      directory: "/apps/{name}"
 #      schedule:
 #        interval: "daily"
-#        time: "09:00"
-#        timezone: "UTC"
+#        time: "18:00"
+#        timezone: "Europe/London"
 #      allow:
 #        - dependency-type: "direct"
 #        - dependency-type: "indirect"
