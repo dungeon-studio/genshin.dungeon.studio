@@ -1,6 +1,18 @@
 # Pre-commit hooks for code quality and consistency
 # See https://pre-commit.com for more information
 
+# Global excludes - never touch these directories with any hook
+exclude: |
+  (?x)^(
+    \.styles/|           # Vale vendor files
+    node_modules/|       # Dependencies
+    \.pnpm-store/|       # pnpm cache
+    dist/|               # Build output
+    build/|              # Build output
+    \.turbo/|            # Turborepo cache
+    pnpm-lock\.yaml      # Package lockfile
+  )
+
 ci:
   # GitHub Actions runs hooks via two separate workflows to avoid duplication:
   # 1. pre-commit.yml (ESLint only) - runs on every PR
@@ -47,7 +59,6 @@ repos:
     hooks:
       - id: prettier
         types_or: [javascript, jsx, ts, tsx, json, yaml, markdown, css]
-        exclude: 'pnpm-lock\.yaml'
         args: [--write]
 
   # Markdown linting
@@ -64,25 +75,12 @@ repos:
       - id: vale
         args: [--config=.vale.ini]
         types: [markdown]
-        exclude: |
-          (?x)^(
-            \.styles/|
-            node_modules/|
-            \.pnpm-store/|
-            dist/|
-            build/|
-            \.turbo/|
-            apps/.*/node_modules/|
-            packages/.*/node_modules/|
-            pnpm-lock\.yaml
-          )
 
   # Secrets detection
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.5.0
     hooks:
       - id: detect-secrets
-        exclude: pnpm-lock.yaml
 
   # ESLint - JavaScript/TypeScript linting
   - repo: local

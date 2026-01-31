@@ -8,6 +8,6 @@ action:
   name: edit
   params:
     - trim
-    - ' '
+    - " "
 tokens:
   - '\s[—–]\s|\s[—–]|[—–]\s'
