@@ -1,0 +1,10 @@
+# Don't format vendor files
+.styles/
+
+# Standard ignores
+node_modules/
+.pnpm-store/
+.turbo/
+dist/
+build/
+pnpm-lock.yaml
