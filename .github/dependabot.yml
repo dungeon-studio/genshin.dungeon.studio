@@ -101,6 +101,25 @@ updates:
           - 'prettier*'
 
   # ==========================================================================
+  # GITHUB ACTIONS
+  # ==========================================================================
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'ci-cd'
+      - 'automated'
+
+  # ==========================================================================
   # DEVCONTAINER
   # ==========================================================================
   - package-ecosystem: 'devcontainers'
