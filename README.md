@@ -1,7 +1,7 @@
 # Genshin Team Builder
 
 [![Version](https://img.shields.io/github/package-json/v/dungeon-studio/genshin.dungeon.studio?style=flat-square&label=version)](https://github.com/dungeon-studio/genshin.dungeon.studio/releases)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 By [Alex Brandt](https://github.com/alunduil) · [Repository](https://github.com/dungeon-studio/genshin.dungeon.studio)
 
@@ -39,7 +39,3 @@ See the [Manual Setup Guide](./docs/how-tos/manual-setup.md) for Node.js 20+ and
 - **Contributing**: See [CONTRIBUTING.md](./CONTRIBUTING.md) for development workflow and how to help
 - **Troubleshooting**: Check [docs/how-tos/troubleshooting.md](./docs/how-tos/troubleshooting.md) for common issues
 - **Planning & Roadmap**: See [GitHub Issues & Milestones](https://github.com/dungeon-studio/genshin.dungeon.studio/milestones) for what's next
-
-## License
-
-MIT — You're free to copy, modify, and distribute this project as long as you include the copyright and license notice. See [LICENSE](./LICENSE) for details.
