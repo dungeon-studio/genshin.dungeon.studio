@@ -1,4 +1,4 @@
-name: "CodeQL"
+name: 'CodeQL'
 
 on:
   push:
@@ -10,8 +10,8 @@ on:
       - develop
       - main
   schedule:
-    # Weekly scan on Sundays at 2 AM UTC to catch new vulnerabilities
-    - cron: "0 2 * * 0"
+    # Weekly scan on Fridays at 6 PM UTC to align with Dependabot schedule
+    - cron: '0 18 * * 5'
 
 jobs:
   analyze:
@@ -44,4 +44,4 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
-          category: "/language:${{ matrix.language }}"
+          category: '/language:${{ matrix.language }}'
