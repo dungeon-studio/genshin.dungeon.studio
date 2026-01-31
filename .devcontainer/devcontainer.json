@@ -6,7 +6,8 @@
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers/features/node:1": {
       "version": "20"
-    }
+    },
+    "ghcr.io/devcontainers-extra/features/pre-commit:2": {}
   },
 
   "customizations": {
@@ -50,10 +51,6 @@
   "containerEnv": {
     "NODE_ENV": "development"
   },
-
-  "mounts": [
-    "source=genshin-pnpm-store,target=${containerWorkspaceFolder}/.pnpm-store,type=volume"
-  ],
 
   "remoteUser": "node"
 }

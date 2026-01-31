@@ -1,0 +1,62 @@
+# Pre-commit hooks for code quality and consistency
+# See https://pre-commit.com for more information
+
+repos:
+  # Basic file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # File formatting
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+      # Syntax validation
+      - id: check-yaml
+        args: [--unsafe] # Allow custom YAML tags
+      - id: check-json
+        exclude: '\.vscode/.*\.json$|tsconfig.*\.json$|\.devcontainer/.*\.json$' # Skip JSONC files
+      - id: check-toml
+
+      # Prevent issues
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: destroyed-symlinks
+
+      # Git hygiene
+      - id: no-commit-to-branch
+        args: [--branch, develop, --branch, main]
+
+  # Prettier - Code formatting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        types_or: [javascript, jsx, ts, tsx, json, yaml, markdown, css]
+        args: [--write]
+
+  # ESLint - JavaScript/TypeScript linting
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint
+        entry: pnpm exec eslint
+        language: system
+        types: [javascript, jsx, ts, tsx]
+        args: [--fix, --max-warnings=0]
+
+  # TypeScript type checking
+  - repo: local
+    hooks:
+      - id: typescript-check
+        name: typescript type check
+        entry: pnpm exec turbo run typecheck
+        language: system
+        types: [ts, tsx]
+        pass_filenames: false
+        stages: [pre-commit]
