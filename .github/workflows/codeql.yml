@@ -6,9 +6,6 @@ on:
       - develop
       - main
   pull_request:
-    branches:
-      - develop
-      - main
   schedule:
     # Weekly scan on Fridays at 6 PM UTC to align with Dependabot schedule
     - cron: '0 18 * * 5'
@@ -45,3 +42,30 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           category: '/language:${{ matrix.language }}'
+
+# ---------------------------------------------------------------------------
+# Maintenance notes (see also: .github/dependabot.yml maintenance section)
+#
+# This workflow currently runs CodeQL for:
+# - javascript-typescript (Node.js/TypeScript monorepo)
+#
+# When updating the monorepo, review and update this workflow if:
+#
+# 1) New programming languages are added
+#    - Add additional entries under `strategy.matrix.include` with the
+#      appropriate `language` and `build-mode` values supported by CodeQL.
+#
+# 2) Build process changes require custom build steps
+#    - If `autobuild` is no longer sufficient (e.g., custom build scripts,
+#      multiple build targets, or non-standard tooling), replace or augment
+#      the current `build-mode: autobuild` configuration with explicit
+#      build steps between `Initialize CodeQL` and `Perform CodeQL Analysis`.
+#
+# 3) New workspaces are added that use different languages or runtimes
+#    - Ensure all new language-specific workspaces are covered by this
+#      workflow by updating the matrix and any required build commands so
+#      that CodeQL analyzes all supported parts of the monorepo.
+#
+# Keeping this file in sync with the active languages and build processes
+# in the monorepo is essential for comprehensive security scanning.
+# ---------------------------------------------------------------------------
