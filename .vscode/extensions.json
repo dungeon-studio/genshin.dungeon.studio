@@ -19,7 +19,10 @@
 
     // Testing - Extension ready for Phase 4 when Vitest is installed
     // Harmless to install early, will activate when Vitest is added
-    "vitest.explorer"
+    "vitest.explorer",
+
+    // API testing
+    "rangav.vscode-thunder-client"
   ],
   "unwantedRecommendations": [
     // Conflicts with ESLint
