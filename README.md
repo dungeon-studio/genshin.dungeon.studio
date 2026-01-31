@@ -27,7 +27,7 @@ The quickest way to explore the project (or contribute) is to use VS Code with D
 2. Click **"Reopen in Container"** when prompted
 3. Run `pnpm dev` to start development servers
 
-The frontend will be available at http://localhost:5173
+The frontend will be available at <http://localhost:5173>
 
 ### Without DevContainers
 

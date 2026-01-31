@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env*", "!**/.env.example", "pnpm-lock.yaml", "pnpm-workspace.yaml"],
+  "globalDependencies": ["**/.env*", "pnpm-lock.yaml", "pnpm-workspace.yaml"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
