@@ -27,7 +27,10 @@
         "meganrogge.template-string-converter",
 
         // Testing (when Vitest is fully configured)
-        "vitest.explorer"
+        "vitest.explorer",
+
+        // API testing
+        "rangav.vscode-thunder-client"
       ]
     }
   },
