@@ -42,13 +42,13 @@ pnpm install
 pnpm dev
 ```
 
-The frontend will be available at http://localhost:5173 and the backend will be available at http://localhost:8080 (when implemented).
+The frontend will be available at <http://localhost:5173> and the backend will be available at <http://localhost:8080> (when implemented).
 
 ---
 
 ## Verify Your Setup
 
-Open your browser and visit http://localhost:5173 to verify the frontend is running.
+Open your browser and visit <http://localhost:5173> to verify the frontend is running.
 
 Backend health checks will be available once the backend API is implemented.
 
