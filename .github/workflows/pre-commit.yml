@@ -9,7 +9,7 @@ on:
 
 jobs:
   pre-commit:
-    name: Run local hooks (ESLint + TypeScript)
+    name: Run local pre-commit hooks
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
