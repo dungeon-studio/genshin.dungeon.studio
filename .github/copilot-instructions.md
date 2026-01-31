@@ -116,7 +116,7 @@ The README should help humans **identify, evaluate, and use** the project. Follo
 
 ## Repository Structure
 
-```
+```text
 genshin.dungeon.studio/
 ├── apps/
 │   ├── web/          # React frontend (Vite)
@@ -258,7 +258,7 @@ pnpm lint                 # Run ESLint
 
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
-```
+```text
 <type>(<scope>): <description>
 
 [optional body explaining why]
@@ -278,7 +278,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 **Examples**:
 
-```
+```text
 feat(collection): add character card component
 
 - Creates reusable CharacterCard component
@@ -288,7 +288,7 @@ feat(collection): add character card component
 Closes #42
 ```
 
-```
+```text
 fix(api): handle missing Firebase credentials gracefully
 
 Throws helpful error message instead of crashing.

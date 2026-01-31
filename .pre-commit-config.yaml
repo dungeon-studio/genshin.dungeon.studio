@@ -18,7 +18,6 @@ repos:
         args: [--unsafe] # Allow custom YAML tags
       - id: check-json
         exclude: '\.vscode/.*\.json$|tsconfig.*\.json$|\.devcontainer/.*\.json$' # Skip JSONC files
-      - id: check-toml
 
       # Prevent issues
       - id: check-added-large-files
@@ -39,6 +38,20 @@ repos:
       - id: prettier
         types_or: [javascript, jsx, ts, tsx, json, yaml, markdown, css]
         args: [--write]
+
+  # Markdown linting
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.17.1
+    hooks:
+      - id: markdownlint-cli2
+        args: [--fix]
+
+  # Secrets detection
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        exclude: pnpm-lock.yaml
 
   # ESLint - JavaScript/TypeScript linting
   - repo: local
