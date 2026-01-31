@@ -114,6 +114,23 @@ The README should help humans **identify, evaluate, and use** the project. Follo
 
 ---
 
+## DevContainer Configuration
+
+### pnpm Store Mount
+
+**Do NOT use volume mounts for pnpm store** in devcontainer.json. Named Docker volumes mount with root ownership, causing EACCES permission errors for the `node` user.
+
+```jsonc
+// ❌ DO NOT DO THIS - causes permission errors
+"mounts": [
+  "source=genshin-pnpm-store,target=${containerWorkspaceFolder}/.pnpm-store,type=volume"
+]
+```
+
+Instead, let pnpm use its default store location in the container. The first `pnpm install` will be slower, but subsequent operations within the same container session will use the cache normally.
+
+---
+
 ## Repository Structure
 
 ```text
@@ -402,30 +419,36 @@ screen.getByText('Pyro');
 When reviewing code or PRs, pay special attention to:
 
 1. **Type Safety**
+
    - No `any` types
    - Proper null/undefined handling
    - Type guards where needed
 
 2. **Testing**
+
    - Tests exist for new features
    - Tests are meaningful (not just for coverage)
    - Tests use Testing Library best practices
 
 3. **Performance**
+
    - Avoid unnecessary re-renders (useMemo, useCallback)
    - Lazy load routes/components
    - Proper Firestore query optimization
 
 4. **Security**
+
    - No hardcoded secrets/API keys
    - Proper input validation
    - Firebase security rules configured
 
 5. **Cross-Platform**
+
    - No OS-specific commands
    - Paths use Node.js path module
 
 6. **Consistency**
+
    - Follows established patterns
    - Matches existing code style
    - Uses shared types from packages/types

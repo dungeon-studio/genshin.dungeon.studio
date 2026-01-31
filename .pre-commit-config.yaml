@@ -17,7 +17,7 @@ repos:
       - id: check-yaml
         args: [--unsafe] # Allow custom YAML tags
       - id: check-json
-        exclude: '\.vscode/.*\.json$|tsconfig.*\.json$|\.devcontainer/.*\.json$' # Skip JSONC files
+        exclude: '\.vscode/.*\.json$|tsconfig.*\.json$|\.devcontainer/.*\.json$|\.markdownlint-cli2\.jsonc$' # Skip JSONC files
 
       # Prevent issues
       - id: check-added-large-files
@@ -33,7 +33,7 @@ repos:
 
   # Prettier - Code formatting
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v4.0.0-alpha.8
+    rev: v3.1.0
     hooks:
       - id: prettier
         types_or: [javascript, jsx, ts, tsx, json, yaml, markdown, css]

@@ -52,5 +52,9 @@
     "NODE_ENV": "development"
   },
 
+  // Note: Not using pnpm-store volume mount due to permission issues.
+  // Named volumes mount as root, causing EACCES errors for the 'node' user.
+  // pnpm will use its default store location in the container.
+
   "remoteUser": "node"
 }
