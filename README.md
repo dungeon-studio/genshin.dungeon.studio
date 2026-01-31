@@ -1,5 +1,6 @@
 # Genshin Team Builder
 
+[![Version](https://img.shields.io/github/package-json/v/dungeon-studio/genshin.dungeon.studio?style=flat-square&label=version)](https://github.com/dungeon-studio/genshin.dungeon.studio/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 By [Alex Brandt](https://github.com/alunduil) · [Repository](https://github.com/dungeon-studio/genshin.dungeon.studio)
