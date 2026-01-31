@@ -57,6 +57,26 @@ repos:
       - id: markdownlint-cli2
         args: [--fix]
 
+  # Vale - Prose linting
+  - repo: https://github.com/errata-ai/vale
+    rev: v3.13.0
+    hooks:
+      - id: vale
+        args: [--config=.vale.ini]
+        types: [markdown]
+        exclude: |
+          (?x)^(
+            \.styles/|
+            node_modules/|
+            \.pnpm-store/|
+            dist/|
+            build/|
+            \.turbo/|
+            apps/.*/node_modules/|
+            packages/.*/node_modules/|
+            pnpm-lock\.yaml
+          )
+
   # Secrets detection
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.5.0
