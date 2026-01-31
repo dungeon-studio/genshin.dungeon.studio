@@ -114,25 +114,26 @@ The README should help humans **identify, evaluate, and use** the project. Follo
 3. **Link, don't duplicate**. Reference external docs such as Diátaxis itself rather than summarizing.
 4. **Keep CONTRIBUTING.md focused**. Move detailed tasks to how-to guides and link back.
 5. **Planning vs. documentation**
+
    - ❌ Don't document development phases, implementation plans, or future features in markdown docs
    - ✅ Track phases and planning in GitHub Issues and Milestones
    - ✅ Documentation should describe what **exists now**, not what's planned
+
 6. **Unimplemented features**
 
-- ❌ Don't document features as working if they're not implemented yet
-- ✅ Either omit them entirely or explicitly mark them as "when implemented" with a link to the relevant issue
-- ✅ If suggesting a feature that doesn't exist, create or reference the GitHub issue for it
+   - ❌ Don't document features as working if they're not implemented yet
+   - ✅ Either omit them entirely or explicitly mark them as "when implemented" with a link to the relevant issue
+   - ✅ If suggesting a feature that doesn't exist, create or reference the GitHub issue for it
 
-1. **DevContainers priority**
+7. **DevContainers priority**
 
-- ✅ When DevContainers exist, emphasize them as the primary recommended path
-- ✅ Document manual setup as an alternative in `docs/how-tos/manual-setup.md`
+   - ✅ When DevContainers exist, emphasize them as the primary recommended path
+   - ✅ Document manual setup as an alternative in `docs/how-tos/manual-setup.md`
 
-1. **Documentation hygiene**
-
-- ✅ Keep docs lean. Remove or avoid low-signal guides until there are real, recurring issues to document
-- ✅ Use line-level Vale suppression comments for known false positives such as license badges
-- ✅ After pre-commit reports Vale issues, run Vale manually to catch warnings and suggestions once you fix errors
+8. **Documentation hygiene**
+   - ✅ Keep docs lean. Remove or avoid low-signal guides until there are real, recurring issues to document
+   - ✅ Use line-level Vale suppression comments for known false positives such as license badges
+   - ✅ After pre-commit reports Vale issues, run Vale manually to catch warnings and suggestions once you fix errors
 
 ---
 
