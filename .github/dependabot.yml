@@ -116,7 +116,7 @@ updates:
       - 'alunduil'
     labels:
       - 'dependencies'
-      - 'ci-cd'
+      - 'cicd'
       - 'automated'
 
   # ==========================================================================
