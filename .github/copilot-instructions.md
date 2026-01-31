@@ -48,7 +48,7 @@ This is an AI-powered team building companion for Genshin Impact. Users can:
 
 - **Canonical Version Source**: Tool versions are pinned to exact versions in [package.json](../package.json) devDependencies for hermetic deployments. Dependabot manages updates automatically. Refer to `package.json` as the source of truth.
 - **Pre-commit Prettier**: The `mirrors-prettier` repo may lag behind the `package.json` Prettier version. Pin the pre-commit hook to the latest available `mirrors-prettier` tag, even if it is older than `package.json`.
-- **Pre-commit.ci skip list**: If we add or remove hooks in `.pre-commit-config.yaml`, keep the `ci.skip` list in sync to avoid duplicate checks.
+- **Pre-commit.ci skip list**: `ci.skip` should only include hooks run in GitHub Actions. Keep it in sync with the workflow’s hook list to avoid duplicate checks.
 - **GitHub Actions Allowlist**: Organization-level Actions policies can block workflows. If CI fails with permission errors for actions, check org-level allowlists before changing workflows.
 - Do NOT suggest Bun-specific code yet. It's listed in plans but not implemented.
 - ESLint 9.x uses flat config format - no `extends` property, use array spreading instead.

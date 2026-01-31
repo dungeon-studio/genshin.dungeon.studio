@@ -4,22 +4,9 @@
 ci:
   # GitHub Actions already runs all hooks via our workflow.
   # Avoid duplicate work and redundant checks from pre-commit.ci.
-  # NOTE: Keep this list in sync with hooks below when adding/removing hooks.
+  # NOTE: This skip list should only include hooks we run in GitHub Actions.
+  # Keep it in sync with the workflow's hook list when adding/removing hooks.
   skip:
-    - trailing-whitespace
-    - end-of-file-fixer
-    - mixed-line-ending
-    - check-yaml
-    - check-json
-    - check-added-large-files
-    - check-case-conflict
-    - check-merge-conflict
-    - check-symlinks
-    - destroyed-symlinks
-    - no-commit-to-branch
-    - prettier
-    - markdownlint-cli2
-    - detect-secrets
     - eslint
     - typescript-check
 
