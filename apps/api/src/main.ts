@@ -1,12 +1,13 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
+import packageJson from '../package.json' with { type: 'json' };
 
 const app = new Hono();
 
 app.get('/', (c) =>
   c.json({
     message: 'Genshin API',
-    version: '0.1.0',
+    version: packageJson.version,
   }),
 );
 
