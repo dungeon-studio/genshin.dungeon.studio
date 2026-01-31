@@ -19,6 +19,7 @@ If not using DevContainers, see [Manual Setup Guide](docs/how-tos/manual-setup.m
 
 - **Check existing [GitHub Issues](https://github.com/dungeon-studio/genshin.dungeon.studio/issues)** to see what's needed
 - **Run linters and formatters** before committing - they'll enforce code style automatically
+- **Install dependencies first** (`pnpm install`) so local pre-commit hooks (ESLint/TypeScript) can run
 
 ## Code of Conduct
 

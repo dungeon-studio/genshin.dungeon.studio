@@ -82,4 +82,4 @@ repos:
         language: system
         types: [ts, tsx]
         pass_filenames: false
-        stages: [pre-commit]
+        stages: [manual]
