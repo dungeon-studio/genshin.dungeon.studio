@@ -1,6 +1,28 @@
 # Pre-commit hooks for code quality and consistency
 # See https://pre-commit.com for more information
 
+ci:
+  # GitHub Actions already runs all hooks via our workflow.
+  # Avoid duplicate work and redundant checks from pre-commit.ci.
+  # NOTE: Keep this list in sync with hooks below when adding/removing hooks.
+  skip:
+    - trailing-whitespace
+    - end-of-file-fixer
+    - mixed-line-ending
+    - check-yaml
+    - check-json
+    - check-added-large-files
+    - check-case-conflict
+    - check-merge-conflict
+    - check-symlinks
+    - destroyed-symlinks
+    - no-commit-to-branch
+    - prettier
+    - markdownlint-cli2
+    - detect-secrets
+    - eslint
+    - typescript-check
+
 repos:
   # Basic file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
