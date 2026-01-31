@@ -12,7 +12,7 @@ By [Alex Brandt](https://github.com/alunduil) · [Repository](https://github.com
 
 🚧 **Pre-Alpha**: not yet ready for general use, but contributors are welcome.
 
-## What's it
+## About
 
 Experiment with team compositions without the spreadsheets. Genshin Team Builder is an early stage project that aims to let you describe your character collection to an AI assistant and, when implemented, get personalized team recommendations. Whether you're optimizing for Abyss clears or just want to try new playstyles, the goal is to provide suggestions tailored to _your_ roster.
 

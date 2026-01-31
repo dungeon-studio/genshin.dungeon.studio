@@ -2,10 +2,6 @@
 # Format: term -> suggestion
 
 # Prefer consistent terminology
-front-end -> frontend
-back-end -> backend
-Front-end -> Frontend
-Back-end -> backend
 npm -> pnpm
 yarn -> pnpm
 # Tool/brand name capitalization
