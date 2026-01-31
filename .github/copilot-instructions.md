@@ -213,7 +213,7 @@ This section provides technical guidance for implementing features and fixes.
 
 ### 1. Feature Development Process
 
-**Branch Creation**
+#### Branch Creation
 
 ```bash
 git checkout -b feature/description  # Use kebab-case
@@ -296,7 +296,7 @@ Throws helpful error message instead of crashing.
 
 ### 3. Pull Request Workflow
 
-**Push and Create PR**
+#### Push and Create PR
 
 ```bash
 git push -u origin feature/description
@@ -641,4 +641,4 @@ Good code in this project:
 
 ---
 
-_These instructions will evolve as the project matures. Last updated: Phase 2 (Basic Frontend Setup Complete - PR #80)_
+These instructions will evolve as the project matures. Last updated: Phase 2 (Basic Frontend Setup Complete - PR #80)
