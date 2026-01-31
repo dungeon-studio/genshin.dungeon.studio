@@ -570,6 +570,28 @@ const avgDamage = calculateAverageDamage(artifacts);
 
 ---
 
+## CI/CD and Security Scanning
+
+### Workflow Patterns and Maintenance
+
+GitHub Actions workflows should include maintenance notes documenting when to update them:
+
+- When new programming languages are added to the monorepo
+- When build processes change and require custom build steps
+- When new workspaces are added with different languages/runtimes
+
+**Example**: See `.github/workflows/codeql.yml` for the maintenance notes pattern. Copy this structure to other workflows to keep them synchronized with the monorepo's evolving architecture.
+
+### Security Scanning Schedule Alignment
+
+Coordinate security scanning schedules across tools for operational consistency:
+
+- **CodeQL**: Configured with `schedule: { day: 'friday', time: '18:00' }`
+- **Dependabot**: Also runs Friday at 1800 UTC for aligned security updates
+- New security scanning tools should use the same schedule when possible
+
+This reduces alert fatigue and simplifies monitoring windows.
+
 ## Dependabot Maintenance
 
 **Important**: When adding new workspaces/packages to the monorepo, update `.github/dependabot.yml` to include them:
@@ -577,6 +599,7 @@ const avgDamage = calculateAverageDamage(artifacts);
 - **New app (e.g., `apps/api`)**: Add npm entry with directory path like `/apps/api` and appropriate semantic groups
 - **New package (e.g., `packages/utils`)**: Add npm entry with directory `/packages/{name}`
 - **New language/ecosystem**: Add new package-ecosystem entry (e.g., Python, Go, etc.)
+- **New workflows**: Automatically covered by `github-actions` package-ecosystem entry with `directory: '/'` (scans all workflows for action updates)
 
 See the maintenance section in `.github/dependabot.yml` for detailed instructions and examples. Without updating Dependabot, new workspaces won't get automated dependency updates.
 
