@@ -17,7 +17,7 @@ repos:
       - id: check-yaml
         args: [--unsafe] # Allow custom YAML tags
       - id: check-json
-        exclude: '\.vscode/.*\.json$|tsconfig.*\.json$|\.devcontainer/.*\.json$|\.markdownlint-cli2\.jsonc$' # Skip JSONC files
+        exclude: '\.jsonc$|\.vscode/|tsconfig|\.devcontainer/' # Skip JSONC files and dirs with JSON-with-comments
 
       # Prevent issues
       - id: check-added-large-files
