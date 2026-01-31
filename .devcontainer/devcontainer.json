@@ -44,7 +44,7 @@
     }
   },
 
-  "postCreateCommand": "npm install -g pnpm@9.15.4 && pnpm install",
+  "postCreateCommand": "npm install -g pnpm@9.15.4 && pnpm install && pre-commit install",
   "updateContentCommand": "pnpm install",
   "postAttachCommand": "echo '✅ Ready | Node $(node --version) | pnpm $(pnpm --version)'",
 
