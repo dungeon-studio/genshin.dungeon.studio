@@ -1,6 +1,9 @@
-import { serve } from '@hono/node-server';
+import { readFileSync } from 'node:fs';
 import { Hono } from 'hono';
-import packageJson from '../package.json' with { type: 'json' };
+import { serve } from '@hono/node-server';
+
+// Read version from package.json to maintain single source of truth
+const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf-8'));
 
 const app = new Hono();
 
