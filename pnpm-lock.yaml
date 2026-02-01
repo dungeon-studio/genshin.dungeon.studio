@@ -104,6 +104,18 @@ importers:
         specifier: ^7.2.4
         version: 7.3.1(@types/node@25.1.0)(tsx@4.19.2)
 
+  packages/game-data:
+    devDependencies:
+      '@types/node':
+        specifier: 25.1.0
+        version: 25.1.0
+      eslint:
+        specifier: 9.39.2
+        version: 9.39.2
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+
 packages:
 
   '@babel/code-frame@7.28.6':
