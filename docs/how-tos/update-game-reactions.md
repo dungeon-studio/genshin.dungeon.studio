@@ -52,9 +52,9 @@ pnpm --filter @genshin/game-data build
 pnpm --filter @genshin/game-data lint
 ```
 
-## Example: Genshin Impact added Lunar reactions in v5.8
+## Example: Genshin Impact added Lunar reactions in v5.1
 
-The game added Lunar reactions—Lunar-Charged, Lunar-Bloom, Lunar-Crystallize—in v5.8. Here's how you add them:
+The game added Lunar reactions—Lunar-Charged, Lunar-Bloom, Lunar-Crystallize—in v5.1. Here's how you add them:
 
 ```typescript
 // In ELEMENT_REACTION_TYPES

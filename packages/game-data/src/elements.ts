@@ -31,7 +31,7 @@ export type ReactionType = (typeof REACTION_TYPES)[keyof typeof REACTION_TYPES];
  * Elemental reaction definitions
  *
  * MAINTENANCE NOTE: Update this file when new reactions are added to the game.
- * Last updated: Version 5.8 (added Lunar reactions)
+ * Last updated: Version 5.1 (added Lunar reactions)
  * Reference: https://genshin-impact.fandom.com/wiki/Elemental_Reaction
  */
 interface ReactionInfo {

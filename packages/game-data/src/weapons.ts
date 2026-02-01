@@ -61,7 +61,7 @@ export const WEAPONS: Weapon[] = [
     baseATK: 48,
     version: '2.0',
     subStat: {
-      type: 'CRIT DMG',
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
       value: 9.6,
     },
     passiveName: "Mistsplitter's Edge",
@@ -75,7 +75,7 @@ export const WEAPONS: Weapon[] = [
     baseATK: 44,
     version: '1.3',
     subStat: {
-      type: 'CRIT Rate',
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
       value: 9.6,
     },
     passiveName: "Protector's Virtue",
@@ -90,7 +90,7 @@ export const WEAPONS: Weapon[] = [
     baseATK: 46,
     version: '1.0',
     subStat: {
-      type: 'ATK%',
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
       value: 10.8,
     },
     passiveName: 'Wolfish Tracker',
@@ -106,7 +106,7 @@ export const WEAPONS: Weapon[] = [
     baseATK: 46,
     version: '1.5',
     subStat: {
-      type: 'CRIT DMG',
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
       value: 14.4,
     },
     passiveName: 'Reckless Cinnabar',
@@ -120,7 +120,7 @@ export const WEAPONS: Weapon[] = [
     baseATK: 46,
     version: '2.1',
     subStat: {
-      type: 'Energy Recharge',
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
       value: 12.0,
     },
     passiveName: 'Timeless Dream: Eternal Stove',
@@ -136,7 +136,7 @@ export const WEAPONS: Weapon[] = [
     baseATK: 46,
     version: '2.4',
     subStat: {
-      type: 'CRIT DMG',
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
       value: 14.4,
     },
     passiveName: 'Rule by Thunder',
@@ -152,7 +152,7 @@ export const WEAPONS: Weapon[] = [
     baseATK: 46,
     version: '1.0',
     subStat: {
-      type: 'CRIT Rate',
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
       value: 7.2,
     },
     passiveName: 'Boundless Blessing',
@@ -167,7 +167,7 @@ export const WEAPONS: Weapon[] = [
     baseATK: 42,
     version: '1.0',
     subStat: {
-      type: 'ATK%',
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
       value: 9.0,
     },
     passiveName: 'Chord',
@@ -182,7 +182,7 @@ export const WEAPONS: Weapon[] = [
     baseATK: 41,
     version: '1.0',
     subStat: {
-      type: 'Energy Recharge',
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
       value: 13.3,
     },
     passiveName: 'Composed',
@@ -198,7 +198,7 @@ export const WEAPONS: Weapon[] = [
     baseATK: 44,
     version: '1.0',
     subStat: {
-      type: 'ATK%',
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
       value: 6.0,
     },
     passiveName: 'Crush',
@@ -213,7 +213,7 @@ export const WEAPONS: Weapon[] = [
     baseATK: 42,
     version: '2.1',
     subStat: {
-      type: 'Energy Recharge',
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
       value: 10.0,
     },
     passiveName: 'Shanty',
@@ -227,7 +227,7 @@ export const WEAPONS: Weapon[] = [
     baseATK: 41,
     version: '1.0',
     subStat: {
-      type: 'Elemental Mastery',
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
       value: 48,
     },
     passiveName: 'Bane of Flame and Water',
@@ -242,7 +242,7 @@ export const WEAPONS: Weapon[] = [
     baseATK: 42,
     version: '1.0',
     subStat: {
-      type: 'Elemental Mastery',
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
       value: 36,
     },
     passiveName: 'Arrowless Song',
@@ -257,7 +257,7 @@ export const WEAPONS: Weapon[] = [
     baseATK: 42,
     version: '1.0',
     subStat: {
-      type: 'CRIT DMG',
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
       value: 12.0,
     },
     passiveName: 'Debut',
@@ -271,7 +271,7 @@ export const WEAPONS: Weapon[] = [
     baseATK: 42,
     version: '1.0',
     subStat: {
-      type: 'Energy Recharge',
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
       value: 10.0,
     },
     passiveName: 'Windfall',

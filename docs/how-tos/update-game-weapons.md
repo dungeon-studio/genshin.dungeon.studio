@@ -56,7 +56,7 @@ interface Weapon {
   id: string; // kebab-case unique identifier
   name: string; // Display name
   type: WeaponType; // Use WEAPON_TYPES constants
-  rarity: 3 | 4 | 5; // Rarity level
+  rarity: Rarity; // Rarity level (1–5; this package typically uses 3–5)
   baseATK: number; // Base Attack (ATK) value
   version: string; // Release version (for example, "1.0", "2.1", "5.2")
   subStat?: {

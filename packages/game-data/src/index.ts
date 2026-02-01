@@ -9,6 +9,7 @@
 export {
   ELEMENT_REACTION_TYPES,
   ELEMENTS,
+  getReactionsByVersion,
   REACTION_TYPES,
   type Element,
   type ReactionType,
@@ -23,6 +24,7 @@ export {
   getCharacterById,
   getCharactersByElement,
   getCharactersByRarity,
+  getCharactersByVersion,
   getCharactersByWeaponType,
   type Character,
 } from './characters.js';
@@ -32,6 +34,7 @@ export {
   getWeaponById,
   getWeaponsByRarity,
   getWeaponsByType,
+  getWeaponsByVersion,
   WEAPON_STAT_TYPES,
   WEAPON_TYPES,
   WEAPONS,
