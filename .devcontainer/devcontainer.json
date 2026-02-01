@@ -7,11 +7,13 @@
     "ghcr.io/devcontainers/features/node:1": {
       "version": "20"
     },
-    "ghcr.io/devcontainers-extra/features/pre-commit:2": {}
+    "ghcr.io/devcontainers-extra/features/pre-commit:2": {},
+    "ghcr.io/shinepukur/devcontainer-features/vale:1": {}
   },
 
   "customizations": {
     "vscode": {
+      // MAINTENANCE: Keep this list in sync with .vscode/extensions.json
       "extensions": [
         // Language support
         "dbaeumer.vscode-eslint",
@@ -20,6 +22,9 @@
         // TypeScript enhancements
         "yoavbls.pretty-ts-errors",
 
+        // Documentation
+        "chrischinchilla.vale-vscode",
+
         // Developer experience
         "usernamehw.errorlens",
         "eamodio.gitlens",
@@ -27,7 +32,10 @@
         "meganrogge.template-string-converter",
 
         // Testing (when Vitest is fully configured)
-        "vitest.explorer"
+        "vitest.explorer",
+
+        // API testing
+        "rangav.vscode-thunder-client"
       ]
     }
   },

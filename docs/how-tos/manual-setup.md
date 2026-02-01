@@ -1,14 +1,14 @@
-# Manual Setup Guide
+# Manual setup guide
 
 This guide covers setting up the project **without DevContainers**.
 
-**Recommended**: Use VS Code + DevContainers instead (see [README.md](../../README.md#getting-started)) - it's faster and avoids manual configuration.
+**Recommended**: use VS Code + DevContainers instead. See [README.md](../../README.md#getting-started). It's faster and avoids manual configuration.
 
 ---
 
 ## Prerequisites
 
-Ensure you have these installed:
+Make sure you have these installed:
 
 ```bash
 node --version    # v20+ required
@@ -16,19 +16,19 @@ pnpm --version    # v9+ required
 gh --version      # GitHub CLI
 ```
 
-### Install Missing Tools
+### Install missing tools
 
 ```bash
 # pnpm
 npm install -g pnpm
 
 # GitHub CLI - See https://cli.github.com/manual/installation
-# (Installation instructions vary by OS)
+# Installation instructions vary by OS
 ```
 
 ---
 
-## Quick Setup
+## Quick setup
 
 ```bash
 # Clone the repository
@@ -42,20 +42,14 @@ pnpm install
 pnpm dev
 ```
 
-The frontend will be available at <http://localhost:5173> and the backend will be available at <http://localhost:8080> (when implemented).
+The frontend is available at <http://localhost:5173>. The API service is available at <http://localhost:8080> once it exists.
 
 ---
 
-## Verify Your Setup
+## Verify your setup
 
 Open your browser and visit <http://localhost:5173> to verify the frontend is running.
 
-Backend health checks will be available once the backend API is implemented.
+You can check API health once the API service exists.
 
 For more detailed development instructions, see [CONTRIBUTING.md](../../CONTRIBUTING.md).
-
----
-
-## Troubleshooting
-
-See [Troubleshooting Guide](./troubleshooting.md) for common issues.
