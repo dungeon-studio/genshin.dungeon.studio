@@ -80,7 +80,7 @@ interface Weapon {
   baseATK: 46,
   version: '1.5',
   subStat: {
-    type: 'CRIT DMG',
+    type: WEAPON_STAT_TYPES.CRIT_DMG,
     value: 14.4,
   },
   passiveName: 'Reckless Cinnabar',
