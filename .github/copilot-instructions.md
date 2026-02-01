@@ -108,22 +108,40 @@ The README should help humans **identify, evaluate, and use** the project. Follo
 - ✅ Instead, link to GitHub Issues for roadmap and CONTRIBUTING.md for setup
 
 ### When creating or updating documentation
+<<<<<<< HEAD
 
 1. **Determine the type**. Decide whether this is teaching, task solving, reference, or explaining.
 2. **Place accordingly**. Use the Diátaxis structure.
 3. **Link, don't duplicate**. Reference external docs such as Diátaxis itself rather than summarizing.
 4. **Keep CONTRIBUTING.md focused**. Move detailed tasks to how-to guides and link back.
 5. **Planning vs. documentation**
+=======
+
+1. **Determine the type**. Decide whether this is teaching, task solving, reference, or explaining.
+2. **Place accordingly**. Use the Diátaxis structure.
+3. **Link, don't duplicate**. Reference external docs such as Diátaxis itself rather than summarizing.
+4. **Keep CONTRIBUTING.md focused**. Move detailed tasks to how-to guides and link back.
+5. **Planning vs. documentation**
+
+>>>>>>> c69ab0d2dcc5c0530850319dfaa121f20963c8e0
    - ❌ Don't document development phases, implementation plans, or future features in markdown docs
    - ✅ Track phases and planning in GitHub Issues and Milestones
    - ✅ Documentation should describe what **exists now**, not what's planned
 
 6. **Unimplemented features**
+<<<<<<< HEAD
+=======
+
+>>>>>>> c69ab0d2dcc5c0530850319dfaa121f20963c8e0
    - ❌ Don't document features as working if they're not implemented yet
    - ✅ Either omit them entirely or explicitly mark them as "when implemented" with a link to the relevant issue
    - ✅ If suggesting a feature that doesn't exist, create or reference the GitHub issue for it
 
 7. **DevContainers priority**
+<<<<<<< HEAD
+=======
+
+>>>>>>> c69ab0d2dcc5c0530850319dfaa121f20963c8e0
    - ✅ When DevContainers exist, emphasize them as the primary recommended path
    - ✅ Document manual setup as an alternative in `docs/how-tos/manual-setup.md`
 
@@ -442,6 +460,11 @@ screen.getByText('Pyro');
 ## Code review focus areas
 
 When reviewing code or pull requests, pay extra attention to:
+<<<<<<< HEAD
+=======
+
+1. **Type safety**
+>>>>>>> c69ab0d2dcc5c0530850319dfaa121f20963c8e0
 
 1. **Type safety**
    - No `any` types
@@ -454,14 +477,27 @@ When reviewing code or pull requests, pay extra attention to:
    - Tests use Testing Library best practices
 
 3. **Performance**
+<<<<<<< HEAD
+=======
+
+>>>>>>> c69ab0d2dcc5c0530850319dfaa121f20963c8e0
    - Avoid unnecessary re-renders with `useMemo` and `useCallback`
    - Lazy load routes and components
    - Optimize Firestore queries
 
 4. **Security**
+<<<<<<< HEAD
    - No hardcoded secrets or API keys
    - Proper input validation
    - Configure Firebase security rules
+=======
+
+   - No hardcoded secrets or API keys
+   - Proper input validation
+   - Configure Firebase security rules
+
+5. **Cross-platform**
+>>>>>>> c69ab0d2dcc5c0530850319dfaa121f20963c8e0
 
 5. **Cross-platform**
    - No OS-specific commands
