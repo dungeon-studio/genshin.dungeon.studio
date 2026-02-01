@@ -109,9 +109,14 @@ The README should help humans **identify, evaluate, and use** the project. Follo
 
 ### When creating or updating documentation
 
-- ❌ Don't document development phases, implementation plans, or future features in markdown docs
-- ✅ Track phases and planning in GitHub Issues and Milestones
-- ✅ Documentation should describe what **exists now**, not what's planned
+1. **Determine the type**. Decide whether this is teaching, task solving, reference, or explaining.
+2. **Place accordingly**. Use the Diátaxis structure.
+3. **Link, don't duplicate**. Reference external docs such as Diátaxis itself rather than summarizing.
+4. **Keep CONTRIBUTING.md focused**. Move detailed tasks to how-to guides and link back.
+5. **Planning vs. documentation**
+   - ❌ Don't document development phases, implementation plans, or future features in markdown docs
+   - ✅ Track phases and planning in GitHub Issues and Milestones
+   - ✅ Documentation should describe what **exists now**, not what's planned
 
 6. **Unimplemented features**
    - ❌ Don't document features as working if they're not implemented yet
