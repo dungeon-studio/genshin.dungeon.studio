@@ -1,46 +1,46 @@
 # Contributing to Genshin Dungeon Studio
 
-Thank you for your interest in contributing! This project is an AI-powered team building companion for Genshin Impact, and we welcome contributions of all kinds.
+Thank you for your interest in contributing. This project is an AI-powered team building companion for Genshin Impact, and contributions of all kinds are welcome.
 
-## Getting Started
+## Getting started
 
-### Quickest Path (Recommended)
+### Recommended quickest path
 
 1. Open the repository in VS Code
-2. Click **"Reopen in Container"** when prompted (DevContainers extension required)
-3. Wait for container setup (~2-3 minutes on first run)
-4. ✅ You're ready to develop!
+2. Click **"Reopen in Container"** when prompted. DevContainers extension required.
+3. Wait for container setup, about 2 to 3 minutes on first run
+4. ✅ You're ready to develop.
 
-### Alternative: Manual Setup
+### Alternative: Manual setup
 
 If not using DevContainers, see [Manual Setup Guide](docs/how-tos/manual-setup.md).
 
-### Before Contributing
+### Before contributing
 
 - **Check existing [GitHub Issues](https://github.com/dungeon-studio/genshin.dungeon.studio/issues)** to see what's needed
 - **Run linters and formatters** before committing - they'll enforce code style automatically
-- **Install dependencies first** (`pnpm install`) so local pre-commit hooks (ESLint/TypeScript) can run
+- **Install dependencies first** by running `pnpm install` so local pre-commit hooks for ESLint and TypeScript can run
 
-## Code of Conduct
+## Code of conduct
 
-We are committed to providing a welcoming and inclusive environment. Please be respectful and constructive in all interactions.
+This project commits to providing a welcoming and inclusive environment. Please be respectful and constructive in all interactions.
 
 ---
 
-## Development Workflow Overview
+## Development workflow overview
 
-Our contribution process follows these principles:
+The contribution process follows these principles:
 
-1. **Check Issues First** — Browse [existing issues](https://github.com/dungeon-studio/genshin.dungeon.studio/issues) to see what needs work
-2. **Create a Feature Branch** — Use naming convention: `feature/description` or `fix/description`
-3. **Develop with TDD** — Write tests alongside (or before) implementation
-4. **Commit with Conventional Commits** — Follow the standard format
-5. **Open a PR** — Reference the issue it addresses
-6. **Iterate** — Address review feedback, tests pass, merge when ready
+1. **Check Issues First**: Browse [existing issues](https://github.com/dungeon-studio/genshin.dungeon.studio/issues) to see what needs work
+2. **Create a Feature Branch**: Use naming convention: `feature/description` or `fix/description`
+3. **Develop with test-driven development**: Write tests alongside or before implementation.
+4. **Commit with Conventional Commits**: Follow the standard format
+5. **Open a PR**: Reference the issue it addresses
+6. **Iterate**: Address review feedback, tests pass, merge when ready
 
-### Quick Start Commands
+### Quick start commands
 
-Once your environment is set up:
+Once you set up your environment:
 
 ```bash
 # Ensure you're on develop and pull latest
@@ -54,7 +54,7 @@ pnpm install
 pnpm dev
 ```
 
-### Code Quality Standards
+### Code quality standards
 
 Before committing:
 
@@ -65,44 +65,42 @@ pnpm test       # Run tests
 pnpm lint       # Check for linting issues
 ```
 
-**Test coverage targets:**
+**Documentation checks**:
 
-- Critical paths: 80%+
-- Utilities: 90%+
-- UI components: Focus on user interactions, not implementation details
+- If pre-commit reports Vale issues, run Vale manually after fixing errors to catch warnings and suggestions
+- Use line-level Vale suppression comments for known false positives, such as license badges
 
-**Commit types** (use these prefixes in your commit messages):
+**Commit types**. Use these prefixes in your commit messages:
 
-- `feat:` — New feature
-- `fix:` — Bug fix
-- `docs:` — Documentation
-- `test:` — Adding/updating tests
-- `refactor:` — Code restructuring
-- `style:` — Formatting
-- `chore:` — Maintenance
+- `feat:` new feature
+- `fix:` bug fix
+- `docs:` documentation
+- `test:` adding or updating tests
+- `refactor:` code restructuring
+- `style:` formatting
+- `chore:` maintenance
 
-### Project Consistency
+### Project consistency
 
-**When updating project descriptions**, ensure consistency across:
+**When updating project descriptions**, make sure these stay consistent:
 
-- [package.json](package.json) — `"description"` field
-- [README.md](README.md) — One-line tagline
-- GitHub repository description (maintainers only; update via repo settings)
+- [package.json](package.json): `"description"` field
+- [README.md](README.md): One-line tagline
+- GitHub repository description. Maintainers update this via repo settings.
 
-### Detailed Guides
+### Detailed guides
 
 For step-by-step instructions and technical details:
 
-- [Manual Setup Guide](docs/how-tos/manual-setup.md) — Development environment setup without DevContainers
-- [Troubleshooting Guide](docs/how-tos/troubleshooting.md) — Solutions for common issues
+- [Manual Setup Guide](docs/how-tos/manual-setup.md): Development environment setup without DevContainers
 
 ---
 
-## Need Help?
+## Need help
 
 **For questions or issues:**
 
-- Review [Troubleshooting Guide](docs/how-tos/troubleshooting.md) for common problems
+- Review [Manual Setup Guide](docs/how-tos/manual-setup.md) for environment setup help
 - Open a [GitHub Discussion](https://github.com/dungeon-studio/genshin.dungeon.studio/discussions) for questions
 - Report bugs via [GitHub Issues](https://github.com/dungeon-studio/genshin.dungeon.studio/issues)
 
@@ -110,10 +108,8 @@ For step-by-step instructions and technical details:
 
 ## Licensing
 
-By contributing to this project, you agree that your contributions will be licensed under the [MIT License](LICENSE).
+<!-- vale Google.Parens = NO -->
 
----
+By contributing to this project, you agree to license your contributions under the [Massachusetts Institute of Technology (MIT) License](LICENSE).
 
-## Recognition
-
-All contributors will be recognized in the project. Thank you for helping make this project better! 🎉
+<!-- vale Google.Parens = YES -->

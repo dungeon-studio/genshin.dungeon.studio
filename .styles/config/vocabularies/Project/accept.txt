@@ -1,0 +1,92 @@
+# Accepted terminology for this project
+# Vale will not flag these terms as spelling errors
+# Format: one term per line, case-sensitive
+
+# Project names and brands
+Genshin
+Genshin Impact
+shadcn/ui
+Tailwind CSS
+
+# Languages and frameworks
+TypeScript
+JavaScript
+React Compiler
+zustand
+
+# Build tools and package managers
+Turborepo
+Vite
+Bun
+pnpm
+npm
+
+# Code quality tools
+ESLint
+Prettier
+Vitest
+
+# Configuration and tooling terms
+config
+configs
+formatters
+
+# Backend and database
+Firebase
+Firestore
+Hono
+
+# Other tools and libraries
+Babel
+OXC
+SWC
+
+# API and architecture
+API
+APIs
+CLI
+CI/CD
+HMR
+MCP
+monorepo
+repo
+repos
+roadmaps
+
+# Cloud infrastructure
+GCP
+Cloud Run
+Cloud Storage
+
+# AI services
+Claude
+Anthropic
+Copilot
+
+# DevOps and automation
+GitHub Actions
+CodeQL
+Dependabot
+
+# Development workflow
+dev
+async
+allowlist
+allowlists
+hardcoded
+memoization
+playstyles
+ddbeck's
+DevContainers
+Diátaxis
+UTC
+
+# Game elements (Genshin Impact)
+Pyro
+Hydro
+Anemo
+Electro
+Dendro
+Cryo
+Geo
+DPS

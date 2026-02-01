@@ -1,129 +1,148 @@
-# GitHub Copilot Instructions for genshin.dungeon.studio
+<!-- vale Microsoft.Headings = NO -->
 
-> **⚠️ NOTE:** This file is FOR AI ASSISTANTS ONLY. Human contributors should not read this for code style or contribution guidelines. Instead:
+# GitHub Copilot instructions for Genshin Dungeon Studio
+
+<!-- vale Microsoft.Headings = YES -->
+
+> **⚠️ NOTE:** This file is for AI assistants only. Human contributors shouldn't read this for code style or contribution guidelines. Instead:
 >
 > - See [CONTRIBUTING.md](../CONTRIBUTING.md) for contribution workflow
 > - See [docs/](../docs/) for human-readable documentation
-> - Rely on linters (ESLint, Prettier) and formatters for code style
+> - Rely on linters such as ESLint and Prettier, plus formatters, for code style
 
 ---
 
-## Project Overview
+## Project overview
 
 This is an AI-powered team building companion for Genshin Impact. Users can:
 
 - Track their character collection
 - Build and save team compositions
-- Get personalized team recommendations via AI chat interface (Claude MCP)
+- Get personalized team recommendations via an AI chat interface with Claude MCP
 
-**Status**: Early development - establishing foundation and infrastructure first.
+**Status**: early development. The focus is on foundation and infrastructure first.
 
-**Philosophy**: Test-driven development, clean git history, cross-platform compatibility, type safety.
+**Philosophy**: test-driven development, clean git history, cross-platform compatibility, type safety.
 
 ---
 
-## Tech Stack
+## Tech stack
 
-### Current (Phase 1-2 Completed)
+### Current phase 1-2 completed
 
-- **Monorepo**: Turborepo 2.7.6 + pnpm 9.15.4 workspaces
-- **Language**: TypeScript 5.9.3 (strict mode)
+- **monorepo**: Turborepo 2.7.6 + pnpm 9.15.4 workspaces
+- **Language**: TypeScript 5.9.3 in strict mode
 - **Package Manager**: pnpm 9+
 - **Runtime**: Node.js 20+
 - **Code Formatting**: Prettier 3.8
-- **Frontend**: React 19.2 + Vite 7.3 + TypeScript (basic setup complete)
+- **Frontend**: React 19.2 + Vite 7.3 + TypeScript, basic setup complete
 - **Linting**: ESLint 9.39 with flat config format
 
-### Planned (Phase 3+)
+### Planned phase 3+
 
 - **Frontend Libraries**: Tailwind CSS, shadcn/ui, react-router-dom, zustand
-- **Backend**: Hono (Node.js server), may migrate to Bun runtime later
+- **API server**: Hono on Node.js, may migrate to Bun runtime later
 - **Database**: Firestore
 - **Auth**: Firebase Authentication
-- **AI**: Claude (Anthropic) via Model Context Protocol (MCP)
-- **Hosting**: GCP (Cloud Run for API, Cloud Storage for frontend)
+- **AI**: Claude by Anthropic via Model Context Protocol, MCP
+- **Hosting**: Google Cloud Platform (GCP), including GCP Cloud Run and GCP Cloud Storage
 - **Testing**: Vitest, React Testing Library
 
-**Important**:
+### Important
 
-- **Canonical Version Source**: Tool versions are pinned to exact versions in [package.json](../package.json) devDependencies for hermetic deployments. Dependabot manages updates automatically. Refer to `package.json` as the source of truth.
-- **Pre-commit Prettier**: The `mirrors-prettier` repo may lag behind the `package.json` Prettier version. Pin the pre-commit hook to the latest available `mirrors-prettier` tag, even if it is older than `package.json`.
-- **Pre-commit.ci skip list**: `ci.skip` should only include hooks run in GitHub Actions. Keep it in sync with the workflow’s hook list to avoid duplicate checks.
-- **pre-commit/action**: `extra_args` only accepts one hook id at a time; use separate steps for multiple hooks.
-- **Turborepo globs**: `globalDependencies` does not support negated patterns (e.g., `!**/.env.example`).
-- **GitHub Actions Allowlist**: Organization-level Actions policies can block workflows. If CI fails with permission errors for actions, check org-level allowlists before changing workflows.
-- Do NOT suggest Bun-specific code yet. It's listed in plans but not implemented.
-- ESLint 9.x uses flat config format - no `extends` property, use array spreading instead.
+- **Canonical Version Source**: Pin tool versions to exact versions in [package.json](../package.json) `devDependencies` for hermetic deployments. Dependabot manages updates automatically. Use `package.json` as the source of truth.
+- **Pre-commit Prettier**: The `mirrors-prettier` repo may lag behind the `package.json` Prettier version. Pin the pre-commit check to the latest available `mirrors-prettier` tag, even if it's older than `package.json`.
+- **Pre-commit.ci skip list**: `ci.skip` should only include checks run in GitHub Actions. Keep it in sync with the workflow check list to avoid duplicate checks.
+- **pre-commit/action**: `extra_args` only accepts one check id at a time. Use separate steps for multiple checks.
+- **Turborepo globs**: `globalDependencies` doesn't support negated patterns such as `!**/.env.example`.
+- **GitHub Actions allowlist**: Organization-level Actions policies can block workflows. If CI fails with permission errors for actions, check org-level allowlists before changing workflows.
+- Don't suggest Bun-specific code yet. It's listed in plans but not implemented.
+- ESLint 9.x uses flat config format. Don't use `extends`; use array spreading instead.
 
 ---
 
-## Documentation Structure
+## Documentation structure
 
-This project follows the [Diátaxis framework](https://diataxis.fr/) for documentation organization:
+This project follows the [Diátaxis framework](https://diataxis.fr/) for documentation organization.
 
-- **Tutorials** (learning-oriented): Step-by-step learning experiences (future)
-- **How-To Guides** (goal-oriented): Task-focused instructions → `docs/how-tos/`
-- **Reference** (information-oriented): Technical descriptions → API docs, type references (future)
-- **Explanation** (understanding-oriented): Conceptual discussion → Architecture docs (future)
+- **Tutorials**: Learning-oriented, step-by-step experiences. Planned.
+- **How-to guides**: Goal-oriented task instructions. Location: `docs/how-tos/`.
+- **Reference**: Technical descriptions such as API docs and type references. Planned.
+- **Explanation**: Conceptual discussion such as architecture notes. Planned.
 
-### Documentation Locations
+### Documentation locations
 
-- `README.md` (root): **For users deciding if the project fits their needs** — see README Standard below
-- `CONTRIBUTING.md` (root): Contribution workflow - focused on the "story" of contributing, not detailed tasks
-- `docs/how-tos/`: Task-specific guides (e.g., "How to set up manually without DevContainers")
-- `docs/reference/`: Technical reference material (future)
-- `docs/explanation/`: Conceptual/architectural documentation (future)
-- **GitHub Issues/Milestones**: Source of truth for planning, phases, and implementation roadmap
+- `README.md` at the root is **for users deciding if the project fits their needs**. See README standard below.
+- `CONTRIBUTING.md` at the root covers the contribution workflow and the story of contributing, not detailed tasks.
+- `docs/how-tos/` contains task-specific guides, for example "How to set up manually without DevContainers."
+- `docs/reference/` holds technical reference material.
+- `docs/explanation/` holds conceptual and architectural documentation.
+- **GitHub Issues and Milestones** are the source of truth for planning, phases, and the implementation roadmap.
 
-### README Standard
+<!-- vale Microsoft.Headings = NO -->
+
+### README standard
+
+<!-- vale Microsoft.Headings = YES -->
 
 The README should help humans **identify, evaluate, and use** the project. Follow [ddbeck's README checklist](https://github.com/ddbeck/readme-checklist):
 
-1. **Identify**: Project name, URL, and author at top
-2. **Evaluate**: What does it do? (benefit-focused, not tech stack). Who's it for? What's the status/maturity?
-3. **Use**: Quick start (emphasize DevContainers). Prerequisites if any.
-4. **Engage**: Links to docs, support, and contributing. License.
+1. **Identify** the project name, address, and maintainer at the top.
+2. **Evaluate** what it does. Focus on benefits rather than the tech stack. Cover who it's for and the status or maturity.
+3. **Use** a quick start that emphasizes DevContainers. List prerequisites if any.
+4. **Engage** with links to docs, support, and contributing. Include the license.
 
-**Key principle**: README is **not** for development roadmaps, architecture details, or tech stack justification. Those belong in:
+**Key principle**: the README shouldn't contain development roadmaps, architecture details, or tech stack justification. Those belong in:
 
-- **Tech details**: copilot-instructions.md or docs/explanation/ (future)
-- **Development roadmap**: GitHub Issues/Milestones
-- **Code organization**: CONTRIBUTING.md or GitHub repo browser
-- **Setup complexity**: docs/how-tos/
+- Tech details: `copilot-instructions.md` or `docs/explanation/`. Planned for later.
+- Development roadmap: GitHub Issues/Milestones
+- Code organization: CONTRIBUTING.md or GitHub repo browser
+- Setup complexity: docs/how-tos/
 
-**What NOT to put in README**:
+**What not to put in README**:
 
-- ❌ "Features (Planned)" checklists
+- ❌ "Planned features" checklists
 - ❌ Project structure diagrams
-- ❌ Tech stack decisions (save for architecture docs)
-- ❌ Detailed development phase / roadmap sections (beyond a short status like "Pre-Alpha")
+- ❌ Tech stack decisions, save for architecture docs
+- ❌ Detailed development phase or roadmap sections beyond a short status like "Pre-Alpha"
 - ✅ Instead, link to GitHub Issues for roadmap and CONTRIBUTING.md for setup
 
-### When Creating/Updating Documentation
+### When creating or updating documentation
 
-1. **Determine the type**: Is this teaching, task-solving, reference, or explaining?
-2. **Place accordingly**: Use the Diátaxis structure
-3. **Link, don't duplicate**: Reference external docs (like Diátaxis itself) rather than summarizing
-4. **Keep CONTRIBUTING.md focused**: Extract detailed tasks to how-tos, link back
-5. **Planning vs. Documentation**:
+1. **Determine the type**. Decide whether this is teaching, task solving, reference, or explaining.
+2. **Place accordingly**. Use the Diátaxis structure.
+3. **Link, don't duplicate**. Reference external docs such as Diátaxis itself rather than summarizing.
+4. **Keep CONTRIBUTING.md focused**. Move detailed tasks to how-to guides and link back.
+5. **Planning vs. documentation**
    - ❌ Don't document development phases, implementation plans, or future features in markdown docs
    - ✅ Track phases and planning in GitHub Issues and Milestones
    - ✅ Documentation should describe what **exists now**, not what's planned
-6. **Unimplemented Features**:
+
+6. **Unimplemented features**
    - ❌ Don't document features as working if they're not implemented yet
-   - ✅ Either omit them entirely or clearly mark as "(when implemented)" with a link to the relevant issue
+   - ✅ Either omit them entirely or explicitly mark them as "when implemented" with a link to the relevant issue
    - ✅ If suggesting a feature that doesn't exist, create or reference the GitHub issue for it
-7. **DevContainers Priority**:
-   - ✅ When DevContainers are configured, emphasize them as the primary recommended path
-   - ✅ Manual setup should be documented as an alternative in `docs/how-tos/manual-setup.md`
+
+7. **DevContainers priority**
+   - ✅ When DevContainers exist, emphasize them as the primary recommended path
+   - ✅ Document manual setup as an alternative in `docs/how-tos/manual-setup.md`
+
+8. **Documentation hygiene**
+   - ✅ Keep docs lean. Remove or avoid low-signal guides until there are real, recurring issues to document
+   - ✅ Use line-level Vale suppression comments for known false positives such as license badges
+   - ✅ After pre-commit reports Vale issues, run Vale manually to catch warnings and suggestions once you fix errors
 
 ---
 
-## DevContainer Configuration
+<!-- vale Microsoft.Headings = NO -->
 
-### pnpm Store Mount
+## DevContainer configuration
 
-**Do NOT use volume mounts for pnpm store** in devcontainer.json. Named Docker volumes mount with root ownership, causing EACCES permission errors for the `node` user.
+<!-- vale Microsoft.Headings = YES -->
+
+### pnpm store mount
+
+**Don't use volume mounts for pnpm store** in devcontainer.json. Named Docker volumes mount with root ownership, causing EACCES permission errors for the `node` user.
 
 ```jsonc
 // ❌ DO NOT DO THIS - causes permission errors
@@ -132,28 +151,28 @@ The README should help humans **identify, evaluate, and use** the project. Follo
 ]
 ```
 
-Instead, let pnpm use its default store location in the container. The first `pnpm install` will be slower, but subsequent operations within the same container session will use the cache normally.
+Instead, let pnpm use its default store location in the container. The first `pnpm install` is slower, but subsequent operations within the same container session use the cache normally.
 
 ---
 
-## Repository Structure
+## Repository structure
 
 ```text
 genshin.dungeon.studio/
 ├── apps/
-│   ├── web/          # React frontend (Vite)
-│   └── api/          # Hono backend
+│   ├── web/          # React frontend with Vite
+│   └── api/          # Hono API server
 ├── packages/
 │   ├── types/        # Shared TypeScript types
-│   └── game-data/    # Static game data (characters, weapons, artifacts)
-├── infrastructure/   # Deployment scripts, Terraform
+│   └── game-data/    # Static game data such as characters, weapons, and artifacts
+├── infrastructure/   # Deployment scripts and Terraform
 ├── docs/             # Project documentation
-└── .github/          # CI/CD workflows, instructions
+└── .github/          # CI and CD workflows plus instructions
 ```
 
 ---
 
-## Code Style Guidelines
+## Code style guidelines
 
 ### TypeScript
 
@@ -162,11 +181,11 @@ genshin.dungeon.studio/
 - ✅ **Explicit types for function returns** - Especially for exported functions
 - ✅ **Use type imports** - `import type { ... }` for types-only imports
 - ✅ **No non-null assertions** - Use proper null checks instead of `!`
-- ✅ **Path aliases configured** - Use `@/` for src imports (configured in tsconfig + vite)
+- ✅ **Path aliases configured** - Use `@/` for `src` imports, configured in `tsconfig` and Vite
 - ❌ **No class components** - Use functional components only
-- ❌ **No enums** - Use const objects or union types instead
+- ❌ **No `enums`** - Use `const` objects or union types instead
 
-### ESLint (v9.x Flat Config)
+### ESLint v9.x flat config
 
 - ✅ **Use array export** - `export default [...]` not `defineConfig([...])`
 - ✅ **Spread configs** - `...tseslint.configs.recommended` not `extends: [...]`
@@ -178,46 +197,46 @@ genshin.dungeon.studio/
 - ✅ **Functional components** with TypeScript interfaces for props
 - ✅ **Named exports** - `export function ComponentName()`
 - ✅ **Props interfaces** named `ComponentNameProps`
-- ✅ **Use hooks** - useState, useEffect, useMemo, useCallback appropriately
+- ✅ **Use hooks** - `useState`, `useEffect`, `useMemo`, `useCallback` appropriately
 - ✅ **Early returns** for conditional rendering
 
-### File Naming
+### File naming
 
 - `kebab-case.tsx` for files
 - `PascalCase` for components
 - `camelCase` for functions, variables
 - `SCREAMING_SNAKE_CASE` for constants
 
-### Code Organization
+### Code organization
 
-- Keep functions small and focused (< 50 lines ideally)
+- Keep functions small and focused, ideally under 50 lines
 - One component per file
 - Co-locate tests with source files: `Component.tsx` + `Component.test.tsx`
-- Group related features in `features/` directory
+- Group related features in the `features/` directory
 
 ---
 
-## Testing Requirements
+## Testing requirements
 
-### Approach: Test-Driven Development (TDD)
+### Approach: Test-driven development
 
-1. Write test first (or alongside implementation)
-2. Implement feature to make test pass
+1. Write tests first or alongside implementation
+2. Implement the feature to make the test pass
 3. Refactor while keeping tests green
 
-### Testing Framework
+### Testing framework
 
 - **Test runner**: Vitest
 - **React testing**: @testing-library/react
-- **Assertions**: Vitest matchers + @testing-library/jest-dom
+- **Assertions**: Vitest `matchers` + @testing-library/jest-dom
 
-### Coverage Expectations
+### Coverage expectations
 
 - **Critical paths**: 80%+ coverage
-- **Utilities/helpers**: 90%+ coverage
+- **Utilities and helpers**: 90%+ coverage
 - **UI components**: Test user interactions, not implementation details
 
-### Test Structure
+### Test structure
 
 ```typescript
 describe('ComponentName', () => {
@@ -229,19 +248,19 @@ describe('ComponentName', () => {
 
 ---
 
-## Detailed Contribution Workflow
+## Detailed contribution workflow
 
 This section provides technical guidance for implementing features and fixes.
 
-### 1. Feature Development Process
+### 1. Feature development process
 
-#### Branch Creation
+#### Branch creation
 
 ```bash
 git checkout -b feature/description  # Use kebab-case
 ```
 
-**Test-Driven Development (TDD)**
+**Test-driven development**
 Write tests before or alongside implementation:
 
 ```typescript
@@ -267,7 +286,8 @@ export function ComponentName(props: ComponentNameProps) {
 }
 ```
 
-**Quality Checks** (before committing)
+**Quality checks**
+Run these before committing:
 
 ```bash
 pnpm format                # Auto-format code with Prettier
@@ -276,9 +296,9 @@ pnpm test                 # Run all tests
 pnpm lint                 # Run ESLint
 ```
 
-### 2. Commit Message Convention
+### 2. Commit message convention
 
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
+Follow [Conventional Commits](https://www.conventionalcommits.org/).
 
 ```text
 <type>(<scope>): <description>
@@ -296,7 +316,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `test:` - Adding or updating tests
 - `refactor:` - Code restructuring without behavior change
 - `style:` - Formatting, no code change
-- `chore:` - Maintenance tasks, dependencies
+- `chore:` - Maintenance tasks and dependencies
 
 **Examples**:
 
@@ -316,9 +336,9 @@ fix(api): handle missing Firebase credentials gracefully
 Throws helpful error message instead of crashing.
 ```
 
-### 3. Pull Request Workflow
+### 3. Pull request workflow
 
-#### Push and Create PR
+#### Push and create pull request
 
 ```bash
 git push -u origin feature/description
@@ -331,28 +351,28 @@ Changes:
 - Integration with existing code"
 ```
 
-**PR Title Format**: Should match commit message format (becomes squash merge commit on merge)
+**Pull request title format**: should match the commit message format and becomes the squash merge commit message.
 
-**Merge Strategy**: Repository uses squash merge (all PR commits become one commit)
+**Merge strategy**: the repository uses squash merge, so all pull request commits become one commit.
 
-**Before Merge Checklist**:
+**Before merge checklist**:
 
-- ✅ All tests passing
+- ✅ All tests pass
 - ✅ No TypeScript errors
 - ✅ No linting errors
-- ✅ Code formatted with Prettier
-- ✅ Tests cover critical paths (80%+)
-- ✅ PR description is accurate
+- ✅ Format code with Prettier
+- ✅ Tests cover critical paths, 80%+
+- ✅ Pull request description is accurate
 
-### 4. Testing Standards
+### 4. Testing standards
 
-**Coverage Targets**:
+**Coverage targets**:
 
-- **Critical paths** (core business logic): 80%+ coverage
-- **Utilities/helpers**: 90%+ coverage
+- **Critical paths**, core business logic: 80%+ coverage
+- **Utilities and helpers**: 90%+ coverage
 - **UI components**: Test user interactions and accessibility, not implementation details
 
-**Testing Philosophy**: Use [React Testing Library](https://testing-library.com/) — query by how users interact, not by internal structure
+**Testing philosophy**: use [React Testing Library](https://testing-library.com/). Query by how users interact, not by internal structure.
 
 ```typescript
 // ❌ Bad: testing implementation details
@@ -366,110 +386,110 @@ screen.getByText('Pyro');
 
 ---
 
-## Pull Request Workflow
+## Pull request workflow
 
-### Branch Naming
+### Branch naming
 
 - `feature/description` - New features
 - `fix/description` - Bug fixes
 - `chore/description` - Maintenance
 - `docs/description` - Documentation
 
-### PR Guidelines
+### Pull request guidelines
 
-1. **One PR = One Feature** - Keep PRs focused and atomic
-2. **Good PR Titles** - Use conventional commit format (becomes commit message)
-3. **Descriptive Body** - Bullet points of what changed and why
-4. **Reference Issues** - Use "Closes #X" or "Addresses #X"
-5. **Self-Review** - Review your own PR before requesting review
+1. **One pull request equals one feature**. Keep pull requests focused and atomic.
+2. **Good pull request titles**. Use the conventional commit format so it becomes the commit message.
+3. **Descriptive body**. Use bullet points that explain what changed and why.
+4. **Reference issues**. Use "Closes #X" or "Addresses #X."
+5. **Self-review**. Review your own pull request before requesting review.
 
-### Merge Strategy
+### Merge strategy
 
-- **Squash and merge** - All PR commits become one commit on develop
-- PR title + body become the final commit message
-- Keep commit history clean: 1 feature = 1 commit
+- **Squash and merge**. All pull request commits become one commit on develop.
+- The pull request title and body become the final commit message.
+- Keep commit history clean. One feature equals one commit.
 
-### Before Merging
+### Before merging
 
 - ✅ All tests pass
 - ✅ No linting errors
 - ✅ TypeScript compiles without errors
-- ✅ Code is formatted with Prettier
-- ✅ PR description is accurate
+- ✅ Format code with Prettier
+- ✅ Pull request description is accurate
 
 ---
 
-## Platform Compatibility
+## Platform compatibility
 
-**Critical**: This project must work on Windows, macOS, and Linux.
+**Critical**: this project must work on Windows, macOS, and Linux.
 
-### ❌ NEVER Use
+### ❌ Never use
 
-- `rm -rf` (use Turborepo clean or cross-platform tools)
-- `&&` for sequential commands (use pnpm scripts instead)
-- Hardcoded paths with `/` or `\`
+- `rm -rf`. Use Turborepo clean or cross-platform tools.
+- `&&` for sequential commands. Use pnpm scripts instead.
+- hardcoded paths with `/` or `\`
 - OS-specific environment variables
 
-### ✅ ALWAYS Use
+### ✅ Always use
 
 - Node.js `path` module for paths
-- Cross-platform packages (e.g., `rimraf`, `del-cli`) if shell commands needed
+- Cross-platform packages such as `rimraf` and `del-cli` when you need shell commands
 - pnpm scripts for task orchestration
-- Turborepo for build/test/lint tasks
+- Turborepo for build, test, and lint tasks
 
 ---
 
-## Code Review Focus Areas
+## Code review focus areas
 
-When reviewing code or PRs, pay special attention to:
+When reviewing code or pull requests, pay extra attention to:
 
-1. **Type Safety**
+1. **Type safety**
    - No `any` types
    - Proper null/undefined handling
    - Type guards where needed
 
 2. **Testing**
    - Tests exist for new features
-   - Tests are meaningful (not just for coverage)
+   - Tests are meaningful, not just for coverage
    - Tests use Testing Library best practices
 
 3. **Performance**
-   - Avoid unnecessary re-renders (useMemo, useCallback)
-   - Lazy load routes/components
-   - Proper Firestore query optimization
+   - Avoid unnecessary re-renders with `useMemo` and `useCallback`
+   - Lazy load routes and components
+   - Optimize Firestore queries
 
 4. **Security**
-   - No hardcoded secrets/API keys
+   - No hardcoded secrets or API keys
    - Proper input validation
-   - Firebase security rules configured
+   - Configure Firebase security rules
 
-5. **Cross-Platform**
+5. **Cross-platform**
    - No OS-specific commands
-   - Paths use Node.js path module
+   - Paths use the Node.js `path` module
 
 6. **Consistency**
    - Follows established patterns
    - Matches existing code style
    - Uses shared types from packages/types
 
-7. **Documentation Accuracy**
+7. **Documentation accuracy**
    - Code examples in docs match actual implementation
-   - Export patterns are consistent (prefer named exports)
-   - Phase/status markers are up-to-date
+   - Export patterns are consistent, prefer named exports
+   - Phase and status markers are up to date
    - Cross-platform commands in all documentation
 
 ---
 
-## Common Patterns
+## Common patterns
 
-### Shared Types
+### Shared types
 
 ```typescript
 // Import from shared package
 import type { Character, Team } from '@genshin/types';
 ```
 
-### API Client Calls
+### API client calls
 
 ```typescript
 // Use try-catch for error handling
@@ -481,7 +501,7 @@ try {
 }
 ```
 
-### React Components
+### React components
 
 ```typescript
 interface CharacterCardProps {
@@ -500,29 +520,29 @@ export function CharacterCard({ character, onClick }: CharacterCardProps) {
 
 ---
 
-## Code Comments and Local Documentation
+## Code comments and local documentation
 
-**Philosophy**: Prefer inline comments in code over external documentation for explaining decisions, trade-offs, and non-obvious logic. Documentation should live close to the code it describes.
+**Philosophy**: prefer inline comments in code over external documentation for explaining decisions, trade-offs, and subtle logic. Documentation should live close to the code it describes.
 
-### When to Comment
+### When to comment
 
 Comment liberally for:
 
 - **Decisions and trade-offs**: Explain why you chose one approach over another
-- **Non-obvious logic**: Complex algorithms, business rules, or unintuitive implementations
-- **Workarounds**: Temporary fixes or browser quirks with issue/ticket references
-- **Performance considerations**: Why certain patterns are used (memoization, lazy loading, etc.)
+- **Subtle logic**: Complex algorithms, business rules, or hard-to-follow implementations
+- **Workarounds**: Temporary fixes or browser quirks with issue or ticket references
+- **Performance considerations**: Explain why you use certain patterns, such as memoization and lazy loading
 - **External dependencies**: Integration points or third-party API quirks
 
 **Examples**:
 
 ```typescript
 // Memoize to prevent unnecessary re-renders since characters array changes frequently
-// from Firebase updates. This is a known bottleneck for large collections (100+ chars).
+// from Firebase updates. This is a known bottleneck for large collections with 100+ characters.
 const memoizedCharacters = useMemo(() => characters.map((c) => new Character(c)), [characters]);
 
 // Firebase listener doesn't trigger on subcollection changes, so we need to
-// manually refetch when teams change. See: https://github.com/firebase/firebase-js-sdk/issues/1234
+// manually refetch when teams change. See https://github.com/firebase/firebase-js-sdk/issues/1234.
 const handleTeamUpdate = useCallback(async () => {
   await refetchCharacters();
 }, []);
@@ -532,16 +552,16 @@ const handleTeamUpdate = useCallback(async () => {
 const config = await import('./config.js').then((m) => m.default);
 ```
 
-### When NOT to Comment
+### When not to comment
 
 Don't comment for:
 
 - **Self-documenting code**: `const isValidEmail = email.includes('@')` needs no comment
-- **Simple iterations or assignments**: `teams.map(t => t.characters)` is clear
-- **Obvious type information**: TypeScript types already document intent
+- **Straightforward iterations or assignments**: `teams.map(t => t.characters)` is clear
+- **Inferred type information**: TypeScript types already document intent
 - **Trivial error handling**: Standard try-catch patterns don't need explanation
 
-**Bad examples** (unnecessary comments):
+**Bad examples** of unnecessary comments:
 
 ```typescript
 // ❌ Loop through teams
@@ -554,15 +574,15 @@ teams.forEach(team => {
 setLoading(true);
 ```
 
-### Comment Format
+### Comment format
 
-Use clear, conversational English:
+Use clear, conversational English.
 
 ```typescript
 // Bad: Too terse
 // calc avg dmg from artifacts
 
-// Good: Explains the why and what clearly
+// Good: Explains the why and what explicitly
 // Calculate average damage across all artifacts to handle Firestore
 // pagination limit of 20 docs. See performanceTests.md for benchmarks.
 const avgDamage = calculateAverageDamage(artifacts);
@@ -570,12 +590,16 @@ const avgDamage = calculateAverageDamage(artifacts);
 
 ---
 
-## When Suggesting Code
+<!-- vale Microsoft.Headings = NO -->
+
+## When suggesting code
+
+<!-- vale Microsoft.Headings = YES -->
 
 ### Do
 
 - ✅ Suggest tests alongside implementation
-- ✅ Use TypeScript strictly
+- ✅ Use TypeScript in strict mode
 - ✅ Follow existing project structure
 - ✅ Consider cross-platform compatibility
 - ✅ Reference documentation in docs/
@@ -584,83 +608,85 @@ const avgDamage = calculateAverageDamage(artifacts);
 ### Don't
 
 - ❌ Suggest libraries not in package.json without asking
-- ❌ Use deprecated React patterns (classes, lifecycle methods)
+- ❌ Use deprecated React patterns such as classes and lifecycle methods
 - ❌ Skip error handling
 - ❌ Ignore TypeScript errors
-- ❌ Suggest Bun-specific code (not implemented yet)
+- ❌ Suggest Bun-specific code that isn't implemented yet
 - ❌ Make OS-specific assumptions
 
 ---
 
-## CI/CD and Security Scanning
+## Continuous integration and delivery, plus security scanning
 
-### Workflow Patterns and Maintenance
+### Workflow patterns and maintenance
 
 GitHub Actions workflows should include maintenance notes documenting when to update them:
 
-- When new programming languages are added to the monorepo
+- When you add new programming languages to the monorepo
 - When build processes change and require custom build steps
-- When new workspaces are added with different languages/runtimes
+- When you add new workspaces with different languages and runtime systems
 
-**Example**: See `.github/workflows/codeql.yml` for the maintenance notes pattern. Copy this structure to other workflows to keep them synchronized with the monorepo's evolving architecture.
+**Example**: see `.github/workflows/codeql.yml` for the maintenance notes pattern. Copy this structure to other workflows to keep them synchronized with the monorepo's evolving architecture.
 
-### Security Scanning Schedule Alignment
+### Security scanning schedule alignment
 
 Coordinate security scanning schedules across tools for operational consistency:
 
 - **CodeQL**: Configured with `schedule: { day: 'friday', time: '18:00' }`
-- **Dependabot**: Also runs Friday at 1800 UTC for aligned security updates
+<!-- vale Google.Parens = NO -->
+- **Dependabot**: Runs Friday at 18:00 Coordinated Universal Time (UTC) for aligned security updates
+<!-- vale Google.Parens = YES -->
 - New security scanning tools should use the same schedule when possible
 
-This reduces alert fatigue and simplifies monitoring windows.
+This reduces notification fatigue and simplifies monitoring windows.
 
-## Dependabot Maintenance
+## Dependabot maintenance
 
-**Important**: When adding new workspaces/packages to the monorepo, update `.github/dependabot.yml` to include them:
+**Important**: when adding new workspaces or packages to the monorepo, update `.github/dependabot.yml` to include them.
 
-- **New app (e.g., `apps/api`)**: Add npm entry with directory path like `/apps/api` and appropriate semantic groups
-- **New package (e.g., `packages/utils`)**: Add npm entry with directory `/packages/{name}`
-- **New language/ecosystem**: Add new package-ecosystem entry (e.g., Python, Go, etc.)
-- **New workflows**: Automatically covered by `github-actions` package-ecosystem entry with `directory: '/'` (scans all workflows for action updates)
+- **New app**, for example `apps/api`: Add an npm entry with the directory path `/apps/api` and appropriate semantic groups
+- **New package**, for example `packages/utils`: Add an npm entry with the directory `/packages/{name}`
+- **New language or ecosystem**, for example Python or Go: Add a new package-ecosystem entry
+- **New workflows**: Covered by the `github-actions` package-ecosystem entry with `directory: '/'` that scans workflows for action updates
 
 See the maintenance section in `.github/dependabot.yml` for detailed instructions and examples. Without updating Dependabot, new workspaces won't get automated dependency updates.
 
-**When suggesting features**: Always check if dependencies/infrastructure exist first. Reference GitHub Issues/Milestones for current phase requirements and blocking dependencies.
+**When suggesting features**: always check if dependencies or infrastructure exist first. Reference GitHub Issues and Milestones for current phase requirements and blocking dependencies.
 
 ---
 
-## Handling PR Reviews
+## Handling pull request reviews
 
-When addressing Copilot PR review comments:
+When addressing Copilot pull request review comments:
 
-1. **Fetch inline comments** - Use `gh api repos/.../pulls/{pr}/comments` to see all review feedback
-2. **Prioritize issues** - Critical (breaks build) > Consistency > Suggestions
-3. **Batch fixes** - Group related changes in single commits
-4. **Verify changes** - Run `pnpm build` and `pnpm lint` after fixes
-5. **Update docs** - If code examples in docs are wrong, fix them too
+1. **Fetch inline comments**. Use `gh api repos/.../pulls/{pr}/comments` to see all review feedback.
+2. **Prioritize issues**. Critical, breaks build, then consistency, then suggestions.
+3. **Batch fixes**. Group related changes in single commits.
+4. **Verify changes**. Run `pnpm build` and `pnpm lint` after fixes.
+5. **Update docs**. If code examples in docs are wrong, fix them too.
 
-## Questions to Ask
+## Questions to ask
 
 If you're unsure about:
 
-- New dependencies → Ask before suggesting
-- Architecture decisions → Reference docs/SETUP_GUIDE.md
-- Breaking changes → Explain trade-offs
-- Alternative approaches → Present options with pros/cons
+- New dependencies. Ask before suggesting.
+- Architecture decisions. Reference docs/SETUP_GUIDE.md.
+- Breaking changes. Explain trade-offs.
+- Alternative approaches. Present options with advantages and disadvantages.
 
 ---
 
-## Success Metrics
+## Success metrics
 
 Good code in this project:
 
 - ✅ Has tests that pass
-- ✅ Is type-safe (TypeScript strict mode)
+- ✅ Is type-safe. Use TypeScript strict mode.
 - ✅ Works on all platforms
 - ✅ Follows established patterns
-- ✅ Is well-documented (inline comments for complex logic)
+- ✅ Is well-documented. Use inline comments for complex logic.
 - ✅ Has a clear, focused purpose
 
 ---
 
-These instructions will evolve as the project matures. Last updated: Phase 2 (Basic Frontend Setup Complete - PR #80)
+These instructions evolve as the project matures. Last updated: phase 2, Basic Frontend Setup Complete, PR #80

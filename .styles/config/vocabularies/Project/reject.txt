@@ -1,0 +1,19 @@
+# Rejected terminology - Vale will flag these and suggest alternatives
+# Format: term -> suggestion
+
+# Prefer consistent terminology
+npm -> pnpm
+yarn -> pnpm
+# Tool/brand name capitalization
+javascript -> JavaScript
+typescript -> TypeScript
+prettier -> Prettier
+eslint -> ESLint
+vite -> Vite
+react -> React
+node -> Node.js
+firebase -> Firebase
+firestore -> Firestore
+github -> GitHub
+gcp -> GCP
+claude -> Claude
