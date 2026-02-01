@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Genshin Impact element colors
+        // Genshin Impact element colors (placeholders - to be replaced with official HoYo colors)
         pyro: {
           light: '#FF9E5A',
           DEFAULT: '#FF6B35',
@@ -40,7 +40,7 @@ export default {
           DEFAULT: '#4ADE80',
           dark: '#22C55E',
         },
-        // Brand colors
+        // Brand colors (placeholders - to be replaced with our distinct branding)
         primary: {
           light: '#818CF8',
           DEFAULT: '#6366F1',
