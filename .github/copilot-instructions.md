@@ -389,6 +389,75 @@ screen.getByText('Pyro');
 
 ---
 
+## Debugging GitHub Actions failures and quality issues
+
+### ❌ Never assume; always verify
+
+When GitHub Actions stops passing or quality checks don't pass:
+
+1. **Fetch actual error logs** - Don't guess. Use GitHub CLI to get real data:
+
+   ```bash
+   gh run view --log <run-id>  # Get full GitHub Actions logs
+   gh pr view <number> --comments  # Get PR review comments
+   ```
+
+2. **Root cause analysis** - The first error symptom often masks the real issue:
+
+   - Frozen pnpm-lock.yaml errors usually mean dependencies changed but weren't committed
+   - Type errors might point to a missing export or incorrect type definition
+   - **Lint failures** should fix at the source, not work around
+
+3. **Check pre-commit hooks locally** - Before pushing, verify all checks pass locally:
+
+   ```bash
+   # These run automatically on git commit, but can run manually:
+   pnpm format      # Prettier formatting
+   pnpm typecheck   # TypeScript type checking
+   pnpm lint        # ESLint checking
+   pnpm test        # Test suite
+   ```
+
+### Quality standards: All checks must pass
+
+**Fix errors, warnings, and suggestions** - Don't skip any quality issues:
+
+- **Vale linting**: Fix errors, warnings, and suggestions
+- **ESLint**: Fix all errors and warnings, including performance and best-practice rules
+- **TypeScript**: No `any` types, no type errors, strict mode throughout
+- **Prettier**: Format all code automatically—use `pnpm format` to fix issues
+- **Pre-commit hooks**: All must pass before committing. They check formatting, secrets, and linting
+
+**Example of incomplete quality work:**
+
+```bash
+# ❌ Bad: Only fix errors, ignore warnings
+vale docs/  # Shows 5 errors, 12 warnings, 30 suggestions
+# → Only fixes the 5 errors, pushes with warnings still present
+
+# ✅ Good: Fix all issues
+vale docs/  # Shows 5 errors, 12 warnings, 30 suggestions
+# → Fix all 47 issues, then verify with `vale docs/` again showing zero output
+```
+
+### Dependency management
+
+**Every import must have a corresponding package**:
+
+- If code imports from a package, that package must be in `package.json` `devDependencies` or `dependencies`
+- When adding new packages to `eslint.config.js` or other files, add them to `package.json` first
+- Run `pnpm install` after updating `package.json` to update the pnpm-lock.yaml file
+- Commit the pnpm-lock.yaml changes along with code changes
+
+### Documentation must match implementation
+
+- Don't document features that don't exist
+- Don't reference patterns that differ from actual code; for example don't say "update MAINTENANCE NOTE" when files don't use that format
+- If docs refer to a specific comment format, verify all files follow it or update docs to reflect reality
+- Code examples in documentation must use the same patterns as actual implementation, for example use `WEAPON_STAT_TYPES.CRIT_DMG`, not string literals
+
+---
+
 ## Pull request workflow
 
 ### Branch naming
@@ -403,7 +472,7 @@ screen.getByText('Pyro');
 1. **One pull request equals one feature**. Keep pull requests focused and atomic.
 2. **Good pull request titles**. Use the conventional commit format so it becomes the commit message.
 3. **Descriptive body**. Use bullet points that explain what changed and why.
-4. **Reference issues**. Use "Closes #X" or "Addresses #X."
+4. **Reference issues**. Use Closes #X or Addresses #X.
 5. **Self-review**. Review your own pull request before requesting review.
 
 ### Merge strategy
@@ -419,6 +488,33 @@ screen.getByText('Pyro');
 - ✅ TypeScript compiles without errors
 - ✅ Format code with Prettier
 - ✅ Pull request description is accurate
+- ✅ All review comments addressed (use `gh pr view <number> --comments` to verify)
+- ✅ Pre-commit hooks pass locally before pushing
+
+### Addressing review comments
+
+**Fetch and fix all feedback**:
+
+1. Before pushing changes, always check for latest comments:
+
+   ```bash
+   gh api repos/OWNER/REPO/pulls/NUMBER/comments --paginate | \
+     jq -r '.[] | "\(.path):\(.line) - \(.body)"'
+   ```
+
+2. Address each comment completely—don't skip suggestions:
+   <!-- vale alex.ProfanityUnlikely = NO -->
+   - Comments labeled "improvement" still need fixing
+   - Documentation and code examples matter as much as code logic
+   - Data accuracy is important; for example, correct weapon versions
+   <!-- vale alex.ProfanityUnlikely = YES -->
+3. Batch related fixes when possible to keep history clean
+
+4. After fixes, verify quality checks still pass:
+
+   ```bash
+   pnpm typecheck && pnpm lint && pnpm format
+   ```
 
 ---
 
@@ -614,6 +710,15 @@ const avgDamage = calculateAverageDamage(artifacts);
 - ✅ Reference documentation in docs/
 - ✅ Keep suggestions focused and minimal
 
+<!-- vale alex.ProfanityUnlikely = NO -->
+
+- ✅ Maintain data accuracy; for example correct game versions and weapon stats
+
+<!-- vale alex.ProfanityUnlikely = YES -->
+
+- ✅ Use constants instead of string literals for maintainability
+- ✅ Verify code examples in documentation match implementation patterns
+
 ### Don't
 
 - ❌ Suggest libraries not in package.json without asking
@@ -622,6 +727,9 @@ const avgDamage = calculateAverageDamage(artifacts);
 - ❌ Ignore TypeScript errors
 - ❌ Suggest Bun-specific code that isn't implemented yet
 - ❌ Make OS-specific assumptions
+- ❌ Use inconsistent patterns across the same codebase
+- ❌ Document features as working if they aren't implemented yet
+<!-- vale alex.ProfanityUnlikely = YES -->
 
 ---
 
@@ -668,13 +776,28 @@ See the maintenance section in `.github/dependabot.yml` for detailed instruction
 
 When addressing Copilot pull request review comments:
 
-1. **Fetch inline comments**. Use `gh api repos/.../pulls/{pr}/comments` to see all review feedback.
-2. **Prioritize issues**. Critical, breaks build, then consistency, then suggestions.
-3. **Batch fixes**. Group related changes in single commits.
-4. **Verify changes**. Run `pnpm build` and `pnpm lint` after fixes.
-5. **Update docs**. If code examples in docs are wrong, fix them too.
+1. **Fetch inline comments**. Use `gh api repos/.../pulls/{pr}/comments --paginate` to see all review feedback in all review cycles.
+2. **Prioritize comprehensively**. Address all issues, not just critical ones. Suggestions for improvement and consistency matter as much as bug fixes.
+3. **Batch fixes**. Group related changes in single commits when possible to keep history clean.
+4. **Verify changes**. Run full quality checks after fixes:
+
+   ```bash
+   pnpm typecheck && pnpm lint && pnpm format
+   ```
+
+5. **Update docs**. If code examples in docs are wrong, fix them alongside the code changes.
+6. **Fetch fresh feedback** before pushing. Copilot may add additional comments as review cycles progress. Use `gh pr view <number> --comments` to check for the latest feedback.
+7. **Iterate systematically**. If there are multiple review cycles, address each cycle completely before pushing the next batch of fixes.
+
+**Key principle**: Address all review feedback comprehensively. Comments marked as "suggestion" or "improvement" aren't optional—they represent opportunities for code quality and consistency.
+
+<!-- vale Google.Parens = NO -->
+<!-- vale Google.Colons = NO -->
 
 ## Questions to ask
+
+<!-- vale Google.Parens = YES -->
+<!-- vale Google.Colons = YES -->
 
 If you're unsure about:
 
