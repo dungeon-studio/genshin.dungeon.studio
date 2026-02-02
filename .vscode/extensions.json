@@ -17,6 +17,9 @@
     "streetsidesoftware.code-spell-checker",
     "meganrogge.template-string-converter",
 
+    // Styling
+    "bradlc.vscode-tailwindcss",
+
     // Testing - Extension ready for Phase 4 when Vitest is installed
     // Harmless to install early, will activate when Vitest is added
     "vitest.explorer",
