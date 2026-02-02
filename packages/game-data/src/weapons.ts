@@ -99,20 +99,6 @@ export const WEAPONS: Weapon[] = [
   },
   // 5-Star Polearms
   {
-    id: 'staff-of-homa',
-    name: 'Staff of Homa',
-    type: 'Polearm',
-    rarity: 5,
-    baseATK: 46,
-    version: '1.5',
-    subStat: {
-      type: WEAPON_STAT_TYPES.CRIT_DMG,
-      value: 14.4,
-    },
-    passiveName: 'Reckless Cinnabar',
-    passiveDescription: 'HP increased. Additionally, provides an ATK Bonus based on Max HP.',
-  },
-  {
     id: 'engulfing-lightning',
     name: 'Engulfing Lightning',
     type: 'Polearm',
@@ -127,6 +113,20 @@ export const WEAPONS: Weapon[] = [
     passiveDescription:
       'ATK increased based on Energy Recharge. Gain Energy Recharge after using Elemental Burst.',
   },
+  {
+    id: 'staff-of-homa',
+    name: 'Staff of Homa',
+    type: 'Polearm',
+    rarity: 5,
+    baseATK: 46,
+    version: '1.3',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 14.4,
+    },
+    passiveName: 'Reckless Cinnabar',
+    passiveDescription: 'HP increased. Additionally, provides an ATK Bonus based on Max HP.',
+  },
   // 5-Star Bows
   {
     id: 'thundering-pulse',
@@ -134,7 +134,7 @@ export const WEAPONS: Weapon[] = [
     type: 'Bow',
     rarity: 5,
     baseATK: 46,
-    version: '2.4',
+    version: '2.0',
     subStat: {
       type: WEAPON_STAT_TYPES.CRIT_DMG,
       value: 14.4,

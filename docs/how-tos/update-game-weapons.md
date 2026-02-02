@@ -98,7 +98,7 @@ Group weapons by:
 
 ### 4. Update version comment
 
-Update the MAINTENANCE NOTE comment at the top of `weapons.ts` with the latest version and description of changes.
+Update the version comment at the top of `weapons.ts` with the latest version and a brief description of the changes.
 
 ### 5. Verify and test
 

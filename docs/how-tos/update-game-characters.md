@@ -63,7 +63,7 @@ Maintain the `CHARACTERS` array in a logical order:
 
 ### 4. Update version comment
 
-Update the MAINTENANCE NOTE comment at the top of `characters.ts` with the latest version and description of changes.
+Update the version comment at the top of `characters.ts` (for example, the line noting "as of version ...") with the latest game version and a brief description of the changes you made.
 
 ### 5. Verify and test
 
