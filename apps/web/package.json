@@ -20,8 +20,7 @@
     "lucide-react": "^0.563.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "tailwind-merge": "^3.4.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
     "@eslint/js": "9.39.2",
@@ -37,6 +36,7 @@
     "postcss": "^8.5.6",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "3",
+    "tailwindcss-animate": "^1.0.7",
     "typescript": "5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4"
