@@ -114,19 +114,16 @@ The README should help humans **identify, evaluate, and use** the project. Follo
 3. **Link, don't duplicate**. Reference external docs such as Diátaxis itself rather than summarizing.
 4. **Keep CONTRIBUTING.md focused**. Move detailed tasks to how-to guides and link back.
 5. **Planning vs. documentation**
-
    - ❌ Don't document development phases, implementation plans, or future features in markdown docs
    - ✅ Track phases and planning in GitHub Issues and Milestones
    - ✅ Documentation should describe what **exists now**, not what's planned
 
 6. **Unimplemented features**
-
    - ❌ Don't document features as working if they're not implemented yet
    - ✅ Either omit them entirely or explicitly mark them as "when implemented" with a link to the relevant issue
    - ✅ If suggesting a feature that doesn't exist, create or reference the GitHub issue for it
 
 7. **DevContainers priority**
-
    - ✅ When DevContainers exist, emphasize them as the primary recommended path
    - ✅ Document manual setup as an alternative in `docs/how-tos/manual-setup.md`
 
@@ -403,7 +400,6 @@ When GitHub Actions stops passing or quality checks don't pass:
    ```
 
 2. **Root cause analysis** - The first error symptom often masks the real issue:
-
    - Frozen pnpm-lock.yaml errors usually mean dependencies changed but weren't committed
    - Type errors might point to a missing export or incorrect type definition
    - **Lint failures** should fix at the source, not work around
@@ -543,36 +539,30 @@ vale docs/  # Shows 5 errors, 12 warnings, 30 suggestions
 When reviewing code or pull requests, pay extra attention to:
 
 1. **Type safety**
-
    - No `any` types
    - Proper null/undefined handling
    - Type guards where needed
 
 2. **Testing**
-
    - Tests exist for new features
    - Tests are meaningful, not just for coverage
    - Tests use Testing Library best practices
 
 3. **Performance**
-
    - Avoid unnecessary re-renders with `useMemo` and `useCallback`
    - Lazy load routes and components
    - Optimize Firestore queries
 
 4. **Security**
-
    - No hardcoded secrets or API keys
    - Proper input validation
    - Configure Firebase security rules
 
 5. **Cross-platform**
-
    - No OS-specific commands
    - Paths use the Node.js `path` module
 
 6. **Consistency**
-
    - Follows established patterns
    - Matches existing code style
    - Uses shared types from packages/types
