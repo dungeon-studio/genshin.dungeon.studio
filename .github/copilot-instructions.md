@@ -485,6 +485,12 @@ When GitHub Actions stops passing or quality checks don't pass:
    pnpm test        # Test suite
    ```
 
+4. **Let pre-commit handle formatting** - Don't run `Prettier --write` manually before committing:
+
+   - Pre-commit automatically formats files and stages them
+   - Running Prettier manually can cause loops where pre-commit keeps modifying files
+   - Just stage your changes with `git add` and let pre-commit do its work on commit
+
 ### Quality standards: All checks must pass
 
 **Fix errors, warnings, and suggestions** - Don't skip any quality issues:
@@ -547,6 +553,7 @@ vale docs/  # Shows 5 errors, 12 warnings, 30 suggestions
 - **Squash and merge**. All pull request commits become one commit on develop.
 - The pull request title and body become the final commit message.
 - Keep commit history clean. One feature equals one commit.
+- **Don't amend commits during PR review**. Since everything gets squashed on merge, just make new commits for fixes and improvements. There's no benefit to amending.
 
 ### Before merging
 
@@ -705,6 +712,7 @@ Comment liberally for:
 - **Workarounds**: Temporary fixes or browser quirks with issue or ticket references
 - **Performance considerations**: Explain why you use certain patterns, such as memoization and lazy loading
 - **External dependencies**: Integration points or third-party API quirks
+- **Configuration rationale**: Explain why specific config options are set the way they're (yamllint rules, ESLint overrides, etc.)
 
 **Examples**:
 
