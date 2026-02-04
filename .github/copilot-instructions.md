@@ -219,20 +219,50 @@ genshin.dungeon.studio/
 - ✅ **Use hooks** - `useState`, `useEffect`, `useMemo`, `useCallback` appropriately
 - ✅ **Early returns** for conditional rendering
 - ✅ **Use NavLink for navigation** - For nav menus, use `NavLink` instead of `Link` to provide active route indication. NavLink automatically provides `isActive` state for styling the current page.
+- ✅ **Add `end` prop to root route** - When using NavLink for the home route ("/"), add `end` prop to prevent it from showing as active on all routes since every path starts with "/"
 
 ```typescript
-// ✅ Good: NavLink with active state styling
+// ✅ Good: NavLink with active state styling and end prop for home route
 <NavLink
-  to="/teams"
+  to="/"
+  end
   className={({ isActive }) =>
     isActive ? 'text-blue-600 border-b-2 border-blue-500' : 'text-gray-600'
   }
 >
-  Teams
+  Home
 </NavLink>
 
 // ❌ Bad: Plain Link doesn't show active state
 <Link to="/teams" className="text-gray-600">Teams</Link>
+```
+
+### Accessibility
+
+- ✅ **Semantic HTML** - Use proper HTML5 semantic elements (`nav`, `main`, `header`, `footer`)
+- ✅ **ARIA labels** - Add `aria-label` to navigation elements: `<nav aria-label="Main navigation">`
+- ✅ **Decorative content** - Add `aria-hidden="true"` to decorative emojis and icons that don't convey meaning
+- ✅ **Screen reader testing** - Consider how content reads to screen reader users
+- ✅ **Keyboard navigation** - Ensure all interactive elements are keyboard accessible
+
+### Import organization
+
+- ✅ **Group imports** - Separate external library imports from internal component imports with a blank line
+- ✅ **Remove unused imports** - Don't leave unused imports in the code
+- ✅ **Alphabetize within groups** - Keep imports sorted within each group for consistency
+
+```typescript
+// ✅ Good: External libraries first, then internal imports
+import { useState, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
+
+import { ComponentA } from './components/ComponentA';
+import { ComponentB } from './components/ComponentB';
+
+// ❌ Bad: Mixed external and internal imports
+import { useState } from 'react';
+import { ComponentA } from './components/ComponentA';
+import { NavLink } from 'react-router-dom';
 ```
 
 ### File naming
