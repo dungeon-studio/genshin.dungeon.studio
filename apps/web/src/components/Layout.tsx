@@ -1,4 +1,4 @@
-import { Outlet, Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, Outlet } from 'react-router-dom';
 
 export function Layout() {
   return (

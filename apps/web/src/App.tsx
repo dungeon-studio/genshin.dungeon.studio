@@ -1,10 +1,10 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
-import { HomePage } from './pages/HomePage';
-import { CollectionPage } from './pages/CollectionPage';
-import { TeamsPage } from './pages/TeamsPage';
 import { ChatPage } from './pages/ChatPage';
+import { CollectionPage } from './pages/CollectionPage';
+import { HomePage } from './pages/HomePage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { TeamsPage } from './pages/TeamsPage';
 
 export function App() {
   return (
