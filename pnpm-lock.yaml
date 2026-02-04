@@ -12,8 +12,8 @@ importers:
         specifier: 9.39.2
         version: 9.39.2
       '@types/node':
-        specifier: 25.1.0
-        version: 25.1.0
+        specifier: 25.2.0
+        version: 25.2.0
       eslint:
         specifier: 9.39.2
         version: 9.39.2(jiti@1.21.7)
@@ -40,8 +40,8 @@ importers:
         specifier: 9.39.2
         version: 9.39.2
       '@types/node':
-        specifier: 25.1.0
-        version: 25.1.0
+        specifier: 25.2.0
+        version: 25.2.0
       eslint:
         specifier: 9.39.2
         version: 9.39.2(jiti@1.21.7)
@@ -104,8 +104,8 @@ importers:
         specifier: 9.39.2
         version: 9.39.2
       '@types/node':
-        specifier: 25.1.0
-        version: 25.1.0
+        specifier: 25.2.0
+        version: 25.2.0
       '@types/react':
         specifier: ^19.2.5
         version: 19.2.10
@@ -114,7 +114,7 @@ importers:
         version: 19.2.3(@types/react@19.2.10)
       '@vitejs/plugin-react':
         specifier: ^5.1.1
-        version: 5.1.2(vite@7.3.1(@types/node@25.1.0)(jiti@1.21.7)(tsx@4.19.2))
+        version: 5.1.2(vite@7.3.1(@types/node@25.2.0)(jiti@1.21.7)(tsx@4.19.2))
       autoprefixer:
         specifier: ^10.4.24
         version: 10.4.24(postcss@8.5.6)
@@ -150,7 +150,7 @@ importers:
         version: 8.54.0(eslint@9.39.2(jiti@1.21.7))(typescript@5.9.3)
       vite:
         specifier: ^7.2.4
-        version: 7.3.1(@types/node@25.1.0)(jiti@1.21.7)(tsx@4.19.2)
+        version: 7.3.1(@types/node@25.2.0)(jiti@1.21.7)(tsx@4.19.2)
 
   packages/game-data:
     devDependencies:
@@ -158,8 +158,8 @@ importers:
         specifier: 9.39.2
         version: 9.39.2
       '@types/node':
-        specifier: 25.1.0
-        version: 25.1.0
+        specifier: 25.2.0
+        version: 25.2.0
       eslint:
         specifier: 9.39.2
         version: 9.39.2(jiti@1.21.7)
@@ -990,8 +990,8 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
-  '@types/node@25.1.0':
-    resolution: {integrity: sha512-t7frlewr6+cbx+9Ohpl0NOTKXZNV9xHRmNOvql47BFJKcEG1CxtxlPEEe+gR9uhVWM4DwhnvTF110mIL4yP9RA==}
+  '@types/node@25.2.0':
+    resolution: {integrity: sha512-DZ8VwRFUNzuqJ5khrvwMXHmvPe+zGayJhr2CDNiKB1WBE1ST8Djl00D0IC4vvNmHMdj6DlbYRIaFE7WHjlDl5w==}
 
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
@@ -2755,7 +2755,7 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
-  '@types/node@25.1.0':
+  '@types/node@25.2.0':
     dependencies:
       undici-types: 7.16.0
 
@@ -2951,7 +2951,7 @@ snapshots:
       '@typescript-eslint/types': 8.54.0
       eslint-visitor-keys: 4.2.1
 
-  '@vitejs/plugin-react@5.1.2(vite@7.3.1(@types/node@25.1.0)(jiti@1.21.7)(tsx@4.19.2))':
+  '@vitejs/plugin-react@5.1.2(vite@7.3.1(@types/node@25.2.0)(jiti@1.21.7)(tsx@4.19.2))':
     dependencies:
       '@babel/core': 7.28.6
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.6)
@@ -2959,7 +2959,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.53
       '@types/babel__core': 7.20.5
       react-refresh: 0.18.0
-      vite: 7.3.1(@types/node@25.1.0)(jiti@1.21.7)(tsx@4.19.2)
+      vite: 7.3.1(@types/node@25.2.0)(jiti@1.21.7)(tsx@4.19.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -3826,7 +3826,7 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  vite@7.3.1(@types/node@25.1.0)(jiti@1.21.7)(tsx@4.19.2):
+  vite@7.3.1(@types/node@25.2.0)(jiti@1.21.7)(tsx@4.19.2):
     dependencies:
       esbuild: 0.27.2
       fdir: 6.5.0(picomatch@4.0.3)
@@ -3835,7 +3835,7 @@ snapshots:
       rollup: 4.57.0
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 25.1.0
+      '@types/node': 25.2.0
       fsevents: 2.3.3
       jiti: 1.21.7
       tsx: 4.19.2
