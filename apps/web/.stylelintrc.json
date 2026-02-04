@@ -10,8 +10,7 @@
     "value-keyword-case": [
       "lower",
       {
-        "camelCaseSvgKeywords": true,
-        "ignoreProperties": ["text-rendering"]
+        "camelCaseSvgKeywords": true
       }
     ]
   }
