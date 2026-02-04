@@ -1,0 +1,47 @@
+---
+# yamllint configuration for Genshin Dungeon Studio
+# Catches malformed YAML and enforces consistent style
+# See https://yamllint.readthedocs.io/ for rule documentation
+
+extends: default
+
+rules:
+  # Line length - allow longer lines for URLs and long strings
+  line-length:
+    max: 120
+    level: warning
+
+  # Document start (---) - required for explicit YAML files
+  document-start: enable
+
+  # Indentation - 2 spaces is standard for our project
+  indentation:
+    spaces: 2
+    indent-sequences: true
+    check-multi-line-strings: false
+
+  # Comments - require space after # but be flexible about indentation
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: disable
+
+  # Allow empty values for optional fields
+  empty-values:
+    forbid-in-block-mappings: false
+    forbid-in-flow-mappings: true
+
+  # Truthy values - be strict to catch common mistakes
+  # Allow GitHub Actions style with 'on:' trigger
+  truthy:
+    allowed-values: ['true', 'false', 'on']
+    check-keys: false
+
+ignore: |
+  # Exclude generated and vendor files
+  .styles/
+  node_modules/
+  .pnpm-store/
+  dist/
+  build/
+  .turbo/
+  pnpm-lock.yaml

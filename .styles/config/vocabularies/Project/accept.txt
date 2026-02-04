@@ -25,6 +25,7 @@ npm
 ESLint
 Prettier
 Vitest
+yamllint
 
 # Configuration and tooling terms
 config
