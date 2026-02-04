@@ -6,6 +6,13 @@
       {
         "ignoreAtRules": ["tailwind", "apply", "layer", "config"]
       }
+    ],
+    "value-keyword-case": [
+      "lower",
+      {
+        "camelCaseSvgKeywords": true,
+        "ignoreProperties": ["text-rendering"]
+      }
     ]
   }
 }
