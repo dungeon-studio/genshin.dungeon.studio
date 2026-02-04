@@ -6,32 +6,36 @@
 extends: default
 
 rules:
-  # Line length - allow longer lines for URLs and long strings
+  # Allow longer lines since YAML configs often contain URLs and long strings
+  # that shouldn't be broken across lines
   line-length:
     max: 120
     level: warning
 
-  # Document start (---) - required for explicit YAML files
+  # Require document-start markers for consistency and to make YAML files
+  # explicit about where they begin
   document-start: enable
 
-  # Indentation - 2 spaces is standard for our project
+  # Disable multiline string checking since regex patterns and code blocks
+  # inside YAML should maintain their own formatting
   indentation:
     spaces: 2
     indent-sequences: true
     check-multi-line-strings: false
 
-  # Comments - require space after # but be flexible about indentation
+  # Disable comment indentation checking because it's too strict for
+  # commented-out YAML structures (like disabled workflow steps)
   comments:
     min-spaces-from-content: 1
   comments-indentation: disable
 
-  # Allow empty values for optional fields
+  # Allow empty values in block mappings for optional configuration fields
   empty-values:
     forbid-in-block-mappings: false
     forbid-in-flow-mappings: true
 
-  # Truthy values - be strict to catch common mistakes
-  # Allow GitHub Actions style with 'on:' trigger
+  # Allow 'on' as a truthy value for GitHub Actions workflow triggers
+  # Disable key checking to allow 'on:' as a top-level key
   truthy:
     allowed-values: ['true', 'false', 'on']
     check-keys: false
