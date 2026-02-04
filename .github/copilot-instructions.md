@@ -486,7 +486,6 @@ When GitHub Actions stops passing or quality checks don't pass:
    ```
 
 4. **Let pre-commit handle formatting** - Don't run `Prettier --write` manually before committing:
-
    - Pre-commit automatically formats files and stages them
    - Running Prettier manually can cause loops where pre-commit keeps modifying files
    - Just stage your changes with `git add` and let pre-commit do its work on commit
@@ -513,6 +512,19 @@ vale docs/  # Shows 5 errors, 12 warnings, 30 suggestions
 # → Fix all 47 issues, then verify with `vale docs/` again showing zero output
 ```
 
+### Pre-commit.ci "error during merge check"
+
+This error indicates the branch needs updating:
+
+```bash
+git fetch origin develop
+git merge origin/develop  # Resolve conflicts if any
+pnpm install  # Regenerate lock file if package.json conflicts
+git push
+```
+
+This isn't an error with your changes - just merge conflicts or an outdated branch, typically from Dependabot updates on develop.
+
 ### Dependency management
 
 **Every import must have a corresponding package**:
@@ -521,6 +533,12 @@ vale docs/  # Shows 5 errors, 12 warnings, 30 suggestions
 - When adding new packages to `eslint.config.js` or other files, add them to `package.json` first
 - Run `pnpm install` after updating `package.json` to update the pnpm-lock.yaml file
 - Commit the pnpm-lock.yaml changes along with code changes
+
+**After manually editing package.json versions**:
+
+1. If you manually change versions (for example, removing `^` carets), immediately run `pnpm install` to regenerate pnpm-lock.yaml
+2. Commit both package.json and pnpm-lock.yaml together
+3. If you don't update the lock file, CI fails with "frozen-lockfile" errors showing version mismatches
 
 ### Documentation must match implementation
 
@@ -805,6 +823,35 @@ const avgDamage = calculateAverageDamage(artifacts);
 - ❌ Use inconsistent patterns across the same codebase
 - ❌ Document features as working if they aren't implemented yet
 <!-- vale alex.ProfanityUnlikely = YES -->
+
+---
+
+## Pre-commit integration
+
+<!-- vale Vale.Spelling = NO -->
+
+### Selection criteria
+
+When adding a new linting/formatting tool, choose the appropriate pre-commit integration type:
+
+**Use local integration** (like ESLint, Stylelint) when:
+
+- Third-party integration requires manual version specification in `additional_dependencies` anyway
+- IDE integration is valuable for developers
+- Manual script capability is needed (for example, `pnpm lint:css`)
+- Version control via package.json is important
+- Pattern: Install in package.json, configure as `repo: local`, add to pre-commit.ci skip list, run manually in GitHub Actions
+
+**Use third-party integration** (like Prettier, Markdownlint) when:
+
+- Integration truly manages its own dependencies without requiring explicit version specification
+- Tool is a formatter without complex configuration needs
+- No manual script needed
+- Pattern: Use third-party repo directly, pre-commit.ci runs automatically
+
+**Key principle**: If `additional_dependencies` requires specifying the tool itself (not just plugins/configs), prefer local integration for better version control and developer experience.
+
+<!-- vale Vale.Spelling = YES -->
 
 ---
 

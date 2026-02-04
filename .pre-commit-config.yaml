@@ -16,12 +16,13 @@ exclude: |
 
 ci:
   # GitHub Actions runs hooks via two separate workflows to avoid duplication:
-  # 1. pre-commit.yml (ESLint only) - runs on every PR
+  # 1. pre-commit.yml (ESLint + Stylelint) - runs on every PR
   # 2. build.yml (typecheck + build) - runs full build pipeline
   # Skip hooks here that are handled by build.yml to prevent running them twice.
   # Keep this list in sync with what's NOT run in GitHub Actions workflows.
   skip:
     - eslint
+    - stylelint
     - typescript-check
 
 repos:
@@ -99,6 +100,16 @@ repos:
         language: system
         types: [javascript, jsx, ts, tsx]
         args: [--fix, --max-warnings=0]
+
+  # Stylelint - CSS linting
+  - repo: local
+    hooks:
+      - id: stylelint
+        name: stylelint
+        entry: pnpm exec stylelint
+        language: system
+        types: [css]
+        args: [--fix]
 
   # TypeScript type checking
   - repo: local
