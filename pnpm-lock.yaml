@@ -91,8 +91,8 @@ importers:
         specifier: ^19.2.0
         version: 19.2.4(react@19.2.4)
       react-router-dom:
-        specifier: 7.2.0
-        version: 7.2.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: 7.13.0
+        version: 7.13.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       tailwind-merge:
         specifier: ^3.4.0
         version: 3.4.0
@@ -984,9 +984,6 @@ packages:
   '@types/babel__traverse@7.28.0':
     resolution: {integrity: sha512-8PvcXf70gTDZBgt9ptxJ8elBeBjcLOAcOtoO/mPJjtji1+CdGbHgm77om1GrsPxsiE+uXIpNSK64UYaIwQXd4Q==}
 
-  '@types/cookie@0.6.0':
-    resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
-
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
@@ -1807,15 +1804,15 @@ packages:
       '@types/react':
         optional: true
 
-  react-router-dom@7.2.0:
-    resolution: {integrity: sha512-cU7lTxETGtQRQbafJubvZKHEn5izNABxZhBY0Jlzdv0gqQhCPQt2J8aN5ZPjS6mQOXn5NnirWNh+FpE8TTYN0Q==}
+  react-router-dom@7.13.0:
+    resolution: {integrity: sha512-5CO/l5Yahi2SKC6rGZ+HDEjpjkGaG/ncEP7eWFTvFxbHP8yeeI0PxTDjimtpXYlR3b3i9/WIL4VJttPrESIf2g==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
 
-  react-router@7.2.0:
-    resolution: {integrity: sha512-fXyqzPgCPZbqhrk7k3hPcCpYIlQ2ugIXDboHUzhJISFVy2DEPsmHgN588MyGmkIOv3jDgNfUE3kJi83L28s/LQ==}
+  react-router@7.13.0:
+    resolution: {integrity: sha512-PZgus8ETambRT17BUm/LL8lX3Of+oiLaPuVTRH3l1eLvSPpKO3AvhAEb5N7ihAFZQrYDqkvvWfFh9p0z9VsjLw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: '>=18'
@@ -1977,9 +1974,6 @@ packages:
     resolution: {integrity: sha512-AsPlza3AsavJdl2o7FE67qyv0aLfmT1XwFQGzvwpoAO6Bj7S4a03tpUchZKNuGjNAkKVProQRFnB7PgUAScFXA==}
     cpu: [arm64]
     os: [linux]
-
-  turbo-stream@2.4.0:
-    resolution: {integrity: sha512-FHncC10WpBd2eOmGwpmQsWLDoK4cqsA/UT/GqNoaKOQnT8uzhtCbg3EoUDMvqpOSAI0S26mr0rkjzbOO6S3v1g==}
 
   turbo-windows-64@2.8.1:
     resolution: {integrity: sha512-GdqNO6bYShRsr79B+2G/2ssjLEp9uBTvLBJSWRtRCiac/SEmv8T6RYv9hu+h5oGbFALtnKNp6BQBw78RJURsPw==}
@@ -2756,8 +2750,6 @@ snapshots:
   '@types/babel__traverse@7.28.0':
     dependencies:
       '@babel/types': 7.28.6
-
-  '@types/cookie@0.6.0': {}
 
   '@types/estree@1.0.8': {}
 
@@ -3571,19 +3563,17 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.10
 
-  react-router-dom@7.2.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  react-router-dom@7.13.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
-      react-router: 7.2.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react-router: 7.13.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
 
-  react-router@7.2.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  react-router@7.13.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
-      '@types/cookie': 0.6.0
       cookie: 1.1.1
       react: 19.2.4
       set-cookie-parser: 2.7.2
-      turbo-stream: 2.4.0
     optionalDependencies:
       react-dom: 19.2.4(react@19.2.4)
 
@@ -3763,8 +3753,6 @@ snapshots:
 
   turbo-linux-arm64@2.8.1:
     optional: true
-
-  turbo-stream@2.4.0: {}
 
   turbo-windows-64@2.8.1:
     optional: true
