@@ -62,6 +62,16 @@ repos:
         types_or: [javascript, jsx, ts, tsx, json, yaml, markdown, css]
         args: [--write]
 
+  # Stylelint - CSS linting
+  - repo: https://github.com/thibaudcolas/pre-commit-stylelint
+    rev: v16.11.0
+    hooks:
+      - id: stylelint
+        args: [--fix]
+        additional_dependencies:
+          - stylelint@^16.11.0
+          - stylelint-config-standard@^36.0.1
+
   # Markdown linting
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.17.1

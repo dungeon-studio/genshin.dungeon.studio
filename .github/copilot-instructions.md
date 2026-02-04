@@ -486,7 +486,6 @@ When GitHub Actions stops passing or quality checks don't pass:
    ```
 
 4. **Let pre-commit handle formatting** - Don't run `Prettier --write` manually before committing:
-
    - Pre-commit automatically formats files and stages them
    - Running Prettier manually can cause loops where pre-commit keeps modifying files
    - Just stage your changes with `git add` and let pre-commit do its work on commit
