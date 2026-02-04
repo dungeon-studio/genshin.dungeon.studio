@@ -472,7 +472,7 @@ vale docs/  # Shows 5 errors, 12 warnings, 30 suggestions
 1. **One pull request equals one feature**. Keep pull requests focused and atomic.
 2. **Good pull request titles**. Use the conventional commit format so it becomes the commit message.
 3. **Descriptive body**. Use bullet points that explain what changed and why.
-4. **Reference issues**. Use Closes #X or Addresses #X.
+4. **Reference issues**. Use "Closes #X" or "Addresses #X."
 5. **Self-review**. Review your own pull request before requesting review.
 
 ### Merge strategy
