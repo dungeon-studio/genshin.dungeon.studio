@@ -34,13 +34,14 @@ function Nav() {
   ];
 
   return (
-    <nav className="border-b border-gray-200 bg-gray-50">
+    <nav className="border-b border-gray-200 bg-gray-50" aria-label="Main navigation">
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex gap-8">
           {navLinks.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
+              end={link.to === '/'}
               className={({ isActive }) =>
                 `inline-block border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
                   isActive

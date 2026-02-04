@@ -1,4 +1,5 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+
 import { Layout } from './components/Layout';
 import { ChatPage } from './pages/ChatPage';
 import { CollectionPage } from './pages/CollectionPage';
