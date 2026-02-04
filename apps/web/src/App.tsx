@@ -9,6 +9,30 @@ export function App() {
         <div className="status">
           <span className="badge">🚧 Under Development</span>
         </div>
+        {/* Tailwind test - element color badges */}
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
+          <span className="rounded-full bg-pyro px-3 py-1 text-sm font-medium text-white shadow-md">
+            Pyro
+          </span>
+          <span className="rounded-full bg-hydro px-3 py-1 text-sm font-medium text-white shadow-md">
+            Hydro
+          </span>
+          <span className="rounded-full bg-electro px-3 py-1 text-sm font-medium text-white shadow-md">
+            Electro
+          </span>
+          <span className="rounded-full bg-cryo px-3 py-1 text-sm font-medium text-white shadow-md">
+            Cryo
+          </span>
+          <span className="rounded-full bg-anemo px-3 py-1 text-sm font-medium text-white shadow-md">
+            Anemo
+          </span>
+          <span className="rounded-full bg-geo px-3 py-1 text-sm font-medium text-white shadow-md">
+            Geo
+          </span>
+          <span className="rounded-full bg-dendro px-3 py-1 text-sm font-medium text-white shadow-md">
+            Dendro
+          </span>
+        </div>
       </div>
 
       <div className="features">

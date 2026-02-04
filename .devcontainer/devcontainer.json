@@ -31,6 +31,9 @@
         "streetsidesoftware.code-spell-checker",
         "meganrogge.template-string-converter",
 
+        // Styling
+        "bradlc.vscode-tailwindcss",
+
         // Testing (when Vitest is fully configured)
         "vitest.explorer",
 
