@@ -28,56 +28,55 @@ This is an AI-powered team building companion for Genshin Impact. Users can:
 
 ## Tech stack
 
-### Current phase 1-2 completed
+### Current phase 1-2
 
-- **monorepo**: Turborepo 2.7.6 + pnpm 9.15.4 workspaces
+- **monorepo**: Turborepo 2.7.6 + pnpm 9.15.4
 - **Language**: TypeScript 5.9.3 in strict mode
-- **Package Manager**: pnpm 9+
 - **Runtime**: Node.js 20+
-- **Code Formatting**: Prettier 3.8
-- **Frontend**: React 19.2 + Vite 7.3 + TypeScript, basic setup complete
+- **Frontend**: React 19.2 + Vite 7.3
 - **Linting**: ESLint 9.39 with flat config format
+- **Code Formatting**: Prettier 3.8
 
 ### Planned phase 3+
 
 - **Frontend Libraries**: Tailwind CSS, shadcn/ui, react-router-dom, zustand
-- **API server**: Hono on Node.js, may migrate to Bun runtime later
-- **Database**: Firestore
-- **Auth**: Firebase Authentication
-- **AI**: Claude by Anthropic via Model Context Protocol, MCP
-- **Hosting**: Google Cloud Platform (GCP), including GCP Cloud Run and GCP Cloud Storage
+- **API server**: Hono on Node.js (may migrate to Bun later)
+- **Database**: Firestore | **Auth**: Firebase Authentication
+- **AI**: Claude via Model Context Protocol (MCP)
+- **Hosting**: Google Cloud Platform (Cloud Run, Cloud Storage)
 - **Testing**: Vitest, React Testing Library
 
-### Important
+### Important notes
 
-- **Canonical Version Source**: Pin tool versions to exact versions in [package.json](../package.json) `devDependencies` for hermetic deployments. Dependabot manages updates automatically. Use `package.json` as the source of truth.
-- **Pre-commit Prettier**: The `mirrors-prettier` repo may lag behind the `package.json` Prettier version. Pin the pre-commit check to the latest available `mirrors-prettier` tag, even if it's older than `package.json`.
-- **Pre-commit.ci skip list**: `ci.skip` should only include checks run in GitHub Actions. Keep it in sync with the workflow check list to avoid duplicate checks.
-- **pre-commit/action**: `extra_args` only accepts one check id at a time. Use separate steps for multiple checks.
-- **Turborepo globs**: `globalDependencies` doesn't support negated patterns such as `!**/.env.example`.
-- **GitHub Actions allowlist**: Organization-level Actions policies can block workflows. If CI fails with permission errors for actions, check org-level allowlists before changing workflows.
-- Don't suggest Bun-specific code yet. It's listed in plans but not implemented.
-- ESLint 9.x uses flat config format. Don't use `extends`; use array spreading instead.
+- **Version pinning**: Use exact versions in `package.json` dev dependencies. Dependabot manages updates.
+- **Pre-commit Prettier**: Pin to latest available `mirrors-prettier` tag, even if older than `package.json`.
+- **Pre-commit.ci skip**: Only include checks run in GitHub Actions to avoid duplication.
+- **pre-commit/action**: `extra_args` accepts one check id at a time.
+- **Turborepo globs**: Doesn't support negated patterns like `!**/.env.example`.
+- **GitHub Actions**: Check org-level allowlists if CI fails with permission errors.
+- **Bun**: Not implemented yet, don't suggest Bun-specific code.
+- **ESLint 9.x**: Uses flat config format. Use array spreading, not `extends`.
 
 ---
 
 ## Documentation structure
 
-This project follows the [Diátaxis framework](https://diataxis.fr/) for documentation organization.
+<!-- vale Google.Passive = NO -->
+<!-- vale Microsoft.Passive = NO -->
 
-- **Tutorials**: Learning-oriented, step-by-step experiences. Planned.
-- **How-to guides**: Goal-oriented task instructions. Location: `docs/how-tos/`.
-- **Reference**: Technical descriptions such as API docs and type references. Planned.
-- **Explanation**: Conceptual discussion such as architecture notes. Planned.
+Follows [Diátaxis framework](https://diataxis.fr/) with tutorials, how-to guides in `docs/how-tos/`, reference material, and explanations. Most sections are planned except how-to guides.
+
+<!-- vale Microsoft.Passive = YES -->
+<!-- vale Google.Passive = YES -->
 
 ### Documentation locations
 
-- `README.md` at the root is **for users deciding if the project fits their needs**. See README standard below.
-- `CONTRIBUTING.md` at the root covers the contribution workflow and the story of contributing, not detailed tasks.
-- `docs/how-tos/` contains task-specific guides, for example "How to set up manually without DevContainers."
-- `docs/reference/` holds technical reference material.
-- `docs/explanation/` holds conceptual and architectural documentation.
-- **GitHub Issues and Milestones** are the source of truth for planning, phases, and the implementation roadmap.
+- `README.md` - For users deciding if the project fits their needs
+- `CONTRIBUTING.md` - Contribution workflow and story
+- `docs/how-tos/` - Task-specific guides
+- `docs/reference/` - Technical reference, planned
+- `docs/explanation/` - Architecture and concepts, planned
+- **GitHub Issues/Milestones** - Planning and roadmap
 
 <!-- vale Microsoft.Headings = NO -->
 
@@ -85,92 +84,33 @@ This project follows the [Diátaxis framework](https://diataxis.fr/) for documen
 
 <!-- vale Microsoft.Headings = YES -->
 
-The README should help humans **identify, evaluate, and use** the project. Follow [ddbeck's README checklist](https://github.com/ddbeck/readme-checklist):
+Follow [ddbeck's README checklist](https://github.com/ddbeck/readme-checklist):
 
-1. **Identify** the project name, address, and maintainer at the top.
-2. **Evaluate** what it does. Focus on benefits rather than the tech stack. Cover who it's for and the status or maturity.
-3. **Use** a quick start that emphasizes DevContainers. List prerequisites if any.
-4. **Engage** with links to docs, support, and contributing. Include the license.
+1. **Identify** - Project name, address, maintainer
+2. **Evaluate** - What it does, who it's for, status/maturity
+3. **Use** - Quick start emphasizing DevContainers
+4. **Engage** - Links to docs, support, contributing, license
 
-**Key principle**: the README shouldn't contain development roadmaps, architecture details, or tech stack justification. Those belong in:
+**Avoid in README** - planned features checklists, project structure diagrams, tech stack justifications, detailed roadmaps. Link to GitHub Issues for roadmap, CONTRIBUTING.md for setup.
 
-- Tech details: `copilot-instructions.md` or `docs/explanation/`. Planned for later.
-- Development roadmap: GitHub Issues/Milestones
-- Code organization: CONTRIBUTING.md or GitHub repo browser
-- Setup complexity: docs/how-tos/
+### Documentation guidelines
 
-**What not to put in README**:
-
-- ❌ "Planned features" checklists
-- ❌ Project structure diagrams
-- ❌ Tech stack decisions, save for architecture docs
-- ❌ Detailed development phase or roadmap sections beyond a short status like "Pre-Alpha"
-- ✅ Instead, link to GitHub Issues for roadmap and CONTRIBUTING.md for setup
-
-### When creating or updating documentation
-
-1. **Determine the type**. Decide whether this is teaching, task solving, reference, or explaining.
-2. **Place accordingly**. Use the Diátaxis structure.
-3. **Link, don't duplicate**. Reference external docs such as Diátaxis itself rather than summarizing.
-4. **Keep CONTRIBUTING.md focused**. Move detailed tasks to how-to guides and link back.
-5. **Planning vs. documentation**
-
-   - ❌ Don't document development phases, implementation plans, or future features in markdown docs
-   - ✅ Track phases and planning in GitHub Issues and Milestones
-   - ✅ Documentation should describe what **exists now**, not what's planned
-
-6. **Unimplemented features**
-
-   - ❌ Don't document features as working if they're not implemented yet
-   - ✅ Either omit them entirely or explicitly mark them as "when implemented" with a link to the relevant issue
-   - ✅ If suggesting a feature that doesn't exist, create or reference the GitHub issue for it
-
-7. **DevContainers priority**
-
-   - ✅ When DevContainers exist, emphasize them as the primary recommended path
-   - ✅ Document manual setup as an alternative in `docs/how-tos/manual-setup.md`
-
-8. **Documentation hygiene**
-   - ✅ Keep docs lean. Remove or avoid low-signal guides until there are real, recurring issues to document
-   - ✅ Use line-level Vale suppression comments for known false positives such as license badges
-   - ✅ After pre-commit reports Vale issues, run Vale manually to catch warnings and suggestions once you fix errors
+1. **Determine type** - Teaching, task-solving, reference, or explaining
+2. **Place accordingly** - Use Diátaxis structure
+3. **Link, don't duplicate** - Reference external docs
+4. **Keep CONTRIBUTING.md focused** - Move detailed tasks to how-to guides
+5. **Document what exists now** - Track planning in GitHub Issues, not markdown docs
+6. **Mark unimplemented features** - Either omit or explicitly mark "when implemented" with issue link
+7. **DevContainers priority** - Emphasize DevContainers, document manual setup in `docs/how-tos/manual-setup.md`
+8. **Documentation hygiene** - Keep docs lean; use line-level Vale suppression for known false positives; run Vale manually after pre-commit
 
 ---
 
-<!-- vale Microsoft.Headings = NO -->
+## DevContainer notes
 
-## DevContainer configuration
+**pnpm store mount** - don't use volume mounts in devcontainer.json. Named volumes mount with root ownership, causing EACCES errors for `node` user. Let pnpm use default store location.
 
-<!-- vale Microsoft.Headings = YES -->
-
-### pnpm store mount
-
-**Don't use volume mounts for pnpm store** in devcontainer.json. Named Docker volumes mount with root ownership, causing EACCES permission errors for the `node` user.
-
-```jsonc
-// ❌ DO NOT DO THIS - causes permission errors
-"mounts": [
-  "source=genshin-pnpm-store,target=${containerWorkspaceFolder}/.pnpm-store,type=volume"
-]
-```
-
-Instead, let pnpm use its default store location in the container. The first `pnpm install` is slower, but subsequent operations within the same container session use the cache normally.
-
-### Vite dev server for DevContainers
-
-**Configure Vite to listen on all interfaces** for DevContainer access. The default `localhost` binding won't be accessible from the host machine.
-
-```typescript
-// vite.config.ts
-export default defineConfig({
-  server: {
-    host: '0.0.0.0', // Listen on all interfaces for DevContainer access
-  },
-  // ... other config
-});
-```
-
-Without this configuration, the dev server runs but won't be accessible from the host browser, causing connection timeouts.
+**Vite dev server** - configure to listen on all interfaces with host set to `0.0.0.0` for DevContainer access. Default `localhost` won't be reachable from host.
 
 ---
 
@@ -183,10 +123,10 @@ genshin.dungeon.studio/
 │   └── api/          # Hono API server
 ├── packages/
 │   ├── types/        # Shared TypeScript types
-│   └── game-data/    # Static game data such as characters, weapons, and artifacts
+│   └── game-data/    # Static game data
 ├── infrastructure/   # Deployment scripts and Terraform
 ├── docs/             # Project documentation
-└── .github/          # CI and CD workflows plus instructions
+└── .github/          # CI/CD workflows and instructions
 ```
 
 ---
@@ -195,116 +135,83 @@ genshin.dungeon.studio/
 
 ### TypeScript
 
-- ✅ **Strict mode enabled** - No implicit any, strict null checks
-- ✅ **No `any` types** - Use `unknown` and type guards instead
-- ✅ **Explicit types for function returns** - Especially for exported functions
-- ✅ **Use type imports** - `import type { ... }` for types-only imports
-- ✅ **No non-null assertions** - Use proper null checks instead of `!`
-- ✅ **Path aliases configured** - Use `@/` for `src` imports, configured in `tsconfig` and Vite
-- ❌ **No class components** - Use functional components only
-- ❌ **No `enums`** - Use `const` objects or union types instead
+- ✅ Strict mode, no `any`, use `unknown` + type guards
+- ✅ Explicit return types for exported functions
+- ✅ Type-only imports with `import type { ... }`
+- ✅ Proper null checks, no non-null assertions `!`
+- ✅ Path aliases: `@/` for `src` imports
+- ❌ No class components, use functional only
+- ❌ No `enums`, use `const` objects or union types
 
 ### ESLint v9.x flat config
 
-- ✅ **Use array export** - `export default [...]` not `defineConfig([...])`
-- ✅ **Spread configs** - `...tseslint.configs.recommended` not `extends: [...]`
-- ✅ **Use `ignores`** - Top-level `{ ignores: ['dist'] }` not `globalIgnores()`
-- ❌ **No `eslint/config` imports** - These don't exist in ESLint 9.x
+- ✅ Array export: `export default [...]`
+- ✅ Spread configs: `...tseslint.configs.recommended`
+- ✅ Use `ignores` at top-level: `{ ignores: ['dist'] }`
+- ❌ No `extends` or `eslint/config` imports
 
 ### React
 
-- ✅ **Functional components** with TypeScript interfaces for props
-- ✅ **Named exports** - `export function ComponentName()`
-- ✅ **Props interfaces** named `ComponentNameProps`
-- ✅ **Use hooks** - `useState`, `useEffect`, `useMemo`, `useCallback` appropriately
-- ✅ **Early returns** for conditional rendering
-- ✅ **Use NavLink for navigation** - For nav menus, use `NavLink` instead of `Link` to provide active route indication. NavLink automatically provides `isActive` state for styling the current page.
-- ✅ **Add `end` prop to root route** - When using NavLink for the home route ("/"), add `end` prop to prevent it from showing as active on all routes since every path starts with "/"
-
-```typescript
-// ✅ Good: NavLink with active state styling and end prop for home route
-<NavLink
-  to="/"
-  end
-  className={({ isActive }) =>
-    isActive ? 'text-blue-600 border-b-2 border-blue-500' : 'text-gray-600'
-  }
->
-  Home
-</NavLink>
-
-// ❌ Bad: Plain Link doesn't show active state
-<Link to="/teams" className="text-gray-600">Teams</Link>
-```
+- ✅ Functional components with TypeScript interfaces
+- ✅ Named exports: `export function ComponentName()`
+- ✅ Props interfaces named `ComponentNameProps`
+- ✅ Use hooks appropriately
+- ✅ Early returns for conditional rendering
+- ✅ `NavLink` for navigation to provide active state
+- ✅ Add `end` prop to root route "/" to prevent showing active on all routes
 
 ### Accessibility
 
-- ✅ **Semantic HTML** - Use proper HTML5 semantic elements (`nav`, `main`, `header`, `footer`)
-- ✅ **ARIA labels** - Add `aria-label` to navigation elements: `<nav aria-label="Main navigation">`
-- ✅ **Decorative content** - Add `aria-hidden="true"` to decorative emojis and icons that don't convey meaning
-- ✅ **Screen reader testing** - Consider how content reads to screen reader users
-- ✅ **Keyboard navigation** - Ensure all interactive elements are keyboard accessible
+- ✅ Semantic HTML5 elements: `nav`, `main`, `header`, `footer`
+  <!-- vale Google.Acronyms = NO -->
+  <!-- vale Microsoft.Acronyms = NO -->
+- ✅ ARIA labels on navigation: `<nav aria-label="Main navigation">`
+- ✅ `aria-hidden="true"` on decorative emojis/icons
+  <!-- vale Google.Acronyms = YES -->
+  <!-- vale Microsoft.Acronyms = YES -->
+- ✅ Keyboard navigation must work for all interactive elements
 
 ### Import organization
 
-- ✅ **Group imports** - Separate external library imports from internal component imports with a blank line
-- ✅ **Remove unused imports** - Don't leave unused imports in the code
-- ✅ **Alphabetize within groups** - Keep imports sorted within each group for consistency
-
-```typescript
-// ✅ Good: External libraries first, then internal imports
-import { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
-
-import { ComponentA } from './components/ComponentA';
-import { ComponentB } from './components/ComponentB';
-
-// ❌ Bad: Mixed external and internal imports
-import { useState } from 'react';
-import { ComponentA } from './components/ComponentA';
-import { NavLink } from 'react-router-dom';
-```
+Group imports: external libraries first, then internal components, blank line between groups. Alphabetize within groups. Remove unused imports.
 
 ### File naming
 
-- `kebab-case.tsx` for files
-- `PascalCase` for components
-- `camelCase` for functions, variables
-- `SCREAMING_SNAKE_CASE` for constants
+- Files: `kebab-case.tsx`
+- Components: `PascalCase`
+- Functions/variables: `camelCase`
+- Constants: `SCREAMING_SNAKE_CASE`
 
 ### Code organization
 
-- Keep functions small and focused, ideally under 50 lines
+- Keep functions under 50 lines
 - One component per file
-- Co-locate tests with source files: `Component.tsx` + `Component.test.tsx`
-- Group related features in the `features/` directory
+- Co-locate tests: `Component.tsx` + `Component.test.tsx`
+- Group related features in `features/` directory
 
 ---
 
-## Testing requirements
+## Testing
 
-### Approach: Test-driven development
+### Approach
 
-1. Write tests first or alongside implementation
-2. Implement the feature to make the test pass
-3. Refactor while keeping tests green
+Test-driven development. Write tests first or alongside implementation.
 
-### Testing framework
+### Framework
 
-- **Test runner**: Vitest
-- **React testing**: @testing-library/react
-- **Assertions**: Vitest `matchers` + @testing-library/jest-dom
+- **Runner**: Vitest
+- **React**: @testing-library/react
+<!-- vale Vale.Spelling = NO -->
+- **Assertions** - Vitest matchers plus @testing-library/jest-dom
+<!-- vale Vale.Spelling = YES -->
 
-**Important**: Before creating test files, check that testing dependencies exist in package.json. Test files that import from packages not in dependencies cause TypeScript build errors. If Vitest or testing libraries aren't installed, either:
+**Important** - before creating test files, verify testing dependencies exist in package.json. Missing dependencies cause TypeScript build errors.
 
-- Add them to `devDependencies` first, or
-- Create basic module export tests without test framework imports until proper setup is complete
+### Coverage targets
 
-### Coverage expectations
-
-- **Critical paths**: 80%+ coverage
-- **Utilities and helpers**: 90%+ coverage
-- **UI components**: Test user interactions, not implementation details
+- Critical paths - 80%+
+- Utilities/helpers - 90%+
+- UI components - test user interactions, not implementation details
 
 ### Test structure
 
@@ -318,77 +225,42 @@ describe('ComponentName', () => {
 
 ---
 
-## Detailed contribution workflow
+## Contribution workflow
 
-This section provides technical guidance for implementing features and fixes.
-
-### 1. Feature development process
-
-#### Branch creation
+### Branch creation
 
 ```bash
 git checkout -b feature/description  # Use kebab-case
 ```
 
-**Test-driven development**
-Write tests before or alongside implementation:
+### Development
 
-```typescript
-// apps/web/src/features/[feature]/ComponentName.test.tsx
-describe('ComponentName', () => {
-  it('expected behavior description', () => {
-    // Arrange
-    const data = { /* test data */ };
-    // Act
-    render(<ComponentName {...data} />);
-    // Assert
-    expect(screen.getByRole('heading', { name: /name/i })).toBeInTheDocument();
-  });
-});
-```
-
-Then implement to make the test pass:
-
-```typescript
-// apps/web/src/features/[feature]/ComponentName.tsx
-export function ComponentName(props: ComponentNameProps) {
-  return <div>{/* implementation */}</div>;
-}
-```
-
-**Quality checks**
-Run these before committing:
+1. Write tests before/alongside implementation
+2. Implement feature to make tests pass
+3. Run quality checks:
 
 ```bash
-pnpm format                # Auto-format code with Prettier
-pnpm tsc --noEmit         # Type check without emitting
-pnpm test                 # Run all tests
-pnpm lint                 # Run ESLint
+pnpm format      # Prettier
+pnpm tsc --noEmit  # Type check
+pnpm test        # Run tests
+pnpm lint        # ESLint
 ```
 
-### 2. Commit message convention
+### Commit messages
 
-Follow [Conventional Commits](https://www.conventionalcommits.org/).
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```text
 <type>(<scope>): <description>
 
-[optional body explaining why]
+[optional body]
 
 [optional footer: Closes #123]
 ```
 
-**Types**:
+**Types**: `feat`, `fix`, `docs`, `test`, `refactor`, `style`, `chore`
 
-- `feat:` - New feature
-- `fix:` - Bug fix
-- `docs:` - Documentation changes
-- `test:` - Adding or updating tests
-- `refactor:` - Code restructuring without behavior change
-- `style:` - Formatting, no code change
-- `chore:` - Maintenance tasks and dependencies
-
-**Examples**:
+**Example**:
 
 ```text
 feat(collection): add character card component
@@ -400,262 +272,119 @@ feat(collection): add character card component
 Closes #42
 ```
 
-```text
-fix(api): handle missing Firebase credentials gracefully
+### Pull request workflow
 
-Throws helpful error message instead of crashing.
-```
-
-### 3. Pull request workflow
-
-#### Push and create pull request
-
-```bash
-git push -u origin feature/description
-gh pr create --title "feat: Add character card component" \
-  --body "Addresses #42
-
-Changes:
-- ComponentName component
-- Tests for user interactions
-- Integration with existing code"
-```
-
-**Pull request title format**: should match the commit message format and becomes the squash merge commit message.
-
-**Merge strategy**: the repository uses squash merge, so all pull request commits become one commit.
-
-**Before merge checklist**:
-
-- ✅ All tests pass
-- ✅ No TypeScript errors
-- ✅ No linting errors
-- ✅ Format code with Prettier
-- ✅ Tests cover critical paths, 80%+
-- ✅ Pull request description is accurate
-
-### 4. Testing standards
-
-**Coverage targets**:
-
-- **Critical paths**, core business logic: 80%+ coverage
-- **Utilities and helpers**: 90%+ coverage
-- **UI components**: Test user interactions and accessibility, not implementation details
-
-**Testing philosophy**: use [React Testing Library](https://testing-library.com/). Query by how users interact, not by internal structure.
-
-```typescript
-// ❌ Bad: testing implementation details
-container.querySelector('.character-card');
-getByTestId('card-wrapper');
-
-// ✅ Good: testing user experience
-screen.getByRole('heading', { name: /character name/i });
-screen.getByText('Pyro');
-```
-
----
-
-## Debugging GitHub Actions failures and quality issues
-
-### ❌ Never assume; always verify
-
-When GitHub Actions stops passing or quality checks don't pass:
-
-1. **Fetch actual error logs** - Don't guess. Use GitHub CLI to get real data:
-
-   ```bash
-   gh run view --log <run-id>  # Get full GitHub Actions logs
-   gh pr view <number> --comments  # Get PR review comments
-   ```
-
-2. **Root cause analysis** - The first error symptom often masks the real issue:
-
-   - Frozen pnpm-lock.yaml errors usually mean dependencies changed but weren't committed
-   - Type errors might point to a missing export or incorrect type definition
-   - **Lint failures** should fix at the source, not work around
-
-3. **Check pre-commit hooks locally** - Before pushing, verify all checks pass locally:
-
-   ```bash
-   # These run automatically on git commit, but can run manually:
-   pnpm format      # Prettier formatting
-   pnpm typecheck   # TypeScript type checking
-   pnpm lint        # ESLint checking
-   pnpm test        # Test suite
-   ```
-
-4. **Let pre-commit handle formatting** - Don't run `Prettier --write` manually before committing:
-
-   - Pre-commit automatically formats files and stages them
-   - Running Prettier manually can cause loops where pre-commit keeps modifying files
-   - Just stage your changes with `git add` and let pre-commit do its work on commit
-
-### Quality standards: All checks must pass
-
-**Fix errors, warnings, and suggestions** - Don't skip any quality issues:
-
-- **Vale linting**: Fix errors, warnings, and suggestions
-- **ESLint**: Fix all errors and warnings, including performance and best-practice rules
-- **TypeScript**: No `any` types, no type errors, strict mode throughout
-- **Prettier**: Format all code automatically—use `pnpm format` to fix issues
-- **Pre-commit hooks**: All must pass before committing. They check formatting, secrets, and linting
-
-**Example of incomplete quality work:**
-
-```bash
-# ❌ Bad: Only fix errors, ignore warnings
-vale docs/  # Shows 5 errors, 12 warnings, 30 suggestions
-# → Only fixes the 5 errors, pushes with warnings still present
-
-# ✅ Good: Fix all issues
-vale docs/  # Shows 5 errors, 12 warnings, 30 suggestions
-# → Fix all 47 issues, then verify with `vale docs/` again showing zero output
-```
-
-### Dependency management
-
-**Every import must have a corresponding package**:
-
-- If code imports from a package, that package must be in `package.json` `devDependencies` or `dependencies`
-- When adding new packages to `eslint.config.js` or other files, add them to `package.json` first
-- Run `pnpm install` after updating `package.json` to update the pnpm-lock.yaml file
-- Commit the pnpm-lock.yaml changes along with code changes
-
-### Documentation must match implementation
-
-- Don't document features that don't exist
-- Don't reference patterns that differ from actual code; for example don't say "update MAINTENANCE NOTE" when files don't use that format
-- If docs refer to a specific comment format, verify all files follow it or update docs to reflect reality
-- Code examples in documentation must use the same patterns as actual implementation, for example use `WEAPON_STAT_TYPES.CRIT_DMG`, not string literals
-
----
-
-## Pull request workflow
-
-### Branch naming
+#### Branch naming
 
 - `feature/description` - New features
 - `fix/description` - Bug fixes
 - `chore/description` - Maintenance
 - `docs/description` - Documentation
 
-### Pull request guidelines
+#### Pull request guidelines
 
-1. **One pull request equals one feature**. Keep pull requests focused and atomic.
-2. **Good pull request titles**. Use the conventional commit format so it becomes the commit message.
-3. **Descriptive body**. Use bullet points that explain what changed and why.
-4. **Reference issues**. Use "Closes #X" or "Addresses #X."
-5. **Self-review**. Review your own pull request before requesting review.
+1. One pull request equals one feature
+2. Use conventional commit format for title that becomes squash merge commit message
+3. Descriptive body with bullet points
+4. Reference issues with "Closes #X" or "Addresses #X"
+5. Self-review before requesting review
 
-### Merge strategy
+#### Merge strategy
 
-- **Squash and merge**. All pull request commits become one commit on develop.
-- The pull request title and body become the final commit message.
-- Keep commit history clean. One feature equals one commit.
-- **Don't amend commits during PR review**. Since everything gets squashed on merge, just make new commits for fixes and improvements. There's no benefit to amending.
+- **Squash and merge** - All commits become one on develop
+- Pull request title/body becomes final commit message
+- Don't amend commits during review; just make new commits because everything gets squashed
 
-### Before merging
+#### Before merging
 
 - ✅ All tests pass
 - ✅ No linting errors
 - ✅ TypeScript compiles without errors
-- ✅ Format code with Prettier
-- ✅ Pull request description is accurate
-- ✅ All review comments addressed (use `gh pr view <number> --comments` to verify)
-- ✅ Pre-commit hooks pass locally before pushing
+- ✅ Code formatted with Prettier
+- ✅ Pull request description accurate
+- ✅ All review comments addressed
+- ✅ Pre-commit hooks pass locally
 
-### Addressing review comments
+#### Addressing review comments
 
-**Fetch and fix all feedback**:
+Respond to each comment with one of these approaches:
 
-1. Before pushing changes, always check for latest comments:
+- "Fixed in [commit]" with link to commit
+- "Won't fix because" with explanation of reasoning
+- "Created #X" with link to follow-up issue
 
-   ```bash
-   gh api repos/OWNER/REPO/pulls/NUMBER/comments --paginate | \
-     jq -r '.[] | "\(.path):\(.line) - \(.body)"'
-   ```
+Mark conversations as resolved only after reviewer confirms or you've provided clear reasoning.
 
-2. Address each comment completely—don't skip suggestions:
-   <!-- vale alex.ProfanityUnlikely = NO -->
-   - Comments labeled "improvement" still need fixing
-   - Documentation and code examples matter as much as code logic
-   - Data accuracy is important; for example, correct weapon versions
-   <!-- vale alex.ProfanityUnlikely = YES -->
-3. Batch related fixes when possible to keep history clean
+---
 
-4. After fixes, verify quality checks still pass:
+## Debugging GitHub Actions and quality issues
 
-   ```bash
-   pnpm typecheck && pnpm lint && pnpm format
-   ```
+### Never assume; always verify
+
+Fetch actual error logs using GitHub CLI:
+
+```bash
+gh run view --log <run-id>
+gh run list --limit 10
+```
+
+### Quality standards
+
+<!-- vale Microsoft.Vocab = NO -->
+
+**All checks must pass** including errors, warnings, and suggestions. Vale shows three alert levels. Fix them all.
+
+<!-- vale Microsoft.Vocab = YES -->
+
+```bash
+# ❌ Bad - Only fixes errors, ignores warnings
+vale docs/  # Shows 5 errors, 42 suggestions
+# → Only fixes 5 errors, pushes with warnings present
+
+# ✅ Good - Fixes all issues
+vale docs/  # Fix all 47 issues
+vale docs/  # Verify zero output
+```
+
+### Dependency management
+
+Check security vulnerabilities in GitHub advisory DB before adding dependencies. Use exact versions in package.json.
+
+### Documentation must match implementation
+
+Don't document features as working if not implemented. Either omit or mark "when implemented" with issue link.
 
 ---
 
 ## Platform compatibility
 
-**Critical**: this project must work on Windows, macOS, and Linux.
+### Never use
 
-### ❌ Never use
+- Platform-specific paths with `\` on Windows
+- Shell-specific commands like `cmd` or PowerShell
+- hardcoded platform checks
 
-- `rm -rf`. Use Turborepo clean or cross-platform tools.
-- `&&` for sequential commands. Use pnpm scripts instead.
-- hardcoded paths with `/` or `\`
-- OS-specific environment variables
+### Always use
 
-### ✅ Always use
-
-- Node.js `path` module for paths
-- Cross-platform packages such as `rimraf` and `del-cli` when you need shell commands
-- pnpm scripts for task orchestration
-- Turborepo for build, test, and lint tasks
+- Cross-platform path methods like `path.join()` or `path.resolve()`
+- Cross-platform commands like `npm` or `git`
+- Feature detection over platform detection
 
 ---
 
 ## Code review focus areas
 
-When reviewing code or pull requests, pay extra attention to:
-
-1. **Type safety**
-
-   - No `any` types
-   - Proper null/undefined handling
-   - Type guards where needed
-
-2. **Testing**
-
-   - Tests exist for new features
-   - Tests are meaningful, not just for coverage
-   - Tests use Testing Library best practices
-
-3. **Performance**
-
-   - Avoid unnecessary re-renders with `useMemo` and `useCallback`
-   - Lazy load routes and components
-   - Optimize Firestore queries
-
-4. **Security**
-
-   - No hardcoded secrets or API keys
-   - Proper input validation
-   - Configure Firebase security rules
-
-5. **Cross-platform**
-
-   - No OS-specific commands
-   - Paths use the Node.js `path` module
-
-6. **Consistency**
-
-   - Follows established patterns
-   - Matches existing code style
-   - Uses shared types from packages/types
-
-7. **Documentation accuracy**
-   - Code examples in docs match actual implementation
-   - Export patterns are consistent, prefer named exports
-   - Phase and status markers are up to date
-   - Cross-platform commands in all documentation
+1. **Type safety** - No `any`, proper null checks, explicit return types
+2. **Test coverage** - Critical paths 80%+, tests for user interactions
+   <!-- vale Google.Acronyms = NO -->
+   <!-- vale Microsoft.Acronyms = NO -->
+3. **Accessibility** - Semantic HTML, ARIA labels, keyboard navigation
+   <!-- vale Google.Acronyms = YES -->
+   <!-- vale Microsoft.Acronyms = YES -->
+4. **Security** - Input validation, no secrets, dependency vulnerabilities checked
+5. **Performance** - Appropriate memoization, avoid unnecessary re-renders
+6. **Error handling** - Graceful failures, helpful error messages
+7. **Code organization** - Functions under 50 lines, one component per file
 
 ---
 
@@ -664,36 +393,29 @@ When reviewing code or pull requests, pay extra attention to:
 ### Shared types
 
 ```typescript
-// Import from shared package
-import type { Character, Team } from '@genshin/types';
+// packages/types/src/index.ts
+export interface Character {
+  id: string;
+  name: string;
+  element: string;
+}
 ```
 
 ### API client calls
 
 ```typescript
-// Use try-catch for error handling
-try {
-  const response = await fetch('/api/characters');
-  const data = await response.json();
-} catch (error) {
-  console.error('Failed to fetch characters:', error);
-}
+// Use standard fetch with error handling
+const response = await fetch('/api/characters');
+if (!response.ok) throw new Error('Failed to fetch');
+const data = await response.json();
 ```
 
 ### React components
 
 ```typescript
-interface CharacterCardProps {
-  character: Character;
-  onClick?: () => void;
-}
-
-export function CharacterCard({ character, onClick }: CharacterCardProps) {
-  return (
-    <div onClick={onClick}>
-      <h3>{character.name}</h3>
-    </div>
-  );
+interface ComponentProps { name: string; }
+export function Component({ name }: ComponentProps) {
+  return <div>{name}</div>;
 }
 ```
 
@@ -701,199 +423,114 @@ export function CharacterCard({ character, onClick }: CharacterCardProps) {
 
 ## Code comments and local documentation
 
-**Philosophy**: prefer inline comments in code over external documentation for explaining decisions, trade-offs, and subtle logic. Documentation should live close to the code it describes.
-
 ### When to comment
 
-Comment liberally for:
+<!-- vale alex.Condescending = NO -->
 
-- **Decisions and trade-offs**: Explain why you chose one approach over another
-- **Subtle logic**: Complex algorithms, business rules, or hard-to-follow implementations
-- **Workarounds**: Temporary fixes or browser quirks with issue or ticket references
-- **Performance considerations**: Explain why you use certain patterns, such as memoization and lazy loading
-- **External dependencies**: Integration points or third-party API quirks
-- **Configuration rationale**: Explain why specific config options are set the way they're (yamllint rules, ESLint overrides, etc.)
-
-**Examples**:
-
-```typescript
-// Memoize to prevent unnecessary re-renders since characters array changes frequently
-// from Firebase updates. This is a known bottleneck for large collections with 100+ characters.
-const memoizedCharacters = useMemo(() => characters.map((c) => new Character(c)), [characters]);
-
-// Firebase listener doesn't trigger on subcollection changes, so we need to
-// manually refetch when teams change. See https://github.com/firebase/firebase-js-sdk/issues/1234.
-const handleTeamUpdate = useCallback(async () => {
-  await refetchCharacters();
-}, []);
-
-// Work around Vite's CommonJS plugin limitation with dynamic imports.
-// Can be removed once we upgrade to Vite 6+
-const config = await import('./config.js').then((m) => m.default);
-```
+- Reasons behind non-obvious decisions
+<!-- vale alex.Condescending = YES -->
+- Complex algorithms or business logic
+- Workarounds for known issues, with issue links
+  <!-- vale Google.Acronyms = NO -->
+  <!-- vale Vale.Spelling = NO -->
+- Public API documentation with JSDoc
+  <!-- vale Vale.Spelling = YES -->
+  <!-- vale Google.Acronyms = YES -->
 
 ### When not to comment
 
-Don't comment for:
-
-- **Self-documenting code**: `const isValidEmail = email.includes('@')` needs no comment
-- **Straightforward iterations or assignments**: `teams.map(t => t.characters)` is clear
-- **Inferred type information**: TypeScript types already document intent
-- **Trivial error handling**: Standard try-catch patterns don't need explanation
-
-**Bad examples** of unnecessary comments:
-
-```typescript
-// ❌ Loop through teams
-teams.forEach(team => {
-  // ❌ Render team card
-  return <TeamCard key={team.id} />;
-});
-
-// ❌ Set loading state
-setLoading(true);
-```
+- Explanations of straightforward code
+- Redundant explanations of variable names
+- Commented-out code; use git history instead
+- TODO comments without issue links
 
 ### Comment format
 
-Use clear, conversational English.
-
 ```typescript
-// Bad: Too terse
-// calc avg dmg from artifacts
+// Single-line comments for brief explanations
 
-// Good: Explains the why and what explicitly
-// Calculate average damage across all artifacts to handle Firestore
-// pagination limit of 20 docs. See performanceTests.md for benchmarks.
-const avgDamage = calculateAverageDamage(artifacts);
+/**
+ * Multi-line JSDoc for public APIs
+ * @param name - Parameter description
+ * @returns Return value description
+ */
+export function publicFunction(name: string): string {
+  // implementation
+}
 ```
 
 ---
 
-<!-- vale Microsoft.Headings = NO -->
-
-## When suggesting code
-
-<!-- vale Microsoft.Headings = YES -->
+## Code suggestion guidelines
 
 ### Do
 
-- ✅ Suggest tests alongside implementation
-- ✅ Use TypeScript in strict mode
-- ✅ Follow existing project structure
-- ✅ Consider cross-platform compatibility
-- ✅ Reference documentation in docs/
-- ✅ Keep suggestions focused and minimal
-
-<!-- vale alex.ProfanityUnlikely = NO -->
-
-- ✅ Maintain data accuracy; for example correct game versions and weapon stats
-
-<!-- vale alex.ProfanityUnlikely = YES -->
-
-- ✅ Use constants instead of string literals for maintainability
-- ✅ Verify code examples in documentation match implementation patterns
+- Provide minimal, focused examples
+- Show both good ✅ and bad ❌ patterns
+- Include TypeScript types
+- Explain reasons for choices that aren't immediately clear
 
 ### Don't
 
-- ❌ Suggest libraries not in package.json without asking
-- ❌ Use deprecated React patterns such as classes and lifecycle methods
-- ❌ Skip error handling
-- ❌ Ignore TypeScript errors
-- ❌ Suggest Bun-specific code that isn't implemented yet
-- ❌ Make OS-specific assumptions
-- ❌ Use inconsistent patterns across the same codebase
-- ❌ Document features as working if they aren't implemented yet
-<!-- vale alex.ProfanityUnlikely = YES -->
+- Suggest large refactors for small issues
+- Include boilerplate without explanation
+- Use placeholder values without noting they're examples
+- Suggest features not in tech stack
 
 ---
 
-## Continuous integration and delivery, plus security scanning
+## Continuous integration and security
 
-### Workflow patterns and maintenance
+### Workflow patterns
 
-GitHub Actions workflows should include maintenance notes documenting when to update them:
+- **pre-commit.yml** - Runs ESLint on every PR
+- **build.yml** - Runs full build pipeline including type checking and build
+<!-- vale Vale.Terms = NO -->
+- **codeql.yml** - Security scanning
+<!-- vale Vale.Terms = YES -->
 
-- When you add new programming languages to the monorepo
-- When build processes change and require custom build steps
-- When you add new workspaces with different languages and runtime systems
+Keep `.pre-commit-config.yaml` skip list in sync with workflows to avoid duplicate checks.
 
-**Example**: see `.github/workflows/codeql.yml` for the maintenance notes pattern. Copy this structure to other workflows to keep them synchronized with the monorepo's evolving architecture.
+### Security scanning
 
-### Security scanning schedule alignment
+CodeQL runs on push to develop/main and on PRs. Dependabot checks dependencies weekly and opens PRs for updates.
 
-Coordinate security scanning schedules across tools for operational consistency:
-
-- **CodeQL**: Configured with `schedule: { day: 'friday', time: '18:00' }`
-<!-- vale Google.Parens = NO -->
-- **Dependabot**: Runs Friday at 18:00 Coordinated Universal Time (UTC) for aligned security updates
-<!-- vale Google.Parens = YES -->
-- New security scanning tools should use the same schedule when possible
-
-This reduces notification fatigue and simplifies monitoring windows.
+---
 
 ## Dependabot maintenance
 
-**Important**: when adding new workspaces or packages to the monorepo, update `.github/dependabot.yml` to include them.
-
-- **New app**, for example `apps/api`: Add an npm entry with the directory path `/apps/api` and appropriate semantic groups
-- **New package**, for example `packages/utils`: Add an npm entry with the directory `/packages/{name}`
-- **New language or ecosystem**, for example Python or Go: Add a new package-ecosystem entry
-- **New workflows**: Covered by the `github-actions` package-ecosystem entry with `directory: '/'` that scans workflows for action updates
-
-See the maintenance section in `.github/dependabot.yml` for detailed instructions and examples. Without updating Dependabot, new workspaces won't get automated dependency updates.
-
-**When suggesting features**: always check if dependencies or infrastructure exist first. Reference GitHub Issues and Milestones for current phase requirements and blocking dependencies.
+Dependabot opens PRs for dependency updates. Review and merge them. For major version updates, check changelog for breaking changes.
 
 ---
 
 ## Handling pull request reviews
 
-When addressing Copilot pull request review comments:
+1. Read all comments before responding
+2. Respond to each comment with action taken or reasoning
+3. Ask clarifying questions if feedback is unclear
+4. Mark resolved only after reviewer confirms or clear reasoning provided
+5. Push follow-up commits; don't amend because squash merge handles history
 
-1. **Fetch inline comments**. Use `gh api repos/.../pulls/{pr}/comments --paginate` to see all review feedback in all review cycles.
-2. **Prioritize comprehensively**. Address all issues, not just critical ones. Suggestions for improvement and consistency matter as much as bug fixes.
-3. **Batch fixes**. Group related changes in single commits when possible to keep history clean.
-4. **Verify changes**. Run full quality checks after fixes:
-
-   ```bash
-   pnpm typecheck && pnpm lint && pnpm format
-   ```
-
-5. **Update docs**. If code examples in docs are wrong, fix them alongside the code changes.
-6. **Fetch fresh feedback** before pushing. Copilot may add additional comments as review cycles progress. Use `gh pr view <number> --comments` to check for the latest feedback.
-7. **Iterate systematically**. If there are multiple review cycles, address each cycle completely before pushing the next batch of fixes.
-
-**Key principle**: Address all review feedback comprehensively. Comments marked as "suggestion" or "improvement" aren't optional—they represent opportunities for code quality and consistency.
-
-<!-- vale Google.Parens = NO -->
-<!-- vale Google.Colons = NO -->
+---
 
 ## Questions to ask
 
-<!-- vale Google.Parens = YES -->
-<!-- vale Google.Colons = YES -->
+When uncertain:
 
-If you're unsure about:
-
-- New dependencies. Ask before suggesting.
-- Architecture decisions. Reference docs/SETUP_GUIDE.md.
-- Breaking changes. Explain trade-offs.
-- Alternative approaches. Present options with advantages and disadvantages.
+- What's the minimal change to achieve the goal?
+- Are there existing patterns to follow?
+- Do tests cover the critical paths?
+- Does this work cross-platform?
+- Are there security implications?
+- Does documentation need updating?
 
 ---
 
 ## Success metrics
 
-Good code in this project:
-
-- ✅ Has tests that pass
-- ✅ Is type-safe. Use TypeScript strict mode.
-- ✅ Works on all platforms
-- ✅ Follows established patterns
-- ✅ Is well-documented. Use inline comments for complex logic.
-- ✅ Has a clear, focused purpose
-
----
-
-These instructions evolve as the project matures. Last updated: phase 2, Basic Frontend Setup Complete, PR #80
+- All tests pass
+- No linting or type errors
+- 80%+ coverage on critical paths
+- Pull request review approval
+- Clean git history with one commit per feature
+- Documentation up to date

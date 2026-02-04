@@ -83,3 +83,7 @@ vite.config.ts.timestamp-*
 
 temp/
 tmp/
+
+# Vale binary
+vale
+vale_*.tar.gz
