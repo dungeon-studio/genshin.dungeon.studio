@@ -1,4 +1,4 @@
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, NavLink } from 'react-router-dom';
 
 export function Layout() {
   return (
@@ -38,13 +38,19 @@ function Nav() {
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex gap-8">
           {navLinks.map((link) => (
-            <Link
+            <NavLink
               key={link.to}
               to={link.to}
-              className="inline-block border-b-2 border-transparent px-1 py-4 text-sm font-medium text-gray-600 transition-colors hover:border-blue-500 hover:text-gray-900"
+              className={({ isActive }) =>
+                `inline-block border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'border-blue-500 text-gray-900'
+                    : 'border-transparent text-gray-600 hover:border-blue-500 hover:text-gray-900'
+                }`
+              }
             >
               {link.label}
-            </Link>
+            </NavLink>
           ))}
         </div>
       </div>
