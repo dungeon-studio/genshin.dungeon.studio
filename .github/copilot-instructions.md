@@ -376,11 +376,7 @@ Don't document features as working if not implemented. Either omit or mark "when
 
 1. **Type safety** - No `any`, proper null checks, explicit return types
 2. **Test coverage** - Critical paths 80%+, tests for user interactions
-   <!-- vale Google.Acronyms = NO -->
-   <!-- vale Microsoft.Acronyms = NO -->
-3. **Accessibility** - Semantic HTML, ARIA labels, keyboard navigation
-   <!-- vale Google.Acronyms = YES -->
-   <!-- vale Microsoft.Acronyms = YES -->
+3. **Accessibility** - Semantic HTML, ARIA labels, keyboard navigation <!-- vale Google.Acronyms = NO --> <!-- vale Microsoft.Acronyms = NO -->
 4. **Security** - Input validation, no secrets, dependency vulnerabilities checked
 5. **Performance** - Appropriate memoization, avoid unnecessary re-renders
 6. **Error handling** - Graceful failures, helpful error messages
@@ -431,11 +427,7 @@ export function Component({ name }: ComponentProps) {
 <!-- vale alex.Condescending = YES -->
 - Complex algorithms or business logic
 - Workarounds for known issues, with issue links
-  <!-- vale Google.Acronyms = NO -->
-  <!-- vale Vale.Spelling = NO -->
-- Public API documentation with JSDoc
-  <!-- vale Vale.Spelling = YES -->
-  <!-- vale Google.Acronyms = YES -->
+- Public API documentation with JSDoc <!-- vale Google.Acronyms = NO --> <!-- vale Vale.Spelling = NO -->
 
 ### When not to comment
 
