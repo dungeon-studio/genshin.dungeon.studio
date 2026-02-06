@@ -53,7 +53,7 @@
 **Never bypass pre-commit hooks** with `--no-verify`. If hooks fail, fix the underlying issues instead:
 
 - Vale errors: Fix prose directly or use line-level suppression comments if false positive
-- ESLint/Stylelint errors: Run `pnpm lint --fix` to resolve most issues
+- ESLint/Stylelint errors: Rerun the specific pre-commit hooks or use the underlying package scripts with `--fix` (for example, web's `lint` / `lint:css`)
 - TypeScript errors: Fix type issues properly; no escape hatches
 - Secrets detected: Remove and use environment variables or secure storage
 

@@ -55,7 +55,7 @@ pnpm dev
 
 ### Quality checks overview
 
-Pre-commit runs formatting, linting, documentation, secrets, and hygiene checks. See [.pre-commit-config.yaml](.pre-commit-config.yaml) for the full list. For manual checks, see the Code quality section below.
+Pre-commit runs formatting, linting, documentation, secrets, and hygiene checks. See [.pre-commit-config.yaml](.pre-commit-config.yaml) for the full list. For manual checks, see the Code quality section below. In the DevContainer and in CI, these hooks run automatically. For manual setup outside DevContainers, install `pre-commit` (for example, with `pipx install pre-commit` or `pip install --user pre-commit`) and run `pre-commit install` once in this repository to enable the Git hooks.
 
 **Commit types**. Use these prefixes in your commit messages:
 
