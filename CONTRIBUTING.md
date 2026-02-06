@@ -87,6 +87,86 @@ pnpm lint       # Check for linting issues
 - [README.md](README.md): One-line tagline
 - GitHub repository description. Maintainers update this via repo settings.
 
+---
+
+## Code quality
+
+Pre-commit hooks automatically enforce:
+
+- **Prettier** - Code formatting
+- **ESLint** - JavaScript/TypeScript linting (fixes issues when possible)
+<!-- vale Vale.Spelling = NO -->
+- **Stylelint** - CSS/Tailwind consistency
+<!-- vale Vale.Spelling = YES -->
+- Basic file checks - trailing whitespace, line endings, YAML/JSON validation
+
+For type checking, run manually before committing:
+
+```bash
+pnpm typecheck
+```
+
+### Code comments
+
+For complex logic, decisions, or subtle patterns:
+
+<!-- vale alex.Condescending = NO -->
+<!-- vale Google.Will = NO -->
+
+- Decisions and trade-offs—why you chose this approach
+- Workarounds—temporary fixes with issue references
+- Performance-sensitive code—explain the optimization
+- External dependencies—integration quirks or API specifics
+
+<!-- vale alex.Condescending = YES -->
+<!-- vale Google.Will = YES -->
+<!-- vale alex.Condescending = YES -->
+
+---
+
+## Pull request workflow
+
+### Branch naming
+
+- `feature/description` - New features
+- `fix/description` - Bug fixes
+- `chore/description` - Maintenance
+- `docs/description` - Documentation
+
+### Before merging
+
+- ✅ All tests pass
+- ✅ No linting errors
+- ✅ TypeScript compiles without errors
+- ✅ Code formatted with Prettier
+- ✅ Pull request description is accurate
+
+### Merge strategy
+
+- **Squash and merge** - All pull request commits become one commit on develop
+- The pull request title becomes the final commit message (use conventional commit format)
+- Keep commit history clean - one feature equals one commit
+
+### Addressing review comments
+
+1. Address feedback completely
+2. Batch related fixes when possible
+3. Pre-commit hooks will verify formatting and linting. For type checking, run:
+
+   ```bash
+   pnpm typecheck
+   ```
+
+---
+
+## Platform compatibility
+
+This project runs on Windows, macOS, and Linux.
+
+- Use Node.js `path` module for paths, not hardcoded `/` or `\`
+- Use cross-platform packages like `rimraf` for file operations, not `rm -rf`
+- Avoid OS-specific environment variables
+
 ### Detailed guides
 
 For step-by-step instructions and technical details:
