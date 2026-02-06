@@ -5,7 +5,7 @@
 ## Tech stack
 
 - Turborepo + pnpm, TypeScript 5.9 strict mode
-- **Web**: React 19 + Vite + Tailwind + shadcn/ui, zustand, react-query, react-router-dom
+- **Web**: React 19 + Vite + Tailwind + shadcn/ui, zustand, TanStack Query, react-router-dom
 - **API**: Hono + Node.js
 - **Testing**: Vitest (React Testing Library not yet installed)
 
@@ -23,7 +23,7 @@
 ## State & storage patterns
 
 - **UI state**: zustand
-- **Server state**: react-query
+- **Server state**: TanStack Query
 - **Persistent**: `localStorage` (Progressive Web App, planned long-term)
 - **Long-term**: Firestore (planned)
 - Game data: Import from `@genshin/game-data`, use helpers
@@ -50,14 +50,7 @@
 
 ## Pre-commit hooks
 
-**Never bypass pre-commit hooks** with `--no-verify`. If hooks fail, fix the underlying issues instead:
-
-- Vale errors: Fix prose directly or use line-level suppression comments if false positive
-- ESLint/Stylelint errors: Rerun the specific pre-commit hooks or use the underlying package scripts with `--fix` (for example, web's `lint` / `lint:css`)
-- TypeScript errors: Fix type issues properly; no escape hatches
-- Secrets detected: Remove and use environment variables or secure storage
-
-Bypassing hooks masks problems that will fail in CI anyway.
+**Never bypass pre-commit hooks** with `--no-verify`. If hooks fail, fix the underlying issues instead. Fix prose for Vale errors, rerun linters with `--fix`, resolve TypeScript errors properly, and move secrets to environment variables. Bypassing hooks masks problems that will fail in CI anyway.
 
 ## Git workflow
 
