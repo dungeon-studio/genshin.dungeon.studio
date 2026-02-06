@@ -53,21 +53,9 @@ pnpm install
 pnpm dev
 ```
 
-### Code quality standards
+### Quality checks overview
 
-Before committing:
-
-```bash
-pnpm format     # Format code with Prettier
-pnpm typecheck  # Type check using TypeScript build mode
-pnpm test       # Run tests
-pnpm lint       # Check for linting issues
-```
-
-**Documentation checks**:
-
-- If pre-commit reports Vale issues, run Vale manually after fixing errors to catch warnings and suggestions
-- Use line-level Vale suppression comments for known false positives, such as license badges
+Pre-commit runs formatting, linting, documentation, secrets, and hygiene checks. See [.pre-commit-config.yaml](.pre-commit-config.yaml) for the full list. For manual checks, see the Code quality section below.
 
 **Commit types**. Use these prefixes in your commit messages:
 
@@ -91,36 +79,29 @@ pnpm lint       # Check for linting issues
 
 ## Code quality
 
-Pre-commit hooks automatically enforce:
+Pre-commit hooks automatically enforce key checks, including:
 
 - **Prettier** - Code formatting
 - **ESLint** - JavaScript/TypeScript linting (fixes issues when possible)
-<!-- vale Vale.Spelling = NO -->
-- **Stylelint** - CSS/Tailwind consistency
-<!-- vale Vale.Spelling = YES -->
-- Basic file checks - trailing whitespace, line endings, YAML/JSON validation
+- CSS and Tailwind linting
+- Documentation and config linting for Markdown, YAML, and prose
+- Safety and repository hygiene checks for secrets, merge conflict markers, large files, trailing whitespace, line endings, and YAML/JSON validation
 
-For type checking, run manually before committing:
+For type checking and tests, run manually before committing:
 
 ```bash
 pnpm typecheck
+pnpm test
 ```
 
 ### Code comments
 
 For complex logic, decisions, or subtle patterns:
 
-<!-- vale alex.Condescending = NO -->
-<!-- vale Google.Will = NO -->
-
 - Decisions and trade-offs—why you chose this approach
 - Workarounds—temporary fixes with issue references
 - Performance-sensitive code—explain the optimization
 - External dependencies—integration quirks or API specifics
-
-<!-- vale alex.Condescending = YES -->
-<!-- vale Google.Will = YES -->
-<!-- vale alex.Condescending = YES -->
 
 ---
 

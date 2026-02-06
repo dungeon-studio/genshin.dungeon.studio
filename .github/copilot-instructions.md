@@ -16,9 +16,9 @@
 ## monorepo structure
 
 - **packages/types**: Shared types across apps
-- **packages/game-data**: Static game data (characters, artifacts, reactions, weapons). Source of truth: wiki. Version = game version. Use exported helpers (for example, `getCharacterById()`), never hard-code. Accuracy validated via tests and manual local dev.
+- **packages/game-data**: Static game data (characters, artifacts, reactions, weapons). Source of truth: wiki. Version = game version. Use exported helpers (for example, `getCharacterById()`), never hard-code. Accuracy validated via manual local development; add automated tests when a test suite exists.
 - **apps/web**: React frontend
-- **apps/API**: Hono API server
+- **`apps/api`**: Hono API server
 
 ## State & storage patterns
 
@@ -31,7 +31,7 @@
 ## API & error handling
 
 - HTTP status codes with user-actionable error messages
-- Structured logging (JSON) for Observability tools/Grafana Cloud
+- Logging: console.log today; structured JSON logging planned for Observability tools/Grafana Cloud
 - Frontend: try/catch with console.error
 
 ## Testing
