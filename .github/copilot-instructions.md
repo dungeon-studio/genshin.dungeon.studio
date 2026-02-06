@@ -13,7 +13,7 @@
 
 - Firestore, Firebase Auth, Claude MCP, React Testing Library, Bun
 
-## monorepo structure
+## Repository structure
 
 - **packages/types**: Shared types across apps
 - **packages/game-data**: Static game data (characters, artifacts, reactions, weapons). Source of truth: wiki. Version = game version. Use exported helpers (for example, `getCharacterById()`), never hard-code. Accuracy validated via manual local development; add automated tests when a test suite exists.
