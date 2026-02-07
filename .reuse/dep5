@@ -22,25 +22,25 @@ License: MIT
 # Google style: https://github.com/errata-ai/Google
 
 Files: .styles/Google .styles/Google/*
-Copyright: Copyright (c) Joseph Kato and contributors
+Copyright: Joseph Kato and contributors
 License: MIT
 
 # Microsoft style: https://github.com/errata-ai/Microsoft
 
 Files: .styles/Microsoft .styles/Microsoft/*
-Copyright: Copyright (c) Joseph Kato and contributors
+Copyright: Joseph Kato and contributors
 License: MIT
 
 # Readability style: https://github.com/errata-ai/readability
 
 Files: .styles/Readability .styles/Readability/*
-Copyright: Copyright (c) Joseph Kato and contributors
+Copyright: Joseph Kato and contributors
 License: MIT
 
 # alex style: https://github.com/get-alex/alex
 
 Files: .styles/alex .styles/alex/*
-Copyright: Copyright (c) 2015 Titus Wormer and contributors
+Copyright: 2015 Titus Wormer and contributors
 License: MIT
 
 # Configuration files that don't support comments
