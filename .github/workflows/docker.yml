@@ -10,38 +10,13 @@ on:
       - develop
 
 jobs:
-  build-pr:
-    name: Build Docker image (PR)
-    if: github.event_name == 'pull_request'
+  build:
+    name: Build and push Docker image
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
       contents: read
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./apps/api/Dockerfile
-          push: false
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  build-push:
-    name: Build and push Docker image (develop)
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-      packages: write
+      packages: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' && 'write' || 'read' }}
 
     steps:
       - name: Checkout repository
@@ -51,6 +26,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to GitHub Container Registry
+        if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -71,7 +47,7 @@ jobs:
         with:
           context: .
           file: ./apps/api/Dockerfile
-          push: true
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
