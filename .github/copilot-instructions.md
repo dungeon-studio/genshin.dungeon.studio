@@ -50,7 +50,7 @@
 
 ## Pre-commit hooks
 
-**Never bypass pre-commit hooks** with `--no-verify`. If hooks fail, fix the underlying issues instead. Fix prose for Vale errors, rerun linters with `--fix`, resolve TypeScript errors properly, and move secrets to environment variables. Bypassing hooks masks problems that will fail in CI anyway.
+**Never bypass pre-commit hooks** with `--no-verify`. If hooks fail, fix the underlying issues instead. Fix prose for Vale errors, rerun linters with `--fix`, resolve TypeScript errors properly, and move secrets to environment variables. Local pre-commit hooks run the full set on every commit; pre-commit.ci runs all hooks on PRs except ESLint, Stylelint, and TypeScript checks (which GitHub Actions handles). Bypassing local hooks masks problems that pre-commit.ci will catch.
 
 ## Git workflow
 
