@@ -140,6 +140,26 @@ updates:
       - 'dependencies'
       - 'devcontainer'
       - 'automated'
+
+  # ==========================================================================
+  # DOCKER
+  # ==========================================================================
+  - package-ecosystem: 'docker'
+    directory: '/apps/api'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'docker'
+      - 'backend'
+      - 'automated'
 # ============================================================================
 # MAINTENANCE NOTES
 # ============================================================================
@@ -178,4 +198,5 @@ updates:
 #  ✓ Root workspace (weekly)
 #  ✓ apps/web (weekly)
 #  ✓ DevContainer (weekly)
+#  ✓ Docker - apps/api (weekly)
 # ============================================================================

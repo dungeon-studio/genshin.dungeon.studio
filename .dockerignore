@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+.git
+.gitignore
+node_modules
+npm-debug.log
+.env
+.env.local
+.env.*.local
+dist
+build
+.DS_Store
+*.md
+.vscode
+.idea
