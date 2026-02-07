@@ -44,10 +44,12 @@ The [Debian machine-readable copyright format](https://www.debian.org/doc/packag
 
 **Where used:**
 
-- JSON config files (`package.json`, `tsconfig.json`, etc.)
+- Standard JSON config files (`package.json`, `tsconfig.json`, etc.) - pure JSON doesn't support comments
 - Package managers (`pnpm-lock.yaml`)
 - Generated/build files (`.turbo/`, `dist/`, `node_modules/`)
 - Binary or non-standard files
+
+**Note:** Files with JSON-with-comments (JSONC) support like `.vscode/*.json` and `.devcontainer/devcontainer.json` can have SPDX headers directly using `//` comment syntax.
 
 **Example entry in .reuse/dep5:**
 
