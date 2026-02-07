@@ -13,6 +13,14 @@
 
 - Firestore, Firebase Auth, Claude MCP, Vitest, React Testing Library, Bun
 
+## Documentation audiences
+
+- **CONTRIBUTING.md**: For human contributors. High-level workflow, links to how-tos for details. Skip CI architecture and technical internals.
+- **`copilot-instructions.md`** (this file): For AI decision-making. Include technical details, CI architecture, hook behavior, dependencies, constraints.
+- **docs/**: Task-specific guides organized by the [Diátaxis framework](https://diataxis.fr/). Currently contains how-tos; tutorials, reference, and explanation sections planned.
+
+When adding documentation, consider the audience and place information accordingly.
+
 ## Repository structure
 
 - **packages/types**: Shared types across apps
@@ -52,6 +60,8 @@
 
 **Never bypass pre-commit hooks** with `--no-verify`. If hooks fail, fix the underlying issues instead. Fix prose for Vale errors, rerun linters with `--fix`, resolve TypeScript errors properly, and move secrets to environment variables. Local pre-commit hooks run the full set on every commit; pre-commit.ci runs all hooks on PRs except ESLint, Stylelint, and TypeScript checks (which GitHub Actions handles). Bypassing local hooks masks problems that pre-commit.ci will catch.
 
+**Vale accept list**: For legitimate tool/package names that Vale flags as spelling errors (for example, Stylelint, markdownlint), add them to `.styles/config/vocabularies/Project/accept.txt` rather than rewording documentation. This maintains accuracy and creates a single source of truth for accepted terminology.
+
 ## Git workflow
 
 **Never use `git commit --amend` or `git push --force`**. This repository uses squash merge, so:
@@ -83,6 +93,17 @@ When explaining decisions or complex patterns, prefer this order:
 Rationale: Comments stay with code through refactors. Long form documentation gets stale and duplicates linter-enforced rules.
 
 <!-- vale alex.Condescending = YES -->
+
+## Documentation accuracy
+
+Documentation must reflect the current repository state (HEAD), not aspirations:
+
+- **Verify existence**: Check package.json dependencies before documenting a tool as "installed" or "configured"
+- **Use accurate names**: Package names should match actual imports (for example, "TanStack Query" for `@tanstack/react-query`, not "react-query")
+- **Mark future plans**: Explicitly note unimplemented features as "planned" or "not yet installed" rather than documenting as if they exist
+- **Test commands**: Verify that documented commands (`pnpm test`, `pnpm dev`) actually work in the current codebase
+
+When in doubt, grep the codebase or check package files rather than assuming.
 
 ## When unsure
 
