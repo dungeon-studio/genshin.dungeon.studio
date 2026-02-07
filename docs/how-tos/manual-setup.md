@@ -16,9 +16,10 @@ This guide covers setting up the project **without DevContainers**.
 Make sure you have these installed:
 
 ```bash
-node --version    # v20+ required
-pnpm --version    # v9+ required
-gh --version      # GitHub CLI
+node --version       # v20+ required
+pnpm --version       # v9+ required
+gh --version         # GitHub CLI
+pre-commit --version # pre-commit hooks
 ```
 
 ### Install missing tools
@@ -29,6 +30,13 @@ npm install -g pnpm
 
 # GitHub CLI - See https://cli.github.com/manual/installation
 # Installation instructions vary by OS
+
+# pre-commit - See https://pre-commit.com/#install
+# On macOS:
+brew install pre-commit
+
+# On Linux/WSL:
+pip install pre-commit
 ```
 
 ---
@@ -42,6 +50,9 @@ cd genshin.dungeon.studio
 
 # Install dependencies
 pnpm install
+
+# Set up pre-commit hooks (runs linters, formatters, SPDX checks automatically)
+pre-commit install
 
 # Start development servers
 pnpm dev
