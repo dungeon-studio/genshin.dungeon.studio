@@ -12,15 +12,13 @@ RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 # Copy workspace configuration and package manifests
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-# Copy only package.json files to maximize Docker layer cache reuse
-COPY packages/game-data/package.json ./packages/game-data/
+# Copy only API package.json to maximize Docker layer cache reuse
 COPY apps/api/package.json ./apps/api/
 
 # Install all dependencies (including devDependencies for build)
 RUN pnpm install --frozen-lockfile
 
-# Copy full workspace source after dependencies are installed
-COPY packages ./packages
+# Copy API source after dependencies are installed
 COPY apps/api ./apps/api
 
 # Build the API
