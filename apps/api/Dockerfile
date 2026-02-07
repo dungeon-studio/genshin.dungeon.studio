@@ -22,8 +22,8 @@ RUN pnpm install --frozen-lockfile
 # Build the API
 RUN pnpm --filter @genshin/api build
 
-# Prune to production dependencies only
-RUN pnpm --filter @genshin/api --prod deploy pruned
+# Prune devDependencies
+RUN pnpm prune --prod
 
 # Production stage
 FROM node:20.18.1-slim
@@ -32,13 +32,22 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Copy built files and production dependencies
-COPY --from=builder /app/pruned/dist ./dist
-COPY --from=builder /app/pruned/package.json ./
-COPY --from=builder /app/pruned/node_modules ./node_modules
+# Copy package.json files and workspace configuration
+COPY --from=builder /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
+
+# Copy production dependencies (pnpm's node_modules structure)
+COPY --from=builder /app/node_modules ./node_modules
+
+# Copy needed packages (game-data might be a runtime dependency)
+COPY --from=builder /app/packages/types ./packages/types
+COPY --from=builder /app/packages/game-data ./packages/game-data
+
+# Copy API built files and package.json
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/apps/api/package.json ./apps/api/
 
 EXPOSE 8080
 
 USER node
 
-CMD ["node", "dist/main.js"]
+CMD ["node", "apps/api/dist/main.js"]
