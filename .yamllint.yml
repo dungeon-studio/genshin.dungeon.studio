@@ -1,4 +1,7 @@
 ---
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
 # yamllint configuration for Genshin Dungeon Studio
 # Catches malformed YAML and enforces consistent style
 # See https://yamllint.readthedocs.io/ for rule documentation

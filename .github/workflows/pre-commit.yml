@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
 ---
 name: Local pre-commit hooks
 
@@ -13,6 +15,9 @@ jobs:
     name: Run local pre-commit hooks
     runs-on: ubuntu-latest
     timeout-minutes: 10
+
+    # NOTE: This workflow runs only the hooks skipped by pre-commit.ci.
+    # See .pre-commit-config.yaml ci.skip for the complete list.
 
     steps:
       - name: Checkout repository

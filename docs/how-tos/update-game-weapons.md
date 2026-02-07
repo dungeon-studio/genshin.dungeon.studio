@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+SPDX-License-Identifier: MIT
+-->
+
 # How to add Genshin Impact weapons
 
 <!-- vale alex.ProfanityUnlikely = NO -->

@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+SPDX-License-Identifier: MIT
+-->
+
 # How to update elemental reactions
 
 Add or update elemental reaction data when Genshin Impact introduces new reactions or changes reaction mechanics.

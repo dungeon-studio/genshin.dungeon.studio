@@ -1,17 +1,20 @@
 ---
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
 # Pre-commit hooks for code quality and consistency
 # See https://pre-commit.com for more information
 
 # Global excludes - never touch these directories with any hook
 exclude: |
   (?x)^(
-    \.styles/|           # Vale vendor files
-    node_modules/|       # Dependencies
-    \.pnpm-store/|       # pnpm cache
-    dist/|               # Build output
-    build/|              # Build output
-    \.turbo/|            # Turborepo cache
-    pnpm-lock\.yaml      # Package lockfile
+    \.styles/(?!config)|    # Vale vendor files (exclude all of .styles/ except .styles/config/)
+    node_modules/|          # Dependencies
+    \.pnpm-store/|          # pnpm cache
+    dist/|                  # Build output
+    build/|                 # Build output
+    \.turbo/|               # Turborepo cache
+    pnpm-lock\.yaml         # Package lockfile
   )
 
 ci:
@@ -31,7 +34,7 @@ ci:
 repos:
   # Basic file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       # File formatting
       - id: trailing-whitespace
@@ -68,7 +71,7 @@ repos:
 
   # Markdown linting
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.17.1
+    rev: v0.20.0
     hooks:
       - id: markdownlint-cli2
         args: [--fix]
@@ -82,11 +85,18 @@ repos:
 
   # Vale - Prose linting
   - repo: https://github.com/errata-ai/vale
-    rev: v3.13.0
+    rev: v3.13.1
     hooks:
       - id: vale
         args: [--config=.vale.ini]
         types: [markdown]
+
+  # REUSE - SPDX license compliance
+  - repo: https://github.com/fsfe/reuse-tool
+    rev: v6.2.0
+    hooks:
+      - id: reuse
+        always_run: true
 
   # Secrets detection
   - repo: https://github.com/Yelp/detect-secrets

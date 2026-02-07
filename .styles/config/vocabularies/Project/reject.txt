@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
 # Rejected terminology - Vale will flag these and suggest alternatives
 # Format: term -> suggestion
 

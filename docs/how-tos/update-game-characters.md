@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+SPDX-License-Identifier: MIT
+-->
+
 # How to add Genshin Impact characters
 
 Add new character data to the game-data package when Genshin Impact releases new characters.

@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+SPDX-License-Identifier: MIT
+-->
+
 # Contributing to Genshin Dungeon Studio
 
 Thank you for your interest in contributing. This project is an AI-powered team building companion for Genshin Impact, and contributions of all kinds are welcome.
@@ -92,6 +97,10 @@ For type checking, run manually before committing:
 ```bash
 pnpm typecheck
 ```
+
+### SPDX headers
+
+All source files require SPDX headers per the [REUSE Specification](https://reuse.software/). Use `reuse addheader` or check [REUSE docs](https://reuse.software/tutorial/) for details.
 
 ### Code comments
 

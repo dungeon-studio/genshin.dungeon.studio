@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+// SPDX-License-Identifier: MIT
+
 import { Link, NavLink, Outlet } from 'react-router-dom';
 
 export function Layout() {

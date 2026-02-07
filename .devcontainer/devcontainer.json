@@ -1,4 +1,6 @@
 {
+  // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+  // SPDX-License-Identifier: MIT
   "name": "Genshin Team Builder",
   "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
 
@@ -55,7 +57,7 @@
     }
   },
 
-  "postCreateCommand": "npm install -g pnpm@9.15.4 && pnpm install && pre-commit install",
+  "postCreateCommand": "npm install -g pnpm@9.15.4 && pnpm install && pre-commit install && pipx install reuse==6.2.0",
   "updateContentCommand": "pnpm install",
   "postAttachCommand": "echo '✅ Ready | Node $(node --version) | pnpm $(pnpm --version)'",
 

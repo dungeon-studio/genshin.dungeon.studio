@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+// SPDX-License-Identifier: MIT
+
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';

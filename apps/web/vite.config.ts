@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+// SPDX-License-Identifier: MIT
+
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { defineConfig } from 'vite';
