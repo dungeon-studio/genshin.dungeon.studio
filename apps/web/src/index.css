@@ -2,76 +2,60 @@
 
 /* SPDX-License-Identifier: MIT */
 
-@import 'tailwindcss';
+@import url('tailwindcss');
+
 @plugin 'tailwindcss-animate';
 
 @theme {
   --color-pyro-light: #FF9E5A;
   --color-pyro: #FF6B35;
   --color-pyro-dark: #D94A1A;
-  
   --color-hydro-light: #6BB6FF;
   --color-hydro: #3B8CD8;
   --color-hydro-dark: #1E5A8E;
-  
   --color-electro-light: #D39CFF;
   --color-electro: #A855F7;
   --color-electro-dark: #7C3AED;
-  
   --color-cryo-light: #C0E7FF;
   --color-cryo: #7DD3FC;
   --color-cryo-dark: #38BDF8;
-  
   --color-anemo-light: #A5F3E5;
   --color-anemo: #67E8C9;
   --color-anemo-dark: #2DD4BF;
-  
   --color-geo-light: #FDE68A;
   --color-geo: #FCD34D;
   --color-geo-dark: #F59E0B;
-  
   --color-dendro-light: #BBF7D0;
   --color-dendro: #4ADE80;
   --color-dendro-dark: #22C55E;
-  
   --color-primary-light: #818CF8;
   --color-primary: hsl(var(--primary));
   --color-primary-dark: #4F46E5;
   --color-primary-foreground: hsl(var(--primary-foreground));
-  
   --color-secondary-light: #C084FC;
   --color-secondary: hsl(var(--secondary));
   --color-secondary-dark: #9333EA;
   --color-secondary-foreground: hsl(var(--secondary-foreground));
-  
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
-  
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
-  
   --color-popover: hsl(var(--popover));
   --color-popover-foreground: hsl(var(--popover-foreground));
-  
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
-  
   --color-accent: hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
-  
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
-  
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
-  
   --color-chart-1: hsl(var(--chart-1));
   --color-chart-2: hsl(var(--chart-2));
   --color-chart-3: hsl(var(--chart-3));
   --color-chart-4: hsl(var(--chart-4));
   --color-chart-5: hsl(var(--chart-5));
-  
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
