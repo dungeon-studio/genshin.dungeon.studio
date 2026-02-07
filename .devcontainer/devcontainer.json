@@ -57,7 +57,7 @@
     }
   },
 
-  "postCreateCommand": "npm install -g pnpm@9.15.4 && pnpm install && pre-commit install && pipx install reuse",
+  "postCreateCommand": "npm install -g pnpm@9.15.4 && pnpm install && pre-commit install && pipx install reuse==6.2.0",
   "updateContentCommand": "pnpm install",
   "postAttachCommand": "echo '✅ Ready | Node $(node --version) | pnpm $(pnpm --version)'",
 

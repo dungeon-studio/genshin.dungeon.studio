@@ -31,7 +31,7 @@
 
 ## Documentation audiences
 
-- **CONTRIBUTING.md**: For human contributors. High-level workflow, links to how-tos for details. Skip CI architecture and technical internals.
+- **CONTRIBUTING.md**: For human contributors. High-level workflow, links to how-tos for details. Skip CI architecture and technical internals. Keep lean and linked—prefer links to existing guides over duplicating content to avoid bloat.
 - **`copilot-instructions.md`** (this file): For AI decision-making. Include technical details, CI architecture, hook behavior, dependencies, constraints.
 - **docs/**: Task-specific guides organized by the [Diátaxis framework](https://diataxis.fr/). Currently contains how-tos; tutorials, reference, and explanation sections planned.
 

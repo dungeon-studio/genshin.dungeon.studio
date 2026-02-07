@@ -14,7 +14,7 @@ This guide shows you how to add copyright and license headers to new source file
 | File Type                                    | Header Format | Example                                                                  |
 | -------------------------------------------- | ------------- | ------------------------------------------------------------------------ |
 | TypeScript/JavaScript (.ts, .tsx, .js, .jsx) | `//`          | `// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>`       |
-| CSS/SCSS (.css, .scss)                       | `//`          | `// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>`       |
+| CSS/SCSS (.css, .scss)                       | `/* */`       | `/* SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> */`    |
 | Markdown (.md)                               | `<!--` HTML   | `<!-- SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> -->` |
 | YAML/INI (.yaml, .yml, .ini)                 | `#`           | `# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>`        |
 | HTML (.html)                                 | `<!--` HTML   | `<!-- SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> -->` |
@@ -28,6 +28,8 @@ This guide shows you how to add copyright and license headers to new source file
 ### 1. Add to top of file
 
 Place the SPDX header at the very beginning of the file (line 1), before any code or other comments.
+
+For YAML files, keep `---` on line 1 if present, and place the SPDX header immediately after.
 
 **Two required lines:**
 
