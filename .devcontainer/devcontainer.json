@@ -65,7 +65,7 @@
 
   // pnpm store configuration
   // ⚠️ DO NOT use volume mounts for pnpm store (e.g., "source=genshin-pnpm-store,target=...")
-  // Named Docker volumes mount as root, causing EACCES permission errors for 'node' user.
+  // Named Docker volumes mount as root, causing EACCES permission errors for the 'node' user.
   // Solution: Use default store location. First pnpm install is slower, but cache works normally after.
 
   "remoteUser": "node"
