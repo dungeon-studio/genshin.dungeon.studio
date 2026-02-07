@@ -24,12 +24,10 @@ COPY apps/api ./apps/api
 # Build the API
 RUN pnpm --filter @genshin/api build
 
-# Production stage
-FROM node:20.18.1-slim
+# Production dependencies stage
+FROM node:20.18.1-slim AS deps
 
 WORKDIR /app
-
-ENV NODE_ENV=production
 
 # Enable Corepack for pnpm
 RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
@@ -42,6 +40,17 @@ COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
 
 # Install production dependencies only for @genshin/api using the lockfile
 RUN pnpm install --filter @genshin/api --prod --frozen-lockfile
+
+# Production stage
+FROM node:20.18.1-slim
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Copy production node_modules from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 
 # Copy built files
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
