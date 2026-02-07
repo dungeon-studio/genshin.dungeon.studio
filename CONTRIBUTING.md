@@ -87,11 +87,10 @@ Pre-commit hooks automatically enforce key checks, including:
 - Documentation and config linting for Markdown, YAML, and prose
 - Safety and repository hygiene checks for secrets, merge conflict markers, large files, trailing whitespace, line endings, and YAML/JSON validation
 
-For type checking and tests, run manually before committing:
+For type checking, run manually before committing:
 
 ```bash
 pnpm typecheck
-pnpm test
 ```
 
 ### Code comments

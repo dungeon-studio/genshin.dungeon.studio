@@ -7,11 +7,11 @@
 - Turborepo + pnpm, TypeScript 5.9 strict mode
 - **Web**: React 19 + Vite + Tailwind + shadcn/ui, zustand, TanStack Query, react-router-dom
 - **API**: Hono + Node.js
-- **Testing**: Vitest (React Testing Library not yet installed)
+- **Testing**: Not yet installed (Vitest and React Testing Library planned)
 
 ## Not yet implemented
 
-- Firestore, Firebase Auth, Claude MCP, React Testing Library, Bun
+- Firestore, Firebase Auth, Claude MCP, Vitest, React Testing Library, Bun
 
 ## Repository structure
 
@@ -36,10 +36,10 @@
 
 ## Testing
 
-- Vitest for tests
-- Structure: co-located with source (Component.tsx + Component.test.tsx), grouped by function/method
-- Coverage: 80%+ core, 90%+ utilities
-- Test behavior, not implementation; manual local validation required before push
+- Not yet configured (Vitest planned)
+- When implemented: co-locate with source (Component.tsx + Component.test.tsx), group by function/method
+- Coverage targets: 80%+ core, 90%+ utilities
+- Manual local validation required before push
 
 ## Dependencies
 
