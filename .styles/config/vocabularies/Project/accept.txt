@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
 # Accepted terminology for this project
 # Vale will not flag these terms as spelling errors
 # Format: one term per line, case-sensitive

@@ -1,5 +1,8 @@
 import tailwindcssAnimate from 'tailwindcss-animate';
 
+// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+// SPDX-License-Identifier: MIT
+
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['class'],

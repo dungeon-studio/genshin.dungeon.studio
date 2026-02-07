@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+SPDX-License-Identifier: MIT
+-->
+
 # Manual setup guide
 
 This guide covers setting up the project **without DevContainers**.

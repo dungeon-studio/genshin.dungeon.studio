@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+// SPDX-License-Identifier: MIT
+
 export function TeamsPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">

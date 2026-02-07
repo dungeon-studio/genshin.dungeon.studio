@@ -1,4 +1,6 @@
 {
+  // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+  // SPDX-License-Identifier: MIT
   "version": "2.0.0",
   "tasks": [
     // ============================================

@@ -28,7 +28,8 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "typecheck": "turbo run typecheck",
-    "clean": "turbo run clean"
+    "clean": "turbo run clean",
+    "reuse:check": "reuse lint"
   },
   "devDependencies": {
     "@eslint/js": "9.39.2",

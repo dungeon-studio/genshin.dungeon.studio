@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+// SPDX-License-Identifier: MIT
+
 import type { Element } from './elements.js';
 import type { Rarity } from './rarities.js';
 import type { WeaponType } from './weapons.js';

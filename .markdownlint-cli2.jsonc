@@ -1,4 +1,6 @@
 {
+  // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+  // SPDX-License-Identifier: MIT
   // Markdown linting configuration
   "config": {
     // Disable line length rule (too restrictive for documentation with code/URLs)

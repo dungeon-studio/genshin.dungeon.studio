@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+// SPDX-License-Identifier: MIT
+
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 import { Layout } from './components/Layout';
