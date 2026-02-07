@@ -115,7 +115,6 @@ For complex logic, decisions, or subtle patterns:
 
 ### Before merging
 
-- ✅ All tests pass
 - ✅ No linting errors
 - ✅ TypeScript compiles without errors
 - ✅ Code formatted with Prettier

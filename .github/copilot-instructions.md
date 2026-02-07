@@ -58,9 +58,9 @@ When adding documentation, consider the audience and place information according
 
 ## Pre-commit hooks
 
-**Never bypass pre-commit hooks** with `--no-verify`. If hooks fail, fix the underlying issues instead. Fix prose for Vale errors, rerun linters with `--fix`, resolve TypeScript errors properly, and move secrets to environment variables. Local pre-commit hooks run the full set on every commit; pre-commit.ci runs all hooks on PRs except ESLint, Stylelint, and TypeScript checks (which GitHub Actions handles). Bypassing local hooks masks problems that pre-commit.ci will catch.
+**Never bypass pre-commit hooks** with `--no-verify`. If hooks fail, fix the underlying issues instead. Fix prose for Vale errors, rerun linters with `--fix`, resolve TypeScript errors properly, and move secrets to environment variables. Local pre-commit hooks run automatically on every commit (except TypeScript check which requires manual invocation via `pnpm typecheck`); pre-commit.ci runs all hooks on PRs except ESLint, Stylelint, and TypeScript checks (which GitHub Actions handles). Bypassing local hooks masks problems that pre-commit.ci will catch.
 
-**Vale accept list**: For legitimate tool/package names that Vale flags as spelling errors (for example, Stylelint, markdownlint), add them to `.styles/config/vocabularies/Project/accept.txt` rather than rewording documentation. This maintains accuracy and creates a single source of truth for accepted terminology.
+**Vale accept list**: For legitimate tool/package names that Vale flags as spelling errors (for example, Stylelint, Markdownlint), add them to `.styles/config/vocabularies/Project/accept.txt` rather than rewording documentation. This maintains accuracy and creates a single source of truth for accepted terminology.
 
 ## Git workflow
 
