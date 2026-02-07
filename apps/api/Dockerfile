@@ -52,6 +52,9 @@ ENV NODE_ENV=production
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 
+# Copy package.json (needed for ES module support and version reading)
+COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
+
 # Copy built files
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 
