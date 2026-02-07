@@ -6,18 +6,22 @@ FROM node:20.18.1-slim AS builder
 
 WORKDIR /app
 
-# Install pnpm
-RUN npm install -g pnpm@9.15.4
+# Enable Corepack to use pnpm version from package.json
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 
-# Copy workspace configuration
+# Copy workspace configuration and package manifests
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-# Copy workspace packages with directory structure
-COPY packages ./packages
-COPY apps/api ./apps/api
+# Copy only package.json files to maximize Docker layer cache reuse
+COPY packages/game-data/package.json ./packages/game-data/
+COPY apps/api/package.json ./apps/api/
 
 # Install all dependencies (including devDependencies for build)
 RUN pnpm install --frozen-lockfile
+
+# Copy full workspace source after dependencies are installed
+COPY packages ./packages
+COPY apps/api ./apps/api
 
 # Build the API
 RUN pnpm --filter @genshin/api build
@@ -29,8 +33,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Install pnpm for dependency installation
-RUN npm install -g pnpm@9.15.4
+# Enable Corepack for pnpm
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 # Copy root workspace files for pnpm to read the lockfile
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
