@@ -16,6 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
+    # NOTE: This workflow runs only the hooks skipped by pre-commit.ci.
+    # See .pre-commit-config.yaml ci.skip for the complete list.
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
