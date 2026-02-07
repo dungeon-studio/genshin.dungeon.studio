@@ -15,6 +15,9 @@ exclude: |
   )
 
 ci:
+  # NOTE: This 'skip' list ONLY affects pre-commit.ci (hosted CI service).
+  # All hooks listed here still run locally on every commit.
+  #
   # GitHub Actions runs hooks via two separate workflows to avoid duplication:
   # 1. pre-commit.yml (ESLint + Stylelint) - runs on every PR
   # 2. build.yml (typecheck + build) - runs full build pipeline
