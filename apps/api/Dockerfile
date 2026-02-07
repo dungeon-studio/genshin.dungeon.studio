@@ -32,17 +32,16 @@ ENV NODE_ENV=production
 # Install pnpm for dependency installation
 RUN npm install -g pnpm@9.15.4
 
-# Copy root workspace files for pnpm
+# Copy root workspace files for pnpm to read the lockfile
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
 
-# Copy workspace and app to run pnpm in production mode
-COPY --from=builder /app/packages ./packages
-COPY --from=builder /app/apps/api ./apps/api
+# Copy API package manifest for production dependency installation
+COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
 
-# Install production dependencies only (this won't need workspace packages)
-RUN pnpm install -r --prod --frozen-lockfile
+# Install production dependencies only for @genshin/api using the lockfile
+RUN pnpm install --filter @genshin/api --prod --frozen-lockfile
 
-# Copy built files (overwrite with fresh build from builder)
+# Copy built files
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 
 EXPOSE 8080
