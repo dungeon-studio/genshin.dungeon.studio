@@ -14,7 +14,8 @@
     "verbatimModuleSyntax": true,
     // baseUrl required for path alias resolution across tools
     "baseUrl": "./src",
-    // Path aliases eliminate relative imports and clarify module organization
+    // Path aliases eliminate relative imports and clarify module organization.
+    // tsc-alias rewrites these in compiled JS during build for runtime compatibility.
     "paths": {
       "@/*": ["./*"],
       "@middleware/*": ["./middleware/*"],
