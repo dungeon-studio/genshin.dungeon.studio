@@ -24,7 +24,10 @@ npm
 # Code quality tools
 ESLint
 Prettier
+Stylelint
 Vitest
+markdownlint
+Markdownlint
 yamllint
 
 # Configuration and tooling terms

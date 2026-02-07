@@ -53,21 +53,9 @@ pnpm install
 pnpm dev
 ```
 
-### Code quality standards
+### Quality checks overview
 
-Before committing:
-
-```bash
-pnpm format     # Format code with Prettier
-pnpm typecheck  # Type check using TypeScript build mode
-pnpm test       # Run tests
-pnpm lint       # Check for linting issues
-```
-
-**Documentation checks**:
-
-- If pre-commit reports Vale issues, run Vale manually after fixing errors to catch warnings and suggestions
-- Use line-level Vale suppression comments for known false positives, such as license badges
+Pre-commit enforces formatting, linting, documentation, secrets, and hygiene checks on every commit and on pull requests. If checks fail, fix the issues—see the Code quality section below for guidance.
 
 **Commit types**. Use these prefixes in your commit messages:
 
@@ -86,6 +74,77 @@ pnpm lint       # Check for linting issues
 - [package.json](package.json): `"description"` field
 - [README.md](README.md): One-line tagline
 - GitHub repository description. Maintainers update this via repo settings.
+
+---
+
+## Code quality
+
+Pre-commit hooks automatically enforce key checks, including:
+
+- **Prettier** - Code formatting
+- **ESLint** - JavaScript/TypeScript linting (fixes issues when possible)
+- CSS linting (Tailwind directives supported)
+- Documentation and config linting for Markdown, YAML, and prose
+- Safety and repository hygiene checks for secrets, merge conflict markers, large files, trailing whitespace, line endings, and YAML/JSON validation
+
+For type checking, run manually before committing:
+
+```bash
+pnpm typecheck
+```
+
+### Code comments
+
+For complex logic, decisions, or subtle patterns:
+
+- Decisions and trade-offs—why you chose this approach
+- Workarounds—temporary fixes with issue references
+- Performance-sensitive code—explain the optimization
+- External dependencies—integration quirks or API specifics
+
+---
+
+## Pull request workflow
+
+### Branch naming
+
+- `feature/description` - New features
+- `fix/description` - Bug fixes
+- `chore/description` - Maintenance
+- `docs/description` - Documentation
+
+### Before merging
+
+- ✅ No linting errors
+- ✅ TypeScript compiles without errors
+- ✅ Code formatted with Prettier
+- ✅ Pull request description is accurate
+
+### Merge strategy
+
+- **Squash and merge** - All pull request commits become one commit on develop
+- The pull request title becomes the final commit message (use conventional commit format)
+- Keep commit history clean - one feature equals one commit
+
+### Addressing review comments
+
+1. Address feedback completely
+2. Batch related fixes when possible
+3. Pre-commit hooks will verify formatting and linting. For type checking, run:
+
+   ```bash
+   pnpm typecheck
+   ```
+
+---
+
+## Platform compatibility
+
+This project runs on Windows, macOS, and Linux.
+
+- Use Node.js `path` module for paths, not hardcoded `/` or `\`
+- Use cross-platform packages like `rimraf` for file operations, not `rm -rf`
+- Avoid OS-specific environment variables
 
 ### Detailed guides
 

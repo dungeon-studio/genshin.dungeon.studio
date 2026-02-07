@@ -12,7 +12,10 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    host: '0.0.0.0', // Listen on all network interfaces for DevContainer compatibility
+    // Bind to 0.0.0.0 instead of localhost to allow access from host machine when running in DevContainer.
+    // The DevContainer's network is isolated; binding to all interfaces exposes the server to the host.
+    // Without this, http://localhost:5173 would timeout from the host browser.
+    host: '0.0.0.0',
     proxy: {
       '/api': {
         target: 'http://localhost:8080',
