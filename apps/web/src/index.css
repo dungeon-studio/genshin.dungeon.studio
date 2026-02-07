@@ -2,8 +2,7 @@
 
 /* SPDX-License-Identifier: MIT */
 
-@import url('tailwindcss');
-
+@import 'tailwindcss';
 @plugin 'tailwindcss-animate';
 
 @theme {
