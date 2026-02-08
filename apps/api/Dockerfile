@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 # Build stage
-FROM node:20.18.1-slim AS builder
+FROM node:25.6.0-slim AS builder
 
 WORKDIR /app
 
@@ -25,7 +25,7 @@ COPY apps/api ./apps/api
 RUN pnpm --filter @genshin/api build
 
 # Production dependencies stage
-FROM node:20.18.1-slim AS deps
+FROM node:25.6.0-slim AS deps
 
 WORKDIR /app
 
@@ -42,7 +42,7 @@ COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
 RUN pnpm install --filter @genshin/api --prod --frozen-lockfile
 
 # Production stage
-FROM node:20.18.1-slim
+FROM node:25.6.0-slim
 
 WORKDIR /app
 
