@@ -186,6 +186,10 @@ importers:
         version: 8.54.0(eslint@10.0.0(jiti@1.21.7))(typescript@5.9.3)
 
   packages/types:
+    dependencies:
+      '@genshin/game-data':
+        specifier: workspace:*
+        version: link:../game-data
     devDependencies:
       '@eslint/js':
         specifier: 10.0.1

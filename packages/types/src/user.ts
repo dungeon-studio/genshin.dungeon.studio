@@ -12,6 +12,6 @@ export interface User {
   emailVerified: boolean;
   provider: string;
   providerUserId: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string; // ISO 8601 timestamp
+  updatedAt: string; // ISO 8601 timestamp
 }

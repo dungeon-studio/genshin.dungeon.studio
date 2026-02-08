@@ -29,6 +29,12 @@ export interface Team {
    */
   members: [TeamMember, TeamMember, TeamMember, TeamMember];
   description?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  /**
+   * ISO 8601 timestamp string representing when the team was created.
+   */
+  createdAt: string;
+  /**
+   * ISO 8601 timestamp string representing when the team was last updated.
+   */
+  updatedAt: string;
 }

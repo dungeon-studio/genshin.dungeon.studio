@@ -2,5 +2,5 @@
 /* SPDX-License-Identifier: MIT */
 
 export type { User } from './user';
-export type { TeamMember } from './teamMember';
+export type { TeamMember, ArtifactPlan } from './teamMember';
 export type { Team, TeamSlot } from './team';

@@ -122,6 +122,12 @@ updates:
       - 'types'
       - 'automated'
     groups:
+      # Linting & formatting
+      eslint:
+        patterns:
+          - 'eslint*'
+          - '@eslint/*'
+          - 'typescript-eslint'
       # TypeScript
       typescript:
         patterns:
