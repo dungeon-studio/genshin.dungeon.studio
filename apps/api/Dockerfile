@@ -6,7 +6,7 @@ FROM node:20.18.1-slim AS builder
 
 WORKDIR /app
 
-# Enable Corepack to use pnpm version from package.json
+# Enable Corepack with the pinned pnpm version used in this project
 RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 # Copy workspace configuration and package manifests
@@ -29,7 +29,7 @@ FROM node:20.18.1-slim AS deps
 
 WORKDIR /app
 
-# Enable Corepack for pnpm
+# Enable Corepack with the pinned pnpm version used in this project
 RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 # Copy root workspace files for pnpm to read the lockfile
