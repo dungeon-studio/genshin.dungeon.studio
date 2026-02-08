@@ -4,15 +4,7 @@
     "at-rule-no-unknown": [
       true,
       {
-        "ignoreAtRules": [
-          "tailwind",
-          "apply",
-          "layer",
-          "config",
-          "theme",
-          "plugin",
-          "import"
-        ]
+        "ignoreAtRules": ["tailwind", "apply", "layer", "config", "theme", "plugin", "import"]
       }
     ],
     "value-keyword-case": [
