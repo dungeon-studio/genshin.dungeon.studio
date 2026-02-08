@@ -63,7 +63,7 @@
     }
   },
 
-  "postCreateCommand": "npm install -g pnpm@9.15.4 && pnpm install && pre-commit install && pipx install reuse==6.2.0",
+  "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
   "updateContentCommand": "pnpm install",
   "postAttachCommand": "echo '✅ Ready | Node $(node --version) | pnpm $(pnpm --version)'",
 
