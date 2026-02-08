@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { serve } from '@hono/node-server';
+import { HTTPException } from 'hono/http-exception';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
@@ -27,10 +28,22 @@ app.use(
 
 // Error handling middleware
 app.onError((err, c) => {
-  console.error('Error:', err);
+  // Handle Hono's HTTPException (intended errors like 404, validation errors, etc.)
+  if (err instanceof HTTPException) {
+    return c.json(
+      {
+        error: err.message,
+        status: 'error',
+      },
+      err.status,
+    );
+  }
+
+  // Handle unexpected errors - log full details server-side, return generic message
+  console.error('Unexpected error:', err);
   return c.json(
     {
-      error: err.message || 'Internal server error',
+      error: 'Internal server error',
       status: 'error',
     },
     500,
