@@ -17,8 +17,9 @@ const app = new Hono();
 app.use('*', logger());
 
 // CORS middleware - allow frontend origin
-const frontendOrigin = process.env.FRONTEND_ORIGIN || 'http://localhost:5173';
-if (frontendOrigin.trim() === '' || frontendOrigin === '*') {
+const rawFrontendOrigin = process.env.FRONTEND_ORIGIN ?? 'http://localhost:5173';
+const frontendOrigin = rawFrontendOrigin.trim();
+if (frontendOrigin === '' || frontendOrigin === '*') {
   throw new Error("FRONTEND_ORIGIN must be a specific origin; '*' is not valid.");
 }
 app.use(
