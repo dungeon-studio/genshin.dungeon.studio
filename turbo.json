@@ -25,6 +25,7 @@
       "inputs": ["src/**", "package.json", "vite.config.*", "vitest.config.*", "tsconfig*.json"]
     },
     "typecheck": {
+      "dependsOn": ["^build"],
       "inputs": ["src/**/*.{ts,tsx}", "package.json", "vite.config.*", "tsconfig*.json"]
     },
     "clean": {
