@@ -5,12 +5,17 @@
 .gitignore
 node_modules
 npm-debug.log
-.env
-.env.local
-.env.*.local
+.env*
+!.env.example
 dist
 build
 .DS_Store
 *.md
 .vscode
 .idea
+
+# Exclude unused workspace paths (API build doesn't copy these)
+apps/web
+packages
+.github
+docs
