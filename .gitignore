@@ -81,6 +81,14 @@ vite.config.ts.timestamp-*
 .DS_Store
 
 # ===================================
+# Google Cloud Platform (GCP)
+# ===================================
+
+# GCP service account keys and credentials
+.gcp/
+service-account*.json
+
+# ===================================
 # Temporary Files
 # ===================================
 

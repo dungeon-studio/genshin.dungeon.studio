@@ -139,6 +139,27 @@ Just commit fixes normally and push. Amend/force-push workflows are unnecessary 
 
 Test alongside code; strict TypeScript; domain-driven design; maintain game-data accuracy; verify docs match code; cross-platform compatible; include SPDX headers in new files.
 
+## Shell script standards
+
+All bash scripts should follow these standards for reliability and safety:
+
+- **Error handling**: Use `set -euo pipefail` at the start to catch errors in piped commands, fail on undefined variables, and exit on first error
+- **Debugging output**: Enable `set -x` for visibility during development and debugging. Don't embed secrets in scripts; use environment variables instead.
+- **Network resilience**: Use `curl -fsSL` to fail on HTTP errors and network issues
+- **Security**: Don't include credentials, API keys, or sensitive data directly in scripts. Pass these via environment variables or secure configuration.
+- **Example**:
+
+  ```bash
+  #!/bin/bash
+  # SPDX-FileCopyrightText: 2026 Your Name
+  # SPDX-License-Identifier: MIT
+  set -euo pipefail
+  set -x
+  # Your commands here
+  ```
+
+The `.devcontainer/postCreateCommand.sh` script serves as the centralized location for all DevContainers provisioning. Add new tools and setup steps there. See issue #219 for extension patterns.
+
 ## Documentation preference hierarchy
 
 When explaining decisions or complex patterns, prefer this order:
