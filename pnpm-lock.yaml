@@ -185,6 +185,25 @@ importers:
         specifier: 8.54.0
         version: 8.54.0(eslint@10.0.0(jiti@1.21.7))(typescript@5.9.3)
 
+  packages/types:
+    dependencies:
+      '@genshin/game-data':
+        specifier: workspace:*
+        version: link:../game-data
+    devDependencies:
+      '@eslint/js':
+        specifier: 10.0.1
+        version: 10.0.1(eslint@10.0.0(jiti@1.21.7))
+      eslint:
+        specifier: 10.0.0
+        version: 10.0.0(jiti@1.21.7)
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      typescript-eslint:
+        specifier: 8.54.0
+        version: 8.54.0(eslint@10.0.0(jiti@1.21.7))(typescript@5.9.3)
+
 packages:
 
   '@alloc/quick-lru@5.2.0':

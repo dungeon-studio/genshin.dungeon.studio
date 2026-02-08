@@ -44,6 +44,27 @@ When adding documentation, consider the audience and place information according
 - **apps/web**: React frontend
 - **`apps/api`**: Hono API server
 
+## Module & package patterns
+
+**Module philosophy**: Packages are runtime modules with behavior, not just type definitions. Think Haskell-style: types include methods, behavior, and encapsulation—not just interfaces. This means:
+
+- Emit JavaScript alongside declarations (no `emitDeclarationOnly`)
+- Provide both `types` and `default` exports in package.json
+- Include `main` field pointing to compiled .js entry
+- Pattern matches `@genshin/game-data` for consistency
+
+**Runtime module configuration**: Workspace packages that other packages import need:
+
+```json
+"exports": {
+  ".": {
+    "types": "./dist/index.d.ts",
+    "default": "./dist/index.js"
+  }
+},
+"main": "./dist/index.js"
+```
+
 ## State & storage patterns
 
 - **UI state**: zustand
@@ -51,6 +72,8 @@ When adding documentation, consider the audience and place information according
 - **Persistent**: `localStorage` (Progressive Web App, planned long-term)
 - **Long-term**: Firestore (planned)
 - Game data: Import from `@genshin/game-data`, use helpers
+
+**Date serialization**: Use ISO 8601 strings (`string`), never `Date` objects, for JSON serialization compatibility. All timestamp fields (`createdAt`, `updatedAt`, etc.) should be typed as `string`.
 
 ## API & error handling
 
@@ -105,6 +128,12 @@ Local pre-commit hooks run automatically on every commit (except TypeScript chec
 - Force pushes rewrite history unnecessarily and can lose work
 
 Just commit fixes normally and push. Amend/force-push workflows are unnecessary overhead here.
+
+## File naming conventions
+
+- **Non-React TypeScript** (types, models, utilities): lowercase single words (`user.ts`, `team.ts`), camelCase compounds (`teamMember.ts`)
+- **React components**: PascalCase (`HomePage.tsx`, `Layout.tsx`, `ChatPage.tsx`)
+- **shadcn/ui components**: lowercase (`button.tsx`, `card.tsx`) - follows their convention
 
 ## When suggesting code
 

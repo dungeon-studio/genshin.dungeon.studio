@@ -87,6 +87,8 @@ ddbeck's
 DevContainers
 Diátaxis
 UTC
+camelCase
+PascalCase
 
 # Game elements (Genshin Impact)
 Pyro
