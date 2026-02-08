@@ -104,6 +104,30 @@ updates:
           - 'prettier*'
 
   # ==========================================================================
+  # SHARED TYPES PACKAGE (packages/types)
+  # ==========================================================================
+  - package-ecosystem: 'npm'
+    directory: '/packages/types'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'types'
+      - 'automated'
+    groups:
+      # TypeScript
+      typescript:
+        patterns:
+          - 'typescript'
+
+  # ==========================================================================
   # GITHUB ACTIONS
   # ==========================================================================
   - package-ecosystem: 'github-actions'
@@ -197,6 +221,7 @@ updates:
 # Current coverage:
 #  ✓ Root workspace (weekly)
 #  ✓ apps/web (weekly)
+#  ✓ packages/types (weekly)
 #  ✓ DevContainer (weekly)
 #  ✓ Docker - apps/api (weekly)
 # ============================================================================
