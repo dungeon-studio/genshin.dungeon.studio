@@ -6,7 +6,6 @@
 node_modules
 npm-debug.log
 .env*
-!.env.example
 dist
 build
 .DS_Store
