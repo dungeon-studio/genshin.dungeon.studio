@@ -1,0 +1,21 @@
+{
+  "name": "@genshin/types",
+  "version": "0.0.0",
+  "description": "Shared types for Genshin Dungeon Studio",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./types": "./dist/index.d.ts"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0"
+  }
+}
