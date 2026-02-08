@@ -9,6 +9,9 @@
     "ghcr.io/devcontainers/features/node:1": {
       "version": "20"
     },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "moby": false
+    },
     "ghcr.io/devcontainers-extra/features/pre-commit:2": {},
     "ghcr.io/shinepukur/devcontainer-features/vale:1": {}
   },
@@ -35,6 +38,9 @@
 
         // Styling
         "bradlc.vscode-tailwindcss",
+
+        // Containerization
+        "ms-azuretools.vscode-docker",
 
         // Testing (when Vitest is fully configured)
         "vitest.explorer",

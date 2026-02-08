@@ -58,6 +58,22 @@ pnpm install
 pnpm dev
 ```
 
+### Building and running the Docker image
+
+To build the API Docker image locally:
+
+```bash
+docker build -f apps/api/Dockerfile -t genshin-api:local .
+```
+
+To run it:
+
+```bash
+docker run -p 8080:8080 genshin-api:local
+```
+
+The API will be available at `http://localhost:8080`. See [apps/api/Dockerfile](apps/api/Dockerfile) for build details and [.github/workflows/](.github/workflows/) for CI/CD pipeline information.
+
 ### Quality checks overview
 
 Pre-commit enforces formatting, linting, documentation, secrets, and hygiene checks on every commit and on pull requests. If checks fail, fix the issues—see the Code quality section below for guidance.
