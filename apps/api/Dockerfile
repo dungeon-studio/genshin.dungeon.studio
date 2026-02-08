@@ -1,13 +1,25 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
+# Define versions for Corepack and pnpm to ensure consistency across all stages
+ARG COREPACK_VERSION=0.34.6
+ARG PNPM_VERSION=9.15.4
+
 # Build stage
 FROM node:25.6.0-slim AS builder
 
+# Pass ARGs to this stage
+ARG COREPACK_VERSION
+ARG PNPM_VERSION
+
 WORKDIR /app
 
-# Enable Corepack with the pinned pnpm version used in this project
-RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
+# Install Corepack (not bundled in Node.js 25+) and enable it with the pinned pnpm version
+# Remove leftover Yarn 1.x symlinks from the base image to avoid conflicts
+RUN rm -f /usr/local/bin/yarn /usr/local/bin/yarnpkg && \
+    npm install -g corepack@${COREPACK_VERSION} && \
+    corepack enable && \
+    corepack prepare pnpm@${PNPM_VERSION} --activate
 
 # Copy workspace configuration and package manifests
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -27,10 +39,18 @@ RUN pnpm --filter @genshin/api build
 # Production dependencies stage
 FROM node:25.6.0-slim AS deps
 
+# Pass ARGs to this stage
+ARG COREPACK_VERSION
+ARG PNPM_VERSION
+
 WORKDIR /app
 
-# Enable Corepack with the pinned pnpm version used in this project
-RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
+# Install Corepack (not bundled in Node.js 25+) and enable it with the pinned pnpm version
+# Remove leftover Yarn 1.x symlinks from the base image to avoid conflicts
+RUN rm -f /usr/local/bin/yarn /usr/local/bin/yarnpkg && \
+    npm install -g corepack@${COREPACK_VERSION} && \
+    corepack enable && \
+    corepack prepare pnpm@${PNPM_VERSION} --activate
 
 # Copy root workspace files for pnpm to read the lockfile
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
