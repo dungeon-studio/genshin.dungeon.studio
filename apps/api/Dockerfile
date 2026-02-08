@@ -7,6 +7,7 @@ FROM node:25.6.0-slim AS builder
 WORKDIR /app
 
 # Install Corepack (not bundled in Node.js 25+) and enable it with the pinned pnpm version
+# --force is required to overwrite leftover Yarn 1.x symlinks in the base image
 RUN npm install -g corepack --force && corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 # Copy workspace configuration and package manifests
@@ -30,6 +31,7 @@ FROM node:25.6.0-slim AS deps
 WORKDIR /app
 
 # Install Corepack (not bundled in Node.js 25+) and enable it with the pinned pnpm version
+# --force is required to overwrite leftover Yarn 1.x symlinks in the base image
 RUN npm install -g corepack --force && corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 # Copy root workspace files for pnpm to read the lockfile
