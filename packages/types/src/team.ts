@@ -1,7 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> */
 /* SPDX-License-Identifier: MIT */
 
-import type { TeamMember } from './teamMember';
+import type { TeamMember } from './teamMember.js';
 
 /**
  * Team loadout slot index for a user (0-indexed, 0-3).

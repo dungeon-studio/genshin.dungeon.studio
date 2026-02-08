@@ -1,8 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> */
 /* SPDX-License-Identifier: MIT */
 
-import type { Character } from '@genshin/game-data';
-import type { Weapon } from '@genshin/game-data';
+import type { Character, Weapon } from '@genshin/game-data';
 
 /**
  * Placeholder for artifact plan configuration.
