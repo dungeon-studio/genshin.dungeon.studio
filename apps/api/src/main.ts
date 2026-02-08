@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import { serve } from '@hono/node-server';
-import { HTTPException } from 'hono/http-exception';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 import { readFileSync } from 'node:fs';
 
@@ -49,6 +49,17 @@ app.onError((err, c) => {
     500,
   );
 });
+
+// 404 handler for unmatched routes
+app.notFound((c) =>
+  c.json(
+    {
+      error: 'Not found',
+      status: 'error',
+    },
+    404,
+  ),
+);
 
 app.get('/', (c) =>
   c.json({
