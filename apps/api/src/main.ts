@@ -3,12 +3,39 @@
 
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { logger } from 'hono/logger';
 import { readFileSync } from 'node:fs';
 
 // Read version from package.json to maintain single source of truth
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf-8'));
 
 const app = new Hono();
+
+// Request logging middleware
+app.use('*', logger());
+
+// CORS middleware - allow frontend origin
+const frontendOrigin = process.env.FRONTEND_ORIGIN || 'http://localhost:5173';
+app.use(
+  '*',
+  cors({
+    origin: frontendOrigin,
+    credentials: true,
+  }),
+);
+
+// Error handling middleware
+app.onError((err, c) => {
+  console.error('Error:', err);
+  return c.json(
+    {
+      error: err.message || 'Internal server error',
+      status: 'error',
+    },
+    500,
+  );
+});
 
 app.get('/', (c) =>
   c.json({
