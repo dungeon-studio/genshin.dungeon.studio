@@ -15,8 +15,8 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 # Copy only API package.json to maximize Docker layer cache reuse
 COPY apps/api/package.json ./apps/api/
 
-# Install all dependencies (including devDependencies for build)
-RUN pnpm install --frozen-lockfile
+# Install dependencies for @genshin/api only (skip unnecessary workspace packages)
+RUN pnpm install --filter @genshin/api --frozen-lockfile
 
 # Copy API source after dependencies are installed
 COPY apps/api ./apps/api
