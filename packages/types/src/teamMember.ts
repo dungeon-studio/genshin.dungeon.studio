@@ -2,8 +2,11 @@
 /* SPDX-License-Identifier: MIT */
 
 /**
- * TeamMember represents a single character slot in a team with equipped weapon and artifacts
- * Character and weapon data are sourced from @genshin/game-data
+ * TeamMember represents a single character slot in a team with equipped weapon and artifacts.
+ *
+ * Character and weapon details should be looked up from @genshin/game-data
+ * using the characterId and weaponId. The specific artifact plan configuration
+ * (set pieces, main/sub stats) is stored separately.
  */
 export interface TeamMember {
   characterId: string;
