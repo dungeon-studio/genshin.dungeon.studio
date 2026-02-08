@@ -6,8 +6,8 @@ FROM node:25.6.0-slim AS builder
 
 WORKDIR /app
 
-# Enable Corepack with the pinned pnpm version used in this project
-RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
+# Install Corepack (not bundled in Node.js 25+) and enable it with the pinned pnpm version
+RUN npm install -g corepack --force && corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 # Copy workspace configuration and package manifests
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -29,8 +29,8 @@ FROM node:25.6.0-slim AS deps
 
 WORKDIR /app
 
-# Enable Corepack with the pinned pnpm version used in this project
-RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
+# Install Corepack (not bundled in Node.js 25+) and enable it with the pinned pnpm version
+RUN npm install -g corepack --force && corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 # Copy root workspace files for pnpm to read the lockfile
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
