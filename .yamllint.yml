@@ -1,0 +1,54 @@
+---
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+# yamllint configuration for Genshin Dungeon Studio
+# Catches malformed YAML and enforces consistent style
+# See https://yamllint.readthedocs.io/ for rule documentation
+
+extends: default
+
+rules:
+  # Allow longer lines since YAML configs often contain URLs and long strings
+  # that shouldn't be broken across lines
+  line-length:
+    max: 120
+    level: warning
+
+  # Require document-start markers for consistency and to make YAML files
+  # explicit about where they begin
+  document-start: enable
+
+  # Disable multiline string checking since regex patterns and code blocks
+  # inside YAML should maintain their own formatting
+  indentation:
+    spaces: 2
+    indent-sequences: true
+    check-multi-line-strings: false
+
+  # Disable comment indentation checking because it's too strict for
+  # commented-out YAML structures (like disabled workflow steps)
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: disable
+
+  # Allow empty values in block mappings for optional configuration fields
+  empty-values:
+    forbid-in-block-mappings: false
+    forbid-in-flow-mappings: true
+
+  # Allow 'on' as a truthy value for GitHub Actions workflow triggers
+  # Disable key checking to allow 'on:' as a top-level key
+  truthy:
+    allowed-values: ['true', 'false', 'on']
+    check-keys: false
+
+ignore: |
+  # Exclude generated and vendor files
+  .styles/
+  node_modules/
+  .pnpm-store/
+  dist/
+  build/
+  .turbo/
+  pnpm-lock.yaml

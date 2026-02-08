@@ -1,39 +1,27 @@
-import './App.css';
+// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+// SPDX-License-Identifier: MIT
+
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+
+import { Layout } from './components/Layout';
+import { ChatPage } from './pages/ChatPage';
+import { CollectionPage } from './pages/CollectionPage';
+import { HomePage } from './pages/HomePage';
+import { NotFoundPage } from './pages/NotFoundPage';
+import { TeamsPage } from './pages/TeamsPage';
 
 export function App() {
   return (
-    <div className="app">
-      <div className="hero">
-        <h1>Genshin Team Builder</h1>
-        <p className="subtitle">AI-powered team building companion</p>
-        <div className="status">
-          <span className="badge">🚧 Under Development</span>
-        </div>
-      </div>
-
-      <div className="features">
-        <div className="feature-card">
-          <span className="icon">📋</span>
-          <h3>Collection Manager</h3>
-          <p>Track your characters, weapons, and artifacts</p>
-        </div>
-
-        <div className="feature-card">
-          <span className="icon">🤖</span>
-          <h3>AI Assistant</h3>
-          <p>Get personalized team recommendations</p>
-        </div>
-
-        <div className="feature-card">
-          <span className="icon">⚡</span>
-          <h3>Team Builder</h3>
-          <p>Create and optimize your team compositions</p>
-        </div>
-      </div>
-
-      <footer className="footer">
-        <p>Built with React 19 + TypeScript + Vite</p>
-      </footer>
-    </div>
+    <Router>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/collection" element={<CollectionPage />} />
+          <Route path="/teams" element={<TeamsPage />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
+      </Routes>
+    </Router>
   );
 }

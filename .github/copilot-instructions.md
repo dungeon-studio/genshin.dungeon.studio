@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!-- vale Microsoft.Headings = NO -->
 
 # GitHub Copilot instructions for Genshin Dungeon Studio
@@ -9,13 +10,27 @@
 > - See [CONTRIBUTING.md](../CONTRIBUTING.md) for contribution workflow
 > - See [docs/](../docs/) for human-readable documentation
 > - Rely on linters such as ESLint and Prettier, plus formatters, for code style
+=======
+<!-- SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> -->
+<!-- SPDX-License-Identifier: MIT -->
 
----
+# GitHub Copilot instructions for Genshin Dungeon Studio
+>>>>>>> develop
 
+> AI-only guidance for decision-making context. Linters and CONTRIBUTING.md handle the rest.
+
+<<<<<<< HEAD
 ## Project overview
+=======
+## Tech stack
+>>>>>>> develop
 
-This is an AI-powered team building companion for Genshin Impact. Users can:
+- Turborepo + pnpm, TypeScript 5.9 strict mode
+- **Web**: React 19 + Vite + Tailwind + shadcn/ui, zustand, TanStack Query, react-router-dom
+- **API**: Hono + Node.js
+- **Testing**: Not yet installed (Vitest and React Testing Library planned)
 
+<<<<<<< HEAD
 - Track their character collection
 - Build and save team compositions
 - Get personalized team recommendations via an AI chat interface with Claude MCP
@@ -23,9 +38,17 @@ This is an AI-powered team building companion for Genshin Impact. Users can:
 **Status**: early development. The focus is on foundation and infrastructure first.
 
 **Philosophy**: test-driven development, clean git history, cross-platform compatibility, type safety.
+=======
+## DevContainers tools
 
----
+**Pre-installed in base image** (`mcr.microsoft.com/devcontainers/typescript-node:20`):
 
+- Node.js 20, npm, git
+>>>>>>> develop
+
+**Via features and postCreateCommand**:
+
+<<<<<<< HEAD
 ## Tech stack
 
 ### Current phase 1-2 completed
@@ -58,9 +81,33 @@ This is an AI-powered team building companion for Genshin Impact. Users can:
 - **GitHub Actions allowlist**: Organization-level Actions policies can block workflows. If CI fails with permission errors for actions, check org-level allowlists before changing workflows.
 - Don't suggest Bun-specific code yet. It's listed in plans but not implemented.
 - ESLint 9.x uses flat config format. Don't use `extends`; use array spreading instead.
+=======
+- GitHub CLI, pre-commit, Vale (features)
+- pnpm 9.15.4 (via npm in postCreateCommand)
+- reuse-tool v6.2.0 (via `pipx` in postCreateCommand - Python application, installed in isolated environment)
+- Project dependencies and hooks (pnpm install, pre-commit install)
 
----
+## Not yet implemented
 
+- Firestore, Firebase Auth, Claude MCP, Vitest, React Testing Library, Bun
+
+## Documentation audiences
+
+- **CONTRIBUTING.md**: For human contributors. High-level workflow, links to how-tos for details. Skip CI architecture and technical internals. Keep lean and linked—prefer links to existing guides over duplicating content to avoid bloat.
+- **`copilot-instructions.md`** (this file): For AI decision-making. Include technical details, CI architecture, hook behavior, dependencies, constraints.
+- **docs/**: Task-specific guides organized by the [Diátaxis framework](https://diataxis.fr/). Currently contains how-tos; tutorials, reference, and explanation sections planned.
+
+When adding documentation, consider the audience and place information accordingly.
+
+## Repository structure
+>>>>>>> develop
+
+- **packages/types**: Shared types across apps
+- **packages/game-data**: Static game data (characters, artifacts, reactions, weapons). Source of truth: wiki. Version = game version. Use exported helpers (for example, `getCharacterById()`), never hard-code. Accuracy validated via manual local development; add automated tests when a test suite exists.
+- **apps/web**: React frontend
+- **`apps/api`**: Hono API server
+
+<<<<<<< HEAD
 ## Documentation structure
 
 This project follows the [Diátaxis framework](https://diataxis.fr/) for documentation organization.
@@ -84,9 +131,32 @@ This project follows the [Diátaxis framework](https://diataxis.fr/) for documen
 ### README standard
 
 <!-- vale Microsoft.Headings = YES -->
+=======
+## State & storage patterns
 
-The README should help humans **identify, evaluate, and use** the project. Follow [ddbeck's README checklist](https://github.com/ddbeck/readme-checklist):
+- **UI state**: zustand
+- **Server state**: TanStack Query
+- **Persistent**: `localStorage` (Progressive Web App, planned long-term)
+- **Long-term**: Firestore (planned)
+- Game data: Import from `@genshin/game-data`, use helpers
 
+## API & error handling
+
+- HTTP status codes with user-actionable error messages
+- Logging: console.log today; structured JSON logging planned for Observability tools/Grafana Cloud
+- Frontend: try/catch with console.error
+
+## Testing
+
+- Not yet configured (Vitest planned)
+- When implemented: co-locate with source (Component.tsx + Component.test.tsx), group by function/method
+- Coverage targets: 80%+ core, 90%+ utilities
+- Manual local validation required before push
+>>>>>>> develop
+
+## Dependencies
+
+<<<<<<< HEAD
 1. **Identify** the project name, address, and maintainer at the top.
 2. **Evaluate** what it does. Focus on benefits rather than the tech stack. Cover who it's for and the status or maturity.
 3. **Use** a quick start that emphasizes DevContainers. List prerequisites if any.
@@ -134,9 +204,33 @@ The README should help humans **identify, evaluate, and use** the project. Follo
    - ✅ Keep docs lean. Remove or avoid low-signal guides until there are real, recurring issues to document
    - ✅ Use line-level Vale suppression comments for known false positives such as license badges
    - ✅ After pre-commit reports Vale issues, run Vale manually to catch warnings and suggestions once you fix errors
+=======
+- package.json is source of truth
+- After changes: `pnpm install` + commit pnpm-lock.yaml
+- Every import must exist in dependencies/devDependencies
+- Don't add without asking
 
----
+## Pre-commit hooks
 
+**Never bypass pre-commit hooks** with `--no-verify`. If hooks fail, fix the underlying issues:
+
+- Fix prose for Vale errors
+- Rerun linters with `--fix`
+- Resolve TypeScript errors properly
+- Move secrets to environment variables
+
+Local pre-commit hooks run automatically on every commit (except TypeScript check, which requires manual invocation via `pnpm typecheck`). When pre-commit.ci runs on PRs, it skips ESLint, Stylelint, and TypeScript checks (GitHub Actions handles these). Bypassing hooks masks problems that CI will catch.
+
+**Vale accept list**: for legitimate tool/package names that Vale flags as spelling errors (for example, Stylelint, Markdownlint), add them to `.styles/config/vocabularies/Project/accept.txt` rather than rewording documentation. This maintains accuracy.
+
+**Vale error handling**: Vale fails only on errors. However, handle warnings and suggestions as best as is practical:
+>>>>>>> develop
+
+- Fix all **errors** (non-negotiable: contractions, passive voice, profanity flags, etc.)
+- Fix **warnings** when doing documentation work (important: adverbs, sentence length, acronyms, voice issues)
+- Address **suggestions** if they improve readability without excessive effort
+
+<<<<<<< HEAD
 <!-- vale Microsoft.Headings = NO -->
 
 ## DevContainer configuration
@@ -146,18 +240,28 @@ The README should help humans **identify, evaluate, and use** the project. Follo
 ### pnpm store mount
 
 **Don't use volume mounts for pnpm store** in devcontainer.json. Named Docker volumes mount with root ownership, causing EACCES permission errors for the `node` user.
+=======
+**Third-party Vale styles**: everything in `.styles/` except `.styles/config/` is generated by `vale sync` and will be overwritten. Don't modify these files.
 
-```jsonc
-// ❌ DO NOT DO THIS - causes permission errors
-"mounts": [
-  "source=genshin-pnpm-store,target=${containerWorkspaceFolder}/.pnpm-store,type=volume"
-]
-```
+**SPDX headers**: all source files require SPDX headers (see [add-spdx-headers.md](../../docs/how-tos/add-spdx-headers.md)). Files without comment syntax should be declared in `.reuse/dep5`. The reuse pre-commit hook enforces compliance. Don't remove `.reuse/` from `.prettierignore`.
 
+## Git workflow
+>>>>>>> develop
+
+**Never use `git commit --amend` or `git push --force`**. This repository uses squash merge, so:
+
+<<<<<<< HEAD
 Instead, let pnpm use its default store location in the container. The first `pnpm install` is slower, but subsequent operations within the same container session use the cache normally.
+=======
+- Each commit can be rough; pre-commit hooks will catch issues
+- If hooks fail, make a new commit with fixes rather than amending
+- All commits become one on merge anyway
+- Force pushes rewrite history unnecessarily and can lose work
+>>>>>>> develop
 
----
+Just commit fixes normally and push. Amend/force-push workflows are unnecessary overhead here.
 
+<<<<<<< HEAD
 ## Repository structure
 
 ```text
@@ -172,13 +276,26 @@ genshin.dungeon.studio/
 ├── docs/             # Project documentation
 └── .github/          # CI and CD workflows plus instructions
 ```
+=======
+## When suggesting code
 
----
+Test alongside code; strict TypeScript; domain-driven design; maintain game-data accuracy; verify docs match code; cross-platform compatible; include SPDX headers in new files.
+>>>>>>> develop
 
+## Documentation preference hierarchy
+
+<<<<<<< HEAD
 ## Code style guidelines
+=======
+When explaining decisions or complex patterns, prefer this order:
+>>>>>>> develop
 
-### TypeScript
+1. **Inline comments** - In the actual code where decisions are made
+2. **Documentation strings** - On functions/classes/modules when inline isn't sufficient
+3. **Updates to existing docs** - Modify CONTRIBUTING.md or existing how-tos if applicable
+4. **New long-form documentation** - Only create if none of the above fit
 
+<<<<<<< HEAD
 - ✅ **Strict mode enabled** - No implicit any, strict null checks
 - ✅ **No `any` types** - Use `unknown` and type guards instead
 - ✅ **Explicit types for function returns** - Especially for exported functions
@@ -189,14 +306,17 @@ genshin.dungeon.studio/
 - ❌ **No `enums`** - Use `const` objects or union types instead
 
 ### ESLint v9.x flat config
+=======
+<!-- vale alex.Condescending = NO -->
 
-- ✅ **Use array export** - `export default [...]` not `defineConfig([...])`
-- ✅ **Spread configs** - `...tseslint.configs.recommended` not `extends: [...]`
-- ✅ **Use `ignores`** - Top-level `{ ignores: ['dist'] }` not `globalIgnores()`
-- ❌ **No `eslint/config` imports** - These don't exist in ESLint 9.x
+Rationale: Comments stay with code through refactors. Long form documentation gets stale and duplicates linter-enforced rules.
+>>>>>>> develop
 
-### React
+<!-- vale alex.Condescending = YES -->
 
+## Documentation accuracy
+
+<<<<<<< HEAD
 - ✅ **Functional components** with TypeScript interfaces for props
 - ✅ **Named exports** - `export function ComponentName()`
 - ✅ **Props interfaces** named `ComponentNameProps`
@@ -204,12 +324,18 @@ genshin.dungeon.studio/
 - ✅ **Early returns** for conditional rendering
 
 ### File naming
+=======
+Documentation must reflect the current repository state (HEAD), not aspirations:
 
-- `kebab-case.tsx` for files
-- `PascalCase` for components
-- `camelCase` for functions, variables
-- `SCREAMING_SNAKE_CASE` for constants
+- **Verify existence**: Check package.json dependencies before documenting a tool as "installed" or "configured"
+- **Use accurate names**: Package names should match actual imports (for example, "TanStack Query" for `@tanstack/react-query`, not "react-query")
+- **Mark future plans**: Explicitly note unimplemented features as "planned" or "not yet installed" rather than documenting as if they exist
+- **Test commands**: Verify that documented commands (`pnpm test`, `pnpm dev`) actually work in the current codebase
+>>>>>>> develop
 
+When in doubt, grep the codebase or check package files rather than assuming.
+
+<<<<<<< HEAD
 ### Code organization
 
 - Keep functions small and focused, ideally under 50 lines
@@ -699,3 +825,10 @@ Good code in this project:
 ---
 
 These instructions evolve as the project matures. Last updated: phase 2, Basic Frontend Setup Complete, PR #80
+=======
+## When unsure
+
+- Check GitHub Issues/Milestones first
+- Ask before adding dependencies
+- Verify against codebase, don't assume
+>>>>>>> develop

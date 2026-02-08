@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+SPDX-License-Identifier: MIT
+-->
+
 # Contributing to Genshin Dungeon Studio
 
 Thank you for your interest in contributing. This project is an AI-powered team building companion for Genshin Impact, and contributions of all kinds are welcome.
@@ -19,7 +24,10 @@ If not using DevContainers, see [Manual Setup Guide](docs/how-tos/manual-setup.m
 
 - **Check existing [GitHub Issues](https://github.com/dungeon-studio/genshin.dungeon.studio/issues)** to see what's needed
 - **Run linters and formatters** before committing - they'll enforce code style automatically
+<<<<<<< HEAD
 - **Install dependencies first** by running `pnpm install` so local pre-commit hooks for ESLint and TypeScript can run
+=======
+>>>>>>> develop
 
 ## Code of conduct
 
@@ -54,17 +62,19 @@ pnpm install
 pnpm dev
 ```
 
+<<<<<<< HEAD
 ### Code quality standards
+=======
+### Building and running the Docker image
+>>>>>>> develop
 
-Before committing:
+To build the API Docker image locally:
 
 ```bash
-pnpm format     # Format code with Prettier
-pnpm typecheck  # Type check using TypeScript build mode
-pnpm test       # Run tests
-pnpm lint       # Check for linting issues
+docker build -f apps/api/Dockerfile -t genshin-api:local .
 ```
 
+<<<<<<< HEAD
 **Documentation checks**:
 
 - If pre-commit reports Vale issues, run Vale manually after fixing errors to catch warnings and suggestions
@@ -89,6 +99,120 @@ pnpm lint       # Check for linting issues
 - GitHub repository description. Maintainers update this via repo settings.
 
 ### Detailed guides
+=======
+To run it:
+
+```bash
+docker run -p 8080:8080 genshin-api:local
+```
+
+The API will be available at `http://localhost:8080`. See [apps/api/Dockerfile](apps/api/Dockerfile) for build details and [.github/workflows/](.github/workflows/) for CI/CD pipeline information.
+
+### Quality checks overview
+
+Pre-commit enforces formatting, linting, documentation, secrets, and hygiene checks on every commit and on pull requests. If checks fail, fix the issues—see the Code quality section below for guidance.
+
+**Commit types**. Use these prefixes in your commit messages:
+
+- `feat:` new feature
+- `fix:` bug fix
+- `docs:` documentation
+- `test:` adding or updating tests
+- `refactor:` code restructuring
+- `style:` formatting
+- `chore:` maintenance
+
+### Project consistency
+>>>>>>> develop
+
+**When updating project descriptions**, make sure these stay consistent:
+
+<<<<<<< HEAD
+- [Manual Setup Guide](docs/how-tos/manual-setup.md): Development environment setup without DevContainers
+
+---
+
+=======
+- [package.json](package.json): `"description"` field
+- [README.md](README.md): One-line tagline
+- GitHub repository description. Maintainers update this via repo settings.
+
+---
+
+## Code quality
+
+Pre-commit hooks automatically enforce key checks, including:
+
+- **Prettier** - Code formatting
+- **ESLint** - JavaScript/TypeScript linting (fixes issues when possible)
+- CSS linting (Tailwind directives supported)
+- Documentation and config linting for Markdown, YAML, and prose
+- Safety and repository hygiene checks for secrets, merge conflict markers, large files, trailing whitespace, line endings, and YAML/JSON validation
+
+For type checking, run manually before committing:
+
+```bash
+pnpm typecheck
+```
+
+### SPDX headers
+
+All source files require SPDX headers per the [REUSE Specification](https://reuse.software/). Use `reuse addheader` or check [REUSE docs](https://reuse.software/tutorial/) for details.
+
+### Code comments
+
+For complex logic, decisions, or subtle patterns:
+
+- Decisions and trade-offs—why you chose this approach
+- Workarounds—temporary fixes with issue references
+- Performance-sensitive code—explain the optimization
+- External dependencies—integration quirks or API specifics
+
+---
+
+## Pull request workflow
+
+### Branch naming
+
+- `feature/description` - New features
+- `fix/description` - Bug fixes
+- `chore/description` - Maintenance
+- `docs/description` - Documentation
+
+### Before merging
+
+- ✅ No linting errors
+- ✅ TypeScript compiles without errors
+- ✅ Code formatted with Prettier
+- ✅ Pull request description is accurate
+
+### Merge strategy
+
+- **Squash and merge** - All pull request commits become one commit on develop
+- The pull request title becomes the final commit message (use conventional commit format)
+- Keep commit history clean - one feature equals one commit
+
+### Addressing review comments
+
+1. Address feedback completely
+2. Batch related fixes when possible
+3. Pre-commit hooks will verify formatting and linting. For type checking, run:
+
+   ```bash
+   pnpm typecheck
+   ```
+
+---
+
+## Platform compatibility
+
+This project runs on Windows, macOS, and Linux.
+
+- Use Node.js `path` module for paths, not hardcoded `/` or `\`
+- Use cross-platform packages like `rimraf` for file operations, not `rm -rf`
+- Avoid OS-specific environment variables
+
+### Detailed guides
 
 For step-by-step instructions and technical details:
 
@@ -96,6 +220,7 @@ For step-by-step instructions and technical details:
 
 ---
 
+>>>>>>> develop
 ## Need help
 
 **For questions or issues:**

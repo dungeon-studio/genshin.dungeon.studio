@@ -1,4 +1,9 @@
 {
+<<<<<<< HEAD
+=======
+  // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+  // SPDX-License-Identifier: MIT
+>>>>>>> develop
   // MAINTENANCE: Keep this list in sync with .devcontainer/devcontainer.json extensions
   "recommendations": [
     // Core language support
@@ -17,9 +22,18 @@
     "streetsidesoftware.code-spell-checker",
     "meganrogge.template-string-converter",
 
+    // Styling
+    "bradlc.vscode-tailwindcss",
+
+    // Containerization
+    "ms-azuretools.vscode-docker",
+
     // Testing - Extension ready for Phase 4 when Vitest is installed
     // Harmless to install early, will activate when Vitest is added
-    "vitest.explorer"
+    "vitest.explorer",
+
+    // API testing
+    "rangav.vscode-thunder-client"
   ],
   "unwantedRecommendations": [
     // Conflicts with ESLint

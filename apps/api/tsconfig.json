@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2022"],
+    "moduleResolution": "bundler",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    // baseUrl required for path alias resolution across tools
+    "baseUrl": "./src",
+    // Path aliases eliminate relative imports and clarify module organization.
+    // Single @/* pattern with baseUrl handles all imports (e.g., @/middleware/auth → ./middleware/auth).
+    // tsc-alias rewrites these in compiled JS during build for runtime compatibility.
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["src"]
+}

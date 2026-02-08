@@ -1,4 +1,6 @@
 {
+  // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+  // SPDX-License-Identifier: MIT
   "name": "Genshin Team Builder",
   "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
 
@@ -6,6 +8,9 @@
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers/features/node:1": {
       "version": "20"
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "moby": false
     },
     "ghcr.io/devcontainers-extra/features/pre-commit:2": {},
     "ghcr.io/shinepukur/devcontainer-features/vale:1": {}
@@ -31,8 +36,17 @@
         "streetsidesoftware.code-spell-checker",
         "meganrogge.template-string-converter",
 
+        // Styling
+        "bradlc.vscode-tailwindcss",
+
+        // Containerization
+        "ms-azuretools.vscode-docker",
+
         // Testing (when Vitest is fully configured)
-        "vitest.explorer"
+        "vitest.explorer",
+
+        // API testing
+        "rangav.vscode-thunder-client"
       ]
     }
   },
@@ -49,7 +63,7 @@
     }
   },
 
-  "postCreateCommand": "npm install -g pnpm@9.15.4 && pnpm install && pre-commit install",
+  "postCreateCommand": "npm install -g pnpm@9.15.4 && pnpm install && pre-commit install && pipx install reuse==6.2.0",
   "updateContentCommand": "pnpm install",
   "postAttachCommand": "echo '✅ Ready | Node $(node --version) | pnpm $(pnpm --version)'",
 
@@ -57,9 +71,10 @@
     "NODE_ENV": "development"
   },
 
-  // Note: Not using pnpm-store volume mount due to permission issues.
-  // Named volumes mount as root, causing EACCES errors for the 'node' user.
-  // pnpm will use its default store location in the container.
+  // pnpm store configuration
+  // ⚠️ DO NOT use volume mounts for pnpm store (e.g., "source=genshin-pnpm-store,target=...")
+  // Named Docker volumes mount as root, causing EACCES permission errors for the 'node' user.
+  // Solution: Use default store location. First pnpm install is slower, but cache works normally after.
 
   "remoteUser": "node"
 }

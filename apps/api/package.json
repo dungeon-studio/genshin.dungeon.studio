@@ -1,0 +1,27 @@
+{
+  "name": "@genshin/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "build": "tsc && tsc-alias",
+    "start": "node dist/main.js",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "1.19.9",
+    "hono": "4.11.9"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "25.2.2",
+    "eslint": "10.0.0",
+    "globals": "17.3.0",
+    "tsc-alias": "1.8.16",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.54.0"
+  }
+}
