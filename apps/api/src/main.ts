@@ -18,6 +18,9 @@ app.use('*', logger());
 
 // CORS middleware - allow frontend origin
 const frontendOrigin = process.env.FRONTEND_ORIGIN || 'http://localhost:5173';
+if (frontendOrigin.trim() === '' || frontendOrigin === '*') {
+  throw new Error('FRONTEND_ORIGIN must be a specific origin when credentials are enabled.');
+}
 app.use(
   '*',
   cors({
