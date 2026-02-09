@@ -29,6 +29,36 @@
 
 - Firestore, Firebase Auth, Claude MCP, Vitest, React Testing Library, Bun
 
+## Google Cloud Platform (GCP) strategy
+
+**Project structure**: Three separate projects per environment (dev, rc, production) for isolation and blast radius control.
+
+- **Development**: `dungeon-studio-genshin-dev` (currently active; shared for all dev resources)
+- **Release Candidate**: `dungeon-studio-genshin-rc` (created at 0.1.0 milestone)
+- **Production**: `dungeon-studio-genshin-prod` (created at 1.0.0 milestone)
+
+**Display names** (human-readable in Cloud Console):
+
+- dev: `develop-genshin-dungeon-studio`
+- rc: `rc-genshin-dungeon-studio` (planned)
+- prod: `production-genshin-dungeon-studio` (planned)
+
+**Organization and IAM**: No organization initially. Once multiple projects and cross-project policies are needed, create a Google Workspace or Cloud Identity domain and set up a GCP organization with centralized IAM, billing, and resource policies. Until then, use labels for environment designation.
+
+**Labels and tags**:
+
+- **Current approach**: Use project labels (`environment=development|rc|production`) since no organization exists.
+- **Future approach with organization**: Migrate to centralized tag keys in the organization for consistency across projects and proper environment badges in Cloud Console.
+- Apply labels at project creation or via `gcloud alpha projects update --update-labels=KEY=VALUE`.
+
+**API enablement strategy**: Don't enable APIs upfront. Defer until the service that needs them is actually being deployed.
+
+- Issues with API dependencies are annotated with their required APIs (for example, #32 Cloud Storage → `storage.googleapis.com`).
+- Enable APIs only when implementing the corresponding feature (for example, "Create Firestore database" → enable `firestore.googleapis.com`).
+- If `gcloud` or Cloud Build complains about a missing API, enable it on-demand via `gcloud services enable API_NAME`.
+
+**Shared resources (future)**: An optional `dungeon-studio-shared` project can host cross-app resources (DNS, monitoring, shared artifact storage) once multiple apps exist beyond Genshin.
+
 ## Documentation audiences
 
 - **CONTRIBUTING.md**: For human contributors. High-level workflow, links to how-tos for details. Skip CI architecture and technical internals. Keep lean and linked—prefer links to existing guides over duplicating content to avoid bloat.

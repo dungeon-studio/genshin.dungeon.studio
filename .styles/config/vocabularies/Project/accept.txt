@@ -43,6 +43,10 @@ Firebase
 Firestore
 Hono
 
+# Environment and deployment
+rc
+enablement
+
 # Other tools and libraries
 Babel
 OXC
