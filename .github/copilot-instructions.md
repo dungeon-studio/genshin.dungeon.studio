@@ -31,33 +31,19 @@
 
 ## Google Cloud Platform (GCP) strategy
 
-**Project structure**: Three separate projects per environment (dev, rc, production) for isolation and blast radius control.
+**Current project**: `dungeon-studio-genshin-dev` (display name: `develop-genshin-dungeon-studio`) hosts all develop environment resources.
 
-- **Development**: `dungeon-studio-genshin-dev` (currently active; shared for all dev resources)
-- **Release Candidate**: `dungeon-studio-genshin-rc` (created at 0.1.0 milestone)
-- **Production**: `dungeon-studio-genshin-prod` (created at 1.0.0 milestone)
+Future release and production environments will be created as separate projects when needed (at the 0.1.0 and 1.0.0 milestones respectively), following the same naming pattern.
 
-**Display names** (human-readable in Cloud Console):
+**Environment labeling**: Apply project labels at creation via `gcloud alpha projects update --update-labels=KEY=VALUE`. (Note: `--update-labels` is currently alpha-only in gcloud; the stable `gcloud projects update` doesn't support incremental label updates.)
 
-- dev: `develop-genshin-dungeon-studio`
-- rc: `rc-genshin-dungeon-studio` (planned)
-- prod: `production-genshin-dungeon-studio` (planned)
-
-**Organization and IAM**: No organization initially. Once multiple projects and cross-project policies are needed, create a Google Workspace or Cloud Identity domain and set up a GCP organization with centralized IAM, billing, and resource policies. Until then, use labels for environment designation.
-
-**Labels and tags**:
-
-- **Current approach**: Use project labels (`environment=development|rc|production`) since no organization exists.
-- **Future approach with organization**: Migrate to centralized tag keys in the organization for consistency across projects and proper environment badges in Cloud Console.
-- Apply labels at project creation or via `gcloud alpha projects update --update-labels=KEY=VALUE`.
+Label format: `environment=develop` (extends to `release` and `production` when those projects are created).
 
 **API enablement strategy**: Don't enable APIs upfront. Defer until the service that needs them is actually being deployed.
 
 - Issues with API dependencies are annotated with their required APIs (for example, #32 Cloud Storage → `storage.googleapis.com`).
 - Enable APIs only when implementing the corresponding feature (for example, "Create Firestore database" → enable `firestore.googleapis.com`).
 - If `gcloud` or Cloud Build complains about a missing API, enable it on-demand via `gcloud services enable API_NAME`.
-
-**Shared resources (future)**: An optional `dungeon-studio-shared` project can host cross-app resources (DNS, monitoring, shared artifact storage) once multiple apps exist beyond Genshin.
 
 ## Documentation audiences
 

@@ -44,7 +44,7 @@ Firestore
 Hono
 
 # Environment and deployment
-rc
+gcloud
 enablement
 
 # Other tools and libraries
