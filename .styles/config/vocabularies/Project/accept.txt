@@ -43,6 +43,9 @@ Firebase
 Firestore
 Hono
 
+# Environment and deployment
+gcloud
+
 # Other tools and libraries
 Babel
 OXC
