@@ -39,7 +39,7 @@ Future release and production environments will be created as separate projects 
 
 Label format: `environment=develop` (extends to `release` and `production` when those projects are created).
 
-**API enablement strategy**: Don't enable APIs upfront. Defer until the service that needs them is actually being deployed.
+**API activation strategy**: Don't enable APIs upfront. Defer until the service that needs them is actually being deployed.
 
 - Issues with API dependencies are annotated with their required APIs (for example, #32 Cloud Storage → `storage.googleapis.com`).
 - Enable APIs only when implementing the corresponding feature (for example, "Create Firestore database" → enable `firestore.googleapis.com`).

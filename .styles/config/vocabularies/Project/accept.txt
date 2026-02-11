@@ -45,7 +45,6 @@ Hono
 
 # Environment and deployment
 gcloud
-enablement
 
 # Other tools and libraries
 Babel
