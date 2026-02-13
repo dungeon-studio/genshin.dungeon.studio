@@ -67,7 +67,7 @@ resource "google_service_account_iam_member" "github_deployer_ro_shared_token_cr
 # Grant read-only service account permission to read service status during plan
 resource "google_project_iam_member" "github_deployer_ro_shared_serviceusage" {
   project = var.gcp_shared_project_id
-  role    = "roles/serviceusage.consumer"
+  role    = "roles/serviceusage.admin"
   member  = "serviceAccount:${google_service_account.github_deployer_ro_shared.email}"
 }
 
