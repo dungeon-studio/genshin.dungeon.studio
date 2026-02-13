@@ -21,7 +21,7 @@ resource "google_service_account_iam_binding" "github_deployer_shared_workload_i
   role               = "roles/iam.workloadIdentityUser"
 
   members = [
-    "principalSet://iam.googleapis.com/projects/${data.google_project.shared.number}/locations/global/workloadIdentityPools/github/attribute.actor/dungeon-studio/genshin.dungeon.studio",
+    "principalSet://iam.googleapis.com/projects/${data.google_project.shared.number}/locations/global/workloadIdentityPools/github/attribute.repository/dungeon-studio/genshin.dungeon.studio",
   ]
 
   depends_on = [google_iam_workload_identity_pool.github]
@@ -32,7 +32,7 @@ resource "google_service_account_iam_binding" "github_deployer_ro_shared_workloa
   role               = "roles/iam.workloadIdentityUser"
 
   members = [
-    "principalSet://iam.googleapis.com/projects/${data.google_project.shared.number}/locations/global/workloadIdentityPools/github/attribute.actor/dungeon-studio/genshin.dungeon.studio",
+    "principalSet://iam.googleapis.com/projects/${data.google_project.shared.number}/locations/global/workloadIdentityPools/github/attribute.repository/dungeon-studio/genshin.dungeon.studio",
   ]
 
   depends_on = [google_iam_workload_identity_pool.github]

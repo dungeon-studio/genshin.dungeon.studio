@@ -34,7 +34,7 @@ resource "google_service_account_iam_binding" "github_deployer_dev_workload_iden
 
   # References the Workload Identity Pool created in the shared environment
   members = [
-    "principalSet://iam.googleapis.com/projects/${data.google_project.shared.number}/locations/global/workloadIdentityPools/github/attribute.actor/dungeon-studio/genshin.dungeon.studio",
+    "principalSet://iam.googleapis.com/projects/${data.google_project.shared.number}/locations/global/workloadIdentityPools/github/attribute.repository/dungeon-studio/genshin.dungeon.studio",
   ]
 }
 
@@ -43,8 +43,15 @@ resource "google_service_account_iam_binding" "github_deployer_ro_dev_workload_i
   role               = "roles/iam.workloadIdentityUser"
 
   members = [
-    "principalSet://iam.googleapis.com/projects/${data.google_project.shared.number}/locations/global/workloadIdentityPools/github/attribute.actor/dungeon-studio/genshin.dungeon.studio",
+    "principalSet://iam.googleapis.com/projects/${data.google_project.shared.number}/locations/global/workloadIdentityPools/github/attribute.repository/dungeon-studio/genshin.dungeon.studio",
   ]
+}
+
+# Grant write-access service account permissions to manage dev environment
+resource "google_project_iam_member" "github_deployer_dev_editor" {
+  project = var.gcp_dev_project_id
+  role    = "roles/editor"
+  member  = "serviceAccount:${google_service_account.github_deployer_dev.email}"
 }
 
 resource "google_project_iam_member" "github_deployer_ro_dev_viewer" {
