@@ -1,8 +1,9 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-data "google_project" "shared" {
-  project_id = var.gcp_shared_project_id
+# Get shared project number for Workload Identity Pool reference
+locals {
+  shared_project_number = var.gcp_shared_project_number
 }
 
 resource "google_project_service" "dev_iam" {
@@ -34,7 +35,7 @@ resource "google_service_account_iam_binding" "github_deployer_dev_workload_iden
 
   # References the Workload Identity Pool created in the shared environment
   members = [
-    "principalSet://iam.googleapis.com/projects/${data.google_project.shared.number}/locations/global/workloadIdentityPools/github/attribute.repository/dungeon-studio/genshin.dungeon.studio",
+    "principalSet://iam.googleapis.com/projects/${local.shared_project_number}/locations/global/workloadIdentityPools/github/attribute.repository/dungeon-studio/genshin.dungeon.studio",
   ]
 }
 
@@ -43,7 +44,7 @@ resource "google_service_account_iam_binding" "github_deployer_ro_dev_workload_i
   role               = "roles/iam.workloadIdentityUser"
 
   members = [
-    "principalSet://iam.googleapis.com/projects/${data.google_project.shared.number}/locations/global/workloadIdentityPools/github/attribute.repository/dungeon-studio/genshin.dungeon.studio",
+    "principalSet://iam.googleapis.com/projects/${local.shared_project_number}/locations/global/workloadIdentityPools/github/attribute.repository/dungeon-studio/genshin.dungeon.studio",
   ]
 }
 
@@ -58,13 +59,6 @@ resource "google_project_iam_member" "github_deployer_ro_dev_viewer" {
   project = var.gcp_dev_project_id
   role    = "roles/viewer"
   member  = "serviceAccount:${google_service_account.github_deployer_ro_dev.email}"
-}
-
-# Grant read-only service account access to shared tfstate bucket
-resource "google_storage_bucket_iam_member" "github_deployer_ro_dev_shared_state" {
-  bucket = "dungeon-studio-genshin-tfstate"
-  role   = "roles/storage.objectViewer"
-  member = "serviceAccount:${google_service_account.github_deployer_ro_dev.email}"
 }
 
 # Grant read-only service account permission to generate tokens via Workload Identity
