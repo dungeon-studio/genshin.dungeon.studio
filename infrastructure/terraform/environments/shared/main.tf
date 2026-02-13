@@ -15,6 +15,9 @@ provider "google" {
   project = var.gcp_shared_project_id
 }
 
-data "google_project" "shared" {
+resource "google_project" "shared" {
+  name       = "DS Genshin Shared"
   project_id = var.gcp_shared_project_id
+
+  labels = var.common_labels
 }
