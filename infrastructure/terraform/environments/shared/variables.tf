@@ -5,3 +5,8 @@ variable "gcp_shared_project_id" {
   type        = string
   description = "GCP Project ID for shared infrastructure"
 }
+
+variable "gcp_dev_project_id" {
+  type        = string
+  description = "GCP Project ID for development environment"
+}

@@ -10,3 +10,8 @@ output "github_deployer_shared_service_account_email" {
   value       = google_service_account.github_deployer_shared.email
   description = "Service account email for GitHub Actions to manage shared infrastructure"
 }
+
+output "github_deployer_ro_shared_service_account_email" {
+  value       = google_service_account.github_deployer_ro_shared.email
+  description = "Service account email for GitHub Actions plan runs in shared"
+}

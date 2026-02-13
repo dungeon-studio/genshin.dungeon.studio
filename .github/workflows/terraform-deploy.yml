@@ -28,9 +28,9 @@ jobs:
       matrix:
         include:
           - environment: shared
-            service_account_secret: GCP_SHARED_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
+            service_account_secret: GCP_RO_SHARED_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
           - environment: dev
-            service_account_secret: GCP_DEV_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
+            service_account_secret: GCP_RO_DEV_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
 
     steps:
       - uses: actions/checkout@v4
@@ -42,7 +42,7 @@ jobs:
       # Authenticate to GCP using Workload Identity
       - uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
+          workload_identity_provider: ${{ secrets.GCP_RO_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
           service_account: ${{ secrets[matrix.service_account_secret] }} # pragma: allowlist secret
 
       - name: Set up Cloud SDK
@@ -56,8 +56,8 @@ jobs:
         id: plan
         working-directory: infrastructure/terraform/environments/${{ matrix.environment }}
         env:
-          TF_VAR_gcp_shared_project_id: ${{ secrets.GCP_SHARED_PROJECT_ID }} # pragma: allowlist secret
-          TF_VAR_gcp_dev_project_id: ${{ secrets.GCP_DEV_PROJECT_ID }} # pragma: allowlist secret
+          TF_VAR_gcp_shared_project_id: ${{ secrets.GCP_RO_SHARED_PROJECT_ID }} # pragma: allowlist secret
+          TF_VAR_gcp_dev_project_id: ${{ secrets.GCP_RO_DEV_PROJECT_ID }} # pragma: allowlist secret
         run: |
           terraform plan -no-color -out=tfplan
           terraform show -no-color tfplan > plan.txt

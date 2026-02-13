@@ -3,3 +3,4 @@
 # Non-sensitive values for shared environment
 
 gcp_shared_project_id = "dungeon-studio-genshin-shared"
+gcp_dev_project_id    = "dungeon-studio-genshin-dev"
