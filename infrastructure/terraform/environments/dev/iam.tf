@@ -52,3 +52,10 @@ resource "google_project_iam_member" "github_deployer_ro_dev_viewer" {
   role    = "roles/viewer"
   member  = "serviceAccount:${google_service_account.github_deployer_ro_dev.email}"
 }
+
+# Grant read-only service account access to shared tfstate bucket
+resource "google_storage_bucket_iam_member" "github_deployer_ro_dev_shared_state" {
+  bucket = "dungeon-studio-genshin-tfstate"
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.github_deployer_ro_dev.email}"
+}

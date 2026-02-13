@@ -10,8 +10,3 @@ variable "gcp_dev_project_id" {
   type        = string
   description = "GCP Project ID for development environment"
 }
-
-variable "common_labels" {
-  type        = map(string)
-  description = "Common labels to apply to all resources"
-}
