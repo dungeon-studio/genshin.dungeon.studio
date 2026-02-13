@@ -19,6 +19,7 @@ jobs:
       id-token: write
 
     strategy:
+      fail-fast: false
       matrix:
         include:
           - environment: shared
@@ -74,6 +75,7 @@ jobs:
     needs: terraform-plan
 
     strategy:
+      fail-fast: false
       matrix:
         include:
           - environment: shared
