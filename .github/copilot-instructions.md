@@ -1,7 +1,7 @@
 <!-- SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> -->
 <!-- SPDX-License-Identifier: MIT -->
 
-# GitHub Copilot instructions for Genshin Dungeon Studio
+# GitHub Copilot instructions for genshin.dungeon.studio
 
 > AI-only guidance for decision-making context. Linters and CONTRIBUTING.md handle the rest.
 

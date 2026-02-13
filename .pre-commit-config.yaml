@@ -91,6 +91,14 @@ repos:
         args: [--config=.vale.ini]
         types: [markdown]
 
+  # Terraform - Infrastructure as Code
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.90.0
+    hooks:
+      - id: terraform_fmt
+        args: [--args=-recursive]
+      - id: terraform_validate
+
   # REUSE - SPDX license compliance
   - repo: https://github.com/fsfe/reuse-tool
     rev: v6.2.0
@@ -114,9 +122,6 @@ repos:
         types: [javascript, jsx, ts, tsx]
         args: [--fix, --max-warnings=0]
 
-  # Stylelint - CSS linting
-  - repo: local
-    hooks:
       - id: stylelint
         name: stylelint
         entry: pnpm exec stylelint
@@ -124,9 +129,6 @@ repos:
         types: [css]
         args: [--fix]
 
-  # TypeScript type checking
-  - repo: local
-    hooks:
       - id: typescript-check
         name: typescript type check
         entry: pnpm exec turbo run typecheck

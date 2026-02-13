@@ -8,6 +8,7 @@
 # Project names and brands
 Genshin
 Genshin Impact
+genshin.dungeon.studio
 shadcn/ui
 Tailwind CSS
 
