@@ -57,6 +57,13 @@ resource "google_storage_bucket_iam_member" "github_deployer_ro_shared_state" {
   member = "serviceAccount:${google_service_account.github_deployer_ro_shared.email}"
 }
 
+# Grant read-only service account permission to generate tokens via Workload Identity
+resource "google_service_account_iam_member" "github_deployer_ro_shared_token_creator" {
+  service_account_id = google_service_account.github_deployer_ro_shared.name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = "serviceAccount:${google_service_account.github_deployer_ro_shared.email}"
+}
+
 # Grant shared service account permission to manage IAM (for Workload Identity setup)
 resource "google_project_iam_member" "github_deployer_shared_iam" {
   project = var.gcp_shared_project_id
