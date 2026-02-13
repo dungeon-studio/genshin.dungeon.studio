@@ -54,7 +54,7 @@ jobs:
           TF_VAR_gcp_shared_project_id: ${{ secrets.GCP_RO_SHARED_PROJECT_ID }} # pragma: allowlist secret
           TF_VAR_gcp_dev_project_id: ${{ secrets.GCP_RO_DEV_PROJECT_ID }} # pragma: allowlist secret
         run: |
-          terraform plan -no-color -out=tfplan
+          terraform plan -lock=false -no-color -out=tfplan
           terraform show -no-color tfplan > plan.txt
 
       - name: Comment PR with Plan
