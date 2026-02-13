@@ -15,9 +15,6 @@ provider "google" {
   project = var.gcp_dev_project_id
 }
 
-resource "google_project" "dev" {
-  name       = "DS Genshin Development"
+data "google_project" "dev" {
   project_id = var.gcp_dev_project_id
-
-  labels = var.common_labels
 }

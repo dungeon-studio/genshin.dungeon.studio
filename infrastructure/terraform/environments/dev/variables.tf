@@ -10,8 +10,3 @@ variable "gcp_shared_project_id" {
   type        = string
   description = "GCP Project ID for shared infrastructure (where Workload Identity Pool is created)"
 }
-
-variable "common_labels" {
-  type        = map(string)
-  description = "Common labels applied to all resources in this environment"
-}
