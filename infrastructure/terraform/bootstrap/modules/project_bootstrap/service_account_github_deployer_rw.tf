@@ -22,3 +22,9 @@ resource "google_storage_bucket_iam_member" "github_deployer_rw_state_bucket" {
   role   = "roles/storage.objectAdmin"
   member = "serviceAccount:${google_service_account.github_deployer_rw.email}"
 }
+
+resource "google_storage_bucket_iam_member" "github_deployer_rw_bucket_reader" {
+  bucket = var.state_bucket_name
+  role   = "roles/storage.legacyBucketReader"
+  member = "serviceAccount:${google_service_account.github_deployer_rw.email}"
+}
