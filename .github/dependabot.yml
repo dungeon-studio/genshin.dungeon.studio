@@ -192,10 +192,10 @@ updates:
       - 'automated'
 
   # ==========================================================================
-  # TERRAFORM - SHARED ENVIRONMENT
+  # TERRAFORM - BOOTSTRAP
   # ==========================================================================
   - package-ecosystem: 'terraform'
-    directory: '/infrastructure/terraform/environments/shared'
+    directory: '/infrastructure/terraform/bootstrap'
     schedule:
       interval: 'weekly'
       day: 'friday'
@@ -209,7 +209,28 @@ updates:
       - 'dependencies'
       - 'terraform'
       - 'infrastructure'
-      - 'shared'
+      - 'bootstrap'
+      - 'automated'
+
+  # ==========================================================================
+  # TERRAFORM - CORE ENVIRONMENT
+  # ==========================================================================
+  - package-ecosystem: 'terraform'
+    directory: '/infrastructure/terraform/environments/core'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'terraform'
+      - 'infrastructure'
+      - 'core'
       - 'automated'
 
   # ==========================================================================
@@ -272,6 +293,7 @@ updates:
 #  ✓ packages/types (weekly)
 #  ✓ DevContainer (weekly)
 #  ✓ Docker - apps/api (weekly)
-#  ✓ Terraform - shared environment (weekly)
+#  ✓ Terraform - bootstrap (weekly)
+#  ✓ Terraform - core environment (weekly)
 #  ✓ Terraform - dev environment (weekly)
 # ============================================================================

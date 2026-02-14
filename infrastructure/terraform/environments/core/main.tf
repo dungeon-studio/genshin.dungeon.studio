@@ -12,9 +12,9 @@ terraform {
 }
 
 provider "google" {
-  project = var.gcp_shared_project_id
+  project = var.gcp_core_project_id
 }
 
-data "google_project" "shared" {
-  project_id = var.gcp_shared_project_id
+data "google_project" "core" {
+  project_id = var.gcp_core_project_id
 }

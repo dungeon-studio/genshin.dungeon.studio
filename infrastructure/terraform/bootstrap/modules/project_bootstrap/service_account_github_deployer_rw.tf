@@ -17,6 +17,14 @@ resource "google_project_iam_member" "github_deployer_rw_editor" {
   member  = "serviceAccount:${google_service_account.github_deployer_rw.email}"
 }
 
+# Grant permission to create and manage service accounts in this project
+# Needed if environment terraform creates application service accounts
+resource "google_project_iam_member" "github_deployer_rw_sa_admin" {
+  project = google_project.env.project_id
+  role    = "roles/iam.serviceAccountAdmin"
+  member  = "serviceAccount:${google_service_account.github_deployer_rw.email}"
+}
+
 resource "google_storage_bucket_iam_member" "github_deployer_rw_state_bucket" {
   bucket = var.state_bucket_name
   role   = "roles/storage.objectAdmin"

@@ -5,6 +5,6 @@
 terraform {
   backend "gcs" {
     bucket = "dungeon-studio-genshin-tfstate"
-    prefix = "environments/shared"
+    prefix = "environments/platform"
   }
 }

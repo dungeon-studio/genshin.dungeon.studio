@@ -23,8 +23,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - environment: shared
-            service_account_secret: GCP_RO_SHARED_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
+          - environment: core
+            service_account_secret: GCP_RO_CORE_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
           - environment: dev
             service_account_secret: GCP_RO_DEV_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
 

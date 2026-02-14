@@ -6,6 +6,11 @@ output "project_id" {
   value       = google_project.env.project_id
 }
 
+output "project_number" {
+  description = "The created GCP project number"
+  value       = google_project.env.number
+}
+
 output "github_deployer_rw_email" {
   description = "Email of the RW service account"
   value       = google_service_account.github_deployer_rw.email

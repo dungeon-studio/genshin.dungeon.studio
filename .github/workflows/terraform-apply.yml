@@ -22,8 +22,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - environment: shared
-            service_account_secret: GCP_RO_SHARED_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
+          - environment: core
+            service_account_secret: GCP_RO_CORE_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
           - environment: dev
             service_account_secret: GCP_RO_DEV_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
 
@@ -62,9 +62,9 @@ jobs:
             infrastructure/terraform/environments/${{ matrix.environment }}/tfplan
             infrastructure/terraform/environments/${{ matrix.environment }}/plan.txt
 
-  terraform-apply-shared:
+  terraform-apply-core:
     runs-on: ubuntu-latest
-    environment: shared
+    environment: core
     permissions:
       contents: read
       id-token: write
@@ -82,23 +82,23 @@ jobs:
       - uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_RW_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
-          service_account: ${{ secrets.GCP_RW_SHARED_SERVICE_ACCOUNT_EMAIL }} # pragma: allowlist secret
+          service_account: ${{ secrets.GCP_RW_CORE_SERVICE_ACCOUNT_EMAIL }} # pragma: allowlist secret
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
 
       - name: Terraform Init
-        working-directory: infrastructure/terraform/environments/shared
+        working-directory: infrastructure/terraform/environments/core
         run: terraform init
 
       - name: Download Terraform Plan
         uses: actions/download-artifact@v4
         with:
-          name: tfplan-shared
-          path: infrastructure/terraform/environments/shared
+          name: tfplan-core
+          path: infrastructure/terraform/environments/core
 
       - name: Terraform Apply
-        working-directory: infrastructure/terraform/environments/shared
+        working-directory: infrastructure/terraform/environments/core
         run: terraform apply -auto-approve tfplan
 
   terraform-apply-dev:
@@ -108,7 +108,7 @@ jobs:
       contents: read
       id-token: write
 
-    needs: terraform-apply-shared
+    needs: terraform-apply-core
 
     steps:
       - uses: actions/checkout@v4
