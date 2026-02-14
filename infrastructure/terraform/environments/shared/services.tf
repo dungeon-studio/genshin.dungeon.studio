@@ -37,19 +37,13 @@ resource "google_project_service" "shared_iam_credentials" {
   depends_on = [google_project_service.shared_serviceusage]
 }
 
-# Dev project services (created in shared, enabling services in dev project)
-resource "google_project_service" "dev_serviceusage" {
+# Reference dev project services (created and managed by dev environment)
+data "google_project_service" "dev_serviceusage" {
   project = var.gcp_dev_project_id
   service = "serviceusage.googleapis.com"
-
-  disable_on_destroy = false
 }
 
-resource "google_project_service" "dev_iam" {
+data "google_project_service" "dev_iam" {
   project = var.gcp_dev_project_id
   service = "iam.googleapis.com"
-
-  disable_on_destroy = false
-
-  depends_on = [google_project_service.dev_serviceusage]
 }

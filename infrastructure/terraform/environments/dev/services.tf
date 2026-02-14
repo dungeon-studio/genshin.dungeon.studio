@@ -1,15 +1,21 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# Reference services created and managed by the shared environment
-data "google_project_service" "dev_serviceusage" {
+# Enable Service Usage API first - required to manage other APIs
+resource "google_project_service" "dev_serviceusage" {
   project = var.gcp_dev_project_id
   service = "serviceusage.googleapis.com"
+
+  disable_on_destroy = false
 }
 
-data "google_project_service" "dev_iam" {
+resource "google_project_service" "dev_iam" {
   project = var.gcp_dev_project_id
   service = "iam.googleapis.com"
+
+  disable_on_destroy = false
+
+  depends_on = [google_project_service.dev_serviceusage]
 }
 
 # Enable IAM Credentials API for Workload Identity token generation
@@ -19,5 +25,5 @@ resource "google_project_service" "dev_iam_credentials" {
 
   disable_on_destroy = false
 
-  depends_on = [data.google_project_service.dev_serviceusage]
+  depends_on = [google_project_service.dev_serviceusage]
 }
