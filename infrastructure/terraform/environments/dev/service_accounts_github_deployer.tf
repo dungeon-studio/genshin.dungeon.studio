@@ -38,3 +38,10 @@ resource "google_service_account_iam_binding" "github_deployer_dev_token_creator
     "principalSet://iam.googleapis.com/projects/${var.gcp_shared_project_number}/locations/global/workloadIdentityPools/github/attribute.repository/dungeon-studio/genshin.dungeon.studio",
   ]
 }
+
+# Grant write-access service account permission to manage state bucket
+resource "google_storage_bucket_iam_member" "github_deployer_dev_storage" {
+  bucket = "dungeon-studio-genshin-tfstate"
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:${google_service_account.github_deployer_dev.email}"
+}

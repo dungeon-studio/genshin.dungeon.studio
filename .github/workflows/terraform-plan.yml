@@ -48,6 +48,10 @@ jobs:
         working-directory: infrastructure/terraform/environments/${{ matrix.environment }}
         run: terraform init
 
+      - name: Terraform Validate
+        working-directory: infrastructure/terraform/environments/${{ matrix.environment }}
+        run: terraform validate
+
       - name: Terraform Plan
         id: plan
         working-directory: infrastructure/terraform/environments/${{ matrix.environment }}

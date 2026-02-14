@@ -40,7 +40,7 @@ resource "google_iam_workload_identity_pool_provider" "github" {
     "attribute.environment"      = "assertion.environment"
   }
 
-  # Security: Restrict to dungeon-studio/genshin.dungeon.studio only
+  # Security: Restrict to the dungeon-studio/genshin.dungeon.studio repository
   attribute_condition = "assertion.repository == 'dungeon-studio/genshin.dungeon.studio'"
 
   oidc {

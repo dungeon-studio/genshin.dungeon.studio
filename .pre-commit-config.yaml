@@ -31,7 +31,6 @@ ci:
     - stylelint
     - typescript-check
     - terraform_fmt
-    - terraform_validate
 
 repos:
   # Basic file checks
@@ -99,7 +98,6 @@ repos:
     hooks:
       - id: terraform_fmt
         args: [--args=-recursive]
-      - id: terraform_validate
 
   # REUSE - SPDX license compliance
   - repo: https://github.com/fsfe/reuse-tool

@@ -47,8 +47,8 @@ resource "google_project_iam_member" "github_deployer_shared_iam" {
   member  = "serviceAccount:${google_service_account.github_deployer_shared.email}"
 }
 
-# Security: Allow impersonation of service accounts in other projects
-# Needed for Terraform to apply changes across dev/staging/production projects
+# Security: Allow impersonation of service accounts in the shared project
+# Needed for Terraform to apply changes to shared resources from GitHub Actions
 resource "google_project_iam_member" "github_deployer_shared_impersonate" {
   project = var.gcp_shared_project_id
   role    = "roles/iam.serviceAccountUser"

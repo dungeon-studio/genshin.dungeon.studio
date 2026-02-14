@@ -43,3 +43,10 @@ resource "google_service_account_iam_binding" "github_deployer_ro_shared_token_c
     "principalSet://iam.googleapis.com/projects/${data.google_project.shared.number}/locations/global/workloadIdentityPools/github/attribute.repository/dungeon-studio/genshin.dungeon.studio",
   ]
 }
+
+# Grant read-only service account access to state bucket
+resource "google_storage_bucket_iam_member" "github_deployer_ro_shared_state" {
+  bucket = "dungeon-studio-genshin-tfstate"
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.github_deployer_ro_shared.email}"
+}

@@ -7,3 +7,10 @@ resource "google_project_service" "dev_iam" {
 
   disable_on_destroy = false
 }
+
+resource "google_project_service" "dev_iam_credentials" {
+  project = var.gcp_dev_project_id
+  service = "iamcredentials.googleapis.com"
+
+  disable_on_destroy = false
+}
