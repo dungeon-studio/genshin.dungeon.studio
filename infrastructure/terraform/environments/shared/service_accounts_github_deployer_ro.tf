@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
+# Shared environment read-only service account
 
 resource "google_service_account" "github_deployer_ro_shared" {
   project      = var.gcp_shared_project_id
@@ -44,7 +45,7 @@ resource "google_service_account_iam_binding" "github_deployer_ro_shared_token_c
   ]
 }
 
-# Grant read-only service account access to state bucket
+# Bucket access: Grant read-only access to terraform state
 resource "google_storage_bucket_iam_member" "github_deployer_ro_shared_state" {
   bucket = data.google_storage_bucket.tfstate.name
   role   = "roles/storage.objectViewer"

@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
+# Shared environment service accounts
 
 resource "google_service_account" "github_deployer_shared" {
   project      = var.gcp_shared_project_id
@@ -22,13 +23,6 @@ resource "google_service_account_iam_binding" "github_deployer_shared_workload_i
   depends_on = [google_iam_workload_identity_pool.github]
 }
 
-# Grant write-access service account permission to manage GCS state bucket
-# Use bucket-level IAM binding for object-level permissions on state bucket only
-resource "google_storage_bucket_iam_member" "github_deployer_shared_storage" {
-  bucket = "dungeon-studio-genshin-tfstate"
-  role   = "roles/storage.objectAdmin"
-  member = "serviceAccount:${google_service_account.github_deployer_shared.email}"
-}
 
 # Grant Workload Identity permission to generate tokens for write-access service account
 resource "google_service_account_iam_binding" "github_deployer_shared_token_creator" {
@@ -53,4 +47,11 @@ resource "google_project_iam_member" "github_deployer_shared_impersonate" {
   project = var.gcp_shared_project_id
   role    = "roles/iam.serviceAccountUser"
   member  = "serviceAccount:${google_service_account.github_deployer_shared.email}"
+}
+
+# Bucket access: Grant write access to terraform state
+resource "google_storage_bucket_iam_member" "github_deployer_shared_storage" {
+  bucket = data.google_storage_bucket.tfstate.name
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:${google_service_account.github_deployer_shared.email}"
 }
