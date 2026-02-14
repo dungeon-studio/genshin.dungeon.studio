@@ -51,6 +51,12 @@ resource "google_project_iam_member" "github_deployer_ro_shared_viewer" {
   member  = "serviceAccount:${google_service_account.github_deployer_ro_shared.email}"
 }
 
+resource "google_project_iam_member" "github_deployer_ro_shared_security_reviewer" {
+  project = var.gcp_shared_project_id
+  role    = "roles/iam.securityReviewer"
+  member  = "serviceAccount:${google_service_account.github_deployer_ro_shared.email}"
+}
+
 resource "google_storage_bucket_iam_member" "github_deployer_ro_shared_state" {
   bucket = "dungeon-studio-genshin-tfstate"
   role   = "roles/storage.objectViewer"
