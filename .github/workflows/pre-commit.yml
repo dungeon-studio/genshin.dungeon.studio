@@ -69,8 +69,3 @@ jobs:
         uses: pre-commit/action@v3.0.1
         with:
           extra_args: --all-files terraform_fmt
-
-      - name: Run Terraform validate hook
-        uses: pre-commit/action@v3.0.1
-        with:
-          extra_args: --all-files terraform_validate

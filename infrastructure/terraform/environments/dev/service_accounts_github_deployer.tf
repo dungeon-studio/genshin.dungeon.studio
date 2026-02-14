@@ -41,7 +41,7 @@ resource "google_service_account_iam_binding" "github_deployer_dev_token_creator
 
 # Grant write-access service account permission to manage state bucket
 resource "google_storage_bucket_iam_member" "github_deployer_dev_storage" {
-  bucket = "dungeon-studio-genshin-tfstate"
+  bucket = data.google_storage_bucket.tfstate.name
   role   = "roles/storage.objectAdmin"
   member = "serviceAccount:${google_service_account.github_deployer_dev.email}"
 }
