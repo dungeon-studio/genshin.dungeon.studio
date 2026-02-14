@@ -81,8 +81,8 @@ jobs:
       # Authenticate to GCP using Workload Identity
       - uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
-          service_account: ${{ secrets.GCP_SHARED_SERVICE_ACCOUNT_EMAIL }} # pragma: allowlist secret
+          workload_identity_provider: ${{ secrets.GCP_RW_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
+          service_account: ${{ secrets.GCP_RW_SHARED_SERVICE_ACCOUNT_EMAIL }} # pragma: allowlist secret
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
@@ -120,8 +120,8 @@ jobs:
       # Authenticate to GCP using Workload Identity
       - uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
-          service_account: ${{ secrets.GCP_DEV_SERVICE_ACCOUNT_EMAIL }} # pragma: allowlist secret
+          workload_identity_provider: ${{ secrets.GCP_RW_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
+          service_account: ${{ secrets.GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL }} # pragma: allowlist secret
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
