@@ -50,11 +50,11 @@ resource "google_service_account_iam_binding" "github_deployer_ro_shared_workloa
 }
 
 # Grant shared service account permission to manage GCS state bucket
-# Use storage.objectAdmin for object-level permissions on state bucket only
-resource "google_project_iam_member" "github_deployer_shared_storage" {
-  project = var.gcp_shared_project_id
-  role    = "roles/storage.objectAdmin"
-  member  = "serviceAccount:${google_service_account.github_deployer_shared.email}"
+# Use bucket-level IAM binding for object-level permissions on state bucket only
+resource "google_storage_bucket_iam_member" "github_deployer_shared_storage" {
+  bucket = "dungeon-studio-genshin-tfstate"
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:${google_service_account.github_deployer_shared.email}"
 }
 
 resource "google_project_iam_member" "github_deployer_ro_shared_viewer" {
@@ -75,11 +75,24 @@ resource "google_storage_bucket_iam_member" "github_deployer_ro_shared_state" {
   member = "serviceAccount:${google_service_account.github_deployer_ro_shared.email}"
 }
 
-# Grant read-only service account permission to generate tokens via Workload Identity
-resource "google_service_account_iam_member" "github_deployer_ro_shared_token_creator" {
+# Grant Workload Identity permission to generate tokens for write-access service account
+resource "google_service_account_iam_binding" "github_deployer_shared_token_creator" {
+  service_account_id = google_service_account.github_deployer_shared.name
+  role               = "roles/iam.serviceAccountTokenCreator"
+
+  members = [
+    "principalSet://iam.googleapis.com/projects/${data.google_project.shared.number}/locations/global/workloadIdentityPools/github/attribute.repository/dungeon-studio/genshin.dungeon.studio",
+  ]
+}
+
+# Grant Workload Identity permission to generate tokens for read-only service account
+resource "google_service_account_iam_binding" "github_deployer_ro_shared_token_creator" {
   service_account_id = google_service_account.github_deployer_ro_shared.name
   role               = "roles/iam.serviceAccountTokenCreator"
-  member             = "serviceAccount:${google_service_account.github_deployer_ro_shared.email}"
+
+  members = [
+    "principalSet://iam.googleapis.com/projects/${data.google_project.shared.number}/locations/global/workloadIdentityPools/github/attribute.repository/dungeon-studio/genshin.dungeon.studio",
+  ]
 }
 
 # Grant shared service account permission to manage IAM (for Workload Identity setup)

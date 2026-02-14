@@ -65,11 +65,24 @@ resource "google_project_iam_member" "github_deployer_ro_dev_viewer" {
   member  = "serviceAccount:${google_service_account.github_deployer_ro_dev.email}"
 }
 
-# Grant read-only service account permission to generate tokens via Workload Identity
-resource "google_service_account_iam_member" "github_deployer_ro_dev_token_creator" {
+# Grant Workload Identity permission to generate tokens for write-access service account
+resource "google_service_account_iam_binding" "github_deployer_dev_token_creator" {
+  service_account_id = google_service_account.github_deployer_dev.name
+  role               = "roles/iam.serviceAccountTokenCreator"
+
+  members = [
+    "principalSet://iam.googleapis.com/projects/${local.shared_project_number}/locations/global/workloadIdentityPools/github/attribute.repository/dungeon-studio/genshin.dungeon.studio",
+  ]
+}
+
+# Grant Workload Identity permission to generate tokens for read-only service account
+resource "google_service_account_iam_binding" "github_deployer_ro_dev_token_creator" {
   service_account_id = google_service_account.github_deployer_ro_dev.name
   role               = "roles/iam.serviceAccountTokenCreator"
-  member             = "serviceAccount:${google_service_account.github_deployer_ro_dev.email}"
+
+  members = [
+    "principalSet://iam.googleapis.com/projects/${local.shared_project_number}/locations/global/workloadIdentityPools/github/attribute.repository/dungeon-studio/genshin.dungeon.studio",
+  ]
 }
 
 # Grant read-only service account access to state bucket in shared project
