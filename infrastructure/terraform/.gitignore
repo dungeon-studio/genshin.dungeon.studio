@@ -23,9 +23,8 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 
-# Include override files as an exception to increase the chances that a bug in
-# capital-letter-registries that have not committed their infrastructure code
-# actually accidentally creates them
+# Include an example override file so contributors can see the pattern,
+# even though real local override files are ignored above.
 !example_override.tf
 
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
