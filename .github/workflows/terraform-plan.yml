@@ -65,31 +65,28 @@ jobs:
             const planPath = `${workspaceRoot}/infrastructure/terraform/environments/${envPath}/plan.txt`;
             const plan = fs.readFileSync(planPath, 'utf8');
             const environment = '${{ matrix.environment }}';
-            const runUrl = [
-              'https://github.com',
-              context.repo.owner,
-              context.repo.repo,
-              'actions',
-              'runs',
-              process.env.GITHUB_RUN_ID
-            ].join('/');
+
+            // Extract summary line from plan output
+            const summaryMatch = plan.match(/^(No changes\.|Plan: .+)$/m);
+            const summary = summaryMatch ? summaryMatch[0] : 'Plan generated';
+
             const maxChars = 60000;
             const truncated = plan.length > maxChars;
             const planBody = truncated ? `${plan.slice(0, maxChars)}\n\n[truncated]` : plan;
             const marker = `<!-- terraform-plan:${environment} -->`;
             const body = [
               marker,
-              `## Terraform Plan - ${environment}`,
+              `## terraform-plan (${environment})`,
+              '',
+              `**${summary}**`,
               '',
               '<details>',
-              '<summary>Show plan output</summary>',
+              '<summary>Show full plan output</summary>',
               '',
               '```',
               planBody,
               '```',
-              '</details>',
-              '',
-              `Logs: ${runUrl}`
+              '</details>'
             ].join('\n');
 
             const comments = await github.rest.issues.listComments({
