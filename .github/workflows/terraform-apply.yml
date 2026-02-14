@@ -65,23 +65,14 @@ jobs:
             infrastructure/terraform/environments/${{ matrix.environment }}/tfplan
             infrastructure/terraform/environments/${{ matrix.environment }}/plan.txt
 
-  terraform-apply:
+  terraform-apply-shared:
     runs-on: ubuntu-latest
-    environment: ${{ matrix.environment }}
+    environment: shared
     permissions:
       contents: read
       id-token: write
 
     needs: terraform-plan
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - environment: shared
-            service_account_secret: GCP_SHARED_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
-          - environment: dev
-            service_account_secret: GCP_DEV_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
 
     steps:
       - uses: actions/checkout@v4
@@ -94,24 +85,60 @@ jobs:
       - uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
-          service_account: ${{ secrets[matrix.service_account_secret] }} # pragma: allowlist secret
+          service_account: ${{ secrets.GCP_SHARED_SERVICE_ACCOUNT_EMAIL }} # pragma: allowlist secret
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
 
       - name: Terraform Init
-        working-directory: infrastructure/terraform/environments/${{ matrix.environment }}
+        working-directory: infrastructure/terraform/environments/shared
         run: terraform init
 
       - name: Download Terraform Plan
         uses: actions/download-artifact@v4
         with:
-          name: tfplan-${{ matrix.environment }}
-          path: infrastructure/terraform/environments/${{ matrix.environment }}
+          name: tfplan-shared
+          path: infrastructure/terraform/environments/shared
 
       - name: Terraform Apply
-        working-directory: infrastructure/terraform/environments/${{ matrix.environment }}
-        env:
-          TF_VAR_gcp_shared_project_id: ${{ secrets.GCP_SHARED_PROJECT_ID }} # pragma: allowlist secret
-          TF_VAR_gcp_dev_project_id: ${{ secrets.GCP_DEV_PROJECT_ID }} # pragma: allowlist secret
+        working-directory: infrastructure/terraform/environments/shared
+        run: terraform apply -auto-approve tfplan
+
+  terraform-apply-dev:
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+      contents: read
+      id-token: write
+
+    needs: terraform-apply-shared
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.9.0'
+
+      # Authenticate to GCP using Workload Identity
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
+          service_account: ${{ secrets.GCP_DEV_SERVICE_ACCOUNT_EMAIL }} # pragma: allowlist secret
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Terraform Init
+        working-directory: infrastructure/terraform/environments/dev
+        run: terraform init
+
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan-dev
+          path: infrastructure/terraform/environments/dev
+
+      - name: Terraform Apply
+        working-directory: infrastructure/terraform/environments/dev
         run: terraform apply -auto-approve tfplan

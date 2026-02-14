@@ -39,9 +39,10 @@ resource "google_service_account_iam_binding" "github_deployer_ro_shared_workloa
 }
 
 # Grant shared service account permission to manage GCS state bucket
+# Use storage.objectAdmin for object-level permissions on state bucket only
 resource "google_project_iam_member" "github_deployer_shared_storage" {
   project = var.gcp_shared_project_id
-  role    = "roles/storage.admin"
+  role    = "roles/storage.objectAdmin"
   member  = "serviceAccount:${google_service_account.github_deployer_shared.email}"
 }
 
