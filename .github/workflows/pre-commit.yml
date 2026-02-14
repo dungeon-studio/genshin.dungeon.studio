@@ -50,6 +50,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.0.0
+
       - name: Run ESLint hook
         uses: pre-commit/action@v3.0.1
         with:
@@ -59,3 +64,13 @@ jobs:
         uses: pre-commit/action@v3.0.1
         with:
           extra_args: --all-files stylelint
+
+      - name: Run Terraform fmt hook
+        uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: --all-files terraform_fmt
+
+      - name: Run Terraform validate hook
+        uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: --all-files terraform_validate

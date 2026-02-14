@@ -22,14 +22,16 @@ ci:
   # All hooks listed here still run locally on every commit.
   #
   # GitHub Actions runs hooks via two separate workflows to avoid duplication:
-  # 1. pre-commit.yml (ESLint + Stylelint) - runs on every PR
+  # 1. pre-commit.yml (ESLint + Stylelint + Terraform hooks) - runs on every PR
   # 2. build.yml (typecheck + build) - runs full build pipeline
-  # Skip hooks here that are handled by build.yml to prevent running them twice.
+  # Skip hooks here that are handled by pre-commit.yml or other workflows.
   # Keep this list in sync with what's NOT run in GitHub Actions workflows.
   skip:
     - eslint
     - stylelint
     - typescript-check
+    - terraform_fmt
+    - terraform_validate
 
 repos:
   # Basic file checks
