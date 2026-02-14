@@ -37,7 +37,7 @@ Future release and production environments will be created as separate projects 
 
 **Environment labeling**: Apply project labels at creation via `gcloud alpha projects update --update-labels=KEY=VALUE`. (Note: `--update-labels` is currently alpha-only in gcloud; the stable `gcloud projects update` doesn't support incremental label updates.)
 
-Label format: `environment=develop` (extends to `release` and `production` when those projects are created).
+Label format: `environment=dev`, `environment=staging`, or `environment=production`.
 
 **API activation strategy**: Don't enable APIs upfront. Defer until the service that needs them is actually being deployed.
 

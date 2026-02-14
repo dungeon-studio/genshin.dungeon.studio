@@ -1,38 +1,23 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# Enable Service Usage API first - required to manage other APIs
-resource "google_project_service" "shared_serviceusage" {
+# Reference APIs created by bootstrap
+data "google_project_service" "serviceusage" {
   project = var.gcp_shared_project_id
   service = "serviceusage.googleapis.com"
-
-  disable_on_destroy = false
 }
 
-# Enable Cloud Resource Manager API - required for project operations
-resource "google_project_service" "shared_cloudresourcemanager" {
-  project = var.gcp_shared_project_id
-  service = "cloudresourcemanager.googleapis.com"
-
-  disable_on_destroy = false
-
-  depends_on = [google_project_service.shared_serviceusage]
-}
-
-resource "google_project_service" "shared_iam" {
+data "google_project_service" "iam" {
   project = var.gcp_shared_project_id
   service = "iam.googleapis.com"
-
-  disable_on_destroy = false
-
-  depends_on = [google_project_service.shared_serviceusage]
 }
 
-resource "google_project_service" "shared_iam_credentials" {
+# Enable IAM Credentials API - required for WIF token generation
+resource "google_project_service" "iam_credentials" {
   project = var.gcp_shared_project_id
   service = "iamcredentials.googleapis.com"
 
   disable_on_destroy = false
 
-  depends_on = [google_project_service.shared_serviceusage]
+  depends_on = [data.google_project_service.iam]
 }

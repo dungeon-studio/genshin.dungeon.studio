@@ -6,22 +6,12 @@ output "workload_identity_provider" {
   description = "Workload Identity Provider resource name for GitHub Actions (shared across all environments)"
 }
 
-output "github_deployer_shared_service_account_email" {
-  value       = google_service_account.github_deployer_shared.email
-  description = "Service account email for GitHub Actions to manage shared infrastructure"
+output "github_deployer_rw_shared_service_account_email" {
+  value       = data.google_service_account.github_deployer_rw_shared.email
+  description = "GitHub Applier service account email for shared environment"
 }
 
 output "github_deployer_ro_shared_service_account_email" {
-  value       = google_service_account.github_deployer_ro_shared.email
-  description = "Service account email for GitHub Actions plan runs in shared"
-}
-
-output "github_deployer_dev_service_account_email" {
-  value       = google_service_account.github_deployer_dev.email
-  description = "Service account email for GitHub Actions deployment in dev"
-}
-
-output "github_deployer_ro_dev_service_account_email" {
-  value       = google_service_account.github_deployer_ro_dev.email
-  description = "Service account email for GitHub Actions plan runs in dev"
+  value       = data.google_service_account.github_deployer_ro_shared.email
+  description = "GitHub Planner service account email for shared environment"
 }
