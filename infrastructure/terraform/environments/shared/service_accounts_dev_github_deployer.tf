@@ -7,8 +7,6 @@ resource "google_service_account" "github_deployer_dev" {
   account_id   = "github-deployer"
   display_name = "GitHub Actions Deployer"
   description  = "Service account for GitHub Actions deployments"
-
-  depends_on = [data.google_project_service.dev_iam]
 }
 
 resource "google_service_account_iam_binding" "github_deployer_dev_workload_identity" {

@@ -36,14 +36,3 @@ resource "google_project_service" "shared_iam_credentials" {
 
   depends_on = [google_project_service.shared_serviceusage]
 }
-
-# Reference dev project services (created and managed by dev environment)
-data "google_project_service" "dev_serviceusage" {
-  project = var.gcp_dev_project_id
-  service = "serviceusage.googleapis.com"
-}
-
-data "google_project_service" "dev_iam" {
-  project = var.gcp_dev_project_id
-  service = "iam.googleapis.com"
-}

@@ -7,8 +7,6 @@ resource "google_service_account" "github_deployer_ro_dev" {
   account_id   = "github-deployer-ro"
   display_name = "GitHub Actions Read-Only"
   description  = "Service account for GitHub Actions plan runs"
-
-  depends_on = [data.google_project_service.dev_iam]
 }
 
 resource "google_service_account_iam_binding" "github_deployer_ro_dev_workload_identity" {
