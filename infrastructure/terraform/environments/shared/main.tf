@@ -18,8 +18,3 @@ provider "google" {
 data "google_project" "shared" {
   project_id = var.gcp_shared_project_id
 }
-
-data "google_storage_bucket" "tfstate" {
-  name    = "dungeon-studio-genshin-tfstate"
-  project = var.gcp_shared_project_id
-}

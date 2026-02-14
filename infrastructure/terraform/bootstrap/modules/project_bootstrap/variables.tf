@@ -41,3 +41,19 @@ variable "billing_account_id" {
     error_message = "Billing account ID must be 18 characters: XXXXXX-XXXXXX-XXXXXX (6 alphanumeric, hyphen, 6 alphanumeric, hyphen, 6 alphanumeric)"
   }
 }
+
+variable "state_bucket_name" {
+  type        = string
+  description = "Name of the GCS bucket for Terraform state storage"
+
+  validation {
+    condition = (
+      length(var.state_bucket_name) >= 3 &&
+      length(var.state_bucket_name) <= 63 &&
+      can(regex("^[a-z0-9][a-z0-9.-]*[a-z0-9]$", var.state_bucket_name)) &&
+      !can(regex("\\.\\.", var.state_bucket_name)) &&
+      !can(regex("^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$", var.state_bucket_name))
+    )
+    error_message = "State bucket name must be 3-63 characters, use lowercase letters, numbers, dots, or hyphens, start/end with a letter or number, not contain '..', and not be an IP address."
+  }
+}

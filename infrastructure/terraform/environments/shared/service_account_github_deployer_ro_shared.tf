@@ -28,10 +28,3 @@ resource "google_service_account_iam_binding" "github_deployer_ro_shared_token_c
     "principalSet://iam.googleapis.com/projects/${data.google_project.shared.number}/locations/global/workloadIdentityPools/github/attribute.repository/dungeon-studio/genshin.dungeon.studio",
   ]
 }
-
-# Bucket access: Grant read-only access to terraform state
-resource "google_storage_bucket_iam_member" "github_deployer_ro_shared_state" {
-  bucket = data.google_storage_bucket.tfstate.name
-  role   = "roles/storage.objectViewer"
-  member = "serviceAccount:${data.google_service_account.github_deployer_ro_shared.email}"
-}
