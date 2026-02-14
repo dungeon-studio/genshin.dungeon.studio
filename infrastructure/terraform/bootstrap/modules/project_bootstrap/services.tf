@@ -9,6 +9,15 @@ resource "google_project_service" "iam" {
   disable_on_destroy = false
 }
 
+resource "google_project_service" "cloudresourcemanager" {
+  project = google_project.env.project_id
+  service = "cloudresourcemanager.googleapis.com"
+
+  disable_on_destroy = false
+
+  depends_on = [google_project_service.iam]
+}
+
 resource "google_project_service" "serviceusage" {
   project = google_project.env.project_id
   service = "serviceusage.googleapis.com"
