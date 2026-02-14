@@ -67,11 +67,7 @@ jobs:
             const environment = '${{ matrix.environment }}';
 
             // Extract summary line from plan output
-            const summaryMatch = plan.match(/^(No changes\.|Plan: .+)$/m);
-            const summary = summaryMatch ? summaryMatch[0] : 'Plan generated';
-
-            const maxChars = 60000;
-            const truncated = plan.length > maxChars;
+            const summaryMatch = plan.match(/^(No changes\..+|Plan: .+)$/m);
             const planBody = truncated ? `${plan.slice(0, maxChars)}\n\n[truncated]` : plan;
             const marker = `<!-- terraform-plan:${environment} -->`;
             const body = [
