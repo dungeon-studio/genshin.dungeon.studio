@@ -57,6 +57,12 @@ resource "google_storage_bucket_iam_member" "github_deployer_ro_shared_state" {
   member = "serviceAccount:${google_service_account.github_deployer_ro_shared.email}"
 }
 
+resource "google_storage_bucket_iam_member" "github_deployer_ro_dev_state" {
+  bucket = "dungeon-studio-genshin-tfstate"
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:github-deployer-ro@${var.gcp_dev_project_id}.iam.gserviceaccount.com"
+}
+
 # Grant read-only service account permission to generate tokens via Workload Identity
 resource "google_service_account_iam_member" "github_deployer_ro_shared_token_creator" {
   service_account_id = google_service_account.github_deployer_ro_shared.name
