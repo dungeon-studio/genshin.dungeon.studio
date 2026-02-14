@@ -18,3 +18,12 @@ resource "google_project_service" "shared_cloudresourcemanager" {
 
   depends_on = [google_project_service.shared_serviceusage]
 }
+
+resource "google_project_service" "shared_iam" {
+  project = var.gcp_shared_project_id
+  service = "iam.googleapis.com"
+
+  disable_on_destroy = false
+
+  depends_on = [google_project_service.shared_serviceusage]
+}
