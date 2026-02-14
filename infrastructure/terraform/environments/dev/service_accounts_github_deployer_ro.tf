@@ -25,6 +25,14 @@ resource "google_project_iam_member" "github_deployer_ro_dev_viewer" {
   member  = "serviceAccount:${google_service_account.github_deployer_ro_dev.email}"
 }
 
+# Grant read-only service account viewer access to shared project
+# Allows Terraform plan to read bucket metadata from shared infrastructure
+resource "google_project_iam_member" "github_deployer_ro_dev_shared_viewer" {
+  project = var.gcp_shared_project_id
+  role    = "roles/viewer"
+  member  = "serviceAccount:${google_service_account.github_deployer_ro_dev.email}"
+}
+
 # Grant Workload Identity permission to generate tokens for read-only service account
 resource "google_service_account_iam_binding" "github_deployer_ro_dev_token_creator" {
   service_account_id = google_service_account.github_deployer_ro_dev.name
