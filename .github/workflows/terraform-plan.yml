@@ -68,7 +68,8 @@ jobs:
 
             // Extract summary line from plan output
             const summaryMatch = plan.match(/^(No changes\..+|Plan: .+)$/m);
-            const planBody = truncated ? `${plan.slice(0, maxChars)}\n\n[truncated]` : plan;
+            const summary = summaryMatch ? summaryMatch[0] : 'Plan generated';
+
             const marker = `<!-- terraform-plan:${environment} -->`;
             const body = [
               marker,
@@ -80,7 +81,7 @@ jobs:
               '<summary>Show full plan output</summary>',
               '',
               '```',
-              planBody,
+              plan,
               '```',
               '</details>'
             ].join('\n');
