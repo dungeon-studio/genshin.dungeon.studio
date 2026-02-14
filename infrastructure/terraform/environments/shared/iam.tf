@@ -6,6 +6,8 @@ resource "google_project_service" "shared_iam" {
   service = "iam.googleapis.com"
 
   disable_on_destroy = false
+
+  depends_on = [google_project_service.shared_serviceusage]
 }
 
 resource "google_service_account" "github_deployer_shared" {
@@ -73,6 +75,12 @@ resource "google_storage_bucket_iam_member" "github_deployer_ro_shared_state" {
   bucket = "dungeon-studio-genshin-tfstate"
   role   = "roles/storage.objectViewer"
   member = "serviceAccount:${google_service_account.github_deployer_ro_shared.email}"
+}
+
+resource "google_storage_bucket_iam_member" "github_deployer_ro_dev_state" {
+  bucket = "dungeon-studio-genshin-tfstate"
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:github-deployer-ro@${var.gcp_dev_project_id}.iam.gserviceaccount.com"
 }
 
 # Grant Workload Identity permission to generate tokens for write-access service account

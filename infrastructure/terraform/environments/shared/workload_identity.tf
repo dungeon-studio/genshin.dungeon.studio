@@ -6,6 +6,8 @@ resource "google_project_service" "shared_sts" {
   service = "sts.googleapis.com"
 
   disable_on_destroy = false
+
+  depends_on = [google_project_service.shared_serviceusage]
 }
 
 # This is the core security boundary for CI/CD authentication
