@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 SPDX-License-Identifier: MIT
 -->
 
-# Contributing to Genshin Dungeon Studio
+# Contributing to genshin.dungeon.studio
 
 Thank you for your interest in contributing. This project is an AI-powered team building companion for Genshin Impact, and contributions of all kinds are welcome.
 
