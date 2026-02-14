@@ -1,23 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# Bootstrap requirement: These services must be enabled before Terraform apply
-# (See infrastructure/scripts/bootstrap.sh)
-data "google_project_service" "shared_iam" {
-  project = var.gcp_shared_project_id
-  service = "iam.googleapis.com"
-}
-
-data "google_project_service" "shared_sts" {
-  project = var.gcp_shared_project_id
-  service = "sts.googleapis.com"
-}
-
-data "google_project_service" "shared_iamcredentials" {
-  project = var.gcp_shared_project_id
-  service = "iamcredentials.googleapis.com"
-}
-
 # This is the core security boundary for CI/CD authentication
 # All environments bind service accounts to this pool
 resource "google_iam_workload_identity_pool" "github" {
@@ -26,12 +9,6 @@ resource "google_iam_workload_identity_pool" "github" {
   display_name              = "GitHub Actions"
   description               = "Workload Identity Pool for GitHub Actions across all environments"
   disabled                  = false
-
-  depends_on = [
-    data.google_project_service.shared_iam,
-    data.google_project_service.shared_sts,
-    data.google_project_service.shared_iamcredentials
-  ]
 }
 
 # Configure the OIDC provider for GitHub
