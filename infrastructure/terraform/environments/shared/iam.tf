@@ -1,11 +1,20 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
+resource "google_project_service" "shared_iam" {
+  project = var.gcp_shared_project_id
+  service = "iam.googleapis.com"
+
+  disable_on_destroy = false
+}
+
 resource "google_service_account" "github_deployer_shared" {
   project      = var.gcp_shared_project_id
   account_id   = "github-deployer"
   display_name = "GitHub Actions Deployer"
   description  = "Service account for GitHub Actions deployments"
+
+  depends_on = [google_project_service.shared_iam]
 }
 
 resource "google_service_account" "github_deployer_ro_shared" {
@@ -13,6 +22,8 @@ resource "google_service_account" "github_deployer_ro_shared" {
   account_id   = "github-deployer-ro"
   display_name = "GitHub Actions Read-Only"
   description  = "Service account for GitHub Actions plan runs"
+
+  depends_on = [google_project_service.shared_iam]
 }
 
 # Security: Allow GitHub Actions to impersonate this service account via Workload Identity
@@ -62,12 +73,6 @@ resource "google_storage_bucket_iam_member" "github_deployer_ro_shared_state" {
   bucket = "dungeon-studio-genshin-tfstate"
   role   = "roles/storage.objectViewer"
   member = "serviceAccount:${google_service_account.github_deployer_ro_shared.email}"
-}
-
-resource "google_storage_bucket_iam_member" "github_deployer_ro_dev_state" {
-  bucket = "dungeon-studio-genshin-tfstate"
-  role   = "roles/storage.objectViewer"
-  member = "serviceAccount:github-deployer-ro@${var.gcp_dev_project_id}.iam.gserviceaccount.com"
 }
 
 # Grant read-only service account permission to generate tokens via Workload Identity

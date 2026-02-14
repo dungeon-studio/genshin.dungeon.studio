@@ -190,6 +190,48 @@ updates:
       - 'docker'
       - 'backend'
       - 'automated'
+
+  # ==========================================================================
+  # TERRAFORM - SHARED ENVIRONMENT
+  # ==========================================================================
+  - package-ecosystem: 'terraform'
+    directory: '/infrastructure/terraform/environments/shared'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'terraform'
+      - 'infrastructure'
+      - 'shared'
+      - 'automated'
+
+  # ==========================================================================
+  # TERRAFORM - DEV ENVIRONMENT
+  # ==========================================================================
+  - package-ecosystem: 'terraform'
+    directory: '/infrastructure/terraform/environments/dev'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'terraform'
+      - 'infrastructure'
+      - 'dev'
+      - 'automated'
 # ============================================================================
 # MAINTENANCE NOTES
 # ============================================================================
@@ -230,4 +272,6 @@ updates:
 #  ✓ packages/types (weekly)
 #  ✓ DevContainer (weekly)
 #  ✓ Docker - apps/api (weekly)
+#  ✓ Terraform - shared environment (weekly)
+#  ✓ Terraform - dev environment (weekly)
 # ============================================================================

@@ -18,6 +18,8 @@ resource "google_service_account" "github_deployer_dev" {
   account_id   = "github-deployer"
   display_name = "GitHub Actions Deployer"
   description  = "Service account for GitHub Actions deployments"
+
+  depends_on = [google_project_service.dev_iam]
 }
 
 resource "google_service_account" "github_deployer_ro_dev" {
@@ -25,6 +27,8 @@ resource "google_service_account" "github_deployer_ro_dev" {
   account_id   = "github-deployer-ro"
   display_name = "GitHub Actions Read-Only"
   description  = "Service account for GitHub Actions plan runs"
+
+  depends_on = [google_project_service.dev_iam]
 }
 
 # Security: Bind service account to shared Workload Identity Pool
@@ -66,4 +70,13 @@ resource "google_service_account_iam_member" "github_deployer_ro_dev_token_creat
   service_account_id = google_service_account.github_deployer_ro_dev.name
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = "serviceAccount:${google_service_account.github_deployer_ro_dev.email}"
+}
+
+# Grant read-only service account access to state bucket in shared project
+resource "google_storage_bucket_iam_member" "github_deployer_ro_dev_state" {
+  bucket = "dungeon-studio-genshin-tfstate"
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.github_deployer_ro_dev.email}"
+
+  depends_on = [google_project_service.dev_iam]
 }

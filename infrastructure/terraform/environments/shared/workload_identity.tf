@@ -1,6 +1,13 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
+resource "google_project_service" "shared_sts" {
+  project = var.gcp_shared_project_id
+  service = "sts.googleapis.com"
+
+  disable_on_destroy = false
+}
+
 # This is the core security boundary for CI/CD authentication
 # All environments bind service accounts to this pool
 resource "google_iam_workload_identity_pool" "github" {
@@ -9,6 +16,8 @@ resource "google_iam_workload_identity_pool" "github" {
   display_name              = "GitHub Actions"
   description               = "Workload Identity Pool for GitHub Actions across all environments"
   disabled                  = false
+
+  depends_on = [google_project_service.shared_sts]
 }
 
 # Configure the OIDC provider for GitHub
