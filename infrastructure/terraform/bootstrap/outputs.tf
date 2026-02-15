@@ -45,42 +45,29 @@ output "github_deployer_ro_dev_service_account_email" {
 output "github_secrets_setup" {
   value       = <<-EOT
 
-    ========================================
-    GitHub Secrets Configuration
-    ========================================
+    == GitHub Secrets Configuration ==
 
-    Repository-level secrets (Settings → Secrets → Actions):
+    == Repository-level secrets (Settings → Secrets → Actions): ==
 
-    GCP_RO_WORKLOAD_IDENTITY_PROVIDER:
-    ${google_iam_workload_identity_pool_provider.github.name}
+    GCP_RO_WORKLOAD_IDENTITY_PROVIDER = ${google_iam_workload_identity_pool_provider.github.name}
+    GCP_RO_CORE_SERVICE_ACCOUNT_EMAIL = ${module.core.github_deployer_ro_email}
+    GCP_RO_DEV_SERVICE_ACCOUNT_EMAIL = ${module.dev.github_deployer_ro_email}
 
-    GCP_RO_CORE_SERVICE_ACCOUNT_EMAIL:
-    ${module.core.github_deployer_ro_email}
+    == Dependabot secrets (Settings → Secrets and variables → Dependabot): ==
 
-    GCP_RO_DEV_SERVICE_ACCOUNT_EMAIL:
-    ${module.dev.github_deployer_ro_email}
+    GCP_RO_WORKLOAD_IDENTITY_PROVIDER = ${google_iam_workload_identity_pool_provider.github.name}
+    GCP_RO_CORE_SERVICE_ACCOUNT_EMAIL = ${module.core.github_deployer_ro_email}
+    GCP_RO_DEV_SERVICE_ACCOUNT_EMAIL = ${module.dev.github_deployer_ro_email}
 
-    ========================================
+    == Environment-level secrets for 'core' (Settings → Environments → core → Secrets): ==
 
-    Environment-level secrets for 'core' (Settings → Environments → core → Secrets):
+    GCP_RW_WORKLOAD_IDENTITY_PROVIDER = ${google_iam_workload_identity_pool_provider.github.name}
+    GCP_RW_CORE_SERVICE_ACCOUNT_EMAIL = ${module.core.github_deployer_rw_email}
 
-    GCP_RW_WORKLOAD_IDENTITY_PROVIDER:
-    ${google_iam_workload_identity_pool_provider.github.name}
+    == Environment-level secrets for 'dev' (Settings → Environments → dev → Secrets): ==
 
-    GCP_RW_CORE_SERVICE_ACCOUNT_EMAIL:
-    ${module.core.github_deployer_rw_email}
-
-    ========================================
-
-    Environment-level secrets for 'dev' (Settings → Environments → dev → Secrets):
-
-    GCP_RW_WORKLOAD_IDENTITY_PROVIDER:
-    ${google_iam_workload_identity_pool_provider.github.name}
-
-    GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL:
-    ${module.dev.github_deployer_rw_email}
-
-    ========================================
+    GCP_RW_WORKLOAD_IDENTITY_PROVIDER = ${google_iam_workload_identity_pool_provider.github.name}
+    GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL = ${module.dev.github_deployer_rw_email}
   EOT
   description = "Copy-pastable guide for setting up GitHub secrets"
 }
