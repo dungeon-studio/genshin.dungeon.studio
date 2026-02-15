@@ -9,6 +9,15 @@ PROJECT_ID="${PROJECT_ID:-dungeon-studio-genshin-shared}"
 LOCATION="${LOCATION:-europe-west1}"
 ENABLE_VERSIONING="${ENABLE_VERSIONING:-true}"
 
+# Create project if it doesn't exist
+if gcloud projects describe "${PROJECT_ID}" >/dev/null 2>&1; then
+  echo "Project ${PROJECT_ID} already exists."
+else
+  echo "Creating project ${PROJECT_ID}..."
+  gcloud projects create "${PROJECT_ID}"
+fi
+
+# Create bucket if it doesn't exist
 if gcloud storage buckets describe "gs://${BUCKET_NAME}" --project "${PROJECT_ID}" >/dev/null 2>&1; then
   echo "Bucket gs://${BUCKET_NAME} already exists in project ${PROJECT_ID}."
 else

@@ -68,6 +68,8 @@ roadmaps
 GCP
 Cloud Run
 Cloud Storage
+auditable
+keyless
 
 # AI services
 Claude

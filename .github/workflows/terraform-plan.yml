@@ -48,6 +48,8 @@ jobs:
         working-directory: infrastructure/terraform/environments/${{ matrix.environment }}
         run: terraform init
 
+      # Terraform validate runs in CI (not pre-commit) because it requires
+      # backend initialization and GCS bucket authentication via WIF.
       - name: Terraform Validate
         working-directory: infrastructure/terraform/environments/${{ matrix.environment }}
         run: terraform validate
