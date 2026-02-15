@@ -190,6 +190,69 @@ updates:
       - 'docker'
       - 'backend'
       - 'automated'
+
+  # ==========================================================================
+  # TERRAFORM - BOOTSTRAP
+  # ==========================================================================
+  - package-ecosystem: 'terraform'
+    directory: '/infrastructure/terraform/bootstrap'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'terraform'
+      - 'infrastructure'
+      - 'bootstrap'
+      - 'automated'
+
+  # ==========================================================================
+  # TERRAFORM - CORE ENVIRONMENT
+  # ==========================================================================
+  - package-ecosystem: 'terraform'
+    directory: '/infrastructure/terraform/environments/core'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'terraform'
+      - 'infrastructure'
+      - 'core'
+      - 'automated'
+
+  # ==========================================================================
+  # TERRAFORM - DEV ENVIRONMENT
+  # ==========================================================================
+  - package-ecosystem: 'terraform'
+    directory: '/infrastructure/terraform/environments/dev'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'terraform'
+      - 'infrastructure'
+      - 'dev'
+      - 'automated'
 # ============================================================================
 # MAINTENANCE NOTES
 # ============================================================================
@@ -230,4 +293,7 @@ updates:
 #  ✓ packages/types (weekly)
 #  ✓ DevContainer (weekly)
 #  ✓ Docker - apps/api (weekly)
+#  ✓ Terraform - bootstrap (weekly)
+#  ✓ Terraform - core environment (weekly)
+#  ✓ Terraform - dev environment (weekly)
 # ============================================================================

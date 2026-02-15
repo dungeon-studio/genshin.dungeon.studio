@@ -25,6 +25,9 @@
     // Containerization
     "ms-azuretools.vscode-docker",
 
+    // Infrastructure as Code
+    "hashicorp.terraform",
+
     // Testing - Extension ready for Phase 4 when Vitest is installed
     // Harmless to install early, will activate when Vitest is added
     "vitest.explorer",

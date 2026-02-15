@@ -12,6 +12,7 @@
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       "moby": false
     },
+    "ghcr.io/devcontainers/features/terraform:1": {},
     "ghcr.io/devcontainers-extra/features/pre-commit:2": {},
     "ghcr.io/shinepukur/devcontainer-features/vale:1": {}
   },
@@ -41,6 +42,9 @@
 
         // Containerization
         "ms-azuretools.vscode-docker",
+
+        // Infrastructure as Code
+        "hashicorp.terraform",
 
         // Testing (when Vitest is fully configured)
         "vitest.explorer",

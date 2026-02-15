@@ -22,14 +22,15 @@ ci:
   # All hooks listed here still run locally on every commit.
   #
   # GitHub Actions runs hooks via two separate workflows to avoid duplication:
-  # 1. pre-commit.yml (ESLint + Stylelint) - runs on every PR
+  # 1. pre-commit.yml (ESLint + Stylelint + Terraform hooks) - runs on every PR
   # 2. build.yml (typecheck + build) - runs full build pipeline
-  # Skip hooks here that are handled by build.yml to prevent running them twice.
+  # Skip hooks here that are handled by pre-commit.yml or other workflows.
   # Keep this list in sync with what's NOT run in GitHub Actions workflows.
   skip:
     - eslint
     - stylelint
     - typescript-check
+    - terraform_fmt
 
 repos:
   # Basic file checks
@@ -91,6 +92,13 @@ repos:
         args: [--config=.vale.ini]
         types: [markdown]
 
+  # Terraform - Infrastructure as Code
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.90.0
+    hooks:
+      - id: terraform_fmt
+        args: [--args=-recursive]
+
   # REUSE - SPDX license compliance
   - repo: https://github.com/fsfe/reuse-tool
     rev: v6.2.0
@@ -114,9 +122,6 @@ repos:
         types: [javascript, jsx, ts, tsx]
         args: [--fix, --max-warnings=0]
 
-  # Stylelint - CSS linting
-  - repo: local
-    hooks:
       - id: stylelint
         name: stylelint
         entry: pnpm exec stylelint
@@ -124,9 +129,6 @@ repos:
         types: [css]
         args: [--fix]
 
-  # TypeScript type checking
-  - repo: local
-    hooks:
       - id: typescript-check
         name: typescript type check
         entry: pnpm exec turbo run typecheck
