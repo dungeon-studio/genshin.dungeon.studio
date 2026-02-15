@@ -4,10 +4,6 @@
     "module": "ES2022",
     "lib": ["ES2022"],
     "moduleResolution": "bundler",
-    "baseUrl": ".",
-    "paths": {
-      "@genshin/game-data": ["../game-data/src/index.ts"]
-    },
     "declaration": true,
     "declarationMap": true,
     "outDir": "./dist",
