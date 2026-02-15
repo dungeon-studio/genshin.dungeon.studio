@@ -1,0 +1,89 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+
+jobs:
+  web:
+    name: Web
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Typecheck
+        run: pnpm --filter @genshin/web typecheck
+
+      - name: Build
+        run: pnpm --filter @genshin/web build
+
+      - name: Verify Build Artifacts
+        run: bash apps/web/scripts/verify-build-output.sh
+
+  api:
+    name: API
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Typecheck
+        run: pnpm --filter @genshin/api typecheck
+
+      - name: Build
+        run: pnpm --filter @genshin/api build
+
+  types:
+    name: Types
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Typecheck
+        run: pnpm --filter @genshin/types typecheck
+
+      - name: Build
+        run: pnpm --filter @genshin/types build
+
+  game-data:
+    name: Game Data
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Typecheck
+        run: pnpm --filter @genshin/game-data typecheck
+
+      - name: Build
+        run: pnpm --filter @genshin/game-data build
+
+# ---------------------------------------------------------------------------
+# Maintenance notes
+# - Add a new job when new packages or apps are added.
+# - Each job runs independently and in parallel for faster feedback.
+# - Keep caching strategy aligned with package manager changes.
+# ---------------------------------------------------------------------------

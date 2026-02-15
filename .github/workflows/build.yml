@@ -20,32 +20,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '20'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9.15.4
-          run_install: false
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v5
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - uses: ./.github/actions/setup-node-pnpm
 
       - name: Typecheck
         run: pnpm typecheck
@@ -53,9 +28,17 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Verify Build Artifacts
+        run: |
+          test -d apps/web/dist || { echo "web dist directory not found"; exit 1; }
+          test -f apps/web/dist/index.html || { echo "index.html not found"; exit 1; }
+          test -d apps/web/dist/assets || { echo "assets directory not found"; exit 1; }
+          echo "✓ Build artifacts verified"
+
       # Tests will be added once a test suite is available.
       # - name: Test
       #   run: pnpm test
+
 # ---------------------------------------------------------------------------
 # Maintenance notes
 # - Update this workflow when new languages or runtimes are added.

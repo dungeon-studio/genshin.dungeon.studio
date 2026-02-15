@@ -20,23 +20,41 @@ node --version       # v20+ required
 pnpm --version       # v9+ required
 gh --version         # GitHub CLI
 pre-commit --version # pre-commit hooks
+jq --version         # JSON processor
 ```
 
 ### Install missing tools
+
+#### macOS
 
 ```bash
 # pnpm
 npm install -g pnpm
 
-# GitHub CLI - See https://cli.github.com/manual/installation
-# Installation instructions vary by OS
+# GitHub CLI
+brew install gh
 
-# pre-commit - See https://pre-commit.com/#install
-# On macOS:
+# pre-commit
 brew install pre-commit
 
-# On Linux/WSL:
+# jq
+brew install jq
+```
+
+#### Linux / Windows Subsystem for Linux
+
+```bash
+# pnpm
+npm install -g pnpm
+
+# GitHub CLI - See https://cli.github.com/manual/installation for Ubuntu/Debian/Fedora specific instructions
+sudo apt-get install gh
+
+# pre-commit
 pip install pre-commit
+
+# jq
+sudo apt-get install jq
 ```
 
 ---
