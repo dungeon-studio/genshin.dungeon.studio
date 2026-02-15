@@ -27,5 +27,8 @@ else
 fi
 
 if [[ "${ENABLE_VERSIONING}" == "true" ]]; then
-  gcloud storage buckets update "gs://${BUCKET_NAME}" --project "${PROJECT_ID}" --versioning
+  gcloud storage buckets update "gs://${BUCKET_NAME}" \
+    --project "${PROJECT_ID}" \
+    --uniform-bucket-level-access \
+    --versioning
 fi
