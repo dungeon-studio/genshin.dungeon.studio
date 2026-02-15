@@ -6,7 +6,7 @@ ARG COREPACK_VERSION=0.34.6
 ARG PNPM_VERSION=9.15.4
 
 # Build stage
-FROM node:25.6.0-slim AS builder
+FROM node:25.6.1-slim AS builder
 
 # Pass ARGs to this stage
 ARG COREPACK_VERSION
@@ -37,7 +37,7 @@ COPY apps/api ./apps/api
 RUN pnpm --filter @genshin/api build
 
 # Production dependencies stage
-FROM node:25.6.0-slim AS deps
+FROM node:25.6.1-slim AS deps
 
 # Pass ARGs to this stage
 ARG COREPACK_VERSION
@@ -62,7 +62,7 @@ COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
 RUN pnpm install --filter @genshin/api --prod --frozen-lockfile
 
 # Production stage
-FROM node:25.6.0-slim
+FROM node:25.6.1-slim
 
 WORKDIR /app
 
