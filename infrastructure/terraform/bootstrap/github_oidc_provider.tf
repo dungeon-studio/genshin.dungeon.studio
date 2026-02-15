@@ -36,7 +36,7 @@ resource "google_iam_workload_identity_pool" "github" {
 }
 
 # Configure the OIDC provider for GitHub
-# Restricts tokens to dungeon-studio GitHub organization repositories
+# Restricts tokens to the dungeon-studio/genshin.dungeon.studio repository
 resource "google_iam_workload_identity_pool_provider" "github" {
   workload_identity_pool_id          = google_iam_workload_identity_pool.github.workload_identity_pool_id
   workload_identity_pool_provider_id = "github-provider"

@@ -6,7 +6,7 @@ output "shared_project_id" {
   description = "Shared project ID (OIDC + state bucket, bootstrap-managed only)"
 }
 
-output "platform_project_id" {
+output "core_project_id" {
   value       = module.core.project_id
   description = "Core project ID (common resources across environments)"
 }
@@ -21,12 +21,12 @@ output "workload_identity_provider" {
   description = "Workload Identity Provider resource name for GitHub Actions"
 }
 
-output "github_deployer_rw_platform_service_account_email" {
+output "github_deployer_rw_core_service_account_email" {
   value       = module.core.github_deployer_rw_email
   description = "GitHub Applier service account email for core environment"
 }
 
-output "github_deployer_ro_platform_service_account_email" {
+output "github_deployer_ro_core_service_account_email" {
   value       = module.core.github_deployer_ro_email
   description = "GitHub Planner service account email for core environment"
 }
