@@ -58,11 +58,11 @@ jobs:
 
       - uses: ./.github/actions/setup-node-pnpm
 
-      - name: Typecheck packages
-        run: pnpm --filter "./packages/**" typecheck
-
       - name: Build packages
         run: pnpm --filter "./packages/**" build
+
+      - name: Typecheck packages
+        run: pnpm --filter "./packages/**" typecheck
 
 # ---------------------------------------------------------------------------
 # Maintenance notes
