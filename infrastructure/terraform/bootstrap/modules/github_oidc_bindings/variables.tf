@@ -28,7 +28,7 @@ variable "wif_pool_project_number" {
   description = "GCP project number where the Workload Identity Pool is created (numeric string)"
 
   validation {
-    condition     = can(regex("^[0-9]+$", var.wif_pool_project_number))
-    error_message = "Project number must be a numeric string (e.g., '123456789012')"
+    condition     = can(regex("^[0-9]{12}$", var.wif_pool_project_number))
+    error_message = "Project number must be exactly 12 digits (e.g., '123456789012')"
   }
 }

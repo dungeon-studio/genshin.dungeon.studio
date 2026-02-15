@@ -68,6 +68,9 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    concurrency:
+      group: terraform-apply
+      cancel-in-progress: false
 
     needs: terraform-plan
 
@@ -107,6 +110,9 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    concurrency:
+      group: terraform-apply
+      cancel-in-progress: false
 
     needs: terraform-apply-core
 
