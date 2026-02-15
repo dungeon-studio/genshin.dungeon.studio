@@ -7,7 +7,6 @@ set -x
 BUCKET_NAME="${BUCKET_NAME:-dungeon-studio-genshin-tfstate}"
 PROJECT_ID="${PROJECT_ID:-dungeon-studio-genshin-shared}"
 LOCATION="${LOCATION:-europe-west1}"
-ENABLE_VERSIONING="${ENABLE_VERSIONING:-true}"
 
 # Create project if it doesn't exist
 if gcloud projects describe "${PROJECT_ID}" >/dev/null 2>&1; then
@@ -26,9 +25,8 @@ else
     --location "${LOCATION}"
 fi
 
-if [[ "${ENABLE_VERSIONING}" == "true" ]]; then
-  gcloud storage buckets update "gs://${BUCKET_NAME}" \
-    --project "${PROJECT_ID}" \
-    --uniform-bucket-level-access \
-    --versioning
-fi
+# Configure bucket: uniform bucket-level access (security) and versioning (state protection)
+gcloud storage buckets update "gs://${BUCKET_NAME}" \
+  --project "${PROJECT_ID}" \
+  --uniform-bucket-level-access \
+  --versioning
