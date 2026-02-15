@@ -47,8 +47,8 @@ jobs:
       - name: Build
         run: pnpm --filter @genshin/api build
 
-  types:
-    name: Types
+  packages:
+    name: Packages
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -58,32 +58,15 @@ jobs:
 
       - uses: ./.github/actions/setup-node-pnpm
 
-      - name: Typecheck
-        run: pnpm --filter @genshin/types typecheck
+      - name: Typecheck packages
+        run: pnpm --filter "./packages/**" typecheck
 
-      - name: Build
-        run: pnpm --filter @genshin/types build
-
-  game-data:
-    name: Game Data
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - uses: ./.github/actions/setup-node-pnpm
-
-      - name: Typecheck
-        run: pnpm --filter @genshin/game-data typecheck
-
-      - name: Build
-        run: pnpm --filter @genshin/game-data build
+      - name: Build packages
+        run: pnpm --filter "./packages/**" build
 
 # ---------------------------------------------------------------------------
 # Maintenance notes
-# - Add a new job when new packages or apps are added.
-# - Each job runs independently and in parallel for faster feedback.
+# - Add a new job when new apps are added.
+# - Package builds are grouped under the Packages job.
 # - Keep caching strategy aligned with package manager changes.
 # ---------------------------------------------------------------------------
