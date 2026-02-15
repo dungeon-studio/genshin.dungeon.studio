@@ -99,7 +99,7 @@ jobs:
         run: terraform init
 
       - name: Download Terraform Plan
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: tfplan-core
           path: infrastructure/terraform/environments/core
@@ -145,7 +145,7 @@ jobs:
         run: terraform init
 
       - name: Download Terraform Plan
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: tfplan-dev
           path: infrastructure/terraform/environments/dev
