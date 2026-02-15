@@ -19,30 +19,13 @@ updates:
       - 'alunduil'
     labels:
       - 'dependencies'
+      - 'npm'
       - 'automated'
     groups:
-      # Linting & formatting
-      eslint:
+      # Group all root workspace dependencies together
+      npm-root:
         patterns:
-          - 'eslint*'
-          - '@eslint/*'
-          - 'typescript-eslint'
-      # TypeScript
-      typescript:
-        patterns:
-          - 'typescript'
-      # Turborepo
-      turborepo:
-        patterns:
-          - 'turbo'
-      # Prettier
-      prettier:
-        patterns:
-          - 'prettier*'
-      # Node types
-      types-node:
-        patterns:
-          - '@types/node'
+          - '*'
 
   # ==========================================================================
   # FRONTEND APP (apps/web)
@@ -60,48 +43,39 @@ updates:
       - 'alunduil'
     labels:
       - 'dependencies'
-      - 'frontend'
+      - 'npm'
+      - 'web'
       - 'automated'
     groups:
-      # React & related
-      react:
+      # Group all web app dependencies together
+      npm-web:
         patterns:
-          - 'react*'
-          - '@react*'
-      # Types for React
-      react-types:
+          - '*'
+
+  # ==========================================================================
+  # BACKEND API (apps/api)
+  # ==========================================================================
+  - package-ecosystem: 'npm'
+    directory: '/apps/api'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'npm'
+      - 'api'
+      - 'automated'
+    groups:
+      # Group all API dependencies together
+      npm-api:
         patterns:
-          - '@types/react*'
-      # Testing libraries
-      testing:
-        patterns:
-          - 'vitest'
-          - '@testing-library/*'
-          - '@vitest/*'
-      # Vite & build
-      vite:
-        patterns:
-          - 'vite*'
-          - '@vitejs/*'
-      # Linting & formatting
-      eslint:
-        patterns:
-          - 'eslint*'
-          - '@eslint/*'
-          - 'typescript-eslint'
-          - 'eslint-plugin-*'
-      # TypeScript
-      typescript:
-        patterns:
-          - 'typescript'
-      # Types packages
-      types:
-        patterns:
-          - '@types/*'
-      # Prettier
-      prettier:
-        patterns:
-          - 'prettier*'
+          - '*'
 
   # ==========================================================================
   # SHARED TYPES PACKAGE (packages/types)
@@ -119,19 +93,39 @@ updates:
       - 'alunduil'
     labels:
       - 'dependencies'
+      - 'npm'
       - 'types'
       - 'automated'
     groups:
-      # Linting & formatting
-      eslint:
+      # Group all types package dependencies together
+      npm-types:
         patterns:
-          - 'eslint*'
-          - '@eslint/*'
-          - 'typescript-eslint'
-      # TypeScript
-      typescript:
+          - '*'
+
+  # ==========================================================================
+  # GAME DATA PACKAGE (packages/game-data)
+  # ==========================================================================
+  - package-ecosystem: 'npm'
+    directory: '/packages/game-data'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'npm'
+      - 'game-data'
+      - 'automated'
+    groups:
+      # Group all game data dependencies together
+      npm-game-data:
         patterns:
-          - 'typescript'
+          - '*'
 
   # ==========================================================================
   # GITHUB ACTIONS
@@ -149,8 +143,13 @@ updates:
       - 'alunduil'
     labels:
       - 'dependencies'
-      - 'cicd'
+      - 'actions'
       - 'automated'
+    groups:
+      # Group all GitHub Actions updates together
+      github-actions:
+        patterns:
+          - '*'
 
   # ==========================================================================
   # DEVCONTAINER
@@ -170,6 +169,11 @@ updates:
       - 'dependencies'
       - 'devcontainer'
       - 'automated'
+    groups:
+      # Group all DevContainer updates together
+      devcontainers:
+        patterns:
+          - '*'
 
   # ==========================================================================
   # DOCKER
@@ -188,8 +192,13 @@ updates:
     labels:
       - 'dependencies'
       - 'docker'
-      - 'backend'
+      - 'api'
       - 'automated'
+    groups:
+      # Group all Docker updates together
+      docker-api:
+        patterns:
+          - '*'
 
   # ==========================================================================
   # TERRAFORM - BOOTSTRAP
@@ -211,6 +220,11 @@ updates:
       - 'infrastructure'
       - 'bootstrap'
       - 'automated'
+    groups:
+      # Group all Terraform bootstrap updates together
+      terraform-bootstrap:
+        patterns:
+          - '*'
 
   # ==========================================================================
   # TERRAFORM - CORE ENVIRONMENT
@@ -232,6 +246,11 @@ updates:
       - 'infrastructure'
       - 'core'
       - 'automated'
+    groups:
+      # Group all Terraform core updates together
+      terraform-core:
+        patterns:
+          - '*'
 
   # ==========================================================================
   # TERRAFORM - DEV ENVIRONMENT
@@ -253,6 +272,11 @@ updates:
       - 'infrastructure'
       - 'dev'
       - 'automated'
+    groups:
+      # Group all Terraform dev updates together
+      terraform-dev:
+        patterns:
+          - '*'
 # ============================================================================
 # MAINTENANCE NOTES
 # ============================================================================
@@ -290,7 +314,10 @@ updates:
 # Current coverage:
 #  ✓ Root workspace (weekly)
 #  ✓ apps/web (weekly)
+#  ✓ apps/api (weekly)
 #  ✓ packages/types (weekly)
+#  ✓ packages/game-data (weekly)
+#  ✓ GitHub Actions (weekly)
 #  ✓ DevContainer (weekly)
 #  ✓ Docker - apps/api (weekly)
 #  ✓ Terraform - bootstrap (weekly)
