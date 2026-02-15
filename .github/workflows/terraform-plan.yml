@@ -13,6 +13,8 @@ on:
 
 jobs:
   terraform-plan:
+    # Skip Terraform Plan for Dependabot PRs since secrets aren't available
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: read
