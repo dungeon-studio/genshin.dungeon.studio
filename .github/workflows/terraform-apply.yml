@@ -68,6 +68,10 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    # Shared concurrency group prevents state lock contention on the GCS bucket.
+    # All environments write to dungeon-studio-genshin-tfstate, so only one apply
+    # can run at a time across ALL workflow runs to prevent conflicts.
+    # The 'needs' keyword only orders jobs within a single workflow run.
     concurrency:
       group: terraform-apply
       cancel-in-progress: false
@@ -110,6 +114,10 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    # Shared concurrency group prevents state lock contention on the GCS bucket.
+    # All environments write to dungeon-studio-genshin-tfstate, so only one apply
+    # can run at a time across ALL workflow runs to prevent conflicts.
+    # The 'needs' keyword only orders jobs within a single workflow run.
     concurrency:
       group: terraform-apply
       cancel-in-progress: false
