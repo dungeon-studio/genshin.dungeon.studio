@@ -34,7 +34,7 @@ A three-stage automated pipeline triggered by merge to `develop`:
 
 - **Early failure detection**: Build verification catches errors before wasting time on deployment
 - **Straightforward and reliable**: Both checks avoid implementation coupling. Don't depend on cache headers, bundle names, or similar details.
-- **Observable**: Anyone can inspect deployment state via `curl https://genshin.dungeon.studio/version.json`
+- **Observable**: Anyone can inspect deployment state via `curl http://develop.genshin.dungeon.studio/version.json`
 
 **Why not alternatives:**
 
@@ -138,7 +138,7 @@ Reviewer: Approve & merge PR
     ↓
 GitHub Actions: Terraform Apply (.terraform-apply.yml)
     ├─ Applies core infrastructure (DNS zone)
-    └─ Applies dev infrastructure (bucket, DNS A record)
+    └─ Applies dev infrastructure (bucket, DNS CNAME record)
     ↓
 GitHub Actions: Deploy Web (.deploy.yml) [triggered by workflow_run]
     ├─ Build web app
@@ -146,15 +146,15 @@ GitHub Actions: Deploy Web (.deploy.yml) [triggered by workflow_run]
     ├─ Deploy to Cloud Storage (with cache headers)
     └─ Verify deployment (SHA comparison)
     ↓
-Site live at: https://genshin.dungeon.studio/
+Site live at: http://develop.genshin.dungeon.studio/
 ```
 
 ### Files Involved
 
 **Infrastructure:**
 
-- `infrastructure/terraform/environments/dev/main.tf`: Bucket + Domain Name System configuration
-- `infrastructure/terraform/modules/cloud-storage/`: Reusable bucket module with Single-page Application (SPA) routing
+- `infrastructure/terraform/environments/dev/web.tf`: Cloud Storage bucket for the web application
+- `infrastructure/terraform/environments/core/dns_record_set_develop.tf`: Domain Name System configuration for develop.genshin.dungeon.studio
 
 **Application:**
 
@@ -171,11 +171,11 @@ Site live at: https://genshin.dungeon.studio/
 
 ## Trade-offs
 
-| Aspect                    | Choice                             | Trade-off                                                                        |
-| ------------------------- | ---------------------------------- | -------------------------------------------------------------------------------- |
-| **Verification strategy** | Structural checks + SHA comparison | Doesn't catch all build errors, only structural ones; can't verify cache headers |
-| **Cache headers**         | no-cache + stale-while-revalidate  | Requires a 1-day revalidation window                                             |
-| **Single region**         | `us-central1`                      | No Geo-redundancy (acceptable for dev environment)                               |
+| Aspect                    | Choice                             | Trade-off                                                                               |
+| ------------------------- | ---------------------------------- | --------------------------------------------------------------------------------------- |
+| **Verification strategy** | Structural checks + SHA comparison | Doesn't catch all build errors, only structural ones; can't verify cache headers        |
+| **Cache headers**         | no-cache + stale-while-revalidate  | Requires a 1-day revalidation window                                                    |
+| **Bucket location**       | `EU` (multi-region)                | Geo-redundant storage; slightly higher latency from non-EU regions (acceptable for dev) |
 
 ## Future considerations
 
@@ -222,7 +222,7 @@ Verify deployment via:
 2. **Deployment verification in deploy workflow:**
 
    ```bash
-   bash apps/web/scripts/verify-deployment.sh https://genshin.dungeon.studio
+   bash apps/web/scripts/verify-deployment.sh http://develop.genshin.dungeon.studio
    ```
 
    Compares deployed `version.json` SHA to `git rev-parse --short HEAD`
@@ -230,7 +230,7 @@ Verify deployment via:
 3. **Manual verification after deployment:**
 
    ```bash
-   curl https://genshin.dungeon.studio/version.json | jq .sha
+   curl http://develop.genshin.dungeon.studio/version.json | jq .sha
    git rev-parse --short HEAD  # should match
    ```
 

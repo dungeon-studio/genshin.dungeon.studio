@@ -40,13 +40,3 @@ resource "google_storage_bucket_iam_binding" "public_read" {
     "allUsers"
   ]
 }
-
-# Ensure bucket can be listed (required for web browsing)
-resource "google_storage_bucket_iam_binding" "public_list" {
-  bucket = google_storage_bucket.web.name
-  role   = "roles/storage.legacyBucketReader"
-
-  members = [
-    "allUsers"
-  ]
-}

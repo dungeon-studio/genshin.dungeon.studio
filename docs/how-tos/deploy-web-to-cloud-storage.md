@@ -29,7 +29,7 @@ Generates `apps/web/dist/` with compiled app and `version.json` containing deplo
 ### 2. Deploy to Cloud Storage
 
 ```bash
-bash apps/web/scripts/deploy-to-cloud-storage.sh genshin-dungeon-studio-web-dev
+bash apps/web/scripts/deploy-to-cloud-storage.sh develop.genshin.dungeon.studio
 ```
 
 This script:
@@ -41,11 +41,11 @@ This script:
 ### 3. Verify deployment
 
 ```bash
-bash apps/web/scripts/verify-deployment.sh https://genshin.dungeon.studio
+bash apps/web/scripts/verify-deployment.sh http://develop.genshin.dungeon.studio
 ```
 
 Compares the deployed version Secure Hash Algorithm (SHA) with your current git `HEAD`. Exits successfully if they match.
 
 ## Done
 
-Your web app is now deployed to <https://genshin.dungeon.studio/>
+Your web app is now deployed to <http://develop.genshin.dungeon.studio/>

@@ -24,6 +24,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.0
+
       - uses: ./.github/actions/setup-node-pnpm
 
       - name: Build Web App
@@ -31,6 +36,9 @@ jobs:
 
       - name: Verify Build Output
         run: bash apps/web/scripts/verify-build-output.sh
+
+      - name: Initialize Terraform
+        run: terraform -chdir=infrastructure/terraform/environments/dev init -input=false
 
       - uses: google-github-actions/auth@v3
         with:
@@ -49,4 +57,4 @@ jobs:
         run: bash apps/web/scripts/deploy-to-cloud-storage.sh "$BUCKET_NAME"
 
       - name: Verify Deployment
-        run: bash apps/web/scripts/verify-deployment.sh "https://${BUCKET_NAME}"
+        run: bash apps/web/scripts/verify-deployment.sh "http://${BUCKET_NAME}"
