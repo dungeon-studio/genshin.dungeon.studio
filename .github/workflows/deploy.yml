@@ -23,22 +23,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.0
-
-      - uses: ./.github/actions/setup-node-pnpm
-
-      - name: Build Web App
-        run: pnpm --filter @genshin/web build
-
-      - name: Verify Build Output
-        run: bash apps/web/scripts/verify-build-output.sh
-
-      - name: Initialize Terraform
-        run: terraform -chdir=infrastructure/terraform/environments/dev init -input=false
 
       - uses: google-github-actions/auth@v3
         with:
@@ -47,6 +39,17 @@ jobs:
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v3
+
+      - name: Initialize Terraform
+        run: terraform -chdir=infrastructure/terraform/environments/dev init -input=false
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Build Web App
+        run: pnpm --filter @genshin/web build
+
+      - name: Verify Build Output
+        run: bash apps/web/scripts/verify-build-output.sh
 
       - name: Get Bucket Name from Terraform
         run: |
