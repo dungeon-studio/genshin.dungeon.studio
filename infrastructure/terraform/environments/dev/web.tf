@@ -14,7 +14,7 @@ resource "google_storage_bucket" "web" {
   name          = "develop.genshin.dungeon.studio"
   project       = var.gcp_dev_project_id
   location      = "EU"
-  force_destroy = true
+  force_destroy = false
 
   labels = var.common_labels
 
@@ -25,7 +25,7 @@ resource "google_storage_bucket" "web" {
   }
 
   lifecycle {
-    prevent_destroy = false
+    prevent_destroy = true
   }
 
   depends_on = [google_project_service.storage]

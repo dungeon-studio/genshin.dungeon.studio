@@ -6,5 +6,5 @@ gcp_dev_project_id = "dungeon-studio-genshin-dev"
 
 common_labels = {
   environment = "dev"
-  managed-by  = "terraform"
+  managed_by  = "terraform"
 }
