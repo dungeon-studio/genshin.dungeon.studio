@@ -15,6 +15,8 @@ When you need to redeploy the web application without merging code—for example
 - Access to `dungeon-studio-genshin-dev` GCP project
 - Local pnpm installation
 - Bash shell
+- `jq` installed locally
+- `git` installed locally
 
 ## Steps
 

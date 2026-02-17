@@ -47,14 +47,21 @@ brew install jq
 # pnpm
 npm install -g pnpm
 
-# GitHub CLI - See https://cli.github.com/manual/installation for Ubuntu/Debian/Fedora specific instructions
+# GitHub CLI - See https://cli.github.com/manual/installation for distro-specific instructions
+# Debian/Ubuntu (including most WSL images)
 sudo apt-get install gh
+
+# Fedora
+sudo dnf install gh
 
 # pre-commit
 pip install pre-commit
 
-# jq
+# jq (Debian/Ubuntu)
 sudo apt-get install jq
+
+# jq (Fedora)
+sudo dnf install jq
 ```
 
 ---
