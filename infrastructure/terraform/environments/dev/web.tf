@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: MIT
 
 locals {
-  web_bucket_name = "develop.genshin.dungeon.studio"
+  web_bucket_name     = "develop.genshin.dungeon.studio"
+  web_bucket_location = "EU"
 }
 
 # Enable Cloud Storage API
@@ -17,7 +18,7 @@ resource "google_project_service" "storage" {
 resource "google_storage_bucket" "web" {
   name          = local.web_bucket_name
   project       = var.gcp_dev_project_id
-  location      = var.gcp_dev_bucket_location
+  location      = local.web_bucket_location
   force_destroy = false
 
   labels = var.common_labels

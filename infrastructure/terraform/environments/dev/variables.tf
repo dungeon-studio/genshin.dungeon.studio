@@ -11,11 +11,6 @@ variable "gcp_dev_project_id" {
   }
 }
 
-variable "gcp_dev_bucket_location" {
-  type        = string
-  description = "GCS bucket location for development environment"
-}
-
 variable "common_labels" {
   type        = map(string)
   description = "Common labels applied to all resources"
