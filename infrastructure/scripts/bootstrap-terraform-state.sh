@@ -18,7 +18,7 @@ else
   # Optionally associate a billing account if provided
   if [[ -n "${BILLING_ACCOUNT_ID:-}" ]]; then
     echo "Linking billing account ${BILLING_ACCOUNT_ID} to project ${PROJECT_ID}..."
-    gcloud beta billing projects link "${PROJECT_ID}" --billing-account="${BILLING_ACCOUNT_ID}"
+    gcloud billing projects link "${PROJECT_ID}" --billing-account="${BILLING_ACCOUNT_ID}"
   fi
 fi
 
@@ -36,5 +36,4 @@ fi
 # Configure bucket: uniform bucket-level access (security) and versioning (state protection)
 gcloud storage buckets update "gs://${BUCKET_NAME}" \
   --project "${PROJECT_ID}" \
-  --uniform-bucket-level-access \
   --versioning
