@@ -20,13 +20,13 @@ gsutil -m rsync -r -d apps/web/dist "gs://${BUCKET_NAME}/"
 # - public: Allows CDNs and proxies to cache (safe for public content)
 # - ETag: Cloud Storage auto-generates; enables efficient 304 Not Modified responses
 # Modern browsers universally support this; HTTP/1.0 is extinct (no max-age needed)
-gsutil -m -h "Cache-Control: public, no-cache, stale-while-revalidate=86400" setmeta "gs://${BUCKET_NAME}/*.html"
+gsutil -m setmeta -h "Cache-Control:public, no-cache, stale-while-revalidate=86400" "gs://${BUCKET_NAME}/*.html"
 
 # Version metadata: Revalidate on every request
 # - no-cache: Forces browser/CDN to validate with server before reusing cached response
 # - public: Cacheable by CDNs and proxies
 # Ensures verify-deployment.sh always fetches the current deployed version
-gsutil -m -h "Cache-Control: public, no-cache" setmeta "gs://${BUCKET_NAME}/version.json"
+gsutil -m setmeta -h "Cache-Control:public, no-cache" "gs://${BUCKET_NAME}/version.json"
 
 # Assets: Aggressive immutable caching
 # - max-age=31536000: Cache for 1 year (31,536,000 seconds)
@@ -34,4 +34,4 @@ gsutil -m -h "Cache-Control: public, no-cache" setmeta "gs://${BUCKET_NAME}/vers
 # - public: Cacheable by CDNs and proxies
 # Safe because Vite includes content hash in filenames (e.g., app.abc123.js)
 # New versions get new URLs, so cache invalidation is automatic (cache-busting pattern)
-gsutil -m -h "Cache-Control: public, max-age=31536000, immutable" setmeta "gs://${BUCKET_NAME}/assets/**"
+gsutil -m setmeta -h "Cache-Control:public, max-age=31536000, immutable" "gs://${BUCKET_NAME}/assets/**"
