@@ -13,7 +13,7 @@ terraform {
 
 provider "google" {
   project = var.gcp_core_project_id
-  region  = "us-central1"
+  region  = "eu-west1"
 }
 
 data "google_project" "core" {
