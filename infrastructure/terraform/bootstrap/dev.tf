@@ -45,3 +45,25 @@ resource "google_project_iam_member" "dev_rw_viewer_core" {
 
   depends_on = [module.dev, module.core]
 }
+
+# In-project: Minimal read-only permission for bucket IAM policy refresh during plan.
+resource "google_project_iam_custom_role" "dev_ro_bucket_iam_policy_reader" {
+  project     = module.dev.project_id
+  role_id     = "terraformPlanBucketIamReader"
+  title       = "Terraform Plan Bucket IAM Reader"
+  description = "Read Cloud Storage bucket IAM policies for Terraform plan refresh"
+
+  permissions = [
+    "storage.buckets.getIamPolicy"
+  ]
+
+  depends_on = [module.dev]
+}
+
+resource "google_project_iam_member" "dev_ro_bucket_iam_policy_reader" {
+  project = module.dev.project_id
+  role    = google_project_iam_custom_role.dev_ro_bucket_iam_policy_reader.name
+  member  = "serviceAccount:${module.dev.github_deployer_ro_email}"
+
+  depends_on = [module.dev, google_project_iam_custom_role.dev_ro_bucket_iam_policy_reader]
+}
