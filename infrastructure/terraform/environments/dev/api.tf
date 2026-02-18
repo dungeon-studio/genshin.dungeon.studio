@@ -39,7 +39,7 @@ resource "google_artifact_registry_repository" "api" {
 # Keep this in `dev` to avoid core->dev state dependencies.
 resource "google_cloud_run_domain_mapping" "api" {
   project  = var.gcp_dev_project_id
-  location = local.api_artifact_repository_loc
+  location = local.api_artifact_repository_location
   name     = "api.develop.genshin.dungeon.studio"
 
   metadata {
