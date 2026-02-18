@@ -4,4 +4,5 @@
 output "web_bucket_name" {
   description = "Cloud Storage bucket hosting the web application"
   value       = google_storage_bucket.web.name
+  sensitive   = false
 }
