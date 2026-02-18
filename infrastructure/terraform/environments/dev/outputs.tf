@@ -6,7 +6,7 @@ output "web_bucket_name" {
   value       = google_storage_bucket.web.name
 }
 
-output "api_artifact_repository" {
-  description = "Artifact Registry repository used for API container images"
+output "api_artifact_repository_id" {
+  description = "Artifact Registry repository used for API container images (full resource ID)"
   value       = google_artifact_registry_repository.api.id
 }
