@@ -32,3 +32,24 @@ resource "google_artifact_registry_repository" "api" {
 
   depends_on = [google_project_service.artifactregistry]
 }
+
+# Cloud Run custom domain mapping for API service.
+# NOTE: The mapped service route (`api`) is created by CI/CD deploy,
+# so this resource has an external ordering dependency on a successful deploy.
+# Keep this in `dev` to avoid core->dev state dependencies.
+resource "google_cloud_run_domain_mapping" "api" {
+  project  = var.gcp_dev_project_id
+  location = local.api_artifact_repository_loc
+  name     = "api.develop.genshin.dungeon.studio"
+
+  metadata {
+    namespace = var.gcp_dev_project_id
+  }
+
+  spec {
+    route_name       = "api"
+    certificate_mode = "AUTOMATIC"
+  }
+
+  depends_on = [google_project_service.cloudrun]
+}
