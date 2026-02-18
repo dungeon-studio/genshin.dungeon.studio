@@ -5,3 +5,8 @@ output "web_bucket_name" {
   description = "Cloud Storage bucket hosting the web application"
   value       = google_storage_bucket.web.name
 }
+
+output "api_artifact_repository" {
+  description = "Artifact Registry repository used for API container images"
+  value       = google_artifact_registry_repository.api.id
+}
