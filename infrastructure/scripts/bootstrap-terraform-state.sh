@@ -2,9 +2,7 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 set -euo pipefail
-if [[ "${DEBUG:-}" != "" ]]; then
-  set -x
-fi
+set -x
 
 BUCKET_NAME="${BUCKET_NAME:-dungeon-studio-genshin-tfstate}"
 PROJECT_ID="${PROJECT_ID:-dungeon-studio-genshin-shared}"
