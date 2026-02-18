@@ -2,12 +2,28 @@
 // SPDX-License-Identifier: MIT
 
 import react from '@vitejs/plugin-react';
+import { execSync } from 'child_process';
+import fs from 'fs';
 import path from 'path';
 import { defineConfig } from 'vite';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: 'generate-version',
+      closeBundle() {
+        const sha = execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim();
+        const timestamp = new Date().toISOString();
+        const pkgPath = path.resolve(__dirname, 'package.json');
+        const version = JSON.parse(fs.readFileSync(pkgPath, 'utf-8')).version;
+        const metadata = { version, sha, timestamp };
+        const distPath = path.resolve(__dirname, 'dist');
+        fs.writeFileSync(path.join(distPath, 'version.json'), JSON.stringify(metadata, null, 2));
+      },
+    },
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

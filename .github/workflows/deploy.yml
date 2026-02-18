@@ -1,0 +1,49 @@
+---
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+name: Deploy
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/deploy.yml'
+      - '.github/actions/setup-node-pnpm/**'
+
+jobs:
+  web:
+    name: Web
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      BUCKET_NAME: develop.genshin.dungeon.studio
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_RW_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
+          service_account: ${{ secrets.GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL }} # pragma: allowlist secret
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Build Web App
+        run: pnpm --filter @genshin/web build
+
+      - name: Verify Build Output
+        run: bash apps/web/scripts/verify-build-output.sh
+
+      - name: Deploy to Cloud Storage
+        run: bash apps/web/scripts/deploy-to-cloud-storage.sh "$BUCKET_NAME"
+
+      - name: Verify Deployment
+        run: bash apps/web/scripts/verify-deployment.sh "http://${BUCKET_NAME}"
