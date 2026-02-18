@@ -72,7 +72,7 @@ repos:
 
   # Markdown linting
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.20.0
+    rev: v0.21.0
     hooks:
       - id: markdownlint-cli2
         args: [--fix]
@@ -94,7 +94,7 @@ repos:
 
   # Terraform - Infrastructure as Code
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.90.0
+    rev: v1.105.0
     hooks:
       - id: terraform_fmt
         args: [--args=-recursive]
