@@ -131,6 +131,12 @@ jobs:
             FRONTEND_ORIGIN=${{ env.FRONTEND_ORIGIN }}
             APP_GIT_SHA=${{ github.sha }}
 
+      - name: Verify Public Health
+        continue-on-error: true
+        run: >-
+          curl -fsSL "${{ steps.deploy.outputs.url }}/health"
+          | jq -e '.status == "ok"'
+
       - uses: ./.github/actions/setup-node-pnpm
 
       - name: Generate Verify Token
@@ -142,7 +148,7 @@ jobs:
           token_format: id_token
           id_token_audience: ${{ steps.deploy.outputs.url }}
 
-      - name: Verify
+      - name: Verify Authenticated Health
         env:
           HEALTH_BEARER_TOKEN: ${{ steps.verify-token.outputs.id_token }}
         run: pnpm --filter @genshin/api exec tsx scripts/verify-deployment.ts "${{ steps.deploy.outputs.url }}"

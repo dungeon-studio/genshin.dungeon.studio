@@ -21,3 +21,9 @@ variable "enable_api_domain_mapping" {
   description = "Whether to create the API Cloud Run custom domain mapping"
   default     = false
 }
+
+variable "enable_api_public_invoker" {
+  type        = bool
+  description = "Whether to grant allUsers the Cloud Run invoker role for API service"
+  default     = false
+}
