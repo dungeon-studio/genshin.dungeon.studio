@@ -5,8 +5,11 @@ locals {
   api_artifact_repository_name     = "api"
   api_artifact_repository_location = "europe-west1"
   api_cloud_run_location           = "europe-west1"
-  api_domain_name                  = "api.develop.genshin.dungeon.studio"
-  api_route_name                   = "api"
+  # NOTE: Cloud Run domain mappings expect a bare domain name without a
+  # trailing dot. The corresponding DNS CNAME record in core intentionally
+  # uses an FQDN with a trailing dot.
+  api_domain_name = "api.develop.genshin.dungeon.studio"
+  api_route_name  = "api"
 }
 
 # Enable APIs required for API image storage and runtime deployment

@@ -8,3 +8,5 @@ common_labels = {
   environment = "dev"
   managed_by  = "terraform"
 }
+
+enable_api_domain_mapping = true
