@@ -8,8 +8,8 @@ type HealthResponse = {
   sha?: string | null;
 };
 
-const baseUrl = process.argv[2];
-if (!baseUrl) {
+const baseUrlArg = process.argv[2];
+if (!baseUrlArg) {
   throw new Error('Base URL is required as first argument');
 }
 
@@ -28,52 +28,48 @@ if (!Number.isInteger(sleepSeconds) || sleepSeconds < 0) {
   throw new Error(`SLEEP_SECONDS must be a non-negative integer, received: ${sleepSeconds}`);
 }
 
-const sleep = (milliseconds: number): Promise<void> =>
-  new Promise((resolve) => {
-    setTimeout(resolve, milliseconds);
-  });
+const healthUrl = new URL('/health', baseUrlArg);
+const headers = new Headers();
+if (healthBearerToken) {
+  headers.set('Authorization', `Bearer ${healthBearerToken}`);
+}
 
-let lastFailure: string | undefined;
-let healthResponseBody: HealthResponse | undefined;
+const getHealthWithRetry = async (): Promise<HealthResponse> => {
+  let lastFailure: string | undefined;
 
-for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-  const headers = new Headers();
-  if (healthBearerToken) {
-    headers.set('Authorization', `Bearer ${healthBearerToken}`);
-  }
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const response = await fetch(healthUrl, { headers });
 
-  try {
-    const response = await fetch(new URL('/health', baseUrl), { headers });
+      if (response.ok) {
+        const healthResponseBody = (await response.json()) as HealthResponse;
 
-    if (!response.ok) {
-      lastFailure = `http_status=${response.status}; status_text=${response.statusText}`;
-    } else {
-      healthResponseBody = (await response.json()) as HealthResponse;
-      break;
+        if (healthResponseBody.status !== 'ok') {
+          lastFailure = `unexpected_status=${String(healthResponseBody.status)}`;
+        } else if (healthResponseBody.sha !== expectedSha) {
+          lastFailure = `sha_mismatch=deployed:${String(healthResponseBody.sha)} expected:${expectedSha}`;
+        } else {
+          return healthResponseBody;
+        }
+      } else {
+        lastFailure = `http_status=${response.status}; status_text=${response.statusText}`;
+      }
+    } catch (error) {
+      lastFailure = error instanceof Error ? error.message : String(error);
     }
-  } catch (error) {
-    lastFailure = error instanceof Error ? error.message : String(error);
+
+    if (attempt === maxAttempts) {
+      throw new Error(
+        `Health check failed after ${maxAttempts} attempts; last_failure=${lastFailure ?? 'unknown'}`,
+      );
+    }
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, sleepSeconds * 1000);
+    });
   }
 
-  if (attempt === maxAttempts) {
-    throw new Error(
-      `Health check failed after ${maxAttempts} attempts; last_failure=${lastFailure ?? 'unknown'}`,
-    );
-  }
+  throw new Error('Health check retry loop exited unexpectedly');
+};
 
-  await sleep(sleepSeconds * 1000);
-}
-
-if (!healthResponseBody) {
-  throw new Error('Health check response body is missing after successful request');
-}
-
-if (healthResponseBody.status !== 'ok') {
-  throw new Error(`Unexpected health status: ${String(healthResponseBody.status)}`);
-}
-
-if (healthResponseBody.sha !== expectedSha) {
-  throw new Error(
-    `SHA mismatch: deployed=${String(healthResponseBody.sha)} expected=${expectedSha}`,
-  );
-}
+await getHealthWithRetry();
