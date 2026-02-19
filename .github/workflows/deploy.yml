@@ -9,6 +9,7 @@ on:
     branches: [develop]
     paths:
       - 'apps/web/**'
+      - 'apps/api/**'
       - '.github/workflows/deploy.yml'
       - '.github/actions/setup-node-pnpm/**'
 
@@ -36,14 +37,99 @@ jobs:
 
       - uses: ./.github/actions/setup-node-pnpm
 
-      - name: Build Web App
+      - name: Build
         run: pnpm --filter @genshin/web build
 
-      - name: Verify Build Output
+      - name: Verify Build
         run: bash apps/web/scripts/verify-build-output.sh
 
-      - name: Deploy to Cloud Storage
+      - name: Deploy
         run: bash apps/web/scripts/deploy-to-cloud-storage.sh "$BUCKET_NAME"
 
-      - name: Verify Deployment
+      - name: Verify
         run: bash apps/web/scripts/verify-deployment.sh "http://${BUCKET_NAME}"
+
+  api:
+    name: API
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      GCP_DEV_PROJECT_ID: dungeon-studio-genshin-dev
+      CLOUD_RUN_REGION: europe-west1
+      CLOUD_RUN_SERVICE_NAME: api
+      ARTIFACT_REPOSITORY: api
+      FRONTEND_ORIGIN: http://develop.genshin.dungeon.studio
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_RW_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
+          service_account: ${{ secrets.GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL }} # pragma: allowlist secret
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Configure Docker Auth
+        run: gcloud auth configure-docker "${CLOUD_RUN_REGION}-docker.pkg.dev" --quiet
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.CLOUD_RUN_REGION }}-docker.pkg.dev/${{ env.GCP_DEV_PROJECT_ID }}/${{
+            env.ARTIFACT_REPOSITORY }}/${{ env.CLOUD_RUN_SERVICE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-,format=short
+
+      - name: Build & Push Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./apps/api/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Resolve Image
+        id: image
+        run: |
+          BRANCH_NAME=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | sed 's|/|-|g')
+          IMAGE_URI="${CLOUD_RUN_REGION}-docker.pkg.dev/${GCP_DEV_PROJECT_ID}/${ARTIFACT_REPOSITORY}/${CLOUD_RUN_SERVICE_NAME}:${BRANCH_NAME}-${GITHUB_SHA::7}"
+          echo "image_uri=$IMAGE_URI" >> "$GITHUB_OUTPUT"
+
+      - name: Log Tags & Image
+        run: |
+          echo "Published image tags:"
+          printf '%s\n' "${{ steps.meta.outputs.tags }}"
+          echo "Deploy image URI: ${{ steps.image.outputs.image_uri }}"
+
+      # Service lifecycle is intentionally CI-managed for fast app rollouts.
+      # Terraform in dev manages supporting infra (APIs, Artifact Registry,
+      # and domain mapping), but does not define the Cloud Run service itself.
+      # This split is intentional and may diverge further for release/prod.
+      - name: Deploy
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          project_id: ${{ env.GCP_DEV_PROJECT_ID }}
+          region: ${{ env.CLOUD_RUN_REGION }}
+          service: ${{ env.CLOUD_RUN_SERVICE_NAME }}
+          image: ${{ steps.image.outputs.image_uri }}
+          flags: --allow-unauthenticated
+          env_vars: |
+            FRONTEND_ORIGIN=${{ env.FRONTEND_ORIGIN }}
+            APP_GIT_SHA=${{ github.sha }}
+
+      - name: Verify
+        run: bash apps/api/scripts/verify-deployment.sh "${{ steps.deploy.outputs.url }}"

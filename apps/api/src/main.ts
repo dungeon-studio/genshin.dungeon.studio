@@ -72,7 +72,12 @@ app.get('/', (c) =>
   }),
 );
 
-app.get('/health', (c) => c.json({ status: 'ok' }));
+app.get('/health', (c) =>
+  c.json({
+    status: 'ok',
+    sha: process.env.APP_GIT_SHA ?? null,
+  }),
+);
 
 const port = parseInt(process.env.PORT || '8080', 10);
 console.log(`Server running at http://localhost:${port}`);
