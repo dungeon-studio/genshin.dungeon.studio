@@ -131,10 +131,13 @@ jobs:
             FRONTEND_ORIGIN=${{ env.FRONTEND_ORIGIN }}
             APP_GIT_SHA=${{ github.sha }}
 
+      - uses: ./.github/actions/setup-node-pnpm
+
       - name: Verify
         run: |
           HEALTH_BEARER_TOKEN=$(gcloud auth print-identity-token \
             --audiences="${{ steps.deploy.outputs.url }}")
           echo "::add-mask::$HEALTH_BEARER_TOKEN"
           HEALTH_BEARER_TOKEN="$HEALTH_BEARER_TOKEN" \
-            bash apps/api/scripts/verify-deployment.sh "${{ steps.deploy.outputs.url }}"
+            pnpm --filter @genshin/api exec tsx scripts/verify-deployment.ts \
+            "${{ steps.deploy.outputs.url }}"
