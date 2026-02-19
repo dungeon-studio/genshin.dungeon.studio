@@ -21,6 +21,11 @@ resource "google_project_service" "cloudrun" {
   disable_on_destroy = false
 }
 
+# NOTE: The Cloud Run service resource is intentionally not managed here.
+# Deploy workflow (`.github/workflows/deploy.yml`) owns service creation and
+# rollout to keep application deploy cadence independent from Terraform applies.
+# Terraform in this module owns only supporting infrastructure.
+
 # Artifact Registry repository for API container images
 resource "google_artifact_registry_repository" "api" {
   project       = var.gcp_dev_project_id
