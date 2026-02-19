@@ -15,3 +15,9 @@ variable "common_labels" {
   type        = map(string)
   description = "Common labels applied to all resources"
 }
+
+variable "enable_api_domain_mapping" {
+  type        = bool
+  description = "Whether to create the API Cloud Run custom domain mapping"
+  default     = false
+}

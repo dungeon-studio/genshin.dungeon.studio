@@ -4,6 +4,12 @@
 locals {
   api_artifact_repository_name     = "api"
   api_artifact_repository_location = "europe-west1"
+  api_cloud_run_location           = "europe-west1"
+  # NOTE: Cloud Run domain mappings expect a bare domain name without a
+  # trailing dot. The corresponding DNS CNAME record in core intentionally
+  # uses an FQDN with a trailing dot.
+  api_domain_name = "api.develop.genshin.dungeon.studio"
+  api_route_name  = "api"
 }
 
 # Enable APIs required for API image storage and runtime deployment
@@ -36,4 +42,27 @@ resource "google_artifact_registry_repository" "api" {
   labels = var.common_labels
 
   depends_on = [google_project_service.artifactregistry]
+}
+
+# Cloud Run custom domain mapping for API service.
+# NOTE: The mapped service route (`api`) is created by CI/CD deploy,
+# so this resource has an external ordering dependency on a successful deploy.
+# Keep this in `dev` to avoid core->dev state dependencies.
+resource "google_cloud_run_domain_mapping" "api" {
+  count = var.enable_api_domain_mapping ? 1 : 0
+
+  project  = var.gcp_dev_project_id
+  location = local.api_cloud_run_location
+  name     = local.api_domain_name
+
+  metadata {
+    namespace = var.gcp_dev_project_id
+  }
+
+  spec {
+    route_name       = local.api_route_name
+    certificate_mode = "AUTOMATIC"
+  }
+
+  depends_on = [google_project_service.cloudrun]
 }
