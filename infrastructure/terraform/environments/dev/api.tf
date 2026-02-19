@@ -4,6 +4,9 @@
 locals {
   api_artifact_repository_name     = "api"
   api_artifact_repository_location = "europe-west1"
+  api_cloud_run_location           = "europe-west1"
+  api_domain_name                  = "api.develop.genshin.dungeon.studio"
+  api_route_name                   = "api"
 }
 
 # Enable APIs required for API image storage and runtime deployment
@@ -43,16 +46,18 @@ resource "google_artifact_registry_repository" "api" {
 # so this resource has an external ordering dependency on a successful deploy.
 # Keep this in `dev` to avoid core->dev state dependencies.
 resource "google_cloud_run_domain_mapping" "api" {
+  count = var.enable_api_domain_mapping ? 1 : 0
+
   project  = var.gcp_dev_project_id
-  location = local.api_artifact_repository_location
-  name     = "api.develop.genshin.dungeon.studio"
+  location = local.api_cloud_run_location
+  name     = local.api_domain_name
 
   metadata {
     namespace = var.gcp_dev_project_id
   }
 
   spec {
-    route_name       = "api"
+    route_name       = local.api_route_name
     certificate_mode = "AUTOMATIC"
   }
 
