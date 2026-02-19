@@ -11,8 +11,26 @@ REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)"
 BASE_URL="${1:?Error: base URL is required as first argument}"
 
 EXPECTED_SHA="${GITHUB_SHA:-$(git -C "$REPO_ROOT" rev-parse HEAD)}"
+HEALTH_BEARER_TOKEN="${HEALTH_BEARER_TOKEN:-}"
+MAX_ATTEMPTS="${MAX_ATTEMPTS:-10}"
+SLEEP_SECONDS="${SLEEP_SECONDS:-3}"
 
-HEALTH_RESPONSE=$(curl -fsSL "$BASE_URL/health")
+for ATTEMPT in $(seq 1 "$MAX_ATTEMPTS"); do
+	CURL_ARGS=(-fsSL)
+	if [ -n "$HEALTH_BEARER_TOKEN" ]; then
+		CURL_ARGS+=(-H "Authorization: Bearer ${HEALTH_BEARER_TOKEN}")
+	fi
+
+	HEALTH_RESPONSE=$(curl "${CURL_ARGS[@]}" "$BASE_URL/health") && break
+
+	if [ "$ATTEMPT" -eq "$MAX_ATTEMPTS" ]; then
+		echo "Health check failed after ${MAX_ATTEMPTS} attempts" >&2
+		exit 1
+	fi
+
+	sleep "$SLEEP_SECONDS"
+done
+
 HEALTH_STATUS=$(jq -r '.status' <<< "$HEALTH_RESPONSE")
 DEPLOYED_SHA=$(jq -r '.sha' <<< "$HEALTH_RESPONSE")
 
