@@ -133,11 +133,16 @@ jobs:
 
       - uses: ./.github/actions/setup-node-pnpm
 
+      - name: Generate Verify Token
+        id: verify-token
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_RW_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
+          service_account: ${{ secrets.GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL }} # pragma: allowlist secret
+          token_format: id_token
+          id_token_audience: ${{ steps.deploy.outputs.url }}
+
       - name: Verify
-        run: |
-          HEALTH_BEARER_TOKEN=$(gcloud auth print-identity-token \
-            --audiences="${{ steps.deploy.outputs.url }}")
-          echo "::add-mask::$HEALTH_BEARER_TOKEN"
-          HEALTH_BEARER_TOKEN="$HEALTH_BEARER_TOKEN" \
-            pnpm --filter @genshin/api exec tsx scripts/verify-deployment.ts \
-            "${{ steps.deploy.outputs.url }}"
+        env:
+          HEALTH_BEARER_TOKEN: ${{ steps.verify-token.outputs.id_token }}
+        run: pnpm --filter @genshin/api exec tsx scripts/verify-deployment.ts "${{ steps.deploy.outputs.url }}"
