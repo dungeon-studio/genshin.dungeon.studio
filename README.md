@@ -3,15 +3,19 @@ SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 SPDX-License-Identifier: MIT
 -->
 
-# Genshin team builder
-
 <!-- vale Google.Acronyms = NO -->
 <!-- vale Microsoft.Acronyms = NO -->
+<!-- markdownlint-disable MD041 -->
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Develop](https://img.shields.io/website?url=http%3A%2F%2Fdevelop.genshin.dungeon.studio&style=flat-square&label=develop)](http://develop.genshin.dungeon.studio)
+[![REUSE status](https://api.reuse.software/badge/github.com/dungeon-studio/genshin.dungeon.studio)](https://api.reuse.software/info/github.com/dungeon-studio/genshin.dungeon.studio)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
 <!-- vale Microsoft.Acronyms = YES -->
 <!-- vale Google.Acronyms = YES -->
+<!-- markdownlint-enable MD041 -->
+
+# Genshin team builder
 
 By [Alex Brandt](https://github.com/alunduil) · [Repository](https://github.com/dungeon-studio/genshin.dungeon.studio)
 
