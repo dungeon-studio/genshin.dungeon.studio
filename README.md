@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 <!-- markdownlint-disable MD041 -->
 
 [![Develop](https://img.shields.io/website?url=http%3A%2F%2Fdevelop.genshin.dungeon.studio&style=flat-square&label=develop)](http://develop.genshin.dungeon.studio)
-[![REUSE status](https://api.reuse.software/badge/github.com/dungeon-studio/genshin.dungeon.studio)](https://api.reuse.software/info/github.com/dungeon-studio/genshin.dungeon.studio)
+[![REUSE status](https://img.shields.io/reuse/compliance/github.com/dungeon-studio/genshin.dungeon.studio?style=flat-square)](https://api.reuse.software/info/github.com/dungeon-studio/genshin.dungeon.studio)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
 <!-- vale Microsoft.Acronyms = YES -->
