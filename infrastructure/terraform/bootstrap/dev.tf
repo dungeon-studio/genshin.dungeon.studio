@@ -46,6 +46,17 @@ resource "google_project_iam_member" "dev_rw_viewer_core" {
   depends_on = [module.dev, module.core]
 }
 
+# In-project: Allow dev RW SA to manage Cloud Run service IAM policies.
+# Required for environment Terraform resources such as
+# `google_cloud_run_service_iam_member` in dev.
+resource "google_project_iam_member" "dev_rw_run_admin" {
+  project = module.dev.project_id
+  role    = "roles/run.admin"
+  member  = "serviceAccount:${module.dev.github_deployer_rw_email}"
+
+  depends_on = [module.dev]
+}
+
 # In-project: Minimal read-only permission for bucket IAM policy refresh during plan.
 resource "google_project_iam_custom_role" "dev_ro_bucket_iam_policy_reader" {
   project     = module.dev.project_id
