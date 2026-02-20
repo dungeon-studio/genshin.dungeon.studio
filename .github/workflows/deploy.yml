@@ -120,7 +120,7 @@ jobs:
       # This split is intentional and may diverge further for release/prod.
       - name: Deploy
         id: deploy
-        uses: google-github-actions/deploy-cloudrun@v2
+        uses: google-github-actions/deploy-cloudrun@v3
         with:
           project_id: ${{ env.GCP_DEV_PROJECT_ID }}
           region: ${{ env.CLOUD_RUN_REGION }}
