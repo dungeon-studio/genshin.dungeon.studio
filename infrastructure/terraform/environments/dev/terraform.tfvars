@@ -11,3 +11,5 @@ common_labels = {
 
 enable_api_domain_mapping = true
 enable_api_public_invoker = true
+
+firestore_location_id = "eur3"
