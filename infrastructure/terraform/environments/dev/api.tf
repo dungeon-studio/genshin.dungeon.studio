@@ -66,3 +66,19 @@ resource "google_cloud_run_domain_mapping" "api" {
 
   depends_on = [google_project_service.cloudrun]
 }
+
+# Cloud Run IAM policy binding for public API invocation.
+# NOTE: The Cloud Run service is created by CI/CD deploy, so this resource
+# has an external ordering dependency on a successful deploy.
+resource "google_cloud_run_service_iam_member" "api_public_invoker" {
+  count = var.enable_api_public_invoker ? 1 : 0
+
+  project  = var.gcp_dev_project_id
+  location = local.api_cloud_run_location
+  service  = local.api_route_name
+
+  role   = "roles/run.invoker"
+  member = "allUsers"
+
+  depends_on = [google_project_service.cloudrun]
+}
