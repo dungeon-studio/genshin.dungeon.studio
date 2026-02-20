@@ -12,3 +12,15 @@ output "api_artifact_repository_id" {
   value       = google_artifact_registry_repository.api.id
   sensitive   = false
 }
+
+output "firestore_database_name" {
+  description = "Firestore database name for the development environment"
+  value       = google_firestore_database.default.name
+  sensitive   = false
+}
+
+output "firestore_location_id" {
+  description = "Firestore location ID for the development environment"
+  value       = google_firestore_database.default.location_id
+  sensitive   = false
+}
