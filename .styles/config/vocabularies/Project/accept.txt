@@ -111,6 +111,11 @@ Masse
 Hardt
 Dalal
 O'Reilly
+DSGEP
+IAM
+SPA
+JSONC
+INI
 
 # Game elements (Genshin Impact)
 Pyro

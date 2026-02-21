@@ -1,7 +1,7 @@
 <!-- SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> -->
 <!-- SPDX-License-Identifier: MIT -->
 
-# DSGEP-001: Workload Identity Federation architecture
+# DSGEP-001: Workload identity federation architecture
 
 - **Status**: Accepted
 - **Created**: 2026-02-15
@@ -30,7 +30,7 @@ The project uses three GCP projects:
 - `dungeon-studio-genshin-core`: Common resources (Domain Name System (DNS), shared services) used across environments
 - `dungeon-studio-genshin-dev`: Development environment resources
 
-### Bootstrap vs environment Terraform
+### Bootstrap vs. environment Terraform
 
 - **Bootstrap**: Creates GCP projects, service accounts, and foundational infrastructure. Run manually with user credentials.
 - **Environments** (core, dev): Manage environment-specific resources. Run via GitHub Actions with WIF authentication.
@@ -125,7 +125,7 @@ The WIF pool lives in `dungeon-studio-genshin-shared` because:
 - Multiplies security configuration: 3 WIF pools to maintain
 - Unclear which pool should be the "source of truth" for shared authentication
 
-### Alternative 2: Workload Identity Federation in shared environment Terraform
+### Alternative 2: Workload identity federation in shared environment Terraform
 
 **Approach**: move WIF creation to `environments/shared` Terraform workspace instead of bootstrap.
 
@@ -135,7 +135,7 @@ The WIF pool lives in `dungeon-studio-genshin-shared` because:
 - Creates the same circular dependency as Alternative 1
 - Doesn't solve the "where does the first WIF come from" problem
 
-### Alternative 3: Separate bootstrap for Workload Identity Federation only
+### Alternative 3: Separate bootstrap for workload identity federation only
 
 **Approach**: create a minimal bootstrap just for WIF, then a second bootstrap for projects.
 

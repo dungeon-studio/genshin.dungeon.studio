@@ -11,15 +11,15 @@ This guide shows you how to add copyright and license headers to new source file
 
 ## Quick reference by file type
 
-| File Type                                    | Header Format | Example                                                                  |
-| -------------------------------------------- | ------------- | ------------------------------------------------------------------------ |
-| TypeScript/JavaScript (.ts, .tsx, .js, .jsx) | `//`          | `// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>`       |
-| CSS/SCSS (.css, .scss)                       | `/* */`       | `/* SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> */`    |
-| Markdown (.md)                               | `<!--` HTML   | `<!-- SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> -->` |
-| YAML/INI (.yaml, .yml, .ini)                 | `#`           | `# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>`        |
-| HTML (.html)                                 | `<!--` HTML   | `<!-- SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> -->` |
-| SVG (.svg)                                   | `<!--` XML    | `<!-- SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> -->` |
-| Shell (.sh, .bash)                           | `#`           | `# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>`        |
+| File type                                            | Header format | Example                                                                  |
+| ---------------------------------------------------- | ------------- | ------------------------------------------------------------------------ |
+| TypeScript/JavaScript (`.ts`, `.tsx`, `.js`, `.jsx`) | `//`          | `// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>`       |
+| CSS/SCSS (`.css`, `.scss`)                           | `/* */`       | `/* SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> */`    |
+| Markdown (`.md`)                                     | `<!--` HTML   | `<!-- SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> -->` |
+| YAML/INI (`.yaml`, `.yml`, `.INI`)                   | `#`           | `# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>`        |
+| HTML (`.html`)                                       | `<!--` HTML   | `<!-- SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> -->` |
+| SVG (`.svg`)                                         | `<!--` XML    | `<!-- SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> -->` |
+| Shell (`.sh`, `.bash`)                               | `#`           | `# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>`        |
 
 ---
 
@@ -27,7 +27,7 @@ This guide shows you how to add copyright and license headers to new source file
 
 ### 1. Add to top of file
 
-Place the SPDX header at the very beginning of the file (line 1), before any code or other comments.
+Place the SPDX header at the beginning of the file (line 1), before any code or other comments.
 
 For YAML files, keep `---` on line 1 if present, and place the SPDX header immediately after.
 
@@ -56,7 +56,7 @@ SPDX-License-Identifier: MIT
 -->
 ```
 
-### 3. Verify with reuse lint
+### 3. Verify with REUSE lint
 
 After adding headers, verify compliance:
 
