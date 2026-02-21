@@ -72,7 +72,7 @@ To run it:
 docker run -p 8080:8080 genshin-api:local
 ```
 
-The API will be available at `http://localhost:8080`. See [apps/api/Dockerfile](apps/api/Dockerfile) for build details and [.github/workflows/](.github/workflows/) for CI/CD pipeline information.
+The API is available at `http://localhost:8080`. See [apps/api/Dockerfile](apps/api/Dockerfile) for build details and [.github/workflows/](.github/workflows/) for CI/CD pipeline information.
 
 ### Quality checks overview
 
@@ -103,8 +103,8 @@ Pre-commit enforces formatting, linting, documentation, secrets, and hygiene che
 Pre-commit hooks automatically enforce key checks, including:
 
 - **Prettier** - Code formatting
-- **ESLint** - JavaScript/TypeScript linting (fixes issues when possible)
-- CSS linting (Tailwind directives supported)
+- **ESLint** - JavaScript/TypeScript linting with automatic fixes when possible
+- CSS linting with Tailwind directives
 - Documentation and config linting for Markdown, YAML, and prose
 - Safety and repository hygiene checks for secrets, merge conflict markers, large files, trailing whitespace, line endings, and YAML/JSON validation
 
@@ -114,7 +114,7 @@ For type checking, run manually before committing:
 pnpm typecheck
 ```
 
-### SPDX headers
+### Source file headers
 
 All source files require SPDX headers per the [REUSE Specification](https://reuse.software/). Use `reuse addheader` or check [REUSE docs](https://reuse.software/tutorial/) for details.
 
@@ -137,7 +137,7 @@ Infrastructure automation follows this branch strategy:
 
 - `develop`: integration branch
 - `release/*`: release-train branches cut from `develop`
-- `main`: long-term release target branch (used when production flow is active)
+- `main`: long-term release target branch, used when production flow is active
 
 Current Terraform workflow routing:
 
@@ -166,14 +166,14 @@ When creating release branches, derive the name from the root `package.json` ver
 ### Merge strategy
 
 - **Squash and merge** - All pull request commits become one commit on develop
-- The pull request title becomes the final commit message (use conventional commit format)
+- The pull request title becomes the final commit message. Use conventional commit format.
 - Keep commit history clean - one feature equals one commit
 
 ### Addressing review comments
 
 1. Address feedback completely
 2. Batch related fixes when possible
-3. Pre-commit hooks will verify formatting and linting. For type checking, run:
+3. Pre-commit hooks verify formatting and linting. For type checking, run:
 
    ```bash
    pnpm typecheck
@@ -195,6 +195,7 @@ For step-by-step instructions and technical details:
 
 - [Manual Setup Guide](docs/how-tos/manual-setup.md): Development environment setup without DevContainers
 - [Add Terraform Environment](docs/how-tos/add-terraform-environment.md): Bootstrap, scaffold, lock file, and workflow updates for new environments
+- [REST API conventions](docs/reference/rest-api-conventions.md): Route design, method semantics, status codes, error shape, and pagination
 
 ---
 
