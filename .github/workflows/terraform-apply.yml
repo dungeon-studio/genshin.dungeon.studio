@@ -12,6 +12,10 @@ on:
       - '.github/workflows/terraform-apply.yml'
       - '.github/workflows/terraform-apply-reusable.yml'
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   core:
     uses: ./.github/workflows/terraform-apply-reusable.yml

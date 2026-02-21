@@ -71,7 +71,7 @@ Don't commit `.terraform/` directories.
 ## 5) Align GitHub workflows
 
 - In `.github/workflows/terraform-plan.yml`, copy one matrix entry and set `<environment>` + RO secret.
-- In `.github/workflows/terraform-apply.yml`, copy one job and set job name, `environment`, and RW secret.
+- In `.github/workflows/terraform-apply.yml`, copy one job and set job id, `with.environment`, and RW secret.
 - Keep `.github/workflows/terraform-apply-reusable.yml` unchanged.
 
 ---
