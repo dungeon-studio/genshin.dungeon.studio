@@ -131,6 +131,24 @@ For complex logic, decisions, or subtle patterns:
 
 ## Pull request workflow
 
+### Branch flow for infrastructure
+
+Infrastructure automation follows this branch strategy:
+
+- `develop`: integration branch
+- `release/*`: release-train branches cut from `develop`
+- `main`: long-term release target branch (used when production flow is active)
+
+Current Terraform workflow routing:
+
+- push to `develop`: applies `core` then `dev`
+- push to `release/*`: applies `core` then `staging`
+- pull requests to `develop`, `release/*`, and `main`: run Terraform plan checks
+
+When creating release branches, derive the name from the root `package.json` version using SemVer2 context and always include both the release date and short hash token, for example:
+
+- `release/0.1.0-20260221.d24af0f`
+
 ### Branch naming
 
 - `feature/description` - New features
@@ -176,6 +194,7 @@ This project runs on Windows, macOS, and Linux.
 For step-by-step instructions and technical details:
 
 - [Manual Setup Guide](docs/how-tos/manual-setup.md): Development environment setup without DevContainers
+- [Add Terraform Environment](docs/how-tos/add-terraform-environment.md): Bootstrap, scaffold, lock file, and workflow updates for new environments
 
 ---
 
