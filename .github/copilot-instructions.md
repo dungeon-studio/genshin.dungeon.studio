@@ -41,8 +41,8 @@
 - Use aliases (`@/components`, `@/components/ui`, `@/lib`, `@/lib/utils`).
 - `shadcn/ui` gotchas:
   - Use ESM imports in Tailwind or Vite config (`import ...`), not `require()`.
-  - Remove conflicting Vite starter CSS dark-mode defaults from `apps/web/src/index.css`.
-  - Keep semantic slots semantic: `CardTitle` should render heading levels and `CardDescription` should render paragraph text.
+  - Ensure Vite starter CSS dark-mode defaults stay removed from `apps/web/src/index.css`; don't reintroduce `color-scheme` or `prefers-color-scheme` defaults.
+  - Keep semantic slots semantic: `CardTitle` should render heading tags (for example, `h3`) and `CardDescription` should render paragraph tags (`p`).
   - `react-refresh/only-export-components` with `allowConstantExport: true` can still flag valid `shadcn` patterns that export a component and helper; targeted suppression is acceptable.
 
 ## Dependencies and linting
@@ -53,7 +53,7 @@
   - `dependencies`: runtime code shipped to production.
   - `devDependencies`: build tools, plugins, type definitions, and local tooling.
 - Use `pnpm why <package>` to detect duplicate transitive versions and pin when needed.
-- ESLint uses flat config only (`eslint.config.js`) and `ignores` instead of `.eslintignore`.
+- ESLint uses flat config via workspace-local `eslint.config.js` files; configure ignore patterns with `ignores`, not `.eslintignore`.
 
 ## Documentation rules
 
