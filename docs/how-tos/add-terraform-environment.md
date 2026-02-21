@@ -11,13 +11,13 @@ This guide explains how to add a new infrastructure environment (for example `st
 
 ## 1) Add bootstrap configuration
 
-Create `infrastructure/terraform/bootstrap/<environment>.tf` by following the same pattern used in `dev.tf`:
+Copy `infrastructure/terraform/bootstrap/dev.tf` to `infrastructure/terraform/bootstrap/<environment>.tf`, then update names and references.
 
-- Create a `module "<environment>"` block using `./modules/project_bootstrap`
+- Rename module blocks and resource names from `dev` to `<environment>`
 - Set `environment`, `project_id`, and `project_name`
-- Add a `github_oidc_bindings_<environment>` module
-- Add cross-project viewer access to `module.core` for RO and RW service accounts
-- Add environment-scoped IAM needed for planning and applies
+- Keep the same `github_oidc_bindings_<environment>` pattern
+- Keep cross-project viewer access to `module.core` for RO and RW service accounts
+- Keep any environment-scoped IAM needed for plan/apply
 
 Use naming based on infrastructure environment names (`dev`, `staging`, `production`), not branch names or release-train names (for example `release/*`).
 
@@ -38,13 +38,17 @@ Keep secret names aligned with infrastructure environment names.
 
 ## 3) Scaffold the environment folder
 
-Create `infrastructure/terraform/environments/<environment>/` with:
+Copy `infrastructure/terraform/environments/dev/` to `infrastructure/terraform/environments/<environment>/`, then update values.
+
+Keep these files in the new folder:
 
 - `backend.tf`
 - `main.tf`
 - `variables.tf`
 - `terraform.tfvars`
 - `outputs.tf`
+
+Update project IDs, project numbers, and any environment-specific variable values.
 
 For early scaffolding, `outputs.tf` can remain empty except SPDX headers until useful outputs exist.
 
@@ -66,15 +70,9 @@ Don't commit `.terraform/` directories.
 
 ## 5) Align GitHub workflows
 
-Update workflow routing in:
-
-- `.github/workflows/terraform-plan.yml`
-- `.github/workflows/terraform-apply.yml`
-
-Ensure:
-
-- plan coverage includes the target branch pattern (for example `release/**`)
-- apply routing is branch-specific for the new environment
+- In `.github/workflows/terraform-plan.yml`, copy one matrix entry and set `<environment>` + RO secret.
+- In `.github/workflows/terraform-apply.yml`, copy one job and set job id, `with.environment`, and RW secret.
+- Keep `.github/workflows/terraform-apply-reusable.yml` unchanged.
 
 ---
 

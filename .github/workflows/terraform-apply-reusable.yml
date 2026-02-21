@@ -1,0 +1,58 @@
+---
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+name: Terraform Apply Reusable
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      service_account_secret:
+        required: true
+        type: string
+
+jobs:
+  terraform-apply:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+    # Shared concurrency group prevents state lock contention on the GCS bucket.
+    # All environments write to dungeon-studio-genshin-tfstate, so only one apply
+    # can run at a time across ALL workflow runs to prevent conflicts.
+    # The 'needs' keyword only orders jobs within a single workflow run.
+    concurrency:
+      group: terraform-apply
+      cancel-in-progress: false
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.9.0'
+
+      # Authenticate to GCP using Workload Identity
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_RW_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
+          service_account: ${{ secrets[inputs.service_account_secret] }} # pragma: allowlist secret
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Terraform Init
+        working-directory: infrastructure/terraform/environments/${{ inputs.environment }}
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: infrastructure/terraform/environments/${{ inputs.environment }}
+        run: terraform plan -lock=false -no-color -out=tfplan
+
+      - name: Terraform Apply
+        working-directory: infrastructure/terraform/environments/${{ inputs.environment }}
+        run: terraform apply -auto-approve tfplan
