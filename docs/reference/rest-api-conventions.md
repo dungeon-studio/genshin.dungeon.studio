@@ -27,23 +27,23 @@ Use each method by protocol intent in Hypertext Transfer Protocol (HTTP): `GET` 
 
 Return meaningful status codes for both success and failure. Don't collapse errors into generic success responses.
 
-See RFC 9110, Section 15: <https://www.rfc-editor.org/rfc/rfc9110.html#name-status-codes>
+See [RFC9110], Section 15: <https://www.rfc-editor.org/rfc/rfc9110.html#name-status-codes>
 
 ### 4. Predictable representation shapes
 
-Representations should be explicit and negotiable through media types. Use content negotiation with `Accept` and `Content-Type`, and define schemas that provide stable semantic structure for clients.
+Representations should be explicit and negotiable through media types. Use content negotiation with `Accept` and `Content-Type`, align media type usage with [RFC6838], and define schemas that provide stable semantic structure for clients.
 
 For `application/json` representations, provide a published JSON Schema for each request and response shape so semantics are discoverable.
 
-See RFC 9110, Section 12: <https://www.rfc-editor.org/rfc/rfc9110.html#name-content-negotiation>
+See [RFC9110], Section 12: <https://www.rfc-editor.org/rfc/rfc9110.html#name-content-negotiation>
 
-See JSON Schema Draft 2020-12: <https://json-schema.org/draft/2020-12>
+See [JSONSchema2020-12]: <https://json-schema.org/draft/2020-12>
 
 ### 5. Consistent error contract
 
 Use the Problem Details standard for machine-readable error responses. Return `application/problem+json` with stable fields and consistent extension members where needed.
 
-See RFC 9457: <https://www.rfc-editor.org/rfc/rfc9457>
+See [RFC9457]: <https://www.rfc-editor.org/rfc/rfc9457>
 
 ### 6. Consistent list behavior
 
@@ -55,7 +55,7 @@ When using cursor pagination, the response representation must explicitly define
 
 When authentication is active, use bearer tokens in the `Authorization` header and distinguish authentication `401` failures from authorization `403` failures.
 
-See RFC 6750: <https://www.rfc-editor.org/rfc/rfc6750>
+See [RFC6750]: <https://www.rfc-editor.org/rfc/rfc6750>
 
 ### 8. Timestamp format
 
