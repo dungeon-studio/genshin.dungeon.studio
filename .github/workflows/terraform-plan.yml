@@ -6,9 +6,9 @@ name: Terraform Plan
 
 on:
   pull_request:
-    branches: [develop]
+    branches: [develop, main, 'release/**']
     paths:
-      - 'infrastructure/terraform/**'
+      - 'infrastructure/terraform/environments/**'
       - '.github/workflows/terraform-plan.yml'
 
 jobs:
@@ -27,6 +27,8 @@ jobs:
             service_account_secret: GCP_RO_CORE_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
           - environment: dev
             service_account_secret: GCP_RO_DEV_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
+          - environment: staging
+            service_account_secret: GCP_RO_STAGING_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
 
     steps:
       - uses: actions/checkout@v6
