@@ -27,7 +27,12 @@
 - Prefer runtime modules over type-only packages; emit JavaScript with declarations.
 - Workspace packages consumed by other packages must expose `types` and `default` in `exports` and include `main`.
 - Use ISO 8601 strings for timestamps (`createdAt`, `updatedAt`, and similar), not `Date` objects.
+- Maintain game-data accuracy when working with `packages/game-data`.
 - Test alongside code when possible; automated test stack is planned, so perform manual local validation now.
+
+## State usage
+
+- Use zustand for UI state, TanStack Query for server state, and `@genshin/game-data` helpers for static game data.
 
 ## Frontend rules
 
@@ -37,6 +42,7 @@
 - `shadcn/ui` gotchas:
   - Use ESM imports in Tailwind or Vite config (`import ...`), not `require()`.
   - Remove conflicting Vite starter CSS dark-mode defaults from `apps/web/src/index.css`.
+  - Keep semantic slots semantic: `CardTitle` should render heading levels and `CardDescription` should render paragraph text.
   - `react-refresh/only-export-components` with `allowConstantExport: true` can still flag valid `shadcn` patterns that export a component and helper; targeted suppression is acceptable.
 
 ## Dependencies and linting
@@ -64,7 +70,7 @@
   4. Never bulk-ignore suggestions or skip the suggestions pass.
 - For valid product and tool names flagged by Vale, update `.styles/config/vocabularies/Project/accept.txt`.
 - Don't modify third-party Vale styles generated under `.styles/` (except `.styles/config/`).
-- Every source file needs SPDX headers; for files without comment syntax, declare in `.reuse/dep5`.
+- Every source file needs SPDX headers; for files without comment syntax, declare in `.reuse/dep5` (see [add-spdx-headers.md](../docs/how-tos/add-spdx-headers.md)).
 - Documentation principles:
   - Prefer concise, factual, present-tense writing.
   - Keep guidance implementation-oriented, not aspirational.
