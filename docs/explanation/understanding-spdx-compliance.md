@@ -49,7 +49,7 @@ The [Debian machine-readable copyright format](https://www.debian.org/doc/packag
 - Generated/build files (`.turbo/`, `dist/`, `node_modules/`)
 - Binary or non-standard files
 
-**Note:** files with JSON-with-comments (JSONC) support like `.vscode/*.json` and `.devcontainer/devcontainer.json` can have SPDX headers directly using `//` comment syntax.
+**Note** that files that support JSON-with-comments (JSONC), such as `.vscode/*.json` and `.devcontainer/devcontainer.json`, can have SPDX headers directly using `//` comment syntax.
 
 **Example entry in `.reuse/dep5`:**
 

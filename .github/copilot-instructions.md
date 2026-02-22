@@ -27,7 +27,7 @@
 ## Core coding rules
 
 - Use strict TypeScript and keep components/functions focused.
-- Remove repeated patterns after the third repetition.
+- Extract reusable patterns after the third repetition.
 - Prefer runtime modules over type-only packages; emit JavaScript with declarations.
 - Workspace packages consumed by other packages must expose `types` and `default` in `exports` and include `main`.
 - Use ISO 8601 strings for timestamps such as `createdAt` and `updatedAt`, not `Date` objects.
