@@ -78,7 +78,7 @@
   4. Never bulk-ignore suggestions or skip the suggestions pass.
 - For valid product and tool names flagged by Vale, update `.styles/config/vocabularies/Project/accept.txt`.
 - Don't modify third-party Vale styles generated under `.styles/`, except `.styles/config/`.
-- Every source file needs SPDX headers. For files without comment syntax, declare them in `.reuse/dep5`; see [add-SPDX-headers.md](../docs/how-tos/add-spdx-headers.md).
+- Every source file needs SPDX headers. For files without comment syntax, declare them in `.reuse/dep5`; see [How to add SPDX headers to new files](../docs/how-tos/add-spdx-headers.md).
 - Documentation principles:
   - Prefer concise, factual, present-tense writing.
   - Keep guidance implementation-oriented, not aspirational.
