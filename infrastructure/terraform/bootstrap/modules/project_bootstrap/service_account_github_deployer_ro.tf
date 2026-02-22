@@ -25,7 +25,6 @@ resource "google_project_iam_custom_role" "github_deployer_ro_planner" {
   permissions = [
     "artifactregistry.repositories.get",
     "artifactregistry.repositories.list",
-    "datastore.databases.getIamPolicy",
     "datastore.databases.get",
     "datastore.databases.list",
     "dns.managedZones.get",
