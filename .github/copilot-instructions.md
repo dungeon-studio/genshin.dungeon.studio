@@ -1,9 +1,13 @@
 <!-- SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> -->
 <!-- SPDX-License-Identifier: MIT -->
 
+<!-- vale Microsoft.Headings = NO -->
+
 # GitHub Copilot instructions for genshin.dungeon.studio
 
-> AI-only guidance. Keep this file short and actionable; linters and CONTRIBUTING.md handle the rest.
+<!-- vale Microsoft.Headings = YES -->
+
+> AI-only guidance. Keep this file short and practical; linters and CONTRIBUTING.md handle the remainder.
 
 ## Snapshot
 
@@ -23,26 +27,30 @@
 ## Core coding rules
 
 - Use strict TypeScript and keep components/functions focused.
-- Extract repeated patterns after the third repetition.
+- Extract reusable patterns after the third repetition.
 - Prefer runtime modules over type-only packages; emit JavaScript with declarations.
 - Workspace packages consumed by other packages must expose `types` and `default` in `exports` and include `main`.
-- Use ISO 8601 strings for timestamps (`createdAt`, `updatedAt`, and similar), not `Date` objects.
+- Use ISO 8601 strings for timestamps such as `createdAt` and `updatedAt`, not `Date` objects.
 - Maintain game-data accuracy when working with `packages/game-data`.
-- Test alongside code when possible; automated test stack is planned, so perform manual local validation now.
+- Test alongside code when possible; the team plans an automated test stack, so perform manual local validation now.
 
 ## State usage
 
 - Use zustand for UI state, TanStack Query for server state, and `@genshin/game-data` helpers for static game data.
 
+## API design rules
+
+- Use the [REST API conventions reference](../docs/reference/rest-api-conventions.md) as guidance for API route shape, methods, status codes, error format, pagination, and auth handling.
+
 ## Frontend rules
 
 - Prefer composition over inheritance and use early returns for conditional rendering.
 - Use semantic HTML: proper heading hierarchy, structural elements, and native interactive elements.
-- Use aliases (`@/components`, `@/components/ui`, `@/lib`, `@/lib/utils`).
+- Use aliases such as `@/components`, `@/components/ui`, `@/lib`, and `@/lib/utils`.
 - `shadcn/ui` gotchas:
   - Use ESM imports in Tailwind or Vite config (`import ...`), not `require()`.
-  - Ensure Vite starter CSS dark-mode defaults stay removed from `apps/web/src/index.css`; don't reintroduce `color-scheme` or `prefers-color-scheme` defaults.
-  - Keep semantic slots semantic: `CardTitle` should render heading tags (for example, `h3`) and `CardDescription` should render paragraph tags (`p`).
+  - Keep Vite starter CSS dark-mode defaults removed from `apps/web/src/index.css`; don't reintroduce `color-scheme` or `prefers-color-scheme` defaults.
+  - Keep semantic slots semantic: `CardTitle` should render heading tags such as `h3`, and `CardDescription` should render paragraph tags such as `p`.
   - `react-refresh/only-export-components` with `allowConstantExport: true` can still flag valid `shadcn` patterns that export a component and helper; targeted suppression is acceptable.
 
 ## Dependencies and linting
@@ -66,11 +74,11 @@
 - Handle Vale output in this order:
   1. Process suggestions first: review every suggestion one by one, then either apply it or make an explicit, reasoned decision not to apply it.
   2. Fix all warnings second.
-  3. Fix all errors last (commit-blocking before commit).
+  3. Fix all errors last because they're commit-blocking.
   4. Never bulk-ignore suggestions or skip the suggestions pass.
 - For valid product and tool names flagged by Vale, update `.styles/config/vocabularies/Project/accept.txt`.
-- Don't modify third-party Vale styles generated under `.styles/` (except `.styles/config/`).
-- Every source file needs SPDX headers; for files without comment syntax, declare in `.reuse/dep5` (see [add-spdx-headers.md](../docs/how-tos/add-spdx-headers.md)).
+- Don't modify third-party Vale styles generated under `.styles/`, except `.styles/config/`.
+- Every source file needs SPDX headers. For files without comment syntax, declare them in `.reuse/dep5`; see [How to add SPDX headers to new files](../docs/how-tos/add-spdx-headers.md).
 - Documentation principles:
   - Prefer concise, factual, present-tense writing.
   - Keep guidance implementation-oriented, not aspirational.
@@ -99,14 +107,14 @@
 - Keep Terraform version aligned across:
   - `.github/workflows/terraform-plan.yml`
   - `.github/workflows/terraform-apply.yml`
-  - `.github/workflows/pre-commit.yml` (when Terraform is used)
+  - `.github/workflows/pre-commit.yml`, when Terraform is in use
 - Current Terraform version baseline: `1.9.0`.
 
 ## File naming
 
-- Non-React TypeScript: lowercase (`user.ts`) or camelCase compounds (`teamMember.ts`).
-- React components: PascalCase (`HomePage.tsx`).
-- `shadcn/ui` components: lowercase (`button.tsx`, `card.tsx`).
+- Non-React TypeScript: lowercase file names like `user.ts`, or camelCase compounds like `teamMember.ts`.
+- React components: PascalCase file names like `HomePage.tsx`.
+- `shadcn/ui` components: lowercase file names like `button.tsx` and `card.tsx`.
 
 ## When unsure
 

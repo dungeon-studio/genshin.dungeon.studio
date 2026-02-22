@@ -95,6 +95,27 @@ Diátaxis
 UTC
 camelCase
 PascalCase
+REST
+HTTP
+URI
+URIs
+ESM
+ISO
+SPDX
+REUSE
+RFC
+IETF
+ISBN
+OAuth
+Masse
+Hardt
+Dalal
+O'Reilly
+DSGEP
+IAM
+SPA
+JSONC
+INI
 
 # Game elements (Genshin Impact)
 Pyro

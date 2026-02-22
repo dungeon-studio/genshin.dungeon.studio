@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 # Add a Terraform environment
 
-This guide explains how to add a new infrastructure environment (for example `staging`) to this repository.
+This guide explains how to add a new infrastructure environment such as `staging` to this repository.
 
 ---
 
@@ -19,7 +19,7 @@ Copy `infrastructure/terraform/bootstrap/dev.tf` to `infrastructure/terraform/bo
 - Keep cross-project viewer access to `module.core` for RO and RW service accounts
 - Keep any environment-scoped IAM needed for plan/apply
 
-Use naming based on infrastructure environment names (`dev`, `staging`, `production`), not branch names or release-train names (for example `release/*`).
+Use naming based on infrastructure environment names such as `dev`, `staging`, and `production`, not branch names or release-train names such as `release/*`.
 
 ---
 
@@ -76,7 +76,7 @@ Don't commit `.terraform/` directories.
 
 ---
 
-## 6) Apply bootstrap before expecting CI success
+## 6) Apply bootstrap before expecting continuous integration success
 
 After merge, apply bootstrap so the new project, service accounts, and IAM bindings exist before relying on CI plan/apply jobs.
 

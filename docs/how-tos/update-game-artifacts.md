@@ -81,7 +81,7 @@ Use exact text from the in-game artifact descriptions or wiki:
 
 ### 4. Update version comment
 
-Update the version comment near the top of `artifacts.ts` (for example, the `Last updated: Version ...` line) with the latest game version and a brief description of the changes.
+Update the version comment near the top of `artifacts.ts`, such as the `Last updated: Version ...` line, with the latest game version and a brief description of the changes.
 
 ### 5. Keep array organized
 
