@@ -227,6 +227,60 @@ updates:
           - '*'
 
   # ==========================================================================
+  # TERRAFORM - BOOTSTRAP MODULES (github_oidc_bindings)
+  # ==========================================================================
+  - package-ecosystem: 'terraform'
+    directory: '/infrastructure/terraform/bootstrap/modules/github_oidc_bindings'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'terraform'
+      - 'infrastructure'
+      - 'bootstrap'
+      - 'modules'
+      - 'automated'
+    groups:
+      # Group all Terraform bootstrap module updates together
+      terraform-bootstrap-modules:
+        patterns:
+          - '*'
+
+  # ==========================================================================
+  # TERRAFORM - BOOTSTRAP MODULES (project_bootstrap)
+  # ==========================================================================
+  - package-ecosystem: 'terraform'
+    directory: '/infrastructure/terraform/bootstrap/modules/project_bootstrap'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'terraform'
+      - 'infrastructure'
+      - 'bootstrap'
+      - 'modules'
+      - 'automated'
+    groups:
+      # Group all Terraform bootstrap module updates together
+      terraform-bootstrap-modules:
+        patterns:
+          - '*'
+
+  # ==========================================================================
   # TERRAFORM - CORE ENVIRONMENT
   # ==========================================================================
   - package-ecosystem: 'terraform'
@@ -277,6 +331,32 @@ updates:
       terraform-dev:
         patterns:
           - '*'
+
+  # ==========================================================================
+  # TERRAFORM - STAGING ENVIRONMENT
+  # ==========================================================================
+  - package-ecosystem: 'terraform'
+    directory: '/infrastructure/terraform/environments/staging'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+      time: '18:00'
+      timezone: 'Europe/London'
+    pull-request-branch-name:
+      separator: '/'
+    reviewers:
+      - 'alunduil'
+    labels:
+      - 'dependencies'
+      - 'terraform'
+      - 'infrastructure'
+      - 'staging'
+      - 'automated'
+    groups:
+      # Group all Terraform staging updates together
+      terraform-staging:
+        patterns:
+          - '*'
 # ============================================================================
 # MAINTENANCE NOTES
 # ============================================================================
@@ -321,6 +401,9 @@ updates:
 #  ✓ DevContainer (weekly)
 #  ✓ Docker - apps/api (weekly)
 #  ✓ Terraform - bootstrap (weekly)
+#  ✓ Terraform - bootstrap/modules/github_oidc_bindings (weekly)
+#  ✓ Terraform - bootstrap/modules/project_bootstrap (weekly)
 #  ✓ Terraform - core environment (weekly)
 #  ✓ Terraform - dev environment (weekly)
+#  ✓ Terraform - staging environment (weekly)
 # ============================================================================

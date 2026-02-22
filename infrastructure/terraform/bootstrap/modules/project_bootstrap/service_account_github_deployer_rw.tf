@@ -25,6 +25,13 @@ resource "google_project_iam_member" "github_deployer_rw_sa_admin" {
   member  = "serviceAccount:${google_service_account.github_deployer_rw.email}"
 }
 
+# Required for google_firestore_database (datastore.databases.create)
+resource "google_project_iam_member" "github_deployer_rw_datastore_owner" {
+  project = google_project.env.project_id
+  role    = "roles/datastore.owner"
+  member  = "serviceAccount:${google_service_account.github_deployer_rw.email}"
+}
+
 resource "google_storage_bucket_iam_member" "github_deployer_rw_state_bucket" {
   bucket = var.state_bucket_name
   role   = "roles/storage.objectAdmin"

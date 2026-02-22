@@ -1,239 +1,123 @@
 <!-- SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> -->
 <!-- SPDX-License-Identifier: MIT -->
 
+<!-- vale Microsoft.Headings = NO -->
+
 # GitHub Copilot instructions for genshin.dungeon.studio
 
-> AI-only guidance for decision-making context. Linters and CONTRIBUTING.md handle the rest.
-
-## Tech stack
-
-- Turborepo + pnpm, TypeScript 5.9 strict mode
-- **Web**: React 19 + Vite + Tailwind + shadcn/ui, zustand, TanStack Query, react-router-dom
-- **API**: Hono + Node.js
-- **Testing**: Not yet installed (Vitest and React Testing Library planned)
-
-## DevContainers tools
-
-**Pre-installed in base image** (`mcr.microsoft.com/devcontainers/typescript-node:20`):
-
-- Node.js 20, npm, git
-
-**Via features and postCreateCommand**:
-
-- GitHub CLI, pre-commit, Vale via features
-- pnpm 9.15.4 via npm in postCreateCommand
-- reuse-tool v6.2.0 via `pipx` in postCreateCommand—a Python application installed in isolated environment
-- Project dependencies and hooks via pnpm install and pre-commit install
-
-## Not yet implemented
-
-- Firestore, Firebase Auth, Claude MCP, Vitest, React Testing Library, Bun
-
-## Google Cloud Platform strategy
-
-**Projects:** three GCP projects follow the pattern `dungeon-studio-genshin-{env}`:
-
-- **shared** (27 chars): Terraform state bucket, Workload Identity Federation (WIF) pool/provider
-- **core** (27 chars): Common resources (Domain Name System, shared services) used across environments
-- **dev** (30 chars): Development environment resources
-
-Future staging and production projects: create at the 0.1.0 and 1.0.0 milestones respectively.
-
-**Environment labeling:** the `environment` label indicates infrastructure tier and availability requirements, not deployment stage:
-
-- **`production`**: Production-grade infrastructure requiring high availability: state storage, authentication, and shared services. Applies to shared and core projects because they contain production-critical infrastructure used by all deployment stages.
-- **`dev`/`staging`**: Environment-specific resources for development or pre-production testing.
-
-Apply labels at creation via `gcloud alpha projects update --update-labels=environment=VALUE`.
-
-**API activation strategy:** enable APIs on-demand when implementing features, not upfront. Issues annotate required APIs—for example, #32 requires `storage.googleapis.com`. If Terraform or Cloud Build errors mention missing APIs, enable via `gcloud services enable API_NAME`.
-
-## Documentation audiences
-
-- **CONTRIBUTING.md**: For human contributors. High-level workflow, links to how-tos for details. Skip CI architecture and technical internals. Keep lean and linked—prefer links to existing guides over duplicating content to avoid bloat.
-- **`copilot-instructions.md`**: For AI decision-making. Include technical details, CI architecture, hook behavior, dependencies, constraints.
-- **docs/**: Task-specific guides organized by the [Diátaxis framework](https://diataxis.fr/). Currently contains how-tos; tutorials, reference, and explanation sections planned.
-
-When adding documentation, consider the audience and place information accordingly.
-
-## Repository structure
-
-- **packages/types**: Shared types across apps
-- **packages/game-data**: Static game data: characters, artifacts, reactions, weapons. Source of truth: wiki. Version = game version. Use exported helpers like `getCharacterById()`; never hard-code. Accuracy validated via manual local development; add automated tests when a test suite exists.
-- **apps/web**: React frontend
-- **`apps/api`**: Hono API server
-
-## Module & package patterns
-
-**Module philosophy:** packages are runtime modules with behavior, not just type definitions. Think Haskell-style: types include methods, behavior, and encapsulation—not just interfaces. This means:
-
-- Emit JavaScript alongside declarations (no `emitDeclarationOnly`)
-- Provide both `types` and `default` exports in package.json
-- Include `main` field pointing to compiled .js entry
-- Pattern matches `@genshin/game-data` for consistency
-
-**Module extraction (Don't Repeat Yourself, or DRY, principle):** when you see the same code pattern repeated 3+ times, extract it to a reusable module. This applies to both application code and infrastructure:
-
-- **TypeScript/React:** extract shared utilities, hooks, or components
-- **Terraform:** create modules for repeated resource patterns—for example, `github_oidc_bindings` eliminates duplicate WIF binding code across projects
-
-**Benefits:** reduces boilerplate, enforces consistency, makes updates easier by changing code in one place.
-
-**Runtime module configuration:** workspace packages that other packages import need:
-
-```json
-"exports": {
-  ".": {
-    "types": "./dist/index.d.ts",
-    "default": "./dist/index.js"
-  }
-},
-"main": "./dist/index.js"
-```
-
-## State & storage patterns
-
-- **UI state**: zustand
-- **Server state**: TanStack Query
-- **Persistent**: `localStorage`, Progressive Web App planned long-term
-- **Long-term**: Firestore, planned
-- Game data: Import from `@genshin/game-data`, use helpers
-
-**Date serialization:** use International Organization for Standardization (ISO) 8601 strings (`string`), never `Date` objects, for JSON serialization compatibility. Type all timestamp fields (`createdAt`, `updatedAt`, etc.) as `string`.
-
-## API & error handling
-
-- HTTP status codes with error messages that explain how to fix the problem
-- Logging: console.log today; structured JSON logging planned for Observability tools/Grafana Cloud
-- Frontend: try/catch with console.error
-
-## Testing
-
-- Not yet configured (Vitest planned)
-- When implemented: co-locate with source (Component.tsx + Component.test.tsx), group by function/method
-- Coverage targets: 80%+ core, 90%+ utilities
-- Manual local validation required before push
-
-## Dependencies
-
-- package.json is source of truth
-- After changes: `pnpm install` + commit pnpm-lock.yaml
-- Every import must exist in dependencies/devDependencies
-- Don't add without asking
-
-## Pre-commit hooks
-
-**Never bypass pre-commit hooks** with `--no-verify`. If hooks fail, fix the underlying issues:
-
-- Fix prose for Vale errors
-- Rerun linters with `--fix`
-- Resolve TypeScript errors
-- Move secrets to environment variables
-
-Local pre-commit hooks run automatically on every commit (except TypeScript check, which requires manual invocation via `pnpm typecheck`). When pre-commit.ci runs on PRs, it skips ESLint, Stylelint, and TypeScript checks—GitHub Actions handles these. Bypassing these checks masks problems that CI catches.
-
-**Vale accept list:** for legitimate tool/package names that Vale flags as spelling errors, such as Stylelint or Markdownlint, add them to `.styles/config/vocabularies/Project/accept.txt` rather than rewording documentation. This maintains accuracy.
-
-**Vale workflow:** vale fails the commit only on errors, but fix issues in this order:
-
-1. **Resolve as many suggestions as possible**: These improve documentation quality with minimal effort: parentheses usage, acronym definitions, passive voice, word choice
-2. **Resolve all warnings**: Important for professional documentation: adverbs, sentence length, acronyms, colon capitalization, future tense
-3. **Fix all errors**: Non-negotiable for commit to succeed: contractions, 'e.g.' vs 'for example', profanity flags, term violations
-
-Focus on making as many improvements as reasonable rather than doing the bare minimum to pass.
-
-**Third-party Vale styles**: `vale sync` generates everything in `.styles/` except `.styles/config/`, which you shouldn't modify. Don't modify these files.
-
-**Software Package Data Exchange (SPDX) headers**: all source files require SPDX headers (see [add-spdx-headers.md](../../docs/how-tos/add-spdx-headers.md)). Declare files without comment syntax in `.reuse/dep5`. The reuse pre-commit tool enforces compliance. Don't remove `.reuse/` from `.prettierignore`.
-
-## Git workflow
-
-**Never use `git commit --amend` or `git push --force`**. This repository uses squash merge, so:
-
-- Each commit can be rough; pre-commit hooks catch issues
-- If hooks fail, make a new commit with fixes rather than amending
-- All commits become one on merge anyway
-- Force pushes rewrite history and can lose work
-
-Just commit fixes normally and push. Amend/force-push workflows are unnecessary overhead here.
-
-## File naming conventions
-
-- **Non-React TypeScript**: lowercase single words (`user.ts`, `team.ts`), camelCase compounds (`teamMember.ts`)
-- **React components**: PascalCase (`HomePage.tsx`, `Layout.tsx`, `ChatPage.tsx`)
-- **shadcn/ui components**: lowercase (`button.tsx`, `card.tsx`) - follows their convention
-
-## When suggesting code
-
-Follow these guidelines:
-
-- Test alongside code
-- Use strict TypeScript
-- Apply domain-driven design principles
-- Maintain game-data accuracy
-- Verify docs match code
-- Make sure code works cross-platform
-- Include Software Package Data Exchange headers in new files
-
-## Shell script standards
-
-All bash scripts should follow these standards for reliability and safety:
-
-- **Error handling**: Use `set -euo pipefail` at the start to catch errors in piped commands, fail on undefined variables, and exit on first error
-- **Debugging output**: Enable `set -x` for visibility during development and debugging. Don't embed secrets in scripts; use environment variables instead.
-- **Network resilience**: Use `curl -fsSL` to fail on HTTP errors and network issues
-- **Security**: Don't include credentials, API keys, or sensitive data directly in scripts. Pass these via environment variables or secure configuration.
-- **Example**:
-
-  ```bash
-  #!/bin/bash
-  # SPDX-FileCopyrightText: 2026 Your Name
-  # SPDX-License-Identifier: MIT
-  set -euo pipefail
-  set -x
-  # Your commands here
-  ```
-
-The `.devcontainer/postCreateCommand.sh` script serves as the centralized location for all DevContainers provisioning. Add new tools and setup steps there. See issue #219 for extension patterns.
-
-## Documentation preference hierarchy
-
-When explaining decisions or complex patterns, prefer this order:
-
-1. **Inline comments** - In the actual code where you make decisions
-2. **Documentation strings** - On functions/classes/modules when inline isn't sufficient
-3. **Updates to existing docs** - Modify CONTRIBUTING.md or existing how-tos if applicable
-4. **New long-form documentation** - Only create if none of these fit
-
-<!-- vale alex.Condescending = NO -->
-
-Rationale: comments stay with code through refactors. Long form documentation gets stale and duplicates linter-enforced rules.
-
-<!-- vale alex.Condescending = YES -->
-
-## Documentation accuracy
-
-Documentation must reflect the current repository state (`HEAD`), not aspirations:
-
-- **Verify existence:** check package.json dependencies before documenting a tool as "installed" or "configured"
-- **Use accurate names**: Package names should match actual imports (for example, "TanStack Query" for `@tanstack/react-query`, not "react-query")
-- **Mark future plans**: Explicitly note unimplemented features as "planned" or "not yet installed" rather than documenting as if they exist
-- **Test commands**: Verify that documented commands (`pnpm test`, `pnpm dev`) actually work in the current codebase
-
-When in doubt, grep the codebase or check package files rather than assuming.
+<!-- vale Microsoft.Headings = YES -->
+
+> AI-only guidance. Keep this file short and practical; linters and CONTRIBUTING.md handle the remainder.
+
+## Snapshot
+
+- Stack: Turborepo + pnpm + TypeScript 5.9 strict mode.
+- Web: React 19, Vite, Tailwind, `shadcn/ui`, zustand, TanStack Query, `react-router-dom`.
+- API: Hono + Node.js.
+- Not yet implemented: Firestore, Firebase Auth, Claude MCP, Vitest, React Testing Library, Bun.
+- `shadcn/ui` setup: New York style, neutral base color, CSS variables, and ESM Tailwind plugin imports.
+
+## Repository map
+
+- `apps/web`: Frontend app.
+- `apps/api`: API server.
+- `packages/game-data`: Source of truth for static game data; use exported helpers, never hard-code.
+- `packages/types`: Shared types.
+
+## Core coding rules
+
+- Use strict TypeScript and keep components/functions focused.
+- Extract reusable patterns after the third repetition.
+- Prefer runtime modules over type-only packages; emit JavaScript with declarations.
+- Workspace packages consumed by other packages must expose `types` and `default` in `exports` and include `main`.
+- Use ISO 8601 strings for timestamps such as `createdAt` and `updatedAt`, not `Date` objects.
+- Maintain game-data accuracy when working with `packages/game-data`.
+- Test alongside code when possible; the team plans an automated test stack, so perform manual local validation now.
+
+## State usage
+
+- Use zustand for UI state, TanStack Query for server state, and `@genshin/game-data` helpers for static game data.
+
+## API design rules
+
+- Use the [REST API conventions reference](../docs/reference/rest-api-conventions.md) as guidance for API route shape, methods, status codes, error format, pagination, and auth handling.
+
+## Frontend rules
+
+- Prefer composition over inheritance and use early returns for conditional rendering.
+- Use semantic HTML: proper heading hierarchy, structural elements, and native interactive elements.
+- Use aliases such as `@/components`, `@/components/ui`, `@/lib`, and `@/lib/utils`.
+- `shadcn/ui` gotchas:
+  - Use ESM imports in Tailwind or Vite config (`import ...`), not `require()`.
+  - Keep Vite starter CSS dark-mode defaults removed from `apps/web/src/index.css`; don't reintroduce `color-scheme` or `prefers-color-scheme` defaults.
+  - Keep semantic slots semantic: `CardTitle` should render heading tags such as `h3`, and `CardDescription` should render paragraph tags such as `p`.
+  - `react-refresh/only-export-components` with `allowConstantExport: true` can still flag valid `shadcn` patterns that export a component and helper; targeted suppression is acceptable.
+
+## Dependencies and linting
+
+- `package.json` is source of truth; run `pnpm install` and commit `pnpm-lock.yaml` after dependency changes.
+- Every import must exist in `dependencies` or `devDependencies`.
+- Classify packages correctly:
+  - `dependencies`: runtime code shipped to production.
+  - `devDependencies`: build tools, plugins, type definitions, and local tooling.
+- Use `pnpm why <package>` to detect duplicate transitive versions and pin when needed.
+- ESLint uses flat config via workspace-local `eslint.config.js` files; configure ignore patterns with `ignores`, not `.eslintignore`.
+
+## Documentation rules
+
+- Put information in the right place:
+  - `CONTRIBUTING.md` for human workflow guidance.
+  - `.github/copilot-instructions.md` for AI decision rules.
+  - `docs/` for task-specific how-tos and deeper explanations.
+- Prefer this order when documenting decisions: inline comments, documentation strings, updates to existing docs, then new long-form docs.
+- Keep docs accurate to `HEAD`: verify dependencies, command availability, and feature status.
+- Handle Vale output in this order:
+  1. Process suggestions first: review every suggestion one by one, then either apply it or make an explicit, reasoned decision not to apply it.
+  2. Fix all warnings second.
+  3. Fix all errors last because they're commit-blocking.
+  4. Never bulk-ignore suggestions or skip the suggestions pass.
+- For valid product and tool names flagged by Vale, update `.styles/config/vocabularies/Project/accept.txt`.
+- Don't modify third-party Vale styles generated under `.styles/`, except `.styles/config/`.
+- Every source file needs SPDX headers. For files without comment syntax, declare them in `.reuse/dep5`; see [How to add SPDX headers to new files](../docs/how-tos/add-spdx-headers.md).
+- Documentation principles:
+  - Prefer concise, factual, present-tense writing.
+  - Keep guidance implementation-oriented, not aspirational.
+  - Avoid duplicating long guidance across files; link to canonical docs instead.
+  - State plans explicitly as planned or not yet implemented.
+
+## Workflow guardrails
+
+- Never bypass pre-commit with `--no-verify`; fix root causes.
+- Run `pnpm typecheck` manually because it's not part of local pre-commit hooks.
+- Never use `git commit --amend` or `git push --force`.
+- Fixes after hook failures should be new commits; squash merge handles cleanup.
+
+## Shell script rules
+
+- Start Bash scripts with `set -euo pipefail` and `set -x`.
+- Use `curl -fsSL` for network fetches.
+- Never hard-code secrets; use environment variables.
+- Add new DevContainer provisioning steps in `.devcontainer/postCreateCommand.sh`.
+
+## Infrastructure rules
+
+- GCP projects use `dungeon-studio-genshin-{env}`; `shared` and `core` are production-grade infrastructure.
+- Apply environment labels on creation with `gcloud alpha projects update --update-labels=environment=VALUE`.
+- Enable Google Cloud APIs on demand when required by active work.
+- Keep Terraform version aligned across:
+  - `.github/workflows/terraform-plan.yml`
+  - `.github/workflows/terraform-apply.yml`
+  - `.github/workflows/pre-commit.yml`, when Terraform is in use
+- Current Terraform version baseline: `1.9.0`.
+
+## File naming
+
+- Non-React TypeScript: lowercase file names like `user.ts`, or camelCase compounds like `teamMember.ts`.
+- React components: PascalCase file names like `HomePage.tsx`.
+- `shadcn/ui` components: lowercase file names like `button.tsx` and `card.tsx`.
 
 ## When unsure
 
-- Check GitHub Issues/Milestones first
-- Ask before adding dependencies
-- Check the codebase rather than assuming
-
-## Terraform & Infrastructure
-
-**Version consistency:** keep the same Terraform version across all workflows and tools:
-
-- `.github/workflows/terraform-plan.yml`
-- `.github/workflows/terraform-apply.yml`
-- `.github/workflows/pre-commit.yml` (if using Terraform)
-
-Current version: **1.9.0**. Update all three locations when upgrading Terraform to maintain consistent formatting, validation, and plan/apply behavior across local development and CI/CD pipelines.
+- Check issues and milestones first.
+- Check the codebase before assuming.
+- Ask before adding dependencies.
