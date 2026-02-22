@@ -9,7 +9,6 @@
 Genshin
 Genshin Impact
 genshin.dungeon.studio
-shadcn/ui
 Tailwind CSS
 
 # Languages and frameworks
@@ -57,6 +56,7 @@ API
 APIs
 CLI
 CI/CD
+ETag
 HMR
 MCP
 monorepo
@@ -95,6 +95,27 @@ Diátaxis
 UTC
 camelCase
 PascalCase
+REST
+HTTP
+URI
+URIs
+ESM
+ISO
+SPDX
+REUSE
+RFC
+IETF
+ISBN
+OAuth
+Masse
+Hardt
+Dalal
+O'Reilly
+DSGEP
+IAM
+SPA
+JSONC
+INI
 
 # Game elements (Genshin Impact)
 Pyro

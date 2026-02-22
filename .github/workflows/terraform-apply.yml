@@ -6,150 +6,38 @@ name: Terraform Apply
 
 on:
   push:
-    branches: [develop]
+    branches: [develop, 'release/**']
     paths:
-      - 'infrastructure/terraform/**'
+      - 'infrastructure/terraform/environments/**'
       - '.github/workflows/terraform-apply.yml'
+      - '.github/workflows/terraform-apply-reusable.yml'
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
-  terraform-plan:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
+  core:
+    uses: ./.github/workflows/terraform-apply-reusable.yml
+    with:
+      environment: core
+      service_account_secret: GCP_RW_CORE_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
+    secrets: inherit # pragma: allowlist secret
 
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - environment: core
-            service_account_secret: GCP_RO_CORE_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
-          - environment: dev
-            service_account_secret: GCP_RO_DEV_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
+  dev:
+    if: github.ref_name == 'develop'
+    needs: core
+    uses: ./.github/workflows/terraform-apply-reusable.yml
+    with:
+      environment: dev
+      service_account_secret: GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
+    secrets: inherit # pragma: allowlist secret
 
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: '1.9.0'
-
-      # Authenticate to GCP using Workload Identity
-      - uses: google-github-actions/auth@v3
-        with:
-          workload_identity_provider: ${{ secrets.GCP_RO_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
-          service_account: ${{ secrets[matrix.service_account_secret] }} # pragma: allowlist secret
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v3
-
-      - name: Terraform Init
-        working-directory: infrastructure/terraform/environments/${{ matrix.environment }}
-        run: terraform init
-
-      - name: Terraform Plan
-        id: plan
-        working-directory: infrastructure/terraform/environments/${{ matrix.environment }}
-        run: |
-          terraform plan -lock=false -no-color -out=tfplan
-          terraform show -no-color tfplan > plan.txt
-
-      - name: Upload Terraform Plan
-        uses: actions/upload-artifact@v6
-        with:
-          name: tfplan-${{ matrix.environment }}
-          path: |
-            infrastructure/terraform/environments/${{ matrix.environment }}/tfplan
-            infrastructure/terraform/environments/${{ matrix.environment }}/plan.txt
-
-  terraform-apply-core:
-    runs-on: ubuntu-latest
-    environment: core
-    permissions:
-      contents: read
-      id-token: write
-    # Shared concurrency group prevents state lock contention on the GCS bucket.
-    # All environments write to dungeon-studio-genshin-tfstate, so only one apply
-    # can run at a time across ALL workflow runs to prevent conflicts.
-    # The 'needs' keyword only orders jobs within a single workflow run.
-    concurrency:
-      group: terraform-apply
-      cancel-in-progress: false
-
-    needs: terraform-plan
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: '1.9.0'
-
-      # Authenticate to GCP using Workload Identity
-      - uses: google-github-actions/auth@v3
-        with:
-          workload_identity_provider: ${{ secrets.GCP_RW_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
-          service_account: ${{ secrets.GCP_RW_CORE_SERVICE_ACCOUNT_EMAIL }} # pragma: allowlist secret
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v3
-
-      - name: Terraform Init
-        working-directory: infrastructure/terraform/environments/core
-        run: terraform init
-
-      - name: Download Terraform Plan
-        uses: actions/download-artifact@v7
-        with:
-          name: tfplan-core
-          path: infrastructure/terraform/environments/core
-
-      - name: Terraform Apply
-        working-directory: infrastructure/terraform/environments/core
-        run: terraform apply -auto-approve tfplan
-
-  terraform-apply-dev:
-    runs-on: ubuntu-latest
-    environment: dev
-    permissions:
-      contents: read
-      id-token: write
-    # Shared concurrency group prevents state lock contention on the GCS bucket.
-    # All environments write to dungeon-studio-genshin-tfstate, so only one apply
-    # can run at a time across ALL workflow runs to prevent conflicts.
-    # The 'needs' keyword only orders jobs within a single workflow run.
-    concurrency:
-      group: terraform-apply
-      cancel-in-progress: false
-
-    needs: terraform-apply-core
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: '1.9.0'
-
-      # Authenticate to GCP using Workload Identity
-      - uses: google-github-actions/auth@v3
-        with:
-          workload_identity_provider: ${{ secrets.GCP_RW_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
-          service_account: ${{ secrets.GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL }} # pragma: allowlist secret
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v3
-
-      - name: Terraform Init
-        working-directory: infrastructure/terraform/environments/dev
-        run: terraform init
-
-      - name: Download Terraform Plan
-        uses: actions/download-artifact@v7
-        with:
-          name: tfplan-dev
-          path: infrastructure/terraform/environments/dev
-
-      - name: Terraform Apply
-        working-directory: infrastructure/terraform/environments/dev
-        run: terraform apply -auto-approve tfplan
+  staging:
+    if: startsWith(github.ref_name, 'release/')
+    needs: core
+    uses: ./.github/workflows/terraform-apply-reusable.yml
+    with:
+      environment: staging
+      service_account_secret: GCP_RW_STAGING_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
+    secrets: inherit # pragma: allowlist secret

@@ -8,3 +8,8 @@ common_labels = {
   environment = "dev"
   managed_by  = "terraform"
 }
+
+enable_api_domain_mapping = true
+enable_api_public_invoker = true
+
+firestore_location_id = "eur3"
