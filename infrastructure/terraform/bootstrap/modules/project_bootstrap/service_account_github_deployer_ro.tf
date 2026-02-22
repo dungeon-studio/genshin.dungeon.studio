@@ -60,6 +60,18 @@ resource "google_project_iam_member" "github_deployer_ro_sa_viewer" {
   member  = "serviceAccount:${google_service_account.github_deployer_ro.email}"
 }
 
+resource "google_project_iam_member" "github_deployer_ro_run_viewer" {
+  project = google_project.env.project_id
+  role    = "roles/run.viewer"
+  member  = "serviceAccount:${google_service_account.github_deployer_ro.email}"
+}
+
+resource "google_project_iam_member" "github_deployer_ro_datastore_viewer" {
+  project = google_project.env.project_id
+  role    = "roles/datastore.viewer"
+  member  = "serviceAccount:${google_service_account.github_deployer_ro.email}"
+}
+
 resource "google_storage_bucket_iam_member" "github_deployer_ro_state_bucket" {
   bucket = var.state_bucket_name
   role   = "roles/storage.objectViewer"
