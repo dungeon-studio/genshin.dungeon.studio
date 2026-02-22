@@ -91,6 +91,7 @@
 - Run `pnpm typecheck` manually because it's not part of local pre-commit hooks.
 - Never use `git commit --amend` or `git push --force`.
 - Fixes after hook failures should be new commits; squash merge handles cleanup.
+- For GitHub issues, track dependencies only with native issue relationships (`blocked by` / `is blocking`), not issue body text or comments.
 
 ## Shell script rules
 
