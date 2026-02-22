@@ -35,6 +35,7 @@ resource "google_project_iam_custom_role" "github_deployer_ro_planner" {
     "resourcemanager.projects.get",
     "run.domainmappings.get",
     "run.domainmappings.list",
+    "run.services.getIamPolicy",
     "run.services.get",
     "run.services.list",
     "serviceusage.services.get",
