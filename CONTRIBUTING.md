@@ -80,7 +80,7 @@ Pre-commit enforces formatting, linting, documentation, secrets, and hygiene che
 
 ### Quality gate ownership
 
-- pre-commit.ci is the authoritative runner for hooks that support its environment.
+- pre-commit.ci is the authoritative runner for hooks that it can run in its environment.
 - [.github/workflows/pre-commit.yml](.github/workflows/pre-commit.yml) runs only hooks that can't run in pre-commit.ci.
 - [.github/workflows/ci.yml](.github/workflows/ci.yml) runs build and type check jobs for apps and packages.
 - Feature work adds tests and enforces them when it introduces testable behavior.
