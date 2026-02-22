@@ -21,7 +21,7 @@ resource "google_project_service" "identitytoolkit" {
 resource "google_identity_platform_config" "default" {
   project = var.gcp_dev_project_id
 
-  autodelete_anonymous_users = false
+  autodelete_anonymous_users = true
 
   depends_on = [
     google_project_service.firebase,
