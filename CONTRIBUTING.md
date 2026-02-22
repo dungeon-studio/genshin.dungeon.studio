@@ -72,11 +72,18 @@ To run it:
 docker run -p 8080:8080 genshin-api:local
 ```
 
-The API will be available at `http://localhost:8080`. See [apps/api/Dockerfile](apps/api/Dockerfile) for build details and [.github/workflows/](.github/workflows/) for CI/CD pipeline information.
+The API is available at `http://localhost:8080`. See [apps/api/Dockerfile](apps/api/Dockerfile) for build details and [.github/workflows/](.github/workflows/) for CI/CD pipeline information.
 
 ### Quality checks overview
 
 Pre-commit enforces formatting, linting, documentation, secrets, and hygiene checks on every commit and on pull requests. If checks fail, fix the issues—see the Code quality section below for guidance.
+
+### Quality gate ownership
+
+- pre-commit.ci is the authoritative runner for hooks that it can run in its environment.
+- [.github/workflows/pre-commit.yml](.github/workflows/pre-commit.yml) runs only hooks that can't run in pre-commit.ci.
+- [.github/workflows/ci.yml](.github/workflows/ci.yml) runs build and type check jobs for apps and packages.
+- Feature work adds tests and enforces them when it introduces testable behavior.
 
 **Commit types**. Use these prefixes in your commit messages:
 
@@ -103,18 +110,18 @@ Pre-commit enforces formatting, linting, documentation, secrets, and hygiene che
 Pre-commit hooks automatically enforce key checks, including:
 
 - **Prettier** - Code formatting
-- **ESLint** - JavaScript/TypeScript linting (fixes issues when possible)
-- CSS linting (Tailwind directives supported)
+- **ESLint** - JavaScript/TypeScript linting with automatic fixes when possible
+- CSS linting with Tailwind directives
 - Documentation and config linting for Markdown, YAML, and prose
 - Safety and repository hygiene checks for secrets, merge conflict markers, large files, trailing whitespace, line endings, and YAML/JSON validation
 
-For type checking, run manually before committing:
+Pull requests must pass type checks in [ci.yml](.github/workflows/ci.yml). Run type checks locally before committing when your change affects TypeScript code:
 
 ```bash
 pnpm typecheck
 ```
 
-### SPDX headers
+### Source file headers
 
 All source files require SPDX headers per the [REUSE Specification](https://reuse.software/). Use `reuse addheader` or check [REUSE docs](https://reuse.software/tutorial/) for details.
 
@@ -130,6 +137,24 @@ For complex logic, decisions, or subtle patterns:
 ---
 
 ## Pull request workflow
+
+### Branch flow for infrastructure
+
+Infrastructure automation follows this branch strategy:
+
+- `develop`: integration branch
+- `release/*`: release-train branches cut from `develop`
+- `main`: long-term release target branch, used when production flow is active
+
+Current Terraform workflow routing:
+
+- push to `develop`: applies `core` then `dev`
+- push to `release/*`: applies `core` then `staging`
+- pull requests to `develop`, `release/*`, and `main`: run Terraform plan checks
+
+When creating release branches, derive the name from the root `package.json` version using SemVer2 context and always include both the release date and short hash token, for example:
+
+- `release/0.1.0-20260221.d24af0f`
 
 ### Branch naming
 
@@ -148,14 +173,14 @@ For complex logic, decisions, or subtle patterns:
 ### Merge strategy
 
 - **Squash and merge** - All pull request commits become one commit on develop
-- The pull request title becomes the final commit message (use conventional commit format)
+- The pull request title becomes the final commit message. Use conventional commit format.
 - Keep commit history clean - one feature equals one commit
 
 ### Addressing review comments
 
 1. Address feedback completely
 2. Batch related fixes when possible
-3. Pre-commit hooks will verify formatting and linting. For type checking, run:
+3. Pre-commit hooks verify formatting and linting. For type checking, run:
 
    ```bash
    pnpm typecheck
@@ -176,6 +201,8 @@ This project runs on Windows, macOS, and Linux.
 For step-by-step instructions and technical details:
 
 - [Manual Setup Guide](docs/how-tos/manual-setup.md): Development environment setup without DevContainers
+- [Add Terraform Environment](docs/how-tos/add-terraform-environment.md): Bootstrap, scaffold, lock file, and workflow updates for new environments
+- [REST API conventions](docs/reference/rest-api-conventions.md): Route design, method semantics, status codes, error shape, and pagination
 
 ---
 

@@ -19,13 +19,14 @@ exclude: |
 
 ci:
   # NOTE: This 'skip' list ONLY affects pre-commit.ci (hosted CI service).
-  # All hooks listed here still run locally on every commit.
+  # pre-commit.ci is authoritative for hooks it can run in its environment.
   #
-  # GitHub Actions runs hooks via two separate workflows to avoid duplication:
-  # 1. pre-commit.yml (ESLint + Stylelint + Terraform hooks) - runs on every PR
-  # 2. build.yml (typecheck + build) - runs full build pipeline
+  # GitHub Actions runs hooks via a dedicated local-hooks workflow to avoid
+  # duplicating hook execution across systems:
+  # 1. pre-commit.yml (hooks that cannot run in pre-commit.ci)
+  # 2. ci.yml (typecheck + build)
   # Skip hooks here that are handled by pre-commit.yml or other workflows.
-  # Keep this list in sync with what's NOT run in GitHub Actions workflows.
+  # Keep this list in sync with workflow ownership documented in CONTRIBUTING.md.
   skip:
     - eslint
     - stylelint
