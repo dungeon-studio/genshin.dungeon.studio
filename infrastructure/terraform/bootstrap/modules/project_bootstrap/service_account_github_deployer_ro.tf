@@ -60,6 +60,9 @@ resource "google_project_iam_member" "github_deployer_ro_sa_viewer" {
   member  = "serviceAccount:${google_service_account.github_deployer_ro.email}"
 }
 
+# Required for Terraform plan refresh of `google_firestore_database`.
+# The equivalent least-privilege custom permission set is currently insufficient
+# for provider read behavior; track tightening in a follow-up issue.
 resource "google_project_iam_member" "github_deployer_ro_datastore_viewer" {
   project = google_project.env.project_id
   role    = "roles/datastore.viewer"
