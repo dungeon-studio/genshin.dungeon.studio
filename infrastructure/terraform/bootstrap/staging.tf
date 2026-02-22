@@ -30,20 +30,20 @@ module "github_oidc_bindings_staging" {
 # Allows staging terraform to use data sources for core resources (DNS zones, etc.)
 resource "google_project_iam_member" "staging_ro_viewer_core" {
   project = module.core.project_id
-  role    = "roles/viewer"
+  role    = google_project_iam_custom_role.core_cross_project_reader.name
   member  = "serviceAccount:${module.staging.github_deployer_ro_email}"
 
-  depends_on = [module.staging, module.core]
+  depends_on = [module.staging, module.core, google_project_iam_custom_role.core_cross_project_reader]
 }
 
 # Cross-project: Grant staging RW SA permission to read core resources
 # Needed during apply to access the same data sources used in plan
 resource "google_project_iam_member" "staging_rw_viewer_core" {
   project = module.core.project_id
-  role    = "roles/viewer"
+  role    = google_project_iam_custom_role.core_cross_project_reader.name
   member  = "serviceAccount:${module.staging.github_deployer_rw_email}"
 
-  depends_on = [module.staging, module.core]
+  depends_on = [module.staging, module.core, google_project_iam_custom_role.core_cross_project_reader]
 }
 
 # In-project: Allow staging RW SA to manage Cloud Run service IAM policies.
@@ -55,26 +55,4 @@ resource "google_project_iam_member" "staging_rw_run_admin" {
   member  = "serviceAccount:${module.staging.github_deployer_rw_email}"
 
   depends_on = [module.staging]
-}
-
-# In-project: Minimal read-only permission for bucket IAM policy refresh during plan.
-resource "google_project_iam_custom_role" "staging_ro_bucket_iam_policy_reader" {
-  project     = module.staging.project_id
-  role_id     = "terraformPlanBucketIamReader"
-  title       = "Terraform Plan Bucket IAM Reader"
-  description = "Read Cloud Storage bucket IAM policies for Terraform plan refresh"
-
-  permissions = [
-    "storage.buckets.getIamPolicy"
-  ]
-
-  depends_on = [module.staging]
-}
-
-resource "google_project_iam_member" "staging_ro_bucket_iam_policy_reader" {
-  project = module.staging.project_id
-  role    = google_project_iam_custom_role.staging_ro_bucket_iam_policy_reader.name
-  member  = "serviceAccount:${module.staging.github_deployer_ro_email}"
-
-  depends_on = [module.staging, google_project_iam_custom_role.staging_ro_bucket_iam_policy_reader]
 }

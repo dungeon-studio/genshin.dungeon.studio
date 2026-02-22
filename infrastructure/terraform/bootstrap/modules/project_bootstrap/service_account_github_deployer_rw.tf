@@ -11,9 +11,57 @@ resource "google_service_account" "github_deployer_rw" {
   depends_on = [google_project_service.serviceusage]
 }
 
-resource "google_project_iam_member" "github_deployer_rw_editor" {
+resource "google_project_iam_custom_role" "github_deployer_rw_applier" {
+  project     = google_project.env.project_id
+  role_id     = "githubDeployerApplier"
+  title       = "GitHub Deployer Applier"
+  description = "Least-privilege base role for Terraform apply workflows"
+
+  # Keep this role scoped to project-level mutate/read permissions needed by
+  # `infrastructure/terraform/environments/*` during `terraform apply`.
+  # Prefer adding narrowly scoped permissions here over granting broad roles
+  # such as `roles/editor`.
+
+  permissions = [
+    "artifactregistry.repositories.create",
+    "artifactregistry.repositories.delete",
+    "artifactregistry.repositories.get",
+    "artifactregistry.repositories.list",
+    "artifactregistry.repositories.update",
+    "datastore.databases.get",
+    "datastore.databases.list",
+    "dns.changes.create",
+    "dns.changes.get",
+    "dns.changes.list",
+    "dns.managedZones.create",
+    "dns.managedZones.delete",
+    "dns.managedZones.get",
+    "dns.managedZones.list",
+    "dns.managedZones.update",
+    "dns.resourceRecordSets.create",
+    "dns.resourceRecordSets.delete",
+    "dns.resourceRecordSets.list",
+    "dns.resourceRecordSets.update",
+    "resourcemanager.projects.get",
+    "serviceusage.services.enable",
+    "serviceusage.services.get",
+    "serviceusage.services.list",
+    "serviceusage.services.use",
+    "storage.buckets.create",
+    "storage.buckets.delete",
+    "storage.buckets.get",
+    "storage.buckets.getIamPolicy",
+    "storage.buckets.list",
+    "storage.buckets.setIamPolicy",
+    "storage.buckets.update"
+  ]
+
+  depends_on = [google_project_service.serviceusage]
+}
+
+resource "google_project_iam_member" "github_deployer_rw_applier" {
   project = google_project.env.project_id
-  role    = "roles/editor"
+  role    = google_project_iam_custom_role.github_deployer_rw_applier.name
   member  = "serviceAccount:${google_service_account.github_deployer_rw.email}"
 }
 

@@ -25,3 +25,19 @@ module "github_oidc_bindings_core" {
 
   depends_on = [google_iam_workload_identity_pool_provider.github, module.core]
 }
+
+resource "google_project_iam_custom_role" "core_cross_project_reader" {
+  project     = module.core.project_id
+  role_id     = "githubCrossProjectReader"
+  title       = "GitHub Cross-Project Reader"
+  description = "Read core DNS resources from non-core Terraform environments"
+
+  permissions = [
+    "dns.managedZones.get",
+    "dns.managedZones.list",
+    "dns.resourceRecordSets.list",
+    "resourcemanager.projects.get"
+  ]
+
+  depends_on = [module.core]
+}
