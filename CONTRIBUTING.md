@@ -78,6 +78,13 @@ The API is available at `http://localhost:8080`. See [apps/api/Dockerfile](apps/
 
 Pre-commit enforces formatting, linting, documentation, secrets, and hygiene checks on every commit and on pull requests. If checks fail, fix the issues—see the Code quality section below for guidance.
 
+### Quality gate ownership
+
+- pre-commit.ci is the authoritative runner for hooks that support its environment.
+- [.github/workflows/pre-commit.yml](.github/workflows/pre-commit.yml) runs only hooks that can't run in pre-commit.ci.
+- [.github/workflows/ci.yml](.github/workflows/ci.yml) runs build and type check jobs for apps and packages.
+- Feature work adds tests and enforces them when it introduces testable behavior.
+
 **Commit types**. Use these prefixes in your commit messages:
 
 - `feat:` new feature
@@ -108,7 +115,7 @@ Pre-commit hooks automatically enforce key checks, including:
 - Documentation and config linting for Markdown, YAML, and prose
 - Safety and repository hygiene checks for secrets, merge conflict markers, large files, trailing whitespace, line endings, and YAML/JSON validation
 
-For type checking, run manually before committing:
+Pull requests must pass type checks in [ci.yml](.github/workflows/ci.yml). Run type checks locally before committing when your change affects TypeScript code:
 
 ```bash
 pnpm typecheck
