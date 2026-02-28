@@ -12,16 +12,16 @@
   },
   "dependencies": {
     "@hono/node-server": "1.19.9",
-    "hono": "4.12.1"
+    "hono": "4.12.3"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "@types/node": "25.3.0",
-    "eslint": "10.0.1",
+    "@types/node": "25.3.2",
+    "eslint": "10.0.2",
     "globals": "17.3.0",
     "tsc-alias": "1.8.16",
     "tsx": "4.21.0",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.56.0"
+    "typescript-eslint": "8.56.1"
   }
 }
