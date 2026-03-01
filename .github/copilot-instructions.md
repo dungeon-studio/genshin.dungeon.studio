@@ -71,6 +71,7 @@
   - `docs/` for task-specific how-tos and deeper explanations.
 - Prefer this order when documenting decisions: inline comments, documentation strings, updates to existing docs, then new long-form docs.
 - Keep docs accurate to `HEAD`: verify dependencies, command availability, and feature status.
+- Run Vale through pre-commit (`pre-commit run vale --all-files`), not `vale .`. Vale has no directory-ignore mechanism and scans everything, including `node_modules`.
 - Handle Vale output in this order:
   1. Process suggestions first: review every suggestion one by one, then either apply it or make an explicit, reasoned decision not to apply it.
   2. Fix all warnings second.
@@ -79,6 +80,7 @@
 - For valid product and tool names flagged by Vale, update `.styles/config/vocabularies/Project/accept.txt`.
 - Don't modify third-party Vale styles generated under `.styles/`, except `.styles/config/`.
 - Every source file needs SPDX headers. For files without comment syntax, declare them in `.reuse/dep5`; see [How to add SPDX headers to new files](../docs/how-tos/add-spdx-headers.md).
+- Wrap file and directory paths in backticks when they appear in prose (for example, `apps/web`, `packages/game-data/src/index.ts`). Markdown link targets don't need backticks.
 - Documentation principles:
   - Prefer concise, factual, present-tense writing.
   - Keep guidance implementation-oriented, not aspirational.

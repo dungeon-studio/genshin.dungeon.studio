@@ -71,6 +71,20 @@
   // Prettier (redundant with .prettierrc but explicit for clarity)
   "prettier.requireConfig": true,
 
+  // GitHub Copilot - task-specific instructions
+  "github.copilot.chat.codeGeneration.instructions": [
+    { "file": ".github/copilot/code-generation.instructions.md" }
+  ],
+  "github.copilot.chat.testGeneration.instructions": [
+    { "file": ".github/copilot/test-generation.instructions.md" }
+  ],
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    { "file": ".github/copilot/commit-message.instructions.md" }
+  ],
+  "github.copilot.chat.reviewSelection.instructions": [
+    { "file": ".github/copilot/review.instructions.md" }
+  ],
+
   // CSS/Tailwind - DISABLED until Issue #20 is implemented
   "css.validate": true
   // Uncomment when Tailwind is installed:
