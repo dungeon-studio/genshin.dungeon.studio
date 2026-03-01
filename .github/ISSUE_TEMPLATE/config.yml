@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+blank_issues_enabled: false
+contact_links:
+  - name: Questions or discussion
+    url: https://github.com/dungeon-studio/genshin.dungeon.studio/discussions
+    about: Use discussions for questions, ideas, or general conversation.

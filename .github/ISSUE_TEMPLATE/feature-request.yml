@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+name: Feature request
+description: Suggest a feature centered around a user journey.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to propose a new feature or experience improvement.
+        Focus on the user journey you want to affect, not the implementation.
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: What would you like to be able to do?
+      description: >-
+        Describe what you want to accomplish and why it matters to you.
+      placeholder: >-
+        I'd like to … because …
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-experience
+    attributes:
+      label: What do you do today?
+      description: >-
+        How do you handle this now? What's frustrating or missing?
+    validations:
+      required: true
+
+  - type: textarea
+    id: desired-experience
+    attributes:
+      label: How should it work?
+      description: >-
+        Describe the experience you'd like, step by step.
+    validations:
+      required: true
+
+  - type: textarea
+    id: success-criteria
+    attributes:
+      label: How would you know this is working?
+      description: >-
+        What would tell you the feature is doing its job?
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: >-
+        Other approaches you thought about and why this one is preferred.
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: >-
+        Mockups, screenshots, links, or references that illustrate the idea.

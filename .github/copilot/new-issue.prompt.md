@@ -23,38 +23,23 @@ task. Good titles read as statements that are true when the issue is done:
 - "Profile writes persist across API restarts in Firestore"
 - "Terraform apply and deploy permissions use separate roles"
 
-For bug fixes, prefix with the conventional commit type:
+For bug reports, describe what went wrong:
 
-- "fix(web): Collection page no longer crashes on empty data"
+- "Collection page shows a blank screen after adding a character"
 
-## Issue body structure
+## Choose the right template
 
-Use this template:
+The repository has three issue templates in `.github/ISSUE_TEMPLATE/`. Pick the
+one that matches the intent:
 
-```markdown
-## Summary
+| Template            | When to use                                                 |
+| ------------------- | ----------------------------------------------------------- |
+| **Work item**       | Planned development work ready to implement.                |
+| **Feature request** | A new capability framed around a user journey.              |
+| **Bug report**      | Something is broken: actual behavior differs from expected. |
 
-One or two sentences describing what this issue delivers.
-
-## Why
-
-Explain the motivation: what problem exists, what opportunity this creates,
-or what dependency requires it.
-
-## Scope
-
-Bullet list of concrete changes required. Be specific enough that a
-contributor can start without ambiguity.
-
-## Acceptance criteria
-
-Measurable conditions that must be true when this issue is done. Use
-checkboxes:
-
-- [ ] Criterion one
-- [ ] Criterion two
-- [ ] Typecheck and lint pass
-```
+Fill in every required field. Leave optional fields blank only when they truly
+don't apply.
 
 ## Labels
 
@@ -82,6 +67,6 @@ controls or `gh` CLI to link related issues.
 ## Before submitting
 
 1. Search existing issues to avoid duplicates.
-2. Verify the title is outcome-oriented, not task-oriented.
-3. Verify acceptance criteria are measurable, not vague.
+2. Verify the title is outcome-oriented or describes the problem directly.
+3. Verify required fields are specific, not vague.
 4. Assign appropriate labels and milestone.
