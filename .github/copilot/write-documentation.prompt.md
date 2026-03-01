@@ -26,8 +26,8 @@ Write concise, factual, present-tense prose. Follow these Vale-enforced rules:
   `Microsoft.Contractions` style requires them.
 - **Em dashes**: Write em dashes without spaces (`word—word`). The
   `Microsoft.Dashes` style enforces this.
-- **Latin abbreviations**: Write "for example" instead of Latin shorthand. The
-  `Microsoft.Latin` style flags Latin abbreviations.
+- **Latin abbreviations**: Avoid Latin shorthand such as "e.g." or "i.e.";
+  write the phrases out in full ("for example," "that's").
 - **Quotation punctuation**: Place commas and periods inside quotation marks
   ("like this," not outside).
 - **Inclusive language**: The `alex` style checks for insensitive or

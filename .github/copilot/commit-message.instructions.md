@@ -29,7 +29,7 @@ rules of a great Git commit message**.
 
 ## Allowed types
 
-Use the prefixes defined in CONTRIBUTING.md:
+Use the prefixes defined in `CONTRIBUTING.md`:
 
 - `feat:` new feature
 - `fix:` bug fix
