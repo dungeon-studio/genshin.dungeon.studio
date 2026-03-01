@@ -34,7 +34,8 @@
 ## Hono API routes (`apps/api`)
 
 - Follow REST conventions in `docs/reference/rest-api-conventions.md`.
-- Return `application/problem+json` for errors using `HTTPException`.
+- Use `HTTPException` for errors; the global error handler formats the
+  response. The API plans to migrate to `application/problem+json` (RFC 9457).
 - Use middleware composition; keep route handlers thin.
 - Validate inputs at the boundary.
 

@@ -17,7 +17,7 @@ Install and configure a new `shadcn/ui` component.
 
 ## Steps
 
-1. Run: `cd apps/web && pnpm dlx shadcn@latest add ${input:componentName}`
+1. Run: `cd apps/web && pnpm dlx shadcn@3.8.5 add ${input:componentName}`
 2. Verify the component was created at
    `apps/web/src/components/ui/${input:componentName}.tsx`.
 3. Add the SPDX header to the generated file if missing:

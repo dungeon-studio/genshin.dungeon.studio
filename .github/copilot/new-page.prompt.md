@@ -9,7 +9,7 @@ tools: ['editFiles', 'codebase', 'terminalLastCommand']
 
 Follow the conventions in [code-generation.instructions.md](code-generation.instructions.md).
 
-Create a new page component at `apps/web/src/pages/${input:PageName}Page.tsx`.
+Create a new page component at `apps/web/src/pages/${input:pageName}Page.tsx`.
 
 Use [HomePage.tsx](../../apps/web/src/pages/HomePage.tsx) as a reference for
 structure and style.
@@ -23,10 +23,10 @@ structure and style.
    // SPDX-License-Identifier: MIT
    ```
 
-2. Use a named function export: `export function ${input:PageName}Page()`.
+2. Use a named function export: `export function ${input:pageName}Page()`.
 3. Use semantic HTML with a `<div className="mx-auto max-w-7xl px-4 py-12">` wrapper.
 4. Include an `<h1>` heading as the first visible content.
 5. Add the route to [App.tsx](../../apps/web/src/App.tsx) inside the
    `<Route element={<Layout />}>` group.
-6. Import the page: `import { ${input:PageName}Page } from './pages/${input:PageName}Page';`.
+6. Import the page: `import { ${input:pageName}Page } from './pages/${input:pageName}Page';`.
 7. Run `pnpm typecheck` to verify the new route compiles.
