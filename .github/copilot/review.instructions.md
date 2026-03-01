@@ -97,7 +97,7 @@ violations as review comments with a brief explanation and a suggested fix.
 
 - Verify Vale compliance: use contractions ("don't," "isn't"), em
   dashes without spaces (`word—word`), "for example" instead of Latin
-  abbreviations, and inclusive language (`alex` style).
+  abbreviations (`Google.Latin`), and inclusive language (`alex` style).
 - Handle Vale output in order: suggestions first, then warnings, then errors.
 - Heading hierarchy must not skip levels.
 - Place files in the correct `docs/` subdirectory following Diátaxis:
