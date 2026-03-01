@@ -81,7 +81,6 @@ body:
       label: Logs or screenshots
       description: >-
         Paste relevant console output, error messages, or attach screenshots.
-      render: shell
 
   - type: textarea
     id: additional-context

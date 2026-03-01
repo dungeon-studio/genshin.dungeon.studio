@@ -51,7 +51,6 @@ body:
         Measurable conditions that must be true when this issue is done.
         Use task list syntax (- [ ]).
       value: |
-        - [ ]
         - [ ] Typecheck and lint pass
     validations:
       required: true
