@@ -45,8 +45,10 @@ violations as review comments with a brief explanation and a suggested fix.
 - Routes must follow the conventions in
   `docs/reference/rest-api-conventions.md`.
 - Use `HTTPException` for errors; the global error handler serializes them
-  as `{ error, status }` JSON. The API plans to migrate to
-  `application/problem+json` (RFC 9457).
+  as `{ error, status }` JSON, where `status` is always the string `'error'`.
+  The numeric HTTP status code is conveyed only by the response status, not
+  the JSON body. The API plans to migrate to `application/problem+json`
+  (RFC 9457).
 - List endpoints must use cursor-based pagination (`limit` and `cursor`).
 
 ## Game data integrity

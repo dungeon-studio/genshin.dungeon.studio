@@ -48,4 +48,9 @@ Library** for component tests. Generate tests targeting this stack.
 
 ## SPDX
 
-- Start every test file with the standard SPDX header.
+- Start every test file with the SPDX header using line comments:
+
+  ```ts
+  // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+  // SPDX-License-Identifier: MIT
+  ```
