@@ -71,6 +71,7 @@
   - `docs/` for task-specific how-tos and deeper explanations.
 - Prefer this order when documenting decisions: inline comments, documentation strings, updates to existing docs, then new long-form docs.
 - Keep docs accurate to `HEAD`: verify dependencies, command availability, and feature status.
+- Run Vale through pre-commit (`pre-commit run vale --all-files`), not `vale .`. Vale has no directory-ignore mechanism and scans everything, including `node_modules`.
 - Handle Vale output in this order:
   1. Process suggestions first: review every suggestion one by one, then either apply it or make an explicit, reasoned decision not to apply it.
   2. Fix all warnings second.

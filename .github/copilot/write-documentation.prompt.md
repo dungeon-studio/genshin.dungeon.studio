@@ -71,6 +71,12 @@ After writing or editing the file, run Vale and handle output in this order:
 Run validation:
 
 ```bash
+pre-commit run vale --all-files
+```
+
+To check a single file without pre-commit overhead:
+
+```bash
 vale ${input:filePath}
 ```
 
