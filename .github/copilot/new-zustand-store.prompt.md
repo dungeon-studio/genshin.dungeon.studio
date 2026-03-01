@@ -2,7 +2,7 @@
 description: Create a new zustand store for UI state in `apps/web`
 agent: agent
 argument-hint: Store name in PascalCase and its purpose
-tools: ['editFiles', 'codebase']
+tools: ['editFiles', 'codebase', 'runInTerminal']
 ---
 
 # New zustand store

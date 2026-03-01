@@ -2,7 +2,7 @@
 description: Scaffold a new Hono API route
 agent: agent
 argument-hint: Resource name (plural, lowercase) and HTTP methods
-tools: ['editFiles', 'codebase', 'terminalLastCommand']
+tools: ['editFiles', 'codebase', 'runInTerminal']
 ---
 
 # New API route

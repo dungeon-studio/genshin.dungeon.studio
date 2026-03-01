@@ -2,7 +2,7 @@
 description: Scaffold a new React page component in `apps/web`
 agent: agent
 argument-hint: Page name in PascalCase (for example, Settings or CharacterDetail)
-tools: ['editFiles', 'codebase', 'terminalLastCommand']
+tools: ['editFiles', 'codebase', 'runInTerminal']
 ---
 
 # New page component
