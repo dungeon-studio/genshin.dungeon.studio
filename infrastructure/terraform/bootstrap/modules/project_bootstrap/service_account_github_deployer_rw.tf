@@ -42,6 +42,7 @@ resource "google_project_iam_custom_role" "github_deployer_rw_applier" {
     "dns.resourceRecordSets.delete",
     "dns.resourceRecordSets.list",
     "dns.resourceRecordSets.update",
+    "firebase.projects.update",
     "firebaseauth.configs.create",
     "firebaseauth.configs.get",
     "firebaseauth.configs.update",
