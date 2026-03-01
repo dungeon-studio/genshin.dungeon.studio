@@ -82,9 +82,7 @@
     { "file": ".github/copilot/commit-message.instructions.md" }
   ],
   "github.copilot.chat.reviewSelection.instructions": [
-    {
-      "text": "Review for: strict TypeScript (no implicit any), correct dependency classification, semantic HTML, proper SPDX headers, and adherence to REST conventions in docs/reference/rest-api-conventions.md. Flag hard-coded game data that should use @genshin/game-data helpers."
-    }
+    { "file": ".github/copilot/review.instructions.md" }
   ],
 
   // CSS/Tailwind - DISABLED until Issue #20 is implemented
