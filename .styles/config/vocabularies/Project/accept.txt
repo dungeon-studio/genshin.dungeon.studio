@@ -32,6 +32,9 @@ Vitest
 markdownlint
 Markdownlint
 yamllint
+Colocate
+middleware
+tooltip
 
 # Configuration and tooling terms
 config

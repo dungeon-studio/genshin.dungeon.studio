@@ -71,6 +71,22 @@
   // Prettier (redundant with .prettierrc but explicit for clarity)
   "prettier.requireConfig": true,
 
+  // GitHub Copilot - task-specific instructions
+  "github.copilot.chat.codeGeneration.instructions": [
+    { "file": ".github/copilot/code-generation.instructions.md" }
+  ],
+  "github.copilot.chat.testGeneration.instructions": [
+    { "file": ".github/copilot/test-generation.instructions.md" }
+  ],
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    { "file": ".github/copilot/commit-message.instructions.md" }
+  ],
+  "github.copilot.chat.reviewSelection.instructions": [
+    {
+      "text": "Review for: strict TypeScript (no implicit any), correct dependency classification, semantic HTML, proper SPDX headers, and adherence to REST conventions in docs/reference/rest-api-conventions.md. Flag hard-coded game data that should use @genshin/game-data helpers."
+    }
+  ],
+
   // CSS/Tailwind - DISABLED until Issue #20 is implemented
   "css.validate": true
   // Uncomment when Tailwind is installed:

@@ -79,6 +79,7 @@
 - For valid product and tool names flagged by Vale, update `.styles/config/vocabularies/Project/accept.txt`.
 - Don't modify third-party Vale styles generated under `.styles/`, except `.styles/config/`.
 - Every source file needs SPDX headers. For files without comment syntax, declare them in `.reuse/dep5`; see [How to add SPDX headers to new files](../docs/how-tos/add-spdx-headers.md).
+- Wrap file and directory paths in backticks when they appear in prose (for example, `apps/web`, `packages/game-data/src/index.ts`). Markdown link targets don't need backticks.
 - Documentation principles:
   - Prefer concise, factual, present-tense writing.
   - Keep guidance implementation-oriented, not aspirational.
