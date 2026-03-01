@@ -88,3 +88,34 @@ violations as review comments with a brief explanation and a suggested fix.
 - `fireEvent` in tests (use `userEvent` instead).
 - Snapshot tests for UI components (assert on behavior and accessible roles).
 - `test()` in test files (use `it()` per project convention).
+
+## Documentation
+
+- Verify Vale compliance: use contractions ("don't," "isn't"), em
+  dashes without spaces (`word—word`), "for example" instead of Latin
+  abbreviations, and inclusive language (`alex` style).
+- Handle Vale output in order: suggestions first, then warnings, then errors.
+- Heading hierarchy must not skip levels.
+- Place files in the correct `docs/` subdirectory following Diátaxis:
+  `docs/how-tos/` for tasks, `docs/reference/` for lookup material,
+  `docs/explanation/` for rationale.
+- Don't duplicate guidance that exists elsewhere; link to the canonical source.
+- Keep docs accurate to `HEAD`: verify dependencies, commands, and feature
+  status.
+- For valid product or tool names flagged by Vale, add them to
+  `.styles/config/vocabularies/Project/accept.txt` instead of rewriting.
+
+## Infrastructure
+
+- Terraform version must stay aligned across
+  `.github/workflows/terraform-plan.yml`,
+  `.github/workflows/terraform-apply.yml`, and
+  `.github/workflows/pre-commit.yml`. Current baseline: `1.9.0`.
+- GCP projects follow the naming convention
+  `dungeon-studio-genshin-{env}`. `shared` and `core` are
+  production-grade infrastructure.
+- Apply environment labels on project creation.
+- Never hard-code secrets in Terraform or scripts; use environment variables.
+- Verify state storage configuration in `backend.tf` files.
+- Terraform files must include SPDX headers using `#` comment syntax.
+- Enable Google Cloud APIs on demand, only when required by active work.
