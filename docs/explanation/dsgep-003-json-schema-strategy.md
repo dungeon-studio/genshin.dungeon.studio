@@ -31,7 +31,7 @@ Without these decisions, each feature would make ad-hoc choices, creating incons
 
 ### Current state
 
-The `apps/api` application is early stage, built on Hono with a handful of endpoints. The codebase organizes routes into domain modules such as `profile`, `team`, and `teams`, each with a `json/` subdirectory for schema files. The REST conventions reference JSON Schema 2020-12 and content negotiation via `Accept` and `Content-Type` headers.
+The `apps/api` application is early stage, built on Hono with a small number of routes defined in `apps/api/src/main.ts`. The codebase has begun organizing domain modules: `profile` exists with a `json/` subdirectory, but modules such as `team` and `teams` aren't yet present. This DSGEP uses the target module structure in examples and implementation notes. The REST conventions reference JSON Schema 2020-12 and content negotiation via `Accept` and `Content-Type` headers.
 
 ### Relevant standards
 
@@ -146,11 +146,11 @@ When a major version increment is necessary:
 
 1. Publish the new version at its own endpoint, such as `/schemas/team/get/2.0.0.json`
 2. Update the latest alias at `/schemas/team/get.json` to redirect to the new version
-3. Previous versions remain available during a transition period
-4. Previous version endpoints return a `Link` header with `rel="successor-version"` pointing to the new version (using RFC 8288 `Link` headers for version navigation, distinct from the `profile`-based discovery mechanism)
-5. After the transition period, previous major version endpoints return `410 Gone`
+3. Previous version endpoints return a `Link` header with `rel="successor-version"` pointing to the new version (using RFC 8288 `Link` headers for version navigation, distinct from the `profile`-based discovery mechanism)
+4. Mark the previous major version as deprecated
+5. After 12 months of deprecation, remove the previous version endpoints (they return `410 Gone`)
 
-Versioned schema URIs are immutable. Once published, a schema at a given version never changes. Clients pinning to a specific version can rely on its structure remaining stable.
+Versioned schema URIs are immutable: once published, a schema at a given version never changes for as long as it remains available. Clients pinning to a specific version can rely on its structure remaining stable throughout the deprecation period.
 
 #### Client compatibility during transitions
 
@@ -164,7 +164,8 @@ Accept: application/json; profile="/schemas/team/get/1.0.0.json"
 The API uses the `profile` value to determine which response shape to serve:
 
 - If the profile matches an active schema version, the API responds with that shape and the corresponding `Content-Type: application/json; profile="..."` header
-- If the profile references a deprecated schema, the API responds with `410 Gone`
+- If the profile references a deprecated schema still within the 12-month deprecation window, the API responds with the requested shape and includes a `Deprecation` header
+- If the profile references a removed schema, the API responds with `410 Gone`
 - If the client omits the profile, the API serves the latest version
 
 This creates symmetric content negotiation: clients declare the schema they expect via `Accept`, and the server confirms the schema it used via `Content-Type`.
@@ -192,7 +193,7 @@ Versioning every schema from initial publication ensures consistency: clients al
 ### Positive
 
 - **Discoverable**: Clients find schemas through standard HTTP mechanisms without out-of-band documentation
-- **cacheable**: Versioned schema URIs are immutable, allowing permanent caching. The latest alias uses short-lived caching to reflect updates
+- **cacheable**: Versioned schema URIs are immutable while available, allowing aggressive caching. The latest alias uses short-lived caching to reflect updates. Negotiated API responses require `Vary: Accept` so shared caches distinguish between schema versions
 - **Tooling-friendly**: Standard JSON Schema 2020-12 with a resolvable `$id` works with validators, code generators, and documentation tools
 - **Atomic deployment**: Schemas deploy with the API, so they're always in sync with the routes they describe
 
@@ -293,13 +294,13 @@ A Hono route serves schema files from module `json/` directories under the hiera
 
 ```typescript
 // Serve specific version
-app.get('/schemas/:module/:name/:version', async (c) => {
-  // Resolve from apps/api/src/{module}/json/schemas/{name}/{version}
+app.get('/schemas/:module/:name/:version.json', async (c) => {
+  // Resolve from apps/api/src/{module}/json/schemas/{name}/{version}.json
   // Serve with application/schema+json content type
 });
 
 // Latest alias — redirect to the current version
-app.get('/schemas/:module/:name', async (c) => {
+app.get('/schemas/:module/:name.json', async (c) => {
   // Determine latest version from apps/api/src/{module}/json/schemas/{name}/
   // Redirect to /schemas/{module}/{name}/{latest}.json
 });
