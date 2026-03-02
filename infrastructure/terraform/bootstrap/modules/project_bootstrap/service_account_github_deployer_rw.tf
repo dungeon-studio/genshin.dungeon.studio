@@ -84,6 +84,13 @@ resource "google_project_iam_member" "github_deployer_rw_sa_admin" {
   member  = "serviceAccount:${google_service_account.github_deployer_rw.email}"
 }
 
+# Required for Cloud Run deploy to act as the default Compute Engine SA
+resource "google_project_iam_member" "github_deployer_rw_sa_user" {
+  project = google_project.env.project_id
+  role    = "roles/iam.serviceAccountUser"
+  member  = "serviceAccount:${google_service_account.github_deployer_rw.email}"
+}
+
 # Required for google_firestore_database (datastore.databases.create)
 resource "google_project_iam_member" "github_deployer_rw_datastore_owner" {
   project = google_project.env.project_id
