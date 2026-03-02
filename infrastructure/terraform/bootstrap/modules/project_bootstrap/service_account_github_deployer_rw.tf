@@ -56,6 +56,7 @@ resource "google_project_iam_custom_role" "github_deployer_rw_applier" {
     "secretmanager.secrets.update",
     "secretmanager.versions.access",
     "secretmanager.versions.add",
+    "secretmanager.versions.destroy",
     "secretmanager.versions.get",
     "secretmanager.versions.list",
     "serviceusage.services.enable",
