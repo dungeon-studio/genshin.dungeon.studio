@@ -150,7 +150,7 @@ When a major version increment is necessary:
 2. Update the latest alias at `/schemas/team/get.json` to redirect to the new version
 3. Previous version endpoints return a `Link` header with `rel="successor-version"` pointing to the new version (using the relation type from [RFC 5829](https://www.rfc-editor.org/rfc/rfc5829) with RFC 8288 `Link` header syntax, distinct from the `profile`-based discovery mechanism)
 4. Mark the previous major version as deprecated
-5. After 12 months of deprecation, remove the previous version endpoints (they return `410 Gone`)
+5. After 12 months of deprecation, remove the previous version schema endpoints (they return `410 Gone`). Resource endpoints respond with `406 Not Acceptable` when a client requests a removed schema via `profile`.
 
 Versioned schema URIs are immutable: once published, a schema at a given version never changes for as long as it remains available. Clients pinning to a specific version can rely on its structure remaining stable throughout the deprecation period.
 
@@ -166,8 +166,8 @@ Accept: application/json; profile="/schemas/team/get/1.0.0.json"
 The API uses the `profile` value to determine which response shape to serve:
 
 - If the profile matches an active schema version, the API responds with that shape and the corresponding `Content-Type: application/json; profile="..."` header
-- If the profile references a deprecated schema still within the 12-month deprecation window, the API responds with the requested shape and includes a `Deprecation` header
-- If the profile references a removed schema, the API responds with `410 Gone`
+- If the profile references a deprecated schema still within the 12-month deprecation window, the API responds with the requested shape and includes a `Sunset` header ([RFC 8594](https://www.rfc-editor.org/rfc/rfc8594)) indicating when the API removes the schema version
+- If the profile references a removed schema, the API responds with `406 Not Acceptable` because the resource still exists but the requested representation is no longer available. The schema endpoint itself returns `410 Gone`.
 - If the client omits the profile, the API serves the latest version
 
 This creates symmetric content negotiation: clients declare the schema they expect via `Accept`, and the server confirms the schema it used via `Content-Type`.
@@ -319,6 +319,7 @@ app.get('/schemas/:module/:name.json', async (c) => {
 <!-- vale alex.Condescending = YES -->
 
 - [RFC 8288: Web Linking](https://www.rfc-editor.org/rfc/rfc8288): `Link` header syntax
+- [RFC 8594: The Sunset HTTP Header Field](https://www.rfc-editor.org/rfc/rfc8594): `Sunset` header for communicating deprecation timelines
 - [RFC 6906: The `profile` Link Relation Type](https://www.rfc-editor.org/rfc/rfc6906): `profile` parameter semantics for schema discovery
 - [RFC 6838: Media Type Registration](https://www.rfc-editor.org/rfc/rfc6838): Media type conventions
 - [Semantic Versioning 2.0.0](https://semver.org/): Schema version numbering convention
