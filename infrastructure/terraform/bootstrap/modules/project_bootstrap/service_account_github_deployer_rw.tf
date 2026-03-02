@@ -25,6 +25,7 @@ resource "google_project_iam_custom_role" "github_deployer_rw_applier" {
   permissions = [
     "artifactregistry.repositories.create",
     "artifactregistry.repositories.delete",
+    "artifactregistry.repositories.downloadArtifacts",
     "artifactregistry.repositories.get",
     "artifactregistry.repositories.list",
     "artifactregistry.repositories.uploadArtifacts",
