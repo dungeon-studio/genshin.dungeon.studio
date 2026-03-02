@@ -126,7 +126,11 @@ jobs:
           region: ${{ env.CLOUD_RUN_REGION }}
           service: ${{ env.CLOUD_RUN_SERVICE_NAME }}
           image: ${{ steps.image.outputs.image_uri }}
-          flags: --allow-unauthenticated
+          flags: >-
+            --allow-unauthenticated
+            --cpu=1
+            --memory=512Mi
+            --concurrency=80
           env_vars: |
             FRONTEND_ORIGIN=${{ env.FRONTEND_ORIGIN }}
             APP_GIT_SHA=${{ github.sha }}
