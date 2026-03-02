@@ -67,7 +67,7 @@ GET /schemas/teams/member.json          → redirects to latest version
 
 This avoids name collisions without requiring global naming conventions. Each module manages its own schema names and versions independently.
 
-The API serves schemas with `Content-Type: application/schema+json` as specified by JSON Schema 2020-12.
+The API serves schemas with `Content-Type: application/schema+json` as defined by the JSON Schema specification.
 
 <!-- vale Microsoft.HeadingAcronyms = NO -->
 
@@ -108,6 +108,8 @@ This approach:
 - Keeps schema discovery within the standard content negotiation mechanism
 - Works with HTTP's existing `Accept`/`Content-Type` negotiation model
 
+Examples in this document use relative URI references for readability. Implementations use absolute URIs matching the `$id` of the schema.
+
 ### 4. Stability contract
 
 Every published schema carries a [Semantic Versioning 2.0.0](https://semver.org/) version. The version communicates the nature of changes:
@@ -146,7 +148,7 @@ When a major version increment is necessary:
 
 1. Publish the new version at its own endpoint, such as `/schemas/team/get/2.0.0.json`
 2. Update the latest alias at `/schemas/team/get.json` to redirect to the new version
-3. Previous version endpoints return a `Link` header with `rel="successor-version"` pointing to the new version (using RFC 8288 `Link` headers for version navigation, distinct from the `profile`-based discovery mechanism)
+3. Previous version endpoints return a `Link` header with `rel="successor-version"` pointing to the new version (using the relation type from [RFC 5829](https://www.rfc-editor.org/rfc/rfc5829) with RFC 8288 `Link` header syntax, distinct from the `profile`-based discovery mechanism)
 4. Mark the previous major version as deprecated
 5. After 12 months of deprecation, remove the previous version endpoints (they return `410 Gone`)
 
@@ -310,7 +312,13 @@ app.get('/schemas/:module/:name.json', async (c) => {
 
 - [`rest-api-conventions.md`](../reference/rest-api-conventions.md): Principle 4, predictable representation shapes
 - [JSON Schema 2020-12](https://json-schema.org/draft/2020-12): Schema vocabulary
-- [RFC 8288: Web Linking](https://www.rfc-editor.org/rfc/rfc8288): `Link` header syntax, used for `successor-version` during transitions
+<!-- vale alex.Condescending = NO -->
+
+- [RFC 5829: Link Relation Types for Simple Version Navigation](https://www.rfc-editor.org/rfc/rfc5829): `successor-version` relation type for major version transitions
+
+<!-- vale alex.Condescending = YES -->
+
+- [RFC 8288: Web Linking](https://www.rfc-editor.org/rfc/rfc8288): `Link` header syntax
 - [RFC 6906: The `profile` Link Relation Type](https://www.rfc-editor.org/rfc/rfc6906): `profile` parameter semantics for schema discovery
 - [RFC 6838: Media Type Registration](https://www.rfc-editor.org/rfc/rfc6838): Media type conventions
 - [Semantic Versioning 2.0.0](https://semver.org/): Schema version numbering convention
