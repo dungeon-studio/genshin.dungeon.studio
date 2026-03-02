@@ -30,7 +30,6 @@ Prettier
 Stylelint
 Vitest
 markdownlint
-Markdownlint
 yamllint
 Colocate
 middleware
@@ -57,15 +56,23 @@ SWC
 # API and architecture
 API
 APIs
+cacheable
 CLI
 CI/CD
+dereferenceable
+dereferencing
 ETag
 HMR
 MCP
 monorepo
+namespace
+OpenAPI
 repo
 repos
 roadmaps
+semver
+unversioned
+validators
 
 # Cloud infrastructure
 GCP
