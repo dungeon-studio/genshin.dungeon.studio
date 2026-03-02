@@ -71,12 +71,14 @@
   - `docs/` for task-specific how-tos and deeper explanations.
 - Prefer this order when documenting decisions: inline comments, documentation strings, updates to existing docs, then new long-form docs.
 - Keep docs accurate to `HEAD`: verify dependencies, command availability, and feature status.
-- Run Vale through pre-commit (`pre-commit run vale --all-files`), not `vale .`. Vale has no directory-ignore mechanism and scans everything, including `node_modules`.
+- Run Vale through pre-commit (`pre-commit run vale --all-files`), not `vale .`. Vale has no directory-ignore mechanism and scans everything, including `node_modules`. For targeted checks on specific files, use `vale <filename>` directly.
 - Handle Vale output in this order:
   1. Process suggestions first: review every suggestion one by one, then either apply it or make an explicit, reasoned decision not to apply it.
   2. Fix all warnings second.
   3. Fix all errors last because they're commit-blocking.
   4. Never bulk-ignore suggestions or skip the suggestions pass.
+- Vale's `Microsoft.Dashes` rule flags em dashes adjacent to backtick-wrapped text as having spaces. Rephrase the sentence to avoid the adjacency rather than suppressing the rule.
+- When Vale's `Vale.Terms` rule enforces casing for a term such as `cacheable`, the Vale rule wins over prose formatting conventions like capitalized bold labels.
 - For valid product and tool names flagged by Vale, update `.styles/config/vocabularies/Project/accept.txt`.
 - Don't modify third-party Vale styles generated under `.styles/`, except `.styles/config/`.
 - Every source file needs SPDX headers. For files without comment syntax, declare them in `.reuse/dep5`; see [How to add SPDX headers to new files](../docs/how-tos/add-spdx-headers.md).
