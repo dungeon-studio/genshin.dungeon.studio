@@ -188,7 +188,7 @@ Co-hosting schemas with the API keeps the `$id` and the retrieval address identi
 
 ### Why semver for all schemas from the start
 
-Versioning every schema from initial publication ensures consistency: clients always know how to interpret changes by comparing version numbers. The alternative\u2014keeping schemas unversioned until a breaking change forces a name-based distinction like `get-v2.json`\u2014creates inconsistency between first-version schemas (unversioned) and later schemas (ad-hoc versioned). The semver model communicates the nature of a change (major, minor, patch) directly, which ad-hoc naming can't express.
+Versioning every schema from initial publication ensures consistency: clients always know how to interpret changes by comparing version numbers. Without upfront versioning, schemas remain unversioned until a breaking change forces a name-based distinction like `get-v2.json`, creating inconsistency between first-version schemas and later schemas. The semver model communicates the nature of a change (major, minor, patch) directly, which ad-hoc naming can't express.
 
 ## Consequences
 
