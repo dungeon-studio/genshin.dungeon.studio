@@ -37,10 +37,10 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: 1.19.9
-        version: 1.19.9(hono@4.12.3)
+        version: 1.19.9(hono@4.12.4)
       hono:
-        specifier: 4.12.3
-        version: 4.12.3
+        specifier: 4.12.4
+        version: 4.12.4
     devDependencies:
       '@eslint/js':
         specifier: 10.0.1
@@ -1694,8 +1694,8 @@ packages:
   hermes-parser@0.25.1:
     resolution: {integrity: sha512-6pEjquH3rqaI6cYAXYPcz9MS4rY6R4ngRgrgfDshRptUZIc3lw0MCIJIGDj9++mfySOuPTHB4nrSW99BCvOPIA==}
 
-  hono@4.12.3:
-    resolution: {integrity: sha512-SFsVSjp8sj5UumXOOFlkZOG6XS9SJDKw0TbwFeV+AJ8xlST8kxK5Z/5EYa111UY8732lK2S/xB653ceuaoGwpg==}
+  hono@4.12.4:
+    resolution: {integrity: sha512-ooiZW1Xy8rQ4oELQ++otI2T9DsKpV0M6c6cO6JGx4RTfav9poFFLlet9UMXHZnoM1yG0HWGlQLswBGX3RZmHtg==}
     engines: {node: '>=16.9.0'}
 
   hookified@1.15.1:
@@ -2903,9 +2903,9 @@ snapshots:
       '@eslint/core': 1.1.0
       levn: 0.4.1
 
-  '@hono/node-server@1.19.9(hono@4.12.3)':
+  '@hono/node-server@1.19.9(hono@4.12.4)':
     dependencies:
-      hono: 4.12.3
+      hono: 4.12.4
 
   '@humanfs/core@0.19.1': {}
 
@@ -3862,7 +3862,7 @@ snapshots:
     dependencies:
       hermes-estree: 0.25.1
 
-  hono@4.12.3: {}
+  hono@4.12.4: {}
 
   hookified@1.15.1: {}
 
