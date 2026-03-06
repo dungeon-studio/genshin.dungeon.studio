@@ -1,52 +1,30 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-locals {
-  web_bucket_name     = "develop.genshin.dungeon.studio"
-  web_bucket_location = "EU"
-}
-
-# Enable Cloud Storage API
-resource "google_project_service" "storage" {
+# Enable Firebase Hosting API
+resource "google_project_service" "firebase_hosting" {
   project = var.gcp_dev_project_id
-  service = "storage.googleapis.com"
+  service = "firebasehosting.googleapis.com"
 
   disable_on_destroy = false
+
+  depends_on = [google_project_service.firebase]
 }
 
-# Cloud Storage bucket for static web hosting
-resource "google_storage_bucket" "web" {
-  name          = local.web_bucket_name
-  project       = var.gcp_dev_project_id
-  location      = local.web_bucket_location
-  force_destroy = false
+# Firebase Hosting site for the web application
+resource "google_firebase_hosting_site" "web" {
+  project  = var.gcp_dev_project_id
+  site_id  = "dungeon-studio-genshin-dev"
+  provider = google
 
   labels = var.common_labels
 
-  # Static website hosting configuration
-  website {
-    main_page_suffix = "index.html"
-    not_found_page   = "index.html"
-  }
-
-  lifecycle {
-    prevent_destroy = true
-  }
-
-  depends_on = [google_project_service.storage]
+  depends_on = [google_project_service.firebase_hosting]
 }
 
-# Make bucket publicly readable for static website hosting.
-# NOTE: This bucket is intended to serve only non-sensitive, public static web
-# assets (e.g., HTML, CSS, JS, images). Granting `roles/storage.objectViewer`
-# to `allUsers` is required so that browsers can access these assets directly
-# from GCS without authentication. Do not store confidential data in this
-# bucket; if requirements change, tighten these permissions accordingly.
-resource "google_storage_bucket_iam_binding" "public_read" {
-  bucket = google_storage_bucket.web.name
-  role   = "roles/storage.objectViewer"
-
-  members = [
-    "allUsers"
-  ]
+# Custom domain for the Firebase Hosting site
+resource "google_firebase_hosting_custom_domain" "web" {
+  project       = var.gcp_dev_project_id
+  site_id       = google_firebase_hosting_site.web.site_id
+  custom_domain = "develop.genshin.dungeon.studio"
 }

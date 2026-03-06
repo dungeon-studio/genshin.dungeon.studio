@@ -1,16 +1,16 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# DNS CNAME record for development web application
-# Points to Cloud Storage for HTTP static hosting using the documented custom-domain pattern
+# DNS A record for development web application
+# Points to Firebase Hosting for HTTPS static hosting with automatic SSL
 resource "google_dns_record_set" "web_develop" {
   name         = "develop.genshin.dungeon.studio."
   managed_zone = google_dns_managed_zone.genshin_dungeon_studio.name
-  type         = "CNAME"
+  type         = "A"
   ttl          = 3600
   project      = var.gcp_core_project_id
 
-  rrdatas = ["c.storage.googleapis.com."]
+  rrdatas = ["199.36.158.100"]
 }
 
 # DNS CNAME record for development API custom domain.
