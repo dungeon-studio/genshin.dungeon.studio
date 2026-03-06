@@ -26,4 +26,9 @@ resource "google_firebase_hosting_custom_domain" "web" {
   project       = var.gcp_dev_project_id
   site_id       = google_firebase_hosting_site.web.site_id
   custom_domain = "develop.genshin.dungeon.studio"
+
+  cert_preference       = "GROUPED"
+  wait_dns_verification = false
+
+  depends_on = [google_firebase_hosting_site.web]
 }
