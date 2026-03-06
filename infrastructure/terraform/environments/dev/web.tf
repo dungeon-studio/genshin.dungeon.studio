@@ -17,8 +17,6 @@ resource "google_firebase_hosting_site" "web" {
   project  = var.gcp_dev_project_id
   site_id  = "dungeon-studio-genshin-dev"
 
-  labels = var.common_labels
-
   depends_on = [google_project_service.firebase_hosting]
 }
 
