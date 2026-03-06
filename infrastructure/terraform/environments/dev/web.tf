@@ -13,9 +13,9 @@ resource "google_project_service" "firebase_hosting" {
 
 # Firebase Hosting site for the web application
 resource "google_firebase_hosting_site" "web" {
+  provider = google-beta
   project  = var.gcp_dev_project_id
   site_id  = "dungeon-studio-genshin-dev"
-  provider = google
 
   labels = var.common_labels
 
@@ -24,6 +24,7 @@ resource "google_firebase_hosting_site" "web" {
 
 # Custom domain for the Firebase Hosting site
 resource "google_firebase_hosting_custom_domain" "web" {
+  provider      = google-beta
   project       = var.gcp_dev_project_id
   site_id       = google_firebase_hosting_site.web.site_id
   custom_domain = "develop.genshin.dungeon.studio"
