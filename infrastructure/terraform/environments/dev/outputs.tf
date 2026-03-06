@@ -1,9 +1,9 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-output "web_bucket_name" {
-  description = "Cloud Storage bucket hosting the web application"
-  value       = google_storage_bucket.web.name
+output "web_hosting_site_id" {
+  description = "Firebase Hosting site ID for the web application"
+  value       = google_firebase_hosting_site.web.site_id
   sensitive   = false
 }
 
