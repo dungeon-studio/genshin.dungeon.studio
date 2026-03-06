@@ -1,15 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# TODO: Remove after successful apply — only kept to let Terraform destroy the
-# non-empty bucket (force_destroy was previously false).
-resource "google_storage_bucket" "web" {
-  name          = "develop.genshin.dungeon.studio"
-  project       = var.gcp_dev_project_id
-  location      = "EU"
-  force_destroy = true
-}
-
 # Enable Firebase Hosting API
 resource "google_project_service" "firebase_hosting" {
   project = var.gcp_dev_project_id
