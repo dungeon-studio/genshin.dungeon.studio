@@ -43,11 +43,8 @@ jobs:
         run: bash apps/web/scripts/verify-build-output.sh
 
       - name: Deploy
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          projectId: ${{ env.GCP_PROJECT_ID }}
-          channelId: live
-          entryPoint: apps/web
+        run: npx -y firebase-tools@15.9.0 deploy --only hosting --project "$GCP_PROJECT_ID"
+        working-directory: apps/web
 
       - name: Verify
         run: bash apps/web/scripts/verify-deployment.sh "https://develop.genshin.dungeon.studio"
