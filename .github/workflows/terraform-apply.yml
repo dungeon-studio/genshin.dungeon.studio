@@ -19,6 +19,7 @@ permissions:
 
 jobs:
   core:
+    if: github.ref_name == 'develop' || startsWith(github.ref_name, 'release/')
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: core

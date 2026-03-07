@@ -16,6 +16,7 @@ on:
 
 jobs:
   web:
+    if: github.ref_name == 'develop'
     name: Web
     runs-on: ubuntu-latest
     environment: dev
@@ -52,6 +53,7 @@ jobs:
         run: bash apps/web/scripts/verify-deployment.sh "https://develop.genshin.dungeon.studio"
 
   api:
+    if: github.ref_name == 'develop'
     name: API
     runs-on: ubuntu-latest
     environment: dev
