@@ -5,6 +5,7 @@
 name: Deploy
 
 on:
+  workflow_dispatch:
   push:
     branches: [develop]
     paths:
@@ -15,6 +16,7 @@ on:
 
 jobs:
   web:
+    if: github.ref == 'refs/heads/develop'
     name: Web
     runs-on: ubuntu-latest
     environment: dev
@@ -51,6 +53,7 @@ jobs:
         run: bash apps/web/scripts/verify-deployment.sh "https://develop.genshin.dungeon.studio"
 
   api:
+    if: github.ref == 'refs/heads/develop'
     name: API
     runs-on: ubuntu-latest
     environment: dev

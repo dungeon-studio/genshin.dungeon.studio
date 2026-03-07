@@ -5,6 +5,7 @@
 name: Terraform Apply
 
 on:
+  workflow_dispatch:
   push:
     branches: [develop, 'release/**']
     paths:
@@ -18,6 +19,7 @@ permissions:
 
 jobs:
   core:
+    if: github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/release/')
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: core
@@ -25,7 +27,7 @@ jobs:
     secrets: inherit # pragma: allowlist secret
 
   dev:
-    if: github.ref_name == 'develop'
+    if: github.ref == 'refs/heads/develop'
     needs: core
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
@@ -34,7 +36,7 @@ jobs:
     secrets: inherit # pragma: allowlist secret
 
   staging:
-    if: startsWith(github.ref_name, 'release/')
+    if: startsWith(github.ref, 'refs/heads/release/')
     needs: core
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
