@@ -25,7 +25,6 @@ Migrate to Firebase Hosting, which provides HTTPS by default with managed SSL ce
 
 - **Verification strategy**: Structural build checks + SHA comparison (unchanged)
 - **Cache strategy**: Same Cache-Control values for HTML, assets, and `version.json`
-- **Automation trigger**: Deploy workflow triggered by Terraform Apply success
 
 ### What changes
 
