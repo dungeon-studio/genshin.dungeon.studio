@@ -43,7 +43,7 @@ jobs:
         run: bash apps/web/scripts/verify-build-output.sh
 
       - name: Deploy
-        run: npx firebase-tools deploy --only hosting --project "$GCP_PROJECT_ID"
+        run: npx -y firebase-tools@15.9.0 deploy --only hosting --project "$GCP_PROJECT_ID"
         working-directory: apps/web
 
       - name: Verify
