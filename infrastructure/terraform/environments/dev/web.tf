@@ -1,6 +1,14 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
+# Initialize Firebase on the GCP project
+resource "google_firebase_project" "default" {
+  provider = google-beta
+  project  = var.gcp_dev_project_id
+
+  depends_on = [google_project_service.firebase]
+}
+
 # Enable Firebase Hosting API
 resource "google_project_service" "firebase_hosting" {
   project = var.gcp_dev_project_id
@@ -17,7 +25,10 @@ resource "google_firebase_hosting_site" "web" {
   project  = var.gcp_dev_project_id
   site_id  = "dungeon-studio-genshin-dev"
 
-  depends_on = [google_project_service.firebase_hosting]
+  depends_on = [
+    google_firebase_project.default,
+    google_project_service.firebase_hosting,
+  ]
 }
 
 # Custom domain for the Firebase Hosting site
