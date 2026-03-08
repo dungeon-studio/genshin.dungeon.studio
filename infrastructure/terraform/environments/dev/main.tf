@@ -8,10 +8,18 @@ terraform {
       source  = "hashicorp/google"
       version = "~> 7.19"
     }
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = "~> 7.19"
+    }
   }
 }
 
 provider "google" {
+  project = var.gcp_dev_project_id
+}
+
+provider "google-beta" {
   project = var.gcp_dev_project_id
 }
 
