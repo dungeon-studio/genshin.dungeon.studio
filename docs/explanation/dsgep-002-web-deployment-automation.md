@@ -5,7 +5,7 @@
 
 This Dungeon Studio Genshin Enhancement Proposal (DSGEP) describes the automated deployment pipeline for the web application to Google Cloud Storage.
 
-- **Status**: Accepted
+- **Status**: Superseded by [DSGEP-004](dsgep-004-firebase-hosting-migration.md)
 - **Created**: 2026-02-15
 - **Authors**: Alex Brandt
 
