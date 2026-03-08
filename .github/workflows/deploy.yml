@@ -5,6 +5,7 @@
 name: Deploy
 
 on:
+  workflow_dispatch:
   push:
     branches: [develop]
     paths:
@@ -15,11 +16,12 @@ on:
 
 jobs:
   web:
+    if: github.ref == 'refs/heads/develop'
     name: Web
     runs-on: ubuntu-latest
     environment: dev
     env:
-      BUCKET_NAME: develop.genshin.dungeon.studio
+      GCP_PROJECT_ID: dungeon-studio-genshin-dev
     permissions:
       contents: read
       id-token: write
@@ -32,9 +34,6 @@ jobs:
           workload_identity_provider: ${{ secrets.GCP_RW_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
           service_account: ${{ secrets.GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL }} # pragma: allowlist secret
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v3
-
       - uses: ./.github/actions/setup-node-pnpm
 
       - name: Build
@@ -44,12 +43,14 @@ jobs:
         run: bash apps/web/scripts/verify-build-output.sh
 
       - name: Deploy
-        run: bash apps/web/scripts/deploy-to-cloud-storage.sh "$BUCKET_NAME"
+        run: npx -y firebase-tools@15.9.0 deploy --only hosting --project "$GCP_PROJECT_ID"
+        working-directory: apps/web
 
       - name: Verify
-        run: bash apps/web/scripts/verify-deployment.sh "http://${BUCKET_NAME}"
+        run: bash apps/web/scripts/verify-deployment.sh "https://develop.genshin.dungeon.studio"
 
   api:
+    if: github.ref == 'refs/heads/develop'
     name: API
     runs-on: ubuntu-latest
     environment: dev
@@ -58,7 +59,7 @@ jobs:
       CLOUD_RUN_REGION: europe-west1
       CLOUD_RUN_SERVICE_NAME: api
       ARTIFACT_REPOSITORY: api
-      FRONTEND_ORIGIN: http://develop.genshin.dungeon.studio
+      FRONTEND_ORIGIN: https://develop.genshin.dungeon.studio
     permissions:
       contents: read
       id-token: write
