@@ -88,6 +88,9 @@ vite.config.ts.timestamp-*
 .gcp/
 service-account*.json
 
+# Firebase
+.firebase/
+
 # ===================================
 # Temporary Files
 # ===================================
