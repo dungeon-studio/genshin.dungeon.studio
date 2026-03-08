@@ -90,6 +90,7 @@ Copilot
 GitHub Actions
 CodeQL
 Dependabot
+Renovate
 
 # Development workflow
 dev

@@ -1,4 +1,51 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"]
+  "extends": ["config:recommended"],
+  "baseBranches": ["develop"],
+  "schedule": ["before 6pm on friday"],
+  "timezone": "Europe/London",
+  "labels": ["dependencies", "automated"],
+  "reviewers": ["alunduil"],
+  "branchPrefix": "renovate/",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6pm on friday"]
+  },
+  "packageRules": [
+    {
+      "description": "Group all npm dependencies in a single PR",
+      "matchManagers": ["npm"],
+      "groupName": "npm dependencies",
+      "groupSlug": "npm",
+      "addLabels": ["npm"]
+    },
+    {
+      "description": "Group all Terraform dependencies in a single PR",
+      "matchManagers": ["terraform"],
+      "groupName": "terraform dependencies",
+      "groupSlug": "terraform",
+      "addLabels": ["terraform", "infrastructure"]
+    },
+    {
+      "description": "Group all GitHub Actions updates in a single PR",
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions",
+      "groupSlug": "github-actions",
+      "addLabels": ["actions"]
+    },
+    {
+      "description": "Group all Docker updates in a single PR",
+      "matchManagers": ["dockerfile"],
+      "groupName": "docker dependencies",
+      "groupSlug": "docker",
+      "addLabels": ["docker"]
+    },
+    {
+      "description": "Group all DevContainer updates in a single PR",
+      "matchManagers": ["devcontainer"],
+      "groupName": "devcontainer dependencies",
+      "groupSlug": "devcontainer",
+      "addLabels": ["devcontainer"]
+    }
+  ]
 }
