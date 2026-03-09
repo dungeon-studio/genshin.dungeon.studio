@@ -17,7 +17,7 @@
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@types/node": "25.3.5",
-    "eslint": "10.0.2",
+    "eslint": "10.0.3",
     "globals": "17.4.0",
     "tsc-alias": "1.8.16",
     "tsx": "4.21.0",
