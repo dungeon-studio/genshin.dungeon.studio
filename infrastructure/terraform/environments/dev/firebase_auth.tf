@@ -24,7 +24,7 @@ resource "google_identity_platform_config" "default" {
   autodelete_anonymous_users = true
 
   authorized_domains = [
-    "develop.genshin.dungeon.studio",
+    "genshin.dungeon.studio",
   ]
 
   depends_on = [
