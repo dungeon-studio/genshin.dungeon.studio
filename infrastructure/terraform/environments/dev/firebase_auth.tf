@@ -24,6 +24,8 @@ resource "google_identity_platform_config" "default" {
   autodelete_anonymous_users = true
 
   authorized_domains = [
+    "${var.gcp_dev_project_id}.firebaseapp.com",
+    "${var.gcp_dev_project_id}.web.app",
     "genshin.dungeon.studio",
   ]
 
