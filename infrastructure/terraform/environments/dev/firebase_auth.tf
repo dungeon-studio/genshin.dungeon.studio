@@ -23,8 +23,16 @@ resource "google_identity_platform_config" "default" {
 
   autodelete_anonymous_users = true
 
+  authorized_domains = [
+    "develop.genshin.dungeon.studio",
+  ]
+
   depends_on = [
     google_project_service.firebase,
     google_project_service.identitytoolkit,
   ]
 }
+
+# TODO(#36): Add google_identity_platform_default_supported_idp_config for
+# google.com after OAuth credentials are stored in Secret Manager.
+# Requires a second apply once the manual steps are complete.
