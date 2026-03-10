@@ -12,11 +12,17 @@ export type AuthVariables = {
 
 export const auth = createMiddleware<{ Variables: AuthVariables }>(async (c, next) => {
   const header = c.req.header('Authorization');
-  if (!header?.startsWith('Bearer ')) {
+  if (!header) {
     throw new HTTPException(401, { message: 'Missing or malformed Authorization header' });
   }
 
-  const token = header.slice(7);
+  const parts = header.trim().split(/\s+/);
+  const scheme = parts[0]?.toLowerCase();
+  const token = parts[1];
+
+  if (scheme !== 'bearer' || !token || parts.length !== 2) {
+    throw new HTTPException(401, { message: 'Missing or malformed Authorization header' });
+  }
 
   try {
     const decoded = await verifyToken(token);

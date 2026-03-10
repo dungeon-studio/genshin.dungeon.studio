@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 // Read version from package.json to maintain single source of truth
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf-8'));
 
-const app = new Hono<{ Variables: AuthVariables }>();
+const app = new Hono<{ Variables: Partial<AuthVariables> }>();
 
 // Request logging middleware
 app.use('*', logger());
