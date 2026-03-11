@@ -36,8 +36,34 @@ jobs:
 
       - uses: ./.github/actions/setup-node-pnpm
 
+      - name: Fetch Firebase Web App Config
+        id: firebase-config
+        run: |
+          SDK_CFG='.result.sdkConfig'
+          CONFIG=$(npx -y firebase-tools@15.9.0 apps:sdkconfig web \
+            --project "$GCP_PROJECT_ID" --json)
+          echo "VITE_FIREBASE_API_KEY=$(echo "$CONFIG" | jq -r "$SDK_CFG.apiKey")" \
+            >> "$GITHUB_OUTPUT"
+          echo "VITE_FIREBASE_AUTH_DOMAIN=$(echo "$CONFIG" | jq -r "$SDK_CFG.authDomain")" \
+            >> "$GITHUB_OUTPUT"
+          echo "VITE_FIREBASE_PROJECT_ID=$(echo "$CONFIG" | jq -r "$SDK_CFG.projectId")" \
+            >> "$GITHUB_OUTPUT"
+          echo "VITE_FIREBASE_STORAGE_BUCKET=$(echo "$CONFIG" | jq -r "$SDK_CFG.storageBucket")" \
+            >> "$GITHUB_OUTPUT"
+          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=$(echo "$CONFIG" | jq -r "$SDK_CFG.messagingSenderId")" \
+            >> "$GITHUB_OUTPUT"
+          echo "VITE_FIREBASE_APP_ID=$(echo "$CONFIG" | jq -r "$SDK_CFG.appId")" \
+            >> "$GITHUB_OUTPUT"
+
       - name: Build
         run: pnpm --filter @genshin/web build
+        env:
+          VITE_FIREBASE_API_KEY: ${{ steps.firebase-config.outputs.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ steps.firebase-config.outputs.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ steps.firebase-config.outputs.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ steps.firebase-config.outputs.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ steps.firebase-config.outputs.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ steps.firebase-config.outputs.VITE_FIREBASE_APP_ID }}
 
       - name: Verify Build
         run: bash apps/web/scripts/verify-build-output.sh
