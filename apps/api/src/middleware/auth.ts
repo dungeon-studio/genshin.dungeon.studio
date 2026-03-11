@@ -10,10 +10,12 @@ export type AuthVariables = {
   user: DecodedIdToken;
 };
 
+const MALFORMED_AUTH_MESSAGE = 'Missing or malformed Authorization header';
+
 export const auth = createMiddleware<{ Variables: AuthVariables }>(async (c, next) => {
   const header = c.req.header('Authorization');
   if (!header) {
-    throw new HTTPException(401, { message: 'Missing or malformed Authorization header' });
+    throw new HTTPException(401, { message: MALFORMED_AUTH_MESSAGE });
   }
 
   const parts = header.trim().split(/\s+/);
@@ -21,7 +23,7 @@ export const auth = createMiddleware<{ Variables: AuthVariables }>(async (c, nex
   const token = parts[1];
 
   if (scheme !== 'bearer' || !token || parts.length !== 2) {
-    throw new HTTPException(401, { message: 'Missing or malformed Authorization header' });
+    throw new HTTPException(401, { message: MALFORMED_AUTH_MESSAGE });
   }
 
   try {
