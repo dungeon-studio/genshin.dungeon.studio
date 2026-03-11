@@ -11,7 +11,8 @@ const app = getApps().length > 0 ? getApp() : initializeApp();
 const auth = getAuth(app);
 
 export async function verifyToken(idToken: string): Promise<DecodedIdToken> {
-  return auth.verifyIdToken(idToken);
+  const checkRevoked = true;
+  return auth.verifyIdToken(idToken, checkRevoked);
 }
 
 export type { DecodedIdToken };
