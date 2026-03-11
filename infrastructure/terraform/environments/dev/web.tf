@@ -43,3 +43,20 @@ resource "google_firebase_hosting_custom_domain" "web" {
 
   depends_on = [google_firebase_hosting_site.web]
 }
+
+# Register a Firebase Web App for the frontend.
+# The SDK config (API key, auth domain, etc.) is derived from this resource.
+resource "google_firebase_web_app" "web" {
+  provider     = google-beta
+  project      = var.gcp_dev_project_id
+  display_name = "Genshin Team Builder (dev)"
+
+  depends_on = [google_firebase_project.default]
+}
+
+# Read the SDK config for the registered web app.
+data "google_firebase_web_app_config" "web" {
+  provider   = google-beta
+  project    = var.gcp_dev_project_id
+  web_app_id = google_firebase_web_app.web.app_id
+}
