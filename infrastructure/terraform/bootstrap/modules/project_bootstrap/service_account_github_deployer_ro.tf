@@ -30,6 +30,8 @@ resource "google_project_iam_custom_role" "github_deployer_ro_planner" {
     "dns.managedZones.get",
     "dns.managedZones.list",
     "dns.resourceRecordSets.list",
+    "firebase.clients.get",
+    "firebase.clients.list",
     "firebase.projects.get",
     "firebaseauth.configs.get",
     "firebasehosting.sites.get",
