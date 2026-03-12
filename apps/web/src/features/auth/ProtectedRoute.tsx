@@ -9,7 +9,11 @@ export function ProtectedRoute() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return null;
+    return (
+      <div role="status" aria-busy="true">
+        Loading…
+      </div>
+    );
   }
 
   if (!user) {

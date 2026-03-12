@@ -10,7 +10,11 @@ const googleProvider = new GoogleAuthProvider();
 
 export function LoginButton() {
   async function handleLogin() {
-    await signInWithPopup(auth, googleProvider);
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      console.error('Sign-in failed:', error);
+    }
   }
 
   return (

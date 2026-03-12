@@ -8,7 +8,11 @@ import { auth } from '@/lib/firebase';
 
 export function LogoutButton() {
   async function handleLogout() {
-    await signOut(auth);
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Sign-out failed:', error);
+    }
   }
 
   return (
