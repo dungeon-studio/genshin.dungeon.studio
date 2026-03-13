@@ -33,7 +33,7 @@
 - Workspace packages consumed by other packages must expose `types` and `default` in `exports` and include `main`.
 - Use ISO 8601 strings for timestamps such as `createdAt` and `updatedAt`, not `Date` objects.
 - Maintain game-data accuracy when working with `packages/game-data`.
-- Test alongside code when possible; the team plans an automated test stack, so perform manual local validation now.
+- Test alongside code when possible; the API has Vitest coverage, but web and UI testing is planned and not yet implemented.
 
 ## Build and CI rules
 
