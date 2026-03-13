@@ -1,6 +1,8 @@
 /* SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> */
 /* SPDX-License-Identifier: MIT */
 
+import type { ISOTimestamp } from './isoTimestamp.js';
+
 /**
  * User represents a Genshin Impact player authenticated via OIDC
  */
@@ -12,6 +14,6 @@ export interface User {
   emailVerified: boolean;
   provider: string;
   providerUserId: string;
-  createdAt: string; // ISO 8601 timestamp
-  updatedAt: string; // ISO 8601 timestamp
+  createdAt: ISOTimestamp;
+  updatedAt: ISOTimestamp;
 }

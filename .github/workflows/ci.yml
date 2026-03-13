@@ -47,6 +47,9 @@ jobs:
       - name: Typecheck
         run: pnpm --filter @genshin/api typecheck
 
+      - name: Test
+        run: pnpm --filter @genshin/api test
+
       - name: Build
         run: pnpm --filter @genshin/api build
 

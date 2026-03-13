@@ -1,13 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { getApp, getApps, initializeApp } from 'firebase-admin/app';
+import { app } from '@/lib/firebase/app';
 import { type DecodedIdToken, getAuth } from 'firebase-admin/auth';
 
-// Initialize with Application Default Credentials (ADC).
-// In GCP, credentials are provided automatically.
-// Locally, set the GOOGLE_APPLICATION_CREDENTIALS environment variable.
-const app = getApps().length > 0 ? getApp() : initializeApp();
 const auth = getAuth(app);
 
 export async function verifyToken(idToken: string): Promise<DecodedIdToken> {
