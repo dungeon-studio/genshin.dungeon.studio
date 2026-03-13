@@ -57,6 +57,13 @@ jobs:
           flags: api
           fail_ci_if_error: false
 
+      - name: Upload test results to Codecov
+        uses: codecov/test-results-action@v1
+        with:
+          files: apps/api/test-results/junit.xml
+          flags: api
+          fail_ci_if_error: false
+
       - name: Build
         run: pnpm turbo run build --filter=@genshin/api
 
