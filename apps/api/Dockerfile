@@ -12,6 +12,8 @@ ARG PNPM_VERSION
 
 WORKDIR /app
 
+ENV CI=true
+
 RUN rm -f /usr/local/bin/yarn /usr/local/bin/yarnpkg && \
     npm install -g corepack@${COREPACK_VERSION} && \
     corepack enable && \
