@@ -48,7 +48,24 @@ jobs:
         run: pnpm turbo run typecheck --filter=@genshin/api
 
       - name: Test
-        run: pnpm turbo run test --filter=@genshin/api
+        run: pnpm turbo run test --filter=@genshin/api -- --coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: apps/api/coverage/lcov.info
+          flags: api
+          fail_ci_if_error: false
+
+      - name: Upload test results to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: apps/api/test-results/junit.xml
+          flags: api
+          report_type: test_results
+          fail_ci_if_error: false
 
       - name: Build
         run: pnpm turbo run build --filter=@genshin/api

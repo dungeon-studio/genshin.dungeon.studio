@@ -54,6 +54,12 @@ build/
 dist/
 out/
 
+# Coverage reports
+coverage/
+
+# Test results
+test-results/
+
 # Vite
 .cache/
 vite.config.js.timestamp-*

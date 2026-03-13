@@ -27,6 +27,7 @@ corepack
 Dockerfile
 
 # Code quality tools
+Codecov
 ESLint
 Prettier
 Stylelint
