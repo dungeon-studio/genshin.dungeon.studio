@@ -13,8 +13,9 @@
 
 - Stack: Turborepo + pnpm + TypeScript 5.9 strict mode.
 - Web: React 19, Vite, Tailwind, `shadcn/ui`, zustand, TanStack Query, `react-router-dom`.
-- API: Hono + Node.js.
-- Not yet implemented: Firestore, Firebase Auth, Claude MCP, Vitest, React Testing Library, Bun.
+- API: Hono + Node.js, Firestore, Firebase Auth.
+- Testing: Vitest (API integration tests).
+- Not yet implemented: Claude MCP, React Testing Library, Bun.
 - `shadcn/ui` setup: New York style, neutral base color, CSS variables, and ESM Tailwind plugin imports.
 
 ## Repository map
@@ -32,7 +33,12 @@
 - Workspace packages consumed by other packages must expose `types` and `default` in `exports` and include `main`.
 - Use ISO 8601 strings for timestamps such as `createdAt` and `updatedAt`, not `Date` objects.
 - Maintain game-data accuracy when working with `packages/game-data`.
-- Test alongside code when possible; the team plans an automated test stack, so perform manual local validation now.
+- Test alongside code when possible; the API has Vitest coverage, but web and UI testing is planned and not yet implemented.
+
+## Build and CI rules
+
+- Always use `pnpm turbo run <task>` for `build`, `typecheck`, and `test` in CI, Docker, and deploy workflows. Never use raw `pnpm --filter <pkg> <task>` for these because pnpm doesn't automatically build workspace dependencies first; turbo handles dependency ordering via `^build` in `turbo.json`.
+- The API uses `tsconfig.json` (includes tests) for typechecking and `tsconfig.build.json` (excludes tests) for emit. The build config extends `tsconfig.json`, so compiler options stay in sync automatically; only the exclude patterns differ.
 
 ## State usage
 
@@ -41,6 +47,7 @@
 ## API design rules
 
 - Use the [REST API conventions reference](../docs/reference/rest-api-conventions.md) as guidance for API route shape, methods, status codes, error format, pagination, and auth handling.
+- All error responses use RFC 9457 Problem Details (`application/problem+json`). Always include a `detail` field, even for generic errors, to keep a stable schema for clients.
 
 ## Frontend rules
 
@@ -114,6 +121,12 @@
   - `.github/workflows/terraform-apply.yml`
   - `.github/workflows/pre-commit.yml`, when Terraform is in use
 - Current Terraform version baseline: `1.9.0`.
+
+## Docker rules
+
+- Don't hard-code the pnpm version in the Dockerfile. Copy `package.json` first and use `corepack install` so corepack reads the `packageManager` field.
+- When adding workspace package dependencies to an app, verify `.dockerignore` doesn't exclude them from the build context.
+- Set `ENV CI=true` in builder stages so pnpm runs non-interactively.
 
 ## File naming
 
