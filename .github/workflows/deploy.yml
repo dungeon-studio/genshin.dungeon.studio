@@ -41,8 +41,11 @@ jobs:
         run: |
           set -euo pipefail
           set -x
+          FIREBASE="npx -y firebase-tools@15.9.0"
+          APP_ID=$($FIREBASE apps:list web --project "$GCP_PROJECT_ID" --json \
+            | jq -er '.result[] | select(.displayName == "Genshin Team Builder (dev)") | .appId')
           SDK_CFG='.result.sdkConfig'
-          CONFIG=$(npx -y firebase-tools@15.9.0 apps:sdkconfig web \
+          CONFIG=$($FIREBASE apps:sdkconfig web "$APP_ID" \
             --project "$GCP_PROJECT_ID" --json)
 
           VITE_FIREBASE_API_KEY=$(echo "$CONFIG" | jq -er "$SDK_CFG.apiKey")
