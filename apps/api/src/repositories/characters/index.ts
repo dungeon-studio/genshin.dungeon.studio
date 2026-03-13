@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { db } from '@/lib/firebase/firestore';
+import { db } from '@/lib/firebase/firestore.js';
 import type { CollectionCharacter, ISOTimestamp } from '@genshin/types';
 
 import { fromDocument, toDocument, type DocumentData } from './document.js';
