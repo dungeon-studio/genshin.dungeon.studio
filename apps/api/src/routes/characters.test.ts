@@ -118,7 +118,7 @@ describe('Character routes', () => {
       const res = await app.request(authedRequest('GET', '/api/characters/albedo'));
 
       expect(res.status).toBe(404);
-      const body = await res.json();
+      const body = (await res.json()) as { detail: string };
       expect(body.detail).toBe('Character not found in collection');
     });
   });
@@ -169,8 +169,20 @@ describe('Character routes', () => {
       );
 
       expect(res.status).toBe(400);
-      const body = await res.json();
+      const body = (await res.json()) as { detail: string };
       expect(body.detail).toBe('Unknown character: not-a-character');
+    });
+
+    it('returns 400 when body is not valid JSON', async () => {
+      const res = await app.request(
+        new Request('http://localhost/api/characters/albedo', {
+          method: 'PUT',
+          headers: { Authorization: 'Bearer valid-token', 'Content-Type': 'application/json' },
+          body: 'not-json',
+        }),
+      );
+
+      expect(res.status).toBe(400);
     });
 
     it('returns 400 when constellationLevel is missing', async () => {

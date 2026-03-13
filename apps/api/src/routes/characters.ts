@@ -58,7 +58,12 @@ characters.put('/:characterId', async (c) => {
     throw new HTTPException(400, { message: `Unknown character: ${characterId}` });
   }
 
-  const body = await c.req.json<SaveCharacterBody>();
+  let body: SaveCharacterBody;
+  try {
+    body = await c.req.json<SaveCharacterBody>();
+  } catch {
+    throw new HTTPException(400, { message: 'Invalid or missing JSON body' });
+  }
 
   const { constellationLevel } = body;
 

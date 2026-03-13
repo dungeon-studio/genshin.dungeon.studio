@@ -54,6 +54,7 @@ app.onError((err, c) => {
       type: 'about:blank',
       title: 'Internal Server Error',
       status: 500,
+      detail: 'An unexpected error occurred',
     },
     { status: 500, headers: PROBLEM_JSON },
   );
@@ -66,6 +67,7 @@ app.notFound((c) =>
       type: 'about:blank',
       title: 'Not Found',
       status: 404,
+      detail: 'The requested resource does not exist',
     },
     { status: 404, headers: PROBLEM_JSON },
   ),
