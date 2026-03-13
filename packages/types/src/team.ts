@@ -1,6 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> */
 /* SPDX-License-Identifier: MIT */
 
+import type { ISOTimestamp } from './isoTimestamp.js';
 import type { TeamMember } from './teamMember.js';
 
 /**
@@ -29,12 +30,6 @@ export interface Team {
    */
   members: [TeamMember, TeamMember, TeamMember, TeamMember];
   description?: string;
-  /**
-   * ISO 8601 timestamp string representing when the team was created.
-   */
-  createdAt: string;
-  /**
-   * ISO 8601 timestamp string representing when the team was last updated.
-   */
-  updatedAt: string;
+  createdAt: ISOTimestamp;
+  updatedAt: ISOTimestamp;
 }

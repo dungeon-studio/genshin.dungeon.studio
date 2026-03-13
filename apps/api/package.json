@@ -5,12 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/main.ts",
-    "build": "tsc && tsc-alias",
+    "build": "tsc --project tsconfig.build.json && tsc-alias --project tsconfig.build.json",
     "start": "node dist/main.js",
     "lint": "eslint .",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit && tsc --project tsconfig.scripts.json --noEmit"
   },
   "dependencies": {
+    "@genshin/game-data": "workspace:*",
+    "@genshin/types": "workspace:*",
     "@hono/node-server": "1.19.11",
     "firebase-admin": "13.7.0",
     "hono": "4.12.7"
@@ -23,6 +26,7 @@
     "tsc-alias": "1.8.16",
     "tsx": "4.21.0",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.57.0"
+    "typescript-eslint": "8.57.0",
+    "vitest": "4.1.0"
   }
 }

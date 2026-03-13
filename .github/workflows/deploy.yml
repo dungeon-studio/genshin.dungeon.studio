@@ -64,7 +64,7 @@ jobs:
             >> "$GITHUB_OUTPUT"
 
       - name: Build
-        run: pnpm --filter @genshin/web build
+        run: pnpm turbo run build --filter=@genshin/web
         env:
           VITE_FIREBASE_API_KEY: ${{ steps.firebase-config.outputs.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ steps.firebase-config.outputs.VITE_FIREBASE_AUTH_DOMAIN }}

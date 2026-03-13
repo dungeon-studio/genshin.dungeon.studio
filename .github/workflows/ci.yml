@@ -25,10 +25,10 @@ jobs:
       - uses: ./.github/actions/setup-node-pnpm
 
       - name: Typecheck
-        run: pnpm --filter @genshin/web typecheck
+        run: pnpm turbo run typecheck --filter=@genshin/web
 
       - name: Build
-        run: pnpm --filter @genshin/web build
+        run: pnpm turbo run build --filter=@genshin/web
 
       - name: Verify Build Artifacts
         run: bash apps/web/scripts/verify-build-output.sh
@@ -45,10 +45,13 @@ jobs:
       - uses: ./.github/actions/setup-node-pnpm
 
       - name: Typecheck
-        run: pnpm --filter @genshin/api typecheck
+        run: pnpm turbo run typecheck --filter=@genshin/api
+
+      - name: Test
+        run: pnpm turbo run test --filter=@genshin/api
 
       - name: Build
-        run: pnpm --filter @genshin/api build
+        run: pnpm turbo run build --filter=@genshin/api
 
   packages:
     name: Packages
@@ -62,10 +65,10 @@ jobs:
       - uses: ./.github/actions/setup-node-pnpm
 
       - name: Build packages
-        run: pnpm --filter "./packages/**" build
+        run: pnpm turbo run build --filter="./packages/**"
 
       - name: Typecheck packages
-        run: pnpm --filter "./packages/**" typecheck
+        run: pnpm turbo run typecheck --filter="./packages/**"
 
 # ---------------------------------------------------------------------------
 # Maintenance notes

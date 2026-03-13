@@ -15,6 +15,5 @@ build
 
 # Exclude unused workspace paths (API build doesn't copy these)
 apps/web
-packages
 .github
 docs
