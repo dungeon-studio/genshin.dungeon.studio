@@ -2,25 +2,26 @@
 # SPDX-License-Identifier: MIT
 
 ARG COREPACK_VERSION=0.34.6
-ARG PNPM_VERSION=9.15.4
 
 # Build stage
 FROM node:25.8.1-slim AS builder
 
 ARG COREPACK_VERSION
-ARG PNPM_VERSION
 
 WORKDIR /app
 
 ENV CI=true
 
+# Copy root package.json first so corepack reads packageManager from it
+COPY package.json ./
+
 RUN rm -f /usr/local/bin/yarn /usr/local/bin/yarnpkg && \
     npm install -g corepack@${COREPACK_VERSION} && \
     corepack enable && \
-    corepack prepare pnpm@${PNPM_VERSION} --activate
+    corepack install
 
-# Copy manifests for all workspace packages so pnpm resolves the full dependency graph
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+# Copy remaining manifests so pnpm resolves the full dependency graph
+COPY pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY apps/api/package.json ./apps/api/
 COPY packages/types/package.json ./packages/types/
 COPY packages/game-data/package.json ./packages/game-data/
