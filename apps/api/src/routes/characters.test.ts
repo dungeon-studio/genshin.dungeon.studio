@@ -27,11 +27,9 @@ import {
   listCharacters,
   saveCharacter,
 } from '@/repositories/characters/index.js';
+import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
 import { getCharacterById } from '@genshin/game-data';
 import { MAX_CONSTELLATION_LEVEL, MIN_CONSTELLATION_LEVEL } from '@genshin/types';
-
-const FAKE_UID = 'test-user-123';
-const FAKE_TOKEN = { uid: FAKE_UID } as Awaited<ReturnType<typeof verifyToken>>;
 
 const FAKE_CHARACTER: CollectionCharacter = {
   characterId: 'albedo',
@@ -39,20 +37,6 @@ const FAKE_CHARACTER: CollectionCharacter = {
   createdAt: '2026-01-01T00:00:00.000Z' as CollectionCharacter['createdAt'],
   updatedAt: '2026-03-13T00:00:00.000Z' as CollectionCharacter['updatedAt'],
 };
-
-function authedRequest(method: string, path: string, body?: unknown) {
-  const init: RequestInit = {
-    method,
-    headers: { Authorization: 'Bearer valid-token' },
-  };
-
-  if (body !== undefined) {
-    init.body = JSON.stringify(body);
-    init.headers = { ...init.headers, 'Content-Type': 'application/json' };
-  }
-
-  return new Request(`http://localhost${path}`, init);
-}
 
 describe('Character routes', () => {
   beforeEach(() => {

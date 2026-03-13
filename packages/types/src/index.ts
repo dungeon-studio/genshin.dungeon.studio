@@ -2,12 +2,19 @@
 // SPDX-License-Identifier: MIT
 
 export {
+  isValidConstellationLevel,
   MAX_CONSTELLATION_LEVEL,
   MIN_CONSTELLATION_LEVEL,
-  isValidConstellationLevel,
   type CollectionCharacter,
 } from './collectionCharacter.js';
+export {
+  isValidRefinementLevel,
+  MAX_REFINEMENT_LEVEL,
+  MIN_REFINEMENT_LEVEL,
+  type CollectionWeapon,
+} from './collectionWeapon.js';
 export type { ISOTimestamp } from './isoTimestamp.js';
 export type { Team, TeamSlot } from './team.js';
 export type { ArtifactPlan, TeamMember } from './teamMember.js';
 export type { User } from './user.js';
+export type { UUID } from './uuid.js';

@@ -3,6 +3,7 @@
 
 import type { AuthVariables } from '@/middleware/auth.js';
 import { characters } from '@/routes/characters.js';
+import { weapons } from '@/routes/weapons.js';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
@@ -89,3 +90,4 @@ app.get('/health', (c) =>
 
 // Routes
 app.route('/api/characters', characters);
+app.route('/api/weapons', weapons);
