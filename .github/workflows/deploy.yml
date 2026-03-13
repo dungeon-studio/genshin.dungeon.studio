@@ -39,21 +39,26 @@ jobs:
       - name: Fetch Firebase Web App Config
         id: firebase-config
         run: |
+          set -euo pipefail
+          set -x
           SDK_CFG='.result.sdkConfig'
           CONFIG=$(npx -y firebase-tools@15.9.0 apps:sdkconfig web \
             --project "$GCP_PROJECT_ID" --json)
-          echo "VITE_FIREBASE_API_KEY=$(echo "$CONFIG" | jq -er "$SDK_CFG.apiKey")" \
+
+          VITE_FIREBASE_API_KEY=$(echo "$CONFIG" | jq -er "$SDK_CFG.apiKey")
+          VITE_FIREBASE_AUTH_DOMAIN=$(echo "$CONFIG" | jq -er "$SDK_CFG.authDomain")
+          VITE_FIREBASE_PROJECT_ID=$(echo "$CONFIG" | jq -er "$SDK_CFG.projectId")
+          VITE_FIREBASE_STORAGE_BUCKET=$(echo "$CONFIG" | jq -er "$SDK_CFG.storageBucket")
+          VITE_FIREBASE_MESSAGING_SENDER_ID=$(echo "$CONFIG" | jq -er "$SDK_CFG.messagingSenderId")
+          VITE_FIREBASE_APP_ID=$(echo "$CONFIG" | jq -er "$SDK_CFG.appId")
+
+          echo "VITE_FIREBASE_API_KEY=$VITE_FIREBASE_API_KEY" >> "$GITHUB_OUTPUT"
+          echo "VITE_FIREBASE_AUTH_DOMAIN=$VITE_FIREBASE_AUTH_DOMAIN" >> "$GITHUB_OUTPUT"
+          echo "VITE_FIREBASE_PROJECT_ID=$VITE_FIREBASE_PROJECT_ID" >> "$GITHUB_OUTPUT"
+          echo "VITE_FIREBASE_STORAGE_BUCKET=$VITE_FIREBASE_STORAGE_BUCKET" >> "$GITHUB_OUTPUT"
+          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=$VITE_FIREBASE_MESSAGING_SENDER_ID" \
             >> "$GITHUB_OUTPUT"
-          echo "VITE_FIREBASE_AUTH_DOMAIN=$(echo "$CONFIG" | jq -er "$SDK_CFG.authDomain")" \
-            >> "$GITHUB_OUTPUT"
-          echo "VITE_FIREBASE_PROJECT_ID=$(echo "$CONFIG" | jq -er "$SDK_CFG.projectId")" \
-            >> "$GITHUB_OUTPUT"
-          echo "VITE_FIREBASE_STORAGE_BUCKET=$(echo "$CONFIG" | jq -er "$SDK_CFG.storageBucket")" \
-            >> "$GITHUB_OUTPUT"
-          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=$(echo "$CONFIG" | jq -er "$SDK_CFG.messagingSenderId")" \
-            >> "$GITHUB_OUTPUT"
-          echo "VITE_FIREBASE_APP_ID=$(echo "$CONFIG" | jq -er "$SDK_CFG.appId")" \
-            >> "$GITHUB_OUTPUT"
+          echo "VITE_FIREBASE_APP_ID=$VITE_FIREBASE_APP_ID" >> "$GITHUB_OUTPUT"
 
       - name: Build
         run: pnpm --filter @genshin/web build
