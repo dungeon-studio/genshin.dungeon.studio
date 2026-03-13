@@ -18,7 +18,7 @@ export function LoginButton() {
   }
 
   return (
-    <Button onClick={handleLogin} variant="outline">
+    <Button type="button" onClick={handleLogin} variant="outline">
       Sign in with Google
     </Button>
   );

@@ -22,6 +22,7 @@ jobs:
     environment: dev
     env:
       GCP_PROJECT_ID: dungeon-studio-genshin-dev
+      FIREBASE_TOOLS: npx -y firebase-tools@15.9.0
     permissions:
       contents: read
       id-token: write
@@ -40,12 +41,11 @@ jobs:
         id: firebase-config
         run: |
           set -euo pipefail
-          set -x
-          FIREBASE="npx -y firebase-tools@15.9.0"
-          APP_ID=$($FIREBASE apps:list web --project "$GCP_PROJECT_ID" --json \
+          APP_ID=$($FIREBASE_TOOLS apps:list web \
+            --project "$GCP_PROJECT_ID" --json \
             | jq -er '.result[] | select(.displayName == "Genshin Team Builder (dev)") | .appId')
           SDK_CFG='.result.sdkConfig'
-          CONFIG=$($FIREBASE apps:sdkconfig web "$APP_ID" \
+          CONFIG=$($FIREBASE_TOOLS apps:sdkconfig web "$APP_ID" \
             --project "$GCP_PROJECT_ID" --json)
 
           VITE_FIREBASE_API_KEY=$(echo "$CONFIG" | jq -er "$SDK_CFG.apiKey")
@@ -77,7 +77,7 @@ jobs:
         run: bash apps/web/scripts/verify-build-output.sh
 
       - name: Deploy
-        run: npx -y firebase-tools@15.9.0 deploy --only hosting --project "$GCP_PROJECT_ID"
+        run: $FIREBASE_TOOLS deploy --only hosting --project "$GCP_PROJECT_ID"
         working-directory: apps/web
 
       - name: Verify
