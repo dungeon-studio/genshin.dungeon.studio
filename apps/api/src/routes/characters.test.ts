@@ -4,11 +4,11 @@
 import type { CollectionCharacter } from '@genshin/types';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/lib/firebase/auth', () => ({
+vi.mock('@/lib/firebase/auth.js', () => ({
   verifyToken: vi.fn(),
 }));
 
-vi.mock('@/repositories/characters', () => ({
+vi.mock('@/repositories/characters/index.js', () => ({
   listCharacters: vi.fn(),
   getCharacter: vi.fn(),
   saveCharacter: vi.fn(),
@@ -19,14 +19,14 @@ vi.mock('@genshin/game-data', () => ({
   getCharacterById: vi.fn(),
 }));
 
-import { app } from '@/app';
-import { verifyToken } from '@/lib/firebase/auth';
+import { app } from '@/app.js';
+import { verifyToken } from '@/lib/firebase/auth.js';
 import {
   deleteCharacter,
   getCharacter,
   listCharacters,
   saveCharacter,
-} from '@/repositories/characters';
+} from '@/repositories/characters/index.js';
 import { getCharacterById } from '@genshin/game-data';
 import { MAX_CONSTELLATION_LEVEL, MIN_CONSTELLATION_LEVEL } from '@genshin/types';
 

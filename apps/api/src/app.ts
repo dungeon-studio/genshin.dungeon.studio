@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { AuthVariables } from '@/middleware/auth';
-import { characters } from '@/routes/characters';
+import type { AuthVariables } from '@/middleware/auth.js';
+import { characters } from '@/routes/characters.js';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';

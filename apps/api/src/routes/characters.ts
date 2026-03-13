@@ -1,14 +1,14 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { AuthVariables } from '@/middleware/auth';
-import { auth } from '@/middleware/auth';
+import type { AuthVariables } from '@/middleware/auth.js';
+import { auth } from '@/middleware/auth.js';
 import {
   deleteCharacter,
   getCharacter,
   listCharacters,
   saveCharacter,
-} from '@/repositories/characters';
+} from '@/repositories/characters/index.js';
 import { getCharacterById } from '@genshin/game-data';
 import {
   MAX_CONSTELLATION_LEVEL,
