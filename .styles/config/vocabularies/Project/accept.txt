@@ -23,6 +23,8 @@ Vite
 Bun
 pnpm
 npm
+corepack
+Dockerfile
 
 # Code quality tools
 ESLint
@@ -71,6 +73,7 @@ repo
 repos
 roadmaps
 semver
+typechecking
 unversioned
 validators
 

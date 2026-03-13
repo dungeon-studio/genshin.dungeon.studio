@@ -43,6 +43,8 @@ See [JSONSchema2020-12]: <https://json-schema.org/draft/2020-12>
 
 Use the Problem Details standard for machine-readable error responses. Return `application/problem+json` with stable fields and consistent extension members where needed.
 
+Always include a `detail` field in every Problem Details response, even for generic errors such as `500 Internal Server Error` or `404 Not Found`. This ensures clients can parse the error body uniformly without branching on status code.
+
 See [RFC9457]: <https://www.rfc-editor.org/rfc/rfc9457>
 
 ### 6. Consistent list behavior
