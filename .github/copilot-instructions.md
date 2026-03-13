@@ -37,8 +37,8 @@
 
 ## Build and CI rules
 
-- Always use `pnpm turbo run <task>` for `build`, `typecheck`, and `test` in CI, Docker, and deploy workflows. Never use raw `pnpm --filter <pkg> <task>` for these because pnpm doesn't build workspace dependencies first; turbo handles dependency ordering via `^build` in `turbo.json`.
-- The API uses `tsconfig.json` (includes tests) for typechecking and `tsconfig.build.json` (excludes tests) for emit. Keep both in sync when changing compiler options.
+- Always use `pnpm turbo run <task>` for `build`, `typecheck`, and `test` in CI, Docker, and deploy workflows. Never use raw `pnpm --filter <pkg> <task>` for these because pnpm doesn't automatically build workspace dependencies first; turbo handles dependency ordering via `^build` in `turbo.json`.
+- The API uses `tsconfig.json` (includes tests) for typechecking and `tsconfig.build.json` (excludes tests) for emit. The build config extends `tsconfig.json`, so compiler options stay in sync automatically; only the exclude patterns differ.
 
 ## State usage
 
