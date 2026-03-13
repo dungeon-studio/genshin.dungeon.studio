@@ -22,6 +22,7 @@ jobs:
     environment: dev
     env:
       GCP_PROJECT_ID: dungeon-studio-genshin-dev
+      FIREBASE_TOOLS: npx -y firebase-tools@15.9.0
     permissions:
       contents: read
       id-token: write
@@ -36,14 +37,47 @@ jobs:
 
       - uses: ./.github/actions/setup-node-pnpm
 
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: '1.9.0'
+          terraform_wrapper: false
+
+      - name: Read Firebase Config from Terraform
+        id: firebase-config
+        working-directory: infrastructure/terraform/environments/dev
+        run: |
+          set -euo pipefail
+          terraform init -backend=true -input=false
+          CFG=$(terraform output -json firebase_web_app_config)
+
+          echo "VITE_FIREBASE_API_KEY=$(echo "$CFG" | jq -er .api_key)" \
+            >> "$GITHUB_OUTPUT"
+          echo "VITE_FIREBASE_AUTH_DOMAIN=$(echo "$CFG" | jq -er .auth_domain)" \
+            >> "$GITHUB_OUTPUT"
+          echo "VITE_FIREBASE_PROJECT_ID=$(echo "$CFG" | jq -er .project_id)" \
+            >> "$GITHUB_OUTPUT"
+          echo "VITE_FIREBASE_STORAGE_BUCKET=$(echo "$CFG" | jq -er .storage_bucket)" \
+            >> "$GITHUB_OUTPUT"
+          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=$(echo "$CFG" \
+            | jq -er .messaging_sender_id)" >> "$GITHUB_OUTPUT"
+          echo "VITE_FIREBASE_APP_ID=$(echo "$CFG" | jq -er .app_id)" \
+            >> "$GITHUB_OUTPUT"
+
       - name: Build
         run: pnpm --filter @genshin/web build
+        env:
+          VITE_FIREBASE_API_KEY: ${{ steps.firebase-config.outputs.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ steps.firebase-config.outputs.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ steps.firebase-config.outputs.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ steps.firebase-config.outputs.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ steps.firebase-config.outputs.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ steps.firebase-config.outputs.VITE_FIREBASE_APP_ID }}
 
       - name: Verify Build
         run: bash apps/web/scripts/verify-build-output.sh
 
       - name: Deploy
-        run: npx -y firebase-tools@15.9.0 deploy --only hosting --project "$GCP_PROJECT_ID"
+        run: $FIREBASE_TOOLS deploy --only hosting --project "$GCP_PROJECT_ID"
         working-directory: apps/web
 
       - name: Verify
