@@ -3,6 +3,8 @@
 
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
+import type { ValidatedBodyVariables } from '@/middleware/validate-body.js';
+import { validateBody } from '@/middleware/validate-body.js';
 import {
   deleteCharacter,
   getCharacter,
@@ -13,22 +15,20 @@ import {
   characterItemDocument,
   characterListDocument,
 } from '@/representations/collection-json/characters.js';
+import characterPutSchema from '@/schemas/characters/put/1.0.0.json' with { type: 'json' };
 import { COLLECTION_JSON } from '@genshin/collection-json';
 import { getCharacterById } from '@genshin/game-data';
-import {
-  MAX_CONSTELLATION_LEVEL,
-  MIN_CONSTELLATION_LEVEL,
-  isValidConstellationLevel,
-} from '@genshin/types';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
-export const characters = new Hono<{ Variables: AuthVariables }>();
+export const characters = new Hono<{ Variables: AuthVariables & ValidatedBodyVariables }>();
 
 characters.use('*', auth);
 
+const PROFILE_PATH = '/profiles/characters/1.0.0.json';
+
 interface SaveCharacterBody {
-  constellationLevel?: unknown;
+  constellationLevel: number;
 }
 
 // GET /api/characters — List user's character collection
@@ -38,7 +38,7 @@ characters.get('/', async (c) => {
   const baseUrl = new URL(c.req.url).origin;
 
   return c.body(JSON.stringify(characterListDocument(items, baseUrl)), {
-    headers: { 'Content-Type': COLLECTION_JSON },
+    headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
   });
 });
 
@@ -56,41 +56,26 @@ characters.get('/:characterId', async (c) => {
   const baseUrl = new URL(c.req.url).origin;
 
   return c.body(JSON.stringify(characterItemDocument(character, baseUrl)), {
-    headers: { 'Content-Type': COLLECTION_JSON },
+    headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
   });
 });
 
 // PUT /api/characters/:characterId — Save/update character (idempotent upsert)
-characters.put('/:characterId', async (c) => {
+characters.put('/:characterId', validateBody(characterPutSchema), async (c) => {
   const userId = c.get('user').uid;
   const { characterId } = c.req.param();
 
-  // Verify characterId exists in game data
   if (!getCharacterById(characterId)) {
     throw new HTTPException(400, { message: `Unknown character: ${characterId}` });
   }
 
-  let body: SaveCharacterBody;
-  try {
-    body = await c.req.json<SaveCharacterBody>();
-  } catch {
-    throw new HTTPException(400, { message: 'Invalid or missing JSON body' });
-  }
-
-  const { constellationLevel } = body;
-
-  if (!isValidConstellationLevel(constellationLevel)) {
-    throw new HTTPException(400, {
-      message: `constellationLevel must be an integer between ${MIN_CONSTELLATION_LEVEL} and ${MAX_CONSTELLATION_LEVEL}`,
-    });
-  }
-
+  const { constellationLevel } = c.get('validatedBody') as SaveCharacterBody;
   const { character, created } = await saveCharacter(userId, characterId, constellationLevel);
   const baseUrl = new URL(c.req.url).origin;
 
   return c.body(JSON.stringify(characterItemDocument(character, baseUrl)), {
     status: created ? 201 : 200,
-    headers: { 'Content-Type': COLLECTION_JSON },
+    headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
   });
 });
 

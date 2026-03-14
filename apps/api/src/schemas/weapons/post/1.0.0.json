@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://api.genshin.dungeon.studio/schemas/weapons/post/1.0.0.json",
+  "title": "Create Weapon Instance Request",
+  "description": "Request body for creating a new weapon instance in the user's collection",
+  "type": "object",
+  "properties": {
+    "refinementLevel": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Refinement rank of the weapon instance"
+    }
+  },
+  "required": ["refinementLevel"],
+  "additionalProperties": false
+}
