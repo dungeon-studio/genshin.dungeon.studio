@@ -23,6 +23,7 @@ RUN rm -f /usr/local/bin/yarn /usr/local/bin/yarnpkg && \
 # Copy remaining manifests so pnpm resolves the full dependency graph
 COPY pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY apps/api/package.json ./apps/api/
+COPY packages/collection-json/package.json ./packages/collection-json/
 COPY packages/types/package.json ./packages/types/
 COPY packages/game-data/package.json ./packages/game-data/
 
@@ -47,6 +48,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/api/node_modules ./apps/api/node_modules
 COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/packages/collection-json ./packages/collection-json
 COPY --from=builder /app/packages/types ./packages/types
 COPY --from=builder /app/packages/game-data ./packages/game-data
 
