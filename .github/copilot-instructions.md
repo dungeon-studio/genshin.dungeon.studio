@@ -34,6 +34,9 @@
 - Use ISO 8601 strings for timestamps such as `createdAt` and `updatedAt`, not `Date` objects.
 - Maintain game-data accuracy when working with `packages/game-data`.
 - Test alongside code when possible; the API has Vitest coverage, but web and UI testing is planned and not yet implemented.
+- Each branded type in `packages/types/` gets its own file (for example, `uuid.ts`, `isoTimestamp.ts`).
+- Shared API test utilities go in `apps/api/src/test/` with descriptive names (not generic names like "helpers"). This directory is excluded from production builds via `tsconfig.build.json`.
+- Use descriptive, specific file names. Avoid generic names like "helpers."
 
 ## Build and CI rules
 
@@ -72,10 +75,12 @@
 
 ## Documentation rules
 
-- Put information in the right place:
-  - `CONTRIBUTING.md` for human workflow guidance.
-  - `.github/copilot-instructions.md` for AI decision rules.
-  - `docs/` for task-specific how-tos and deeper explanations.
+- Put information in the right place, in this priority order:
+  1. Inline comments explaining _why_ code works a certain way.
+  2. Documentation strings on functions or modules.
+  3. `docs/` for how-tos, references, and explanations following [Diátaxis](https://diataxis.fr/).
+  4. `CONTRIBUTING.md` for human workflow guidance.
+  5. `.github/copilot-instructions.md` for AI decision rules.
 - Prefer this order when documenting decisions: inline comments, documentation strings, updates to existing docs, then new long-form docs.
 - Keep docs accurate to `HEAD`: verify dependencies, command availability, and feature status.
 - Run Vale through pre-commit (`pre-commit run vale --all-files`), not `vale .`. Vale has no directory-ignore mechanism and scans everything, including `node_modules`. For targeted checks on specific files, use `vale <filename>` directly.
@@ -103,6 +108,8 @@
 - Never use `git commit --amend` or `git push --force`.
 - Fixes after hook failures should be new commits; squash merge handles cleanup.
 - For GitHub issues, track dependencies only with native issue relationships (`blocked by` / `is blocking`), not issue body text or comments.
+- Prefer filing follow-up issues for out-of-scope concerns over expanding a PR.
+- Evaluate automated PR review suggestions critically. Verify that a suggestion actually solves the stated problem before applying it.
 
 ## Shell script rules
 
