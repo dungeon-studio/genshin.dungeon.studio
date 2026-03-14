@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit && tsc --project tsconfig.scripts.json --noEmit"
   },
   "dependencies": {
+    "@genshin/collection-json": "workspace:*",
     "@genshin/game-data": "workspace:*",
     "@genshin/types": "workspace:*",
     "@hono/node-server": "1.19.11",

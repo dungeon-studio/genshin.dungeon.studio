@@ -22,3 +22,45 @@ flag_management:
     - name: api
       paths:
         - apps/api/src/**
+    - name: collection-json
+      paths:
+        - packages/collection-json/src/**
+
+component_management:
+  individual_components:
+    - component_id: api-routes
+      name: 'API: Routes'
+      paths:
+        - apps/api/src/routes/**
+      flag_regexes:
+        - api
+    - component_id: api-repositories
+      name: 'API: Repositories'
+      paths:
+        - apps/api/src/repositories/**
+      flag_regexes:
+        - api
+    - component_id: api-middleware
+      name: 'API: Middleware'
+      paths:
+        - apps/api/src/middleware/**
+      flag_regexes:
+        - api
+    - component_id: api-representations
+      name: 'API: Representations'
+      paths:
+        - apps/api/src/representations/**
+      flag_regexes:
+        - api
+    - component_id: api-firebase
+      name: 'API: Firebase'
+      paths:
+        - apps/api/src/lib/firebase/**
+      flag_regexes:
+        - api
+    - component_id: collection-json
+      name: Collection JSON
+      paths:
+        - packages/collection-json/src/**
+      flag_regexes:
+        - collection-json

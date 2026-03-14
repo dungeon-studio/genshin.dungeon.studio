@@ -10,6 +10,13 @@ import {
   listWeapons,
   updateWeaponInstance,
 } from '@/repositories/weapons/index.js';
+import {
+  weaponInstanceListDocument,
+  weaponItemDocument,
+  weaponItemHref,
+  weaponListDocument,
+} from '@/representations/collection-json/weapons.js';
+import { COLLECTION_JSON } from '@genshin/collection-json';
 import { getWeaponById } from '@genshin/game-data';
 import {
   MAX_REFINEMENT_LEVEL,
@@ -32,12 +39,15 @@ interface UpdateWeaponBody {
   refinementLevel?: unknown;
 }
 
-// GET /api/weapons — List all weapon instances grouped by weaponId
+// GET /api/weapons — List all weapon instances as a flat collection
 weapons.get('/', async (c) => {
   const userId = c.get('user').uid;
-  const grouped = await listWeapons(userId);
+  const items = await listWeapons(userId);
+  const baseUrl = new URL(c.req.url).origin;
 
-  return c.json(grouped);
+  return c.body(JSON.stringify(weaponListDocument(items, baseUrl)), {
+    headers: { 'Content-Type': COLLECTION_JSON },
+  });
 });
 
 // GET /api/weapons/:weaponId — List instances of specific weapon
@@ -50,8 +60,11 @@ weapons.get('/:weaponId', async (c) => {
   }
 
   const instances = await listWeaponInstances(userId, weaponId);
+  const baseUrl = new URL(c.req.url).origin;
 
-  return c.json(instances);
+  return c.body(JSON.stringify(weaponInstanceListDocument(instances, weaponId, baseUrl)), {
+    headers: { 'Content-Type': COLLECTION_JSON },
+  });
 });
 
 // POST /api/weapons/:weaponId — Create new weapon instance
@@ -80,8 +93,15 @@ weapons.post('/:weaponId', async (c) => {
   }
 
   const weapon = await createWeaponInstance(userId, weaponId, refinementLevel);
+  const baseUrl = new URL(c.req.url).origin;
 
-  return c.json(weapon, 201);
+  return c.body(JSON.stringify(weaponInstanceListDocument([weapon], weaponId, baseUrl)), {
+    status: 201,
+    headers: {
+      'Content-Type': COLLECTION_JSON,
+      Location: weaponItemHref(baseUrl, weapon),
+    },
+  });
 });
 
 // PUT /api/weapons/:weaponId/:weaponInstanceId — Update weapon instance
@@ -115,7 +135,11 @@ weapons.put('/:weaponId/:weaponInstanceId', async (c) => {
     throw new HTTPException(404, { message: 'Weapon instance not found' });
   }
 
-  return c.json(weapon);
+  const baseUrl = new URL(c.req.url).origin;
+
+  return c.body(JSON.stringify(weaponItemDocument(weapon, baseUrl)), {
+    headers: { 'Content-Type': COLLECTION_JSON },
+  });
 });
 
 // DELETE /api/weapons/:weaponId/:weaponInstanceId — Delete weapon instance

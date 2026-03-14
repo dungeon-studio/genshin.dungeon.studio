@@ -70,8 +70,8 @@ jobs:
       - name: Build
         run: pnpm turbo run build --filter=@genshin/api
 
-  packages:
-    name: Packages
+  game-data:
+    name: Game Data
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -81,15 +81,68 @@ jobs:
 
       - uses: ./.github/actions/setup-node-pnpm
 
-      - name: Build packages
-        run: pnpm turbo run build --filter="./packages/**"
+      - name: Build
+        run: pnpm turbo run build --filter=@genshin/game-data
 
-      - name: Typecheck packages
-        run: pnpm turbo run typecheck --filter="./packages/**"
+      - name: Typecheck
+        run: pnpm turbo run typecheck --filter=@genshin/game-data
+
+  types:
+    name: Types
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Build
+        run: pnpm turbo run build --filter=@genshin/types
+
+      - name: Typecheck
+        run: pnpm turbo run typecheck --filter=@genshin/types
+
+  collection-json:
+    name: Collection JSON
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Build
+        run: pnpm turbo run build --filter=@genshin/collection-json
+
+      - name: Typecheck
+        run: pnpm turbo run typecheck --filter=@genshin/collection-json
+
+      - name: Test
+        run: pnpm turbo run test --filter=@genshin/collection-json -- --coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: packages/collection-json/coverage/lcov.info
+          flags: collection-json
+          fail_ci_if_error: false
+
+      - name: Upload test results to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: packages/collection-json/test-results/junit.xml
+          flags: collection-json
+          report_type: test_results
+          fail_ci_if_error: false
 
 # ---------------------------------------------------------------------------
 # Maintenance notes
-# - Add a new job when new apps are added.
-# - Package builds are grouped under the Packages job.
+# - Add a new job when new apps or packages are added.
 # - Keep caching strategy aligned with package manager changes.
 # ---------------------------------------------------------------------------

@@ -16,20 +16,18 @@ function collectionRef(userId: string, weaponId: string) {
     .collection('instances');
 }
 
-export async function listWeapons(userId: string): Promise<Record<string, CollectionWeapon[]>> {
+export async function listWeapons(userId: string): Promise<CollectionWeapon[]> {
   const weaponsRef = db.collection('users').doc(userId).collection('weapons');
   const weaponDocs = await weaponsRef.listDocuments();
 
-  const results: Record<string, CollectionWeapon[]> = {};
+  const results: CollectionWeapon[] = [];
 
   for (const weaponDoc of weaponDocs) {
     const snapshot = await weaponDoc.collection('instances').get();
     const instances = snapshot.docs.map((doc) =>
       fromDocument(doc.id as UUID, weaponDoc.id, doc.data() as DocumentData),
     );
-    if (instances.length > 0) {
-      results[weaponDoc.id] = instances;
-    }
+    results.push(...instances);
   }
 
   return results;

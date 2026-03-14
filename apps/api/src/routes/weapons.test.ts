@@ -30,6 +30,7 @@ import {
   updateWeaponInstance,
 } from '@/repositories/weapons/index.js';
 import { FAKE_TOKEN, FAKE_UID, authedRequest } from '@/test/auth-requests.js';
+import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
 import { getWeaponById } from '@genshin/game-data';
 import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '@genshin/types';
 
@@ -40,6 +41,14 @@ const FAKE_WEAPON: CollectionWeapon = {
   createdAt: '2026-01-01T00:00:00.000Z' as CollectionWeapon['createdAt'],
   updatedAt: '2026-03-13T00:00:00.000Z' as CollectionWeapon['updatedAt'],
 };
+
+const FAKE_WEAPON_ITEM_DATA = [
+  { name: 'weaponInstanceId', value: 'instance-uuid-1' },
+  { name: 'weaponId', value: 'mistsplitter-reforged' },
+  { name: 'refinementLevel', value: 1 },
+  { name: 'createdAt', value: '2026-01-01T00:00:00.000Z' },
+  { name: 'updatedAt', value: '2026-03-13T00:00:00.000Z' },
+];
 
 describe('Weapon routes', () => {
   beforeEach(() => {
@@ -64,58 +73,111 @@ describe('Weapon routes', () => {
 
       expect(res.status).toBe(401);
     });
+
+    it('returns 401 when token is expired', async () => {
+      vi.mocked(verifyToken).mockRejectedValue({ code: 'auth/id-token-expired' });
+
+      const res = await app.request(authedRequest('GET', '/api/weapons'));
+
+      expect(res.status).toBe(401);
+      const body = (await res.json()) as { detail: string };
+      expect(body.detail).toBe('Invalid or expired token');
+    });
   });
 
   describe('GET /api/weapons', () => {
-    it('returns 200 with weapons grouped by weaponId', async () => {
-      vi.mocked(listWeapons).mockResolvedValue({
-        'mistsplitter-reforged': [FAKE_WEAPON],
-      });
+    let res: Response;
+    let body: CollectionDocument;
 
-      const res = await app.request(authedRequest('GET', '/api/weapons'));
-
-      expect(res.status).toBe(200);
-      const body = await res.json();
-      expect(body).toEqual({ 'mistsplitter-reforged': [FAKE_WEAPON] });
+    beforeEach(async () => {
+      vi.mocked(listWeapons).mockResolvedValue([FAKE_WEAPON]);
+      res = await app.request(authedRequest('GET', '/api/weapons'));
+      body = (await res.json()) as CollectionDocument;
     });
 
-    it('returns 200 with empty object when no weapons', async () => {
-      vi.mocked(listWeapons).mockResolvedValue({});
+    it('returns 200', () => {
+      expect(res.status).toBe(200);
+    });
+
+    it('returns collection+json content type', () => {
+      expect(res.headers.get('content-type')).toBe(COLLECTION_JSON);
+    });
+
+    it('returns one item per weapon', () => {
+      expect(body.collection.items).toHaveLength(1);
+    });
+
+    it('includes weapon domain data', () => {
+      expect(body.collection.items[0].data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ name: 'weaponId', value: 'mistsplitter-reforged' }),
+          expect.objectContaining({ name: 'refinementLevel', value: 1 }),
+        ]),
+      );
+    });
+
+    it('returns empty items when no weapons exist', async () => {
+      vi.mocked(listWeapons).mockResolvedValue([]);
 
       const res = await app.request(authedRequest('GET', '/api/weapons'));
 
-      expect(res.status).toBe(200);
-      const body = await res.json();
-      expect(body).toEqual({});
+      const body = (await res.json()) as CollectionDocument;
+      expect(body.collection.items).toEqual([]);
+    });
+
+    it('returns 500 when repository throws', async () => {
+      vi.mocked(listWeapons).mockRejectedValue(new Error('Firestore unavailable'));
+
+      const res = await app.request(authedRequest('GET', '/api/weapons'));
+
+      expect(res.status).toBe(500);
+      const body = (await res.json()) as { detail: string };
+      expect(body.detail).toBe('An unexpected error occurred');
     });
   });
 
   describe('GET /api/weapons/:weaponId', () => {
-    beforeEach(() => {
+    let res: Response;
+    let body: CollectionDocument;
+
+    beforeEach(async () => {
       vi.mocked(getWeaponById).mockReturnValue({
         id: 'mistsplitter-reforged',
         name: 'Mistsplitter Reforged',
       } as ReturnType<typeof getWeaponById>);
-    });
-
-    it('returns 200 with instances of specific weapon', async () => {
       vi.mocked(listWeaponInstances).mockResolvedValue([FAKE_WEAPON]);
-
-      const res = await app.request(authedRequest('GET', '/api/weapons/mistsplitter-reforged'));
-
-      expect(res.status).toBe(200);
-      const body = await res.json();
-      expect(body).toEqual([FAKE_WEAPON]);
+      res = await app.request(authedRequest('GET', '/api/weapons/mistsplitter-reforged'));
+      body = (await res.json()) as CollectionDocument;
     });
 
-    it('returns 200 with empty list when no instances', async () => {
+    it('returns 200', () => {
+      expect(res.status).toBe(200);
+    });
+
+    it('returns collection+json content type', () => {
+      expect(res.headers.get('content-type')).toBe(COLLECTION_JSON);
+    });
+
+    it('returns one item per instance', () => {
+      expect(body.collection.items).toHaveLength(1);
+    });
+
+    it('includes weapon domain data', () => {
+      expect(body.collection.items[0].data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ name: 'weaponId', value: 'mistsplitter-reforged' }),
+          expect.objectContaining({ name: 'refinementLevel', value: 1 }),
+        ]),
+      );
+    });
+
+    it('returns empty items when no instances exist', async () => {
       vi.mocked(listWeaponInstances).mockResolvedValue([]);
 
       const res = await app.request(authedRequest('GET', '/api/weapons/mistsplitter-reforged'));
 
-      expect(res.status).toBe(200);
-      const body = await res.json();
-      expect(body).toEqual([]);
+      const body = (await res.json()) as CollectionDocument;
+      expect(body.collection.items).toEqual([]);
     });
 
     it('returns 400 for unknown weapon ID', async () => {
@@ -130,25 +192,43 @@ describe('Weapon routes', () => {
   });
 
   describe('POST /api/weapons/:weaponId', () => {
-    beforeEach(() => {
+    let res: Response;
+    let body: CollectionDocument;
+
+    beforeEach(async () => {
       vi.mocked(getWeaponById).mockReturnValue({
         id: 'mistsplitter-reforged',
         name: 'Mistsplitter Reforged',
       } as ReturnType<typeof getWeaponById>);
-    });
-
-    it('returns 201 when weapon instance is created', async () => {
       vi.mocked(createWeaponInstance).mockResolvedValue(FAKE_WEAPON);
-
-      const res = await app.request(
+      res = await app.request(
         authedRequest('POST', '/api/weapons/mistsplitter-reforged', {
           refinementLevel: 1,
         }),
       );
+      body = (await res.json()) as CollectionDocument;
+    });
 
+    it('returns 201', () => {
       expect(res.status).toBe(201);
-      const body = await res.json();
-      expect(body).toEqual(FAKE_WEAPON);
+    });
+
+    it('returns collection+json content type', () => {
+      expect(res.headers.get('content-type')).toBe(COLLECTION_JSON);
+    });
+
+    it('returns Location header pointing to created instance', () => {
+      expect(res.headers.get('location')).toBe(
+        'http://localhost/api/weapons/mistsplitter-reforged/instance-uuid-1',
+      );
+    });
+
+    it('returns single-item collection', () => {
+      expect(body.collection.items).toHaveLength(1);
+    });
+
+    it('includes weapon domain data', () => {
+      expect(body.collection.items[0].data).toEqual(FAKE_WEAPON_ITEM_DATA);
     });
 
     it('returns 400 for unknown weapon ID', async () => {
@@ -257,25 +337,37 @@ describe('Weapon routes', () => {
   });
 
   describe('PUT /api/weapons/:weaponId/:weaponInstanceId', () => {
-    beforeEach(() => {
+    let res: Response;
+    let body: CollectionDocument;
+
+    beforeEach(async () => {
       vi.mocked(getWeaponById).mockReturnValue({
         id: 'mistsplitter-reforged',
         name: 'Mistsplitter Reforged',
       } as ReturnType<typeof getWeaponById>);
-    });
-
-    it('returns 200 when weapon instance is updated', async () => {
       vi.mocked(updateWeaponInstance).mockResolvedValue(FAKE_WEAPON);
-
-      const res = await app.request(
+      res = await app.request(
         authedRequest('PUT', '/api/weapons/mistsplitter-reforged/instance-uuid-1', {
           refinementLevel: 1,
         }),
       );
+      body = (await res.json()) as CollectionDocument;
+    });
 
+    it('returns 200', () => {
       expect(res.status).toBe(200);
-      const body = await res.json();
-      expect(body).toEqual(FAKE_WEAPON);
+    });
+
+    it('returns collection+json content type', () => {
+      expect(res.headers.get('content-type')).toBe(COLLECTION_JSON);
+    });
+
+    it('returns single-item collection', () => {
+      expect(body.collection.items).toHaveLength(1);
+    });
+
+    it('includes weapon domain data', () => {
+      expect(body.collection.items[0].data).toEqual(FAKE_WEAPON_ITEM_DATA);
     });
 
     it('returns 404 when weapon instance not found', async () => {

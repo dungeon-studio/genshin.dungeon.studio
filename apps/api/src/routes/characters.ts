@@ -9,6 +9,11 @@ import {
   listCharacters,
   saveCharacter,
 } from '@/repositories/characters/index.js';
+import {
+  characterItemDocument,
+  characterListDocument,
+} from '@/representations/collection-json/characters.js';
+import { COLLECTION_JSON } from '@genshin/collection-json';
 import { getCharacterById } from '@genshin/game-data';
 import {
   MAX_CONSTELLATION_LEVEL,
@@ -30,8 +35,11 @@ interface SaveCharacterBody {
 characters.get('/', async (c) => {
   const userId = c.get('user').uid;
   const items = await listCharacters(userId);
+  const baseUrl = new URL(c.req.url).origin;
 
-  return c.json(items);
+  return c.body(JSON.stringify(characterListDocument(items, baseUrl)), {
+    headers: { 'Content-Type': COLLECTION_JSON },
+  });
 });
 
 // GET /api/characters/:characterId — Get specific character record
@@ -45,7 +53,11 @@ characters.get('/:characterId', async (c) => {
     throw new HTTPException(404, { message: 'Character not found in collection' });
   }
 
-  return c.json(character);
+  const baseUrl = new URL(c.req.url).origin;
+
+  return c.body(JSON.stringify(characterItemDocument(character, baseUrl)), {
+    headers: { 'Content-Type': COLLECTION_JSON },
+  });
 });
 
 // PUT /api/characters/:characterId — Save/update character (idempotent upsert)
@@ -74,8 +86,12 @@ characters.put('/:characterId', async (c) => {
   }
 
   const { character, created } = await saveCharacter(userId, characterId, constellationLevel);
+  const baseUrl = new URL(c.req.url).origin;
 
-  return c.json(character, created ? 201 : 200);
+  return c.body(JSON.stringify(characterItemDocument(character, baseUrl)), {
+    status: created ? 201 : 200,
+    headers: { 'Content-Type': COLLECTION_JSON },
+  });
 });
 
 // DELETE /api/characters/:characterId — Remove from collection
