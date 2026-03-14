@@ -18,6 +18,9 @@ import { verifyToken } from '@/lib/firebase/auth.js';
 import { getProfile, updateProfile } from '@/repositories/profile/index.js';
 import { FAKE_UID, authedRequest } from '@/test/auth-requests.js';
 
+const EXPECTED_CONTENT_TYPE =
+  'application/json; profile="http://localhost/schemas/profile/get/1.0.0.json"';
+
 const FAKE_PROFILE_TOKEN = {
   uid: FAKE_UID,
   aud: 'test-project',
@@ -72,6 +75,7 @@ describe('Profile routes', () => {
       const res = await app.request(authedRequest('GET', '/api/profile'));
 
       expect(res.status).toBe(200);
+      expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
       const body = (await res.json()) as Record<string, unknown>;
       expect(body.name).toBe('Traveler');
     });
@@ -116,6 +120,7 @@ describe('Profile routes', () => {
       const res = await app.request(authedRequest('PATCH', '/api/profile', { name: 'Aether' }));
 
       expect(res.status).toBe(200);
+      expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
       const body = (await res.json()) as UserProfile;
       expect(body.name).toBe('Aether');
     });

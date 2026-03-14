@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "/schemas/profile/get/1.0.0.json",
+  "$id": "https://api.genshin.dungeon.studio/schemas/profile/get/1.0.0.json",
   "title": "Profile",
   "description": "Composite user profile combining auth identity fields (read-only, from DecodedIdToken) with Firestore profile fields (mutable via PATCH).",
   "type": "object",

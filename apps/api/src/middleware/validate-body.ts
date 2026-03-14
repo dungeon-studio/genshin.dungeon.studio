@@ -15,7 +15,7 @@ export type ValidatedBodyVariables = {
 /**
  * Hono middleware that validates the JSON request body against a JSON Schema.
  * Stores the parsed body on the context as `validatedBody`.
- * Returns 400 with validation error details on failure.
+ * Returns 400 for unparseable JSON, 422 for schema validation failures.
  */
 export function validateBody(schema: Record<string, unknown>): MiddlewareHandler {
   const validate = ajv.compile(schema);

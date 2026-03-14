@@ -15,6 +15,8 @@ export const userProfile = new Hono<{ Variables: AuthVariables & ValidatedBodyVa
 
 userProfile.use('*', auth);
 
+const GET_SCHEMA_PATH = '/schemas/profile/get/1.0.0.json';
+
 // GET /api/profile — Return the authenticated user's composite profile
 userProfile.get('/', async (c) => {
   const decoded = c.get('user');
@@ -24,13 +26,19 @@ userProfile.get('/', async (c) => {
     throw new HTTPException(404, { message: 'Profile not found' });
   }
 
-  return c.json({
-    uid: decoded.uid,
-    email: decoded.email ?? null,
-    email_verified: decoded.email_verified ?? false,
-    picture: decoded.picture ?? null,
-    ...profile,
-  });
+  return c.json(
+    {
+      uid: decoded.uid,
+      email: decoded.email ?? null,
+      email_verified: decoded.email_verified ?? false,
+      picture: decoded.picture ?? null,
+      ...profile,
+    },
+    200,
+    {
+      'Content-Type': `application/json; profile="${new URL(c.req.url).origin}${GET_SCHEMA_PATH}"`,
+    },
+  );
 });
 
 // PATCH /api/profile — Partial update of mutable profile fields
@@ -39,5 +47,7 @@ userProfile.patch('/', validateBody(profilePatchSchema), async (c) => {
   const body = c.get('validatedBody') as ProfileUpdate;
   const updated = await updateProfile(userId, body);
 
-  return c.json(updated);
+  return c.json(updated, 200, {
+    'Content-Type': `application/json; profile="${new URL(c.req.url).origin}${GET_SCHEMA_PATH}"`,
+  });
 });

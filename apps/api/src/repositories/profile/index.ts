@@ -43,6 +43,6 @@ export async function updateProfile(userId: string, fields: ProfileUpdate): Prom
     updatedAt: now,
   };
 
-  await ref.set(toDocument(updated));
+  await ref.update({ ...toDocument(updated) });
   return updated;
 }
