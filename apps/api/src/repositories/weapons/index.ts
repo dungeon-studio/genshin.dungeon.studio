@@ -123,4 +123,9 @@ export async function deleteWeaponInstance(
   weaponInstanceId: UUID,
 ): Promise<void> {
   await collectionRef(userId, weaponId).doc(weaponInstanceId).delete();
+
+  const remaining = await collectionRef(userId, weaponId).limit(1).get();
+  if (remaining.empty) {
+    await db.collection('users').doc(userId).collection('weapons').doc(weaponId).delete();
+  }
 }
