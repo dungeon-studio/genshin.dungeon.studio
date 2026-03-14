@@ -18,6 +18,10 @@ userProfile.use('*', auth);
 
 const GET_SCHEMA_PATH = '/schemas/profile/get/1.0.0.json';
 
+// Cherry-pick identity fields rather than spreading the full DecodedIdToken.
+// The token carries ~15 internal JWT fields (iss, aud, exp, firebase metadata,
+// custom claims) that are not part of the API contract and would make the
+// response shape unpredictable.
 function compositeResponse(decoded: DecodedIdToken, profile: UserProfile) {
   return {
     uid: decoded.uid,

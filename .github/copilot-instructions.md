@@ -51,6 +51,8 @@
 
 - Use the [REST API conventions reference](../docs/reference/rest-api-conventions.md) as guidance for API route shape, methods, status codes, error format, pagination, and auth handling.
 - All error responses use RFC 9457 Problem Details (`application/problem+json`). Always include a `detail` field, even for generic errors, to keep a stable schema for clients.
+- Validate API success responses against the published JSON Schema in tests using AJV, not just individual field assertions. Keep one sanity-check assertion per test for a specific value.
+- Prefer explicit types over type munging. For example, define `ProfileUpdate` rather than using `Partial<Pick<UserProfile, 'name'>>` inline.
 
 ## Frontend rules
 
