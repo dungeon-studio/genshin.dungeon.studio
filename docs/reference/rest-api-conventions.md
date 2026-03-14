@@ -111,6 +111,31 @@ Distinguish request parsing failures from schema validation failures:
 
 See [RFC9110], Section 15.5.21: <https://www.rfc-editor.org/rfc/rfc9110.html#name-422-unprocessable-content>
 
+### 12. Resource discovery
+
+The API root (`GET /`) serves as a HATEOAS entry point that advertises available resources. The response contains a `links` object populated dynamically from the app's registered routes at startup using Hono's route introspection (`app.routes`):
+
+```json
+{
+  "links": {
+    "characters": { "href": "/api/characters" },
+    "profile": { "href": "/api/profile" },
+    "weapons": { "href": "/api/weapons" },
+    "health": { "href": "/health" }
+  }
+}
+```
+
+The root response uses `application/json` with a `profile` parameter referencing its published JSON Schema, consistent with other API endpoints.
+
+Design choices:
+
+- **Link format**: a plain `links` object with `href` strings. Each key is the resource name derived from the last path segment. This avoids introducing a separate hypermedia media type for a single endpoint.
+- **Dynamic extraction**: the app's route table at startup populates the links. New resource endpoints appear automatically without manual maintenance. The discovery logic filters to `GET` handlers on top-level paths, excluding the root itself, wildcard routes, and parameterized sub-resource paths.
+- **Visibility**: all resources appear regardless of authentication status. URLs aren't secret; each resource enforces its own authorization.
+- **Versioning**: the `/health` endpoint carries the API version alongside operational metadata like `status` and `sha`, not the root response. The root handles resource discovery only.
+- **Route file**: the handler lives in `apps/api/src/routes/root.ts`. Mount it after all other routes so it can discover them.
+
 ## Repository scope
 
 These principles guide route design, method semantics, status code usage, error shape, pagination, authentication header handling, and timestamp format for `apps/api`.

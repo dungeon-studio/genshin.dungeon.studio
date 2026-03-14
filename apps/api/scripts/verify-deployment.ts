@@ -5,6 +5,7 @@ import { execFileSync } from 'node:child_process';
 
 type HealthResponse = {
   status?: string;
+  version?: string;
   sha?: string | null;
 };
 
