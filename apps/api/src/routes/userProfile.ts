@@ -22,7 +22,7 @@ function compositeResponse(decoded: DecodedIdToken, profile: UserProfile) {
   return {
     uid: decoded.uid,
     email: decoded.email ?? null,
-    email_verified: decoded.email_verified ?? false,
+    emailVerified: decoded.email_verified ?? false,
     picture: decoded.picture ?? null,
     ...profile,
   };

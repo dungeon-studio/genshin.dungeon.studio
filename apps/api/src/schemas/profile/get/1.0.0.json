@@ -13,7 +13,7 @@
       "type": ["string", "null"],
       "description": "Email address from the identity provider (read-only)"
     },
-    "email_verified": {
+    "emailVerified": {
       "type": "boolean",
       "description": "Whether the email has been verified (read-only)"
     },
@@ -34,6 +34,6 @@
       "description": "ISO 8601 UTC timestamp when the profile was last modified (system-managed)"
     }
   },
-  "required": ["uid", "email", "email_verified", "name", "createdAt", "updatedAt"],
+  "required": ["uid", "email", "emailVerified", "name", "createdAt", "updatedAt"],
   "additionalProperties": false
 }

@@ -67,11 +67,11 @@ Encode API timestamps as ISO 8601 UTC strings.
 
 Resources that combine data from multiple authorities define field ownership at the type level. Each field belongs to exactly one authority, and the API enforces ownership boundaries on write operations.
 
-| Category       | Authority                        | API behavior                                   | Example fields                   |
-| -------------- | -------------------------------- | ---------------------------------------------- | -------------------------------- |
-| Identity       | Firebase Auth (`DecodedIdToken`) | Read-only; projected from the decoded ID token | `uid`, `email`, `email_verified` |
-| Profile        | Firestore                        | Mutable via `PATCH`                            | `name`                           |
-| System-managed | Firestore                        | Set automatically; rejected in `PATCH` input   | `createdAt`, `updatedAt`         |
+| Category       | Authority                        | API behavior                                   | Example fields                  |
+| -------------- | -------------------------------- | ---------------------------------------------- | ------------------------------- |
+| Identity       | Firebase Auth (`DecodedIdToken`) | Read-only; projected from the decoded ID token | `uid`, `email`, `emailVerified` |
+| Profile        | Firestore                        | Mutable via `PATCH`                            | `name`                          |
+| System-managed | Firestore                        | Set automatically; rejected in `PATCH` input   | `createdAt`, `updatedAt`        |
 
 `PATCH` endpoints use `additionalProperties: false` in their JSON Schema to reject fields outside the mutable set.
 
