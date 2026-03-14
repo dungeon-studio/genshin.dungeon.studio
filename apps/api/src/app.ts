@@ -5,6 +5,7 @@ import type { AuthVariables } from '@/middleware/auth.js';
 import { characters } from '@/routes/characters.js';
 import { profiles } from '@/routes/profiles.js';
 import { schemas } from '@/routes/schemas.js';
+import { userProfile } from '@/routes/userProfile.js';
 import { weapons } from '@/routes/weapons.js';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
@@ -94,4 +95,5 @@ app.get('/health', (c) =>
 app.route('/schemas', schemas);
 app.route('/profiles', profiles);
 app.route('/api/characters', characters);
+app.route('/api/profile', userProfile);
 app.route('/api/weapons', weapons);

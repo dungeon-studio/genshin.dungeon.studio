@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://api.genshin.dungeon.studio/schemas/profile/patch/1.0.0.json",
+  "title": "Patch Profile",
+  "description": "Partial update to a user profile. Only mutable fields are accepted; auth-managed fields are rejected.",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false,
+  "minProperties": 1
+}

@@ -63,6 +63,18 @@ See [RFC6750]: <https://www.rfc-editor.org/rfc/rfc6750>
 
 Encode API timestamps as ISO 8601 UTC strings.
 
+### 9. Profile field ownership
+
+Resources that combine data from multiple authorities define field ownership at the type level. Each field belongs to exactly one authority, and the API enforces ownership boundaries on write operations.
+
+| Category       | Authority                        | API behavior                                   | Example fields                  |
+| -------------- | -------------------------------- | ---------------------------------------------- | ------------------------------- |
+| Identity       | Firebase Auth (`DecodedIdToken`) | Read-only; projected from the decoded ID token | `uid`, `email`, `emailVerified` |
+| Profile        | Firestore                        | Mutable via `PATCH`                            | `name`                          |
+| System-managed | Firestore                        | Set automatically; rejected in `PATCH` input   | `createdAt`, `updatedAt`        |
+
+`PATCH` endpoints use `additionalProperties: false` in their JSON Schema to reject fields outside the mutable set.
+
 ## Repository scope
 
 These principles guide route design, method semantics, status code usage, error shape, pagination, authentication header handling, and timestamp format for `apps/api`.
