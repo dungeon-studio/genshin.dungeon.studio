@@ -26,16 +26,23 @@ userProfile.use(
   negotiateContent([{ mediaType: 'application/json', profilePath: GET_SCHEMA_PATH }]),
 );
 
+// The profile response is a composite of two ownership domains:
+//
+//   Auth-owned (read-only, from verified token): uid, email, emailVerified, picture
+//   Profile-owned (mutable via PATCH, from Firestore): name, createdAt, updatedAt
+//
 // Cherry-pick identity fields rather than spreading the full DecodedIdToken.
 // The token carries ~15 internal JWT fields (iss, aud, exp, firebase metadata,
 // custom claims) that are not part of the API contract and would make the
 // response shape unpredictable.
 function compositeResponse(decoded: DecodedIdToken, profile: UserProfile) {
   return {
+    // Auth-owned — sourced from the verified Firebase ID token
     uid: decoded.uid,
     email: decoded.email ?? null,
     emailVerified: decoded.email_verified ?? false,
     picture: decoded.picture ?? null,
+    // Profile-owned — sourced from Firestore, mutable via PATCH
     ...profile,
   };
 }
