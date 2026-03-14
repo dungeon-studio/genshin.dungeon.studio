@@ -16,16 +16,25 @@ function collectionRef(userId: string, weaponId: string) {
     .collection('instances');
 }
 
-export async function listWeapons(userId: string): Promise<CollectionWeapon[]> {
+export async function listWeapons(userId: string): Promise<Record<string, CollectionWeapon[]>> {
   const weaponsRef = db.collection('users').doc(userId).collection('weapons');
   const weaponDocs = await weaponsRef.listDocuments();
 
-  const results: CollectionWeapon[] = [];
+  const results: Record<string, CollectionWeapon[]> = {};
 
-  for (const weaponDoc of weaponDocs) {
-    const snapshot = await weaponDoc.collection('instances').get();
-    for (const doc of snapshot.docs) {
-      results.push(fromDocument(doc.id as UUID, weaponDoc.id, doc.data() as DocumentData));
+  const snapshots = await Promise.all(
+    weaponDocs.map(async (weaponDoc) => ({
+      weaponId: weaponDoc.id,
+      snapshot: await weaponDoc.collection('instances').get(),
+    })),
+  );
+
+  for (const { weaponId, snapshot } of snapshots) {
+    const instances = snapshot.docs.map((doc) =>
+      fromDocument(doc.id as UUID, weaponId, doc.data() as DocumentData),
+    );
+    if (instances.length > 0) {
+      results[weaponId] = instances;
     }
   }
 
@@ -73,7 +82,14 @@ export async function createWeaponInstance(
     updatedAt: now,
   };
 
-  await collectionRef(userId, weaponId).doc(weaponInstanceId).set(toDocument(weapon));
+  const batch = db.batch();
+  batch.set(
+    db.collection('users').doc(userId).collection('weapons').doc(weaponId),
+    {},
+    { merge: true },
+  );
+  batch.set(collectionRef(userId, weaponId).doc(weaponInstanceId), toDocument(weapon));
+  await batch.commit();
 
   return weapon;
 }

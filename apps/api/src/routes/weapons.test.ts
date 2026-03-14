@@ -67,24 +67,26 @@ describe('Weapon routes', () => {
   });
 
   describe('GET /api/weapons', () => {
-    it('returns 200 with weapon list', async () => {
-      vi.mocked(listWeapons).mockResolvedValue([FAKE_WEAPON]);
+    it('returns 200 with weapons grouped by weaponId', async () => {
+      vi.mocked(listWeapons).mockResolvedValue({
+        'mistsplitter-reforged': [FAKE_WEAPON],
+      });
 
       const res = await app.request(authedRequest('GET', '/api/weapons'));
 
       expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body).toEqual([FAKE_WEAPON]);
+      expect(body).toEqual({ 'mistsplitter-reforged': [FAKE_WEAPON] });
     });
 
-    it('returns 200 with empty list when no weapons', async () => {
-      vi.mocked(listWeapons).mockResolvedValue([]);
+    it('returns 200 with empty object when no weapons', async () => {
+      vi.mocked(listWeapons).mockResolvedValue({});
 
       const res = await app.request(authedRequest('GET', '/api/weapons'));
 
       expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body).toEqual([]);
+      expect(body).toEqual({});
     });
   });
 

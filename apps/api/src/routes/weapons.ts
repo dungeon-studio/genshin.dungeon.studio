@@ -32,12 +32,12 @@ interface UpdateWeaponBody {
   refinementLevel?: unknown;
 }
 
-// GET /api/weapons — List all weapon instances
+// GET /api/weapons — List all weapon instances grouped by weaponId
 weapons.get('/', async (c) => {
   const userId = c.get('user').uid;
-  const items = await listWeapons(userId);
+  const grouped = await listWeapons(userId);
 
-  return c.json(items);
+  return c.json(grouped);
 });
 
 // GET /api/weapons/:weaponId — List instances of specific weapon
