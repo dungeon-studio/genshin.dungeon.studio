@@ -45,6 +45,10 @@ weapons.get('/:weaponId', async (c) => {
   const userId = c.get('user').uid;
   const { weaponId } = c.req.param();
 
+  if (!getWeaponById(weaponId)) {
+    throw new HTTPException(400, { message: `Unknown weapon: ${weaponId}` });
+  }
+
   const instances = await listWeaponInstances(userId, weaponId);
 
   return c.json(instances);
@@ -86,6 +90,10 @@ weapons.put('/:weaponId/:weaponInstanceId', async (c) => {
   const { weaponId } = c.req.param();
   const weaponInstanceId = c.req.param('weaponInstanceId') as UUID;
 
+  if (!getWeaponById(weaponId)) {
+    throw new HTTPException(400, { message: `Unknown weapon: ${weaponId}` });
+  }
+
   let body: UpdateWeaponBody;
   try {
     body = await c.req.json<UpdateWeaponBody>();
@@ -115,6 +123,10 @@ weapons.delete('/:weaponId/:weaponInstanceId', async (c) => {
   const userId = c.get('user').uid;
   const { weaponId } = c.req.param();
   const weaponInstanceId = c.req.param('weaponInstanceId') as UUID;
+
+  if (!getWeaponById(weaponId)) {
+    throw new HTTPException(400, { message: `Unknown weapon: ${weaponId}` });
+  }
 
   await deleteWeaponInstance(userId, weaponId, weaponInstanceId);
 

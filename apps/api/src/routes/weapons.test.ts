@@ -91,6 +91,13 @@ describe('Weapon routes', () => {
   });
 
   describe('GET /api/weapons/:weaponId', () => {
+    beforeEach(() => {
+      vi.mocked(getWeaponById).mockReturnValue({
+        id: 'mistsplitter-reforged',
+        name: 'Mistsplitter Reforged',
+      } as ReturnType<typeof getWeaponById>);
+    });
+
     it('returns 200 with instances of specific weapon', async () => {
       vi.mocked(listWeaponInstances).mockResolvedValue([FAKE_WEAPON]);
 
@@ -109,6 +116,16 @@ describe('Weapon routes', () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body).toEqual([]);
+    });
+
+    it('returns 400 for unknown weapon ID', async () => {
+      vi.mocked(getWeaponById).mockReturnValue(undefined);
+
+      const res = await app.request(authedRequest('GET', '/api/weapons/not-a-weapon'));
+
+      expect(res.status).toBe(400);
+      const body = (await res.json()) as { detail: string };
+      expect(body.detail).toBe('Unknown weapon: not-a-weapon');
     });
   });
 
@@ -240,6 +257,13 @@ describe('Weapon routes', () => {
   });
 
   describe('PUT /api/weapons/:weaponId/:weaponInstanceId', () => {
+    beforeEach(() => {
+      vi.mocked(getWeaponById).mockReturnValue({
+        id: 'mistsplitter-reforged',
+        name: 'Mistsplitter Reforged',
+      } as ReturnType<typeof getWeaponById>);
+    });
+
     it('returns 200 when weapon instance is updated', async () => {
       vi.mocked(updateWeaponInstance).mockResolvedValue(FAKE_WEAPON);
 
@@ -310,9 +334,30 @@ describe('Weapon routes', () => {
         3,
       );
     });
+
+    it('returns 400 for unknown weapon ID', async () => {
+      vi.mocked(getWeaponById).mockReturnValue(undefined);
+
+      const res = await app.request(
+        authedRequest('PUT', '/api/weapons/not-a-weapon/instance-uuid-1', {
+          refinementLevel: 1,
+        }),
+      );
+
+      expect(res.status).toBe(400);
+      const body = (await res.json()) as { detail: string };
+      expect(body.detail).toBe('Unknown weapon: not-a-weapon');
+    });
   });
 
   describe('DELETE /api/weapons/:weaponId/:weaponInstanceId', () => {
+    beforeEach(() => {
+      vi.mocked(getWeaponById).mockReturnValue({
+        id: 'mistsplitter-reforged',
+        name: 'Mistsplitter Reforged',
+      } as ReturnType<typeof getWeaponById>);
+    });
+
     it('returns 204 with no body', async () => {
       vi.mocked(deleteWeaponInstance).mockResolvedValue();
 
@@ -322,6 +367,18 @@ describe('Weapon routes', () => {
 
       expect(res.status).toBe(204);
       expect(await res.text()).toBe('');
+    });
+
+    it('returns 400 for unknown weapon ID', async () => {
+      vi.mocked(getWeaponById).mockReturnValue(undefined);
+
+      const res = await app.request(
+        authedRequest('DELETE', '/api/weapons/not-a-weapon/instance-uuid-1'),
+      );
+
+      expect(res.status).toBe(400);
+      const body = (await res.json()) as { detail: string };
+      expect(body.detail).toBe('Unknown weapon: not-a-weapon');
     });
   });
 });
