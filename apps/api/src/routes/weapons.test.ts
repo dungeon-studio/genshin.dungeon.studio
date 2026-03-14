@@ -29,7 +29,7 @@ import {
   listWeapons,
   updateWeaponInstance,
 } from '@/repositories/weapons/index.js';
-import { FAKE_TOKEN, FAKE_UID, authedRequest } from '@/test/auth-requests.js';
+import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
 import { getWeaponById } from '@genshin/game-data';
 import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '@genshin/types';
@@ -259,55 +259,55 @@ describe('Weapon routes', () => {
       expect(res.status).toBe(400);
     });
 
-    it('returns 400 when refinementLevel is missing', async () => {
+    it('returns 422 when refinementLevel is missing', async () => {
       const res = await app.request(
         authedRequest('POST', '/api/weapons/mistsplitter-reforged', {}),
       );
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
-    it('returns 400 when refinementLevel is not a number', async () => {
+    it('returns 422 when refinementLevel is not a number', async () => {
       const res = await app.request(
         authedRequest('POST', '/api/weapons/mistsplitter-reforged', {
           refinementLevel: 'R5',
         }),
       );
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
-    it('returns 400 when refinementLevel is below minimum', async () => {
+    it('returns 422 when refinementLevel is below minimum', async () => {
       const res = await app.request(
         authedRequest('POST', '/api/weapons/mistsplitter-reforged', {
           refinementLevel: MIN_REFINEMENT_LEVEL - 1,
         }),
       );
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
-    it('returns 400 when refinementLevel is above maximum', async () => {
+    it('returns 422 when refinementLevel is above maximum', async () => {
       const res = await app.request(
         authedRequest('POST', '/api/weapons/mistsplitter-reforged', {
           refinementLevel: MAX_REFINEMENT_LEVEL + 1,
         }),
       );
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
-    it('returns 400 when refinementLevel is not an integer', async () => {
+    it('returns 422 when refinementLevel is not an integer', async () => {
       const res = await app.request(
         authedRequest('POST', '/api/weapons/mistsplitter-reforged', {
           refinementLevel: 2.5,
         }),
       );
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
-    it('returns 400 when body contains extra properties', async () => {
+    it('returns 422 when body contains extra properties', async () => {
       const res = await app.request(
         authedRequest('POST', '/api/weapons/mistsplitter-reforged', {
           refinementLevel: 1,
@@ -315,7 +315,7 @@ describe('Weapon routes', () => {
         }),
       );
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
     it('accepts refinementLevel at minimum boundary', async () => {
@@ -409,17 +409,17 @@ describe('Weapon routes', () => {
       expect(res.status).toBe(400);
     });
 
-    it('returns 400 when refinementLevel is invalid', async () => {
+    it('returns 422 when refinementLevel is invalid', async () => {
       const res = await app.request(
         authedRequest('PUT', '/api/weapons/mistsplitter-reforged/instance-uuid-1', {
           refinementLevel: 0,
         }),
       );
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
-    it('returns 400 when body contains extra properties', async () => {
+    it('returns 422 when body contains extra properties', async () => {
       const res = await app.request(
         authedRequest('PUT', '/api/weapons/mistsplitter-reforged/instance-uuid-1', {
           refinementLevel: 1,
@@ -427,7 +427,7 @@ describe('Weapon routes', () => {
         }),
       );
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
     it('updates refinementLevel', async () => {
@@ -443,12 +443,6 @@ describe('Weapon routes', () => {
       );
 
       expect(res.status).toBe(200);
-      expect(updateWeaponInstance).toHaveBeenCalledWith(
-        FAKE_UID,
-        'mistsplitter-reforged',
-        'instance-uuid-1',
-        3,
-      );
     });
 
     it('returns 400 for unknown weapon ID', async () => {

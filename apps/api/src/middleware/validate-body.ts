@@ -36,7 +36,7 @@ export function validateBody(schema: Record<string, unknown>): MiddlewareHandler
         })
         .join('; ');
 
-      throw new HTTPException(400, {
+      throw new HTTPException(422, {
         message: detail ?? 'Request body validation failed',
       });
     }

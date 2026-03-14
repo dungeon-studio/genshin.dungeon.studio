@@ -249,54 +249,54 @@ describe('Character routes', () => {
       expect(res.status).toBe(400);
     });
 
-    it('returns 400 when constellationLevel is missing', async () => {
+    it('returns 422 when constellationLevel is missing', async () => {
       const res = await app.request(authedRequest('PUT', '/api/characters/albedo', {}));
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
-    it('returns 400 when constellationLevel is not a number', async () => {
+    it('returns 422 when constellationLevel is not a number', async () => {
       const res = await app.request(
         authedRequest('PUT', '/api/characters/albedo', { constellationLevel: 'high' }),
       );
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
-    it('returns 400 when constellationLevel is below minimum', async () => {
+    it('returns 422 when constellationLevel is below minimum', async () => {
       const res = await app.request(
         authedRequest('PUT', '/api/characters/albedo', {
           constellationLevel: MIN_CONSTELLATION_LEVEL - 1,
         }),
       );
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
-    it('returns 400 when constellationLevel is above maximum', async () => {
+    it('returns 422 when constellationLevel is above maximum', async () => {
       const res = await app.request(
         authedRequest('PUT', '/api/characters/albedo', {
           constellationLevel: MAX_CONSTELLATION_LEVEL + 1,
         }),
       );
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
-    it('returns 400 when constellationLevel is not an integer', async () => {
+    it('returns 422 when constellationLevel is not an integer', async () => {
       const res = await app.request(
         authedRequest('PUT', '/api/characters/albedo', { constellationLevel: 2.5 }),
       );
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
-    it('returns 400 when body contains extra properties', async () => {
+    it('returns 422 when body contains extra properties', async () => {
       const res = await app.request(
         authedRequest('PUT', '/api/characters/albedo', { constellationLevel: 2, extra: true }),
       );
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
     it('accepts constellationLevel at minimum boundary', async () => {
