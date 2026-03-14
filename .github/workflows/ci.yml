@@ -115,6 +115,12 @@ jobs:
 
       - uses: ./.github/actions/setup-node-pnpm
 
+      - name: Build
+        run: pnpm turbo run build --filter=@genshin/collection-json
+
+      - name: Typecheck
+        run: pnpm turbo run typecheck --filter=@genshin/collection-json
+
       - name: Test
         run: pnpm turbo run test --filter=@genshin/collection-json -- --coverage
 

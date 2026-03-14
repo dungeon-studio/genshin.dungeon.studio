@@ -217,6 +217,12 @@ describe('Weapon routes', () => {
       expect(res.headers.get('content-type')).toBe(COLLECTION_JSON);
     });
 
+    it('returns Location header pointing to created instance', () => {
+      expect(res.headers.get('location')).toBe(
+        'http://localhost/api/weapons/mistsplitter-reforged/instance-uuid-1',
+      );
+    });
+
     it('returns single-item collection', () => {
       expect(body.collection.items).toHaveLength(1);
     });

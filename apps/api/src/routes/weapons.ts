@@ -13,6 +13,7 @@ import {
 import {
   weaponInstanceListDocument,
   weaponItemDocument,
+  weaponItemHref,
   weaponListDocument,
 } from '@/representations/collection-json/weapons.js';
 import { COLLECTION_JSON } from '@genshin/collection-json';
@@ -94,9 +95,12 @@ weapons.post('/:weaponId', async (c) => {
   const weapon = await createWeaponInstance(userId, weaponId, refinementLevel);
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(JSON.stringify(weaponItemDocument(weapon, baseUrl)), {
+  return c.body(JSON.stringify(weaponInstanceListDocument([weapon], weaponId, baseUrl)), {
     status: 201,
-    headers: { 'Content-Type': COLLECTION_JSON },
+    headers: {
+      'Content-Type': COLLECTION_JSON,
+      Location: weaponItemHref(baseUrl, weapon),
+    },
   });
 });
 
