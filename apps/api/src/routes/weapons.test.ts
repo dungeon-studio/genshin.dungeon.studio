@@ -50,6 +50,8 @@ const FAKE_WEAPON_ITEM_DATA = [
   { name: 'updatedAt', value: '2026-03-13T00:00:00.000Z' },
 ];
 
+const EXPECTED_CONTENT_TYPE = `${COLLECTION_JSON}; profile="http://localhost/profiles/weapons/1.0.0.json"`;
+
 describe('Weapon routes', () => {
   beforeEach(() => {
     vi.mocked(verifyToken).mockResolvedValue(FAKE_TOKEN);
@@ -100,7 +102,7 @@ describe('Weapon routes', () => {
     });
 
     it('returns collection+json content type', () => {
-      expect(res.headers.get('content-type')).toBe(COLLECTION_JSON);
+      expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
     it('returns one item per weapon', () => {
@@ -155,7 +157,7 @@ describe('Weapon routes', () => {
     });
 
     it('returns collection+json content type', () => {
-      expect(res.headers.get('content-type')).toBe(COLLECTION_JSON);
+      expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
     it('returns one item per instance', () => {
@@ -214,7 +216,7 @@ describe('Weapon routes', () => {
     });
 
     it('returns collection+json content type', () => {
-      expect(res.headers.get('content-type')).toBe(COLLECTION_JSON);
+      expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
     it('returns Location header pointing to created instance', () => {
@@ -305,6 +307,17 @@ describe('Weapon routes', () => {
       expect(res.status).toBe(400);
     });
 
+    it('returns 400 when body contains extra properties', async () => {
+      const res = await app.request(
+        authedRequest('POST', '/api/weapons/mistsplitter-reforged', {
+          refinementLevel: 1,
+          extra: true,
+        }),
+      );
+
+      expect(res.status).toBe(400);
+    });
+
     it('accepts refinementLevel at minimum boundary', async () => {
       vi.mocked(createWeaponInstance).mockResolvedValue({
         ...FAKE_WEAPON,
@@ -359,7 +372,7 @@ describe('Weapon routes', () => {
     });
 
     it('returns collection+json content type', () => {
-      expect(res.headers.get('content-type')).toBe(COLLECTION_JSON);
+      expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
     it('returns single-item collection', () => {
@@ -400,6 +413,17 @@ describe('Weapon routes', () => {
       const res = await app.request(
         authedRequest('PUT', '/api/weapons/mistsplitter-reforged/instance-uuid-1', {
           refinementLevel: 0,
+        }),
+      );
+
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 400 when body contains extra properties', async () => {
+      const res = await app.request(
+        authedRequest('PUT', '/api/weapons/mistsplitter-reforged/instance-uuid-1', {
+          refinementLevel: 1,
+          extra: true,
         }),
       );
 

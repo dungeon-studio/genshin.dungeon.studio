@@ -3,6 +3,7 @@
 
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
+import { validateBody } from '@/middleware/validate-body.js';
 import {
   createWeaponInstance,
   deleteWeaponInstance,
@@ -16,14 +17,11 @@ import {
   weaponItemHref,
   weaponListDocument,
 } from '@/representations/collection-json/weapons.js';
+import weaponPostSchema from '@/schemas/weapons/post/1.0.0.json' with { type: 'json' };
+import weaponPutSchema from '@/schemas/weapons/put/1.0.0.json' with { type: 'json' };
 import { COLLECTION_JSON } from '@genshin/collection-json';
 import { getWeaponById } from '@genshin/game-data';
-import {
-  MAX_REFINEMENT_LEVEL,
-  MIN_REFINEMENT_LEVEL,
-  isValidRefinementLevel,
-  type UUID,
-} from '@genshin/types';
+import type { UUID } from '@genshin/types';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
@@ -31,12 +29,14 @@ export const weapons = new Hono<{ Variables: AuthVariables }>();
 
 weapons.use('*', auth);
 
+const PROFILE_PATH = '/profiles/weapons/1.0.0.json';
+
 interface CreateWeaponBody {
-  refinementLevel?: unknown;
+  refinementLevel: number;
 }
 
 interface UpdateWeaponBody {
-  refinementLevel?: unknown;
+  refinementLevel: number;
 }
 
 // GET /api/weapons — List all weapon instances as a flat collection
@@ -46,7 +46,7 @@ weapons.get('/', async (c) => {
   const baseUrl = new URL(c.req.url).origin;
 
   return c.body(JSON.stringify(weaponListDocument(items, baseUrl)), {
-    headers: { 'Content-Type': COLLECTION_JSON },
+    headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
   });
 });
 
@@ -63,12 +63,12 @@ weapons.get('/:weaponId', async (c) => {
   const baseUrl = new URL(c.req.url).origin;
 
   return c.body(JSON.stringify(weaponInstanceListDocument(instances, weaponId, baseUrl)), {
-    headers: { 'Content-Type': COLLECTION_JSON },
+    headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
   });
 });
 
 // POST /api/weapons/:weaponId — Create new weapon instance
-weapons.post('/:weaponId', async (c) => {
+weapons.post('/:weaponId', validateBody(weaponPostSchema), async (c) => {
   const userId = c.get('user').uid;
   const { weaponId } = c.req.param();
 
@@ -77,20 +77,7 @@ weapons.post('/:weaponId', async (c) => {
     throw new HTTPException(400, { message: `Unknown weapon: ${weaponId}` });
   }
 
-  let body: CreateWeaponBody;
-  try {
-    body = await c.req.json<CreateWeaponBody>();
-  } catch {
-    throw new HTTPException(400, { message: 'Invalid or missing JSON body' });
-  }
-
-  const { refinementLevel } = body;
-
-  if (!isValidRefinementLevel(refinementLevel)) {
-    throw new HTTPException(400, {
-      message: `refinementLevel must be an integer between ${MIN_REFINEMENT_LEVEL} and ${MAX_REFINEMENT_LEVEL}`,
-    });
-  }
+  const { refinementLevel } = await c.req.json<CreateWeaponBody>();
 
   const weapon = await createWeaponInstance(userId, weaponId, refinementLevel);
   const baseUrl = new URL(c.req.url).origin;
@@ -98,14 +85,14 @@ weapons.post('/:weaponId', async (c) => {
   return c.body(JSON.stringify(weaponInstanceListDocument([weapon], weaponId, baseUrl)), {
     status: 201,
     headers: {
-      'Content-Type': COLLECTION_JSON,
+      'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"`,
       Location: weaponItemHref(baseUrl, weapon),
     },
   });
 });
 
 // PUT /api/weapons/:weaponId/:weaponInstanceId — Update weapon instance
-weapons.put('/:weaponId/:weaponInstanceId', async (c) => {
+weapons.put('/:weaponId/:weaponInstanceId', validateBody(weaponPutSchema), async (c) => {
   const userId = c.get('user').uid;
   const { weaponId } = c.req.param();
   const weaponInstanceId = c.req.param('weaponInstanceId') as UUID;
@@ -114,20 +101,7 @@ weapons.put('/:weaponId/:weaponInstanceId', async (c) => {
     throw new HTTPException(400, { message: `Unknown weapon: ${weaponId}` });
   }
 
-  let body: UpdateWeaponBody;
-  try {
-    body = await c.req.json<UpdateWeaponBody>();
-  } catch {
-    throw new HTTPException(400, { message: 'Invalid or missing JSON body' });
-  }
-
-  const { refinementLevel } = body;
-
-  if (!isValidRefinementLevel(refinementLevel)) {
-    throw new HTTPException(400, {
-      message: `refinementLevel must be an integer between ${MIN_REFINEMENT_LEVEL} and ${MAX_REFINEMENT_LEVEL}`,
-    });
-  }
+  const { refinementLevel } = await c.req.json<UpdateWeaponBody>();
 
   const weapon = await updateWeaponInstance(userId, weaponId, weaponInstanceId, refinementLevel);
 
@@ -138,7 +112,7 @@ weapons.put('/:weaponId/:weaponInstanceId', async (c) => {
   const baseUrl = new URL(c.req.url).origin;
 
   return c.body(JSON.stringify(weaponItemDocument(weapon, baseUrl)), {
-    headers: { 'Content-Type': COLLECTION_JSON },
+    headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
   });
 });
 

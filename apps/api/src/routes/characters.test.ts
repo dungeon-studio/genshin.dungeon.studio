@@ -39,6 +39,8 @@ const FAKE_CHARACTER: CollectionCharacter = {
   updatedAt: '2026-03-13T00:00:00.000Z' as CollectionCharacter['updatedAt'],
 };
 
+const EXPECTED_CONTENT_TYPE = `${COLLECTION_JSON}; profile="http://localhost/profiles/characters/1.0.0.json"`;
+
 describe('Character routes', () => {
   beforeEach(() => {
     vi.mocked(verifyToken).mockResolvedValue(FAKE_TOKEN);
@@ -89,7 +91,7 @@ describe('Character routes', () => {
     });
 
     it('returns collection+json content type', () => {
-      expect(res.headers.get('content-type')).toBe(COLLECTION_JSON);
+      expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
     it('returns one item per character', () => {
@@ -140,7 +142,7 @@ describe('Character routes', () => {
     });
 
     it('returns collection+json content type', () => {
-      expect(res.headers.get('content-type')).toBe(COLLECTION_JSON);
+      expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
     it('returns single-item collection', () => {
@@ -190,7 +192,7 @@ describe('Character routes', () => {
     });
 
     it('returns collection+json content type', () => {
-      expect(res.headers.get('content-type')).toBe(COLLECTION_JSON);
+      expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
     it('returns single-item collection', () => {
@@ -284,6 +286,14 @@ describe('Character routes', () => {
     it('returns 400 when constellationLevel is not an integer', async () => {
       const res = await app.request(
         authedRequest('PUT', '/api/characters/albedo', { constellationLevel: 2.5 }),
+      );
+
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 400 when body contains extra properties', async () => {
+      const res = await app.request(
+        authedRequest('PUT', '/api/characters/albedo', { constellationLevel: 2, extra: true }),
       );
 
       expect(res.status).toBe(400);

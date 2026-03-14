@@ -16,12 +16,15 @@
     "@genshin/game-data": "workspace:*",
     "@genshin/types": "workspace:*",
     "@hono/node-server": "1.19.11",
+    "ajv": "8.18.0",
     "firebase-admin": "13.7.0",
-    "hono": "4.12.7"
+    "hono": "4.12.7",
+    "semver": "7.7.4"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@types/node": "25.5.0",
+    "@types/semver": "7.7.1",
     "@vitest/coverage-v8": "4.1.0",
     "eslint": "10.0.3",
     "globals": "17.4.0",
