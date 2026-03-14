@@ -3,6 +3,8 @@
 
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
+import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
+import { negotiateContent } from '@/middleware/negotiate-content.js';
 import type { ValidatedBodyVariables } from '@/middleware/validate-body.js';
 import { validateBody } from '@/middleware/validate-body.js';
 import { getProfile, updateProfile } from '@/repositories/profile/index.js';
@@ -12,11 +14,17 @@ import type { DecodedIdToken } from 'firebase-admin/auth';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
-export const userProfile = new Hono<{ Variables: AuthVariables & ValidatedBodyVariables }>();
-
-userProfile.use('*', auth);
+export const userProfile = new Hono<{
+  Variables: AuthVariables & NegotiatedContentVariables & ValidatedBodyVariables;
+}>();
 
 const GET_SCHEMA_PATH = '/schemas/profile/get/1.0.0.json';
+
+userProfile.use('*', auth);
+userProfile.use(
+  '*',
+  negotiateContent([{ mediaType: 'application/json', profilePath: GET_SCHEMA_PATH }]),
+);
 
 // Cherry-pick identity fields rather than spreading the full DecodedIdToken.
 // The token carries ~15 internal JWT fields (iss, aud, exp, firebase metadata,
@@ -42,7 +50,7 @@ userProfile.get('/', async (c) => {
   }
 
   return c.json(compositeResponse(decoded, profile), 200, {
-    'Content-Type': `application/json; profile="${new URL(c.req.url).origin}${GET_SCHEMA_PATH}"`,
+    'Content-Type': c.get('negotiatedMediaType'),
   });
 });
 
@@ -53,6 +61,6 @@ userProfile.patch('/', validateBody(profilePatchSchema), async (c) => {
   const updated = await updateProfile(decoded.uid, body);
 
   return c.json(compositeResponse(decoded, updated), 200, {
-    'Content-Type': `application/json; profile="${new URL(c.req.url).origin}${GET_SCHEMA_PATH}"`,
+    'Content-Type': c.get('negotiatedMediaType'),
   });
 });

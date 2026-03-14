@@ -39,6 +39,29 @@ See [RFC9110], Section 12: <https://www.rfc-editor.org/rfc/rfc9110.html#name-con
 
 See [JSONSchema2020-12]: <https://json-schema.org/draft/2020-12>
 
+#### `profile` parameter negotiation
+
+Clients request a specific representation version using the `profile` parameter on the `Accept` header, referencing the schema URI that describes the expected response shape:
+
+```http
+GET /api/profile HTTP/1.1
+Accept: application/json; profile="https://api.genshin.dungeon.studio/schemas/profile/get/1.0.0.json"
+```
+
+The API confirms the schema used in the response `Content-Type`:
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json; profile="https://api.genshin.dungeon.studio/schemas/profile/get/1.0.0.json"
+```
+
+Negotiation rules:
+
+- **Profile omitted**: the API serves the latest representation version.
+- **Profile matches a supported version**: the API responds with that representation.
+- **Profile doesn't match any supported version**: the API responds with `406 Not Acceptable` using the RFC 9457 error format.
+- **`Accept` doesn't include `application/json`** (or a wildcard): the API responds with `406 Not Acceptable`.
+
 ### 5. Consistent error contract
 
 Use the Problem Details standard for machine-readable error responses. Return `application/problem+json` with stable fields and consistent extension members where needed.
