@@ -134,6 +134,30 @@ For complex logic, decisions, or subtle patterns:
 - Performance-sensitive code—explain the optimization
 - External dependencies—integration quirks or API specifics
 
+### Documentation strategy
+
+When documenting decisions or conventions, prefer the highest-priority location that fits:
+
+1. **Inline comments**: explain _why_ code works a certain way.
+2. **Documentation strings**: explain module or function purpose when the name isn't sufficient.
+3. **`docs/`**: task-specific how-tos, references, and explanations following the [Diátaxis](https://diataxis.fr/) framework.
+4. **`CONTRIBUTING.md`**: high-level human workflow guidance and project conventions.
+5. **`.github/copilot-instructions.md`**: AI-specific decision rules.
+
+Avoid duplicating the same guidance across multiple locations. Place it once at the most appropriate level and link to it from others.
+
+### Naming conventions
+
+Use descriptive, specific names for files and modules. Avoid generic names like "helpers." For example, name a shared test auth module `auth-requests.ts`, not `helpers.ts`.
+
+### Shared types
+
+Branded types in `packages/types/` each get their own file (for example, `uuid.ts`, `isoTimestamp.ts`). Export both the type and any related validation functions from the same file.
+
+### Test utilities
+
+Shared API test utilities live in `apps/api/src/test/` with descriptive file names. The build excludes this directory via `tsconfig.build.json`.
+
 ---
 
 ## Pull request workflow

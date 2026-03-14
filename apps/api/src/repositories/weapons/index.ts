@@ -76,6 +76,9 @@ export async function createWeaponInstance(
     updatedAt: now,
   };
 
+  // Batch write: create the parent weapon doc so listWeapons() can discover it
+  // via listDocuments(), then create the instance doc. The parent doc is an
+  // empty anchor; see #455 for the planned collectionGroup redesign.
   const batch = db.batch();
   batch.set(
     db.collection('users').doc(userId).collection('weapons').doc(weaponId),
