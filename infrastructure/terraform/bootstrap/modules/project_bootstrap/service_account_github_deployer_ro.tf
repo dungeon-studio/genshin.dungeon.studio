@@ -80,6 +80,16 @@ resource "google_project_iam_member" "github_deployer_ro_datastore_viewer" {
   member  = "serviceAccount:${google_service_account.github_deployer_ro.email}"
 }
 
+# Required for Terraform plan refresh of `google_firebase_web_app`.
+# The custom role includes `firebase.clients.get` and `firebase.projects.get`,
+# but the google-beta provider requires additional permissions covered by this
+# predefined role; track tightening in a follow-up issue.
+resource "google_project_iam_member" "github_deployer_ro_firebase_viewer" {
+  project = google_project.env.project_id
+  role    = "roles/firebase.viewer"
+  member  = "serviceAccount:${google_service_account.github_deployer_ro.email}"
+}
+
 resource "google_storage_bucket_iam_member" "github_deployer_ro_state_bucket" {
   bucket = var.state_bucket_name
   role   = "roles/storage.objectViewer"
