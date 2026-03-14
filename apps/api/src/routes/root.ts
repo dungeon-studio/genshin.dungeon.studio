@@ -10,13 +10,12 @@ import { findTargetHandler, isMiddleware } from 'hono/utils/handler';
 const ROOT_SCHEMA_PATH = '/schemas/root/get/1.0.0.json';
 
 /**
- * Discover top-level resource collection paths from the app's registered
- * routes. Returns GET-accessible paths that represent resource collections
- * (e.g. `/api/characters`) plus infrastructure endpoints like `/health` and
- * `/schemas`.
+ * Discover top-level resource paths from the app's registered routes.
+ * Returns GET-accessible paths that have a discrete handler (e.g.
+ * `/api/characters`, `/health`).
  *
- * Excludes the root path itself, wildcard catch-all routes, and sub-resource
- * paths that contain route parameters.
+ * Excludes the root path itself, wildcard catch-all routes (like `/schemas/*`
+ * and `/profiles/*`), and sub-resource paths that contain route parameters.
  */
 function discoverLinks<E extends Env>(app: HonoApp<E>): Record<string, { href: string }> {
   const seen = new Set<string>();
