@@ -5,12 +5,12 @@ import type { ISOTimestamp } from './isoTimestamp.js';
 import type { TeamMember } from './teamMember.js';
 
 /**
- * Team loadout slot index for a user (0-indexed, 0-3).
+ * Team loadout slot index for a user (1-indexed, 1-4).
  *
  * This identifies which team loadout in a user's collection this team
  * corresponds to, not the index of an individual party member.
  */
-export type TeamSlot = 0 | 1 | 2 | 3;
+export type TeamSlot = 1 | 2 | 3 | 4;
 
 /**
  * Team represents a party composition of 4 Genshin Impact characters.
@@ -21,7 +21,7 @@ export type TeamSlot = 0 | 1 | 2 | 3;
  */
 export interface Team {
   /**
-   * The user's team loadout slot this team is assigned to (0-3).
+   * The user's team loadout slot this team is assigned to (1-4).
    */
   slot: TeamSlot;
   name: string;

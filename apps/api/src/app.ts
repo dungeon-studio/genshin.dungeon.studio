@@ -7,6 +7,7 @@ import { characters } from '@/routes/characters.js';
 import { profiles } from '@/routes/profiles.js';
 import { root } from '@/routes/root.js';
 import { schemas } from '@/routes/schemas.js';
+import { teams } from '@/routes/teams.js';
 import { userProfile } from '@/routes/userProfile.js';
 import { weapons } from '@/routes/weapons.js';
 import { Hono } from 'hono';
@@ -92,6 +93,7 @@ app.route('/schemas', schemas);
 app.route('/profiles', profiles);
 app.route('/api/characters', characters);
 app.route('/api/profile', userProfile);
+app.route('/api/teams', teams);
 app.route('/api/weapons', weapons);
 
 // Root must be registered after all other routes so it can discover them
