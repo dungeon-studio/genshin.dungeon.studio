@@ -62,6 +62,10 @@ jobs:
       - name: Dump container logs on failure
         if: failure()
         run: docker logs api-smoke 2>&1 || true
+
+      - name: Cleanup container
+        if: always()
+        run: docker rm -f api-smoke 2>/dev/null || true
 # ---------------------------------------------------------------------------
 # Maintenance notes
 # ---------------------------------------------------------------------------
