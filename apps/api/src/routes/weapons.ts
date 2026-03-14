@@ -3,6 +3,7 @@
 
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
+import type { ValidatedBodyVariables } from '@/middleware/validate-body.js';
 import { validateBody } from '@/middleware/validate-body.js';
 import {
   createWeaponInstance,
@@ -25,7 +26,7 @@ import type { UUID } from '@genshin/types';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
-export const weapons = new Hono<{ Variables: AuthVariables }>();
+export const weapons = new Hono<{ Variables: AuthVariables & ValidatedBodyVariables }>();
 
 weapons.use('*', auth);
 
@@ -77,7 +78,7 @@ weapons.post('/:weaponId', validateBody(weaponPostSchema), async (c) => {
     throw new HTTPException(400, { message: `Unknown weapon: ${weaponId}` });
   }
 
-  const { refinementLevel } = await c.req.json<CreateWeaponBody>();
+  const { refinementLevel } = c.get('validatedBody') as CreateWeaponBody;
 
   const weapon = await createWeaponInstance(userId, weaponId, refinementLevel);
   const baseUrl = new URL(c.req.url).origin;
@@ -101,7 +102,7 @@ weapons.put('/:weaponId/:weaponInstanceId', validateBody(weaponPutSchema), async
     throw new HTTPException(400, { message: `Unknown weapon: ${weaponId}` });
   }
 
-  const { refinementLevel } = await c.req.json<UpdateWeaponBody>();
+  const { refinementLevel } = c.get('validatedBody') as UpdateWeaponBody;
 
   const weapon = await updateWeaponInstance(userId, weaponId, weaponInstanceId, refinementLevel);
 

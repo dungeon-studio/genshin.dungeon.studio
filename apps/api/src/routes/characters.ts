@@ -3,6 +3,7 @@
 
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
+import type { ValidatedBodyVariables } from '@/middleware/validate-body.js';
 import { validateBody } from '@/middleware/validate-body.js';
 import {
   deleteCharacter,
@@ -20,7 +21,7 @@ import { getCharacterById } from '@genshin/game-data';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
-export const characters = new Hono<{ Variables: AuthVariables }>();
+export const characters = new Hono<{ Variables: AuthVariables & ValidatedBodyVariables }>();
 
 characters.use('*', auth);
 
@@ -68,7 +69,7 @@ characters.put('/:characterId', validateBody(characterPutSchema), async (c) => {
     throw new HTTPException(400, { message: `Unknown character: ${characterId}` });
   }
 
-  const { constellationLevel } = await c.req.json<SaveCharacterBody>();
+  const { constellationLevel } = c.get('validatedBody') as SaveCharacterBody;
   const { character, created } = await saveCharacter(userId, characterId, constellationLevel);
   const baseUrl = new URL(c.req.url).origin;
 

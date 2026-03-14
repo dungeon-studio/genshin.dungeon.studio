@@ -8,8 +8,13 @@ import { HTTPException } from 'hono/http-exception';
 
 const ajv = new Ajv2020({ allErrors: true });
 
+export type ValidatedBodyVariables = {
+  validatedBody: unknown;
+};
+
 /**
  * Hono middleware that validates the JSON request body against a JSON Schema.
+ * Stores the parsed body on the context as `validatedBody`.
  * Returns 400 with validation error details on failure.
  */
 export function validateBody(schema: Record<string, unknown>): MiddlewareHandler {
@@ -36,6 +41,7 @@ export function validateBody(schema: Record<string, unknown>): MiddlewareHandler
       });
     }
 
+    c.set('validatedBody', body);
     await next();
   };
 }

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/main.ts",
-    "build": "tsc --project tsconfig.build.json && tsc-alias --project tsconfig.build.json",
+    "build": "tsc --project tsconfig.build.json && tsc-alias --project tsconfig.build.json && cp -r src/schemas src/profiles dist/",
     "start": "node dist/main.js",
     "lint": "eslint .",
     "test": "vitest run",
