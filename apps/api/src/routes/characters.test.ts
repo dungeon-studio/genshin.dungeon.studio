@@ -28,6 +28,7 @@ import {
   saveCharacter,
 } from '@/repositories/characters/index.js';
 import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
+import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
 import { getCharacterById } from '@genshin/game-data';
 import { MAX_CONSTELLATION_LEVEL, MIN_CONSTELLATION_LEVEL } from '@genshin/types';
 
@@ -61,39 +62,98 @@ describe('Character routes', () => {
 
       expect(res.status).toBe(401);
     });
-  });
 
-  describe('GET /api/characters', () => {
-    it('returns 200 with character list', async () => {
-      vi.mocked(listCharacters).mockResolvedValue([FAKE_CHARACTER]);
+    it('returns 401 when token is expired', async () => {
+      vi.mocked(verifyToken).mockRejectedValue({ code: 'auth/id-token-expired' });
 
       const res = await app.request(authedRequest('GET', '/api/characters'));
 
-      expect(res.status).toBe(200);
-      const body = await res.json();
-      expect(body).toEqual([FAKE_CHARACTER]);
+      expect(res.status).toBe(401);
+      const body = (await res.json()) as { detail: string };
+      expect(body.detail).toBe('Invalid or expired token');
+    });
+  });
+
+  describe('GET /api/characters', () => {
+    let res: Response;
+    let body: CollectionDocument;
+
+    beforeEach(async () => {
+      vi.mocked(listCharacters).mockResolvedValue([FAKE_CHARACTER]);
+      res = await app.request(authedRequest('GET', '/api/characters'));
+      body = (await res.json()) as CollectionDocument;
     });
 
-    it('returns 200 with empty list when no characters', async () => {
+    it('returns 200', () => {
+      expect(res.status).toBe(200);
+    });
+
+    it('returns collection+json content type', () => {
+      expect(res.headers.get('content-type')).toBe(COLLECTION_JSON);
+    });
+
+    it('returns one item per character', () => {
+      expect(body.collection.items).toHaveLength(1);
+    });
+
+    it('includes character domain data', () => {
+      expect(body.collection.items[0].data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ name: 'characterId', value: 'albedo' }),
+          expect.objectContaining({ name: 'constellationLevel', value: 2 }),
+        ]),
+      );
+    });
+
+    it('returns empty items when no characters exist', async () => {
       vi.mocked(listCharacters).mockResolvedValue([]);
 
       const res = await app.request(authedRequest('GET', '/api/characters'));
 
-      expect(res.status).toBe(200);
-      const body = await res.json();
-      expect(body).toEqual([]);
+      const body = (await res.json()) as CollectionDocument;
+      expect(body.collection.items).toEqual([]);
+    });
+
+    it('returns 500 when repository throws', async () => {
+      vi.mocked(listCharacters).mockRejectedValue(new Error('Firestore unavailable'));
+
+      const res = await app.request(authedRequest('GET', '/api/characters'));
+
+      expect(res.status).toBe(500);
+      const body = (await res.json()) as { detail: string };
+      expect(body.detail).toBe('An unexpected error occurred');
     });
   });
 
   describe('GET /api/characters/:characterId', () => {
-    it('returns 200 with character', async () => {
+    let res: Response;
+    let body: CollectionDocument;
+
+    beforeEach(async () => {
       vi.mocked(getCharacter).mockResolvedValue(FAKE_CHARACTER);
+      res = await app.request(authedRequest('GET', '/api/characters/albedo'));
+      body = (await res.json()) as CollectionDocument;
+    });
 
-      const res = await app.request(authedRequest('GET', '/api/characters/albedo'));
-
+    it('returns 200', () => {
       expect(res.status).toBe(200);
-      const body = await res.json();
-      expect(body).toEqual(FAKE_CHARACTER);
+    });
+
+    it('returns collection+json content type', () => {
+      expect(res.headers.get('content-type')).toBe(COLLECTION_JSON);
+    });
+
+    it('returns single-item collection', () => {
+      expect(body.collection.items).toHaveLength(1);
+    });
+
+    it('includes character domain data', () => {
+      expect(body.collection.items[0].data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ name: 'characterId', value: 'albedo' }),
+          expect.objectContaining({ name: 'constellationLevel', value: 2 }),
+        ]),
+      );
     });
 
     it('returns 404 when character not in collection', async () => {
@@ -115,19 +175,39 @@ describe('Character routes', () => {
       } as ReturnType<typeof getCharacterById>);
     });
 
-    it('returns 201 when character is newly added', async () => {
+    let res: Response;
+    let body: CollectionDocument;
+
+    beforeEach(async () => {
       vi.mocked(saveCharacter).mockResolvedValue({
         character: FAKE_CHARACTER,
         created: true,
       });
-
-      const res = await app.request(
+      res = await app.request(
         authedRequest('PUT', '/api/characters/albedo', { constellationLevel: 2 }),
       );
+      body = (await res.json()) as CollectionDocument;
+    });
 
+    it('returns collection+json content type', () => {
+      expect(res.headers.get('content-type')).toBe(COLLECTION_JSON);
+    });
+
+    it('returns single-item collection', () => {
+      expect(body.collection.items).toHaveLength(1);
+    });
+
+    it('includes character domain data', () => {
+      expect(body.collection.items[0].data).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ name: 'characterId', value: 'albedo' }),
+          expect.objectContaining({ name: 'constellationLevel', value: 2 }),
+        ]),
+      );
+    });
+
+    it('returns 201 when character is newly added', () => {
       expect(res.status).toBe(201);
-      const body = await res.json();
-      expect(body).toEqual(FAKE_CHARACTER);
     });
 
     it('returns 200 when character is updated', async () => {
@@ -141,8 +221,6 @@ describe('Character routes', () => {
       );
 
       expect(res.status).toBe(200);
-      const body = await res.json();
-      expect(body).toEqual(FAKE_CHARACTER);
     });
 
     it('returns 400 for unknown character ID', async () => {
@@ -250,6 +328,14 @@ describe('Character routes', () => {
 
       expect(res.status).toBe(204);
       expect(await res.text()).toBe('');
+    });
+
+    it('returns 204 when character does not exist', async () => {
+      vi.mocked(deleteCharacter).mockResolvedValue();
+
+      const res = await app.request(authedRequest('DELETE', '/api/characters/nonexistent'));
+
+      expect(res.status).toBe(204);
     });
   });
 });
