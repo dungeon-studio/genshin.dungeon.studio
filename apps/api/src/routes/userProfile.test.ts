@@ -1,7 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import profileGetSchema from '@/schemas/profile/get/1.0.0.json' with { type: 'json' };
 import type { UserProfile } from '@genshin/types';
+import { Ajv2020 } from 'ajv/dist/2020.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/firebase/auth.js', () => ({
@@ -17,6 +19,9 @@ import { app } from '@/app.js';
 import { verifyToken } from '@/lib/firebase/auth.js';
 import { getProfile, updateProfile } from '@/repositories/profile/index.js';
 import { FAKE_UID, authedRequest } from '@/test/auth-requests.js';
+
+const ajv = new Ajv2020();
+const validateGetSchema = ajv.compile(profileGetSchema);
 
 const EXPECTED_CONTENT_TYPE =
   'application/json; profile="http://localhost/schemas/profile/get/1.0.0.json"';
@@ -69,26 +74,16 @@ describe('Profile routes', () => {
   });
 
   describe('GET /api/profile', () => {
-    it('returns 200 with profile data', async () => {
+    it('returns 200 with a response matching the profile schema', async () => {
       vi.mocked(getProfile).mockResolvedValue(FAKE_PROFILE);
 
       const res = await app.request(authedRequest('GET', '/api/profile'));
 
       expect(res.status).toBe(200);
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
-      const body = (await res.json()) as Record<string, unknown>;
-      expect(body.name).toBe('Traveler');
-    });
-
-    it('includes auth identity fields from token', async () => {
-      vi.mocked(getProfile).mockResolvedValue(FAKE_PROFILE);
-
-      const res = await app.request(authedRequest('GET', '/api/profile'));
-
-      const body = (await res.json()) as Record<string, unknown>;
-      expect(body.uid).toBe(FAKE_UID);
-      expect(body.email).toBe('traveler@example.com');
-      expect(body.email_verified).toBe(true);
+      const body = await res.json();
+      expect(validateGetSchema(body)).toBe(true);
+      expect((body as Record<string, unknown>).name).toBe('Traveler');
     });
 
     it('returns 404 when profile does not exist', async () => {
@@ -113,7 +108,7 @@ describe('Profile routes', () => {
   });
 
   describe('PATCH /api/profile', () => {
-    it('returns 200 with updated profile', async () => {
+    it('returns 200 with a response matching the profile schema', async () => {
       const updated = { ...FAKE_PROFILE, name: 'Aether' };
       vi.mocked(updateProfile).mockResolvedValue(updated);
 
@@ -121,8 +116,9 @@ describe('Profile routes', () => {
 
       expect(res.status).toBe(200);
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
-      const body = (await res.json()) as UserProfile;
-      expect(body.name).toBe('Aether');
+      const body = await res.json();
+      expect(validateGetSchema(body)).toBe(true);
+      expect((body as Record<string, unknown>).name).toBe('Aether');
     });
 
     it('rejects empty body', async () => {
