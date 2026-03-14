@@ -75,6 +75,19 @@ Resources that combine data from multiple authorities define field ownership at 
 
 `PATCH` endpoints use `additionalProperties: false` in their JSON Schema to reject fields outside the mutable set.
 
+### 10. Field naming
+
+Use camelCase for all API response fields. When projecting fields from upstream types that use different conventions (for example, `DecodedIdToken.email_verified`), normalize casing at the translation boundary so clients see a consistent naming convention across all endpoints.
+
+### 11. Validation status codes
+
+Distinguish request parsing failures from schema validation failures:
+
+- **400 Bad Request**: the server can't parse the request body as JSON.
+- **422 Unprocessable Content**: the body is valid JSON but fails schema validation, such as a wrong shape, missing required fields, or extra properties.
+
+See [RFC9110], Section 15.5.21: <https://www.rfc-editor.org/rfc/rfc9110.html#name-422-unprocessable-content>
+
 ## Repository scope
 
 These principles guide route design, method semantics, status code usage, error shape, pagination, authentication header handling, and timestamp format for `apps/api`.

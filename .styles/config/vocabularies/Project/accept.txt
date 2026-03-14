@@ -59,6 +59,7 @@ SWC
 # API and architecture
 API
 APIs
+AJV
 cacheable
 CLI
 CI/CD
@@ -76,6 +77,7 @@ roadmaps
 semver
 typechecking
 unversioned
+Unprocessable
 validators
 
 # Cloud infrastructure
