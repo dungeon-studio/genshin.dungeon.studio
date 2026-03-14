@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import type { AuthVariables } from '@/middleware/auth.js';
+import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
 import { characters } from '@/routes/characters.js';
 import { profiles } from '@/routes/profiles.js';
+import { root } from '@/routes/root.js';
 import { schemas } from '@/routes/schemas.js';
 import { userProfile } from '@/routes/userProfile.js';
 import { weapons } from '@/routes/weapons.js';
@@ -19,7 +21,7 @@ const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.me
 
 export const PROBLEM_JSON = { 'Content-Type': 'application/problem+json' };
 
-export const app = new Hono<{ Variables: Partial<AuthVariables> }>();
+export const app = new Hono<{ Variables: Partial<AuthVariables> & NegotiatedContentVariables }>();
 
 // Request logging middleware
 app.use('*', logger());
@@ -77,16 +79,10 @@ app.notFound((c) =>
   ),
 );
 
-app.get('/', (c) =>
-  c.json({
-    message: 'Genshin API',
-    version: packageJson.version,
-  }),
-);
-
 app.get('/health', (c) =>
   c.json({
     status: 'ok',
+    version: packageJson.version,
     sha: process.env.APP_GIT_SHA ?? null,
   }),
 );
@@ -97,3 +93,6 @@ app.route('/profiles', profiles);
 app.route('/api/characters', characters);
 app.route('/api/profile', userProfile);
 app.route('/api/weapons', weapons);
+
+// Root must be registered after all other routes so it can discover them
+app.route('/', root(app));
