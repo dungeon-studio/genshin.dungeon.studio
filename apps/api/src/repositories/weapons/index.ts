@@ -22,19 +22,13 @@ export async function listWeapons(userId: string): Promise<Record<string, Collec
 
   const results: Record<string, CollectionWeapon[]> = {};
 
-  const snapshots = await Promise.all(
-    weaponDocs.map(async (weaponDoc) => ({
-      weaponId: weaponDoc.id,
-      snapshot: await weaponDoc.collection('instances').get(),
-    })),
-  );
-
-  for (const { weaponId, snapshot } of snapshots) {
+  for (const weaponDoc of weaponDocs) {
+    const snapshot = await weaponDoc.collection('instances').get();
     const instances = snapshot.docs.map((doc) =>
-      fromDocument(doc.id as UUID, weaponId, doc.data() as DocumentData),
+      fromDocument(doc.id as UUID, weaponDoc.id, doc.data() as DocumentData),
     );
     if (instances.length > 0) {
-      results[weaponId] = instances;
+      results[weaponDoc.id] = instances;
     }
   }
 
