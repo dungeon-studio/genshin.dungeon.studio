@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionWeapon, ISOTimestamp, UUID } from '@genshin/types';
+import type { CollectionWeapon, ISOTimestamp, UUID } from '@genshin/domain';
 
 export interface DocumentData {
   weaponId: string;

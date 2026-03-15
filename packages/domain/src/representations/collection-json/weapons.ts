@@ -2,24 +2,24 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * Weapon domain → Collection+JSON representation.
+ * Weapon domain ↔ Collection+JSON wire format.
  *
- * Maps CollectionWeapon domain objects to the collection+json wire format.
+ * Bidirectional converters shared by API and web.
  * No framework dependencies — only domain types and collection+json builders.
  */
 
-import type { CollectionWeapon } from '@genshin/types';
-import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '@genshin/types';
-
 import {
-  buildCollection,
   buildItem,
-  type CollectionDocument,
   type CollectionJsonRepresentation,
   type Item,
   type Link,
   type Template,
 } from '@genshin/collection-json';
+
+import type { CollectionWeapon } from '../../collectionWeapon.js';
+import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '../../collectionWeapon.js';
+import type { ISOTimestamp } from '../../isoTimestamp.js';
+import type { UUID } from '../../uuid.js';
 
 const WEAPON_TEMPLATE: Template = {
   data: [
@@ -34,7 +34,7 @@ export function weaponItemHref(baseUrl: string, weapon: CollectionWeapon): strin
   return `${baseUrl}/api/weapons/${weapon.weaponInstanceId}`;
 }
 
-export function weaponToItem(weapon: CollectionWeapon, baseUrl: string): Item {
+export function serialiseWeapon(weapon: CollectionWeapon, baseUrl: string): Item {
   const links: Link[] = [
     {
       rel: 'collection',
@@ -56,28 +56,19 @@ export function weaponToItem(weapon: CollectionWeapon, baseUrl: string): Item {
   );
 }
 
-export function weaponListDocument(
-  weapons: CollectionWeapon[],
-  baseUrl: string,
-): CollectionDocument {
-  return buildCollection(
-    `${baseUrl}/api/weapons`,
-    weapons.map((w) => weaponToItem(w, baseUrl)),
-    { template: WEAPON_TEMPLATE },
-  );
+export function deserialiseWeapon(item: Item): CollectionWeapon {
+  const data = new Map(item.data.map((d) => [d.name, d.value]));
+  return {
+    weaponInstanceId: data.get('weaponInstanceId') as UUID,
+    weaponId: data.get('weaponId') as string,
+    refinementLevel: data.get('refinementLevel') as number,
+    createdAt: data.get('createdAt') as ISOTimestamp,
+    updatedAt: data.get('updatedAt') as ISOTimestamp,
+  };
 }
 
-export function weaponItemDocument(weapon: CollectionWeapon, baseUrl: string): CollectionDocument {
-  return buildCollection(weaponItemHref(baseUrl, weapon), [weaponToItem(weapon, baseUrl)], {
-    template: WEAPON_TEMPLATE,
-  });
-}
-
-// Compile-time enforcement: every required mapping function exists and has the right shape.
-// Resource-specific extras (weaponInstanceListDocument) live outside the contract.
-const _weaponRepresentation = {
-  toItem: weaponToItem,
-  listDocument: weaponListDocument,
-  itemDocument: weaponItemDocument,
+export const weaponRepresentation = {
+  serialise: serialiseWeapon,
+  deserialise: deserialiseWeapon,
+  template: WEAPON_TEMPLATE,
 } satisfies CollectionJsonRepresentation<CollectionWeapon>;
-void _weaponRepresentation;

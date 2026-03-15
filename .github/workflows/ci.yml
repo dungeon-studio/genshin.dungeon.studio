@@ -87,8 +87,8 @@ jobs:
       - name: Typecheck
         run: pnpm turbo run typecheck --filter=@genshin/game-data
 
-  types:
-    name: Types
+  domain:
+    name: Domain
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -99,10 +99,10 @@ jobs:
       - uses: ./.github/actions/setup-node-pnpm
 
       - name: Build
-        run: pnpm turbo run build --filter=@genshin/types
+        run: pnpm turbo run build --filter=@genshin/domain
 
       - name: Typecheck
-        run: pnpm turbo run typecheck --filter=@genshin/types
+        run: pnpm turbo run typecheck --filter=@genshin/domain
 
   collection-json:
     name: Collection JSON

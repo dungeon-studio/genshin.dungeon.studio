@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionCharacter } from '@genshin/types';
-import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL } from '@genshin/types';
+import type { CollectionCharacter } from '@genshin/domain';
+import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 

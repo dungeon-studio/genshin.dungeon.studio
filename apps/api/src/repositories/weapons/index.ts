@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { db } from '@/lib/firebase/firestore.js';
-import type { CollectionWeapon, ISOTimestamp, UUID } from '@genshin/types';
+import type { CollectionWeapon, ISOTimestamp, UUID } from '@genshin/domain';
 import { randomUUID } from 'node:crypto';
 
 import { fromDocument, toDocument, type DocumentData } from './document.js';

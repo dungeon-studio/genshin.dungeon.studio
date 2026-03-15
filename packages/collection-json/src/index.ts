@@ -5,6 +5,7 @@ export {
   COLLECTION_JSON,
   buildCollection,
   buildItem,
+  serialiseCollection,
   type Collection,
   type CollectionDocument,
   type CollectionJsonRepresentation,

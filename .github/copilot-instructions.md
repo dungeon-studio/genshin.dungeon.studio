@@ -23,7 +23,7 @@
 - `apps/web`: Frontend app.
 - `apps/api`: API server.
 - `packages/game-data`: Source of truth for static game data; use exported helpers, never hard-code.
-- `packages/types`: Shared types.
+- `packages/domain`: Shared domain model: types, invariants, and wire format representations.
 
 ## Core coding rules
 
@@ -34,7 +34,7 @@
 - Use ISO 8601 strings for timestamps such as `createdAt` and `updatedAt`, not `Date` objects.
 - Maintain game-data accuracy when working with `packages/game-data`.
 - Test alongside code when possible; the API has Vitest coverage, but web and UI testing is planned and not yet implemented.
-- Each branded type in `packages/types/` gets its own file (for example, `uuid.ts`, `isoTimestamp.ts`).
+- Each branded type in `packages/domain/` gets its own file (for example, `uuid.ts`, `isoTimestamp.ts`).
 - Shared API test utilities go in `apps/api/src/test/` with descriptive names (not generic names like "helpers"). This directory is excluded from production builds via `tsconfig.build.json`.
 - Use descriptive, specific file names. Avoid generic names like "helpers."
 
