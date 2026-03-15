@@ -13,7 +13,7 @@ interface CollectionEntry {
 type CharacterId = CollectionCharacter['characterId'];
 
 interface CollectionState {
-  characters: Record<string, CollectionEntry>;
+  characters: Record<CharacterId, CollectionEntry>;
   addCharacter: (characterId: CharacterId) => void;
   removeCharacter: (characterId: CharacterId) => void;
   setConstellationLevel: (characterId: CharacterId, level: number) => void;
@@ -27,6 +27,8 @@ export const useCollectionStore = create<CollectionState>()(
       characters: {},
 
       addCharacter: (characterId) => {
+        if (get().characters[characterId]) return;
+
         set((state) => ({
           characters: {
             ...state.characters,
