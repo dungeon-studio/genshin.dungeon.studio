@@ -3,18 +3,20 @@
 
 export type { AuthIdentity } from './authIdentity.js';
 export {
+  assertCollectionCharacter,
   isValidConstellationLevel,
   MAX_CONSTELLATION_LEVEL,
   MIN_CONSTELLATION_LEVEL,
   type CollectionCharacter,
 } from './collectionCharacter.js';
 export {
+  assertCollectionWeapon,
   isValidRefinementLevel,
   MAX_REFINEMENT_LEVEL,
   MIN_REFINEMENT_LEVEL,
   type CollectionWeapon,
 } from './collectionWeapon.js';
-export type { ISOTimestamp } from './isoTimestamp.js';
+export { isISOTimestamp, type ISOTimestamp } from './isoTimestamp.js';
 export {
   characterItemHref,
   characterRepresentation,

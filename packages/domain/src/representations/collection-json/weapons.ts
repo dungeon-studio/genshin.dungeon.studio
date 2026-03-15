@@ -17,9 +17,11 @@ import {
 } from '@genshin/collection-json';
 
 import type { CollectionWeapon } from '../../collectionWeapon.js';
-import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '../../collectionWeapon.js';
-import type { ISOTimestamp } from '../../isoTimestamp.js';
-import type { UUID } from '../../uuid.js';
+import {
+  assertCollectionWeapon,
+  MAX_REFINEMENT_LEVEL,
+  MIN_REFINEMENT_LEVEL,
+} from '../../collectionWeapon.js';
 
 const WEAPON_TEMPLATE: Template = {
   data: [
@@ -57,14 +59,9 @@ export function serialiseWeapon(weapon: CollectionWeapon, baseUrl: string): Item
 }
 
 export function deserialiseWeapon(item: Item): CollectionWeapon {
-  const data = new Map(item.data.map((d) => [d.name, d.value]));
-  return {
-    weaponInstanceId: data.get('weaponInstanceId') as UUID,
-    weaponId: data.get('weaponId') as string,
-    refinementLevel: data.get('refinementLevel') as number,
-    createdAt: data.get('createdAt') as ISOTimestamp,
-    updatedAt: data.get('updatedAt') as ISOTimestamp,
-  };
+  const data = Object.fromEntries(item.data.map((d) => [d.name, d.value]));
+  assertCollectionWeapon(data);
+  return data;
 }
 
 export const weaponRepresentation = {

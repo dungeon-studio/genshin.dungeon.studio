@@ -16,8 +16,11 @@ import {
 } from '@genshin/collection-json';
 
 import type { CollectionCharacter } from '../../collectionCharacter.js';
-import { MAX_CONSTELLATION_LEVEL, MIN_CONSTELLATION_LEVEL } from '../../collectionCharacter.js';
-import type { ISOTimestamp } from '../../isoTimestamp.js';
+import {
+  assertCollectionCharacter,
+  MAX_CONSTELLATION_LEVEL,
+  MIN_CONSTELLATION_LEVEL,
+} from '../../collectionCharacter.js';
 
 const CHARACTER_TEMPLATE: Template = {
   data: [
@@ -42,13 +45,9 @@ export function serialiseCharacter(character: CollectionCharacter, baseUrl: stri
 }
 
 export function deserialiseCharacter(item: Item): CollectionCharacter {
-  const data = new Map(item.data.map((d) => [d.name, d.value]));
-  return {
-    characterId: data.get('characterId') as string,
-    constellationLevel: data.get('constellationLevel') as number,
-    createdAt: data.get('createdAt') as ISOTimestamp,
-    updatedAt: data.get('updatedAt') as ISOTimestamp,
-  };
+  const data = Object.fromEntries(item.data.map((d) => [d.name, d.value]));
+  assertCollectionCharacter(data);
+  return data;
 }
 
 export const characterRepresentation = {
