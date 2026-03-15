@@ -4,19 +4,16 @@
 import type { CollectionWeapon, ISOTimestamp, UUID } from '@genshin/types';
 
 export interface DocumentData {
+  weaponId: string;
   refinementLevel: number;
   createdAt: string;
   updatedAt: string;
 }
 
-export function fromDocument(
-  weaponInstanceId: UUID,
-  weaponId: string,
-  data: DocumentData,
-): CollectionWeapon {
+export function fromDocument(weaponInstanceId: UUID, data: DocumentData): CollectionWeapon {
   return {
     weaponInstanceId,
-    weaponId,
+    weaponId: data.weaponId,
     refinementLevel: data.refinementLevel,
     createdAt: data.createdAt as ISOTimestamp,
     updatedAt: data.updatedAt as ISOTimestamp,
@@ -25,6 +22,7 @@ export function fromDocument(
 
 export function toDocument(weapon: CollectionWeapon): DocumentData {
   return {
+    weaponId: weapon.weaponId,
     refinementLevel: weapon.refinementLevel,
     createdAt: weapon.createdAt,
     updatedAt: weapon.updatedAt,

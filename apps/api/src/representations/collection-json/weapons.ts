@@ -31,14 +31,14 @@ const WEAPON_TEMPLATE: Template = {
 };
 
 export function weaponItemHref(baseUrl: string, weapon: CollectionWeapon): string {
-  return `${baseUrl}/api/weapons/${weapon.weaponId}/${weapon.weaponInstanceId}`;
+  return `${baseUrl}/api/weapons/${weapon.weaponInstanceId}`;
 }
 
 export function weaponToItem(weapon: CollectionWeapon, baseUrl: string): Item {
   const links: Link[] = [
     {
       rel: 'collection',
-      href: `${baseUrl}/api/weapons/${weapon.weaponId}`,
+      href: `${baseUrl}/api/weapons?weaponId=${weapon.weaponId}`,
       prompt: `All instances of ${weapon.weaponId}`,
     },
   ];
@@ -62,18 +62,6 @@ export function weaponListDocument(
 ): CollectionDocument {
   return buildCollection(
     `${baseUrl}/api/weapons`,
-    weapons.map((w) => weaponToItem(w, baseUrl)),
-    { template: WEAPON_TEMPLATE },
-  );
-}
-
-export function weaponInstanceListDocument(
-  weapons: CollectionWeapon[],
-  weaponId: string,
-  baseUrl: string,
-): CollectionDocument {
-  return buildCollection(
-    `${baseUrl}/api/weapons/${weaponId}`,
     weapons.map((w) => weaponToItem(w, baseUrl)),
     { template: WEAPON_TEMPLATE },
   );

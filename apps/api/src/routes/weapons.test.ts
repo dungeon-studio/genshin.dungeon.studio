@@ -10,10 +10,10 @@ vi.mock('@/lib/firebase/auth.js', () => ({
 
 vi.mock('@/repositories/weapons/index.js', () => ({
   listWeapons: vi.fn(),
-  listWeaponInstances: vi.fn(),
-  createWeaponInstance: vi.fn(),
-  updateWeaponInstance: vi.fn(),
-  deleteWeaponInstance: vi.fn(),
+  getWeapon: vi.fn(),
+  createWeapon: vi.fn(),
+  updateWeapon: vi.fn(),
+  deleteWeapon: vi.fn(),
 }));
 
 vi.mock('@genshin/game-data', () => ({
@@ -23,11 +23,11 @@ vi.mock('@genshin/game-data', () => ({
 import { app } from '@/app.js';
 import { verifyToken } from '@/lib/firebase/auth.js';
 import {
-  createWeaponInstance,
-  deleteWeaponInstance,
-  listWeaponInstances,
+  createWeapon,
+  deleteWeapon,
+  getWeapon,
   listWeapons,
-  updateWeaponInstance,
+  updateWeapon,
 } from '@/repositories/weapons/index.js';
 import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
@@ -59,32 +59,6 @@ describe('Weapon routes', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
-  });
-
-  describe('authentication', () => {
-    it('returns 401 without Authorization header', async () => {
-      const res = await app.request('/api/weapons');
-
-      expect(res.status).toBe(401);
-    });
-
-    it('returns 401 with malformed Authorization header', async () => {
-      const res = await app.request('/api/weapons', {
-        headers: { Authorization: 'NotBearer token' },
-      });
-
-      expect(res.status).toBe(401);
-    });
-
-    it('returns 401 when token is expired', async () => {
-      vi.mocked(verifyToken).mockRejectedValue({ code: 'auth/id-token-expired' });
-
-      const res = await app.request(authedRequest('GET', '/api/weapons'));
-
-      expect(res.status).toBe(401);
-      const body = (await res.json()) as { detail: string };
-      expect(body.detail).toBe('Invalid or expired token');
-    });
   });
 
   describe('GET /api/weapons', () => {
@@ -138,7 +112,7 @@ describe('Weapon routes', () => {
     });
   });
 
-  describe('GET /api/weapons/:weaponId', () => {
+  describe('GET /api/weapons?weaponId=', () => {
     let res: Response;
     let body: CollectionDocument;
 
@@ -147,8 +121,8 @@ describe('Weapon routes', () => {
         id: 'mistsplitter-reforged',
         name: 'Mistsplitter Reforged',
       } as ReturnType<typeof getWeaponById>);
-      vi.mocked(listWeaponInstances).mockResolvedValue([FAKE_WEAPON]);
-      res = await app.request(authedRequest('GET', '/api/weapons/mistsplitter-reforged'));
+      vi.mocked(listWeapons).mockResolvedValue([FAKE_WEAPON]);
+      res = await app.request(authedRequest('GET', '/api/weapons?weaponId=mistsplitter-reforged'));
       body = (await res.json()) as CollectionDocument;
     });
 
@@ -174,9 +148,11 @@ describe('Weapon routes', () => {
     });
 
     it('returns empty items when no instances exist', async () => {
-      vi.mocked(listWeaponInstances).mockResolvedValue([]);
+      vi.mocked(listWeapons).mockResolvedValue([]);
 
-      const res = await app.request(authedRequest('GET', '/api/weapons/mistsplitter-reforged'));
+      const res = await app.request(
+        authedRequest('GET', '/api/weapons?weaponId=mistsplitter-reforged'),
+      );
 
       const body = (await res.json()) as CollectionDocument;
       expect(body.collection.items).toEqual([]);
@@ -185,7 +161,7 @@ describe('Weapon routes', () => {
     it('returns 400 for unknown weapon ID', async () => {
       vi.mocked(getWeaponById).mockReturnValue(undefined);
 
-      const res = await app.request(authedRequest('GET', '/api/weapons/not-a-weapon'));
+      const res = await app.request(authedRequest('GET', '/api/weapons?weaponId=not-a-weapon'));
 
       expect(res.status).toBe(400);
       const body = (await res.json()) as { detail: string };
@@ -193,7 +169,7 @@ describe('Weapon routes', () => {
     });
   });
 
-  describe('POST /api/weapons/:weaponId', () => {
+  describe('POST /api/weapons', () => {
     let res: Response;
     let body: CollectionDocument;
 
@@ -202,9 +178,10 @@ describe('Weapon routes', () => {
         id: 'mistsplitter-reforged',
         name: 'Mistsplitter Reforged',
       } as ReturnType<typeof getWeaponById>);
-      vi.mocked(createWeaponInstance).mockResolvedValue(FAKE_WEAPON);
+      vi.mocked(createWeapon).mockResolvedValue(FAKE_WEAPON);
       res = await app.request(
-        authedRequest('POST', '/api/weapons/mistsplitter-reforged', {
+        authedRequest('POST', '/api/weapons', {
+          weaponId: 'mistsplitter-reforged',
           refinementLevel: 1,
         }),
       );
@@ -220,9 +197,7 @@ describe('Weapon routes', () => {
     });
 
     it('returns Location header pointing to created instance', () => {
-      expect(res.headers.get('location')).toBe(
-        'http://localhost/api/weapons/mistsplitter-reforged/instance-uuid-1',
-      );
+      expect(res.headers.get('location')).toBe('http://localhost/api/weapons/instance-uuid-1');
     });
 
     it('returns single-item collection', () => {
@@ -237,7 +212,8 @@ describe('Weapon routes', () => {
       vi.mocked(getWeaponById).mockReturnValue(undefined);
 
       const res = await app.request(
-        authedRequest('POST', '/api/weapons/not-a-weapon', {
+        authedRequest('POST', '/api/weapons', {
+          weaponId: 'not-a-weapon',
           refinementLevel: 1,
         }),
       );
@@ -249,7 +225,7 @@ describe('Weapon routes', () => {
 
     it('returns 400 when body is not valid JSON', async () => {
       const res = await app.request(
-        new Request('http://localhost/api/weapons/mistsplitter-reforged', {
+        new Request('http://localhost/api/weapons', {
           method: 'POST',
           headers: { Authorization: 'Bearer valid-token', 'Content-Type': 'application/json' },
           body: 'not-json',
@@ -259,9 +235,21 @@ describe('Weapon routes', () => {
       expect(res.status).toBe(400);
     });
 
+    it('returns 422 when weaponId is missing', async () => {
+      const res = await app.request(
+        authedRequest('POST', '/api/weapons', {
+          refinementLevel: 1,
+        }),
+      );
+
+      expect(res.status).toBe(422);
+    });
+
     it('returns 422 when refinementLevel is missing', async () => {
       const res = await app.request(
-        authedRequest('POST', '/api/weapons/mistsplitter-reforged', {}),
+        authedRequest('POST', '/api/weapons', {
+          weaponId: 'mistsplitter-reforged',
+        }),
       );
 
       expect(res.status).toBe(422);
@@ -269,7 +257,8 @@ describe('Weapon routes', () => {
 
     it('returns 422 when refinementLevel is not a number', async () => {
       const res = await app.request(
-        authedRequest('POST', '/api/weapons/mistsplitter-reforged', {
+        authedRequest('POST', '/api/weapons', {
+          weaponId: 'mistsplitter-reforged',
           refinementLevel: 'R5',
         }),
       );
@@ -279,7 +268,8 @@ describe('Weapon routes', () => {
 
     it('returns 422 when refinementLevel is below minimum', async () => {
       const res = await app.request(
-        authedRequest('POST', '/api/weapons/mistsplitter-reforged', {
+        authedRequest('POST', '/api/weapons', {
+          weaponId: 'mistsplitter-reforged',
           refinementLevel: MIN_REFINEMENT_LEVEL - 1,
         }),
       );
@@ -289,7 +279,8 @@ describe('Weapon routes', () => {
 
     it('returns 422 when refinementLevel is above maximum', async () => {
       const res = await app.request(
-        authedRequest('POST', '/api/weapons/mistsplitter-reforged', {
+        authedRequest('POST', '/api/weapons', {
+          weaponId: 'mistsplitter-reforged',
           refinementLevel: MAX_REFINEMENT_LEVEL + 1,
         }),
       );
@@ -299,7 +290,8 @@ describe('Weapon routes', () => {
 
     it('returns 422 when refinementLevel is not an integer', async () => {
       const res = await app.request(
-        authedRequest('POST', '/api/weapons/mistsplitter-reforged', {
+        authedRequest('POST', '/api/weapons', {
+          weaponId: 'mistsplitter-reforged',
           refinementLevel: 2.5,
         }),
       );
@@ -309,7 +301,8 @@ describe('Weapon routes', () => {
 
     it('returns 422 when body contains extra properties', async () => {
       const res = await app.request(
-        authedRequest('POST', '/api/weapons/mistsplitter-reforged', {
+        authedRequest('POST', '/api/weapons', {
+          weaponId: 'mistsplitter-reforged',
           refinementLevel: 1,
           extra: true,
         }),
@@ -319,13 +312,14 @@ describe('Weapon routes', () => {
     });
 
     it('accepts refinementLevel at minimum boundary', async () => {
-      vi.mocked(createWeaponInstance).mockResolvedValue({
+      vi.mocked(createWeapon).mockResolvedValue({
         ...FAKE_WEAPON,
         refinementLevel: MIN_REFINEMENT_LEVEL,
       });
 
       const res = await app.request(
-        authedRequest('POST', '/api/weapons/mistsplitter-reforged', {
+        authedRequest('POST', '/api/weapons', {
+          weaponId: 'mistsplitter-reforged',
           refinementLevel: MIN_REFINEMENT_LEVEL,
         }),
       );
@@ -334,13 +328,14 @@ describe('Weapon routes', () => {
     });
 
     it('accepts refinementLevel at maximum boundary', async () => {
-      vi.mocked(createWeaponInstance).mockResolvedValue({
+      vi.mocked(createWeapon).mockResolvedValue({
         ...FAKE_WEAPON,
         refinementLevel: MAX_REFINEMENT_LEVEL,
       });
 
       const res = await app.request(
-        authedRequest('POST', '/api/weapons/mistsplitter-reforged', {
+        authedRequest('POST', '/api/weapons', {
+          weaponId: 'mistsplitter-reforged',
           refinementLevel: MAX_REFINEMENT_LEVEL,
         }),
       );
@@ -349,18 +344,51 @@ describe('Weapon routes', () => {
     });
   });
 
-  describe('PUT /api/weapons/:weaponId/:weaponInstanceId', () => {
+  describe('GET /api/weapons/:weaponInstanceId', () => {
     let res: Response;
     let body: CollectionDocument;
 
     beforeEach(async () => {
-      vi.mocked(getWeaponById).mockReturnValue({
-        id: 'mistsplitter-reforged',
-        name: 'Mistsplitter Reforged',
-      } as ReturnType<typeof getWeaponById>);
-      vi.mocked(updateWeaponInstance).mockResolvedValue(FAKE_WEAPON);
+      vi.mocked(getWeapon).mockResolvedValue(FAKE_WEAPON);
+      res = await app.request(authedRequest('GET', '/api/weapons/instance-uuid-1'));
+      body = (await res.json()) as CollectionDocument;
+    });
+
+    it('returns 200', () => {
+      expect(res.status).toBe(200);
+    });
+
+    it('returns collection+json content type', () => {
+      expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
+    });
+
+    it('returns single-item collection', () => {
+      expect(body.collection.items).toHaveLength(1);
+    });
+
+    it('includes weapon domain data', () => {
+      expect(body.collection.items[0].data).toEqual(FAKE_WEAPON_ITEM_DATA);
+    });
+
+    it('returns 404 when weapon instance not found', async () => {
+      vi.mocked(getWeapon).mockResolvedValue(null);
+
+      const res = await app.request(authedRequest('GET', '/api/weapons/nonexistent'));
+
+      expect(res.status).toBe(404);
+      const body = (await res.json()) as { detail: string };
+      expect(body.detail).toBe('Weapon instance not found');
+    });
+  });
+
+  describe('PATCH /api/weapons/:weaponInstanceId', () => {
+    let res: Response;
+    let body: CollectionDocument;
+
+    beforeEach(async () => {
+      vi.mocked(updateWeapon).mockResolvedValue(FAKE_WEAPON);
       res = await app.request(
-        authedRequest('PUT', '/api/weapons/mistsplitter-reforged/instance-uuid-1', {
+        authedRequest('PATCH', '/api/weapons/instance-uuid-1', {
           refinementLevel: 1,
         }),
       );
@@ -384,10 +412,10 @@ describe('Weapon routes', () => {
     });
 
     it('returns 404 when weapon instance not found', async () => {
-      vi.mocked(updateWeaponInstance).mockResolvedValue(null);
+      vi.mocked(updateWeapon).mockResolvedValue(null);
 
       const res = await app.request(
-        authedRequest('PUT', '/api/weapons/mistsplitter-reforged/nonexistent', {
+        authedRequest('PATCH', '/api/weapons/nonexistent', {
           refinementLevel: 1,
         }),
       );
@@ -399,8 +427,8 @@ describe('Weapon routes', () => {
 
     it('returns 400 when body is not valid JSON', async () => {
       const res = await app.request(
-        new Request('http://localhost/api/weapons/mistsplitter-reforged/instance-uuid-1', {
-          method: 'PUT',
+        new Request('http://localhost/api/weapons/instance-uuid-1', {
+          method: 'PATCH',
           headers: { Authorization: 'Bearer valid-token', 'Content-Type': 'application/json' },
           body: 'not-json',
         }),
@@ -411,7 +439,7 @@ describe('Weapon routes', () => {
 
     it('returns 422 when refinementLevel is invalid', async () => {
       const res = await app.request(
-        authedRequest('PUT', '/api/weapons/mistsplitter-reforged/instance-uuid-1', {
+        authedRequest('PATCH', '/api/weapons/instance-uuid-1', {
           refinementLevel: 0,
         }),
       );
@@ -421,7 +449,7 @@ describe('Weapon routes', () => {
 
     it('returns 422 when body contains extra properties', async () => {
       const res = await app.request(
-        authedRequest('PUT', '/api/weapons/mistsplitter-reforged/instance-uuid-1', {
+        authedRequest('PATCH', '/api/weapons/instance-uuid-1', {
           refinementLevel: 1,
           extra: true,
         }),
@@ -431,64 +459,29 @@ describe('Weapon routes', () => {
     });
 
     it('updates refinementLevel', async () => {
-      vi.mocked(updateWeaponInstance).mockResolvedValue({
+      vi.mocked(updateWeapon).mockResolvedValue({
         ...FAKE_WEAPON,
         refinementLevel: 3,
       });
 
       const res = await app.request(
-        authedRequest('PUT', '/api/weapons/mistsplitter-reforged/instance-uuid-1', {
+        authedRequest('PATCH', '/api/weapons/instance-uuid-1', {
           refinementLevel: 3,
         }),
       );
 
       expect(res.status).toBe(200);
     });
-
-    it('returns 400 for unknown weapon ID', async () => {
-      vi.mocked(getWeaponById).mockReturnValue(undefined);
-
-      const res = await app.request(
-        authedRequest('PUT', '/api/weapons/not-a-weapon/instance-uuid-1', {
-          refinementLevel: 1,
-        }),
-      );
-
-      expect(res.status).toBe(400);
-      const body = (await res.json()) as { detail: string };
-      expect(body.detail).toBe('Unknown weapon: not-a-weapon');
-    });
   });
 
-  describe('DELETE /api/weapons/:weaponId/:weaponInstanceId', () => {
-    beforeEach(() => {
-      vi.mocked(getWeaponById).mockReturnValue({
-        id: 'mistsplitter-reforged',
-        name: 'Mistsplitter Reforged',
-      } as ReturnType<typeof getWeaponById>);
-    });
-
+  describe('DELETE /api/weapons/:weaponInstanceId', () => {
     it('returns 204 with no body', async () => {
-      vi.mocked(deleteWeaponInstance).mockResolvedValue();
+      vi.mocked(deleteWeapon).mockResolvedValue();
 
-      const res = await app.request(
-        authedRequest('DELETE', '/api/weapons/mistsplitter-reforged/instance-uuid-1'),
-      );
+      const res = await app.request(authedRequest('DELETE', '/api/weapons/instance-uuid-1'));
 
       expect(res.status).toBe(204);
       expect(await res.text()).toBe('');
-    });
-
-    it('returns 400 for unknown weapon ID', async () => {
-      vi.mocked(getWeaponById).mockReturnValue(undefined);
-
-      const res = await app.request(
-        authedRequest('DELETE', '/api/weapons/not-a-weapon/instance-uuid-1'),
-      );
-
-      expect(res.status).toBe(400);
-      const body = (await res.json()) as { detail: string };
-      expect(body.detail).toBe('Unknown weapon: not-a-weapon');
     });
   });
 });

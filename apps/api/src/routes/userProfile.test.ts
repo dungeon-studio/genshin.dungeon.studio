@@ -71,6 +71,16 @@ describe('Profile routes', () => {
 
       expect(res.status).toBe(401);
     });
+
+    it('returns 401 when token is expired', async () => {
+      vi.mocked(verifyToken).mockRejectedValue({ code: 'auth/id-token-expired' });
+
+      const res = await app.request(authedRequest('GET', '/api/profile'));
+
+      expect(res.status).toBe(401);
+      const body = (await res.json()) as { detail: string };
+      expect(body.detail).toBe('Invalid or expired token');
+    });
   });
 
   describe('GET /api/profile', () => {

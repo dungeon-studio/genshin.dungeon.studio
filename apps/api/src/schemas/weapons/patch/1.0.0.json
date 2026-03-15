@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://api.genshin.dungeon.studio/schemas/weapons/put/1.0.0.json",
+  "$id": "https://api.genshin.dungeon.studio/schemas/weapons/patch/1.0.0.json",
   "title": "Update Weapon Instance Request",
   "description": "Request body for updating an existing weapon instance in the user's collection",
   "type": "object",
