@@ -3,7 +3,7 @@
 
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import type { JsonSchemaProfile } from '@/schemas/json-schema-profile.js';
 import { schemaRegistry } from '@/schemas/registry.js';
@@ -30,7 +30,7 @@ describe('schemaRegistry', () => {
     const registeredPaths = new Set(schemaRegistry.map((e) => e.path));
 
     for (const file of files) {
-      const mod = (await import(file)) as Record<string, unknown>;
+      const mod = (await import(pathToFileURL(file).href)) as Record<string, unknown>;
       const entry = Object.values(mod).find(
         (v): v is JsonSchemaProfile =>
           typeof v === 'object' && v !== null && 'path' in v && 'schema' in v,
