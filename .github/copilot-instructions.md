@@ -54,6 +54,14 @@
 - Validate API success responses against the published JSON Schema in tests using AJV, not just individual field assertions. Keep one sanity-check assertion per test for a specific value.
 - Prefer explicit types over type munging. For example, define `ProfileUpdate` rather than using `Partial<Pick<UserProfile, 'name'>>` inline.
 
+## Schema module conventions
+
+- Define each JSON Schema as a typed TypeScript module in `apps/api/src/schemas/{module}/`, not a `.json` file.
+- Export a single `const` using `as const satisfies JsonSchemaProfile` from `@/schemas/json-schema-profile.js`.
+- Name files `{direction}-v{n}.ts` (for example, `get-response-v1.ts`, `put-request-v1.ts`). The serving path mirrors the filename: `/schemas/{module}/{direction}-v{n}.json`.
+- Register every schema module in `apps/api/src/schemas/registry.ts`. The registry completeness test discovers files on disk and asserts the registry contains each one.
+- The schema route stamps `$id` from the request origin at serve time. Don't declare `$id` in schema modules.
+
 ## Frontend rules
 
 - Prefer composition over inheritance and use early returns for conditional rendering.
