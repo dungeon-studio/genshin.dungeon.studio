@@ -66,9 +66,10 @@ export function CharacterCard({
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-card-foreground">{character.name}</p>
-        <span className="text-xs text-geo-dark" aria-label={`${character.rarity}-star`}>
+        <span className="text-xs text-geo-dark" aria-hidden="true">
           {'\u2605'.repeat(character.rarity)}
         </span>
+        <span className="sr-only">{character.rarity}-star</span>
       </div>
 
       {owned && (
