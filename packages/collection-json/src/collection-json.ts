@@ -66,21 +66,30 @@ export interface CollectionDocument {
 // --- Representation contract ---
 
 /**
- * Core contract for mapping a domain type to collection+json.
+ * Core contract for mapping a domain type to Collection+JSON.
  *
- * Covers the common kernel every resource needs: single-item serialisation,
- * list documents, and single-item documents. Resource-specific extras
- * (e.g. sub-collection lists) live outside this contract as additional exports.
+ * Instances define the minimal data needed: how to serialise/deserialise
+ * individual items, and an optional template for write affordances.
+ * The generic serialiseCollection function handles the envelope.
  */
 export interface CollectionJsonRepresentation<T> {
-  toItem: (entity: T, baseUrl: string) => Item;
-  listDocument: (entities: T[], baseUrl: string) => CollectionDocument;
-  /**
-   * Separate from listDocument because collection.href must reflect the
-   * request URI: the item URI for single-item responses vs the collection
-   * URI for list responses.
-   */
-  itemDocument: (entity: T, baseUrl: string) => CollectionDocument;
+  serialise: (entity: T, baseUrl: string) => Item;
+  deserialise: (item: Item) => T;
+  template?: Template;
+}
+
+/**
+ * Wrap pre-built Items into a CollectionDocument envelope.
+ *
+ * Reads the template from the representation so each resource module
+ * only declares data, not envelope-wrapping behaviour.
+ */
+export function serialiseCollection<T>(
+  repr: CollectionJsonRepresentation<T>,
+  href: string,
+  items: Item[],
+): CollectionDocument {
+  return buildCollection(href, items, { template: repr.template });
 }
 
 // --- Builders ---

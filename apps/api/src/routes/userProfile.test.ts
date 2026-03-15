@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { profileGetResponseV1 } from '@/schemas/profile/get-response-v1.js';
-import type { UserProfile } from '@genshin/types';
+import type { UserProfile } from '@genshin/domain';
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

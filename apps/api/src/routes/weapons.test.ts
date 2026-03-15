@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionWeapon, UUID } from '@genshin/types';
+import type { CollectionWeapon, UUID } from '@genshin/domain';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/firebase/auth.js', () => ({
@@ -31,8 +31,8 @@ import {
 } from '@/repositories/weapons/index.js';
 import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
+import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
 import { getWeaponById } from '@genshin/game-data';
-import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '@genshin/types';
 
 const FAKE_WEAPON: CollectionWeapon = {
   weaponInstanceId: 'instance-uuid-1' as UUID,

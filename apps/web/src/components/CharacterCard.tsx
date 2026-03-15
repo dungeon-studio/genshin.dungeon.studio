@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import type { Character, Element } from '@genshin/game-data';
-import { MIN_CONSTELLATION_LEVEL } from '@genshin/types';
 import { motion } from 'framer-motion';
 
 import { cn } from '@/lib/utils';

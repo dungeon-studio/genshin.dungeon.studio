@@ -11,12 +11,9 @@ import {
   listCharacters,
   saveCharacter,
 } from '@/repositories/characters/index.js';
-import {
-  characterItemDocument,
-  characterListDocument,
-} from '@/representations/collection-json/characters.js';
 import { characterPutRequestV1 } from '@/schemas/characters/put-request-v1.js';
-import { COLLECTION_JSON } from '@genshin/collection-json';
+import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
+import { characterItemHref, characterRepresentation, serialiseCharacter } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -37,9 +34,18 @@ characters.get('/', async (c) => {
   const items = await listCharacters(userId);
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(JSON.stringify(characterListDocument(items, baseUrl)), {
-    headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
-  });
+  return c.body(
+    JSON.stringify(
+      serialiseCollection(
+        characterRepresentation,
+        `${baseUrl}/api/characters`,
+        items.map((item) => serialiseCharacter(item, baseUrl)),
+      ),
+    ),
+    {
+      headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
+    },
+  );
 });
 
 // GET /api/characters/:characterId — Get specific character record
@@ -55,9 +61,16 @@ characters.get('/:characterId', async (c) => {
 
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(JSON.stringify(characterItemDocument(character, baseUrl)), {
-    headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
-  });
+  return c.body(
+    JSON.stringify(
+      serialiseCollection(characterRepresentation, characterItemHref(baseUrl, character), [
+        serialiseCharacter(character, baseUrl),
+      ]),
+    ),
+    {
+      headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
+    },
+  );
 });
 
 // PUT /api/characters/:characterId — Save/update character (idempotent upsert)
@@ -73,10 +86,17 @@ characters.put('/:characterId', validateBody(characterPutRequestV1.schema), asyn
   const { character, created } = await saveCharacter(userId, characterId, constellationLevel);
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(JSON.stringify(characterItemDocument(character, baseUrl)), {
-    status: created ? 201 : 200,
-    headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
-  });
+  return c.body(
+    JSON.stringify(
+      serialiseCollection(characterRepresentation, characterItemHref(baseUrl, character), [
+        serialiseCharacter(character, baseUrl),
+      ]),
+    ),
+    {
+      status: created ? 201 : 200,
+      headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
+    },
+  );
 });
 
 // DELETE /api/characters/:characterId — Remove from collection

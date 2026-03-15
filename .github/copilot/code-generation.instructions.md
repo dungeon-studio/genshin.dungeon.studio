@@ -44,7 +44,8 @@
 - `@genshin/game-data`: export data arrays (for example, `CHARACTERS`) and
   getter helpers (for example, `getCharacterById`). Export relevant types
   alongside data.
-- `@genshin/types`: export only `type` declarations. No runtime code.
+- `@genshin/domain`: export domain types, value objects, invariants, and wire
+  format representations. Emit JavaScript with declarations.
 
 ## State management (`apps/web`)
 

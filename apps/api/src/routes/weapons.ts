@@ -12,16 +12,12 @@ import {
   listWeapons,
   updateWeapon,
 } from '@/repositories/weapons/index.js';
-import {
-  weaponItemDocument,
-  weaponItemHref,
-  weaponListDocument,
-} from '@/representations/collection-json/weapons.js';
 import { weaponPatchRequestV1 } from '@/schemas/weapons/patch-request-v1.js';
 import { weaponPostRequestV1 } from '@/schemas/weapons/post-request-v1.js';
-import { COLLECTION_JSON } from '@genshin/collection-json';
+import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
+import type { UUID } from '@genshin/domain';
+import { serialiseWeapon, weaponItemHref, weaponRepresentation } from '@genshin/domain';
 import { getWeaponById } from '@genshin/game-data';
-import type { UUID } from '@genshin/types';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
@@ -57,16 +53,34 @@ weapons.get('/', async (c) => {
 
     const instances = await listWeapons(userId, weaponId);
 
-    return c.body(JSON.stringify(weaponListDocument(instances, baseUrl)), {
-      headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
-    });
+    return c.body(
+      JSON.stringify(
+        serialiseCollection(
+          weaponRepresentation,
+          `${baseUrl}/api/weapons`,
+          instances.map((w) => serialiseWeapon(w, baseUrl)),
+        ),
+      ),
+      {
+        headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
+      },
+    );
   }
 
   const items = await listWeapons(userId);
 
-  return c.body(JSON.stringify(weaponListDocument(items, baseUrl)), {
-    headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
-  });
+  return c.body(
+    JSON.stringify(
+      serialiseCollection(
+        weaponRepresentation,
+        `${baseUrl}/api/weapons`,
+        items.map((w) => serialiseWeapon(w, baseUrl)),
+      ),
+    ),
+    {
+      headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
+    },
+  );
 });
 
 // POST /api/weapons — Create new weapon instance
@@ -81,13 +95,20 @@ weapons.post('/', validateBody(weaponPostRequestV1.schema), async (c) => {
   const weapon = await createWeapon(userId, weaponId, refinementLevel);
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(JSON.stringify(weaponListDocument([weapon], baseUrl)), {
-    status: 201,
-    headers: {
-      'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"`,
-      Location: weaponItemHref(baseUrl, weapon),
+  return c.body(
+    JSON.stringify(
+      serialiseCollection(weaponRepresentation, `${baseUrl}/api/weapons`, [
+        serialiseWeapon(weapon, baseUrl),
+      ]),
+    ),
+    {
+      status: 201,
+      headers: {
+        'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"`,
+        Location: weaponItemHref(baseUrl, weapon),
+      },
     },
-  });
+  );
 });
 
 // GET /api/weapons/:weaponInstanceId — Get single weapon instance
@@ -103,9 +124,16 @@ weapons.get('/:weaponInstanceId', async (c) => {
 
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(JSON.stringify(weaponItemDocument(weapon, baseUrl)), {
-    headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
-  });
+  return c.body(
+    JSON.stringify(
+      serialiseCollection(weaponRepresentation, weaponItemHref(baseUrl, weapon), [
+        serialiseWeapon(weapon, baseUrl),
+      ]),
+    ),
+    {
+      headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
+    },
+  );
 });
 
 // PATCH /api/weapons/:weaponInstanceId — Update weapon instance
@@ -123,9 +151,16 @@ weapons.patch('/:weaponInstanceId', validateBody(weaponPatchRequestV1.schema), a
 
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(JSON.stringify(weaponItemDocument(weapon, baseUrl)), {
-    headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
-  });
+  return c.body(
+    JSON.stringify(
+      serialiseCollection(weaponRepresentation, weaponItemHref(baseUrl, weapon), [
+        serialiseWeapon(weapon, baseUrl),
+      ]),
+    ),
+    {
+      headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
+    },
+  );
 });
 
 // DELETE /api/weapons/:weaponInstanceId — Delete weapon instance

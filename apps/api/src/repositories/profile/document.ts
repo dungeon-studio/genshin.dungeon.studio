@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { ISOTimestamp, UserProfile } from '@genshin/types';
+import type { ISOTimestamp, UserProfile } from '@genshin/domain';
 
 export interface DocumentData {
   name: string;

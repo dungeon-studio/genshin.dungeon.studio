@@ -10,10 +10,14 @@ import { validateBody } from '@/middleware/validate-body.js';
 import { getProfile, updateProfile } from '@/repositories/profile/index.js';
 import { profileGetResponseV1 } from '@/schemas/profile/get-response-v1.js';
 import { profilePatchRequestV1 } from '@/schemas/profile/patch-request-v1.js';
-import type { ProfileUpdate, UserProfile } from '@genshin/types';
+import { serialiseProfile, type AuthIdentity, type ProfileUpdate } from '@genshin/domain';
 import type { DecodedIdToken } from 'firebase-admin/auth';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+
+function toAuthIdentity({ uid, email, email_verified, picture }: DecodedIdToken): AuthIdentity {
+  return { uid, email, emailVerified: email_verified, picture };
+}
 
 export const userProfile = new Hono<{
   Variables: AuthVariables & NegotiatedContentVariables & ValidatedBodyVariables;
@@ -25,26 +29,12 @@ userProfile.use(
   negotiateContent([{ mediaType: 'application/json', profile: profileGetResponseV1 }]),
 );
 
-// The profile response is a composite of two ownership domains:
-//
-//   Auth-owned (read-only, from verified token): uid, email, emailVerified, picture
-//   Profile-owned (mutable via PATCH, from Firestore): name, createdAt, updatedAt
-//
 // Cherry-pick identity fields rather than spreading the full DecodedIdToken.
 // The token carries ~15 internal JWT fields (iss, aud, exp, firebase metadata,
 // custom claims) that are not part of the API contract and would make the
-// response shape unpredictable.
-function compositeResponse(decoded: DecodedIdToken, profile: UserProfile) {
-  return {
-    // Auth-owned — sourced from the verified Firebase ID token
-    uid: decoded.uid,
-    email: decoded.email ?? null,
-    emailVerified: decoded.email_verified ?? false,
-    picture: decoded.picture ?? null,
-    // Profile-owned — sourced from Firestore, mutable via PATCH
-    ...profile,
-  };
-}
+// response shape unpredictable. The shared serialiseProfile converter in
+// @genshin/domain handles building the composite response from an AuthIdentity
+// and a UserProfile.
 
 // GET /api/profile — Return the authenticated user's composite profile
 userProfile.get('/', async (c) => {
@@ -55,7 +45,7 @@ userProfile.get('/', async (c) => {
     throw new HTTPException(404, { message: 'Profile not found' });
   }
 
-  return c.json(compositeResponse(decoded, profile), 200, {
+  return c.json(serialiseProfile(toAuthIdentity(decoded), profile), 200, {
     'Content-Type': c.get('negotiatedMediaType'),
   });
 });
@@ -66,7 +56,7 @@ userProfile.patch('/', validateBody(profilePatchRequestV1.schema), async (c) => 
   const body = c.get('validatedBody') as ProfileUpdate;
   const updated = await updateProfile(decoded.uid, body);
 
-  return c.json(compositeResponse(decoded, updated), 200, {
+  return c.json(serialiseProfile(toAuthIdentity(decoded), updated), 200, {
     'Content-Type': c.get('negotiatedMediaType'),
   });
 });

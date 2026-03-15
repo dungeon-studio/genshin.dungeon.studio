@@ -46,7 +46,7 @@ Use the workspace package name when the change is scoped to one package:
 - `feat(web):` change in `apps/web`
 - `fix(api):` change in `apps/api`
 - `refactor(game-data):` change in `packages/game-data`
-- `chore(types):` change in `packages/types`
+- `chore(domain):` change in `packages/domain`
 - `docs:` cross-cutting documentation (no scope needed)
 - `chore(infra):` Terraform and infrastructure changes
 

@@ -14,7 +14,7 @@
   "dependencies": {
     "@genshin/collection-json": "workspace:*",
     "@genshin/game-data": "workspace:*",
-    "@genshin/types": "workspace:*",
+    "@genshin/domain": "workspace:*",
     "@hono/node-server": "1.19.11",
     "ajv": "8.18.0",
     "firebase-admin": "13.7.0",

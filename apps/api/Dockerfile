@@ -24,7 +24,7 @@ RUN rm -f /usr/local/bin/yarn /usr/local/bin/yarnpkg && \
 COPY pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY apps/api/package.json ./apps/api/
 COPY packages/collection-json/package.json ./packages/collection-json/
-COPY packages/types/package.json ./packages/types/
+COPY packages/domain/package.json ./packages/domain/
 COPY packages/game-data/package.json ./packages/game-data/
 
 RUN pnpm install --frozen-lockfile
@@ -49,7 +49,7 @@ COPY --from=builder /app/apps/api/node_modules ./apps/api/node_modules
 COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/packages/collection-json ./packages/collection-json
-COPY --from=builder /app/packages/types ./packages/types
+COPY --from=builder /app/packages/domain ./packages/domain
 COPY --from=builder /app/packages/game-data ./packages/game-data
 
 EXPOSE 8080

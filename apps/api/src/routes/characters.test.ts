@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionCharacter } from '@genshin/types';
+import type { CollectionCharacter } from '@genshin/domain';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/firebase/auth.js', () => ({
@@ -29,8 +29,8 @@ import {
 } from '@/repositories/characters/index.js';
 import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
+import { MAX_CONSTELLATION_LEVEL, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
-import { MAX_CONSTELLATION_LEVEL, MIN_CONSTELLATION_LEVEL } from '@genshin/types';
 
 const FAKE_CHARACTER: CollectionCharacter = {
   characterId: 'albedo',

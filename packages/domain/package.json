@@ -1,7 +1,7 @@
 {
-  "name": "@genshin/types",
+  "name": "@genshin/domain",
   "version": "0.0.0",
-  "description": "Shared types for Genshin Dungeon Studio",
+  "description": "Shared domain model for Genshin Dungeon Studio",
   "private": true,
   "type": "module",
   "exports": {
@@ -21,6 +21,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@genshin/collection-json": "workspace:*",
     "@genshin/game-data": "workspace:*"
   },
   "devDependencies": {
