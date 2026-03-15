@@ -31,7 +31,7 @@ interface CharacterCardProps {
   owned?: boolean;
   constellationLevel?: number;
   selected?: boolean;
-  onSelect?: (characterId: string) => void;
+  onSelect?: (characterId: Character['id']) => void;
 }
 
 export function CharacterCard({
@@ -46,11 +46,12 @@ export function CharacterCard({
   return (
     <motion.button
       type="button"
+      aria-pressed={selected}
       whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
       whileTap={{ scale: 0.97 }}
       onClick={() => onSelect?.(character.id)}
       className={cn(
-        'relative flex items-center gap-3 rounded-lg border border-border border-l-4 bg-card p-3 text-left shadow-sm transition-colors',
+        'relative flex items-center gap-3 rounded-lg border border-border border-l-4 bg-card p-3 text-left shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         ELEMENT_BORDER_COLORS[character.element],
         !owned && 'opacity-40 grayscale',
         selected &&
