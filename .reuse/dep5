@@ -53,6 +53,12 @@ Files: *.json .prettierrc
 Copyright: 2026 Alex Brandt <alunduil@gmail.com>
 License: MIT
 
+# Generated element icon images (binary files, no inline SPDX headers)
+
+Files: apps/web/public/elements/*.png
+Copyright: 2026 Alex Brandt <alunduil@gmail.com>
+License: MIT
+
 # Copilot prompt files (frontmatter must be first line, no room for SPDX)
 
 Files: .github/copilot/*.prompt.md
