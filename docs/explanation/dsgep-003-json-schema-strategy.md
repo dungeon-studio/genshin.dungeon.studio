@@ -7,7 +7,7 @@
 
 <!-- vale Microsoft.HeadingAcronyms = YES -->
 
-- **Status**: Draft
+- **Status**: Accepted
 - **Created**: 2026-03-01
 - **Authors**: Alex Brandt
 
