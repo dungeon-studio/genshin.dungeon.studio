@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import profileGetSchema from '@/schemas/profile/get/1.0.0.json' with { type: 'json' };
+import { profileGetResponseV1 } from '@/schemas/profile/get-response-v1.js';
 import type { UserProfile } from '@genshin/types';
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -21,10 +21,10 @@ import { getProfile, updateProfile } from '@/repositories/profile/index.js';
 import { FAKE_UID, authedRequest } from '@/test/auth-requests.js';
 
 const ajv = new Ajv2020();
-const validateGetSchema = ajv.compile(profileGetSchema);
+const validateGetSchema = ajv.compile(profileGetResponseV1.schema);
 
 const EXPECTED_CONTENT_TYPE =
-  'application/json; profile="http://localhost/schemas/profile/get/1.0.0.json"';
+  'application/json; profile="http://localhost/schemas/profile/get-response-v1.json"';
 
 const FAKE_PROFILE_TOKEN = {
   uid: FAKE_UID,

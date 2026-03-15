@@ -2,15 +2,15 @@
 // SPDX-License-Identifier: MIT
 
 import { app } from '@/app.js';
-import rootGetSchema from '@/schemas/root/get/1.0.0.json' with { type: 'json' };
+import { rootGetResponseV1 } from '@/schemas/root/get-response-v1.js';
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 const ajv = new Ajv2020();
-const validateGetSchema = ajv.compile(rootGetSchema);
+const validateGetSchema = ajv.compile(rootGetResponseV1.schema);
 
 const EXPECTED_CONTENT_TYPE =
-  'application/json; profile="http://localhost/schemas/root/get/1.0.0.json"';
+  'application/json; profile="http://localhost/schemas/root/get-response-v1.json"';
 
 describe('GET /', () => {
   let res: Response;

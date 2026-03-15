@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { ErrorObject } from 'ajv/dist/2020.js';
+import type { ErrorObject, SchemaObject } from 'ajv/dist/2020.js';
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import type { MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -17,7 +17,7 @@ export type ValidatedBodyVariables = {
  * Stores the parsed body on the context as `validatedBody`.
  * Returns 400 for unparseable JSON, 422 for schema validation failures.
  */
-export function validateBody(schema: Record<string, unknown>): MiddlewareHandler {
+export function validateBody(schema: SchemaObject): MiddlewareHandler {
   const validate = ajv.compile(schema);
 
   return async (c, next) => {

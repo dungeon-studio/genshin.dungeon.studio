@@ -15,7 +15,7 @@ import {
   characterItemDocument,
   characterListDocument,
 } from '@/representations/collection-json/characters.js';
-import characterPutSchema from '@/schemas/characters/put/1.0.0.json' with { type: 'json' };
+import { characterPutRequestV1 } from '@/schemas/characters/put-request-v1.js';
 import { COLLECTION_JSON } from '@genshin/collection-json';
 import { getCharacterById } from '@genshin/game-data';
 import { Hono } from 'hono';
@@ -61,7 +61,7 @@ characters.get('/:characterId', async (c) => {
 });
 
 // PUT /api/characters/:characterId — Save/update character (idempotent upsert)
-characters.put('/:characterId', validateBody(characterPutSchema), async (c) => {
+characters.put('/:characterId', validateBody(characterPutRequestV1.schema), async (c) => {
   const userId = c.get('user').uid;
   const { characterId } = c.req.param();
 

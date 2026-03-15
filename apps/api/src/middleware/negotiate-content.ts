@@ -6,19 +6,27 @@ import { HTTPException } from 'hono/http-exception';
 import Negotiator from 'negotiator';
 
 /**
+ * Anything with a serving path that can be used as an RFC 6906 profile link.
+ * Satisfied by `JsonSchemaProfile` and any future profile-like types.
+ */
+export interface ProfileLink {
+  readonly path: string;
+}
+
+/**
  * A representation the endpoint can produce.
  *
  * @example
- * // JSON with a schema profile
- * { mediaType: 'application/json', profilePath: '/schemas/profile/get/1.0.0.json' }
+ * // JSON with a profile link (e.g. a JSON Schema or ALPS document)
+ * { mediaType: 'application/json', profile: profileGetResponseV1 }
  *
  * // Plain JSON without a profile
  * { mediaType: 'application/json' }
  */
 export interface SupportedRepresentation {
   mediaType: string;
-  /** Absolute URL path (starting with `/`) resolved against the request origin. */
-  profilePath?: string;
+  /** Profile link whose path becomes the `profile` parameter in the media type. */
+  profile?: ProfileLink;
 }
 
 export type NegotiatedContentVariables = {
@@ -30,8 +38,8 @@ export type NegotiatedContentVariables = {
  * parameter when declared.
  */
 export function toMediaTypeString(representation: SupportedRepresentation, origin: string): string {
-  if (!representation.profilePath) return representation.mediaType;
-  return `${representation.mediaType}; profile="${origin}${representation.profilePath}"`;
+  if (!representation.profile) return representation.mediaType;
+  return `${representation.mediaType}; profile="${origin}${representation.profile.path}"`;
 }
 
 /**
