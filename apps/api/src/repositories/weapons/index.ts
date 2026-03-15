@@ -7,58 +7,33 @@ import { randomUUID } from 'node:crypto';
 
 import { fromDocument, toDocument, type DocumentData } from './document.js';
 
-function collectionRef(userId: string, weaponId: string) {
-  return db
-    .collection('users')
-    .doc(userId)
-    .collection('weapons')
-    .doc(weaponId)
-    .collection('instances');
+function collectionRef(userId: string) {
+  return db.collection('users').doc(userId).collection('weapons');
 }
 
-export async function listWeapons(userId: string): Promise<CollectionWeapon[]> {
-  const weaponsRef = db.collection('users').doc(userId).collection('weapons');
-  const weaponDocs = await weaponsRef.listDocuments();
+export async function listWeapons(userId: string, weaponId?: string): Promise<CollectionWeapon[]> {
+  const ref = weaponId
+    ? collectionRef(userId).where('weaponId', '==', weaponId)
+    : collectionRef(userId);
+  const snapshot = await ref.get();
 
-  const results: CollectionWeapon[] = [];
-
-  for (const weaponDoc of weaponDocs) {
-    const snapshot = await weaponDoc.collection('instances').get();
-    const instances = snapshot.docs.map((doc) =>
-      fromDocument(doc.id as UUID, weaponDoc.id, doc.data() as DocumentData),
-    );
-    results.push(...instances);
-  }
-
-  return results;
+  return snapshot.docs.map((doc) => fromDocument(doc.id as UUID, doc.data() as DocumentData));
 }
 
-export async function listWeaponInstances(
+export async function getWeapon(
   userId: string,
-  weaponId: string,
-): Promise<CollectionWeapon[]> {
-  const snapshot = await collectionRef(userId, weaponId).get();
-
-  return snapshot.docs.map((doc) =>
-    fromDocument(doc.id as UUID, weaponId, doc.data() as DocumentData),
-  );
-}
-
-export async function getWeaponInstance(
-  userId: string,
-  weaponId: string,
   weaponInstanceId: UUID,
 ): Promise<CollectionWeapon | null> {
-  const doc = await collectionRef(userId, weaponId).doc(weaponInstanceId).get();
+  const doc = await collectionRef(userId).doc(weaponInstanceId).get();
 
   if (!doc.exists) {
     return null;
   }
 
-  return fromDocument(weaponInstanceId as UUID, weaponId, doc.data() as DocumentData);
+  return fromDocument(weaponInstanceId, doc.data() as DocumentData);
 }
 
-export async function createWeaponInstance(
+export async function createWeapon(
   userId: string,
   weaponId: string,
   refinementLevel: number,
@@ -74,28 +49,17 @@ export async function createWeaponInstance(
     updatedAt: now,
   };
 
-  // Batch write: create the parent weapon doc so listWeapons() can discover it
-  // via listDocuments(), then create the instance doc. The parent doc is an
-  // empty anchor; see #455 for the planned collectionGroup redesign.
-  const batch = db.batch();
-  batch.set(
-    db.collection('users').doc(userId).collection('weapons').doc(weaponId),
-    {},
-    { merge: true },
-  );
-  batch.set(collectionRef(userId, weaponId).doc(weaponInstanceId), toDocument(weapon));
-  await batch.commit();
+  await collectionRef(userId).doc(weaponInstanceId).set(toDocument(weapon));
 
   return weapon;
 }
 
-export async function updateWeaponInstance(
+export async function updateWeapon(
   userId: string,
-  weaponId: string,
   weaponInstanceId: UUID,
   refinementLevel: number,
 ): Promise<CollectionWeapon | null> {
-  const docRef = collectionRef(userId, weaponId).doc(weaponInstanceId);
+  const docRef = collectionRef(userId).doc(weaponInstanceId);
   const existing = await docRef.get();
 
   if (!existing.exists) {
@@ -107,7 +71,7 @@ export async function updateWeaponInstance(
 
   const weapon: CollectionWeapon = {
     weaponInstanceId,
-    weaponId,
+    weaponId: existingData.weaponId,
     refinementLevel,
     createdAt: existingData.createdAt as ISOTimestamp,
     updatedAt: now,
@@ -118,10 +82,6 @@ export async function updateWeaponInstance(
   return weapon;
 }
 
-export async function deleteWeaponInstance(
-  userId: string,
-  weaponId: string,
-  weaponInstanceId: UUID,
-): Promise<void> {
-  await collectionRef(userId, weaponId).doc(weaponInstanceId).delete();
+export async function deleteWeapon(userId: string, weaponInstanceId: UUID): Promise<void> {
+  await collectionRef(userId).doc(weaponInstanceId).delete();
 }

@@ -5,6 +5,11 @@
   "description": "Request body for creating a new weapon instance in the user's collection",
   "type": "object",
   "properties": {
+    "weaponId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identifier of the weapon from game data"
+    },
     "refinementLevel": {
       "type": "integer",
       "minimum": 1,
@@ -12,6 +17,6 @@
       "description": "Refinement rank of the weapon instance"
     }
   },
-  "required": ["refinementLevel"],
+  "required": ["weaponId", "refinementLevel"],
   "additionalProperties": false
 }
