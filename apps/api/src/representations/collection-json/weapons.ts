@@ -38,7 +38,7 @@ export function weaponToItem(weapon: CollectionWeapon, baseUrl: string): Item {
   const links: Link[] = [
     {
       rel: 'collection',
-      href: `${baseUrl}/api/weapons?weaponId=${weapon.weaponId}`,
+      href: `${baseUrl}/api/weapons?weaponId=${encodeURIComponent(weapon.weaponId)}`,
       prompt: `All instances of ${weapon.weaponId}`,
     },
   ];

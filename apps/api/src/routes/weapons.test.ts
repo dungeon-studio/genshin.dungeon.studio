@@ -167,6 +167,14 @@ describe('Weapon routes', () => {
       const body = (await res.json()) as { detail: string };
       expect(body.detail).toBe('Unknown weapon: not-a-weapon');
     });
+
+    it('returns 400 for empty weaponId', async () => {
+      const res = await app.request(authedRequest('GET', '/api/weapons?weaponId='));
+
+      expect(res.status).toBe(400);
+      const body = (await res.json()) as { detail: string };
+      expect(body.detail).toBe('weaponId query parameter must not be empty');
+    });
   });
 
   describe('POST /api/weapons', () => {

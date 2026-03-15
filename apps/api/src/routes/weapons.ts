@@ -46,7 +46,11 @@ weapons.get('/', async (c) => {
   const weaponId = c.req.query('weaponId');
   const baseUrl = new URL(c.req.url).origin;
 
-  if (weaponId) {
+  if (weaponId !== undefined) {
+    if (!weaponId) {
+      throw new HTTPException(400, { message: 'weaponId query parameter must not be empty' });
+    }
+
     if (!getWeaponById(weaponId)) {
       throw new HTTPException(400, { message: `Unknown weapon: ${weaponId}` });
     }
