@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { Character, Element } from '@genshin/game-data';
+import { MIN_CONSTELLATION_LEVEL } from '@genshin/types';
 import { motion } from 'framer-motion';
 
 import { cn } from '@/lib/utils';
@@ -37,11 +38,12 @@ interface CharacterCardProps {
 export function CharacterCard({
   character,
   owned = false,
-  constellationLevel,
+  constellationLevel = MIN_CONSTELLATION_LEVEL,
   selected = false,
   onSelect,
 }: CharacterCardProps) {
   const elementIconSrc = `/elements/${character.element.toLowerCase()}.png`;
+  const elementRing = ELEMENT_SELECTED_RINGS[character.element];
 
   return (
     <motion.button
@@ -51,14 +53,16 @@ export function CharacterCard({
       whileTap={{ scale: 0.97 }}
       onClick={() => onSelect?.(character.id)}
       className={cn(
-        'relative flex items-center gap-3 rounded-lg border border-border border-l-4 bg-card p-3 text-left shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        'relative flex items-center gap-3 rounded-lg border border-border border-l-4 bg-card p-3 text-left shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
         ELEMENT_BORDER_COLORS[character.element],
         !owned && 'opacity-40 grayscale',
-        selected &&
-          cn(
-            'ring-2 ring-offset-2 ring-offset-background',
-            ELEMENT_SELECTED_RINGS[character.element],
-          ),
+        selected
+          ? cn(
+              'ring-2 ring-offset-2 ring-offset-background',
+              elementRing,
+              `focus-visible:${elementRing}`,
+            )
+          : 'focus-visible:ring-ring',
       )}
     >
       <img src={elementIconSrc} alt={character.element} className="h-6 w-6 shrink-0" />
@@ -70,8 +74,11 @@ export function CharacterCard({
         </span>
       </div>
 
-      {owned && constellationLevel !== undefined && (
-        <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-bold text-muted-foreground">
+      {owned && (
+        <span
+          className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-bold text-muted-foreground"
+          aria-label={`Constellation level ${constellationLevel}`}
+        >
           C{constellationLevel}
         </span>
       )}
