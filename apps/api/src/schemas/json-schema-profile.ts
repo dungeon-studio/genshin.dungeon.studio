@@ -16,6 +16,10 @@
 export interface JsonSchemaProfile {
   /** Absolute URL path where the schema is served (e.g. `/schemas/profile/get-response-v1.json`). */
   readonly path: string;
+  // Intentionally `Record<string, unknown>` rather than AJV's `SchemaObject`
+  // to keep this interface free of validation-library coupling. The
+  // `as const satisfies` pattern on each module preserves literal types, and
+  // `Record<string, unknown>` is assignable to `SchemaObject` at call sites.
   /** The JSON Schema object. */
   readonly schema: Record<string, unknown>;
 }
