@@ -102,6 +102,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@genshin/game-data':
+        specifier: workspace:*
+        version: link:../../packages/game-data
       '@genshin/types':
         specifier: workspace:*
         version: link:../../packages/types
