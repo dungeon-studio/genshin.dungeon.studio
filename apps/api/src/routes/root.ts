@@ -3,11 +3,10 @@
 
 import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
+import { rootGetResponseV1 } from '@/schemas/root/get-response-v1.js';
 import type { Env, Hono as HonoApp } from 'hono';
 import { Hono } from 'hono';
 import { findTargetHandler, isMiddleware } from 'hono/utils/handler';
-
-const ROOT_SCHEMA_PATH = '/schemas/root/get/1.0.0.json';
 
 /**
  * Discover top-level resource paths from the app's registered routes.
@@ -49,7 +48,7 @@ export function root<E extends Env>(
 
   router.get(
     '/',
-    negotiateContent([{ mediaType: 'application/json', profilePath: ROOT_SCHEMA_PATH }]),
+    negotiateContent([{ mediaType: 'application/json', profile: rootGetResponseV1 }]),
     (c) => c.json({ links }, 200, { 'Content-Type': c.get('negotiatedMediaType') }),
   );
 

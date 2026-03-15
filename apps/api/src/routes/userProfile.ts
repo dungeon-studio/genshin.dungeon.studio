@@ -8,7 +8,8 @@ import { negotiateContent } from '@/middleware/negotiate-content.js';
 import type { ValidatedBodyVariables } from '@/middleware/validate-body.js';
 import { validateBody } from '@/middleware/validate-body.js';
 import { getProfile, updateProfile } from '@/repositories/profile/index.js';
-import profilePatchSchema from '@/schemas/profile/patch/1.0.0.json' with { type: 'json' };
+import { profileGetResponseV1 } from '@/schemas/profile/get-response-v1.js';
+import { profilePatchRequestV1 } from '@/schemas/profile/patch-request-v1.js';
 import type { ProfileUpdate, UserProfile } from '@genshin/types';
 import type { DecodedIdToken } from 'firebase-admin/auth';
 import { Hono } from 'hono';
@@ -18,12 +19,10 @@ export const userProfile = new Hono<{
   Variables: AuthVariables & NegotiatedContentVariables & ValidatedBodyVariables;
 }>();
 
-const GET_SCHEMA_PATH = '/schemas/profile/get/1.0.0.json';
-
 userProfile.use('*', auth);
 userProfile.use(
   '*',
-  negotiateContent([{ mediaType: 'application/json', profilePath: GET_SCHEMA_PATH }]),
+  negotiateContent([{ mediaType: 'application/json', profile: profileGetResponseV1 }]),
 );
 
 // The profile response is a composite of two ownership domains:
@@ -62,7 +61,7 @@ userProfile.get('/', async (c) => {
 });
 
 // PATCH /api/profile — Partial update of mutable profile fields
-userProfile.patch('/', validateBody(profilePatchSchema), async (c) => {
+userProfile.patch('/', validateBody(profilePatchRequestV1.schema), async (c) => {
   const decoded = c.get('user');
   const body = c.get('validatedBody') as ProfileUpdate;
   const updated = await updateProfile(decoded.uid, body);

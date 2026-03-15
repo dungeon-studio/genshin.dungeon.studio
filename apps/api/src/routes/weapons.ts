@@ -17,8 +17,8 @@ import {
   weaponItemHref,
   weaponListDocument,
 } from '@/representations/collection-json/weapons.js';
-import weaponPatchSchema from '@/schemas/weapons/patch/1.0.0.json' with { type: 'json' };
-import weaponPostSchema from '@/schemas/weapons/post/1.0.0.json' with { type: 'json' };
+import { weaponPatchRequestV1 } from '@/schemas/weapons/patch-request-v1.js';
+import { weaponPostRequestV1 } from '@/schemas/weapons/post-request-v1.js';
 import { COLLECTION_JSON } from '@genshin/collection-json';
 import { getWeaponById } from '@genshin/game-data';
 import type { UUID } from '@genshin/types';
@@ -70,7 +70,7 @@ weapons.get('/', async (c) => {
 });
 
 // POST /api/weapons — Create new weapon instance
-weapons.post('/', validateBody(weaponPostSchema), async (c) => {
+weapons.post('/', validateBody(weaponPostRequestV1.schema), async (c) => {
   const userId = c.get('user').uid;
   const { weaponId, refinementLevel } = c.get('validatedBody') as CreateWeaponBody;
 
@@ -109,7 +109,7 @@ weapons.get('/:weaponInstanceId', async (c) => {
 });
 
 // PATCH /api/weapons/:weaponInstanceId — Update weapon instance
-weapons.patch('/:weaponInstanceId', validateBody(weaponPatchSchema), async (c) => {
+weapons.patch('/:weaponInstanceId', validateBody(weaponPatchRequestV1.schema), async (c) => {
   const userId = c.get('user').uid;
   const weaponInstanceId = c.req.param('weaponInstanceId') as UUID;
 

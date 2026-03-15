@@ -9,28 +9,28 @@ import { negotiateContent, toMediaTypeString } from './negotiate-content.js';
 
 const ORIGIN = 'http://localhost';
 
-const jsonWithProfile: SupportedRepresentation = {
+const jsonWithProfileLink: SupportedRepresentation = {
   mediaType: 'application/json',
-  profilePath: '/schemas/profile/get/1.0.0.json',
+  profile: { path: '/schemas/profile/get/1.0.0.json' },
 };
 
-const jsonWithoutProfile: SupportedRepresentation = {
+const plainJson: SupportedRepresentation = {
   mediaType: 'application/json',
 };
 
 describe('toMediaTypeString', () => {
-  it('returns bare media type when no profilePath is set', () => {
-    expect(toMediaTypeString(jsonWithoutProfile, ORIGIN)).toBe('application/json');
+  it('returns bare media type when no profile is set', () => {
+    expect(toMediaTypeString(plainJson, ORIGIN)).toBe('application/json');
   });
 
   it('appends profile parameter with absolute URI', () => {
-    expect(toMediaTypeString(jsonWithProfile, ORIGIN)).toBe(
+    expect(toMediaTypeString(jsonWithProfileLink, ORIGIN)).toBe(
       'application/json; profile="http://localhost/schemas/profile/get/1.0.0.json"',
     );
   });
 
   it('uses the provided origin in the profile URI', () => {
-    expect(toMediaTypeString(jsonWithProfile, 'https://api.example.com')).toBe(
+    expect(toMediaTypeString(jsonWithProfileLink, 'https://api.example.com')).toBe(
       'application/json; profile="https://api.example.com/schemas/profile/get/1.0.0.json"',
     );
   });
@@ -38,7 +38,7 @@ describe('toMediaTypeString', () => {
 
 describe('negotiateContent middleware', () => {
   const supported: SupportedRepresentation[] = [
-    { mediaType: 'application/json', profilePath: '/schemas/test/1.0.0.json' },
+    { mediaType: 'application/json', profile: { path: '/schemas/test/1.0.0.json' } },
   ];
 
   function createApp() {
