@@ -188,18 +188,24 @@ describe('Team routes', () => {
       expect(body.detail).toBe('Team not found');
     });
 
-    it('returns 400 for invalid slot', async () => {
+    it('returns 404 for invalid slot', async () => {
       const res = await app.request(authedRequest('GET', '/api/teams/5'));
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(404);
       const body = (await res.json()) as { detail: string };
       expect(body.detail).toBe('Team slot must be 1, 2, 3, or 4');
     });
 
-    it('returns 400 for non-numeric slot', async () => {
+    it('returns 404 for non-numeric slot', async () => {
       const res = await app.request(authedRequest('GET', '/api/teams/abc'));
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(404);
+    });
+
+    it('returns 404 for slot with trailing characters', async () => {
+      const res = await app.request(authedRequest('GET', '/api/teams/1abc'));
+
+      expect(res.status).toBe(404);
     });
   });
 
@@ -262,10 +268,10 @@ describe('Team routes', () => {
       expect(res.status).toBe(200);
     });
 
-    it('returns 400 for invalid slot', async () => {
+    it('returns 404 for invalid slot', async () => {
       const res = await app.request(authedRequest('PUT', '/api/teams/5', { name: 'Team' }));
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(404);
       const body = (await res.json()) as { detail: string };
       expect(body.detail).toBe('Team slot must be 1, 2, 3, or 4');
     });
@@ -533,10 +539,10 @@ describe('Team routes', () => {
       expect(res.status).toBe(204);
     });
 
-    it('returns 400 for invalid slot', async () => {
+    it('returns 404 for invalid slot', async () => {
       const res = await app.request(authedRequest('DELETE', '/api/teams/5'));
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(404);
       const body = (await res.json()) as { detail: string };
       expect(body.detail).toBe('Team slot must be 1, 2, 3, or 4');
     });

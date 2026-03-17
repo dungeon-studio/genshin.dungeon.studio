@@ -29,10 +29,10 @@ interface UpdateTeamBody {
 }
 
 function parseSlot(param: string): TeamSlot {
-  const slot = parseInt(param, 10);
+  const slot = Number(param);
 
   if (!isValidTeamSlot(slot)) {
-    throw new HTTPException(400, { message: 'Team slot must be 1, 2, 3, or 4' });
+    throw new HTTPException(404, { message: 'Team slot must be 1, 2, 3, or 4' });
   }
 
   return slot;

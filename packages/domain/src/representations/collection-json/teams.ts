@@ -23,6 +23,7 @@ import {
 
 import type { CollectionTeam } from '../../collectionTeam.js';
 import { MAX_TEAM_MEMBERS, assertCollectionTeam } from '../../collectionTeam.js';
+import type { ArtifactPlan, TeamMember } from '../../teamMember.js';
 
 const TEAM_TEMPLATE: Template = {
   data: [
@@ -64,10 +65,66 @@ export function teamItemDocument(team: CollectionTeam, baseUrl: string): Collect
   });
 }
 
+function deserialiseArtifactPlan(value: unknown): ArtifactPlan {
+  if (typeof value !== 'object' || value === null) {
+    throw new TypeError(`artifactPlan must be a non-null object, got: ${JSON.stringify(value)}`);
+  }
+  const plan = value as Record<string, unknown>;
+  for (const field of ['sands', 'goblet', 'circlet'] as const) {
+    if (typeof plan[field] !== 'string') {
+      throw new TypeError(
+        `artifactPlan.${field} must be a string, got: ${JSON.stringify(plan[field])}`,
+      );
+    }
+  }
+  for (const field of ['sets', 'primaryStats', 'secondaryStats'] as const) {
+    if (!Array.isArray(plan[field])) {
+      throw new TypeError(
+        `artifactPlan.${field} must be an array, got: ${JSON.stringify(plan[field])}`,
+      );
+    }
+  }
+  return value as ArtifactPlan;
+}
+
+function deserialiseTeamMember(value: unknown, index: number): TeamMember {
+  if (typeof value !== 'object' || value === null) {
+    throw new TypeError(
+      `members[${index}] must be a non-null object, got: ${JSON.stringify(value)}`,
+    );
+  }
+  const raw = value as Record<string, unknown>;
+  if (typeof raw.characterId !== 'string') {
+    throw new TypeError(
+      `members[${index}].characterId must be a string, got: ${JSON.stringify(raw.characterId)}`,
+    );
+  }
+  if (raw.weaponInstanceId !== undefined && typeof raw.weaponInstanceId !== 'string') {
+    throw new TypeError(
+      `members[${index}].weaponInstanceId must be a string, got: ${JSON.stringify(raw.weaponInstanceId)}`,
+    );
+  }
+  if (raw.artifactPlan !== undefined) {
+    deserialiseArtifactPlan(raw.artifactPlan);
+  }
+  return value as TeamMember;
+}
+
 export function deserialiseTeam(item: Item): CollectionTeam {
-  const data = Object.fromEntries(
-    item.data.map((d) => [d.name, d.name === 'members' ? JSON.parse(d.value as string) : d.value]),
+  let members: unknown;
+  try {
+    const raw = item.data.find((d) => d.name === 'members');
+    members = raw ? JSON.parse(raw.value as string) : [];
+  } catch {
+    throw new TypeError('members must be valid JSON');
+  }
+  if (!Array.isArray(members)) {
+    throw new TypeError(`members must be an array, got: ${JSON.stringify(members)}`);
+  }
+  const data: Record<string, unknown> = Object.fromEntries(
+    item.data.filter((d) => d.name !== 'members').map((d) => [d.name, d.value]),
   );
+  data.members = members.map((m: unknown, i: number) => deserialiseTeamMember(m, i));
   assertCollectionTeam(data);
   return data;
 }
