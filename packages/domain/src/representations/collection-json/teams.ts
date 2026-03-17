@@ -114,8 +114,12 @@ export function deserialiseTeam(item: Item): CollectionTeam {
   let members: unknown;
   try {
     const raw = item.data.find((d) => d.name === 'members');
+    if (raw && typeof raw.value !== 'string') {
+      throw new TypeError(`members value must be a JSON string, got: ${typeof raw.value}`);
+    }
     members = raw ? JSON.parse(raw.value as string) : [];
-  } catch {
+  } catch (error) {
+    if (error instanceof TypeError) throw error;
     throw new TypeError('members must be valid JSON');
   }
   if (!Array.isArray(members)) {
