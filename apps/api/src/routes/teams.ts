@@ -11,7 +11,7 @@ import { getWeapon } from '@/repositories/weapons/index.js';
 import { teamPutRequestV1 } from '@/schemas/teams/put-request-v1.js';
 import { COLLECTION_JSON } from '@genshin/collection-json';
 import type { ArtifactPlan, CollectionTeam, TeamMember, TeamSlot, UUID } from '@genshin/domain';
-import { isValidTeamSlot, teamItemDocument, teamListDocument } from '@genshin/domain';
+import { teamItemDocument, teamListDocument } from '@genshin/domain';
 import { getArtifactSetById } from '@genshin/game-data';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -29,13 +29,11 @@ interface UpdateTeamBody {
 }
 
 function parseSlot(param: string): TeamSlot {
-  const slot = Number(param);
-
-  if (!isValidTeamSlot(slot)) {
+  if (!/^[1-4]$/.test(param)) {
     throw new HTTPException(404, { message: 'Team slot must be 1, 2, 3, or 4' });
   }
 
-  return slot;
+  return Number(param) as TeamSlot;
 }
 
 // GET /api/teams — List user's teams
@@ -108,30 +106,32 @@ async function validateMembers(userId: string, members: TeamMember[]): Promise<v
     throw new HTTPException(400, { message: 'Duplicate character IDs in team' });
   }
 
-  for (const member of members) {
-    // Character must be in user's collection
-    const character = await getCharacter(userId, member.characterId);
-    if (!character) {
-      throw new HTTPException(400, {
-        message: `Character not in collection: ${member.characterId}`,
-      });
-    }
-
-    // Weapon instance must be in user's collection (if provided)
-    if (member.weaponInstanceId) {
-      const weapon = await getWeapon(userId, member.weaponInstanceId as UUID);
-      if (!weapon) {
+  await Promise.all(
+    members.map(async (member) => {
+      // Character must be in user's collection
+      const character = await getCharacter(userId, member.characterId);
+      if (!character) {
         throw new HTTPException(400, {
-          message: `Weapon instance not in collection: ${member.weaponInstanceId}`,
+          message: `Character not in collection: ${member.characterId}`,
         });
       }
-    }
 
-    // Validate artifact plan if provided
-    if (member.artifactPlan) {
-      validateArtifactPlan(member.artifactPlan);
-    }
-  }
+      // Weapon instance must be in user's collection (if provided)
+      if (member.weaponInstanceId) {
+        const weapon = await getWeapon(userId, member.weaponInstanceId as UUID);
+        if (!weapon) {
+          throw new HTTPException(400, {
+            message: `Weapon instance not in collection: ${member.weaponInstanceId}`,
+          });
+        }
+      }
+
+      // Validate artifact plan if provided
+      if (member.artifactPlan) {
+        validateArtifactPlan(member.artifactPlan);
+      }
+    }),
+  );
 }
 
 function validateArtifactPlan(plan: ArtifactPlan): void {

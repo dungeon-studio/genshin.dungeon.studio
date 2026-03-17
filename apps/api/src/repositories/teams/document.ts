@@ -33,7 +33,7 @@ export function fromDocument(slot: TeamSlot, data: DocumentData): CollectionTeam
       ...(m.weaponInstanceId ? { weaponInstanceId: m.weaponInstanceId } : {}),
       ...(m.artifactPlan ? { artifactPlan: m.artifactPlan } : {}),
     })) as CollectionTeam['members'],
-    ...(data.description ? { description: data.description } : {}),
+    ...(data.description !== undefined ? { description: data.description } : {}),
     createdAt: data.createdAt as ISOTimestamp,
     updatedAt: data.updatedAt as ISOTimestamp,
   };
@@ -47,7 +47,7 @@ export function toDocument(team: CollectionTeam): DocumentData {
       ...(m.weaponInstanceId ? { weaponInstanceId: m.weaponInstanceId } : {}),
       ...(m.artifactPlan ? { artifactPlan: m.artifactPlan } : {}),
     })),
-    ...(team.description ? { description: team.description } : {}),
+    ...(team.description !== undefined ? { description: team.description } : {}),
     createdAt: team.createdAt,
     updatedAt: team.updatedAt,
   };

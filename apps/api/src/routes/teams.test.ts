@@ -207,6 +207,12 @@ describe('Team routes', () => {
 
       expect(res.status).toBe(404);
     });
+
+    it('returns 404 for non-canonical slot like 01', async () => {
+      const res = await app.request(authedRequest('GET', '/api/teams/01'));
+
+      expect(res.status).toBe(404);
+    });
   });
 
   describe('PUT /api/teams/:slot', () => {
