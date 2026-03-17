@@ -11,7 +11,7 @@ import { getWeapon } from '@/repositories/weapons/index.js';
 import { teamPutRequestV1 } from '@/schemas/teams/put-request-v1.js';
 import { COLLECTION_JSON } from '@genshin/collection-json';
 import type { ArtifactPlan, CollectionTeam, TeamMember, TeamSlot, UUID } from '@genshin/domain';
-import { teamItemDocument, teamListDocument } from '@genshin/domain';
+import { isValidTeamSlot, teamItemDocument, teamListDocument } from '@genshin/domain';
 import { getArtifactSetById } from '@genshin/game-data';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -29,11 +29,13 @@ interface UpdateTeamBody {
 }
 
 function parseSlot(param: string): TeamSlot {
-  if (!/^[1-4]$/.test(param)) {
+  const slot = Number(param);
+
+  if (String(slot) !== param || !isValidTeamSlot(slot)) {
     throw new HTTPException(404, { message: 'Team slot must be 1, 2, 3, or 4' });
   }
 
-  return Number(param) as TeamSlot;
+  return slot;
 }
 
 // GET /api/teams — List user's teams
