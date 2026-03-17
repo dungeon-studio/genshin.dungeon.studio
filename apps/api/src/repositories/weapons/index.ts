@@ -85,20 +85,3 @@ export async function updateWeapon(
 export async function deleteWeapon(userId: string, weaponInstanceId: UUID): Promise<void> {
   await collectionRef(userId).doc(weaponInstanceId).delete();
 }
-
-export async function findWeaponInstanceById(
-  userId: string,
-  weaponInstanceId: UUID,
-): Promise<CollectionWeapon | null> {
-  const weaponsRef = db.collection('users').doc(userId).collection('weapons');
-  const weaponDocs = await weaponsRef.listDocuments();
-
-  for (const weaponDoc of weaponDocs) {
-    const instanceDoc = await weaponDoc.collection('instances').doc(weaponInstanceId).get();
-    if (instanceDoc.exists) {
-      return fromDocument(weaponInstanceId, weaponDoc.id, instanceDoc.data() as DocumentData);
-    }
-  }
-
-  return null;
-}

@@ -11,14 +11,13 @@ export const MAX_TEAM_SLOT = 4;
 /**
  * CollectionTeam is the persisted form of a user's team composition.
  *
- * Each user has up to 4 team loadout slots (1–4). Members is an empty
- * array for cleared teams and a 4-element array of TeamMember for
- * populated teams.
+ * Each user has up to 4 team loadout slots (1–4). Members is 0–4 entries;
+ * partial teams (with holes) are valid input for downstream optimizers.
  */
 export interface CollectionTeam {
   slot: TeamSlot;
   name: string;
-  members: [TeamMember, TeamMember, TeamMember, TeamMember] | [];
+  members: TeamMember[];
   description?: string;
   createdAt: ISOTimestamp;
   updatedAt: ISOTimestamp;
@@ -31,4 +30,20 @@ export function isValidTeamSlot(value: unknown): value is TeamSlot {
     value >= MIN_TEAM_SLOT &&
     value <= MAX_TEAM_SLOT
   );
+}
+
+export function assertCollectionTeam(value: unknown): asserts value is CollectionTeam {
+  if (typeof value !== 'object' || value === null) {
+    throw new TypeError(`CollectionTeam must be a non-null object, got: ${JSON.stringify(value)}`);
+  }
+  const data = value as Record<string, unknown>;
+  if (!isValidTeamSlot(data.slot)) {
+    throw new TypeError(`Invalid team slot: ${String(data.slot)}`);
+  }
+  if (typeof data.name !== 'string') {
+    throw new TypeError(`Invalid team name: ${String(data.name)}`);
+  }
+  if (!Array.isArray(data.members)) {
+    throw new TypeError('members must be an array');
+  }
 }

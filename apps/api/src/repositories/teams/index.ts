@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { db } from '@/lib/firebase/firestore.js';
-import type { CollectionTeam, ISOTimestamp, TeamSlot } from '@genshin/types';
+import type { CollectionTeam, ISOTimestamp, TeamSlot } from '@genshin/domain';
 
 import { fromDocument, toDocument, type DocumentData } from './document.js';
 

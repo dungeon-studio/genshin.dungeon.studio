@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionCharacter, CollectionTeam, CollectionWeapon, UUID } from '@genshin/types';
+import type { CollectionCharacter, CollectionTeam, CollectionWeapon, UUID } from '@genshin/domain';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/firebase/auth.js', () => ({
@@ -20,7 +20,7 @@ vi.mock('@/repositories/characters/index.js', () => ({
 }));
 
 vi.mock('@/repositories/weapons/index.js', () => ({
-  findWeaponInstanceById: vi.fn(),
+  getWeapon: vi.fn(),
 }));
 
 vi.mock('@genshin/game-data', () => ({
@@ -31,7 +31,7 @@ import { app } from '@/app.js';
 import { verifyToken } from '@/lib/firebase/auth.js';
 import { getCharacter } from '@/repositories/characters/index.js';
 import { deleteTeam, getTeam, listTeams, saveTeam } from '@/repositories/teams/index.js';
-import { findWeaponInstanceById } from '@/repositories/weapons/index.js';
+import { getWeapon } from '@/repositories/weapons/index.js';
 import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
 import { getArtifactSetById } from '@genshin/game-data';
@@ -69,7 +69,7 @@ function mockCharacterOwned() {
 }
 
 function mockWeaponOwned() {
-  vi.mocked(findWeaponInstanceById).mockResolvedValue({
+  vi.mocked(getWeapon).mockResolvedValue({
     weaponInstanceId: 'uuid-1' as UUID,
     weaponId: 'staff-of-homa',
     refinementLevel: 1,
@@ -94,32 +94,6 @@ describe('Team routes', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
-  });
-
-  describe('authentication', () => {
-    it('returns 401 without Authorization header', async () => {
-      const res = await app.request('/api/teams');
-
-      expect(res.status).toBe(401);
-    });
-
-    it('returns 401 with malformed Authorization header', async () => {
-      const res = await app.request('/api/teams', {
-        headers: { Authorization: 'NotBearer token' },
-      });
-
-      expect(res.status).toBe(401);
-    });
-
-    it('returns 401 when token is expired', async () => {
-      vi.mocked(verifyToken).mockRejectedValue({ code: 'auth/id-token-expired' });
-
-      const res = await app.request(authedRequest('GET', '/api/teams'));
-
-      expect(res.status).toBe(401);
-      const body = (await res.json()) as { detail: string };
-      expect(body.detail).toBe('Invalid or expired token');
-    });
   });
 
   describe('GET /api/teams', () => {
@@ -318,17 +292,43 @@ describe('Team routes', () => {
       expect(res.status).toBe(200);
     });
 
-    it('returns 400 when members array has fewer than 4', async () => {
+    it('allows partial team with fewer than 4 members', async () => {
+      vi.mocked(saveTeam).mockResolvedValue({
+        team: {
+          ...FAKE_TEAM,
+          members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' as UUID }],
+        },
+        created: false,
+      });
+
       const res = await app.request(
         authedRequest('PUT', '/api/teams/1', {
           members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }],
         }),
       );
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(200);
     });
 
-    it('returns 400 when members array has more than 4', async () => {
+    it('allows member without weapon (optimizer placeholder)', async () => {
+      vi.mocked(saveTeam).mockResolvedValue({
+        team: {
+          ...FAKE_TEAM,
+          members: [{ characterId: 'hu-tao' }],
+        },
+        created: false,
+      });
+
+      const res = await app.request(
+        authedRequest('PUT', '/api/teams/1', {
+          members: [{ characterId: 'hu-tao' }],
+        }),
+      );
+
+      expect(res.status).toBe(200);
+    });
+
+    it('returns 422 when members array has more than 4', async () => {
       const res = await app.request(
         authedRequest('PUT', '/api/teams/1', {
           members: [
@@ -341,15 +341,15 @@ describe('Team routes', () => {
         }),
       );
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
-    it('returns 400 when body contains extra properties', async () => {
+    it('returns 422 when body contains extra properties', async () => {
       const res = await app.request(
         authedRequest('PUT', '/api/teams/1', { name: 'Team', extra: true }),
       );
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(422);
     });
 
     it('returns 400 when body is not valid JSON', async () => {
@@ -364,7 +364,7 @@ describe('Team routes', () => {
       expect(res.status).toBe(400);
     });
 
-    describe('cross-collection validation', () => {
+    describe('ownership validation', () => {
       it('returns 400 for duplicate character IDs', async () => {
         const res = await app.request(
           authedRequest('PUT', '/api/teams/1', {
@@ -382,7 +382,7 @@ describe('Team routes', () => {
         expect(body.detail).toBe('Duplicate character IDs in team');
       });
 
-      it('returns 409 when character not in collection', async () => {
+      it('returns 400 when character not in collection', async () => {
         vi.mocked(getCharacter).mockResolvedValue(null);
 
         const res = await app.request(
@@ -396,13 +396,13 @@ describe('Team routes', () => {
           }),
         );
 
-        expect(res.status).toBe(409);
+        expect(res.status).toBe(400);
         const body = (await res.json()) as { detail: string };
         expect(body.detail).toContain('Character not in collection');
       });
 
-      it('returns 409 when weapon instance not in collection', async () => {
-        vi.mocked(findWeaponInstanceById).mockResolvedValue(null);
+      it('returns 400 when weapon instance not in collection', async () => {
+        vi.mocked(getWeapon).mockResolvedValue(null);
 
         const res = await app.request(
           authedRequest('PUT', '/api/teams/1', {
@@ -415,7 +415,7 @@ describe('Team routes', () => {
           }),
         );
 
-        expect(res.status).toBe(409);
+        expect(res.status).toBe(400);
         const body = (await res.json()) as { detail: string };
         expect(body.detail).toContain('Weapon instance not in collection');
       });

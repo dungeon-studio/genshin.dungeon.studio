@@ -34,6 +34,6 @@ export interface ArtifactPlan {
  */
 export interface TeamMember {
   characterId: Character['id'];
-  weaponInstanceId: UUID;
+  weaponInstanceId?: UUID;
   artifactPlan?: ArtifactPlan;
 }
