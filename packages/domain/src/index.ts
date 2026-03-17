@@ -10,6 +10,7 @@ export {
   type CollectionCharacter,
 } from './collectionCharacter.js';
 export {
+  MAX_TEAM_MEMBERS,
   MAX_TEAM_SLOT,
   MIN_TEAM_SLOT,
   assertCollectionTeam,

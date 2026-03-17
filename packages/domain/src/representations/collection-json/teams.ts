@@ -22,7 +22,7 @@ import {
 } from '@genshin/collection-json';
 
 import type { CollectionTeam } from '../../collectionTeam.js';
-import { assertCollectionTeam, MAX_TEAM_SLOT } from '../../collectionTeam.js';
+import { MAX_TEAM_MEMBERS, assertCollectionTeam } from '../../collectionTeam.js';
 
 const TEAM_TEMPLATE: Template = {
   data: [
@@ -30,7 +30,7 @@ const TEAM_TEMPLATE: Template = {
     { name: 'description', prompt: 'Team description (optional, max 200 characters)' },
     {
       name: 'members',
-      prompt: `Team members (0-${MAX_TEAM_SLOT} members as JSON; partial teams are valid)`,
+      prompt: `Team members (0-${MAX_TEAM_MEMBERS} members as JSON; partial teams are valid)`,
     },
   ],
 };

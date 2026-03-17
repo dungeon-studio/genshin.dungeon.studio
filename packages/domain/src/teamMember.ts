@@ -20,7 +20,7 @@ export interface ArtifactPlan {
   circlet: string;
   /** 1–2 artifact set IDs from game-data */
   sets: [ArtifactSet['id']] | [ArtifactSet['id'], ArtifactSet['id']];
-  /** 1–3 desired primary stats to prioritize */
+  /** 0–3 desired primary stats to prioritize */
   primaryStats: string[];
   /** 0–3 desired secondary stats (must be disjoint from primaryStats) */
   secondaryStats: string[];

@@ -3,6 +3,7 @@
 
 import { db } from '@/lib/firebase/firestore.js';
 import type { CollectionTeam, ISOTimestamp, TeamSlot } from '@genshin/domain';
+import { isValidTeamSlot } from '@genshin/domain';
 
 import { fromDocument, toDocument, type DocumentData } from './document.js';
 
@@ -13,9 +14,9 @@ function collectionRef(userId: string) {
 export async function listTeams(userId: string): Promise<CollectionTeam[]> {
   const snapshot = await collectionRef(userId).get();
 
-  return snapshot.docs.map((doc) =>
-    fromDocument(Number(doc.id) as TeamSlot, doc.data() as DocumentData),
-  );
+  return snapshot.docs
+    .filter((doc) => isValidTeamSlot(Number(doc.id)))
+    .map((doc) => fromDocument(Number(doc.id) as TeamSlot, doc.data() as DocumentData));
 }
 
 export async function getTeam(userId: string, slot: TeamSlot): Promise<CollectionTeam | null> {
