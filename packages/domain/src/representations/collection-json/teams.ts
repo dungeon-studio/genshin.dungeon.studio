@@ -45,7 +45,7 @@ export function serialiseTeam(team: CollectionTeam, baseUrl: string): Item {
     { name: 'slot', value: team.slot },
     { name: 'name', value: team.name },
     { name: 'members', value: JSON.stringify(team.members) },
-    { name: 'description', value: team.description ?? '' },
+    ...(team.description !== undefined ? [{ name: 'description', value: team.description }] : []),
     { name: 'createdAt', value: team.createdAt },
     { name: 'updatedAt', value: team.updatedAt },
   ]);
