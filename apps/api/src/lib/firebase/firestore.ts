@@ -4,4 +4,13 @@
 import { app } from '@/lib/firebase/app.js';
 import { getFirestore } from 'firebase-admin/firestore';
 
-export const db = getFirestore(app);
+const rawDatabaseId = process.env.FIRESTORE_DATABASE_ID ?? '(default)';
+const databaseId = rawDatabaseId.trim();
+
+if (databaseId === '') {
+  throw new Error('FIRESTORE_DATABASE_ID must not be empty when set.');
+}
+
+console.log(`Firestore: database=${databaseId}`);
+
+export const db = getFirestore(app, databaseId);

@@ -83,7 +83,14 @@ pre-commit install
 pnpm dev
 ```
 
-The frontend is available at <http://localhost:5173>. The API service is available at <http://localhost:8080> once it exists.
+The frontend is available at <http://localhost:5173>. The API is available at <http://localhost:8080>.
+
+> **Note:** The API starts without Google Cloud credentials. Routes that don't
+> use Firestore (health check, schemas) work immediately. Routes that read or
+> write Firestore (profiles, teams, characters, weapons) return 500 until you
+> configure credentials. See
+> [Configure Firestore credentials](configure-firestore-credentials.md) for
+> setup instructions.
 
 ---
 
@@ -91,6 +98,6 @@ The frontend is available at <http://localhost:5173>. The API service is availab
 
 Open your browser and visit <http://localhost:5173> to verify the frontend is running.
 
-You can check API health once the API service exists.
+Check API health at <http://localhost:8080/health> to verify the API is running.
 
 For more detailed development instructions, see [CONTRIBUTING.md](../../CONTRIBUTING.md).
