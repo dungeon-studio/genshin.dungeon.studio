@@ -2,20 +2,15 @@
 // SPDX-License-Identifier: MIT
 
 import { auth } from '@/lib/firebase';
+import type { ProblemDetail } from '@genshin/domain';
 
-export interface ProblemDetail {
-  type: string;
-  title: string;
-  status: number;
-  detail: string;
-}
+export type { ProblemDetail };
 
 export class ApiError extends Error {
   readonly problem: ProblemDetail;
 
   constructor(problem: ProblemDetail) {
     super(problem.detail);
-    this.name = 'ApiError';
     this.problem = problem;
   }
 }
@@ -23,45 +18,40 @@ export class ApiError extends Error {
 async function getAuthHeaders(): Promise<HeadersInit> {
   const user = auth.currentUser;
   if (!user) {
-    throw new ApiError({
-      type: 'about:blank',
-      title: 'Unauthorized',
-      status: 401,
-      detail: 'Not signed in',
-    });
+    return {};
   }
 
   const token = await user.getIdToken();
   return { Authorization: `Bearer ${token}` };
 }
 
-async function handleResponse<T>(response: Response): Promise<T> {
+async function handleResponse(response: Response): Promise<unknown> {
   if (!response.ok) {
     const problem: ProblemDetail = await response.json();
     throw new ApiError(problem);
   }
 
   if (response.status === 204) {
-    return undefined as T;
+    return undefined;
   }
 
-  return response.json() as Promise<T>;
+  return response.json();
 }
 
-export async function apiGet<T>(path: string): Promise<T> {
+export async function apiGet(path: string): Promise<unknown> {
   const headers = await getAuthHeaders();
   const response = await fetch(path, { headers });
-  return handleResponse<T>(response);
+  return handleResponse(response);
 }
 
-export async function apiPut<T>(path: string, body: unknown): Promise<T> {
+export async function apiPut(path: string, body: unknown): Promise<unknown> {
   const headers = await getAuthHeaders();
   const response = await fetch(path, {
     method: 'PUT',
     headers: { ...headers, 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  return handleResponse<T>(response);
+  return handleResponse(response);
 }
 
 export async function apiDelete(path: string): Promise<void> {
@@ -70,5 +60,5 @@ export async function apiDelete(path: string): Promise<void> {
     method: 'DELETE',
     headers,
   });
-  return handleResponse<void>(response);
+  await handleResponse(response);
 }
