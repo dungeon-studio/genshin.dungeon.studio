@@ -58,6 +58,13 @@ pnpm install
 pnpm dev
 ```
 
+> **Note:** The API starts without Google Cloud credentials. Routes that don't
+> use Firestore (health check, schemas, static game data) work immediately.
+> Routes that read or write Firestore (profiles, teams) return 500 until you
+> configure credentials. See
+> [Configure Firestore credentials](docs/how-tos/configure-firestore-credentials.md)
+> for setup instructions.
+
 ### Building and running the Docker image
 
 To build the API Docker image locally:
@@ -217,7 +224,7 @@ When creating release branches, derive the name from the root `package.json` ver
 This project runs on Windows, macOS, and Linux.
 
 - Use Node.js `path` module for paths, not hardcoded `/` or `\`
-- Use cross-platform packages like `rimraf` for file operations, not `rm -rf`
+- Use cross-platform approaches for file operations
 - Avoid OS-specific environment variables
 
 ### Detailed guides

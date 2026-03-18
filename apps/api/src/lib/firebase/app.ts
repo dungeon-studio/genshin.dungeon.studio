@@ -3,7 +3,10 @@
 
 import { getApp, getApps, initializeApp } from 'firebase-admin/app';
 
-// Initialize with Application Default Credentials (ADC).
+const projectId = process.env.GOOGLE_CLOUD_PROJECT?.trim() || undefined;
+
+console.log(`Firebase: projectId=${projectId ?? '(not set)'}`);
 // In GCP, credentials are provided automatically.
-// Locally, set the GOOGLE_APPLICATION_CREDENTIALS environment variable.
-export const app = getApps().length > 0 ? getApp() : initializeApp();
+// Locally, run `gcloud auth application-default login` and set GOOGLE_CLOUD_PROJECT.
+export const app =
+  getApps().length > 0 ? getApp() : initializeApp(projectId ? { projectId } : undefined);
