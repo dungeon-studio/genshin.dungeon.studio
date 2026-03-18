@@ -14,6 +14,7 @@ const GRPC_TO_HTTP: Partial<Record<Status, ContentfulStatusCode>> = {
 
 export function firestoreErrorToHttpException(err: GoogleError): HTTPException {
   const httpStatus = (err.code !== undefined && GRPC_TO_HTTP[err.code]) || 500;
-  console.error(`Firestore error [gRPC ${Status[err.code!] ?? err.code}]:`, err.message);
+  const label = err.code !== undefined ? (Status[err.code] ?? String(err.code)) : '(unknown)';
+  console.error(`Firestore error [gRPC ${label}]:`, err.message);
   return new HTTPException(httpStatus, { message: 'An unexpected error occurred' });
 }

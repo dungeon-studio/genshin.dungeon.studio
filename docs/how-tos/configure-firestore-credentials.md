@@ -41,7 +41,8 @@ Start the API and confirm the startup log shows the expected project and
 database:
 
 ```text
-Firebase initialized: project=dungeon-studio-genshin-dev, database=(default)
+Firebase: projectId=dungeon-studio-genshin-dev
+Firestore: database=(default)
 ```
 
 Check `http://localhost:8080/health` returns `{"status":"ok"}`.

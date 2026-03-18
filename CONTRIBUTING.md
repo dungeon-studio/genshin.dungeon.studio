@@ -59,8 +59,8 @@ pnpm dev
 ```
 
 > **Note:** The API starts without Google Cloud credentials. Routes that don't
-> use Firestore (health check, schemas, static game data) work immediately.
-> Routes that read or write Firestore (profiles, teams) return 500 until you
+> use Firestore (health check, schemas) work immediately. Routes that read or
+> write Firestore (profiles, teams, characters, weapons) return 500 until you
 > configure credentials. See
 > [Configure Firestore credentials](docs/how-tos/configure-firestore-credentials.md)
 > for setup instructions.
