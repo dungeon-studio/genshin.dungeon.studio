@@ -3,12 +3,15 @@
 
 import type { AuthVariables } from '@/middleware/auth.js';
 import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
+import { firestoreErrorToHttpException } from '@/repositories/firestore-error.js';
 import { characters } from '@/routes/characters.js';
 import { profiles } from '@/routes/profiles.js';
 import { root } from '@/routes/root.js';
 import { schemas } from '@/routes/schemas.js';
+import { teams } from '@/routes/teams.js';
 import { userProfile } from '@/routes/userProfile.js';
 import { weapons } from '@/routes/weapons.js';
+import { GoogleError } from 'google-gax';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
@@ -42,19 +45,21 @@ app.use(
 
 // Error handling middleware — RFC 9457 Problem Details
 app.onError((err, c) => {
-  if (err instanceof HTTPException) {
+  const resolved = err instanceof GoogleError ? firestoreErrorToHttpException(err) : err;
+
+  if (resolved instanceof HTTPException) {
     return c.json(
       {
         type: 'about:blank',
-        title: STATUS_CODES[err.status] ?? 'Unknown Error',
-        status: err.status,
-        detail: err.message,
+        title: STATUS_CODES[resolved.status] ?? 'Unknown Error',
+        status: resolved.status,
+        detail: resolved.message,
       },
-      { status: err.status, headers: PROBLEM_JSON },
+      { status: resolved.status, headers: PROBLEM_JSON },
     );
   }
 
-  console.error('Unexpected error:', err);
+  console.error('Unexpected error:', resolved);
   return c.json(
     {
       type: 'about:blank',
@@ -92,6 +97,7 @@ app.route('/schemas', schemas);
 app.route('/profiles', profiles);
 app.route('/api/characters', characters);
 app.route('/api/profile', userProfile);
+app.route('/api/teams', teams);
 app.route('/api/weapons', weapons);
 
 // Root must be registered after all other routes so it can discover them

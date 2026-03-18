@@ -3,17 +3,25 @@
 
 export type { AuthIdentity } from './authIdentity.js';
 export {
-  assertCollectionCharacter,
-  isValidConstellationLevel,
   MAX_CONSTELLATION_LEVEL,
   MIN_CONSTELLATION_LEVEL,
+  assertCollectionCharacter,
+  isValidConstellationLevel,
   type CollectionCharacter,
 } from './collectionCharacter.js';
 export {
-  assertCollectionWeapon,
-  isValidRefinementLevel,
+  MAX_TEAM_MEMBERS,
+  MAX_TEAM_SLOT,
+  MIN_TEAM_SLOT,
+  assertCollectionTeam,
+  isValidTeamSlot,
+  type CollectionTeam,
+} from './collectionTeam.js';
+export {
   MAX_REFINEMENT_LEVEL,
   MIN_REFINEMENT_LEVEL,
+  assertCollectionWeapon,
+  isValidRefinementLevel,
   type CollectionWeapon,
 } from './collectionWeapon.js';
 export { isISOTimestamp, type ISOTimestamp } from './isoTimestamp.js';
@@ -23,6 +31,14 @@ export {
   deserialiseCharacter,
   serialiseCharacter,
 } from './representations/collection-json/characters.js';
+export {
+  deserialiseTeam,
+  serialiseTeam,
+  teamItemDocument,
+  teamItemHref,
+  teamListDocument,
+  teamRepresentation,
+} from './representations/collection-json/teams.js';
 export {
   deserialiseWeapon,
   serialiseWeapon,
