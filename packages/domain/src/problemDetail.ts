@@ -2,7 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * RFC 9457 Problem Details for HTTP APIs.
+ * Problem Details for HTTP APIs — strict project subset of RFC 9457.
+ *
+ * This interface requires fields that RFC 9457 leaves optional. The shape
+ * will be reassessed when content negotiation and representation parsing
+ * are implemented (see #518, #520).
  *
  * @see https://www.rfc-editor.org/rfc/rfc9457
  */

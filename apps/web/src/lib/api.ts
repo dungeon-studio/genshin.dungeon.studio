@@ -56,13 +56,13 @@ async function handleResponse(response: Response): Promise<unknown> {
 
 export async function apiGet(path: string): Promise<unknown> {
   const headers = await getAuthHeaders();
-  const response = await fetch(`${API_BASE_URL}${path}`, { headers });
+  const response = await fetch(new URL(path, API_BASE_URL).href, { headers });
   return handleResponse(response);
 }
 
 export async function apiPut(path: string, body: unknown): Promise<unknown> {
   const headers = await getAuthHeaders();
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(new URL(path, API_BASE_URL).href, {
     method: 'PUT',
     headers: { ...headers, 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -72,7 +72,7 @@ export async function apiPut(path: string, body: unknown): Promise<unknown> {
 
 export async function apiDelete(path: string): Promise<void> {
   const headers = await getAuthHeaders();
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(new URL(path, API_BASE_URL).href, {
     method: 'DELETE',
     headers,
   });
