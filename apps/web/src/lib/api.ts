@@ -41,6 +41,7 @@ async function handleResponse(response: Response): Promise<unknown> {
 
     const text = await response.text();
     throw new ApiError({
+      type: 'about:blank',
       title: response.statusText || 'Unknown Error',
       status: response.status,
       detail: text || `Request failed with status ${response.status}`,
