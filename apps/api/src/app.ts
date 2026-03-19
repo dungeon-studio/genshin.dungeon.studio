@@ -11,6 +11,7 @@ import { schemas } from '@/routes/schemas.js';
 import { teams } from '@/routes/teams.js';
 import { userProfile } from '@/routes/userProfile.js';
 import { weapons } from '@/routes/weapons.js';
+import type { ProblemDetail } from '@genshin/domain';
 import { GoogleError } from 'google-gax';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
@@ -54,7 +55,7 @@ app.onError((err, c) => {
         title: STATUS_CODES[resolved.status] ?? 'Unknown Error',
         status: resolved.status,
         detail: resolved.message,
-      },
+      } satisfies ProblemDetail,
       { status: resolved.status, headers: PROBLEM_JSON },
     );
   }
@@ -66,7 +67,7 @@ app.onError((err, c) => {
       title: 'Internal Server Error',
       status: 500,
       detail: 'An unexpected error occurred',
-    },
+    } satisfies ProblemDetail,
     { status: 500, headers: PROBLEM_JSON },
   );
 });
@@ -79,7 +80,7 @@ app.notFound((c) =>
       title: 'Not Found',
       status: 404,
       detail: 'The requested resource does not exist',
-    },
+    } satisfies ProblemDetail,
     { status: 404, headers: PROBLEM_JSON },
   ),
 );

@@ -3,28 +3,29 @@
 
 export type { AuthIdentity } from './authIdentity.js';
 export {
-  MAX_CONSTELLATION_LEVEL,
-  MIN_CONSTELLATION_LEVEL,
   assertCollectionCharacter,
   isValidConstellationLevel,
+  MAX_CONSTELLATION_LEVEL,
+  MIN_CONSTELLATION_LEVEL,
   type CollectionCharacter,
 } from './collectionCharacter.js';
 export {
+  assertCollectionTeam,
+  isValidTeamSlot,
   MAX_TEAM_MEMBERS,
   MAX_TEAM_SLOT,
   MIN_TEAM_SLOT,
-  assertCollectionTeam,
-  isValidTeamSlot,
   type CollectionTeam,
 } from './collectionTeam.js';
 export {
-  MAX_REFINEMENT_LEVEL,
-  MIN_REFINEMENT_LEVEL,
   assertCollectionWeapon,
   isValidRefinementLevel,
+  MAX_REFINEMENT_LEVEL,
+  MIN_REFINEMENT_LEVEL,
   type CollectionWeapon,
 } from './collectionWeapon.js';
 export { isISOTimestamp, type ISOTimestamp } from './isoTimestamp.js';
+export type { ProblemDetail } from './problemDetail.js';
 export {
   characterItemHref,
   characterRepresentation,
