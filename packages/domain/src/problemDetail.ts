@@ -7,8 +7,8 @@
  * @see https://www.rfc-editor.org/rfc/rfc9457
  */
 export interface ProblemDetail {
-  /** A URI reference identifying the problem type. Defaults to "about:blank". */
-  type: string;
+  /** A URI reference identifying the problem type. Defaults to "about:blank" when omitted. */
+  type?: string;
   /** A short, human-readable summary of the problem type. */
   title: string;
   /** The HTTP status code. */
