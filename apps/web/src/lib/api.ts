@@ -16,6 +16,7 @@ export class ApiError extends Error {
 
   constructor(problem: ProblemDetail) {
     super(problem.detail);
+    this.name = 'ApiError';
     this.problem = problem;
   }
 }
@@ -32,8 +33,18 @@ async function getAuthHeaders(): Promise<HeadersInit> {
 
 async function handleResponse(response: Response): Promise<unknown> {
   if (!response.ok) {
-    const problem: ProblemDetail = await response.json();
-    throw new ApiError(problem);
+    const contentType = response.headers.get('content-type') ?? '';
+    if (contentType.includes('application/problem+json')) {
+      const problem: ProblemDetail = await response.json();
+      throw new ApiError(problem);
+    }
+
+    const text = await response.text();
+    throw new ApiError({
+      title: response.statusText || 'Unknown Error',
+      status: response.status,
+      detail: text || `Request failed with status ${response.status}`,
+    });
   }
 
   if (response.status === 204) {
