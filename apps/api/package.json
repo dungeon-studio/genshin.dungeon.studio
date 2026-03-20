@@ -18,8 +18,8 @@
     "@hono/node-server": "1.19.11",
     "ajv": "8.18.0",
     "firebase-admin": "13.7.0",
-    "google-gax": "4.6.1",
-    "hono": "4.12.7",
+    "google-gax": "5.0.6",
+    "hono": "4.12.8",
     "negotiator": "1.0.0",
     "semver": "7.7.4"
   },
@@ -29,12 +29,12 @@
     "@types/node": "25.5.0",
     "@types/semver": "7.7.1",
     "@vitest/coverage-v8": "4.1.0",
-    "eslint": "10.0.3",
+    "eslint": "10.1.0",
     "globals": "17.4.0",
     "tsc-alias": "1.8.16",
     "tsx": "4.21.0",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.57.0",
+    "typescript-eslint": "8.57.1",
     "vitest": "4.1.0"
   }
 }
