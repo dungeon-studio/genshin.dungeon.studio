@@ -68,6 +68,9 @@ vite.config.ts.timestamp-*
 # Turborepo
 .turbo/
 
+# Playwright MCP
+.playwright-mcp/
+
 # ===================================
 # IDEs & Editors
 # ===================================

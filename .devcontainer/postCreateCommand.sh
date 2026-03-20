@@ -21,3 +21,6 @@ pre-commit install
 
 # Install reuse-tool (SPDX license compliance checker)
 pipx install reuse==6.2.0
+
+# Install Playwright Chromium and system dependencies for the Playwright MCP server
+npx --yes playwright install --with-deps chromium
