@@ -55,6 +55,8 @@ export function CharacterCard({
       <img
         src={elementIconSrc}
         alt={character.element}
+        loading="lazy"
+        decoding="async"
         className={cn('h-10 w-10 shrink-0', !owned && 'opacity-30')}
       />
 

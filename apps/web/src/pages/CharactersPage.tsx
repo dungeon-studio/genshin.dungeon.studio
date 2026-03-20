@@ -22,6 +22,7 @@ export function CharactersPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">
+      <h1 className="sr-only">Characters</h1>
       <p className="text-sm text-muted-foreground">
         {ownedCount} / {CHARACTERS.length} owned
       </p>

@@ -11,7 +11,11 @@
   <body>
     <script>
       (function () {
-        var stored = localStorage.getItem('theme');
+        try {
+          var stored = localStorage.getItem('theme');
+        } catch (e) {
+          var stored = null;
+        }
         var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (stored === 'dark' || (!stored && prefersDark)) {
           document.documentElement.classList.add('dark');
