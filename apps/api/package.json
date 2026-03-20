@@ -18,7 +18,7 @@
     "@hono/node-server": "1.19.11",
     "ajv": "8.18.0",
     "firebase-admin": "13.7.0",
-    "google-gax": "4.6.1",
+    "google-gax": "5.0.6",
     "hono": "4.12.7",
     "negotiator": "1.0.0",
     "semver": "7.7.4"
