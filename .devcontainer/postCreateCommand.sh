@@ -23,4 +23,4 @@ pre-commit install
 pipx install reuse==6.2.0
 
 # Install Playwright Chromium and system dependencies for the Playwright MCP server
-npx --yes playwright install --with-deps chromium
+npx --yes playwright install --with-deps chromium chrome

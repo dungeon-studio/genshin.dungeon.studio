@@ -39,10 +39,14 @@ export function ThemeToggle() {
   useEffect(() => {
     applyTheme(theme);
 
-    if (theme === 'system') {
-      localStorage.removeItem('theme');
-    } else {
-      localStorage.setItem('theme', theme);
+    try {
+      if (theme === 'system') {
+        localStorage.removeItem('theme');
+      } else {
+        localStorage.setItem('theme', theme);
+      }
+    } catch {
+      // Ignore storage errors (e.g. access blocked in privacy mode)
     }
   }, [theme]);
 
