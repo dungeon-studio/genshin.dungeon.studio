@@ -9,8 +9,12 @@ import { Button } from '@/components/ui/button';
 type Theme = 'light' | 'dark' | 'system';
 
 function getStoredTheme(): Theme {
-  const stored = localStorage.getItem('theme');
-  if (stored === 'light' || stored === 'dark') return stored;
+  try {
+    const stored = localStorage.getItem('theme');
+    if (stored === 'light' || stored === 'dark') return stored;
+  } catch {
+    // Storage access blocked (privacy mode / sandboxed iframe)
+  }
   return 'system';
 }
 
