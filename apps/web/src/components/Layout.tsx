@@ -3,6 +3,8 @@
 
 import { Link, NavLink, Outlet } from 'react-router-dom';
 
+import { ThemeToggle } from '@/components/ThemeToggle';
+
 export function Layout() {
   return (
     <div className="flex min-h-screen flex-col">
@@ -18,11 +20,15 @@ export function Layout() {
 
 function Header() {
   return (
-    <header className="border-b border-gray-200 bg-white">
-      <div className="mx-auto max-w-7xl px-4 py-4">
-        <Link to="/" className="text-2xl font-bold text-blue-600 hover:text-blue-700">
+    <header className="border-b border-border bg-background">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
+        <Link
+          to="/"
+          className="text-2xl font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+        >
           Genshin Team Builder
         </Link>
+        <ThemeToggle />
       </div>
     </header>
   );
@@ -31,13 +37,14 @@ function Header() {
 function Nav() {
   const navLinks = [
     { to: '/', label: 'Home' },
-    { to: '/collection', label: 'Collection' },
+    { to: '/characters', label: 'Characters' },
+    { to: '/weapons', label: 'Weapons' },
     { to: '/teams', label: 'Teams' },
     { to: '/chat', label: 'Chat' },
   ];
 
   return (
-    <nav className="border-b border-gray-200 bg-gray-50" aria-label="Main navigation">
+    <nav className="border-b border-border bg-muted" aria-label="Main navigation">
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex gap-8">
           {navLinks.map((link) => (
@@ -48,8 +55,8 @@ function Nav() {
               className={({ isActive }) =>
                 `inline-block border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
                   isActive
-                    ? 'border-blue-500 text-gray-900'
-                    : 'border-transparent text-gray-600 hover:border-blue-500 hover:text-gray-900'
+                    ? 'border-blue-500 text-foreground'
+                    : 'border-transparent text-muted-foreground hover:border-blue-500 hover:text-foreground'
                 }`
               }
             >
@@ -64,10 +71,10 @@ function Nav() {
 
 function Footer() {
   return (
-    <footer className="border-t border-gray-200 bg-gray-50 py-8">
-      <div className="mx-auto max-w-7xl px-4 text-center text-sm text-gray-600">
+    <footer className="border-t border-border bg-muted py-8">
+      <div className="mx-auto max-w-7xl px-4 text-center text-sm text-muted-foreground">
         <p>Built with React 19 + TypeScript + Vite</p>
-        <p className="mt-2 text-xs text-gray-500">© 2026 Genshin Team Builder</p>
+        <p className="mt-2 text-xs text-muted-foreground/70">© 2026 Genshin Team Builder</p>
       </div>
     </footer>
   );

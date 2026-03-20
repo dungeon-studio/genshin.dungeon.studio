@@ -128,6 +128,11 @@
 - Never hard-code secrets; use environment variables.
 - Add new DevContainer provisioning steps in `.devcontainer/postCreateCommand.sh`.
 
+## Playwright MCP rules
+
+- The Playwright MCP server is configured in `.vscode/mcp.json` and runs headless Chrome.
+- Save screenshots to `/tmp/` (for example, `/tmp/dark-mode.png`), never to the workspace. This keeps the repo clean without needing gitignore entries.
+
 ## Infrastructure rules
 
 - GCP projects use `dungeon-studio-genshin-{env}`; `shared` and `core` are production-grade infrastructure.

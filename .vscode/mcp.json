@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@0.0.68", "--browser", "chrome", "--no-sandbox", "--headless"]
+    }
+  }
+}
