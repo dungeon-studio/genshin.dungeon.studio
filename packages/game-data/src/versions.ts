@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-// Luna versions map to [major, minor] tuples that sort after all numeric versions.
+// Luna versions map to [major, minor] tuples in the 6.x series (after 5.x, the last numeric era).
 const LUNA_VERSIONS: Record<string, readonly [number, number]> = {
   'Luna I': [6, 0],
   'Luna II': [6, 1],

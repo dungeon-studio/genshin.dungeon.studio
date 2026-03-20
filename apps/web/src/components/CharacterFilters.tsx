@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { Character, Element } from '@genshin/game-data';
+import type { Character, Element, Rarity } from '@genshin/game-data';
 import { compareVersions, ELEMENTS } from '@genshin/game-data';
-import { ArrowDown, ArrowUp, Search } from 'lucide-react';
+import { ArrowDownWideNarrow, ArrowUpNarrowWide, Search } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,7 +18,7 @@ export type SortDirection = 'asc' | 'desc';
 export interface CharacterFilterState {
   search: string;
   elements: Set<Element>;
-  rarities: Set<4 | 5>;
+  rarities: Set<Rarity>;
   ownership: OwnershipFilter;
   sortField: SortField;
   sortDirection: SortDirection;
@@ -34,7 +34,7 @@ interface CharacterFiltersProps {
 }
 
 const ELEMENT_VALUES = Object.values(ELEMENTS);
-const RARITY_VALUES: (4 | 5)[] = [5, 4];
+const RARITY_VALUES: Rarity[] = [5, 4];
 
 const SORT_LABELS: Record<SortField, string> = {
   release: 'Release',
@@ -51,7 +51,7 @@ export function filterCharacters(
   const result = characters.filter((c) => {
     if (searchLower && !c.name.toLowerCase().includes(searchLower)) return false;
     if (filters.elements.size > 0 && !filters.elements.has(c.element)) return false;
-    if (filters.rarities.size > 0 && !filters.rarities.has(c.rarity as 4 | 5)) return false;
+    if (filters.rarities.size > 0 && !filters.rarities.has(c.rarity)) return false;
     if (filters.ownership === 'owned' && !ownedIds.has(c.id)) return false;
     if (filters.ownership === 'unowned' && ownedIds.has(c.id)) return false;
     return true;
@@ -61,7 +61,7 @@ export function filterCharacters(
     let cmp = 0;
     switch (filters.sortField) {
       case 'release':
-        cmp = compareVersions(b.version, a.version);
+        cmp = compareVersions(a.version, b.version);
         break;
       case 'name':
         cmp = a.name.localeCompare(b.name);
@@ -91,7 +91,7 @@ export function CharacterFilters({
     onChange({ ...filters, elements: next });
   }
 
-  function toggleRarity(rarity: 4 | 5) {
+  function toggleRarity(rarity: Rarity) {
     const next = new Set(filters.rarities);
     if (next.has(rarity)) {
       next.delete(rarity);
@@ -230,9 +230,9 @@ export function CharacterFilters({
             className="-ml-px rounded-l-none px-1.5"
           >
             {filters.sortDirection === 'asc' ? (
-              <ArrowDown className="h-3.5 w-3.5" />
+              <ArrowUpNarrowWide className="h-3.5 w-3.5" />
             ) : (
-              <ArrowUp className="h-3.5 w-3.5" />
+              <ArrowDownWideNarrow className="h-3.5 w-3.5" />
             )}
           </Button>
         </div>

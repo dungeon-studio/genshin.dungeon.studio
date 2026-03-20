@@ -17,7 +17,7 @@ function initialFilterState(): CharacterFilterState {
     rarities: new Set(),
     ownership: 'all',
     sortField: 'release',
-    sortDirection: 'asc',
+    sortDirection: 'desc',
   };
 }
 
