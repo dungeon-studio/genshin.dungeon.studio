@@ -42,3 +42,13 @@ export const ELEMENT_FOCUS_RINGS: Record<Element, string> = {
   Geo: 'focus-visible:ring-geo',
   Dendro: 'focus-visible:ring-dendro',
 };
+
+export const ELEMENT_BG_COLORS: Record<Element, string> = {
+  Pyro: 'bg-pyro-dark text-white',
+  Hydro: 'bg-hydro-dark text-white',
+  Electro: 'bg-electro-dark text-white',
+  Cryo: 'bg-cryo-dark text-white',
+  Anemo: 'bg-anemo-dark text-white',
+  Geo: 'bg-geo-dark text-white',
+  Dendro: 'bg-dendro-dark text-white',
+};
