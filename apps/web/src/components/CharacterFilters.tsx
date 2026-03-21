@@ -108,7 +108,7 @@ export function CharacterFilters({
     const fields: SortField[] = ['release', 'name'];
     const currentIndex = fields.indexOf(filters.sortField);
     const nextField = fields[(currentIndex + 1) % fields.length];
-    onChange({ ...filters, sortField: nextField, sortDirection: 'asc' });
+    onChange({ ...filters, sortField: nextField });
   }
 
   function toggleSortDirection() {
