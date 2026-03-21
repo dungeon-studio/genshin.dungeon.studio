@@ -6,11 +6,11 @@ import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL } from '@genshin/dom
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface CollectionEntry {
+export interface CollectionEntry {
   constellationLevel: number;
 }
 
-type CharacterId = CollectionCharacter['characterId'];
+export type CharacterId = CollectionCharacter['characterId'];
 
 interface CollectionState {
   characters: Record<CharacterId, CollectionEntry>;
@@ -19,6 +19,7 @@ interface CollectionState {
   setConstellationLevel: (characterId: CharacterId, level: number) => void;
   isOwned: (characterId: CharacterId) => boolean;
   getCharacter: (characterId: CharacterId) => CollectionEntry | undefined;
+  replaceCharacters: (characters: Record<CharacterId, CollectionEntry>) => void;
 }
 
 export const useCollectionStore = create<CollectionState>()(
@@ -67,6 +68,10 @@ export const useCollectionStore = create<CollectionState>()(
 
       getCharacter: (characterId) => {
         return get().characters[characterId];
+      },
+
+      replaceCharacters: (characters) => {
+        set({ characters });
       },
     }),
     {

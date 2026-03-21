@@ -3,12 +3,13 @@
 
 import type { Character, Element, Rarity } from '@genshin/game-data';
 import { CHARACTERS } from '@genshin/game-data';
+import { Loader2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { CharacterCard } from '@/components/CharacterCard';
 import type { CharacterFilterState } from '@/components/CharacterFilters';
 import { CharacterFilters, filterCharacters } from '@/components/CharacterFilters';
-import { useCollectionStore } from '@/features/collection/useCollectionStore';
+import { useCollection } from '@/features/collection/useCollection';
 
 function initialFilterState(): CharacterFilterState {
   return {
@@ -22,11 +23,15 @@ function initialFilterState(): CharacterFilterState {
 }
 
 export function CharactersPage() {
-  const addCharacter = useCollectionStore((s) => s.addCharacter);
-  const removeCharacter = useCollectionStore((s) => s.removeCharacter);
-  const setConstellationLevel = useCollectionStore((s) => s.setConstellationLevel);
-  const isOwned = useCollectionStore((s) => s.isOwned);
-  const characters = useCollectionStore((s) => s.characters);
+  const {
+    characters,
+    addCharacter,
+    removeCharacter,
+    setConstellationLevel,
+    isOwned,
+    isLoading,
+    error,
+  } = useCollection();
 
   const [filters, setFilters] = useState<CharacterFilterState>(initialFilterState);
 
@@ -43,6 +48,33 @@ export function CharactersPage() {
 
   function handleConstellationChange(characterId: Character['id'], level: number) {
     setConstellationLevel(characterId, level);
+  }
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-12">
+        <h1 className="sr-only">Characters</h1>
+        <div className="flex items-center justify-center py-24">
+          <Loader2
+            className="h-8 w-8 animate-spin text-muted-foreground"
+            aria-hidden="true"
+            focusable={false}
+          />
+          <span className="sr-only">Loading collection</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-12">
+        <h1 className="sr-only">Characters</h1>
+        <p className="py-12 text-center text-destructive">
+          Failed to load collection. Please try again later.
+        </p>
+      </div>
+    );
   }
 
   return (
