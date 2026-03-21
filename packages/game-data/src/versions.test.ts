@@ -24,6 +24,10 @@ describe('compareVersions', () => {
       expect(compareVersions('5.8', '5.3')).toBeGreaterThan(0);
     });
 
+    it('handles multi-digit minor versions correctly', () => {
+      expect(compareVersions('5.9', '5.10')).toBeLessThan(0);
+    });
+
     it('treats a single-segment version as minor zero', () => {
       expect(compareVersions('2', '2.0')).toBe(0);
     });
