@@ -62,6 +62,9 @@ export function filterCharacters(
     switch (filters.sortField) {
       case 'release':
         cmp = compareVersions(a.version, b.version);
+        if (cmp === 0) {
+          cmp = a.name.localeCompare(b.name) || a.id.localeCompare(b.id);
+        }
         break;
       case 'name':
         cmp = a.name.localeCompare(b.name);
