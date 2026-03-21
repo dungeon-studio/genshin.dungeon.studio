@@ -14,6 +14,7 @@ import {
   ELEMENT_FOCUS_RINGS,
   ELEMENT_SELECTED_RINGS,
 } from '@/lib/elementStyles';
+import { getElementIconPath } from '@/lib/elements';
 import { cn } from '@/lib/utils';
 
 const CONSTELLATION_LEVELS = Array.from(
@@ -41,7 +42,7 @@ export function CharacterCard({
   onConstellationChange,
 }: CharacterCardProps) {
   const [popoverOpen, setPopoverOpen] = useState(false);
-  const elementIconSrc = `/elements/${character.element.toLowerCase()}.png`;
+  const elementIconSrc = getElementIconPath(character.element);
 
   const borderColors = owned ? ELEMENT_BORDER_COLORS : ELEMENT_BORDER_COLORS_DIM;
 

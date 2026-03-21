@@ -1,11 +1,25 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { Character } from '@genshin/game-data';
+import type { Character, Element, Rarity } from '@genshin/game-data';
 import { CHARACTERS } from '@genshin/game-data';
+import { useMemo, useState } from 'react';
 
 import { CharacterCard } from '@/components/CharacterCard';
+import type { CharacterFilterState } from '@/components/CharacterFilters';
+import { CharacterFilters, filterCharacters } from '@/components/CharacterFilters';
 import { useCollectionStore } from '@/features/collection/useCollectionStore';
+
+function initialFilterState(): CharacterFilterState {
+  return {
+    search: '',
+    elements: new Set<Element>(),
+    rarities: new Set<Rarity>(),
+    ownership: 'all',
+    sortField: 'release',
+    sortDirection: 'desc',
+  };
+}
 
 export function CharactersPage() {
   const addCharacter = useCollectionStore((s) => s.addCharacter);
@@ -14,7 +28,18 @@ export function CharactersPage() {
   const isOwned = useCollectionStore((s) => s.isOwned);
   const characters = useCollectionStore((s) => s.characters);
 
+  const [filters, setFilters] = useState<CharacterFilterState>(initialFilterState);
+
   const ownedCount = Object.keys(characters).length;
+  const ownedIds = useMemo(() => new Set(Object.keys(characters)), [characters]);
+
+  const { filteredCharacters, filteredOwnedCount } = useMemo(() => {
+    const filtered = filterCharacters(CHARACTERS, filters, ownedIds);
+    return {
+      filteredCharacters: filtered,
+      filteredOwnedCount: filtered.filter((c) => ownedIds.has(c.id)).length,
+    };
+  }, [filters, ownedIds]);
 
   function handleConstellationChange(characterId: Character['id'], level: number) {
     setConstellationLevel(characterId, level);
@@ -23,12 +48,18 @@ export function CharactersPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">
       <h1 className="sr-only">Characters</h1>
-      <p className="text-sm text-muted-foreground">
-        {ownedCount} / {CHARACTERS.length} owned
-      </p>
+
+      <CharacterFilters
+        filters={filters}
+        onChange={setFilters}
+        filteredCount={filteredCharacters.length}
+        totalCount={CHARACTERS.length}
+        ownedCount={ownedCount}
+        filteredOwnedCount={filteredOwnedCount}
+      />
 
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {CHARACTERS.map((character) => {
+        {filteredCharacters.map((character) => {
           const owned = isOwned(character.id);
           const entry = owned ? characters[character.id] : undefined;
 
@@ -46,6 +77,10 @@ export function CharactersPage() {
           );
         })}
       </div>
+
+      {filteredCharacters.length === 0 && (
+        <p className="py-12 text-center text-muted-foreground">No characters match your filters.</p>
+      )}
     </div>
   );
 }

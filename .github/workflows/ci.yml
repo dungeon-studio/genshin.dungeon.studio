@@ -47,25 +47,13 @@ jobs:
       - name: Typecheck
         run: pnpm turbo run typecheck --filter=@genshin/api
 
-      - name: Test
-        run: pnpm turbo run test --filter=@genshin/api -- --coverage
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+      - uses: ./.github/actions/test-and-upload-coverage
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: apps/api/coverage/lcov.info
-          flags: api
-          fail_ci_if_error: false
-
-      - name: Upload test results to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: apps/api/test-results/junit.xml
-          flags: api
-          report_type: test_results
-          fail_ci_if_error: false
+          filter: '@genshin/api'
+          coverage-file: apps/api/coverage/lcov.info
+          results-file: apps/api/test-results/junit.xml
+          flag: api
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Build
         run: pnpm turbo run build --filter=@genshin/api
@@ -86,6 +74,14 @@ jobs:
 
       - name: Typecheck
         run: pnpm turbo run typecheck --filter=@genshin/game-data
+
+      - uses: ./.github/actions/test-and-upload-coverage
+        with:
+          filter: '@genshin/game-data'
+          coverage-file: packages/game-data/coverage/lcov.info
+          results-file: packages/game-data/test-results/junit.xml
+          flag: game-data
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
   domain:
     name: Domain
@@ -121,25 +117,13 @@ jobs:
       - name: Typecheck
         run: pnpm turbo run typecheck --filter=@genshin/collection-json
 
-      - name: Test
-        run: pnpm turbo run test --filter=@genshin/collection-json -- --coverage
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+      - uses: ./.github/actions/test-and-upload-coverage
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: packages/collection-json/coverage/lcov.info
-          flags: collection-json
-          fail_ci_if_error: false
-
-      - name: Upload test results to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: packages/collection-json/test-results/junit.xml
-          flags: collection-json
-          report_type: test_results
-          fail_ci_if_error: false
+          filter: '@genshin/collection-json'
+          coverage-file: packages/collection-json/coverage/lcov.info
+          results-file: packages/collection-json/test-results/junit.xml
+          flag: collection-json
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
 # ---------------------------------------------------------------------------
 # Maintenance notes

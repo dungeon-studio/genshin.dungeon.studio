@@ -66,6 +66,7 @@
 
 - Prefer composition over inheritance and use early returns for conditional rendering.
 - Use semantic HTML: proper heading hierarchy, structural elements, and native interactive elements.
+- Mark decorative Lucide icons with `aria-hidden="true"` and `focusable={false}`. Icons inside labeled buttons, or adjacent to labeled inputs, are decorative.
 - Use aliases such as `@/components`, `@/components/ui`, `@/lib`, and `@/lib/utils`.
 - `shadcn/ui` gotchas:
   - Use ESM imports in Tailwind or Vite config (`import ...`), not `require()`.
@@ -126,6 +127,7 @@
 - Start Bash scripts with `set -euo pipefail` and `set -x`.
 - Use `curl -fsSL` for network fetches.
 - Never hard-code secrets; use environment variables.
+- Quote `${{ inputs.* }}` expansions in GitHub Actions composite action `run` steps to prevent shell word-splitting.
 - Add new DevContainer provisioning steps in `.devcontainer/postCreateCommand.sh`.
 
 ## Playwright MCP rules

@@ -53,6 +53,7 @@ gcloud
 
 # Other tools and libraries
 Babel
+Lucide
 OXC
 SWC
 

@@ -10,10 +10,10 @@
 
 // Elements
 export {
-  ELEMENT_REACTION_TYPES,
   ELEMENTS,
-  getReactionsByVersion,
+  ELEMENT_REACTION_TYPES,
   REACTION_TYPES,
+  getReactionsByVersion,
   type Element,
   type ReactionType,
 } from './elements.js';
@@ -34,13 +34,13 @@ export {
 
 // Weapons
 export {
+  WEAPONS,
+  WEAPON_STAT_TYPES,
+  WEAPON_TYPES,
   getWeaponById,
   getWeaponsByRarity,
   getWeaponsByType,
   getWeaponsByVersion,
-  WEAPON_STAT_TYPES,
-  WEAPON_TYPES,
-  WEAPONS,
   type Weapon,
   type WeaponStatType,
   type WeaponType,
@@ -55,3 +55,6 @@ export {
   type ArtifactPiece,
   type ArtifactSet,
 } from './artifacts.js';
+
+// Versions
+export { compareVersions } from './versions.js';
