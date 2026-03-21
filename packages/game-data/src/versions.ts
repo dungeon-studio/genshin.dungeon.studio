@@ -10,9 +10,17 @@ const LUNA_VERSIONS: Record<string, readonly [number, number]> = {
 };
 
 function versionTuple(version: string): readonly [number, number] {
-  if (version in LUNA_VERSIONS) return LUNA_VERSIONS[version];
-  const [major, minor] = version.split('.').map(Number);
-  return [major, minor ?? 0];
+  if (Object.hasOwn(LUNA_VERSIONS, version)) return LUNA_VERSIONS[version];
+
+  const [majorRaw, minorRaw] = version.split('.');
+  const major = Number(majorRaw);
+  const minor = minorRaw === undefined ? 0 : Number(minorRaw);
+
+  if (!majorRaw || Number.isNaN(major) || Number.isNaN(minor)) {
+    throw new Error(`Invalid version string: "${version}"`);
+  }
+
+  return [major, minor];
 }
 
 /**

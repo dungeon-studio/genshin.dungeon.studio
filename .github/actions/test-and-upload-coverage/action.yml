@@ -1,0 +1,48 @@
+---
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+name: Test and upload coverage
+description: Run vitest with coverage and upload results to Codecov
+
+inputs:
+  filter:
+    description: 'Turborepo filter (e.g. @genshin/api)'
+    required: true
+  coverage-file:
+    description: 'Path to lcov.info coverage file'
+    required: true
+  results-file:
+    description: 'Path to junit.xml test results file'
+    required: true
+  flag:
+    description: 'Codecov flag name'
+    required: true
+  codecov-token:
+    description: 'Codecov upload token'
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    - name: Test
+      shell: bash
+      run: pnpm turbo run test --filter=${{ inputs.filter }} -- --coverage
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: ${{ inputs.coverage-file }}
+        flags: ${{ inputs.flag }}
+        fail_ci_if_error: false
+
+    - name: Upload test results to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: ${{ inputs.results-file }}
+        flags: ${{ inputs.flag }}
+        report_type: test_results
+        fail_ci_if_error: false

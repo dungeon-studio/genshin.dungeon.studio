@@ -25,6 +25,9 @@ flag_management:
     - name: collection-json
       paths:
         - packages/collection-json/src/**
+    - name: game-data
+      paths:
+        - packages/game-data/src/**
 
 component_management:
   individual_components:
@@ -58,6 +61,12 @@ component_management:
         - apps/api/src/lib/firebase/**
       flag_regexes:
         - api
+    - component_id: game-data-versions
+      name: 'Game Data: Versions'
+      paths:
+        - packages/game-data/src/versions.ts
+      flag_regexes:
+        - game-data
     - component_id: collection-json
       name: Collection JSON
       paths:
