@@ -33,10 +33,13 @@ export function CharactersPage() {
   const ownedCount = Object.keys(characters).length;
   const ownedIds = useMemo(() => new Set(Object.keys(characters)), [characters]);
 
-  const filteredCharacters = useMemo(
-    () => filterCharacters(CHARACTERS, filters, ownedIds),
-    [filters, ownedIds],
-  );
+  const { filteredCharacters, filteredOwnedCount } = useMemo(() => {
+    const filtered = filterCharacters(CHARACTERS, filters, ownedIds);
+    return {
+      filteredCharacters: filtered,
+      filteredOwnedCount: filtered.filter((c) => ownedIds.has(c.id)).length,
+    };
+  }, [filters, ownedIds]);
 
   function handleConstellationChange(characterId: Character['id'], level: number) {
     setConstellationLevel(characterId, level);
@@ -52,7 +55,7 @@ export function CharactersPage() {
         filteredCount={filteredCharacters.length}
         totalCount={CHARACTERS.length}
         ownedCount={ownedCount}
-        filteredOwnedCount={filteredCharacters.filter((c) => ownedIds.has(c.id)).length}
+        filteredOwnedCount={filteredOwnedCount}
       />
 
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
