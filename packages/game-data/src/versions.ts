@@ -12,11 +12,20 @@ const LUNA_VERSIONS: Record<string, readonly [number, number]> = {
 function versionTuple(version: string): readonly [number, number] {
   if (Object.hasOwn(LUNA_VERSIONS, version)) return LUNA_VERSIONS[version];
 
-  const [majorRaw, minorRaw] = version.split('.');
+  const parts = version.split('.');
+  if (parts.length > 2) {
+    throw new Error(`Invalid version string: "${version}"`);
+  }
+
+  const [majorRaw, minorRaw] = parts;
+  if (!majorRaw || (minorRaw !== undefined && minorRaw === '')) {
+    throw new Error(`Invalid version string: "${version}"`);
+  }
+
   const major = Number(majorRaw);
   const minor = minorRaw === undefined ? 0 : Number(minorRaw);
 
-  if (!majorRaw || Number.isNaN(major) || Number.isNaN(minor)) {
+  if (Number.isNaN(major) || Number.isNaN(minor)) {
     throw new Error(`Invalid version string: "${version}"`);
   }
 

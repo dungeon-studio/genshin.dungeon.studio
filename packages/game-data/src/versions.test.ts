@@ -58,5 +58,13 @@ describe('compareVersions', () => {
     it('throws for empty strings', () => {
       expect(() => compareVersions('', '1.0')).toThrow('Invalid version string: ""');
     });
+
+    it('throws for trailing dot', () => {
+      expect(() => compareVersions('5.', '1.0')).toThrow('Invalid version string: "5."');
+    });
+
+    it('throws for extra segments', () => {
+      expect(() => compareVersions('1.2.3', '1.0')).toThrow('Invalid version string: "1.2.3"');
+    });
   });
 });

@@ -28,7 +28,7 @@ runs:
   steps:
     - name: Test
       shell: bash
-      run: pnpm turbo run test --filter=${{ inputs.filter }} -- --coverage
+      run: pnpm turbo run test --filter="${{ inputs.filter }}" -- --coverage
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5
