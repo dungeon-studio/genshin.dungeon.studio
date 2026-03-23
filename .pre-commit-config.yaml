@@ -73,7 +73,7 @@ repos:
 
   # Markdown linting
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.21.0
+    rev: v0.22.0
     hooks:
       - id: markdownlint-cli2
         args: [--fix]
@@ -87,7 +87,7 @@ repos:
 
   # Vale - Prose linting
   - repo: https://github.com/errata-ai/vale
-    rev: v3.14.0
+    rev: v3.14.1
     hooks:
       - id: vale
         args: [--config=.vale.ini]
