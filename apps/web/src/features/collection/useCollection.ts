@@ -4,6 +4,8 @@
 import { useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 
+import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+
 import { useAuth } from '@/features/auth/useAuth';
 
 import type { MutationResult } from './useCollectionApi';
@@ -81,8 +83,8 @@ export function useCollection(): UseCollectionResult {
         addCharacterApi(id, {
           onSuccess: applyMutationResult,
           onError: () => {
-            const stillExists = id in useCollectionStore.getState().characters;
-            if (stillExists) {
+            const current = useCollectionStore.getState().characters[id];
+            if (current && current.constellationLevel === MIN_CONSTELLATION_LEVEL) {
               storeRemoveCharacter(id);
               toast.error('Failed to add character. Change has been reverted.');
             } else {
