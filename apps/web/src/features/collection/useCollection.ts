@@ -51,9 +51,25 @@ export function useCollection(): UseCollectionResult {
   const { mutate: removeCharacterApi } = useRemoveCharacterMutation(user?.uid);
   const { mutate: setConstellationLevelApi } = useSetConstellationLevelMutation(user?.uid);
 
+  // Patch zustand with confirmed server data
+  const applyMutationResult = useCallback(
+    ({ characterId, entry }: MutationResult) => {
+      storeSetConstellationLevel(characterId, entry.constellationLevel);
+    },
+    [storeSetConstellationLevel],
+  );
+
   // Merge anonymous localStorage data with server data on first query resolution
-  // per user session. Subsequent resolutions (refetches) replace zustand normally.
+  // per user session. Subsequent resolutions (refetches) merge additively to
+  // avoid overwriting optimistic state while merge mutations are in flight.
   const mergedForUser = useRef<string | null>(null);
+
+  // Reset merge tracking on logout so re-login triggers a fresh merge.
+  useEffect(() => {
+    if (!user) {
+      mergedForUser.current = null;
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!apiCharacters) return;
@@ -74,7 +90,12 @@ export function useCollection(): UseCollectionResult {
       }
 
       for (const diff of diffs) {
-        setConstellationLevelApi(diff);
+        setConstellationLevelApi(diff, {
+          onSuccess: applyMutationResult,
+          onError: () => {
+            toast.error('Failed to sync a merged character to the server.');
+          },
+        });
       }
 
       if (diffs.length > 0) {
@@ -83,17 +104,12 @@ export function useCollection(): UseCollectionResult {
 
       mergedForUser.current = user.uid;
     } else {
-      replaceCharacters(apiCharacters);
+      // Keep refetches additive so in-flight merge mutations aren't overwritten.
+      const currentCharacters = useCollectionStore.getState().characters;
+      const merged = mergeCollections(currentCharacters, apiCharacters);
+      replaceCharacters(merged);
     }
-  }, [apiCharacters, user, replaceCharacters, setConstellationLevelApi]);
-
-  // Patch zustand with confirmed server data
-  const applyMutationResult = useCallback(
-    ({ characterId, entry }: MutationResult) => {
-      storeSetConstellationLevel(characterId, entry.constellationLevel);
-    },
-    [storeSetConstellationLevel],
-  );
+  }, [apiCharacters, user, replaceCharacters, setConstellationLevelApi, applyMutationResult]);
 
   // Mutation error strategy: optimistic rollback + toast notification.
   // Each mutation writes to zustand first for instant UI feedback, then fires
