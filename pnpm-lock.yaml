@@ -105,6 +105,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@genshin/collection-json':
+        specifier: workspace:*
+        version: link:../../packages/collection-json
       '@genshin/domain':
         specifier: workspace:*
         version: link:../../packages/domain

@@ -3,7 +3,12 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { buildCollection, buildItem, COLLECTION_JSON } from './collection-json.js';
+import {
+  assertCollectionDocument,
+  buildCollection,
+  buildItem,
+  COLLECTION_JSON,
+} from './collection-json.js';
 
 describe('COLLECTION_JSON', () => {
   it('equals the IANA-registered media type', () => {
@@ -126,5 +131,47 @@ describe('buildCollection', () => {
     const doc = buildCollection('http://example.com/items', [], { links });
 
     expect(doc.collection.links).toEqual(links);
+  });
+});
+
+describe('assertCollectionDocument', () => {
+  it('accepts a valid CollectionDocument', () => {
+    const doc = buildCollection('http://example.com/items', []);
+
+    expect(() => assertCollectionDocument(doc)).not.toThrow();
+  });
+
+  it('accepts a document with items', () => {
+    const doc = buildCollection('http://example.com/items', [
+      buildItem('http://example.com/items/1', [{ name: 'id', value: '1' }]),
+    ]);
+
+    expect(() => assertCollectionDocument(doc)).not.toThrow();
+  });
+
+  it('throws for null', () => {
+    expect(() => assertCollectionDocument(null)).toThrow(TypeError);
+  });
+
+  it('throws for undefined', () => {
+    expect(() => assertCollectionDocument(undefined)).toThrow(TypeError);
+  });
+
+  it('throws for a plain string', () => {
+    expect(() => assertCollectionDocument('not a document')).toThrow(TypeError);
+  });
+
+  it('throws when collection property is missing', () => {
+    expect(() => assertCollectionDocument({ other: 'value' })).toThrow(TypeError);
+  });
+
+  it('throws when collection.items is missing', () => {
+    expect(() => assertCollectionDocument({ collection: { version: '1.0' } })).toThrow(TypeError);
+  });
+
+  it('throws when collection.items is not an array', () => {
+    expect(() => assertCollectionDocument({ collection: { items: 'not-an-array' } })).toThrow(
+      TypeError,
+    );
   });
 });

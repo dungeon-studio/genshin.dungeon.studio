@@ -3,6 +3,7 @@
 
 export {
   COLLECTION_JSON,
+  assertCollectionDocument,
   buildCollection,
   buildItem,
   serialiseCollection,
