@@ -38,13 +38,15 @@ export function useCollection(): UseCollectionResult {
   const replaceCharacters = useCollectionStore((s) => s.replaceCharacters);
 
   // TanStack Query — background sync when authenticated
-  const { data: apiCharacters, error: queryError } = useCharacterCollectionQuery(
-    isAuthenticated && !authLoading,
-  );
+  const {
+    data: apiCharacters,
+    error: queryError,
+    isLoading: queryLoading,
+  } = useCharacterCollectionQuery(user?.uid);
 
-  const { mutate: addCharacterApi } = useAddCharacterMutation();
-  const { mutate: removeCharacterApi } = useRemoveCharacterMutation();
-  const { mutate: setConstellationLevelApi } = useSetConstellationLevelMutation();
+  const { mutate: addCharacterApi } = useAddCharacterMutation(user?.uid);
+  const { mutate: removeCharacterApi } = useRemoveCharacterMutation(user?.uid);
+  const { mutate: setConstellationLevelApi } = useSetConstellationLevelMutation(user?.uid);
 
   // Sync API data into zustand when the query resolves
   useEffect(() => {
@@ -103,7 +105,7 @@ export function useCollection(): UseCollectionResult {
     setConstellationLevel,
     isOwned,
     getCharacter,
-    isLoading: authLoading,
+    isLoading: authLoading || (isAuthenticated && queryLoading),
     error,
   };
 }

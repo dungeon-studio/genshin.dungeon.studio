@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionDocument } from '@genshin/collection-json';
+import { assertCollectionDocument } from '@genshin/collection-json';
 import { deserialiseCharacter, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -16,13 +16,15 @@ export interface MutationResult {
   entry: CollectionEntry;
 }
 
-export const COLLECTION_KEY = ['characters'] as const;
+export function collectionKey(userId: string): readonly [string, string] {
+  return ['characters', userId] as const;
+}
 
 export function parseCollectionResponse(response: unknown): CharacterRecord {
-  const doc = response as CollectionDocument;
+  assertCollectionDocument(response);
   const record: CharacterRecord = {};
 
-  for (const item of doc.collection.items) {
+  for (const item of response.collection.items) {
     const character = deserialiseCharacter(item);
     record[character.characterId] = { constellationLevel: character.constellationLevel };
   }
@@ -31,26 +33,31 @@ export function parseCollectionResponse(response: unknown): CharacterRecord {
 }
 
 function parseSingleCharacterResponse(response: unknown): MutationResult {
-  const doc = response as CollectionDocument;
-  const character = deserialiseCharacter(doc.collection.items[0]);
+  assertCollectionDocument(response);
+  if (response.collection.items.length !== 1) {
+    throw new Error(
+      `Invalid API response: expected exactly one item, got ${response.collection.items.length}`,
+    );
+  }
+  const character = deserialiseCharacter(response.collection.items[0]);
   return {
     characterId: character.characterId,
     entry: { constellationLevel: character.constellationLevel },
   };
 }
 
-export function useCharacterCollectionQuery(enabled: boolean) {
+export function useCharacterCollectionQuery(userId: string | undefined) {
   return useQuery({
-    queryKey: COLLECTION_KEY,
+    queryKey: collectionKey(userId ?? ''),
     queryFn: async () => {
       const response = await apiGet('/api/characters');
       return parseCollectionResponse(response);
     },
-    enabled,
+    enabled: userId !== undefined,
   });
 }
 
-export function useAddCharacterMutation() {
+export function useAddCharacterMutation(userId: string | undefined) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -61,12 +68,12 @@ export function useAddCharacterMutation() {
       return parseSingleCharacterResponse(response);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: COLLECTION_KEY });
+      if (userId !== undefined) queryClient.invalidateQueries({ queryKey: collectionKey(userId) });
     },
   });
 }
 
-export function useRemoveCharacterMutation() {
+export function useRemoveCharacterMutation(userId: string | undefined) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -74,12 +81,12 @@ export function useRemoveCharacterMutation() {
       await apiDelete(`/api/characters/${encodeURIComponent(characterId)}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: COLLECTION_KEY });
+      if (userId !== undefined) queryClient.invalidateQueries({ queryKey: collectionKey(userId) });
     },
   });
 }
 
-export function useSetConstellationLevelMutation() {
+export function useSetConstellationLevelMutation(userId: string | undefined) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -96,7 +103,7 @@ export function useSetConstellationLevelMutation() {
       return parseSingleCharacterResponse(response);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: COLLECTION_KEY });
+      if (userId !== undefined) queryClient.invalidateQueries({ queryKey: collectionKey(userId) });
     },
   });
 }

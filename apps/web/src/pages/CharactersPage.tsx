@@ -66,20 +66,15 @@ export function CharactersPage() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="mx-auto max-w-7xl px-4 py-12">
-        <h1 className="sr-only">Characters</h1>
-        <p className="py-12 text-center text-destructive">
-          Failed to load collection. Please try again later.
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">
       <h1 className="sr-only">Characters</h1>
+
+      {error && (
+        <p className="mb-4 rounded-md bg-destructive/10 px-4 py-3 text-center text-sm text-destructive">
+          Failed to sync collection. Local data is still available.
+        </p>
+      )}
 
       <CharacterFilters
         filters={filters}

@@ -92,6 +92,22 @@ export function serialiseCollection<T>(
   return buildCollection(href, items, { template: repr.template });
 }
 
+// --- Assertions ---
+
+/**
+ * Runtime check that an unknown value conforms to the CollectionDocument envelope.
+ *
+ * Validates that `value` has a `collection` object whose `items` property is an
+ * array. Individual item shapes are left to domain-level deserialisers.
+ */
+export function assertCollectionDocument(value: unknown): asserts value is CollectionDocument {
+  const doc = value as Record<string, unknown>;
+  const collection = doc?.collection as Record<string, unknown> | undefined;
+  if (!collection || !Array.isArray(collection.items)) {
+    throw new TypeError('Expected a Collection+JSON document with collection.items array');
+  }
+}
+
 // --- Builders ---
 
 export function buildItem(href: string, data: Datum[], links?: Link[]): Item {
