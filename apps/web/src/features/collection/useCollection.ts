@@ -134,6 +134,8 @@ export function useCollection(): UseCollectionResult {
   const setConstellationLevel = useCallback(
     (id: CharacterId, level: number) => {
       const previousLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
+      if (previousLevel === undefined || previousLevel === level) return;
+
       storeSetConstellationLevel(id, level);
       if (isAuthenticated) {
         setConstellationLevelApi(
