@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
-import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 
 import { useAuth } from '@/features/auth/useAuth';
 
@@ -16,7 +16,7 @@ import {
   useSetConstellationLevelMutation,
 } from './useCollectionApi';
 import type { CharacterId, CollectionEntry } from './useCollectionStore';
-import { useCollectionStore } from './useCollectionStore';
+import { mergeCollections, useCollectionStore } from './useCollectionStore';
 
 export interface UseCollectionResult {
   characters: Record<CharacterId, CollectionEntry>;
@@ -39,6 +39,7 @@ export function useCollection(): UseCollectionResult {
   const storeRemoveCharacter = useCollectionStore((s) => s.removeCharacter);
   const storeSetConstellationLevel = useCollectionStore((s) => s.setConstellationLevel);
   const replaceCharacters = useCollectionStore((s) => s.replaceCharacters);
+  const clearCharacters = useCollectionStore((s) => s.clearCharacters);
 
   // TanStack Query — background sync when authenticated
   const {
@@ -51,13 +52,6 @@ export function useCollection(): UseCollectionResult {
   const { mutate: removeCharacterApi } = useRemoveCharacterMutation(user?.uid);
   const { mutate: setConstellationLevelApi } = useSetConstellationLevelMutation(user?.uid);
 
-  // Sync API data into zustand when the query resolves
-  useEffect(() => {
-    if (apiCharacters) {
-      replaceCharacters(apiCharacters);
-    }
-  }, [apiCharacters, replaceCharacters]);
-
   // Patch zustand with confirmed server data
   const applyMutationResult = useCallback(
     ({ characterId, entry }: MutationResult) => {
@@ -65,6 +59,64 @@ export function useCollection(): UseCollectionResult {
     },
     [storeSetConstellationLevel],
   );
+
+  // Merge anonymous localStorage data with server data on first query resolution
+  // per user session. Subsequent resolutions (refetches) merge additively to
+  // avoid overwriting optimistic state while merge mutations are in flight.
+  const mergedForUser = useRef<string | null>(null);
+
+  // Reset merge tracking and clear persisted collection on logout so
+  // re-login triggers a fresh merge and a different account cannot
+  // inherit the previous user's local data.
+  useEffect(() => {
+    if (!user) {
+      mergedForUser.current = null;
+      clearCharacters();
+    }
+  }, [user, clearCharacters]);
+
+  useEffect(() => {
+    if (!apiCharacters) return;
+
+    if (user && mergedForUser.current !== user.uid) {
+      const localData = useCollectionStore.getState().characters;
+      const merged = mergeCollections(localData, apiCharacters);
+      replaceCharacters(merged);
+
+      // Push entries that differ from the server
+      const diffs: Array<{ characterId: CharacterId; level: number }> = [];
+      for (const id of Object.keys(merged)) {
+        const entry = merged[id];
+        const serverEntry = apiCharacters[id];
+        if (
+          isValidConstellationLevel(entry.constellationLevel) &&
+          (!serverEntry || entry.constellationLevel > serverEntry.constellationLevel)
+        ) {
+          diffs.push({ characterId: id, level: entry.constellationLevel });
+        }
+      }
+
+      for (const diff of diffs) {
+        setConstellationLevelApi(diff, {
+          onSuccess: applyMutationResult,
+          onError: () => {
+            toast.error('Failed to sync a merged character to the server.');
+          },
+        });
+      }
+
+      if (diffs.length > 0) {
+        toast.success(`Merged ${diffs.length} character(s) from your local collection.`);
+      }
+
+      mergedForUser.current = user.uid;
+    } else {
+      // Keep refetches additive so in-flight merge mutations aren't overwritten.
+      const currentCharacters = useCollectionStore.getState().characters;
+      const merged = mergeCollections(currentCharacters, apiCharacters);
+      replaceCharacters(merged);
+    }
+  }, [apiCharacters, user, replaceCharacters, setConstellationLevelApi, applyMutationResult]);
 
   // Mutation error strategy: optimistic rollback + toast notification.
   // Each mutation writes to zustand first for instant UI feedback, then fires
