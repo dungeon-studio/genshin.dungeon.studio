@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
 import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
@@ -16,7 +16,7 @@ import {
   useSetConstellationLevelMutation,
 } from './useCollectionApi';
 import type { CharacterId, CollectionEntry } from './useCollectionStore';
-import { useCollectionStore } from './useCollectionStore';
+import { mergeCollections, useCollectionStore } from './useCollectionStore';
 
 export interface UseCollectionResult {
   characters: Record<CharacterId, CollectionEntry>;
@@ -51,12 +51,41 @@ export function useCollection(): UseCollectionResult {
   const { mutate: removeCharacterApi } = useRemoveCharacterMutation(user?.uid);
   const { mutate: setConstellationLevelApi } = useSetConstellationLevelMutation(user?.uid);
 
-  // Sync API data into zustand when the query resolves
+  // Merge anonymous localStorage data with server data on first query resolution
+  // per user session. Subsequent resolutions (refetches) replace zustand normally.
+  const mergedForUser = useRef<string | null>(null);
+
   useEffect(() => {
-    if (apiCharacters) {
+    if (!apiCharacters) return;
+
+    if (user && mergedForUser.current !== user.uid) {
+      const localData = useCollectionStore.getState().characters;
+      const merged = mergeCollections(localData, apiCharacters);
+      replaceCharacters(merged);
+
+      // Push entries that differ from the server
+      const diffs: Array<{ characterId: CharacterId; level: number }> = [];
+      for (const id of Object.keys(merged)) {
+        const entry = merged[id];
+        const serverEntry = apiCharacters[id];
+        if (!serverEntry || entry.constellationLevel > serverEntry.constellationLevel) {
+          diffs.push({ characterId: id, level: entry.constellationLevel });
+        }
+      }
+
+      for (const diff of diffs) {
+        setConstellationLevelApi(diff);
+      }
+
+      if (diffs.length > 0) {
+        toast.success(`Merged ${diffs.length} character(s) from your local collection.`);
+      }
+
+      mergedForUser.current = user.uid;
+    } else {
       replaceCharacters(apiCharacters);
     }
-  }, [apiCharacters, replaceCharacters]);
+  }, [apiCharacters, user, replaceCharacters, setConstellationLevelApi]);
 
   // Patch zustand with confirmed server data
   const applyMutationResult = useCallback(

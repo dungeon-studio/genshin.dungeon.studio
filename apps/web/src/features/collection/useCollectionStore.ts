@@ -12,6 +12,25 @@ export interface CollectionEntry {
 
 export type CharacterId = CollectionCharacter['characterId'];
 
+// Additive merge: union of both sets, keep higher constellation level on conflicts.
+export function mergeCollections(
+  local: Record<CharacterId, CollectionEntry>,
+  server: Record<CharacterId, CollectionEntry>,
+): Record<CharacterId, CollectionEntry> {
+  const merged: Record<CharacterId, CollectionEntry> = { ...server };
+
+  for (const [id, localEntry] of Object.entries(local)) {
+    const serverEntry = merged[id];
+    if (!serverEntry) {
+      merged[id] = localEntry;
+    } else if (localEntry.constellationLevel > serverEntry.constellationLevel) {
+      merged[id] = { constellationLevel: localEntry.constellationLevel };
+    }
+  }
+
+  return merged;
+}
+
 interface CollectionState {
   characters: Record<CharacterId, CollectionEntry>;
   addCharacter: (characterId: CharacterId) => void;
@@ -20,6 +39,7 @@ interface CollectionState {
   isOwned: (characterId: CharacterId) => boolean;
   getCharacter: (characterId: CharacterId) => CollectionEntry | undefined;
   replaceCharacters: (characters: Record<CharacterId, CollectionEntry>) => void;
+  clearCharacters: () => void;
 }
 
 export const useCollectionStore = create<CollectionState>()(
@@ -72,6 +92,10 @@ export const useCollectionStore = create<CollectionState>()(
 
       replaceCharacters: (characters) => {
         set({ characters });
+      },
+
+      clearCharacters: () => {
+        set({ characters: {} });
       },
     }),
     {
