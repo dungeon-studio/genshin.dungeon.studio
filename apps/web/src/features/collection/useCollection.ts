@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import { useCallback, useEffect } from 'react';
+import { toast } from 'sonner';
+
+import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 
 import { useAuth } from '@/features/auth/useAuth';
 
@@ -63,31 +66,95 @@ export function useCollection(): UseCollectionResult {
     [storeSetConstellationLevel],
   );
 
+  // Mutation error strategy: optimistic rollback + toast notification.
+  // Each mutation writes to zustand first for instant UI feedback, then fires
+  // the API call. On failure the onError callback rolls back the zustand change
+  // only if the store still reflects this mutation's optimistic value (guards
+  // against races from rapid user interactions). Errors are surfaced via toast
+  // side-effects — no retry is attempted.
+
   const addCharacter = useCallback(
     (id: CharacterId) => {
+      const alreadyOwned = id in useCollectionStore.getState().characters;
+      if (alreadyOwned) return;
+
       storeAddCharacter(id);
       if (isAuthenticated) {
-        addCharacterApi(id, { onSuccess: applyMutationResult });
+        addCharacterApi(id, {
+          onSuccess: applyMutationResult,
+          onError: () => {
+            const current = useCollectionStore.getState().characters[id];
+            if (current && current.constellationLevel === MIN_CONSTELLATION_LEVEL) {
+              storeRemoveCharacter(id);
+              toast.error('Failed to add character. Change has been reverted.');
+            } else {
+              toast.error('Failed to add character.');
+            }
+          },
+        });
       }
     },
-    [isAuthenticated, addCharacterApi, storeAddCharacter, applyMutationResult],
+    [
+      isAuthenticated,
+      addCharacterApi,
+      storeAddCharacter,
+      storeRemoveCharacter,
+      applyMutationResult,
+    ],
   );
 
   const removeCharacter = useCallback(
     (id: CharacterId) => {
+      const current = useCollectionStore.getState().characters[id];
+      if (!current) return;
+
       storeRemoveCharacter(id);
       if (isAuthenticated) {
-        removeCharacterApi(id);
+        removeCharacterApi(id, {
+          onError: () => {
+            const stillAbsent = !(id in useCollectionStore.getState().characters);
+            if (stillAbsent) {
+              storeAddCharacter(id);
+              storeSetConstellationLevel(id, current.constellationLevel);
+              toast.error('Failed to remove character. Change has been reverted.');
+            } else {
+              toast.error('Failed to remove character.');
+            }
+          },
+        });
       }
     },
-    [isAuthenticated, removeCharacterApi, storeRemoveCharacter],
+    [
+      isAuthenticated,
+      removeCharacterApi,
+      storeRemoveCharacter,
+      storeAddCharacter,
+      storeSetConstellationLevel,
+    ],
   );
 
   const setConstellationLevel = useCallback(
     (id: CharacterId, level: number) => {
+      const previousLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
+      if (previousLevel === undefined || previousLevel === level) return;
+
       storeSetConstellationLevel(id, level);
       if (isAuthenticated) {
-        setConstellationLevelApi({ characterId: id, level }, { onSuccess: applyMutationResult });
+        setConstellationLevelApi(
+          { characterId: id, level },
+          {
+            onSuccess: applyMutationResult,
+            onError: () => {
+              const currentLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
+              if (previousLevel !== undefined && currentLevel === level) {
+                storeSetConstellationLevel(id, previousLevel);
+                toast.error('Failed to update constellation level. Change has been reverted.');
+              } else {
+                toast.error('Failed to update constellation level.');
+              }
+            },
+          },
+        );
       }
     },
     [isAuthenticated, setConstellationLevelApi, storeSetConstellationLevel, applyMutationResult],
