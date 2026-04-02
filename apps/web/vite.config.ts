@@ -24,7 +24,7 @@ export default defineConfig({
     {
       name: 'validate-env',
       configResolved(config) {
-        if (config.command !== 'build' || !process.env.VITE_VERIFY_ENV) return;
+        if (config.command !== 'build' || process.env.VITE_VERIFY_ENV !== 'true') return;
 
         const missing = requiredEnvVars.filter((key) => !config.env[key]);
         if (missing.length > 0) {
