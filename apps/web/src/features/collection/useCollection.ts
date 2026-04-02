@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { useCallback, useEffect } from 'react';
+import { toast } from 'sonner';
 
 import { useAuth } from '@/features/auth/useAuth';
 
@@ -67,30 +68,76 @@ export function useCollection(): UseCollectionResult {
     (id: CharacterId) => {
       storeAddCharacter(id);
       if (isAuthenticated) {
-        addCharacterApi(id, { onSuccess: applyMutationResult });
+        addCharacterApi(id, {
+          onSuccess: applyMutationResult,
+          onError: () => {
+            storeRemoveCharacter(id);
+            toast.error('Failed to add character. Change has been reverted.');
+          },
+        });
       }
     },
-    [isAuthenticated, addCharacterApi, storeAddCharacter, applyMutationResult],
+    [
+      isAuthenticated,
+      addCharacterApi,
+      storeAddCharacter,
+      storeRemoveCharacter,
+      applyMutationResult,
+    ],
   );
 
   const removeCharacter = useCallback(
     (id: CharacterId) => {
+      const previous = characters[id];
       storeRemoveCharacter(id);
       if (isAuthenticated) {
-        removeCharacterApi(id);
+        removeCharacterApi(id, {
+          onError: () => {
+            if (previous) {
+              storeAddCharacter(id);
+              storeSetConstellationLevel(id, previous.constellationLevel);
+            }
+            toast.error('Failed to remove character. Change has been reverted.');
+          },
+        });
       }
     },
-    [isAuthenticated, removeCharacterApi, storeRemoveCharacter],
+    [
+      isAuthenticated,
+      characters,
+      removeCharacterApi,
+      storeRemoveCharacter,
+      storeAddCharacter,
+      storeSetConstellationLevel,
+    ],
   );
 
   const setConstellationLevel = useCallback(
     (id: CharacterId, level: number) => {
+      const previousLevel = characters[id]?.constellationLevel;
       storeSetConstellationLevel(id, level);
       if (isAuthenticated) {
-        setConstellationLevelApi({ characterId: id, level }, { onSuccess: applyMutationResult });
+        setConstellationLevelApi(
+          { characterId: id, level },
+          {
+            onSuccess: applyMutationResult,
+            onError: () => {
+              if (previousLevel !== undefined) {
+                storeSetConstellationLevel(id, previousLevel);
+              }
+              toast.error('Failed to update constellation level. Change has been reverted.');
+            },
+          },
+        );
       }
     },
-    [isAuthenticated, setConstellationLevelApi, storeSetConstellationLevel, applyMutationResult],
+    [
+      isAuthenticated,
+      characters,
+      setConstellationLevelApi,
+      storeSetConstellationLevel,
+      applyMutationResult,
+    ],
   );
 
   const isOwned = useCallback((id: CharacterId) => id in characters, [characters]);
