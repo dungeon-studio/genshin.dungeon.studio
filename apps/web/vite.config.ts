@@ -7,10 +7,31 @@ import fs from 'fs';
 import path from 'path';
 import { defineConfig } from 'vite';
 
+const requiredEnvVars: readonly string[] = [
+  'VITE_FIREBASE_API_KEY',
+  'VITE_FIREBASE_AUTH_DOMAIN',
+  'VITE_FIREBASE_PROJECT_ID',
+  'VITE_FIREBASE_STORAGE_BUCKET',
+  'VITE_FIREBASE_MESSAGING_SENDER_ID',
+  'VITE_FIREBASE_APP_ID',
+  'VITE_API_BASE_URL',
+];
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    {
+      name: 'validate-env',
+      configResolved(config) {
+        if (config.command !== 'build' || process.env.VERIFY_ENV !== 'true') return;
+
+        const missing = requiredEnvVars.filter((key) => !config.env[key]);
+        if (missing.length > 0) {
+          throw new Error(`Missing required environment variables:\n  ${missing.join('\n  ')}`);
+        }
+      },
+    },
     {
       name: 'generate-version',
       closeBundle() {
