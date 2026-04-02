@@ -66,23 +66,27 @@ export function useCollection(): UseCollectionResult {
 
   const addCharacter = useCallback(
     (id: CharacterId) => {
-      const existed = id in characters;
+      const alreadyOwned = id in useCollectionStore.getState().characters;
+      if (alreadyOwned) return;
+
       storeAddCharacter(id);
       if (isAuthenticated) {
         addCharacterApi(id, {
           onSuccess: applyMutationResult,
           onError: () => {
-            if (!existed) {
+            const stillExists = id in useCollectionStore.getState().characters;
+            if (stillExists) {
               storeRemoveCharacter(id);
+              toast.error('Failed to add character. Change has been reverted.');
+            } else {
+              toast.error('Failed to add character.');
             }
-            toast.error('Failed to add character. Change has been reverted.');
           },
         });
       }
     },
     [
       isAuthenticated,
-      characters,
       addCharacterApi,
       storeAddCharacter,
       storeRemoveCharacter,
@@ -92,23 +96,27 @@ export function useCollection(): UseCollectionResult {
 
   const removeCharacter = useCallback(
     (id: CharacterId) => {
-      const previous = characters[id];
+      const current = useCollectionStore.getState().characters[id];
+      if (!current) return;
+
       storeRemoveCharacter(id);
       if (isAuthenticated) {
         removeCharacterApi(id, {
           onError: () => {
-            if (previous && !(id in useCollectionStore.getState().characters)) {
+            const stillAbsent = !(id in useCollectionStore.getState().characters);
+            if (stillAbsent) {
               storeAddCharacter(id);
-              storeSetConstellationLevel(id, previous.constellationLevel);
+              storeSetConstellationLevel(id, current.constellationLevel);
+              toast.error('Failed to remove character. Change has been reverted.');
+            } else {
+              toast.error('Failed to remove character.');
             }
-            toast.error('Failed to remove character. Change has been reverted.');
           },
         });
       }
     },
     [
       isAuthenticated,
-      characters,
       removeCharacterApi,
       storeRemoveCharacter,
       storeAddCharacter,
@@ -118,7 +126,7 @@ export function useCollection(): UseCollectionResult {
 
   const setConstellationLevel = useCallback(
     (id: CharacterId, level: number) => {
-      const previousLevel = characters[id]?.constellationLevel;
+      const previousLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
       storeSetConstellationLevel(id, level);
       if (isAuthenticated) {
         setConstellationLevelApi(
@@ -129,20 +137,16 @@ export function useCollection(): UseCollectionResult {
               const currentLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
               if (previousLevel !== undefined && currentLevel === level) {
                 storeSetConstellationLevel(id, previousLevel);
+                toast.error('Failed to update constellation level. Change has been reverted.');
+              } else {
+                toast.error('Failed to update constellation level.');
               }
-              toast.error('Failed to update constellation level. Change has been reverted.');
             },
           },
         );
       }
     },
-    [
-      isAuthenticated,
-      characters,
-      setConstellationLevelApi,
-      storeSetConstellationLevel,
-      applyMutationResult,
-    ],
+    [isAuthenticated, setConstellationLevelApi, storeSetConstellationLevel, applyMutationResult],
   );
 
   const isOwned = useCallback((id: CharacterId) => id in characters, [characters]);
