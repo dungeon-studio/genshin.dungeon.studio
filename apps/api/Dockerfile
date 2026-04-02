@@ -4,7 +4,7 @@
 ARG COREPACK_VERSION=0.34.6
 
 # Build stage
-FROM node:25.8.1-slim AS builder
+FROM node:25.8.2-slim AS builder
 
 ARG COREPACK_VERSION
 
@@ -38,7 +38,7 @@ RUN pnpm turbo run build --filter=@genshin/api
 RUN pnpm install --prod --frozen-lockfile
 
 # Production stage
-FROM node:25.8.1-slim
+FROM node:25.8.2-slim
 
 WORKDIR /app
 
