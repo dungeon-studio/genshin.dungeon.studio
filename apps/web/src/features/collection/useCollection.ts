@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
-import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 
 import { useAuth } from '@/features/auth/useAuth';
 
@@ -39,6 +39,7 @@ export function useCollection(): UseCollectionResult {
   const storeRemoveCharacter = useCollectionStore((s) => s.removeCharacter);
   const storeSetConstellationLevel = useCollectionStore((s) => s.setConstellationLevel);
   const replaceCharacters = useCollectionStore((s) => s.replaceCharacters);
+  const clearCharacters = useCollectionStore((s) => s.clearCharacters);
 
   // TanStack Query — background sync when authenticated
   const {
@@ -64,12 +65,15 @@ export function useCollection(): UseCollectionResult {
   // avoid overwriting optimistic state while merge mutations are in flight.
   const mergedForUser = useRef<string | null>(null);
 
-  // Reset merge tracking on logout so re-login triggers a fresh merge.
+  // Reset merge tracking and clear persisted collection on logout so
+  // re-login triggers a fresh merge and a different account cannot
+  // inherit the previous user's local data.
   useEffect(() => {
     if (!user) {
       mergedForUser.current = null;
+      clearCharacters();
     }
-  }, [user]);
+  }, [user, clearCharacters]);
 
   useEffect(() => {
     if (!apiCharacters) return;
@@ -84,7 +88,10 @@ export function useCollection(): UseCollectionResult {
       for (const id of Object.keys(merged)) {
         const entry = merged[id];
         const serverEntry = apiCharacters[id];
-        if (!serverEntry || entry.constellationLevel > serverEntry.constellationLevel) {
+        if (
+          isValidConstellationLevel(entry.constellationLevel) &&
+          (!serverEntry || entry.constellationLevel > serverEntry.constellationLevel)
+        ) {
           diffs.push({ characterId: id, level: entry.constellationLevel });
         }
       }
