@@ -64,6 +64,13 @@ export function useCollection(): UseCollectionResult {
     [storeSetConstellationLevel],
   );
 
+  // Mutation error strategy: optimistic rollback + toast notification.
+  // Each mutation writes to zustand first for instant UI feedback, then fires
+  // the API call. On failure the onError callback rolls back the zustand change
+  // only if the store still reflects this mutation's optimistic value (guards
+  // against races from rapid user interactions). Errors are surfaced via toast
+  // side-effects — no retry is attempted.
+
   const addCharacter = useCallback(
     (id: CharacterId) => {
       const alreadyOwned = id in useCollectionStore.getState().characters;
