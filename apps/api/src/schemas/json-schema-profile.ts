@@ -9,7 +9,7 @@
  *   entry at its declared path, stamping `$id` with the request origin.
  * - **Validation:** Route handlers pass `entry.schema` to `validateBody`.
  *
- * Satisfies `ProfileLink` from the negotiate-content middleware, so
+ * Satisfies `ProfileLink` from the profile-link module, so
  * instances can be used directly as the `profile` in a
  * `SupportedRepresentation`.
  */

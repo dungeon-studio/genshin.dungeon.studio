@@ -17,6 +17,7 @@
     "@genshin/game-data": "workspace:*",
     "@hono/node-server": "1.19.12",
     "ajv": "8.18.0",
+    "content-type": "1.0.5",
     "firebase-admin": "13.7.0",
     "google-gax": "5.0.6",
     "hono": "4.12.10",
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@types/content-type": "1.1.9",
     "@types/negotiator": "0.6.4",
     "@types/node": "25.5.2",
     "@types/semver": "7.7.1",

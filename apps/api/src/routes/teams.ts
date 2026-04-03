@@ -3,8 +3,12 @@
 
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
-import type { ValidatedBodyVariables } from '@/middleware/validate-body.js';
-import { validateBody } from '@/middleware/validate-body.js';
+import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
+import { negotiateContent } from '@/middleware/negotiate-content.js';
+import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
+import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
+import type { ValidatedRequestBodyVariables } from '@/middleware/validate-request-body.js';
+import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { getCharacter } from '@/repositories/characters/index.js';
 import { deleteTeam, getTeam, listTeams, saveTeam } from '@/repositories/teams/index.js';
 import { getWeapon } from '@/repositories/weapons/index.js';
@@ -16,11 +20,18 @@ import { getArtifactSetById } from '@genshin/game-data';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
-export const teams = new Hono<{ Variables: AuthVariables & ValidatedBodyVariables }>();
+export const teams = new Hono<{
+  Variables: AuthVariables &
+    NegotiatedContentVariables &
+    NegotiatedRequestSchemaVariables &
+    ValidatedRequestBodyVariables;
+}>();
 
 teams.use('*', auth);
 
 const PROFILE_PATH = '/profiles/teams/1.0.0.json';
+
+teams.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: { path: PROFILE_PATH } }]));
 
 interface UpdateTeamBody {
   name?: string;
@@ -45,7 +56,7 @@ teams.get('/', async (c) => {
   const baseUrl = new URL(c.req.url).origin;
 
   return c.body(JSON.stringify(teamListDocument(items, baseUrl)), {
-    headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
+    headers: { 'Content-Type': c.get('negotiatedMediaType') },
   });
 });
 
@@ -63,33 +74,38 @@ teams.get('/:slot', async (c) => {
   const baseUrl = new URL(c.req.url).origin;
 
   return c.body(JSON.stringify(teamItemDocument(team, baseUrl)), {
-    headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
+    headers: { 'Content-Type': c.get('negotiatedMediaType') },
   });
 });
 
 // PUT /api/teams/:slot — Create or update team composition (idempotent upsert)
-teams.put('/:slot', validateBody(teamPutRequestV1.schema), async (c) => {
-  const userId = c.get('user').uid;
-  const slot = parseSlot(c.req.param('slot'));
-  const body = c.get('validatedBody') as UpdateTeamBody;
+teams.put(
+  '/:slot',
+  negotiateRequestSchema([teamPutRequestV1]),
+  validateRequestBody([teamPutRequestV1]),
+  async (c) => {
+    const userId = c.get('user').uid;
+    const slot = parseSlot(c.req.param('slot'));
+    const body = c.get('validatedBody') as UpdateTeamBody;
 
-  if (body.members && body.members.length > 0) {
-    await validateMembers(userId, body.members);
-  }
+    if (body.members && body.members.length > 0) {
+      await validateMembers(userId, body.members);
+    }
 
-  const { team, created } = await saveTeam(userId, slot, {
-    name: body.name,
-    members: body.members ? (body.members as CollectionTeam['members']) : undefined,
-    description: body.description,
-  });
+    const { team, created } = await saveTeam(userId, slot, {
+      name: body.name,
+      members: body.members ? (body.members as CollectionTeam['members']) : undefined,
+      description: body.description,
+    });
 
-  const baseUrl = new URL(c.req.url).origin;
+    const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(JSON.stringify(teamItemDocument(team, baseUrl)), {
-    status: created ? 201 : 200,
-    headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
-  });
-});
+    return c.body(JSON.stringify(teamItemDocument(team, baseUrl)), {
+      status: created ? 201 : 200,
+      headers: { 'Content-Type': c.get('negotiatedMediaType') },
+    });
+  },
+);
 
 // DELETE /api/teams/:slot — Remove team
 teams.delete('/:slot', async (c) => {
