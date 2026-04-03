@@ -50,7 +50,13 @@ const FAKE_WEAPON_ITEM_DATA = [
   { name: 'updatedAt', value: '2026-03-13T00:00:00.000Z' },
 ];
 
-const EXPECTED_CONTENT_TYPE = `${COLLECTION_JSON}; profile="http://localhost/profiles/weapons/1.0.0.json"`;
+import { toMediaTypeString } from '@/middleware/negotiate-content.js';
+import { weaponItemV1 } from '@/profiles/alps/weapon/item-v1.js';
+
+const EXPECTED_CONTENT_TYPE = toMediaTypeString(
+  { mediaType: COLLECTION_JSON, profile: weaponItemV1 },
+  'http://localhost',
+);
 
 describe('Weapon routes', () => {
   beforeEach(() => {

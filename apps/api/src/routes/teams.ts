@@ -9,6 +9,7 @@ import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-re
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
 import type { ValidatedRequestBodyVariables } from '@/middleware/validate-request-body.js';
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
+import { teamItemV1 } from '@/profiles/alps/team/item-v1.js';
 import { getCharacter } from '@/repositories/characters/index.js';
 import { deleteTeam, getTeam, listTeams, saveTeam } from '@/repositories/teams/index.js';
 import { getWeapon } from '@/repositories/weapons/index.js';
@@ -29,9 +30,7 @@ export const teams = new Hono<{
 
 teams.use('*', auth);
 
-const PROFILE_PATH = '/profiles/teams/1.0.0.json';
-
-teams.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: { path: PROFILE_PATH } }]));
+teams.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: teamItemV1 }]));
 
 interface UpdateTeamBody {
   name?: string;

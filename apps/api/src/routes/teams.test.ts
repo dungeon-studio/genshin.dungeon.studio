@@ -36,6 +36,9 @@ import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
 import { getArtifactSetById } from '@genshin/game-data';
 
+import { toMediaTypeString } from '@/middleware/negotiate-content.js';
+import { teamItemV1 } from '@/profiles/alps/team/item-v1.js';
+
 const FAKE_TEAM: CollectionTeam = {
   slot: 1,
   name: 'Team 1',
@@ -57,7 +60,10 @@ const FAKE_EMPTY_TEAM: CollectionTeam = {
   updatedAt: '2026-03-13T00:00:00.000Z' as CollectionTeam['updatedAt'],
 };
 
-const EXPECTED_CONTENT_TYPE = `${COLLECTION_JSON}; profile="http://localhost/profiles/teams/1.0.0.json"`;
+const EXPECTED_CONTENT_TYPE = toMediaTypeString(
+  { mediaType: COLLECTION_JSON, profile: teamItemV1 },
+  'http://localhost',
+);
 
 function mockCharacterOwned() {
   vi.mocked(getCharacter).mockResolvedValue({

@@ -39,7 +39,13 @@ const FAKE_CHARACTER: CollectionCharacter = {
   updatedAt: '2026-03-13T00:00:00.000Z' as CollectionCharacter['updatedAt'],
 };
 
-const EXPECTED_CONTENT_TYPE = `${COLLECTION_JSON}; profile="http://localhost/profiles/characters/1.0.0.json"`;
+import { toMediaTypeString } from '@/middleware/negotiate-content.js';
+import { characterItemV1 } from '@/profiles/alps/character/item-v1.js';
+
+const EXPECTED_CONTENT_TYPE = toMediaTypeString(
+  { mediaType: COLLECTION_JSON, profile: characterItemV1 },
+  'http://localhost',
+);
 
 describe('Character routes', () => {
   beforeEach(() => {
