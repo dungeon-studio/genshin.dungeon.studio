@@ -7,7 +7,8 @@
  * Serves two roles:
  * - **Serving:** The schema route iterates the registry and serves each
  *   entry at its declared path, stamping `$id` with the request origin.
- * - **Validation:** Route handlers pass `entry.schema` to `validateBody`.
+ * - **Validation:** Route handlers pass entries to `validateRequestBody`,
+ *   which validates the request body against the negotiated `entry.schema`.
  *
  * Satisfies `ProfileLink` from the profile-link module, so
  * instances can be used directly as the `profile` in a
