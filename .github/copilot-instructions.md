@@ -11,7 +11,7 @@
 
 ## Snapshot
 
-- Stack: Turborepo + pnpm + TypeScript 5.9 strict mode.
+- Stack: Turborepo + pnpm + TypeScript 6.0 strict mode.
 - Web: React 19, Vite, Tailwind, `shadcn/ui`, zustand, TanStack Query, `react-router-dom`.
 - API: Hono + Node.js, Firestore, Firebase Auth.
 - Testing: Vitest (API integration tests).
