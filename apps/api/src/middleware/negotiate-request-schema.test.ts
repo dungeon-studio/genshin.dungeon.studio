@@ -96,4 +96,11 @@ describe('negotiateRequestSchema middleware', () => {
       'negotiateRequestSchema requires at least one profile',
     );
   });
+
+  it('returns 400 for a malformed Content-Type header', async () => {
+    const app = createApp([profileV1]);
+    const res = await app.request(putRequest('%%%garbage%%%'));
+
+    expect(res.status).toBe(400);
+  });
 });

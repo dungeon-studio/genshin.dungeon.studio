@@ -55,7 +55,9 @@ export function negotiateRequestSchema(profiles: ProfileLink[]): MiddlewareHandl
         const parsed = contentType.parse(header);
         profile = parsed.parameters['profile'];
       } catch {
-        // Malformed Content-Type — fall through to default
+        throw new HTTPException(400, {
+          message: 'Malformed Content-Type header',
+        });
       }
     }
 
