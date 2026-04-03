@@ -8,15 +8,15 @@ import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL } from '@genshin/dom
 
 import { useAuth } from '@/features/auth/useAuth';
 
-import type { MutationResult } from './useCollectionApi';
+import type { MutationResult } from './useCharacterCollectionApi';
 import {
   useAddCharacterMutation,
   useCharacterCollectionQuery,
   useRemoveCharacterMutation,
   useSetConstellationLevelMutation,
-} from './useCollectionApi';
-import type { CharacterId, CollectionEntry } from './useCollectionStore';
-import { mergeCollections, useCollectionStore } from './useCollectionStore';
+} from './useCharacterCollectionApi';
+import type { CharacterId, CollectionEntry } from './useCharacterCollectionStore';
+import { mergeCollections, useCollectionStore } from './useCharacterCollectionStore';
 
 export interface UseCollectionResult {
   characters: Record<CharacterId, CollectionEntry>;

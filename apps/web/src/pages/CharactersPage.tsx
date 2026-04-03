@@ -6,10 +6,13 @@ import { CHARACTERS } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-import { CharacterCard } from '@/components/CharacterCard';
-import type { CharacterFilterState } from '@/components/CharacterFilters';
-import { CharacterFilters, filterCharacters } from '@/components/CharacterFilters';
-import { useCollection } from '@/features/collection/useCollection';
+import { CharacterCard } from '@/features/collection/characters/CharacterCard';
+import type { CharacterFilterState } from '@/features/collection/characters/CharacterFilters';
+import {
+  CharacterFilters,
+  filterCharacters,
+} from '@/features/collection/characters/CharacterFilters';
+import { useCollection } from '@/features/collection/characters/useCharacterCollection';
 
 function initialFilterState(): CharacterFilterState {
   return {
