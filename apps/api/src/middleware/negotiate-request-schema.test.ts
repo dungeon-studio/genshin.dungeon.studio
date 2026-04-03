@@ -90,4 +90,10 @@ describe('negotiateRequestSchema middleware', () => {
 
     expect(res.status).toBe(415);
   });
+
+  it('throws when constructed with an empty profiles array', () => {
+    expect(() => negotiateRequestSchema([])).toThrow(
+      'negotiateRequestSchema requires at least one profile',
+    );
+  });
 });

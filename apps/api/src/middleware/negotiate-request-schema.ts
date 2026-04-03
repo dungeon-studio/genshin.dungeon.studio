@@ -40,6 +40,10 @@ export type NegotiatedRequestSchemaVariables = {
  * Sets `negotiatedSchema` on the context.
  */
 export function negotiateRequestSchema(profiles: ProfileLink[]): MiddlewareHandler {
+  if (profiles.length === 0) {
+    throw new Error('negotiateRequestSchema requires at least one profile');
+  }
+
   const paths = profiles.map((p) => p.path);
 
   return async (c, next) => {
