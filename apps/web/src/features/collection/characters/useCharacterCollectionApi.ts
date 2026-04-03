@@ -7,7 +7,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPut } from '@/lib/api';
 
-import type { CharacterId, CollectionEntry } from './useCollectionStore';
+import type { CharacterId, CollectionEntry } from './useCharacterCollectionStore';
 
 type CharacterRecord = Record<CharacterId, CollectionEntry>;
 
