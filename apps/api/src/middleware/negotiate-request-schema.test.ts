@@ -83,4 +83,11 @@ describe('negotiateRequestSchema middleware', () => {
 
     expect(res.status).toBe(415);
   });
+
+  it('returns 415 when profile is a bare string that is not a URL or supported path', async () => {
+    const app = createApp([profileV1]);
+    const res = await app.request(putRequest('application/json; profile="some-unknown-value"'));
+
+    expect(res.status).toBe(415);
+  });
 });
