@@ -3,8 +3,12 @@
 
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
-import type { ValidatedBodyVariables } from '@/middleware/validate-body.js';
-import { validateBody } from '@/middleware/validate-body.js';
+import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
+import { negotiateContent } from '@/middleware/negotiate-content.js';
+import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
+import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
+import type { ValidatedRequestBodyVariables } from '@/middleware/validate-request-body.js';
+import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import {
   deleteCharacter,
   getCharacter,
@@ -18,11 +22,21 @@ import { getCharacterById } from '@genshin/game-data';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
-export const characters = new Hono<{ Variables: AuthVariables & ValidatedBodyVariables }>();
+export const characters = new Hono<{
+  Variables: AuthVariables &
+    NegotiatedContentVariables &
+    NegotiatedRequestSchemaVariables &
+    ValidatedRequestBodyVariables;
+}>();
 
 characters.use('*', auth);
 
 const PROFILE_PATH = '/profiles/characters/1.0.0.json';
+
+characters.use(
+  '*',
+  negotiateContent([{ mediaType: COLLECTION_JSON, profile: { path: PROFILE_PATH } }]),
+);
 
 interface SaveCharacterBody {
   constellationLevel: number;
@@ -43,7 +57,7 @@ characters.get('/', async (c) => {
       ),
     ),
     {
-      headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
+      headers: { 'Content-Type': c.get('negotiatedMediaType') },
     },
   );
 });
@@ -68,36 +82,41 @@ characters.get('/:characterId', async (c) => {
       ]),
     ),
     {
-      headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
+      headers: { 'Content-Type': c.get('negotiatedMediaType') },
     },
   );
 });
 
 // PUT /api/characters/:characterId — Save/update character (idempotent upsert)
-characters.put('/:characterId', validateBody(characterPutRequestV1.schema), async (c) => {
-  const userId = c.get('user').uid;
-  const { characterId } = c.req.param();
+characters.put(
+  '/:characterId',
+  negotiateRequestSchema([characterPutRequestV1]),
+  validateRequestBody([characterPutRequestV1]),
+  async (c) => {
+    const userId = c.get('user').uid;
+    const { characterId } = c.req.param();
 
-  if (!getCharacterById(characterId)) {
-    throw new HTTPException(400, { message: `Unknown character: ${characterId}` });
-  }
+    if (!getCharacterById(characterId)) {
+      throw new HTTPException(400, { message: `Unknown character: ${characterId}` });
+    }
 
-  const { constellationLevel } = c.get('validatedBody') as SaveCharacterBody;
-  const { character, created } = await saveCharacter(userId, characterId, constellationLevel);
-  const baseUrl = new URL(c.req.url).origin;
+    const { constellationLevel } = c.get('validatedBody') as SaveCharacterBody;
+    const { character, created } = await saveCharacter(userId, characterId, constellationLevel);
+    const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(
-    JSON.stringify(
-      serialiseCollection(characterRepresentation, characterItemHref(baseUrl, character), [
-        serialiseCharacter(character, baseUrl),
-      ]),
-    ),
-    {
-      status: created ? 201 : 200,
-      headers: { 'Content-Type': `${COLLECTION_JSON}; profile="${baseUrl}${PROFILE_PATH}"` },
-    },
-  );
-});
+    return c.body(
+      JSON.stringify(
+        serialiseCollection(characterRepresentation, characterItemHref(baseUrl, character), [
+          serialiseCharacter(character, baseUrl),
+        ]),
+      ),
+      {
+        status: created ? 201 : 200,
+        headers: { 'Content-Type': c.get('negotiatedMediaType') },
+      },
+    );
+  },
+);
 
 // DELETE /api/characters/:characterId — Remove from collection
 characters.delete('/:characterId', async (c) => {

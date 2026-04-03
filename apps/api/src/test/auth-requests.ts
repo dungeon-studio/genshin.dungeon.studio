@@ -6,7 +6,17 @@ import { verifyToken } from '@/lib/firebase/auth.js';
 export const FAKE_UID = 'test-user-123';
 export const FAKE_TOKEN = { uid: FAKE_UID } as Awaited<ReturnType<typeof verifyToken>>;
 
-export function authedRequest(method: string, path: string, body?: unknown) {
+export interface AuthedRequestOptions {
+  /** Profile URL to include in the Content-Type header. */
+  profile?: string;
+}
+
+export function authedRequest(
+  method: string,
+  path: string,
+  body?: unknown,
+  options?: AuthedRequestOptions,
+) {
   const init: RequestInit = {
     method,
     headers: { Authorization: 'Bearer valid-token' },
@@ -14,7 +24,10 @@ export function authedRequest(method: string, path: string, body?: unknown) {
 
   if (body !== undefined) {
     init.body = JSON.stringify(body);
-    init.headers = { ...init.headers, 'Content-Type': 'application/json' };
+    const contentType = options?.profile
+      ? `application/json; profile="${options.profile}"`
+      : 'application/json';
+    init.headers = { ...init.headers, 'Content-Type': contentType };
   }
 
   return new Request(`http://localhost${path}`, init);
