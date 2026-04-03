@@ -9,16 +9,15 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "types": ["node"],
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
-    // baseUrl required for path alias resolution across tools
-    "baseUrl": "./src",
     // Path aliases eliminate relative imports and clarify module organization.
-    // Single @/* pattern with baseUrl handles all imports (e.g., @/middleware/auth → ./middleware/auth).
+    // Single @/* pattern handles all imports (e.g., @/middleware/auth → ./src/middleware/auth).
     // tsc-alias rewrites these in compiled JS during build for runtime compatibility.
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src"]

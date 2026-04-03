@@ -39,7 +39,7 @@
     "stylelint": "17.6.0",
     "stylelint-config-standard": "40.0.0",
     "turbo": "2.9.3",
-    "typescript": "5.9.3"
+    "typescript": "6.0.2"
   },
   "packageManager": "pnpm@10.33.0",
   "engines": {
