@@ -85,17 +85,18 @@ export const teamItemV1 = {
                   },
                 },
                 {
-                  id: 'primaryStats',
+                  id: 'priorityMinorAffixes',
                   type: 'semantic',
                   doc: {
-                    value: '0-3 desired primary stats to prioritize',
+                    value: '0-3 priority minor affixes',
                   },
                 },
                 {
-                  id: 'secondaryStats',
+                  id: 'secondaryMinorAffixes',
                   type: 'semantic',
                   doc: {
-                    value: '0-3 desired secondary stats (must be disjoint from primaryStats)',
+                    value:
+                      '0-3 secondary minor affixes (must be disjoint from priorityMinorAffixes)',
                   },
                 },
               ],

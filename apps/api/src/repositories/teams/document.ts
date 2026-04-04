@@ -11,8 +11,8 @@ export interface MemberDocumentData {
     goblet: string;
     circlet: string;
     sets: string[];
-    primaryStats: string[];
-    secondaryStats: string[];
+    priorityMinorAffixes: string[];
+    secondaryMinorAffixes: string[];
   };
 }
 

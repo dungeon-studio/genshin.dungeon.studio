@@ -15,9 +15,13 @@ import { deleteTeam, getTeam, listTeams, saveTeam } from '@/repositories/teams/i
 import { getWeapon } from '@/repositories/weapons/index.js';
 import { teamPutRequestV1 } from '@/schemas/teams/put-request-v1.js';
 import { COLLECTION_JSON } from '@genshin/collection-json';
-import type { ArtifactPlan, CollectionTeam, TeamMember, TeamSlot, UUID } from '@genshin/domain';
-import { isValidTeamSlot, teamItemDocument, teamListDocument } from '@genshin/domain';
-import { getArtifactSetById } from '@genshin/game-data';
+import type { CollectionTeam, TeamMember, TeamSlot, UUID } from '@genshin/domain';
+import {
+  assertArtifactPlan,
+  isValidTeamSlot,
+  teamItemDocument,
+  teamListDocument,
+} from '@genshin/domain';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
@@ -145,26 +149,14 @@ async function validateMembers(userId: string, members: TeamMember[]): Promise<v
 
       // Validate artifact plan if provided
       if (member.artifactPlan) {
-        validateArtifactPlan(member.artifactPlan);
+        try {
+          assertArtifactPlan(member.artifactPlan);
+        } catch (err) {
+          throw new HTTPException(400, {
+            message: err instanceof TypeError ? err.message : 'Invalid artifact plan',
+          });
+        }
       }
     }),
   );
-}
-
-function validateArtifactPlan(plan: ArtifactPlan): void {
-  // Artifact sets must reference valid game data
-  for (const setId of plan.sets) {
-    if (!getArtifactSetById(setId)) {
-      throw new HTTPException(400, { message: `Unknown artifact set: ${setId}` });
-    }
-  }
-
-  // Primary and secondary stats must be disjoint
-  const primarySet = new Set(plan.primaryStats);
-  const overlap = plan.secondaryStats.filter((s) => primarySet.has(s));
-  if (overlap.length > 0) {
-    throw new HTTPException(400, {
-      message: `Primary and secondary stats must be disjoint. Overlap: ${overlap.join(', ')}`,
-    });
-  }
 }

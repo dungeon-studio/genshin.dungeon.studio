@@ -77,7 +77,7 @@ function deserialiseArtifactPlan(value: unknown): ArtifactPlan {
       );
     }
   }
-  for (const field of ['sets', 'primaryStats', 'secondaryStats'] as const) {
+  for (const field of ['sets', 'priorityMinorAffixes', 'secondaryMinorAffixes'] as const) {
     if (!Array.isArray(plan[field])) {
       throw new TypeError(
         `artifactPlan.${field} must be an array, got: ${JSON.stringify(plan[field])}`,

@@ -52,6 +52,6 @@ export {
   type ProfileResponse,
 } from './representations/json/profile.js';
 export type { Team, TeamSlot } from './team.js';
-export type { ArtifactPlan, TeamMember } from './teamMember.js';
+export { assertArtifactPlan, type ArtifactPlan, type TeamMember } from './teamMember.js';
 export { type ProfileUpdate, type UserProfile } from './userProfile.js';
 export type { UUID } from './uuid.js';
