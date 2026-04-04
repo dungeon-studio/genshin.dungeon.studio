@@ -21,6 +21,8 @@ vi.mock('@genshin/game-data', () => ({
 
 import { app } from '@/app.js';
 import { verifyToken } from '@/lib/firebase/auth.js';
+import { toMediaTypeString } from '@/middleware/negotiate-content.js';
+import { characterItemV1 } from '@/profiles/alps/character/item-v1.js';
 import {
   deleteCharacter,
   getCharacter,
@@ -38,9 +40,6 @@ const FAKE_CHARACTER: CollectionCharacter = {
   createdAt: '2026-01-01T00:00:00.000Z' as CollectionCharacter['createdAt'],
   updatedAt: '2026-03-13T00:00:00.000Z' as CollectionCharacter['updatedAt'],
 };
-
-import { toMediaTypeString } from '@/middleware/negotiate-content.js';
-import { characterItemV1 } from '@/profiles/alps/character/item-v1.js';
 
 const EXPECTED_CONTENT_TYPE = toMediaTypeString(
   { mediaType: COLLECTION_JSON, profile: characterItemV1 },

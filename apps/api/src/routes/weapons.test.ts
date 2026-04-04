@@ -22,6 +22,8 @@ vi.mock('@genshin/game-data', () => ({
 
 import { app } from '@/app.js';
 import { verifyToken } from '@/lib/firebase/auth.js';
+import { toMediaTypeString } from '@/middleware/negotiate-content.js';
+import { weaponItemV1 } from '@/profiles/alps/weapon/item-v1.js';
 import {
   createWeapon,
   deleteWeapon,
@@ -49,9 +51,6 @@ const FAKE_WEAPON_ITEM_DATA = [
   { name: 'createdAt', value: '2026-01-01T00:00:00.000Z' },
   { name: 'updatedAt', value: '2026-03-13T00:00:00.000Z' },
 ];
-
-import { toMediaTypeString } from '@/middleware/negotiate-content.js';
-import { weaponItemV1 } from '@/profiles/alps/weapon/item-v1.js';
 
 const EXPECTED_CONTENT_TYPE = toMediaTypeString(
   { mediaType: COLLECTION_JSON, profile: weaponItemV1 },
