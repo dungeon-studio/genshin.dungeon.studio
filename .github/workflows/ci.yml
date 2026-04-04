@@ -125,6 +125,23 @@ jobs:
           flag: collection-json
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
+  validation:
+    name: Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Build
+        run: pnpm turbo run build --filter=@genshin/validation
+
+      - name: Typecheck
+        run: pnpm turbo run typecheck --filter=@genshin/validation
+
 # ---------------------------------------------------------------------------
 # Maintenance notes
 # - Add a new job when new apps or packages are added.

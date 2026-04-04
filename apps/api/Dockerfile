@@ -26,6 +26,7 @@ COPY apps/api/package.json ./apps/api/
 COPY packages/collection-json/package.json ./packages/collection-json/
 COPY packages/domain/package.json ./packages/domain/
 COPY packages/game-data/package.json ./packages/game-data/
+COPY packages/validation/package.json ./packages/validation/
 
 RUN pnpm install --frozen-lockfile
 
@@ -51,6 +52,7 @@ COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/packages/collection-json ./packages/collection-json
 COPY --from=builder /app/packages/domain ./packages/domain
 COPY --from=builder /app/packages/game-data ./packages/game-data
+COPY --from=builder /app/packages/validation ./packages/validation
 
 EXPOSE 8080
 

@@ -17,10 +17,10 @@ import { teamPutRequestV1 } from '@/schemas/teams/put-request-v1.js';
 import { COLLECTION_JSON } from '@genshin/collection-json';
 import type { CollectionTeam, TeamMember, TeamSlot, UUID } from '@genshin/domain';
 import {
-  assertArtifactPlan,
   isValidTeamSlot,
   teamItemDocument,
   teamListDocument,
+  validateArtifactPlan,
 } from '@genshin/domain';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -149,12 +149,9 @@ async function validateMembers(userId: string, members: TeamMember[]): Promise<v
 
       // Validate artifact plan if provided
       if (member.artifactPlan) {
-        try {
-          assertArtifactPlan(member.artifactPlan);
-        } catch (err) {
-          throw new HTTPException(400, {
-            message: err instanceof TypeError ? err.message : 'Invalid artifact plan',
-          });
+        const issues = validateArtifactPlan(member.artifactPlan);
+        if (issues.length > 0) {
+          throw new HTTPException(400, { message: issues[0].message });
         }
       }
     }),
