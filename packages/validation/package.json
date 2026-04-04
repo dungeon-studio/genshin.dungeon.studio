@@ -1,7 +1,7 @@
 {
-  "name": "@genshin/domain",
+  "name": "@genshin/validation",
   "version": "0.0.0",
-  "description": "Shared domain model for Genshin Dungeon Studio",
+  "description": "Reusable validation algebra — accumulating issues with a Valid/Invalid sum type",
   "private": true,
   "type": "module",
   "exports": {
@@ -19,11 +19,6 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "lint": "eslint ."
-  },
-  "dependencies": {
-    "@genshin/collection-json": "workspace:*",
-    "@genshin/game-data": "workspace:*",
-    "@genshin/validation": "workspace:*"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

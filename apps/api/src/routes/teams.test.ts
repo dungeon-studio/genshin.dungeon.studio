@@ -449,7 +449,7 @@ describe('Team routes', () => {
 
         expect(res.status).toBe(400);
         const body = (await res.json()) as { detail: string };
-        expect(body.detail).toContain('unknown artifact set');
+        expect(body.detail).toContain('Unknown artifact set');
       });
 
       it('returns 400 when priority and secondary minor affixes overlap', async () => {
