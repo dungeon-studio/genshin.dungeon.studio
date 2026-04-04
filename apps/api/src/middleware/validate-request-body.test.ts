@@ -10,7 +10,7 @@ import type { ValidatedRequestBodyVariables } from './validate-request-body.js';
 import { validateRequestBody } from './validate-request-body.js';
 
 const schemaV1: JsonSchemaProfile = {
-  path: '/schemas/test/put-request-v1.json',
+  path: '/profiles/json-schema/test/put-request-v1.json',
   schema: {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
     type: 'object',
@@ -21,7 +21,7 @@ const schemaV1: JsonSchemaProfile = {
 };
 
 const schemaV2: JsonSchemaProfile = {
-  path: '/schemas/test/put-request-v2.json',
+  path: '/profiles/json-schema/test/put-request-v2.json',
   schema: {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
     type: 'object',

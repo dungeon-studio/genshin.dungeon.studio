@@ -8,8 +8,8 @@ import { describe, expect, it } from 'vitest';
 import type { NegotiatedRequestSchemaVariables } from './negotiate-request-schema.js';
 import { negotiateRequestSchema } from './negotiate-request-schema.js';
 
-const profileV1: ProfileLink = { path: '/schemas/test/put-request-v1.json' };
-const profileV2: ProfileLink = { path: '/schemas/test/put-request-v2.json' };
+const profileV1: ProfileLink = { path: '/profiles/json-schema/test/put-request-v1.json' };
+const profileV2: ProfileLink = { path: '/profiles/json-schema/test/put-request-v2.json' };
 
 describe('negotiateRequestSchema middleware', () => {
   function createApp(profiles: ProfileLink[] = [profileV1]) {
@@ -39,7 +39,7 @@ describe('negotiateRequestSchema middleware', () => {
 
   it('selects v1 when v1 profile URL is specified', async () => {
     const app = createApp([profileV2, profileV1]);
-    const profileUrl = 'http://localhost/schemas/test/put-request-v1.json';
+    const profileUrl = 'http://localhost/profiles/json-schema/test/put-request-v1.json';
     const res = await app.request(putRequest(`application/json; profile="${profileUrl}"`));
 
     expect(res.status).toBe(200);
@@ -50,7 +50,7 @@ describe('negotiateRequestSchema middleware', () => {
   it('selects v1 when profile is an absolute path', async () => {
     const app = createApp([profileV1]);
     const res = await app.request(
-      putRequest('application/json; profile="/schemas/test/put-request-v1.json"'),
+      putRequest('application/json; profile="/profiles/json-schema/test/put-request-v1.json"'),
     );
 
     expect(res.status).toBe(200);
@@ -60,7 +60,7 @@ describe('negotiateRequestSchema middleware', () => {
 
   it('selects v2 when v2 profile URL is specified', async () => {
     const app = createApp([profileV2, profileV1]);
-    const profileUrl = 'http://localhost/schemas/test/put-request-v2.json';
+    const profileUrl = 'http://localhost/profiles/json-schema/test/put-request-v2.json';
     const res = await app.request(putRequest(`application/json; profile="${profileUrl}"`));
 
     expect(res.status).toBe(200);
@@ -70,7 +70,7 @@ describe('negotiateRequestSchema middleware', () => {
 
   it('returns 415 for unrecognised profile', async () => {
     const app = createApp([profileV1]);
-    const profileUrl = 'http://localhost/schemas/test/put-request-v99.json';
+    const profileUrl = 'http://localhost/profiles/json-schema/test/put-request-v99.json';
     const res = await app.request(putRequest(`application/json; profile="${profileUrl}"`));
 
     expect(res.status).toBe(415);
@@ -78,7 +78,7 @@ describe('negotiateRequestSchema middleware', () => {
 
   it('returns 415 when client requests v1 but server only supports v2', async () => {
     const app = createApp([profileV2]);
-    const profileUrl = 'http://localhost/schemas/test/put-request-v1.json';
+    const profileUrl = 'http://localhost/profiles/json-schema/test/put-request-v1.json';
     const res = await app.request(putRequest(`application/json; profile="${profileUrl}"`));
 
     expect(res.status).toBe(415);

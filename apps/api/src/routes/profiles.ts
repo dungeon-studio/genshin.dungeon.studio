@@ -7,9 +7,9 @@ import { Hono } from 'hono';
 export const profiles = new Hono();
 
 for (const entry of alpsRegistry) {
-  // entry.path is e.g. '/profiles/character/item-v1.json'
-  // The router is mounted at '/profiles', so strip the prefix for the route pattern.
-  const routePath = entry.path.replace(/^\/profiles/, '');
+  // entry.path is e.g. '/profiles/alps/character/item-v1.json'
+  // The router is mounted at '/profiles/alps', so strip the prefix for the route pattern.
+  const routePath = entry.path.replace(/^\/profiles\/alps/, '');
 
   profiles.get(routePath, (c) => {
     return c.json(entry.profile, 200, {

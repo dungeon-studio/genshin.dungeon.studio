@@ -10,7 +10,7 @@ describe('Schema serving routes', () => {
     let res: Response;
 
     beforeEach(async () => {
-      res = await app.request('http://localhost/schemas/root/get-response-v1.json');
+      res = await app.request('http://localhost/profiles/json-schema/root/get-response-v1.json');
     });
 
     it('returns 200', () => {
@@ -23,7 +23,7 @@ describe('Schema serving routes', () => {
 
     it('rewrites $id to match request origin', async () => {
       const body = (await res.json()) as Record<string, unknown>;
-      expect(body.$id).toBe('http://localhost/schemas/root/get-response-v1.json');
+      expect(body.$id).toBe('http://localhost/profiles/json-schema/root/get-response-v1.json');
     });
 
     it('preserves schema fields', async () => {
@@ -44,7 +44,7 @@ describe('Schema serving routes', () => {
   });
 
   it('returns 404 for unknown schema', async () => {
-    const res = await app.request('/schemas/unknown/get-response-v1.json');
+    const res = await app.request('/profiles/json-schema/unknown/get-response-v1.json');
     expect(res.status).toBe(404);
   });
 });

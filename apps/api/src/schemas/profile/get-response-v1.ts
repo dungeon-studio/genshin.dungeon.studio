@@ -4,7 +4,7 @@
 import type { JsonSchemaProfile } from '@/schemas/json-schema-profile.js';
 
 export const profileGetResponseV1 = {
-  path: '/schemas/profile/get-response-v1.json',
+  path: '/profiles/json-schema/profile/get-response-v1.json',
   schema: {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
     title: 'Profile',

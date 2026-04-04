@@ -4,7 +4,7 @@
 import type { JsonSchemaProfile } from '@/schemas/json-schema-profile.js';
 
 export const teamPutRequestV1 = {
-  path: '/schemas/teams/put-request-v1.json',
+  path: '/profiles/json-schema/teams/put-request-v1.json',
   schema: {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
     title: 'Update Team Request',

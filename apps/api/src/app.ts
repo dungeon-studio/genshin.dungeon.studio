@@ -94,8 +94,8 @@ app.get('/health', (c) =>
 );
 
 // Routes
-app.route('/schemas', schemas);
-app.route('/profiles', profiles);
+app.route('/profiles/json-schema', schemas);
+app.route('/profiles/alps', profiles);
 app.route('/api/characters', characters);
 app.route('/api/profile', userProfile);
 app.route('/api/teams', teams);

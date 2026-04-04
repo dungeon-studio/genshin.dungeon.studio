@@ -45,14 +45,14 @@ Clients request a specific representation version using the `profile` parameter 
 
 ```http
 GET /api/profile HTTP/1.1
-Accept: application/json; profile="https://api.genshin.dungeon.studio/schemas/profile/get/1.0.0.json"
+Accept: application/json; profile="https://api.genshin.dungeon.studio/profiles/json-schema/profile/get-response-v1.json"
 ```
 
 The API confirms the schema used in the response `Content-Type`:
 
 ```http
 HTTP/1.1 200 OK
-Content-Type: application/json; profile="https://api.genshin.dungeon.studio/schemas/profile/get/1.0.0.json"
+Content-Type: application/json; profile="https://api.genshin.dungeon.studio/profiles/json-schema/profile/get-response-v1.json"
 ```
 
 Negotiation rules:

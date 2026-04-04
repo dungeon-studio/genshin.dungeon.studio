@@ -4,7 +4,7 @@
 import type { AlpsProfile } from '@/profiles/alps/profile.js';
 
 export const weaponItemV1 = {
-  path: '/profiles/weapon/item-v1.json',
+  path: '/profiles/alps/weapon/item-v1.json',
   profile: {
     alps: {
       version: '1.0',

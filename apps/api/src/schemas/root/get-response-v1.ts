@@ -4,7 +4,7 @@
 import type { JsonSchemaProfile } from '@/schemas/json-schema-profile.js';
 
 export const rootGetResponseV1 = {
-  path: '/schemas/root/get-response-v1.json',
+  path: '/profiles/json-schema/root/get-response-v1.json',
   schema: {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
     title: 'API Root',

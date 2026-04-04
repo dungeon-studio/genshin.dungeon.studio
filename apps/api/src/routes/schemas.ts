@@ -7,9 +7,9 @@ import { Hono } from 'hono';
 export const schemas = new Hono();
 
 for (const entry of schemaRegistry) {
-  // entry.path is e.g. '/schemas/profile/get-response-v1.json'
-  // The router is mounted at '/schemas', so strip the prefix for the route pattern.
-  const routePath = entry.path.replace(/^\/schemas/, '');
+  // entry.path is e.g. '/profiles/json-schema/profile/get-response-v1.json'
+  // The router is mounted at '/profiles/json-schema', so strip the prefix for the route pattern.
+  const routePath = entry.path.replace(/^\/profiles\/json-schema/, '');
 
   schemas.get(routePath, (c) => {
     const origin = new URL(c.req.url).origin;
