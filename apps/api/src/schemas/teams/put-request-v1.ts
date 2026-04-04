@@ -74,20 +74,27 @@ export const teamPutRequestV1 = {
             maxItems: 2,
             description: '1-2 artifact set IDs from game data',
           },
-          primaryStats: {
+          priorityMinorAffixes: {
             type: 'array',
             items: { type: 'string', minLength: 1 },
             maxItems: 3,
-            description: '0-3 desired primary stats',
+            description: '0-3 priority minor affixes',
           },
-          secondaryStats: {
+          secondaryMinorAffixes: {
             type: 'array',
             items: { type: 'string', minLength: 1 },
             maxItems: 3,
-            description: '0-3 desired secondary stats (disjoint from primaryStats)',
+            description: '0-3 secondary minor affixes (disjoint from priorityMinorAffixes)',
           },
         },
-        required: ['sands', 'goblet', 'circlet', 'sets', 'primaryStats', 'secondaryStats'],
+        required: [
+          'sands',
+          'goblet',
+          'circlet',
+          'sets',
+          'priorityMinorAffixes',
+          'secondaryMinorAffixes',
+        ],
         additionalProperties: false,
       },
     },

@@ -449,12 +449,12 @@ describe('Team routes', () => {
                 characterId: 'hu-tao',
                 weaponInstanceId: 'uuid-1',
                 artifactPlan: {
-                  sands: 'HP%',
-                  goblet: 'Pyro DMG',
-                  circlet: 'Crit DMG',
+                  sands: 'HP Percentage',
+                  goblet: 'Pyro DMG Bonus',
+                  circlet: 'CRIT DMG',
                   sets: ['fake-set'],
-                  primaryStats: ['Crit Rate'],
-                  secondaryStats: ['ATK%'],
+                  priorityMinorAffixes: ['CRIT Rate'],
+                  secondaryMinorAffixes: ['ATK Percentage'],
                 },
               },
               { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
@@ -466,10 +466,10 @@ describe('Team routes', () => {
 
         expect(res.status).toBe(400);
         const body = (await res.json()) as { detail: string };
-        expect(body.detail).toContain('Unknown artifact set');
+        expect(body.detail).toContain('unknown artifact set');
       });
 
-      it('returns 400 when primary and secondary stats overlap', async () => {
+      it('returns 400 when priority and secondary minor affixes overlap', async () => {
         mockArtifactSetValid();
 
         const res = await app.request(
@@ -479,12 +479,12 @@ describe('Team routes', () => {
                 characterId: 'hu-tao',
                 weaponInstanceId: 'uuid-1',
                 artifactPlan: {
-                  sands: 'HP%',
-                  goblet: 'Pyro DMG',
-                  circlet: 'Crit DMG',
+                  sands: 'HP Percentage',
+                  goblet: 'Pyro DMG Bonus',
+                  circlet: 'CRIT DMG',
                   sets: ['crimson-witch-of-flames'],
-                  primaryStats: ['Crit Rate', 'Crit DMG'],
-                  secondaryStats: ['Crit Rate', 'ATK%'],
+                  priorityMinorAffixes: ['CRIT Rate', 'CRIT DMG'],
+                  secondaryMinorAffixes: ['CRIT Rate', 'ATK Percentage'],
                 },
               },
               { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
@@ -496,7 +496,7 @@ describe('Team routes', () => {
 
         expect(res.status).toBe(400);
         const body = (await res.json()) as { detail: string };
-        expect(body.detail).toContain('Primary and secondary stats must be disjoint');
+        expect(body.detail).toContain('must be disjoint');
       });
 
       it('accepts valid artifact plan', async () => {
@@ -513,12 +513,12 @@ describe('Team routes', () => {
                 characterId: 'hu-tao',
                 weaponInstanceId: 'uuid-1',
                 artifactPlan: {
-                  sands: 'HP%',
-                  goblet: 'Pyro DMG',
-                  circlet: 'Crit DMG',
+                  sands: 'HP Percentage',
+                  goblet: 'Pyro DMG Bonus',
+                  circlet: 'CRIT DMG',
                   sets: ['crimson-witch-of-flames'],
-                  primaryStats: ['Crit Rate', 'Crit DMG'],
-                  secondaryStats: ['ATK%', 'HP%'],
+                  priorityMinorAffixes: ['CRIT Rate', 'CRIT DMG'],
+                  secondaryMinorAffixes: ['ATK Percentage', 'HP Percentage'],
                 },
               },
               { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
