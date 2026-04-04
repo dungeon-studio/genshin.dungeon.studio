@@ -13,8 +13,9 @@ import { findTargetHandler, isMiddleware } from 'hono/utils/handler';
  * Returns GET-accessible paths that have a discrete handler (e.g.
  * `/api/characters`, `/health`).
  *
- * Excludes the root path itself, wildcard catch-all routes (like `/profiles/*`),
- * and sub-resource paths that contain route parameters.
+ * Excludes the root path itself, wildcard catch-all routes (like
+ * `/profiles/json-schema/*` and `/profiles/alps/*`), and sub-resource
+ * paths that contain route parameters.
  */
 function discoverLinks<E extends Env>(app: HonoApp<E>): Record<string, { href: string }> {
   const seen = new Set<string>();
