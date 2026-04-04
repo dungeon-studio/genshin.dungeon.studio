@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "firebase emulators:start --only auth --project dungeon-studio-genshin-dev & vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "lint:css": "stylelint 'src/**/*.css' --fix",
