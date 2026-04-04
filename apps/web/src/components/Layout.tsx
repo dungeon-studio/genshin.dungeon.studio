@@ -4,6 +4,7 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
 
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { LoginButton, LogoutButton, useAuth } from '@/features/auth';
 
 export function Layout() {
   return (
@@ -19,6 +20,8 @@ export function Layout() {
 }
 
 function Header() {
+  const { user, loading } = useAuth();
+
   return (
     <header className="border-b border-border bg-background">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
@@ -28,9 +31,30 @@ function Header() {
         >
           Genshin Team Builder
         </Link>
-        <ThemeToggle />
+        <div className="flex items-center gap-3">
+          {!loading && (user ? <UserMenu user={user} /> : <LoginButton />)}
+          <ThemeToggle />
+        </div>
       </div>
     </header>
+  );
+}
+
+function UserMenu({ user }: { user: { displayName: string | null; photoURL: string | null } }) {
+  return (
+    <div className="flex items-center gap-3">
+      {user.photoURL ? (
+        <img
+          src={user.photoURL}
+          alt=""
+          aria-hidden="true"
+          className="h-8 w-8 rounded-full"
+          referrerPolicy="no-referrer"
+        />
+      ) : null}
+      <span className="text-sm font-medium text-foreground">{user.displayName ?? 'User'}</span>
+      <LogoutButton />
+    </div>
   );
 }
 

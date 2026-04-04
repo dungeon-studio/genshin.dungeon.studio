@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { LogIn } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { auth } from '@/lib/firebase';
@@ -19,7 +20,8 @@ export function LoginButton() {
 
   return (
     <Button type="button" onClick={handleLogin} variant="outline">
-      Sign in with Google
+      <LogIn aria-hidden="true" focusable={false} className="h-4 w-4" />
+      Sign in
     </Button>
   );
 }

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { signOut } from 'firebase/auth';
+import { LogOut } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { auth } from '@/lib/firebase';
@@ -16,8 +17,8 @@ export function LogoutButton() {
   }
 
   return (
-    <Button type="button" onClick={handleLogout} variant="outline">
-      Sign out
+    <Button type="button" onClick={handleLogout} variant="ghost" size="icon" aria-label="Sign out">
+      <LogOut aria-hidden="true" focusable={false} className="h-4 w-4" />
     </Button>
   );
 }
