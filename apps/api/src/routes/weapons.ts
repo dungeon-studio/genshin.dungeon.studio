@@ -67,7 +67,7 @@ weapons.get('/', async (c) => {
       JSON.stringify(
         serialiseCollection(
           weaponRepresentation,
-          `${baseUrl}/api/weapons`,
+          `${baseUrl}/api/weapons?weaponId=${encodeURIComponent(weaponId)}`,
           instances.map((w) => serialiseWeapon(w, baseUrl)),
         ),
       ),

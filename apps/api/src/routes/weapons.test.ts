@@ -97,6 +97,10 @@ describe('Weapon routes', () => {
       );
     });
 
+    it('sets collection.href without query string', () => {
+      expect(body.collection.href).toBe('http://localhost/api/weapons');
+    });
+
     it('returns empty items when no weapons exist', async () => {
       vi.mocked(listWeapons).mockResolvedValue([]);
 
@@ -149,6 +153,12 @@ describe('Weapon routes', () => {
           expect.objectContaining({ name: 'weaponId', value: 'mistsplitter-reforged' }),
           expect.objectContaining({ name: 'refinementLevel', value: 1 }),
         ]),
+      );
+    });
+
+    it('sets collection.href with query string', () => {
+      expect(body.collection.href).toBe(
+        'http://localhost/api/weapons?weaponId=mistsplitter-reforged',
       );
     });
 
