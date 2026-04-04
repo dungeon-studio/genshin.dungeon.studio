@@ -9,7 +9,13 @@ import type {
   GobletMainAffix,
   SandsMainAffix,
 } from '@genshin/game-data';
-import { getArtifactSetById } from '@genshin/game-data';
+import {
+  ARTIFACT_MINOR_AFFIXES,
+  CIRCLET_MAIN_AFFIXES,
+  getArtifactSetById,
+  GOBLET_MAIN_AFFIXES,
+  SANDS_MAIN_AFFIXES,
+} from '@genshin/game-data';
 
 import type { UUID } from './uuid.js';
 
@@ -48,6 +54,19 @@ export function assertArtifactPlan(value: unknown): asserts value is ArtifactPla
     }
   }
 
+  const mainAffixMap = {
+    sands: SANDS_MAIN_AFFIXES as readonly string[],
+    goblet: GOBLET_MAIN_AFFIXES as readonly string[],
+    circlet: CIRCLET_MAIN_AFFIXES as readonly string[],
+  } as const;
+  for (const [field, valid] of Object.entries(mainAffixMap)) {
+    if (!valid.includes(plan[field] as string)) {
+      throw new TypeError(
+        `ArtifactPlan.${field} is not a valid main affix: ${JSON.stringify(plan[field])}`,
+      );
+    }
+  }
+
   if (!Array.isArray(plan.sets) || plan.sets.length < 1 || plan.sets.length > 2) {
     throw new TypeError(
       `ArtifactPlan.sets must be an array of 1–2 artifact set IDs, got: ${JSON.stringify(plan.sets)}`,
@@ -66,6 +85,23 @@ export function assertArtifactPlan(value: unknown): asserts value is ArtifactPla
       throw new TypeError(
         `ArtifactPlan.${field} must be an array, got: ${JSON.stringify(plan[field])}`,
       );
+    }
+    const arr = plan[field] as unknown[];
+    if (arr.length > 3) {
+      throw new TypeError(`ArtifactPlan.${field} must have at most 3 entries, got ${arr.length}`);
+    }
+    for (const entry of arr) {
+      if (
+        typeof entry !== 'string' ||
+        !(ARTIFACT_MINOR_AFFIXES as readonly string[]).includes(entry)
+      ) {
+        throw new TypeError(
+          `ArtifactPlan.${field} contains invalid minor affix: ${JSON.stringify(entry)}`,
+        );
+      }
+    }
+    if (new Set(arr).size !== arr.length) {
+      throw new TypeError(`ArtifactPlan.${field} contains duplicates`);
     }
   }
 

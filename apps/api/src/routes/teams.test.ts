@@ -23,10 +23,6 @@ vi.mock('@/repositories/weapons/index.js', () => ({
   getWeapon: vi.fn(),
 }));
 
-vi.mock('@genshin/game-data', () => ({
-  getArtifactSetById: vi.fn(),
-}));
-
 import { app } from '@/app.js';
 import { verifyToken } from '@/lib/firebase/auth.js';
 import { getCharacter } from '@/repositories/characters/index.js';
@@ -34,7 +30,6 @@ import { deleteTeam, getTeam, listTeams, saveTeam } from '@/repositories/teams/i
 import { getWeapon } from '@/repositories/weapons/index.js';
 import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
-import { getArtifactSetById } from '@genshin/game-data';
 
 import { toMediaTypeString } from '@/middleware/negotiate-content.js';
 import { teamItemV1 } from '@/profiles/alps/team/item-v1.js';
@@ -82,15 +77,6 @@ function mockWeaponOwned() {
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
   } as CollectionWeapon);
-}
-
-function mockArtifactSetValid() {
-  vi.mocked(getArtifactSetById).mockReturnValue({
-    id: 'crimson-witch-of-flames',
-    name: 'Crimson Witch of Flames',
-    version: '1.0',
-    bonuses: { 2: 'Pyro DMG +15%', 4: 'Overloaded and Burning +40%' },
-  });
 }
 
 describe('Team routes', () => {
@@ -439,9 +425,6 @@ describe('Team routes', () => {
       });
 
       it('returns 400 for unknown artifact set', async () => {
-        mockArtifactSetValid();
-        vi.mocked(getArtifactSetById).mockReturnValueOnce(undefined);
-
         const res = await app.request(
           authedRequest('PUT', '/api/teams/1', {
             members: [
@@ -470,8 +453,6 @@ describe('Team routes', () => {
       });
 
       it('returns 400 when priority and secondary minor affixes overlap', async () => {
-        mockArtifactSetValid();
-
         const res = await app.request(
           authedRequest('PUT', '/api/teams/1', {
             members: [
@@ -500,7 +481,6 @@ describe('Team routes', () => {
       });
 
       it('accepts valid artifact plan', async () => {
-        mockArtifactSetValid();
         vi.mocked(saveTeam).mockResolvedValue({
           team: FAKE_TEAM,
           created: true,
