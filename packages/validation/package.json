@@ -1,7 +1,7 @@
 {
   "name": "@genshin/validation",
   "version": "0.0.0",
-  "description": "Reusable validation algebra — accumulating issues with a Valid/Invalid sum type",
+  "description": "Reusable validation helpers for accumulating ValidationIssue[] results",
   "private": true,
   "type": "module",
   "exports": {

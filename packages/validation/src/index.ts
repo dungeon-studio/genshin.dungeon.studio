@@ -17,6 +17,8 @@ export function isValid(issues: readonly ValidationIssue[]): boolean {
 
 /** Prefix all issue paths with a dot-separated prefix. */
 export function prefixPaths(issues: readonly ValidationIssue[], prefix: string): ValidationIssue[] {
+  if (prefix === '') return issues.map((i) => ({ ...i }));
+
   return issues.map((i) => ({
     ...i,
     path: i.path ? `${prefix}.${i.path}` : prefix,
