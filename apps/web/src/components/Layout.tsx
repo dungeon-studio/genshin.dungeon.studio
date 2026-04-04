@@ -27,8 +27,24 @@ function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
         <Link
           to="/"
-          className="text-2xl font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+          className="flex items-center gap-2 text-2xl font-bold text-foreground hover:text-foreground/80"
         >
+          <img
+            src="/favicon-32x32.png"
+            alt=""
+            aria-hidden="true"
+            width={32}
+            height={32}
+            className="dark:hidden"
+          />
+          <img
+            src="/favicon-32x32-dark.png"
+            alt=""
+            aria-hidden="true"
+            width={32}
+            height={32}
+            className="hidden dark:block"
+          />
           Genshin Team Builder
         </Link>
         <div className="flex items-center gap-3">
