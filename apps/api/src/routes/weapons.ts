@@ -9,6 +9,7 @@ import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-re
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
 import type { ValidatedRequestBodyVariables } from '@/middleware/validate-request-body.js';
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
+import { weaponItemV1 } from '@/profiles/alps/weapon/item-v1.js';
 import {
   createWeapon,
   deleteWeapon,
@@ -34,12 +35,7 @@ export const weapons = new Hono<{
 
 weapons.use('*', auth);
 
-const PROFILE_PATH = '/profiles/weapons/1.0.0.json';
-
-weapons.use(
-  '*',
-  negotiateContent([{ mediaType: COLLECTION_JSON, profile: { path: PROFILE_PATH } }]),
-);
+weapons.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: weaponItemV1 }]));
 
 interface CreateWeaponBody {
   weaponId: string;
