@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { JsonSchemaProfile } from '@/schemas/json-schema-profile.js';
+import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
 
 export const teamPutRequestV1 = {
   path: '/profiles/json-schema/teams/put-request-v1.json',

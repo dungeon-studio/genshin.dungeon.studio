@@ -10,13 +10,13 @@ import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js
 import type { ValidatedRequestBodyVariables } from '@/middleware/validate-request-body.js';
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { characterItemV1 } from '@/profiles/alps/character/item-v1.js';
+import { characterPutRequestV1 } from '@/profiles/json-schema/characters/put-request-v1.js';
 import {
   deleteCharacter,
   getCharacter,
   listCharacters,
   saveCharacter,
 } from '@/repositories/characters/index.js';
-import { characterPutRequestV1 } from '@/schemas/characters/put-request-v1.js';
 import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
 import { characterItemHref, characterRepresentation, serialiseCharacter } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
