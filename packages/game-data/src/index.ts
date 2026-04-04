@@ -54,7 +54,6 @@ export {
   CIRCLET_MAIN_AFFIXES,
   getArtifactSetById,
   getArtifactSetsByVersion,
-  getValidMainAffixes,
   GOBLET_MAIN_AFFIXES,
   SANDS_MAIN_AFFIXES,
   type ArtifactMainAffix,

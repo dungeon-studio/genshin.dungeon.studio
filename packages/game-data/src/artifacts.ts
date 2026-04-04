@@ -490,27 +490,6 @@ export type ArtifactMinorAffix = (typeof ARTIFACT_MINOR_AFFIXES)[number];
 export type ArtifactMainAffix = SandsMainAffix | GobletMainAffix | CircletMainAffix;
 
 /**
- * Returns the valid main affixes for a given artifact piece.
- *
- * Flower and Plume have fixed main affixes (HP flat and ATK flat respectively)
- * and return single-element arrays.
- */
-export function getValidMainAffixes(piece: ArtifactPiece): readonly string[] {
-  switch (piece) {
-    case ARTIFACT_PIECES.FLOWER:
-      return ['HP'] as const;
-    case ARTIFACT_PIECES.PLUME:
-      return ['ATK'] as const;
-    case ARTIFACT_PIECES.SANDS:
-      return SANDS_MAIN_AFFIXES;
-    case ARTIFACT_PIECES.GOBLET:
-      return GOBLET_MAIN_AFFIXES;
-    case ARTIFACT_PIECES.CIRCLET:
-      return CIRCLET_MAIN_AFFIXES;
-  }
-}
-
-/**
  * Helper to find artifact set by ID
  */
 export function getArtifactSetById(id: string): ArtifactSet | undefined {

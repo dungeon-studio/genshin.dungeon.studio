@@ -26,4 +26,11 @@ describe('artifact affix constants', () => {
   it('ARTIFACT_MINOR_AFFIXES has no duplicates', () => {
     expect(new Set(ARTIFACT_MINOR_AFFIXES).size).toBe(ARTIFACT_MINOR_AFFIXES.length);
   });
+
+  it('affix arrays are non-empty', () => {
+    expect(SANDS_MAIN_AFFIXES.length).toBeGreaterThan(0);
+    expect(GOBLET_MAIN_AFFIXES.length).toBeGreaterThan(0);
+    expect(CIRCLET_MAIN_AFFIXES.length).toBeGreaterThan(0);
+    expect(ARTIFACT_MINOR_AFFIXES.length).toBeGreaterThan(0);
+  });
 });
