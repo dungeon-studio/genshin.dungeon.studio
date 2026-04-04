@@ -15,7 +15,7 @@
  * `SupportedRepresentation`.
  */
 export interface AlpsProfile {
-  /** Absolute URL path where the profile is served (e.g. `/profiles/character/item-v1.json`). */
+  /** Absolute URL path where the profile is served (e.g. `/profiles/alps/character/item-v1.json`). */
   readonly path: string;
   /** The ALPS profile document. */
   readonly profile: Record<string, unknown>;

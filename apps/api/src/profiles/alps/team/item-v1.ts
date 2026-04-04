@@ -4,7 +4,7 @@
 import type { AlpsProfile } from '@/profiles/alps/profile.js';
 
 export const teamItemV1 = {
-  path: '/profiles/team/item-v1.json',
+  path: '/profiles/alps/team/item-v1.json',
   profile: {
     alps: {
       version: '1.0',

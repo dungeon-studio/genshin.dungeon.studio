@@ -10,7 +10,7 @@ describe('Profile serving routes', () => {
     let res: Response;
 
     beforeEach(async () => {
-      res = await app.request('http://localhost/profiles/character/item-v1.json');
+      res = await app.request('http://localhost/profiles/alps/character/item-v1.json');
     });
 
     it('returns 200', () => {
@@ -38,7 +38,7 @@ describe('Profile serving routes', () => {
   });
 
   it('returns 404 for unknown profile', async () => {
-    const res = await app.request('/profiles/unknown/item-v1.json');
+    const res = await app.request('/profiles/alps/unknown/item-v1.json');
     expect(res.status).toBe(404);
   });
 });

@@ -24,7 +24,7 @@ const ajv = new Ajv2020();
 const validateGetSchema = ajv.compile(profileGetResponseV1.schema);
 
 const EXPECTED_CONTENT_TYPE =
-  'application/json; profile="http://localhost/schemas/profile/get-response-v1.json"';
+  'application/json; profile="http://localhost/profiles/json-schema/profile/get-response-v1.json"';
 
 const FAKE_PROFILE_TOKEN = {
   uid: FAKE_UID,

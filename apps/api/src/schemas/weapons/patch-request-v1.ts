@@ -4,7 +4,7 @@
 import type { JsonSchemaProfile } from '@/schemas/json-schema-profile.js';
 
 export const weaponPatchRequestV1 = {
-  path: '/schemas/weapons/patch-request-v1.json',
+  path: '/profiles/json-schema/weapons/patch-request-v1.json',
   schema: {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
     title: 'Update Weapon Instance Request',

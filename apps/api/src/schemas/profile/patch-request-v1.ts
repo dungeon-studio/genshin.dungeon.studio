@@ -4,7 +4,7 @@
 import type { JsonSchemaProfile } from '@/schemas/json-schema-profile.js';
 
 export const profilePatchRequestV1 = {
-  path: '/schemas/profile/patch-request-v1.json',
+  path: '/profiles/json-schema/profile/patch-request-v1.json',
   schema: {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
     title: 'Patch Profile',

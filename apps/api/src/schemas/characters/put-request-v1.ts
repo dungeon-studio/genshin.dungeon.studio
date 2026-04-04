@@ -4,7 +4,7 @@
 import type { JsonSchemaProfile } from '@/schemas/json-schema-profile.js';
 
 export const characterPutRequestV1 = {
-  path: '/schemas/characters/put-request-v1.json',
+  path: '/profiles/json-schema/characters/put-request-v1.json',
   schema: {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
     title: 'Save Character Request',
