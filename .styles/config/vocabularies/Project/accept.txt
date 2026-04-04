@@ -99,6 +99,9 @@ CodeQL
 Dependabot
 Renovate
 
+# Web assets
+favicon
+
 # Development workflow
 dev
 async
