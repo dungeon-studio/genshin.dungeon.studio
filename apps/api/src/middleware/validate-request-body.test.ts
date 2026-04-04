@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
-import type { JsonSchemaProfile } from '@/schemas/json-schema-profile.js';
+import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
 import { Hono } from 'hono';
 import { describe, expect, it } from 'vitest';
 

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { JsonSchemaProfile } from '@/schemas/json-schema-profile.js';
+import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
 
 export const profilePatchRequestV1 = {
   path: '/profiles/json-schema/profile/patch-request-v1.json',

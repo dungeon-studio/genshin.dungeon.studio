@@ -56,10 +56,10 @@
 
 ## Schema module conventions
 
-- Define each JSON Schema as a typed TypeScript module in `apps/api/src/schemas/{module}/`, not a `.json` file.
-- Export a single `const` using `as const satisfies JsonSchemaProfile` from `@/schemas/json-schema-profile.js`.
+- Define each JSON Schema as a typed TypeScript module in `apps/api/src/profiles/json-schema/{module}/`, not a `.json` file.
+- Export a single `const` using `as const satisfies JsonSchemaProfile` from `@/profiles/json-schema/json-schema-profile.js`.
 - Name files `{method}-{direction}-v{n}.ts` (for example, `get-response-v1.ts`, `put-request-v1.ts`). `{method}` is the lowercase HTTP method and `{direction}` is `request` or `response`. The serving path mirrors the filename: `/profiles/json-schema/{module}/{method}-{direction}-v{n}.json`. See [DSGEP-005](../docs/explanation/dsgep-005-schema-direction-segment.md).
-- Register every schema module in `apps/api/src/schemas/registry.ts`. The registry completeness test discovers files on disk and asserts the registry contains each one.
+- Register every schema module in `apps/api/src/profiles/json-schema/registry.ts`. The registry completeness test discovers files on disk and asserts the registry contains each one.
 - The schema route stamps `$id` from the request origin at serve time. Don't declare `$id` in schema modules.
 
 ## Frontend rules

@@ -10,10 +10,10 @@ import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js
 import type { ValidatedRequestBodyVariables } from '@/middleware/validate-request-body.js';
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { teamItemV1 } from '@/profiles/alps/team/item-v1.js';
+import { teamPutRequestV1 } from '@/profiles/json-schema/teams/put-request-v1.js';
 import { getCharacter } from '@/repositories/characters/index.js';
 import { deleteTeam, getTeam, listTeams, saveTeam } from '@/repositories/teams/index.js';
 import { getWeapon } from '@/repositories/weapons/index.js';
-import { teamPutRequestV1 } from '@/schemas/teams/put-request-v1.js';
 import { COLLECTION_JSON } from '@genshin/collection-json';
 import type { CollectionTeam, TeamMember, TeamSlot, UUID } from '@genshin/domain';
 import {

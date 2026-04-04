@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { app } from '@/app.js';
-import { schemaRegistry } from '@/schemas/registry.js';
+import { jsonSchemaRegistry } from '@/profiles/json-schema/registry.js';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('Schema serving routes', () => {
@@ -34,7 +34,7 @@ describe('Schema serving routes', () => {
   });
 
   it('serves every registered schema', async () => {
-    for (const entry of schemaRegistry) {
+    for (const entry of jsonSchemaRegistry) {
       const res = await app.request(`http://localhost${entry.path}`);
       expect(res.status).toBe(200);
 

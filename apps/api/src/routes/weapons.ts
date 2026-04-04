@@ -10,6 +10,8 @@ import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js
 import type { ValidatedRequestBodyVariables } from '@/middleware/validate-request-body.js';
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { weaponItemV1 } from '@/profiles/alps/weapon/item-v1.js';
+import { weaponPatchRequestV1 } from '@/profiles/json-schema/weapons/patch-request-v1.js';
+import { weaponPostRequestV1 } from '@/profiles/json-schema/weapons/post-request-v1.js';
 import {
   createWeapon,
   deleteWeapon,
@@ -17,8 +19,6 @@ import {
   listWeapons,
   updateWeapon,
 } from '@/repositories/weapons/index.js';
-import { weaponPatchRequestV1 } from '@/schemas/weapons/patch-request-v1.js';
-import { weaponPostRequestV1 } from '@/schemas/weapons/post-request-v1.js';
 import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
 import type { UUID } from '@genshin/domain';
 import { serialiseWeapon, weaponItemHref, weaponRepresentation } from '@genshin/domain';

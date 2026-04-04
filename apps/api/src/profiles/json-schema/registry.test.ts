@@ -5,8 +5,8 @@ import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import type { JsonSchemaProfile } from '@/schemas/json-schema-profile.js';
-import { schemaRegistry } from '@/schemas/registry.js';
+import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
+import { jsonSchemaRegistry } from '@/profiles/json-schema/registry.js';
 import { describe, expect, it } from 'vitest';
 
 const schemasDir = fileURLToPath(new URL('.', import.meta.url));
@@ -24,10 +24,10 @@ function findSchemaFiles(dir: string): string[] {
   return results;
 }
 
-describe('schemaRegistry', () => {
+describe('jsonSchemaRegistry', () => {
   it('contains every schema module', async () => {
     const files = findSchemaFiles(schemasDir);
-    const registeredPaths = new Set(schemaRegistry.map((e) => e.path));
+    const registeredPaths = new Set(jsonSchemaRegistry.map((e) => e.path));
 
     for (const file of files) {
       const mod = (await import(pathToFileURL(file).href)) as Record<string, unknown>;
