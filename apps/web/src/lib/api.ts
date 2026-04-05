@@ -71,6 +71,26 @@ export async function apiPut(path: string, body: unknown): Promise<unknown> {
   return handleResponse(response);
 }
 
+export async function apiPost(path: string, body: unknown): Promise<unknown> {
+  const headers = await getAuthHeaders();
+  const response = await fetch(new URL(path, API_BASE_URL).href, {
+    method: 'POST',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return handleResponse(response);
+}
+
+export async function apiPatch(path: string, body: unknown): Promise<unknown> {
+  const headers = await getAuthHeaders();
+  const response = await fetch(new URL(path, API_BASE_URL).href, {
+    method: 'PATCH',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return handleResponse(response);
+}
+
 export async function apiDelete(path: string): Promise<void> {
   const headers = await getAuthHeaders();
   const response = await fetch(new URL(path, API_BASE_URL).href, {
