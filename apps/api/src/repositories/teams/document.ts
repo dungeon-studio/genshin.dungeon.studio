@@ -7,12 +7,12 @@ export interface MemberDocumentData {
   characterId: string;
   weaponInstanceId?: string;
   artifactPlan?: {
-    sands: string;
-    goblet: string;
-    circlet: string;
-    sets: string[];
-    priorityMinorAffixes: string[];
-    secondaryMinorAffixes: string[];
+    sands?: string;
+    goblet?: string;
+    circlet?: string;
+    sets?: string[];
+    priorityMinorAffixes?: string[];
+    secondaryMinorAffixes?: string[];
   };
 }
 
