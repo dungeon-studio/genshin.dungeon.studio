@@ -45,7 +45,7 @@ export function WeaponsPage() {
     }
   }, [isAuthenticated]);
 
-  // Count unique weapon types owned (at least one instance)
+  // Collect weapon IDs that have at least one instance
   const ownedWeaponIds = useMemo(() => {
     const ids = new Set<string>();
     for (const instance of Object.values(weapons)) {
