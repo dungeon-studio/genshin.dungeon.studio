@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/main.ts",
+    "dev": "DEV=true tsx watch src/main.ts",
     "build": "tsc --project tsconfig.build.json && tsc-alias --project tsconfig.build.json && cp -r src/profiles dist/",
     "start": "node dist/main.js",
     "lint": "eslint .",
