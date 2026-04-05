@@ -43,7 +43,7 @@ export function TeamCharacterPlanner({
         <div className="flex items-center gap-3">
           <CharacterSummary character={character} />
 
-          {collectionCharacter && (
+          {character && collectionCharacter && (
             <span
               className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-bold tabular-nums text-muted-foreground"
               aria-label={`Constellation level ${collectionCharacter.constellationLevel}`}

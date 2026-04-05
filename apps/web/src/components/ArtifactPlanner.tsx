@@ -130,6 +130,12 @@ function SetConfiguration({
     onChange([sets![0], setId]);
   };
 
+  const handleClearSecond = () => {
+    if (sets) {
+      onChange([sets[0]]);
+    }
+  };
+
   return (
     <div className="space-y-2">
       <span className="text-xs font-medium text-card-foreground">Artifact Sets</span>
@@ -145,6 +151,7 @@ function SetConfiguration({
           label="Optional second 2-piece set..."
           value={sets?.[1]}
           onChange={handleSecondChange}
+          onClear={sets?.[1] ? handleClearSecond : undefined}
         />
       )}
     </div>
@@ -155,10 +162,12 @@ function ArtifactSetSearch({
   label,
   value,
   onChange,
+  onClear,
 }: {
   label: string;
   value: string | undefined;
   onChange: (id: string) => void;
+  onClear?: () => void;
 }) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
@@ -183,7 +192,7 @@ function ArtifactSetSearch({
   };
 
   return (
-    <div className="relative">
+    <div className="relative flex gap-1">
       <input
         ref={inputRef}
         type="text"
@@ -192,9 +201,19 @@ function ArtifactSetSearch({
         onChange={(e) => setQuery(e.target.value)}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-xs text-foreground transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="min-w-0 flex-1 rounded-md border border-border bg-background px-2 py-1.5 text-xs text-foreground transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         aria-label={label}
       />
+      {onClear && (
+        <button
+          type="button"
+          onClick={onClear}
+          className="shrink-0 rounded-md border border-border px-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+          aria-label="Clear selection"
+        >
+          <Minus className="h-3 w-3" aria-hidden="true" focusable={false} />
+        </button>
+      )}
       {open && filtered.length > 0 && (
         <ul className="absolute z-10 mt-1 max-h-40 w-full overflow-auto rounded-md border border-border bg-popover shadow-md">
           {filtered.map((set) => (
