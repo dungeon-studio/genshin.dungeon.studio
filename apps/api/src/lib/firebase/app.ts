@@ -13,7 +13,7 @@ import { getApp, getApps, initializeApp } from 'firebase-admin/app';
 if (process.env.DEV === 'true') {
   process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
   process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8181';
-  process.env.GOOGLE_CLOUD_PROJECT ??= 'demo-dungeon-studio-genshin-dev';
+  process.env.GOOGLE_CLOUD_PROJECT = 'demo-dungeon-studio-genshin-dev';
   console.log('Firebase: using local emulators (auth :9099, firestore :8181)');
 }
 
