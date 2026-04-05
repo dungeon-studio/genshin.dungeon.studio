@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
+import { CharacterSummary } from '@/components/CharacterSummary';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   ELEMENT_BORDER_COLORS,
@@ -14,7 +15,6 @@ import {
   ELEMENT_FOCUS_RINGS,
   ELEMENT_SELECTED_RINGS,
 } from '@/lib/elementStyles';
-import { getElementIconPath } from '@/lib/elements';
 import { cn } from '@/lib/utils';
 
 const CONSTELLATION_LEVELS = Array.from(
@@ -42,7 +42,6 @@ export function CharacterCard({
   onConstellationChange,
 }: CharacterCardProps) {
   const [popoverOpen, setPopoverOpen] = useState(false);
-  const elementIconSrc = getElementIconPath(character.element);
 
   const borderColors = owned ? ELEMENT_BORDER_COLORS : ELEMENT_BORDER_COLORS_DIM;
 
@@ -53,24 +52,7 @@ export function CharacterCard({
 
   const content = (
     <>
-      <img
-        src={elementIconSrc}
-        alt={character.element}
-        loading="lazy"
-        decoding="async"
-        className={cn('h-10 w-10 shrink-0', !owned && 'opacity-30')}
-      />
-
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-card-foreground">{character.name}</p>
-        <p className="truncate text-xs text-muted-foreground">
-          <span className="text-geo-dark" aria-hidden="true">
-            {character.rarity}★
-          </span>
-          <span className="sr-only">{character.rarity}-star</span>
-          {` · ${character.weaponType} · ${character.region}`}
-        </p>
-      </div>
+      <CharacterSummary character={character} dimmed={!owned} />
 
       {owned && onConstellationChange && (
         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
