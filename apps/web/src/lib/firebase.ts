@@ -28,6 +28,14 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
+// Safety: In dev mode, force the project ID to match the local Firebase
+// Emulators (started at the repository root with --project demo-dungeon-studio-genshin-dev).
+// This mirrors the API's forced project ID in apps/api/src/lib/firebase/app.ts.
+// Dead-code-eliminated during production builds.
+if (import.meta.env.DEV) {
+  firebaseConfig.projectId = 'demo-dungeon-studio-genshin-dev';
+}
+
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
@@ -37,7 +45,7 @@ export const auth = getAuth(app);
 // replaced with `false` and this entire block is removed from the bundle — the emulator code
 // cannot ship to any deployed environment regardless of environment variables.
 //
-// The emulator URL is hardcoded to match the port in firebase.json.
+// The emulator URL is hardcoded to match the port in firebase.json at the repository root.
 if (import.meta.env.DEV) {
   connectAuthEmulator(auth, 'http://localhost:9099');
 }

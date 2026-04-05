@@ -97,6 +97,15 @@ pnpm install
 # Set up pre-commit hooks (runs linters, formatters, SPDX checks automatically)
 pre-commit install
 
+# Configure the web app for local emulators
+cp apps/web/.env.example apps/web/.env.local
+```
+
+Edit `apps/web/.env.local` and fill in the Firebase client config. For local
+emulator development, any non-empty placeholder values work because the emulator
+doesn't validate them. See `apps/web/.env.example` for the full list.
+
+```bash
 # Start development servers
 pnpm dev
 ```
@@ -104,7 +113,7 @@ pnpm dev
 The frontend is available at <http://localhost:5173>. The API is available at <http://localhost:8080>.
 
 Firebase Auth and Firestore emulators start automatically with `pnpm dev`, so
-all routes work immediately. To run against real GCP Firestore instead, see
+all routes work immediately. To use real GCP Firestore instead, see
 [Configure Firestore credentials](configure-firestore-credentials.md).
 
 ---
