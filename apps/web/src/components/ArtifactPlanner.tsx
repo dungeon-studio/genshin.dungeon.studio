@@ -15,9 +15,18 @@ import {
   type GobletMainAffix,
   type SandsMainAffix,
 } from '@genshin/game-data';
-import { GripVertical, Minus, Shield } from 'lucide-react';
+import { Check, ChevronsUpDown, GripVertical, Minus, Shield } from 'lucide-react';
 import { useState } from 'react';
 
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
 interface ArtifactPlannerProps {
