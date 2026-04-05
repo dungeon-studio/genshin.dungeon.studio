@@ -42,19 +42,19 @@ export function ArtifactPlanner({ plan, onChange }: ArtifactPlannerProps) {
           label={ARTIFACT_PIECES.SANDS}
           options={SANDS_MAIN_AFFIXES}
           value={plan?.sands}
-          onChange={(value) => updatePlan({ sands: value as SandsMainAffix })}
+          onChange={(value) => updatePlan({ sands: value as SandsMainAffix | undefined })}
         />
         <MainAffixSelector
           label={ARTIFACT_PIECES.GOBLET}
           options={GOBLET_MAIN_AFFIXES}
           value={plan?.goblet}
-          onChange={(value) => updatePlan({ goblet: value as GobletMainAffix })}
+          onChange={(value) => updatePlan({ goblet: value as GobletMainAffix | undefined })}
         />
         <MainAffixSelector
           label={ARTIFACT_PIECES.CIRCLET}
           options={CIRCLET_MAIN_AFFIXES}
           value={plan?.circlet}
-          onChange={(value) => updatePlan({ circlet: value as CircletMainAffix })}
+          onChange={(value) => updatePlan({ circlet: value as CircletMainAffix | undefined })}
         />
 
         <SetConfiguration sets={plan?.sets} onChange={(sets) => updatePlan({ sets })} />
@@ -87,27 +87,24 @@ function MainAffixSelector({
   label: string;
   options: readonly string[];
   value: string | undefined;
-  onChange: (value: string) => void;
+  onChange: (value: string | undefined) => void;
 }) {
   return (
-    <div className="space-y-1">
-      <label className="text-xs font-medium text-card-foreground">{label}</label>
+    <label className="block space-y-1">
+      <span className="text-xs font-medium text-card-foreground">{label}</span>
       <select
         value={value ?? ''}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value === '' ? undefined : e.target.value)}
         className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-xs text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        aria-label={`Main stat for ${label}`}
       >
-        <option value="" disabled>
-          Select main stat...
-        </option>
+        <option value="">Select main stat...</option>
         {options.map((option) => (
           <option key={option} value={option}>
             {option}
           </option>
         ))}
       </select>
-    </div>
+    </label>
   );
 }
 
@@ -116,7 +113,7 @@ function SetConfiguration({
   onChange,
 }: {
   sets: ArtifactPlan['sets'] | undefined;
-  onChange: (sets: ArtifactPlan['sets']) => void;
+  onChange: (sets: ArtifactPlan['sets'] | undefined) => void;
 }) {
   const handleFirstChange = (setId: ArtifactSet['id']) => {
     if (sets && sets.length === 2) {
@@ -136,6 +133,10 @@ function SetConfiguration({
     }
   };
 
+  const handleClearFirst = () => {
+    onChange(undefined);
+  };
+
   return (
     <div className="space-y-2">
       <span className="text-xs font-medium text-card-foreground">Artifact Sets</span>
@@ -144,6 +145,7 @@ function SetConfiguration({
         label="Search artifact set..."
         value={sets?.[0]}
         onChange={handleFirstChange}
+        onClear={sets?.[0] ? handleClearFirst : undefined}
       />
 
       {sets && sets.length >= 1 && (
