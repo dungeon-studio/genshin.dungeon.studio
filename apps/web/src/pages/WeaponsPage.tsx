@@ -4,7 +4,7 @@
 import type { Rarity, WeaponType } from '@genshin/game-data';
 import { WEAPONS } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { useWeaponCollection } from '@/features/collection/weapons/useWeaponCollection';
@@ -38,6 +38,12 @@ export function WeaponsPage() {
 
   const [filters, setFilters] = useState<WeaponFilterState>(initialFilterState);
   const [selectedWeaponId, setSelectedWeaponId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setSelectedWeaponId(null);
+    }
+  }, [isAuthenticated]);
 
   // Count unique weapon types owned (at least one instance)
   const ownedWeaponIds = useMemo(() => {

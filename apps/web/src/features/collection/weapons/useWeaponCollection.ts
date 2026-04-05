@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { Weapon } from '@genshin/game-data';
 import { useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -21,10 +22,10 @@ import { useWeaponCollectionStore } from './useWeaponCollectionStore';
 export interface UseWeaponCollectionResult {
   weapons: Record<WeaponInstanceId, WeaponInstance>;
   isAuthenticated: boolean;
-  addWeapon: (weaponId: string) => void;
+  addWeapon: (weaponId: Weapon['id']) => void;
   removeWeapon: (weaponInstanceId: WeaponInstanceId) => void;
   setRefinementLevel: (weaponInstanceId: WeaponInstanceId, level: number) => void;
-  getWeaponsByWeaponId: (weaponId: string) => WeaponInstance[];
+  getWeaponsByWeaponId: (weaponId: Weapon['id']) => WeaponInstance[];
   isLoading: boolean;
   error: Error | null;
 }
@@ -69,7 +70,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   }, [apiWeapons, storeSetWeapons]);
 
   const addWeapon = useCallback(
-    (weaponId: string) => {
+    (weaponId: Weapon['id']) => {
       if (!isAuthenticated) return;
 
       addWeaponApi(weaponId, {
@@ -135,7 +136,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   );
 
   const getWeaponsByWeaponId = useCallback(
-    (weaponId: string) => {
+    (weaponId: Weapon['id']) => {
       return Object.values(weapons).filter((w) => w.weaponId === weaponId);
     },
     [weapons],

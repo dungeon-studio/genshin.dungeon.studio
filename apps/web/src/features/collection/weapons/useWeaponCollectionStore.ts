@@ -3,11 +3,12 @@
 
 import type { CollectionWeapon, UUID } from '@genshin/domain';
 import { isValidRefinementLevel } from '@genshin/domain';
+import type { Weapon } from '@genshin/game-data';
 import { create } from 'zustand';
 
 export interface WeaponInstance {
   weaponInstanceId: UUID;
-  weaponId: string;
+  weaponId: Weapon['id'];
   refinementLevel: number;
 }
 
@@ -19,7 +20,7 @@ interface WeaponCollectionState {
   addWeapon: (instance: WeaponInstance) => void;
   removeWeapon: (weaponInstanceId: WeaponInstanceId) => void;
   setRefinementLevel: (weaponInstanceId: WeaponInstanceId, level: number) => void;
-  getWeaponsByWeaponId: (weaponId: string) => WeaponInstance[];
+  getWeaponsByWeaponId: (weaponId: Weapon['id']) => WeaponInstance[];
   clearWeapons: () => void;
 }
 
