@@ -22,7 +22,7 @@
     "url": "https://github.com/dungeon-studio/genshin.dungeon.studio/issues"
   },
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "firebase emulators:start --only auth,firestore --project demo-dungeon-studio-genshin-dev & turbo run dev",
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",

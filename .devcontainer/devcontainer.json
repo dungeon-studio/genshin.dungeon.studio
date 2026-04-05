@@ -17,7 +17,12 @@
     "ghcr.io/shinepukur/devcontainer-features/vale:1": {
       "version": "3.14.1"
     },
-    "ghcr.io/devcontainers-extra/features/firebase-cli:2": {}
+    "ghcr.io/devcontainers-extra/features/firebase-cli:2": {},
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "21",
+      "installGradle": false,
+      "installMaven": false
+    }
   },
 
   "customizations": {
