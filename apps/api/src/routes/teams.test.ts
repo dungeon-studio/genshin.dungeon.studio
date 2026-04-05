@@ -510,6 +510,84 @@ describe('Team routes', () => {
 
         expect(res.status).toBe(201);
       });
+
+      it('accepts partial artifact plan with only main stats', async () => {
+        vi.mocked(saveTeam).mockResolvedValue({
+          team: FAKE_TEAM,
+          created: true,
+        });
+
+        const res = await app.request(
+          authedRequest('PUT', '/api/teams/1', {
+            members: [
+              {
+                characterId: 'hu-tao',
+                weaponInstanceId: 'uuid-1',
+                artifactPlan: {
+                  sands: 'HP Percentage',
+                  goblet: 'Pyro DMG Bonus',
+                  circlet: 'CRIT DMG',
+                },
+              },
+              { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
+              { characterId: 'zhongli', weaponInstanceId: 'uuid-3' },
+              { characterId: 'albedo', weaponInstanceId: 'uuid-4' },
+            ],
+          }),
+        );
+
+        expect(res.status).toBe(201);
+      });
+
+      it('accepts partial artifact plan with only sets', async () => {
+        vi.mocked(saveTeam).mockResolvedValue({
+          team: FAKE_TEAM,
+          created: true,
+        });
+
+        const res = await app.request(
+          authedRequest('PUT', '/api/teams/1', {
+            members: [
+              {
+                characterId: 'hu-tao',
+                weaponInstanceId: 'uuid-1',
+                artifactPlan: {
+                  sets: ['crimson-witch-of-flames'],
+                },
+              },
+              { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
+              { characterId: 'zhongli', weaponInstanceId: 'uuid-3' },
+              { characterId: 'albedo', weaponInstanceId: 'uuid-4' },
+            ],
+          }),
+        );
+
+        expect(res.status).toBe(201);
+      });
+
+      it('accepts empty artifact plan', async () => {
+        vi.mocked(saveTeam).mockResolvedValue({
+          team: FAKE_TEAM,
+          created: true,
+        });
+
+        const res = await app.request(
+          authedRequest('PUT', '/api/teams/1', {
+            members: [
+              {
+                characterId: 'hu-tao',
+                weaponInstanceId: 'uuid-1',
+                artifactPlan: {},
+              },
+              { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
+              { characterId: 'zhongli', weaponInstanceId: 'uuid-3' },
+              { characterId: 'albedo', weaponInstanceId: 'uuid-4' },
+            ],
+          }),
+        );
+
+        expect(res.status).toBe(201);
+      });
     });
   });
 

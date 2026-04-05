@@ -3,6 +3,7 @@
 
 import type { Weapon } from '@genshin/game-data';
 
+import { WeaponSummary } from '@/components/WeaponSummary';
 import { RARITY_BORDER_COLORS, RARITY_BORDER_COLORS_DIM } from '@/lib/rarityStyles';
 import { cn } from '@/lib/utils';
 
@@ -29,25 +30,7 @@ export function WeaponCard({ weapon, instanceCount, selected = false, onClick }:
       )}
       aria-label={`${weapon.name}, ${instanceCount} owned`}
     >
-      <div
-        className={cn(
-          'flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-bold text-muted-foreground',
-          !owned && 'opacity-30',
-        )}
-      >
-        {weapon.type.slice(0, 3)}
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-card-foreground">{weapon.name}</p>
-        <p className="truncate text-xs text-muted-foreground">
-          <span className="text-geo-dark" aria-hidden="true">
-            {weapon.rarity}★
-          </span>
-          <span className="sr-only">{weapon.rarity}-star</span>
-          {` · ${weapon.type}`}
-        </p>
-      </div>
+      <WeaponSummary weapon={weapon} dimmed={!owned} />
 
       {owned && (
         <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-bold tabular-nums text-muted-foreground">
