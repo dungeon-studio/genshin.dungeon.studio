@@ -21,6 +21,8 @@ const projectId = process.env.GOOGLE_CLOUD_PROJECT?.trim() || undefined;
 
 console.log(`Firebase: projectId=${projectId ?? '(not set)'}`);
 // In GCP, credentials are provided automatically.
-// Locally, the emulator block above handles configuration.
+// Locally with DEV=true, the emulator block above handles configuration.
+// Local runs against real GCP still need ADC and a real GOOGLE_CLOUD_PROJECT;
+// see docs/how-tos/configure-firestore-credentials.md.
 export const app =
   getApps().length > 0 ? getApp() : initializeApp(projectId ? { projectId } : undefined);
