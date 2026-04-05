@@ -18,6 +18,8 @@ Make sure you have these installed:
 ```bash
 node --version       # v20+ required
 pnpm --version       # v9+ required
+java -version        # Java 21+ required (Firebase emulators)
+firebase --version   # Firebase CLI
 gh --version         # GitHub CLI
 pre-commit --version # pre-commit hooks
 jq --version         # JSON processor
@@ -30,6 +32,12 @@ jq --version         # JSON processor
 ```bash
 # pnpm
 npm install -g pnpm
+
+# Java 21 (required by Firebase emulators)
+brew install openjdk@21
+
+# Firebase CLI
+npm install -g firebase-tools
 
 # GitHub CLI
 brew install gh
@@ -46,6 +54,16 @@ brew install jq
 ```bash
 # pnpm
 npm install -g pnpm
+
+# Java 21 (required by Firebase emulators)
+# Debian/Ubuntu
+sudo apt-get install openjdk-21-jre-headless
+
+# Fedora
+sudo dnf install java-21-openjdk-headless
+
+# Firebase CLI
+npm install -g firebase-tools
 
 # GitHub CLI - See https://cli.github.com/manual/installation for distro-specific instructions
 # Debian/Ubuntu (including most WSL images)
@@ -85,12 +103,9 @@ pnpm dev
 
 The frontend is available at <http://localhost:5173>. The API is available at <http://localhost:8080>.
 
-> **Note:** The API starts without Google Cloud credentials. Routes that don't
-> use Firestore (health check, schemas) work immediately. Routes that read or
-> write Firestore (profiles, teams, characters, weapons) return 500 until you
-> configure credentials. See
-> [Configure Firestore credentials](configure-firestore-credentials.md) for
-> setup instructions.
+Firebase Auth and Firestore emulators start automatically with `pnpm dev`, so
+all routes work immediately. To run against real GCP Firestore instead, see
+[Configure Firestore credentials](configure-firestore-credentials.md).
 
 ---
 
