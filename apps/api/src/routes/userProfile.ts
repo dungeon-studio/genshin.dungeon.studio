@@ -5,11 +5,13 @@ import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
 import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
-import type { ValidatedBodyVariables } from '@/middleware/validate-body.js';
-import { validateBody } from '@/middleware/validate-body.js';
+import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
+import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
+import type { ValidatedRequestBodyVariables } from '@/middleware/validate-request-body.js';
+import { validateRequestBody } from '@/middleware/validate-request-body.js';
+import { profileGetResponseV1 } from '@/profiles/json-schema/profile/get-response-v1.js';
+import { profilePatchRequestV1 } from '@/profiles/json-schema/profile/patch-request-v1.js';
 import { getProfile, updateProfile } from '@/repositories/profile/index.js';
-import { profileGetResponseV1 } from '@/schemas/profile/get-response-v1.js';
-import { profilePatchRequestV1 } from '@/schemas/profile/patch-request-v1.js';
 import { serialiseProfile, type AuthIdentity, type ProfileUpdate } from '@genshin/domain';
 import type { DecodedIdToken } from 'firebase-admin/auth';
 import { Hono } from 'hono';
@@ -20,7 +22,10 @@ function toAuthIdentity({ uid, email, email_verified, picture }: DecodedIdToken)
 }
 
 export const userProfile = new Hono<{
-  Variables: AuthVariables & NegotiatedContentVariables & ValidatedBodyVariables;
+  Variables: AuthVariables &
+    NegotiatedContentVariables &
+    NegotiatedRequestSchemaVariables &
+    ValidatedRequestBodyVariables;
 }>();
 
 userProfile.use('*', auth);
@@ -51,12 +56,17 @@ userProfile.get('/', async (c) => {
 });
 
 // PATCH /api/profile — Partial update of mutable profile fields
-userProfile.patch('/', validateBody(profilePatchRequestV1.schema), async (c) => {
-  const decoded = c.get('user');
-  const body = c.get('validatedBody') as ProfileUpdate;
-  const updated = await updateProfile(decoded.uid, body);
+userProfile.patch(
+  '/',
+  negotiateRequestSchema([profilePatchRequestV1]),
+  validateRequestBody([profilePatchRequestV1]),
+  async (c) => {
+    const decoded = c.get('user');
+    const body = c.get('validatedBody') as ProfileUpdate;
+    const updated = await updateProfile(decoded.uid, body);
 
-  return c.json(serialiseProfile(toAuthIdentity(decoded), updated), 200, {
-    'Content-Type': c.get('negotiatedMediaType'),
-  });
-});
+    return c.json(serialiseProfile(toAuthIdentity(decoded), updated), 200, {
+      'Content-Type': c.get('negotiatedMediaType'),
+    });
+  },
+);

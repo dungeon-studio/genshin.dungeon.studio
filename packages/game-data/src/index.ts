@@ -10,10 +10,10 @@
 
 // Elements
 export {
-  ELEMENTS,
   ELEMENT_REACTION_TYPES,
-  REACTION_TYPES,
+  ELEMENTS,
   getReactionsByVersion,
+  REACTION_TYPES,
   type Element,
   type ReactionType,
 } from './elements.js';
@@ -34,13 +34,13 @@ export {
 
 // Weapons
 export {
-  WEAPONS,
-  WEAPON_STAT_TYPES,
-  WEAPON_TYPES,
   getWeaponById,
   getWeaponsByRarity,
   getWeaponsByType,
   getWeaponsByVersion,
+  WEAPON_STAT_TYPES,
+  WEAPON_TYPES,
+  WEAPONS,
   type Weapon,
   type WeaponStatType,
   type WeaponType,
@@ -48,12 +48,21 @@ export {
 
 // Artifacts
 export {
+  ARTIFACT_MINOR_AFFIXES,
   ARTIFACT_PIECES,
   ARTIFACT_SETS,
+  CIRCLET_MAIN_AFFIXES,
   getArtifactSetById,
   getArtifactSetsByVersion,
+  GOBLET_MAIN_AFFIXES,
+  SANDS_MAIN_AFFIXES,
+  type ArtifactMainAffix,
+  type ArtifactMinorAffix,
   type ArtifactPiece,
   type ArtifactSet,
+  type CircletMainAffix,
+  type GobletMainAffix,
+  type SandsMainAffix,
 } from './artifacts.js';
 
 // Versions

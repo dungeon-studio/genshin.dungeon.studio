@@ -1,17 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { ProfileLink } from '@/middleware/profile-link.js';
 import type { MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import Negotiator from 'negotiator';
 
-/**
- * Anything with a serving path that can be used as an RFC 6906 profile link.
- * Satisfied by `JsonSchemaProfile` and any future profile-like types.
- */
-export interface ProfileLink {
-  readonly path: string;
-}
+export type { ProfileLink } from '@/middleware/profile-link.js';
 
 /**
  * A representation the endpoint can produce.

@@ -1,0 +1,24 @@
+// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+// SPDX-License-Identifier: MIT
+
+import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
+
+export const weaponPatchRequestV1 = {
+  path: '/profiles/json-schema/weapons/patch-request-v1.json',
+  schema: {
+    $schema: 'https://json-schema.org/draft/2020-12/schema',
+    title: 'Update Weapon Instance Request',
+    description: "Request body for updating an existing weapon instance in the user's collection",
+    type: 'object',
+    properties: {
+      refinementLevel: {
+        type: 'integer',
+        minimum: 1,
+        maximum: 5,
+        description: 'Refinement rank of the weapon instance',
+      },
+    },
+    required: ['refinementLevel'],
+    additionalProperties: false,
+  },
+} as const satisfies JsonSchemaProfile;

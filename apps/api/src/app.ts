@@ -4,10 +4,10 @@
 import type { AuthVariables } from '@/middleware/auth.js';
 import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
 import { firestoreErrorToHttpException } from '@/repositories/firestore-error.js';
+import { alpsProfiles } from '@/routes/alps-profiles.js';
 import { characters } from '@/routes/characters.js';
-import { profiles } from '@/routes/profiles.js';
+import { jsonSchemaProfiles } from '@/routes/json-schema-profiles.js';
 import { root } from '@/routes/root.js';
-import { schemas } from '@/routes/schemas.js';
 import { teams } from '@/routes/teams.js';
 import { userProfile } from '@/routes/userProfile.js';
 import { weapons } from '@/routes/weapons.js';
@@ -94,8 +94,8 @@ app.get('/health', (c) =>
 );
 
 // Routes
-app.route('/schemas', schemas);
-app.route('/profiles', profiles);
+app.route('/profiles/json-schema', jsonSchemaProfiles);
+app.route('/profiles/alps', alpsProfiles);
 app.route('/api/characters', characters);
 app.route('/api/profile', userProfile);
 app.route('/api/teams', teams);

@@ -3,7 +3,7 @@
 
 import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
-import { rootGetResponseV1 } from '@/schemas/root/get-response-v1.js';
+import { rootGetResponseV1 } from '@/profiles/json-schema/root/get-response-v1.js';
 import type { Env, Hono as HonoApp } from 'hono';
 import { Hono } from 'hono';
 import { findTargetHandler, isMiddleware } from 'hono/utils/handler';
@@ -13,8 +13,9 @@ import { findTargetHandler, isMiddleware } from 'hono/utils/handler';
  * Returns GET-accessible paths that have a discrete handler (e.g.
  * `/api/characters`, `/health`).
  *
- * Excludes the root path itself, wildcard catch-all routes (like `/schemas/*`
- * and `/profiles/*`), and sub-resource paths that contain route parameters.
+ * Excludes the root path itself, wildcard catch-all routes (like
+ * `/profiles/json-schema/*` and `/profiles/alps/*`), and sub-resource
+ * paths that contain route parameters.
  */
 function discoverLinks<E extends Env>(app: HonoApp<E>): Record<string, { href: string }> {
   const seen = new Set<string>();

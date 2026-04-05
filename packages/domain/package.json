@@ -22,7 +22,8 @@
   },
   "dependencies": {
     "@genshin/collection-json": "workspace:*",
-    "@genshin/game-data": "workspace:*"
+    "@genshin/game-data": "workspace:*",
+    "@genshin/validation": "workspace:*"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

@@ -1,0 +1,29 @@
+{
+  "name": "@genshin/validation",
+  "version": "0.0.0",
+  "description": "Reusable validation helpers for accumulating ValidationIssue[] results",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.1.0",
+    "typescript": "6.0.2",
+    "typescript-eslint": "8.58.0"
+  }
+}

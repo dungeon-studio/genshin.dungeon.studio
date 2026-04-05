@@ -11,7 +11,7 @@ const ORIGIN = 'http://localhost';
 
 const jsonWithProfileLink: SupportedRepresentation = {
   mediaType: 'application/json',
-  profile: { path: '/schemas/profile/get/1.0.0.json' },
+  profile: { path: '/profiles/json-schema/profile/get/1.0.0.json' },
 };
 
 const plainJson: SupportedRepresentation = {
@@ -25,20 +25,20 @@ describe('toMediaTypeString', () => {
 
   it('appends profile parameter with absolute URI', () => {
     expect(toMediaTypeString(jsonWithProfileLink, ORIGIN)).toBe(
-      'application/json; profile="http://localhost/schemas/profile/get/1.0.0.json"',
+      'application/json; profile="http://localhost/profiles/json-schema/profile/get/1.0.0.json"',
     );
   });
 
   it('uses the provided origin in the profile URI', () => {
     expect(toMediaTypeString(jsonWithProfileLink, 'https://api.example.com')).toBe(
-      'application/json; profile="https://api.example.com/schemas/profile/get/1.0.0.json"',
+      'application/json; profile="https://api.example.com/profiles/json-schema/profile/get/1.0.0.json"',
     );
   });
 });
 
 describe('negotiateContent middleware', () => {
   const supported: SupportedRepresentation[] = [
-    { mediaType: 'application/json', profile: { path: '/schemas/test/1.0.0.json' } },
+    { mediaType: 'application/json', profile: { path: '/profiles/json-schema/test/1.0.0.json' } },
   ];
 
   function createApp() {
@@ -55,7 +55,7 @@ describe('negotiateContent middleware', () => {
 
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toBe(
-      'application/json; profile="http://localhost/schemas/test/1.0.0.json"',
+      'application/json; profile="http://localhost/profiles/json-schema/test/1.0.0.json"',
     );
   });
 
@@ -64,7 +64,7 @@ describe('negotiateContent middleware', () => {
 
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toBe(
-      'application/json; profile="http://localhost/schemas/test/1.0.0.json"',
+      'application/json; profile="http://localhost/profiles/json-schema/test/1.0.0.json"',
     );
   });
 

@@ -22,6 +22,8 @@ vi.mock('@genshin/game-data', () => ({
 
 import { app } from '@/app.js';
 import { verifyToken } from '@/lib/firebase/auth.js';
+import { toMediaTypeString } from '@/middleware/negotiate-content.js';
+import { weaponItemV1 } from '@/profiles/alps/weapon/item-v1.js';
 import {
   createWeapon,
   deleteWeapon,
@@ -50,7 +52,10 @@ const FAKE_WEAPON_ITEM_DATA = [
   { name: 'updatedAt', value: '2026-03-13T00:00:00.000Z' },
 ];
 
-const EXPECTED_CONTENT_TYPE = `${COLLECTION_JSON}; profile="http://localhost/profiles/weapons/1.0.0.json"`;
+const EXPECTED_CONTENT_TYPE = toMediaTypeString(
+  { mediaType: COLLECTION_JSON, profile: weaponItemV1 },
+  'http://localhost',
+);
 
 describe('Weapon routes', () => {
   beforeEach(() => {
@@ -90,6 +95,10 @@ describe('Weapon routes', () => {
           expect.objectContaining({ name: 'refinementLevel', value: 1 }),
         ]),
       );
+    });
+
+    it('sets collection.href without query string', () => {
+      expect(body.collection.href).toBe('http://localhost/api/weapons');
     });
 
     it('returns empty items when no weapons exist', async () => {
@@ -144,6 +153,12 @@ describe('Weapon routes', () => {
           expect.objectContaining({ name: 'weaponId', value: 'mistsplitter-reforged' }),
           expect.objectContaining({ name: 'refinementLevel', value: 1 }),
         ]),
+      );
+    });
+
+    it('sets collection.href with query string', () => {
+      expect(body.collection.href).toBe(
+        'http://localhost/api/weapons?weaponId=mistsplitter-reforged',
       );
     });
 

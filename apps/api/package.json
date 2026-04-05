@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/main.ts",
-    "build": "tsc --project tsconfig.build.json && tsc-alias --project tsconfig.build.json && cp -r src/schemas src/profiles dist/",
+    "dev": "DEV=true tsx watch src/main.ts",
+    "build": "tsc --project tsconfig.build.json && tsc-alias --project tsconfig.build.json && cp -r src/profiles dist/",
     "start": "node dist/main.js",
     "lint": "eslint .",
     "test": "vitest run",
@@ -17,17 +17,17 @@
     "@genshin/game-data": "workspace:*",
     "@hono/node-server": "1.19.12",
     "ajv": "8.18.0",
+    "content-type": "1.0.5",
     "firebase-admin": "13.7.0",
     "google-gax": "5.0.6",
     "hono": "4.12.10",
-    "negotiator": "1.0.0",
-    "semver": "7.7.4"
+    "negotiator": "1.0.0"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@types/content-type": "1.1.9",
     "@types/negotiator": "0.6.4",
     "@types/node": "25.5.2",
-    "@types/semver": "7.7.1",
     "@vitest/coverage-v8": "4.1.2",
     "eslint": "10.1.0",
     "globals": "17.4.0",

@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+export { issue, isValid, prefixPaths, type ValidationIssue } from '@genshin/validation';
+export { validateArtifactPlan } from './artifactPlanValidation.js';
 export type { AuthIdentity } from './authIdentity.js';
 export {
   assertCollectionCharacter,
@@ -52,6 +54,7 @@ export {
   type ProfileResponse,
 } from './representations/json/profile.js';
 export type { Team, TeamSlot } from './team.js';
-export type { ArtifactPlan, TeamMember } from './teamMember.js';
+export { type ArtifactPlan, type TeamMember } from './teamMember.js';
+export { validateTeam, validateTeamSlot, type TeamValidationContext } from './teamValidation.js';
 export { type ProfileUpdate, type UserProfile } from './userProfile.js';
 export type { UUID } from './uuid.js';

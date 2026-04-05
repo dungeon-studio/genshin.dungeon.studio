@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { getApp, getApps, initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { connectAuthEmulator, getAuth } from 'firebase/auth';
 
 const requiredEnvVars = [
   'VITE_FIREBASE_API_KEY',
@@ -28,6 +28,24 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
+// Safety: In dev mode, force the project ID to match the local Firebase
+// Emulators (started at the repository root with --project demo-dungeon-studio-genshin-dev).
+// This mirrors the API's forced project ID in apps/api/src/lib/firebase/app.ts.
+// Dead-code-eliminated during production builds.
+if (import.meta.env.DEV) {
+  firebaseConfig.projectId = 'demo-dungeon-studio-genshin-dev';
+}
+
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
+
+// Safety: `import.meta.env.DEV` is a compile-time constant that is `true` only when running
+// the local Vite dev server. During `vite build` (used for all deployed environments), it is
+// replaced with `false` and this entire block is removed from the bundle — the emulator code
+// cannot ship to any deployed environment regardless of environment variables.
+//
+// The emulator URL is hardcoded to match the port in firebase.json at the repository root.
+if (import.meta.env.DEV) {
+  connectAuthEmulator(auth, 'http://localhost:9099');
+}
