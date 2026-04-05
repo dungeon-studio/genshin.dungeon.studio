@@ -49,22 +49,44 @@ export function WeaponInstanceSidebar({
         className="flex w-full flex-col overflow-y-auto sm:w-1/2 sm:max-w-none"
       >
         <SheetHeader>
-          <SheetTitle asChild>
-            <h2>{weapon?.name ?? 'Weapon'}</h2>
-          </SheetTitle>
-          <SheetDescription asChild>
-            <p>
+          <div className="flex items-start justify-between gap-3 pr-6">
+            <div className="flex items-start gap-3">
               {weapon && (
-                <>
-                  <span className="text-geo-dark" aria-hidden="true">
-                    {weapon.rarity}★
-                  </span>
-                  <span className="sr-only">{weapon.rarity}-star</span>
-                  {` · ${weapon.type}`}
-                </>
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-bold text-muted-foreground">
+                  {weapon.type.slice(0, 3)}
+                </div>
               )}
-            </p>
-          </SheetDescription>
+              <div>
+                <SheetTitle asChild>
+                  <h2>{weapon?.name ?? 'Weapon'}</h2>
+                </SheetTitle>
+                <SheetDescription asChild>
+                  <p>
+                    {weapon && (
+                      <>
+                        <span className="text-geo-dark" aria-hidden="true">
+                          {weapon.rarity}★
+                        </span>
+                        <span className="sr-only">{weapon.rarity}-star</span>
+                        {` · ${weapon.type}`}
+                      </>
+                    )}
+                  </p>
+                </SheetDescription>
+              </div>
+            </div>
+            {weaponId && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="shrink-0"
+                onClick={() => onAdd(weaponId)}
+                aria-label="Add instance"
+              >
+                <Plus className="h-5 w-5" aria-hidden="true" focusable={false} />
+              </Button>
+            )}
+          </div>
         </SheetHeader>
 
         <div className="flex-1 space-y-3">
@@ -74,52 +96,58 @@ export function WeaponInstanceSidebar({
             </p>
           )}
 
-          {instances.map((instance, index) => (
-            <div
-              key={instance.weaponInstanceId}
-              className="flex items-center gap-3 rounded-lg border border-border bg-card p-3"
-            >
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-card-foreground">Instance {index + 1}</p>
-              </div>
-
-              <div className="flex items-center gap-1">
-                {REFINEMENT_LEVELS.map((level) => (
-                  <button
-                    key={level}
-                    type="button"
-                    onClick={() => onRefinementChange(instance.weaponInstanceId, level)}
-                    className={cn(
-                      'h-7 w-7 rounded text-xs font-bold tabular-nums transition-colors',
-                      level === instance.refinementLevel
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted text-muted-foreground hover:bg-muted/80',
-                    )}
-                    aria-label={`Set refinement level ${level}`}
-                    aria-pressed={level === instance.refinementLevel}
-                  >
-                    {level}
-                  </button>
-                ))}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => onRemove(instance.weaponInstanceId)}
-                className="shrink-0 rounded-md p-1 text-destructive transition-opacity hover:bg-destructive hover:text-destructive-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
-                aria-label={`Remove instance ${index + 1}`}
+          {[...instances]
+            .sort((a, b) => b.refinementLevel - a.refinementLevel)
+            .map((instance, index) => (
+              <div
+                key={instance.weaponInstanceId}
+                className="flex items-center gap-3 rounded-lg border border-border bg-card p-3"
               >
-                <Trash2 className="h-4 w-4" aria-hidden="true" focusable={false} />
-              </button>
-            </div>
-          ))}
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold tabular-nums text-card-foreground">
+                    R{instance.refinementLevel}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  {REFINEMENT_LEVELS.map((level) => (
+                    <button
+                      key={level}
+                      type="button"
+                      onClick={() => onRefinementChange(instance.weaponInstanceId, level)}
+                      className={cn(
+                        'h-7 w-7 rounded text-xs font-bold tabular-nums transition-colors',
+                        level === instance.refinementLevel
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-muted-foreground hover:bg-muted/80',
+                      )}
+                      aria-label={`Set refinement level ${level}`}
+                      aria-pressed={level === instance.refinementLevel}
+                    >
+                      {level}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => onRemove(instance.weaponInstanceId)}
+                  className="shrink-0 rounded-md p-1 text-destructive transition-opacity hover:bg-destructive hover:text-destructive-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
+                  aria-label={`Remove instance ${index + 1}`}
+                >
+                  <Trash2 className="h-4 w-4" aria-hidden="true" focusable={false} />
+                </button>
+              </div>
+            ))}
         </div>
 
         {weaponId && (
-          <Button variant="outline" className="mt-3 w-full" onClick={() => onAdd(weaponId)}>
-            <Plus className="mr-2 h-4 w-4" aria-hidden="true" focusable={false} />
-            Add another
-          </Button>
+          <div className="sticky bottom-0 border-t border-border bg-background pt-3 sm:hidden">
+            <Button variant="outline" className="w-full" onClick={() => onAdd(weaponId)}>
+              <Plus className="mr-2 h-4 w-4" aria-hidden="true" focusable={false} />
+              Add instance
+            </Button>
+          </div>
         )}
       </SheetContent>
     </Sheet>
