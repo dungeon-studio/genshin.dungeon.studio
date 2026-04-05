@@ -16,7 +16,7 @@ import {
   type SandsMainAffix,
 } from '@genshin/game-data';
 import { GripVertical, Minus, Shield } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -171,41 +171,61 @@ function ArtifactSetSearch({
   onChange: (id: string) => void;
   onClear?: () => void;
 }) {
-  const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const selectedSet = value ? ARTIFACT_SETS.find((s) => s.id === value) : undefined;
-  const filtered = ARTIFACT_SETS.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()));
-
-  const handleSelect = (setId: string) => {
-    onChange(setId);
-    setQuery('');
-    setOpen(false);
-  };
-
-  const handleFocus = () => {
-    setOpen(true);
-  };
-
-  const handleBlur = () => {
-    // Delay to allow click on option
-    setTimeout(() => setOpen(false), 150);
-  };
 
   return (
-    <div className="relative flex gap-1">
-      <input
-        ref={inputRef}
-        type="text"
-        value={open ? query : (selectedSet?.name ?? '')}
-        placeholder={label}
-        onChange={(e) => setQuery(e.target.value)}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        className="min-w-0 flex-1 rounded-md border border-border bg-background px-2 py-1.5 text-xs text-foreground transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        aria-label={label}
-      />
+    <div className="flex gap-1">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            role="combobox"
+            aria-expanded={open}
+            aria-label={label}
+            className={cn(
+              'flex min-w-0 flex-1 items-center justify-between rounded-md border border-border bg-background px-2 py-1.5 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              selectedSet ? 'text-foreground' : 'text-muted-foreground',
+            )}
+          >
+            <span className="truncate">{selectedSet?.name ?? label}</span>
+            <ChevronsUpDown
+              className="ml-1 h-3 w-3 shrink-0 opacity-50"
+              aria-hidden="true"
+              focusable={false}
+            />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+          <Command>
+            <CommandInput placeholder="Search artifact set..." className="h-8 text-xs" />
+            <CommandList>
+              <CommandEmpty className="py-3 text-xs">No sets found.</CommandEmpty>
+              <CommandGroup>
+                {ARTIFACT_SETS.map((set) => (
+                  <CommandItem
+                    key={set.id}
+                    value={set.name}
+                    onSelect={() => {
+                      onChange(set.id);
+                      setOpen(false);
+                    }}
+                    className="text-xs"
+                  >
+                    <Check
+                      className={cn('mr-1 h-3 w-3', set.id === value ? 'opacity-100' : 'opacity-0')}
+                      aria-hidden="true"
+                      focusable={false}
+                    />
+                    {set.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
       {onClear && (
         <button
           type="button"
@@ -215,25 +235,6 @@ function ArtifactSetSearch({
         >
           <Minus className="h-3 w-3" aria-hidden="true" focusable={false} />
         </button>
-      )}
-      {open && filtered.length > 0 && (
-        <ul className="absolute z-10 mt-1 max-h-40 w-full overflow-auto rounded-md border border-border bg-popover shadow-md">
-          {filtered.map((set) => (
-            <li key={set.id}>
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => handleSelect(set.id)}
-                className={cn(
-                  'w-full px-2 py-1.5 text-left text-xs transition-colors hover:bg-accent hover:text-accent-foreground',
-                  set.id === value && 'bg-accent/50 font-medium',
-                )}
-              >
-                {set.name}
-              </button>
-            </li>
-          ))}
-        </ul>
       )}
     </div>
   );
