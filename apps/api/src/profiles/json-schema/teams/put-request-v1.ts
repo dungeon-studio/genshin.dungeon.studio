@@ -87,7 +87,6 @@ export const teamPutRequestV1 = {
             description: '0-3 secondary minor affixes (disjoint from priorityMinorAffixes)',
           },
         },
-        required: [] as string[],
         additionalProperties: false,
       },
     },
