@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { Character, Element, Rarity } from '@genshin/game-data';
+import type { Character } from '@genshin/game-data';
 import { CHARACTERS } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -11,19 +11,9 @@ import type { CharacterFilterState } from '@/features/collection/characters/Char
 import {
   CharacterFilters,
   filterCharacters,
+  initialFilterState,
 } from '@/features/collection/characters/CharacterFilters';
 import { useCollection } from '@/features/collection/characters/useCharacterCollection';
-
-function initialFilterState(): CharacterFilterState {
-  return {
-    search: '',
-    elements: new Set<Element>(),
-    rarities: new Set<Rarity>(),
-    ownership: 'all',
-    sortField: 'release',
-    sortDirection: 'desc',
-  };
-}
 
 export function CharactersPage() {
   const {
