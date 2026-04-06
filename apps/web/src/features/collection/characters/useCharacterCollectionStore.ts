@@ -1,30 +1,34 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionCharacter } from '@genshin/domain';
+import type { CollectionCharacter, ISOTimestamp } from '@genshin/domain';
 import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export interface CollectionEntry {
-  constellationLevel: number;
-}
-
 export type CharacterId = CollectionCharacter['characterId'];
+
+function nowTimestamp(): ISOTimestamp {
+  return new Date().toISOString() as ISOTimestamp;
+}
 
 // Additive merge: union of both sets, keep higher constellation level on conflicts.
 export function mergeCollections(
-  local: Record<CharacterId, CollectionEntry>,
-  server: Record<CharacterId, CollectionEntry>,
-): Record<CharacterId, CollectionEntry> {
-  const merged: Record<CharacterId, CollectionEntry> = { ...server };
+  local: Record<CharacterId, CollectionCharacter>,
+  server: Record<CharacterId, CollectionCharacter>,
+): Record<CharacterId, CollectionCharacter> {
+  const merged: Record<CharacterId, CollectionCharacter> = { ...server };
 
   for (const [id, localEntry] of Object.entries(local)) {
     const serverEntry = merged[id];
     if (!serverEntry) {
       merged[id] = localEntry;
     } else if (localEntry.constellationLevel > serverEntry.constellationLevel) {
-      merged[id] = { constellationLevel: localEntry.constellationLevel };
+      merged[id] = {
+        ...serverEntry,
+        constellationLevel: localEntry.constellationLevel,
+        updatedAt: nowTimestamp(),
+      };
     }
   }
 
@@ -32,13 +36,13 @@ export function mergeCollections(
 }
 
 interface CollectionState {
-  characters: Record<CharacterId, CollectionEntry>;
+  characters: Record<CharacterId, CollectionCharacter>;
   addCharacter: (characterId: CharacterId) => void;
   removeCharacter: (characterId: CharacterId) => void;
   setConstellationLevel: (characterId: CharacterId, level: number) => void;
   isOwned: (characterId: CharacterId) => boolean;
-  getCharacter: (characterId: CharacterId) => CollectionEntry | undefined;
-  replaceCharacters: (characters: Record<CharacterId, CollectionEntry>) => void;
+  getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
+  replaceCharacters: (characters: Record<CharacterId, CollectionCharacter>) => void;
   clearCharacters: () => void;
 }
 
@@ -50,11 +54,15 @@ export const useCollectionStore = create<CollectionState>()(
       addCharacter: (characterId) => {
         if (get().characters[characterId]) return;
 
+        const now = nowTimestamp();
         set((state) => ({
           characters: {
             ...state.characters,
             [characterId]: {
+              characterId,
               constellationLevel: MIN_CONSTELLATION_LEVEL,
+              createdAt: now,
+              updatedAt: now,
             },
           },
         }));
@@ -77,7 +85,7 @@ export const useCollectionStore = create<CollectionState>()(
         set((state) => ({
           characters: {
             ...state.characters,
-            [characterId]: { ...entry, constellationLevel: level },
+            [characterId]: { ...entry, constellationLevel: level, updatedAt: nowTimestamp() },
           },
         }));
       },

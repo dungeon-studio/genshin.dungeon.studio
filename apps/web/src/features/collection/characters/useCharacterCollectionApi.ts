@@ -2,18 +2,19 @@
 // SPDX-License-Identifier: MIT
 
 import { assertCollectionDocument } from '@genshin/collection-json';
+import type { CollectionCharacter } from '@genshin/domain';
 import { deserialiseCharacter, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPut } from '@/lib/api';
 
-import type { CharacterId, CollectionEntry } from './useCharacterCollectionStore';
+import type { CharacterId } from './useCharacterCollectionStore';
 
-type CharacterRecord = Record<CharacterId, CollectionEntry>;
+type CharacterRecord = Record<CharacterId, CollectionCharacter>;
 
 export interface MutationResult {
   characterId: CharacterId;
-  entry: CollectionEntry;
+  entry: CollectionCharacter;
 }
 
 export function collectionKey(userId: string): readonly [string, string] {
@@ -26,7 +27,7 @@ export function parseCollectionResponse(response: unknown): CharacterRecord {
 
   for (const item of response.collection.items) {
     const character = deserialiseCharacter(item);
-    record[character.characterId] = { constellationLevel: character.constellationLevel };
+    record[character.characterId] = character;
   }
 
   return record;
@@ -42,7 +43,7 @@ function parseSingleCharacterResponse(response: unknown): MutationResult {
   const character = deserialiseCharacter(response.collection.items[0]);
   return {
     characterId: character.characterId,
-    entry: { constellationLevel: character.constellationLevel },
+    entry: character,
   };
 }
 

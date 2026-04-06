@@ -39,9 +39,9 @@ export function TeamCharacterPlanner({
   return (
     <Card className={cn('border-l-4 transition-colors', borderClass)}>
       {/* Row 1: Character */}
-      <CardHeader className="pb-3">
+      <CardHeader className="p-3 pb-1.5">
         {character ? (
-          <div className="flex items-center gap-3 rounded-md bg-muted/50 px-2 py-1.5">
+          <div className="flex items-center gap-2">
             <CharacterSummary character={character} />
 
             {collectionCharacter && (
@@ -54,16 +54,16 @@ export function TeamCharacterPlanner({
             )}
           </div>
         ) : (
-          <div className="flex items-center gap-3 rounded-md border border-dashed border-border px-2 py-1.5">
+          <div className="flex items-center gap-2">
             <CharacterSummary />
           </div>
         )}
       </CardHeader>
 
-      <CardContent className="space-y-4 pt-0">
+      <CardContent className="space-y-1.5 p-3 pt-0">
         {/* Row 2: Weapon instance */}
         {weapon && collectionWeapon ? (
-          <div className="flex items-center gap-3 rounded-md bg-muted/50 px-2 py-1.5">
+          <div className="flex items-center gap-2">
             <WeaponSummary weapon={weapon} />
             <span
               className="shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-muted-foreground"
@@ -73,7 +73,7 @@ export function TeamCharacterPlanner({
             </span>
           </div>
         ) : (
-          <div className="flex items-center gap-3 rounded-md border border-dashed border-border px-2 py-1.5">
+          <div className="flex items-center gap-2">
             <WeaponSummary />
           </div>
         )}

@@ -31,6 +31,7 @@ interface CharacterFiltersProps {
   totalCount: number;
   ownedCount: number;
   filteredOwnedCount: number;
+  showOwnership?: boolean;
 }
 
 const ELEMENT_VALUES = Object.values(ELEMENTS);
@@ -40,6 +41,17 @@ const SORT_LABELS: Record<SortField, string> = {
   release: 'Release',
   name: 'Name',
 };
+
+export function initialFilterState(): CharacterFilterState {
+  return {
+    search: '',
+    elements: new Set<Element>(),
+    rarities: new Set<Rarity>(),
+    ownership: 'all',
+    sortField: 'release',
+    sortDirection: 'desc',
+  };
+}
 
 export function filterCharacters(
   characters: readonly Character[],
@@ -83,6 +95,7 @@ export function CharacterFilters({
   totalCount,
   ownedCount,
   filteredOwnedCount,
+  showOwnership = true,
 }: CharacterFiltersProps) {
   function toggleElement(element: Element) {
     const next = new Set(filters.elements);
@@ -123,26 +136,29 @@ export function CharacterFilters({
       {/* Row 1: Filters */}
       <div className="flex flex-wrap items-center gap-1.5">
         {/* Ownership filters */}
-        {(['all', 'owned', 'unowned'] as const).map((value) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => onChange({ ...filters, ownership: value })}
-            className={cn(
-              'rounded-full px-2.5 py-1 text-xs font-medium capitalize transition-colors',
-              filters.ownership === value
-                ? 'bg-foreground text-background'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80',
-            )}
-            aria-pressed={filters.ownership === value}
-          >
-            {value}
-          </button>
-        ))}
+        {showOwnership &&
+          (['all', 'owned', 'unowned'] as const).map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => onChange({ ...filters, ownership: value })}
+              className={cn(
+                'rounded-full px-2.5 py-1 text-xs font-medium capitalize transition-colors',
+                filters.ownership === value
+                  ? 'bg-foreground text-background'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80',
+              )}
+              aria-pressed={filters.ownership === value}
+            >
+              {value}
+            </button>
+          ))}
 
-        <span className="self-center text-border" aria-hidden="true">
-          |
-        </span>
+        {showOwnership && (
+          <span className="self-center text-border" aria-hidden="true">
+            |
+          </span>
+        )}
 
         {/* Rarity filters */}
         {RARITY_VALUES.map((rarity) => (
@@ -214,7 +230,9 @@ export function CharacterFilters({
         <div className="flex-1" />
 
         <p className="text-sm text-muted-foreground">
-          {filteredCount === totalCount ? (
+          {!showOwnership ? (
+            <>{filteredCount} characters</>
+          ) : filteredCount === totalCount ? (
             <>
               {ownedCount} / {totalCount} owned
             </>
