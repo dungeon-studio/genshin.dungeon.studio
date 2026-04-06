@@ -88,9 +88,7 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
         [slot]: {
           ...state.teams[slot],
           members: state.teams[slot].members.map((m, i) =>
-            i === memberIndex && m
-              ? { characterId: m.characterId, artifactPlan: m.artifactPlan }
-              : m,
+            i === memberIndex && m ? { ...m, weaponInstanceId: undefined } : m,
           ) as Team['members'],
         },
       },

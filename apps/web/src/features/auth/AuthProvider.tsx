@@ -20,7 +20,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return unsubscribe;
-  }, []);
+  }, [auth]);
 
   return <AuthContext value={{ user, loading }}>{children}</AuthContext>;
 }
