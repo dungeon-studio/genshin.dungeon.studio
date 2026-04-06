@@ -17,7 +17,7 @@ import { ELEMENT_BORDER_COLORS } from '@/lib/elementStyles';
 import { cn } from '@/lib/utils';
 
 interface TeamCharacterPlannerProps {
-  member: TeamMember;
+  member?: TeamMember;
   collectionCharacter?: CollectionCharacter;
   collectionWeapon?: CollectionWeapon;
   onArtifactPlanChange?: (plan: ArtifactPlan | undefined) => void;
@@ -29,7 +29,7 @@ export function TeamCharacterPlanner({
   collectionWeapon,
   onArtifactPlanChange,
 }: TeamCharacterPlannerProps) {
-  const character = getCharacterById(member.characterId);
+  const character = member ? getCharacterById(member.characterId) : undefined;
   const weapon = collectionWeapon ? getWeaponById(collectionWeapon.weaponId) : undefined;
 
   const borderClass = character
@@ -40,18 +40,24 @@ export function TeamCharacterPlanner({
     <Card className={cn('border-l-4 transition-colors', borderClass)}>
       {/* Row 1: Character */}
       <CardHeader className="pb-3">
-        <div className="flex items-center gap-3">
-          <CharacterSummary character={character} />
+        {character ? (
+          <div className="flex items-center gap-3 rounded-md bg-muted/50 px-2 py-1.5">
+            <CharacterSummary character={character} />
 
-          {character && collectionCharacter && (
-            <span
-              className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-bold tabular-nums text-muted-foreground"
-              aria-label={`Constellation level ${collectionCharacter.constellationLevel}`}
-            >
-              C{collectionCharacter.constellationLevel}
-            </span>
-          )}
-        </div>
+            {collectionCharacter && (
+              <span
+                className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-bold tabular-nums text-muted-foreground"
+                aria-label={`Constellation level ${collectionCharacter.constellationLevel}`}
+              >
+                C{collectionCharacter.constellationLevel}
+              </span>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 rounded-md border border-dashed border-border px-2 py-1.5">
+            <CharacterSummary />
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className="space-y-4 pt-0">
@@ -73,7 +79,7 @@ export function TeamCharacterPlanner({
         )}
 
         {/* Row 3: Artifact plan (only when character is assigned) */}
-        {character && (
+        {character && member && (
           <ArtifactPlanner plan={member.artifactPlan} onChange={onArtifactPlanChange} />
         )}
       </CardContent>
