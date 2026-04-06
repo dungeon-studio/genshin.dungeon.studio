@@ -108,27 +108,6 @@ export const useCollectionStore = create<CollectionState>()(
     }),
     {
       name: 'genshin-collection',
-      version: 1,
-      migrate: (persisted, version) => {
-        if (version === 0) {
-          const state = persisted as { characters: Record<string, Record<string, unknown>> };
-          const now = nowTimestamp();
-          const migrated: Record<CharacterId, CollectionCharacter> = {};
-
-          for (const [id, entry] of Object.entries(state.characters)) {
-            migrated[id] = {
-              characterId: (entry.characterId as string) ?? id,
-              constellationLevel: (entry.constellationLevel as number) ?? MIN_CONSTELLATION_LEVEL,
-              createdAt: (entry.createdAt as ISOTimestamp) ?? now,
-              updatedAt: (entry.updatedAt as ISOTimestamp) ?? now,
-            };
-          }
-
-          return { ...state, characters: migrated };
-        }
-
-        return persisted as CollectionState;
-      },
     },
   ),
 );
