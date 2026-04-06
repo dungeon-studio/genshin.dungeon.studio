@@ -1,13 +1,18 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { TeamPlanner } from '@/features/teams/TeamPlanner';
+
+const TEAM_NAMES = ['Team 1', 'Team 2', 'Team 3', 'Team 4'];
+
 export function TeamsPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">
-      <h1 className="text-3xl font-bold text-foreground">Team Builder</h1>
-      <p className="mt-4 text-muted-foreground">Create and save your team compositions.</p>
-      <div className="mt-8 rounded-lg border border-border bg-muted p-8 text-center">
-        <p className="text-muted-foreground">Coming soon...</p>
+      <h1 className="sr-only">Teams</h1>
+      <div className="space-y-8">
+        {TEAM_NAMES.map((name) => (
+          <TeamPlanner key={name} name={name} members={[]} />
+        ))}
       </div>
     </div>
   );
