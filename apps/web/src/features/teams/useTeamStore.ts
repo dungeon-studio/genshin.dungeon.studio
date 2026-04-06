@@ -15,12 +15,12 @@ function createEmptyTeam(slot: TeamSlot): TeamState {
 }
 
 function initialTeams(): Record<TeamSlot, TeamState> {
-  return {
-    1: createEmptyTeam(1),
-    2: createEmptyTeam(2),
-    3: createEmptyTeam(3),
-    4: createEmptyTeam(4),
-  };
+  return Object.fromEntries(
+    Array.from({ length: MAX_TEAM_SLOT - MIN_TEAM_SLOT + 1 }, (_, i) => {
+      const slot = (MIN_TEAM_SLOT + i) as TeamSlot;
+      return [slot, createEmptyTeam(slot)];
+    }),
+  ) as Record<TeamSlot, TeamState>;
 }
 
 interface TeamStoreState {

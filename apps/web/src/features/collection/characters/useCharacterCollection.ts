@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
+import type { CollectionCharacter } from '@genshin/domain';
 import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 
 import { useAuth } from '@/features/auth/useAuth';
@@ -15,16 +16,16 @@ import {
   useRemoveCharacterMutation,
   useSetConstellationLevelMutation,
 } from './useCharacterCollectionApi';
-import type { CharacterId, CollectionEntry } from './useCharacterCollectionStore';
+import type { CharacterId } from './useCharacterCollectionStore';
 import { mergeCollections, useCollectionStore } from './useCharacterCollectionStore';
 
 export interface UseCollectionResult {
-  characters: Record<CharacterId, CollectionEntry>;
+  characters: Record<CharacterId, CollectionCharacter>;
   addCharacter: (characterId: CharacterId) => void;
   removeCharacter: (characterId: CharacterId) => void;
   setConstellationLevel: (characterId: CharacterId, level: number) => void;
   isOwned: (characterId: CharacterId) => boolean;
-  getCharacter: (characterId: CharacterId) => CollectionEntry | undefined;
+  getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
   isLoading: boolean;
   error: Error | null;
 }
