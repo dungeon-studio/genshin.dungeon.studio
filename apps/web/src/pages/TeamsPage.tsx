@@ -12,7 +12,7 @@ import { useWeaponCollection } from '@/features/collection/weapons/useWeaponColl
 import { CharacterPool } from '@/features/teams/CharacterPool';
 import { TeamPlanner } from '@/features/teams/TeamPlanner';
 import { WeaponPool } from '@/features/teams/WeaponPool';
-import { useTeamStore } from '@/features/teams/useTeamStore';
+import { useTeams } from '@/features/teams/useTeams';
 
 type SheetTab = 'characters' | 'weapons';
 
@@ -31,13 +31,15 @@ export function TeamsPage() {
   const [selectedSlot, setSelectedSlot] = useState<TeamSlot | null>(null);
   const [selectedMemberIndex, setSelectedMemberIndex] = useState<number | null>(null);
 
-  const teams = useTeamStore((s) => s.teams);
-  const assignCharacter = useTeamStore((s) => s.assignCharacter);
-  const removeCharacter = useTeamStore((s) => s.removeCharacter);
-  const setTeamName = useTeamStore((s) => s.setTeamName);
-  const assignWeapon = useTeamStore((s) => s.assignWeapon);
-  const removeWeapon = useTeamStore((s) => s.removeWeapon);
-  const setArtifactPlan = useTeamStore((s) => s.setArtifactPlan);
+  const {
+    teams,
+    assignCharacter,
+    removeCharacter,
+    setTeamName,
+    assignWeapon,
+    removeWeapon,
+    setArtifactPlan,
+  } = useTeams();
 
   const selectedTeam = selectedSlot !== null ? teams[selectedSlot] : null;
 

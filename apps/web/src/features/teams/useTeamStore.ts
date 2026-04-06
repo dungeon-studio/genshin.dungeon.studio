@@ -19,6 +19,9 @@ interface TeamStoreState {
   setArtifactPlan: (slot: TeamSlot, memberIndex: number, plan: ArtifactPlan | undefined) => void;
   clearTeam: (slot: TeamSlot) => void;
   setTeamName: (slot: TeamSlot, name: string) => void;
+  setTeam: (slot: TeamSlot, team: Team) => void;
+  setTeams: (teams: Record<TeamSlot, Team>) => void;
+  resetTeams: () => void;
 
   getTeam: (slot: TeamSlot) => Team;
   isCharacterInTeam: (slot: TeamSlot, characterId: string) => boolean;
@@ -131,6 +134,20 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
         [slot]: { ...state.teams[slot], name },
       },
     }));
+  },
+
+  setTeam: (slot, team) => {
+    set((state) => ({
+      teams: { ...state.teams, [slot]: team },
+    }));
+  },
+
+  setTeams: (teams) => {
+    set({ teams });
+  },
+
+  resetTeams: () => {
+    set({ teams: initialTeams() });
   },
 
   getTeam: (slot) => get().teams[slot],
