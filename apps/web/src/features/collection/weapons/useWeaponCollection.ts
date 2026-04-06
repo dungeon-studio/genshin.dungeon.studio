@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
 import type { Weapon } from '@genshin/game-data';
 import { useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
@@ -16,16 +17,15 @@ import {
   useSetRefinementLevelMutation,
   useWeaponCollectionQuery,
 } from './useWeaponCollectionApi';
-import type { WeaponInstance, WeaponInstanceId } from './useWeaponCollectionStore';
 import { useWeaponCollectionStore } from './useWeaponCollectionStore';
 
 export interface UseWeaponCollectionResult {
-  weapons: Record<WeaponInstanceId, WeaponInstance>;
+  weapons: Record<CollectionWeaponId, CollectionWeapon>;
   isAuthenticated: boolean;
   addWeapon: (weaponId: Weapon['id']) => void;
-  removeWeapon: (weaponInstanceId: WeaponInstanceId) => void;
-  setRefinementLevel: (weaponInstanceId: WeaponInstanceId, level: number) => void;
-  getWeaponsByWeaponId: (weaponId: Weapon['id']) => WeaponInstance[];
+  removeWeapon: (collectionWeaponId: CollectionWeaponId) => void;
+  setRefinementLevel: (collectionWeaponId: CollectionWeaponId, level: number) => void;
+  getWeaponsByWeaponId: (weaponId: Weapon['id']) => CollectionWeapon[];
   isLoading: boolean;
   error: Error | null;
 }
@@ -52,8 +52,8 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   const { mutate: setRefinementLevelApi } = useSetRefinementLevelMutation(user?.uid);
 
   const applyMutationResult = useCallback(
-    ({ instance }: WeaponMutationResult) => {
-      storeAddWeapon(instance);
+    ({ weapon }: WeaponMutationResult) => {
+      storeAddWeapon(weapon);
     },
     [storeAddWeapon],
   );
@@ -84,16 +84,16 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   );
 
   const removeWeapon = useCallback(
-    (weaponInstanceId: WeaponInstanceId) => {
+    (collectionWeaponId: CollectionWeaponId) => {
       if (!isAuthenticated) return;
 
-      const current = useWeaponCollectionStore.getState().weapons[weaponInstanceId];
+      const current = useWeaponCollectionStore.getState().weapons[collectionWeaponId];
       if (!current) return;
 
-      storeRemoveWeapon(weaponInstanceId);
-      removeWeaponApi(weaponInstanceId, {
+      storeRemoveWeapon(collectionWeaponId);
+      removeWeaponApi(collectionWeaponId, {
         onError: () => {
-          const stillAbsent = !(weaponInstanceId in useWeaponCollectionStore.getState().weapons);
+          const stillAbsent = !(collectionWeaponId in useWeaponCollectionStore.getState().weapons);
           if (stillAbsent) {
             storeAddWeapon(current);
             toast.error('Failed to remove weapon. Change has been reverted.');
@@ -107,23 +107,23 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   );
 
   const setRefinementLevel = useCallback(
-    (weaponInstanceId: WeaponInstanceId, level: number) => {
+    (collectionWeaponId: CollectionWeaponId, level: number) => {
       if (!isAuthenticated) return;
       if (!isValidRefinementLevel(level)) return;
 
-      const previous = useWeaponCollectionStore.getState().weapons[weaponInstanceId];
+      const previous = useWeaponCollectionStore.getState().weapons[collectionWeaponId];
       if (!previous || previous.refinementLevel === level) return;
 
-      storeSetRefinementLevel(weaponInstanceId, level);
+      storeSetRefinementLevel(collectionWeaponId, level);
       setRefinementLevelApi(
-        { weaponInstanceId, level },
+        { collectionWeaponId, level },
         {
           onSuccess: applyMutationResult,
           onError: () => {
             const currentLevel =
-              useWeaponCollectionStore.getState().weapons[weaponInstanceId]?.refinementLevel;
+              useWeaponCollectionStore.getState().weapons[collectionWeaponId]?.refinementLevel;
             if (currentLevel === level) {
-              storeSetRefinementLevel(weaponInstanceId, previous.refinementLevel);
+              storeSetRefinementLevel(collectionWeaponId, previous.refinementLevel);
               toast.error('Failed to update refinement level. Change has been reverted.');
             } else {
               toast.error('Failed to update refinement level.');

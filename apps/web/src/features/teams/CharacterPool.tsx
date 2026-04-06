@@ -1,19 +1,15 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionCharacter } from '@genshin/domain';
+import type { CharacterId, CollectionCharacter } from '@genshin/domain';
 import type { Character } from '@genshin/game-data';
 import { CHARACTERS } from '@genshin/game-data';
 import { useMemo, useState } from 'react';
 
 import { CharacterSummary } from '@/components/CharacterSummary';
-import type { CharacterFilterState } from '@/features/collection/characters/CharacterFilters';
-import {
-  CharacterFilters,
-  filterCharacters,
-  initialFilterState,
-} from '@/features/collection/characters/CharacterFilters';
-import type { CharacterId } from '@/features/collection/characters/useCharacterCollectionStore';
+import { CharacterFilters } from '@/features/collection/characters/CharacterFilters';
+import type { CharacterFilterState } from '@/features/collection/characters/filtering';
+import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
 import { ELEMENT_BORDER_COLORS, ELEMENT_BORDER_COLORS_DIM } from '@/lib/elementStyles';
 import { cn } from '@/lib/utils';
 

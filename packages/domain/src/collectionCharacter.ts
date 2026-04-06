@@ -17,6 +17,8 @@ export interface CollectionCharacter {
   updatedAt: ISOTimestamp;
 }
 
+export type CharacterId = CollectionCharacter['characterId'];
+
 export function isValidConstellationLevel(value: unknown): value is number {
   return (
     typeof value === 'number' &&

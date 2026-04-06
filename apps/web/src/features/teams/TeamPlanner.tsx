@@ -1,21 +1,31 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionCharacter } from '@genshin/domain';
-import type { TeamMember, TeamSlot } from '@genshin/domain';
+import type {
+  ArtifactPlan,
+  CollectionCharacter,
+  CollectionWeapon,
+  Team,
+  TeamSlot,
+} from '@genshin/domain';
 import { MAX_TEAM_MEMBERS } from '@genshin/domain';
 import { Pencil } from 'lucide-react';
 import { useRef, useState } from 'react';
 
-import { TeamCharacterPlanner } from '@/components/TeamCharacterPlanner';
 import { Input } from '@/components/ui/input';
+
+import { TeamMemberPlanner } from './TeamMemberPlanner';
 
 interface TeamPlannerProps {
   slot: TeamSlot;
   name: string;
-  members: TeamMember[];
+  members: Team['members'];
   getCharacter: (characterId: string) => CollectionCharacter | undefined;
+  getCollectionWeapon: (collectionWeaponId: string) => CollectionWeapon | undefined;
+  selectedMemberIndex?: number | null;
+  onMemberSelect?: (memberIndex: number) => void;
   onNameChange: (name: string) => void;
+  onArtifactPlanChange?: (memberIndex: number, plan: ArtifactPlan | undefined) => void;
   onEdit?: () => void;
 }
 
@@ -24,7 +34,11 @@ export function TeamPlanner({
   name,
   members,
   getCharacter,
+  getCollectionWeapon,
+  selectedMemberIndex,
+  onMemberSelect,
   onNameChange,
+  onArtifactPlanChange,
   onEdit,
 }: TeamPlannerProps) {
   const slots = Array.from({ length: MAX_TEAM_MEMBERS }, (_, i) => members[i]);
@@ -97,10 +111,18 @@ export function TeamPlanner({
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {slots.map((member, i) => (
-          <TeamCharacterPlanner
+          <TeamMemberPlanner
             key={i}
             member={member}
             collectionCharacter={member ? getCharacter(member.characterId) : undefined}
+            collectionWeapon={
+              member?.weaponInstanceId ? getCollectionWeapon(member.weaponInstanceId) : undefined
+            }
+            selected={selectedMemberIndex === i}
+            onSelect={onMemberSelect ? () => onMemberSelect(i) : undefined}
+            onArtifactPlanChange={
+              onArtifactPlanChange ? (plan) => onArtifactPlanChange(i, plan) : undefined
+            }
           />
         ))}
       </div>

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
 import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
 import type { Weapon } from '@genshin/game-data';
 import { getWeaponById } from '@genshin/game-data';
@@ -16,8 +17,6 @@ import {
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 
-import type { WeaponInstance, WeaponInstanceId } from './useWeaponCollectionStore';
-
 const REFINEMENT_LEVELS = Array.from(
   { length: MAX_REFINEMENT_LEVEL - MIN_REFINEMENT_LEVEL + 1 },
   (_, i) => MIN_REFINEMENT_LEVEL + i,
@@ -25,11 +24,11 @@ const REFINEMENT_LEVELS = Array.from(
 
 interface WeaponInstanceSidebarProps {
   weaponId: string | null;
-  instances: WeaponInstance[];
+  instances: CollectionWeapon[];
   onClose: () => void;
   onAdd: (weaponId: string) => void;
-  onRemove: (weaponInstanceId: WeaponInstanceId) => void;
-  onRefinementChange: (weaponInstanceId: WeaponInstanceId, level: number) => void;
+  onRemove: (collectionWeaponId: CollectionWeaponId) => void;
+  onRefinementChange: (collectionWeaponId: CollectionWeaponId, level: number) => void;
 }
 
 export function WeaponInstanceSidebar({

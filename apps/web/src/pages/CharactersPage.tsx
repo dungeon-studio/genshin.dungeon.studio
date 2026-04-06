@@ -7,12 +7,9 @@ import { Loader2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { CharacterCard } from '@/features/collection/characters/CharacterCard';
-import type { CharacterFilterState } from '@/features/collection/characters/CharacterFilters';
-import {
-  CharacterFilters,
-  filterCharacters,
-  initialFilterState,
-} from '@/features/collection/characters/CharacterFilters';
+import { CharacterFilters } from '@/features/collection/characters/CharacterFilters';
+import type { CharacterFilterState } from '@/features/collection/characters/filtering';
+import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
 import { useCollection } from '@/features/collection/characters/useCharacterCollection';
 
 export function CharactersPage() {

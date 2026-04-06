@@ -22,7 +22,8 @@ import {
 } from '@genshin/collection-json';
 
 import type { CollectionTeam } from '../../collectionTeam.js';
-import { MAX_TEAM_MEMBERS, assertCollectionTeam } from '../../collectionTeam.js';
+import { assertCollectionTeam } from '../../collectionTeam.js';
+import { MAX_TEAM_MEMBERS } from '../../team.js';
 import type { ArtifactPlan, TeamMember } from '../../teamMember.js';
 
 const TEAM_TEMPLATE: Template = {
@@ -120,7 +121,7 @@ export function deserialiseTeam(item: Item): CollectionTeam {
     members = raw ? JSON.parse(raw.value as string) : [];
   } catch (error) {
     if (error instanceof TypeError) throw error;
-    throw new TypeError('members must be valid JSON');
+    throw new TypeError('members must be valid JSON', { cause: error });
   }
   if (!Array.isArray(members)) {
     throw new TypeError(`members must be an array, got: ${JSON.stringify(members)}`);

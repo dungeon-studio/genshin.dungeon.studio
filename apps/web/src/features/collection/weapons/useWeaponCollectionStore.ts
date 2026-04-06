@@ -1,26 +1,18 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionWeapon, UUID } from '@genshin/domain';
+import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
 import { isValidRefinementLevel } from '@genshin/domain';
 import type { Weapon } from '@genshin/game-data';
 import { create } from 'zustand';
 
-export interface WeaponInstance {
-  weaponInstanceId: UUID;
-  weaponId: Weapon['id'];
-  refinementLevel: number;
-}
-
-export type WeaponInstanceId = CollectionWeapon['weaponInstanceId'];
-
 interface WeaponCollectionState {
-  weapons: Record<WeaponInstanceId, WeaponInstance>;
-  setWeapons: (weapons: Record<WeaponInstanceId, WeaponInstance>) => void;
-  addWeapon: (instance: WeaponInstance) => void;
-  removeWeapon: (weaponInstanceId: WeaponInstanceId) => void;
-  setRefinementLevel: (weaponInstanceId: WeaponInstanceId, level: number) => void;
-  getWeaponsByWeaponId: (weaponId: Weapon['id']) => WeaponInstance[];
+  weapons: Record<CollectionWeaponId, CollectionWeapon>;
+  setWeapons: (weapons: Record<CollectionWeaponId, CollectionWeapon>) => void;
+  addWeapon: (weapon: CollectionWeapon) => void;
+  removeWeapon: (collectionWeaponId: CollectionWeaponId) => void;
+  setRefinementLevel: (collectionWeaponId: CollectionWeaponId, level: number) => void;
+  getWeaponsByWeaponId: (weaponId: Weapon['id']) => CollectionWeapon[];
   clearWeapons: () => void;
 }
 
@@ -31,33 +23,33 @@ export const useWeaponCollectionStore = create<WeaponCollectionState>()((set, ge
     set({ weapons });
   },
 
-  addWeapon: (instance) => {
+  addWeapon: (weapon) => {
     set((state) => ({
       weapons: {
         ...state.weapons,
-        [instance.weaponInstanceId]: instance,
+        [weapon.weaponInstanceId]: weapon,
       },
     }));
   },
 
-  removeWeapon: (weaponInstanceId) => {
+  removeWeapon: (collectionWeaponId) => {
     set((state) => {
       const weapons = { ...state.weapons };
-      delete weapons[weaponInstanceId];
+      delete weapons[collectionWeaponId];
       return { weapons };
     });
   },
 
-  setRefinementLevel: (weaponInstanceId, level) => {
+  setRefinementLevel: (collectionWeaponId, level) => {
     if (!isValidRefinementLevel(level)) return;
 
-    const entry = get().weapons[weaponInstanceId];
+    const entry = get().weapons[collectionWeaponId];
     if (!entry) return;
 
     set((state) => ({
       weapons: {
         ...state.weapons,
-        [weaponInstanceId]: { ...entry, refinementLevel: level },
+        [collectionWeaponId]: { ...entry, refinementLevel: level },
       },
     }));
   },

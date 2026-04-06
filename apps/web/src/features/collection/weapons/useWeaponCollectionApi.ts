@@ -2,17 +2,16 @@
 // SPDX-License-Identifier: MIT
 
 import { assertCollectionDocument } from '@genshin/collection-json';
+import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
 import { deserialiseWeapon, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPatch, apiPost } from '@/lib/api';
 
-import type { WeaponInstance, WeaponInstanceId } from './useWeaponCollectionStore';
-
-type WeaponRecord = Record<WeaponInstanceId, WeaponInstance>;
+type WeaponRecord = Record<CollectionWeaponId, CollectionWeapon>;
 
 export interface WeaponMutationResult {
-  instance: WeaponInstance;
+  weapon: CollectionWeapon;
 }
 
 export function weaponCollectionKey(userId: string): readonly [string, string] {
@@ -25,11 +24,7 @@ export function parseWeaponCollectionResponse(response: unknown): WeaponRecord {
 
   for (const item of response.collection.items) {
     const weapon = deserialiseWeapon(item);
-    record[weapon.weaponInstanceId] = {
-      weaponInstanceId: weapon.weaponInstanceId,
-      weaponId: weapon.weaponId,
-      refinementLevel: weapon.refinementLevel,
-    };
+    record[weapon.weaponInstanceId] = weapon;
   }
 
   return record;
@@ -43,13 +38,7 @@ function parseSingleWeaponResponse(response: unknown): WeaponMutationResult {
     );
   }
   const weapon = deserialiseWeapon(response.collection.items[0]);
-  return {
-    instance: {
-      weaponInstanceId: weapon.weaponInstanceId,
-      weaponId: weapon.weaponId,
-      refinementLevel: weapon.refinementLevel,
-    },
-  };
+  return { weapon };
 }
 
 export function useWeaponCollectionQuery(userId: string | undefined) {
@@ -85,8 +74,8 @@ export function useRemoveWeaponMutation(userId: string | undefined) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (weaponInstanceId: WeaponInstanceId) => {
-      await apiDelete(`/api/weapons/${encodeURIComponent(weaponInstanceId)}`);
+    mutationFn: async (collectionWeaponId: CollectionWeaponId) => {
+      await apiDelete(`/api/weapons/${encodeURIComponent(collectionWeaponId)}`);
     },
     onSuccess: () => {
       if (userId !== undefined)
@@ -100,13 +89,13 @@ export function useSetRefinementLevelMutation(userId: string | undefined) {
 
   return useMutation({
     mutationFn: async ({
-      weaponInstanceId,
+      collectionWeaponId,
       level,
     }: {
-      weaponInstanceId: WeaponInstanceId;
+      collectionWeaponId: CollectionWeaponId;
       level: number;
     }): Promise<WeaponMutationResult> => {
-      const response = await apiPatch(`/api/weapons/${encodeURIComponent(weaponInstanceId)}`, {
+      const response = await apiPatch(`/api/weapons/${encodeURIComponent(collectionWeaponId)}`, {
         refinementLevel: level,
       });
       return parseSingleWeaponResponse(response);
