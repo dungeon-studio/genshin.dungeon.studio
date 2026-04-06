@@ -79,7 +79,6 @@ export function WeaponFilters({
       {/* Row 1: Filters */}
       <div className="flex flex-wrap items-center gap-1.5">
         {/* Ownership filters */}
-        {/* Ownership filters */}
         {showOwnership &&
           (['all', 'owned', 'unowned'] as const).map((value) => (
             <button

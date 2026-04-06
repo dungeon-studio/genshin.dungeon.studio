@@ -20,11 +20,11 @@ function poolFilterState(): CharacterFilterState {
 interface CharacterPoolProps {
   characters: Record<CharacterId, CollectionCharacter>;
   assignedIds: Set<string>;
-  teamFull: boolean;
+  disabled: boolean;
   onAssign: (characterId: string) => void;
 }
 
-export function CharacterPool({ characters, assignedIds, teamFull, onAssign }: CharacterPoolProps) {
+export function CharacterPool({ characters, assignedIds, disabled, onAssign }: CharacterPoolProps) {
   const [filters, setFilters] = useState<CharacterFilterState>(poolFilterState);
 
   function handleFilterChange(next: CharacterFilterState) {
@@ -58,7 +58,7 @@ export function CharacterPool({ characters, assignedIds, teamFull, onAssign }: C
         {filteredCharacters.map((character) => {
           const owned = ownedIds.has(character.id);
           const assigned = assignedIds.has(character.id);
-          const clickable = owned && (assigned || !teamFull);
+          const clickable = !disabled && owned;
 
           const entry = characters[character.id];
 

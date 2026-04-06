@@ -23,7 +23,7 @@ export function TeamsPage() {
   const collectionWeapons = useMemo(() => Object.values(weapons), [weapons]);
 
   const getCollectionWeapon = useCallback(
-    (collectionWeaponId: string) => weapons[collectionWeaponId as UUID],
+    (collectionWeaponId: UUID) => weapons[collectionWeaponId],
     [weapons],
   );
 
@@ -175,12 +175,13 @@ export function TeamsPage() {
                   <CharacterPool
                     characters={characters}
                     assignedIds={assignedIds}
-                    teamFull={selectedMemberIndex === null}
+                    disabled={selectedMemberIndex === null}
                     onAssign={handleToggleCharacter}
                   />
                 )}
                 {activeTab === 'weapons' && selectedMember && selectedMemberWeaponType && (
                   <WeaponPool
+                    key={selectedMemberWeaponType}
                     collectionWeapons={collectionWeapons}
                     weaponType={selectedMemberWeaponType}
                     selectedCollectionWeaponId={selectedMember.weaponInstanceId}
