@@ -5,9 +5,9 @@ import type {
   ArtifactPlan,
   CollectionCharacter,
   CollectionWeapon,
+  CollectionWeaponId,
   Team,
   TeamSlot,
-  UUID,
 } from '@genshin/domain';
 import { MAX_TEAM_MEMBERS } from '@genshin/domain';
 import { Pencil } from 'lucide-react';
@@ -22,7 +22,7 @@ interface TeamPlannerProps {
   name: string;
   members: Team['members'];
   getCharacter: (characterId: string) => CollectionCharacter | undefined;
-  getCollectionWeapon: (collectionWeaponId: UUID) => CollectionWeapon | undefined;
+  getCollectionWeapon: (collectionWeaponId: CollectionWeaponId) => CollectionWeapon | undefined;
   selectedMemberIndex?: number | null;
   onMemberSelect?: (memberIndex: number) => void;
   onNameChange: (name: string) => void;

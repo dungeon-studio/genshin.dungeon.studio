@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { ArtifactPlan, Team, TeamSlot, UUID } from '@genshin/domain';
+import type { ArtifactPlan, CollectionWeaponId, Team, TeamSlot } from '@genshin/domain';
 import { initialTeams, isValidMemberIndex } from '@genshin/domain';
 import { create } from 'zustand';
 
@@ -10,7 +10,11 @@ interface TeamStoreState {
 
   assignCharacter: (slot: TeamSlot, memberIndex: number, characterId: string) => void;
   removeCharacter: (slot: TeamSlot, memberIndex: number) => void;
-  assignWeapon: (slot: TeamSlot, memberIndex: number, collectionWeaponId: UUID) => void;
+  assignWeapon: (
+    slot: TeamSlot,
+    memberIndex: number,
+    collectionWeaponId: CollectionWeaponId,
+  ) => void;
   removeWeapon: (slot: TeamSlot, memberIndex: number) => void;
   setArtifactPlan: (slot: TeamSlot, memberIndex: number, plan: ArtifactPlan | undefined) => void;
   clearTeam: (slot: TeamSlot) => void;

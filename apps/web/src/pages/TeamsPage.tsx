@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { TeamMember, TeamSlot, UUID } from '@genshin/domain';
+import type { CollectionWeaponId, TeamMember, TeamSlot } from '@genshin/domain';
 import { TEAM_SLOTS } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
 import { useCallback, useMemo, useState } from 'react';
@@ -23,7 +23,7 @@ export function TeamsPage() {
   const collectionWeapons = useMemo(() => Object.values(weapons), [weapons]);
 
   const getCollectionWeapon = useCallback(
-    (collectionWeaponId: UUID) => weapons[collectionWeaponId],
+    (collectionWeaponId: CollectionWeaponId) => weapons[collectionWeaponId],
     [weapons],
   );
 
@@ -77,7 +77,7 @@ export function TeamsPage() {
   );
 
   const handleWeaponSelect = useCallback(
-    (collectionWeaponId: UUID) => {
+    (collectionWeaponId: CollectionWeaponId) => {
       if (selectedSlot === null || selectedMemberIndex === null) return;
       assignWeapon(selectedSlot, selectedMemberIndex, collectionWeaponId);
     },

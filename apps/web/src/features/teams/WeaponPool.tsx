@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionWeapon, UUID } from '@genshin/domain';
+import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
 import type { Weapon, WeaponType } from '@genshin/game-data';
 import { WEAPONS } from '@genshin/game-data';
 import { useMemo, useState } from 'react';
@@ -20,8 +20,8 @@ function poolFilterState(weaponType: WeaponType): WeaponFilterState {
 interface WeaponPoolProps {
   collectionWeapons: CollectionWeapon[];
   weaponType: WeaponType;
-  selectedCollectionWeaponId?: UUID;
-  onSelect: (collectionWeaponId: UUID) => void;
+  selectedCollectionWeaponId?: CollectionWeaponId;
+  onSelect: (collectionWeaponId: CollectionWeaponId) => void;
   onClear: () => void;
 }
 
