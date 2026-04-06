@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
-import type { CollectionCharacter } from '@genshin/domain';
+import type { CharacterId, CollectionCharacter } from '@genshin/domain';
 import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 
 import { useAuth } from '@/features/auth/useAuth';
@@ -16,7 +16,6 @@ import {
   useRemoveCharacterMutation,
   useSetConstellationLevelMutation,
 } from './useCharacterCollectionApi';
-import type { CharacterId } from './useCharacterCollectionStore';
 import { mergeCollections, useCollectionStore } from './useCharacterCollectionStore';
 
 export interface UseCollectionResult {

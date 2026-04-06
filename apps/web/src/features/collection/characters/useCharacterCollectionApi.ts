@@ -2,13 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 import { assertCollectionDocument } from '@genshin/collection-json';
-import type { CollectionCharacter } from '@genshin/domain';
+import type { CharacterId, CollectionCharacter } from '@genshin/domain';
 import { deserialiseCharacter, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPut } from '@/lib/api';
-
-import type { CharacterId } from './useCharacterCollectionStore';
 
 type CharacterRecord = Record<CharacterId, CollectionCharacter>;
 

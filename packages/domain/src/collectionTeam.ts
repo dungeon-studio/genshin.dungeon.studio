@@ -4,11 +4,8 @@
 import type { ISOTimestamp } from './isoTimestamp.js';
 import { isISOTimestamp } from './isoTimestamp.js';
 import type { TeamSlot } from './team.js';
+import { MAX_TEAM_MEMBERS, MAX_TEAM_SLOT, MIN_TEAM_SLOT } from './team.js';
 import type { TeamMember } from './teamMember.js';
-
-export const MIN_TEAM_SLOT = 1;
-export const MAX_TEAM_SLOT = 4;
-export const MAX_TEAM_MEMBERS = 4;
 
 /**
  * CollectionTeam is the persisted form of a user's team composition.

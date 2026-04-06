@@ -19,6 +19,8 @@ export interface CollectionWeapon {
   updatedAt: ISOTimestamp;
 }
 
+export type CollectionWeaponId = CollectionWeapon['weaponInstanceId'];
+
 export function isValidRefinementLevel(value: unknown): value is number {
   return (
     typeof value === 'number' &&

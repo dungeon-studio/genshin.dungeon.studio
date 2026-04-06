@@ -1,26 +1,15 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { Rarity, Weapon, WeaponType } from '@genshin/game-data';
-import { compareVersions, WEAPON_TYPES } from '@genshin/game-data';
+import type { Rarity, WeaponType } from '@genshin/game-data';
+import { WEAPON_TYPES } from '@genshin/game-data';
 import { ArrowDownWideNarrow, ArrowUpNarrowWide, Search } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
-export type OwnershipFilter = 'all' | 'owned' | 'unowned';
-export type SortField = 'release' | 'name';
-export type SortDirection = 'asc' | 'desc';
-
-export interface WeaponFilterState {
-  search: string;
-  weaponTypes: Set<WeaponType>;
-  rarities: Set<Rarity>;
-  ownership: OwnershipFilter;
-  sortField: SortField;
-  sortDirection: SortDirection;
-}
+import type { SortField, WeaponFilterState } from './filtering';
 
 interface WeaponFiltersProps {
   filters: WeaponFilterState;
@@ -29,6 +18,8 @@ interface WeaponFiltersProps {
   totalCount: number;
   ownedCount: number;
   filteredOwnedCount: number;
+  showOwnership?: boolean;
+  showWeaponTypes?: boolean;
 }
 
 const WEAPON_TYPE_VALUES = Object.values(WEAPON_TYPES);
@@ -39,41 +30,6 @@ const SORT_LABELS: Record<SortField, string> = {
   name: 'Name',
 };
 
-export function filterWeapons(
-  weapons: readonly Weapon[],
-  filters: WeaponFilterState,
-  ownedWeaponIds: Set<Weapon['id']>,
-): Weapon[] {
-  const searchLower = filters.search.toLowerCase();
-
-  const result = weapons.filter((w) => {
-    if (searchLower && !w.name.toLowerCase().includes(searchLower)) return false;
-    if (filters.weaponTypes.size > 0 && !filters.weaponTypes.has(w.type)) return false;
-    if (filters.rarities.size > 0 && !filters.rarities.has(w.rarity)) return false;
-    if (filters.ownership === 'owned' && !ownedWeaponIds.has(w.id)) return false;
-    if (filters.ownership === 'unowned' && ownedWeaponIds.has(w.id)) return false;
-    return true;
-  });
-
-  result.sort((a, b) => {
-    let cmp = 0;
-    switch (filters.sortField) {
-      case 'release':
-        cmp = compareVersions(a.version, b.version);
-        if (cmp === 0) {
-          cmp = a.name.localeCompare(b.name) || a.id.localeCompare(b.id);
-        }
-        break;
-      case 'name':
-        cmp = a.name.localeCompare(b.name);
-        break;
-    }
-    return filters.sortDirection === 'desc' ? -cmp : cmp;
-  });
-
-  return result;
-}
-
 export function WeaponFilters({
   filters,
   onChange,
@@ -81,6 +37,8 @@ export function WeaponFilters({
   totalCount,
   ownedCount,
   filteredOwnedCount,
+  showOwnership = true,
+  showWeaponTypes = true,
 }: WeaponFiltersProps) {
   function toggleWeaponType(type: WeaponType) {
     const next = new Set(filters.weaponTypes);
@@ -121,26 +79,29 @@ export function WeaponFilters({
       {/* Row 1: Filters */}
       <div className="flex flex-wrap items-center gap-1.5">
         {/* Ownership filters */}
-        {(['all', 'owned', 'unowned'] as const).map((value) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => onChange({ ...filters, ownership: value })}
-            className={cn(
-              'rounded-full px-2.5 py-1 text-xs font-medium capitalize transition-colors',
-              filters.ownership === value
-                ? 'bg-foreground text-background'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80',
-            )}
-            aria-pressed={filters.ownership === value}
-          >
-            {value}
-          </button>
-        ))}
+        {showOwnership &&
+          (['all', 'owned', 'unowned'] as const).map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => onChange({ ...filters, ownership: value })}
+              className={cn(
+                'rounded-full px-2.5 py-1 text-xs font-medium capitalize transition-colors',
+                filters.ownership === value
+                  ? 'bg-foreground text-background'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80',
+              )}
+              aria-pressed={filters.ownership === value}
+            >
+              {value}
+            </button>
+          ))}
 
-        <span className="self-center text-border" aria-hidden="true">
-          |
-        </span>
+        {showOwnership && (
+          <span className="self-center text-border" aria-hidden="true">
+            |
+          </span>
+        )}
 
         {/* Rarity filters */}
         {RARITY_VALUES.map((rarity) => (
@@ -161,28 +122,31 @@ export function WeaponFilters({
           </button>
         ))}
 
-        <span className="self-center text-border" aria-hidden="true">
-          |
-        </span>
+        {showWeaponTypes && (
+          <span className="self-center text-border" aria-hidden="true">
+            |
+          </span>
+        )}
 
         {/* Weapon type filters */}
-        {WEAPON_TYPE_VALUES.map((type) => (
-          <button
-            key={type}
-            type="button"
-            onClick={() => toggleWeaponType(type)}
-            className={cn(
-              'rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
-              filters.weaponTypes.has(type)
-                ? 'bg-foreground text-background'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80',
-            )}
-            aria-pressed={filters.weaponTypes.has(type)}
-            aria-label={`Filter by ${type}`}
-          >
-            {type}
-          </button>
-        ))}
+        {showWeaponTypes &&
+          WEAPON_TYPE_VALUES.map((type) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => toggleWeaponType(type)}
+              className={cn(
+                'rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
+                filters.weaponTypes.has(type)
+                  ? 'bg-foreground text-background'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80',
+              )}
+              aria-pressed={filters.weaponTypes.has(type)}
+              aria-label={`Filter by ${type}`}
+            >
+              {type}
+            </button>
+          ))}
       </div>
 
       {/* Row 2: Search + status + sort */}
@@ -206,7 +170,9 @@ export function WeaponFilters({
         <div className="flex-1" />
 
         <p className="text-sm text-muted-foreground">
-          {filteredCount === totalCount ? (
+          {!showOwnership ? (
+            <>{filteredCount} weapons</>
+          ) : filteredCount === totalCount ? (
             <>
               {ownedCount} / {totalCount} owned
             </>

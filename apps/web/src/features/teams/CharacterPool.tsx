@@ -1,19 +1,15 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionCharacter } from '@genshin/domain';
+import type { CharacterId, CollectionCharacter } from '@genshin/domain';
 import type { Character } from '@genshin/game-data';
 import { CHARACTERS } from '@genshin/game-data';
 import { useMemo, useState } from 'react';
 
 import { CharacterSummary } from '@/components/CharacterSummary';
-import type { CharacterFilterState } from '@/features/collection/characters/CharacterFilters';
-import {
-  CharacterFilters,
-  filterCharacters,
-  initialFilterState,
-} from '@/features/collection/characters/CharacterFilters';
-import type { CharacterId } from '@/features/collection/characters/useCharacterCollectionStore';
+import { CharacterFilters } from '@/features/collection/characters/CharacterFilters';
+import type { CharacterFilterState } from '@/features/collection/characters/filtering';
+import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
 import { ELEMENT_BORDER_COLORS, ELEMENT_BORDER_COLORS_DIM } from '@/lib/elementStyles';
 import { cn } from '@/lib/utils';
 
@@ -24,11 +20,11 @@ function poolFilterState(): CharacterFilterState {
 interface CharacterPoolProps {
   characters: Record<CharacterId, CollectionCharacter>;
   assignedIds: Set<string>;
-  teamFull: boolean;
+  disabled: boolean;
   onAssign: (characterId: string) => void;
 }
 
-export function CharacterPool({ characters, assignedIds, teamFull, onAssign }: CharacterPoolProps) {
+export function CharacterPool({ characters, assignedIds, disabled, onAssign }: CharacterPoolProps) {
   const [filters, setFilters] = useState<CharacterFilterState>(poolFilterState);
 
   function handleFilterChange(next: CharacterFilterState) {
@@ -62,7 +58,7 @@ export function CharacterPool({ characters, assignedIds, teamFull, onAssign }: C
         {filteredCharacters.map((character) => {
           const owned = ownedIds.has(character.id);
           const assigned = assignedIds.has(character.id);
-          const clickable = owned && (assigned || !teamFull);
+          const clickable = !disabled && owned;
 
           const entry = characters[character.id];
 

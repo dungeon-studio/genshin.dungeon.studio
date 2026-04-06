@@ -9,24 +9,19 @@ export {
   isValidConstellationLevel,
   MAX_CONSTELLATION_LEVEL,
   MIN_CONSTELLATION_LEVEL,
+  type CharacterId,
   type CollectionCharacter,
 } from './collectionCharacter.js';
-export {
-  assertCollectionTeam,
-  isValidTeamSlot,
-  MAX_TEAM_MEMBERS,
-  MAX_TEAM_SLOT,
-  MIN_TEAM_SLOT,
-  type CollectionTeam,
-} from './collectionTeam.js';
+export { assertCollectionTeam, isValidTeamSlot, type CollectionTeam } from './collectionTeam.js';
 export {
   assertCollectionWeapon,
   isValidRefinementLevel,
   MAX_REFINEMENT_LEVEL,
   MIN_REFINEMENT_LEVEL,
   type CollectionWeapon,
+  type CollectionWeaponId,
 } from './collectionWeapon.js';
-export { isISOTimestamp, type ISOTimestamp } from './isoTimestamp.js';
+export { isISOTimestamp, nowTimestamp, type ISOTimestamp } from './isoTimestamp.js';
 export type { ProblemDetail } from './problemDetail.js';
 export {
   characterItemHref,
@@ -53,7 +48,17 @@ export {
   serialiseProfile,
   type ProfileResponse,
 } from './representations/json/profile.js';
-export type { Team, TeamSlot } from './team.js';
+export {
+  createEmptyTeam,
+  initialTeams,
+  isValidMemberIndex,
+  MAX_TEAM_MEMBERS,
+  MAX_TEAM_SLOT,
+  MIN_TEAM_SLOT,
+  TEAM_SLOTS,
+  type Team,
+  type TeamSlot,
+} from './team.js';
 export { type ArtifactPlan, type TeamMember } from './teamMember.js';
 export { validateTeam, validateTeamSlot, type TeamValidationContext } from './teamValidation.js';
 export { type ProfileUpdate, type UserProfile } from './userProfile.js';

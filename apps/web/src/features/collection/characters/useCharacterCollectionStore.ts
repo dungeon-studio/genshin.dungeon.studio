@@ -1,16 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionCharacter, ISOTimestamp } from '@genshin/domain';
-import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import type { CharacterId, CollectionCharacter } from '@genshin/domain';
+import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL, nowTimestamp } from '@genshin/domain';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-
-export type CharacterId = CollectionCharacter['characterId'];
-
-function nowTimestamp(): ISOTimestamp {
-  return new Date().toISOString() as ISOTimestamp;
-}
 
 // Additive merge: union of both sets, keep higher constellation level on conflicts.
 export function mergeCollections(

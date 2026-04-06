@@ -1,28 +1,17 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { Rarity, WeaponType } from '@genshin/game-data';
 import { WEAPONS } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
+import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
+import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
 import { useWeaponCollection } from '@/features/collection/weapons/useWeaponCollection';
 import { WeaponCard } from '@/features/collection/weapons/WeaponCard';
-import type { WeaponFilterState } from '@/features/collection/weapons/WeaponFilters';
-import { filterWeapons, WeaponFilters } from '@/features/collection/weapons/WeaponFilters';
+import { WeaponFilters } from '@/features/collection/weapons/WeaponFilters';
 import { WeaponInstanceSidebar } from '@/features/collection/weapons/WeaponInstanceSidebar';
-
-function initialFilterState(): WeaponFilterState {
-  return {
-    search: '',
-    weaponTypes: new Set<WeaponType>(),
-    rarities: new Set<Rarity>(),
-    ownership: 'all',
-    sortField: 'release',
-    sortDirection: 'desc',
-  };
-}
 
 export function WeaponsPage() {
   const {
@@ -39,11 +28,7 @@ export function WeaponsPage() {
   const [filters, setFilters] = useState<WeaponFilterState>(initialFilterState);
   const [selectedWeaponId, setSelectedWeaponId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setSelectedWeaponId(null);
-    }
-  }, [isAuthenticated]);
+  const effectiveSelectedWeaponId = isAuthenticated ? selectedWeaponId : null;
 
   // Collect weapon IDs that have at least one instance
   const ownedWeaponIds = useMemo(() => {
@@ -72,8 +57,8 @@ export function WeaponsPage() {
   }, [filters, ownedWeaponIds]);
 
   const selectedInstances = useMemo(
-    () => (selectedWeaponId ? getWeaponsByWeaponId(selectedWeaponId) : []),
-    [selectedWeaponId, getWeaponsByWeaponId],
+    () => (effectiveSelectedWeaponId ? getWeaponsByWeaponId(effectiveSelectedWeaponId) : []),
+    [effectiveSelectedWeaponId, getWeaponsByWeaponId],
   );
 
   const handleWeaponClick = useCallback(
@@ -146,7 +131,7 @@ export function WeaponsPage() {
             key={weapon.id}
             weapon={weapon}
             instanceCount={instanceCounts[weapon.id] ?? 0}
-            selected={selectedWeaponId === weapon.id}
+            selected={effectiveSelectedWeaponId === weapon.id}
             onClick={handleWeaponClick}
           />
         ))}
@@ -157,7 +142,7 @@ export function WeaponsPage() {
       )}
 
       <WeaponInstanceSidebar
-        weaponId={selectedWeaponId}
+        weaponId={effectiveSelectedWeaponId}
         instances={selectedInstances}
         onClose={() => setSelectedWeaponId(null)}
         onAdd={handleAddWeapon}

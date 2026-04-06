@@ -14,3 +14,7 @@ export function isISOTimestamp(value: unknown): value is ISOTimestamp {
     typeof value === 'string' && ISO_8601_DATE_TIME.test(value) && !Number.isNaN(Date.parse(value))
   );
 }
+
+export function nowTimestamp(): ISOTimestamp {
+  return new Date().toISOString() as ISOTimestamp;
+}
