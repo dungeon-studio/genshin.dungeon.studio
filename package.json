@@ -22,7 +22,7 @@
     "url": "https://github.com/dungeon-studio/genshin.dungeon.studio/issues"
   },
   "scripts": {
-    "dev": "firebase emulators:exec --only auth,firestore --project demo-dungeon-studio-genshin-dev \"turbo run dev\"",
+    "dev": "concurrently --kill-others \"firebase emulators:start --only auth,firestore --project demo-dungeon-studio-genshin-dev\" \"turbo run dev\"",
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",
@@ -38,6 +38,7 @@
     "prettier": "3.8.1",
     "stylelint": "17.6.0",
     "stylelint-config-standard": "40.0.0",
+    "concurrently": "9.2.1",
     "turbo": "2.9.3",
     "typescript": "6.0.2"
   },
