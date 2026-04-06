@@ -81,7 +81,7 @@
 
   "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
   "updateContentCommand": "pnpm install",
-  "postAttachCommand": "echo '✅ Ready | Node $(node --version) | pnpm $(pnpm --version)'",
+  "postAttachCommand": "bash .devcontainer/postAttachCommand.sh",
 
   "containerEnv": {
     "NODE_ENV": "development"

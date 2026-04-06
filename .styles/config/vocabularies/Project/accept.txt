@@ -28,6 +28,8 @@ Dockerfile
 
 # Code quality tools
 Codecov
+jq
+pipx
 ESLint
 Prettier
 Stylelint
