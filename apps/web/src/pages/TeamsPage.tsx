@@ -11,7 +11,7 @@ import { TeamPlanner } from '@/features/teams/TeamPlanner';
 import { TEAM_SLOTS, useTeamStore } from '@/features/teams/useTeamStore';
 
 export function TeamsPage() {
-  const { characters } = useCollection();
+  const { characters, getCharacter } = useCollection();
 
   const teams = useTeamStore((s) => s.teams);
   const selectedSlot = useTeamStore((s) => s.selectedSlot);
@@ -54,6 +54,7 @@ export function TeamsPage() {
               slot={slot}
               name={teams[slot].name}
               members={teams[slot].members}
+              getCharacter={getCharacter}
               onNameChange={(name) => setTeamName(slot, name)}
               onEdit={() => selectSlot(slot)}
             />
@@ -77,6 +78,7 @@ export function TeamsPage() {
                 slot={selectedSlot}
                 name={selectedTeam.name}
                 members={selectedTeam.members}
+                getCharacter={getCharacter}
                 onNameChange={(name) => setTeamName(selectedSlot, name)}
               />
 

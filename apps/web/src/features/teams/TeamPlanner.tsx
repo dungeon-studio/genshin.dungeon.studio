@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { CollectionCharacter } from '@genshin/domain';
 import type { TeamMember, TeamSlot } from '@genshin/domain';
 import { MAX_TEAM_MEMBERS } from '@genshin/domain';
 import { Pencil } from 'lucide-react';
@@ -8,19 +9,25 @@ import { useRef, useState } from 'react';
 
 import { TeamCharacterPlanner } from '@/components/TeamCharacterPlanner';
 import { Input } from '@/components/ui/input';
-import { useCollection } from '@/features/collection/characters/useCharacterCollection';
 
 interface TeamPlannerProps {
   slot: TeamSlot;
   name: string;
   members: TeamMember[];
+  getCharacter: (characterId: string) => CollectionCharacter | undefined;
   onNameChange: (name: string) => void;
   onEdit?: () => void;
 }
 
-export function TeamPlanner({ slot, name, members, onNameChange, onEdit }: TeamPlannerProps) {
+export function TeamPlanner({
+  slot,
+  name,
+  members,
+  getCharacter,
+  onNameChange,
+  onEdit,
+}: TeamPlannerProps) {
   const slots = Array.from({ length: MAX_TEAM_MEMBERS }, (_, i) => members[i]);
-  const { getCharacter } = useCollection();
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(name);
   const inputRef = useRef<HTMLInputElement>(null);
