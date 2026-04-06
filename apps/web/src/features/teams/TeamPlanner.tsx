@@ -28,7 +28,10 @@ export function TeamPlanner({ slot, name, members, onNameChange, onEdit }: TeamP
   function startEditing() {
     setEditValue(name);
     setEditing(true);
-    requestAnimationFrame(() => inputRef.current?.select());
+    requestAnimationFrame(() => {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    });
   }
 
   function commitEdit() {
