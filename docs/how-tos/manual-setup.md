@@ -38,12 +38,12 @@ npm install -g firebase-tools
 ```bash
 # Debian/Ubuntu (including most WSL images)
 sudo apt-get install openjdk-21-jre-headless gh jq pipx
-pip install pre-commit
+pipx install pre-commit
 npm install -g firebase-tools
 
 # Fedora
 sudo dnf install java-21-openjdk-headless gh jq pipx
-pip install pre-commit
+pipx install pre-commit
 npm install -g firebase-tools
 ```
 
