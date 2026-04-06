@@ -41,6 +41,8 @@ print_version() {
 # ---------------------------------------------------------------------------
 
 run_verification() {
+  local _xtrace
+  _xtrace="$(shopt -po xtrace 2>/dev/null)" || true
   { set +x; } 2>/dev/null
   step "Verifying installed tools"
 
@@ -51,8 +53,8 @@ run_verification() {
   verify "reuse"                reuse --version
   verify "firebase"             firebase --version
   verify "playwright-cli"       npx playwright --version
-  verify "playwright-chromium"  npx playwright install --list
-  set -x
+  verify "playwright-browsers"  npx playwright install --list
+  eval "${_xtrace}"
 }
 
 # ---------------------------------------------------------------------------
@@ -60,6 +62,8 @@ run_verification() {
 # ---------------------------------------------------------------------------
 
 run_version_summary() {
+  local _xtrace
+  _xtrace="$(shopt -po xtrace 2>/dev/null)" || true
   { set +x; } 2>/dev/null
   step "Environment versions"
 
@@ -70,7 +74,7 @@ run_version_summary() {
   print_version "reuse"      reuse --version
   print_version "firebase"   firebase --version
   print_version "playwright" npx playwright --version
-  set -x
+  eval "${_xtrace}"
 }
 
 # ---------------------------------------------------------------------------
@@ -78,6 +82,8 @@ run_version_summary() {
 # ---------------------------------------------------------------------------
 
 run_status() {
+  local _xtrace
+  _xtrace="$(shopt -po xtrace 2>/dev/null)" || true
   { set +x; } 2>/dev/null
   echo ""
   if [[ ${#FAILURES[@]} -gt 0 ]]; then
@@ -91,4 +97,5 @@ run_status() {
   fi
 
   echo "Setup complete — all tools verified."
+  eval "${_xtrace}"
 }

@@ -18,7 +18,9 @@ on your host before running it:
 
 - **Node.js** v20+ (`node --version`)
 - **Java** 21+, required by Firebase emulators (`java -version`)
+- **Firebase CLI** (`firebase --version`)
 - **GitHub CLI** (`gh --version`)
+- **pre-commit** (`pre-commit --version`)
 - **jq** (`jq --version`)
 - **pipx** (`pipx --version`)
 
@@ -27,7 +29,8 @@ on your host before running it:
 #### macOS
 
 ```bash
-brew install openjdk@21 gh jq pipx
+brew install openjdk@21 gh jq pipx pre-commit
+npm install -g firebase-tools
 ```
 
 #### Linux / Windows Subsystem for Linux
@@ -35,9 +38,13 @@ brew install openjdk@21 gh jq pipx
 ```bash
 # Debian/Ubuntu (including most WSL images)
 sudo apt-get install openjdk-21-jre-headless gh jq pipx
+pip install pre-commit
+npm install -g firebase-tools
 
 # Fedora
 sudo dnf install java-21-openjdk-headless gh jq pipx
+pip install pre-commit
+npm install -g firebase-tools
 ```
 
 ---
@@ -50,6 +57,8 @@ git clone https://github.com/dungeon-studio/genshin.dungeon.studio.git
 cd genshin.dungeon.studio
 
 # Run the setup script (installs dependencies, hooks, and verifies tools)
+# NOTE: The script assumes Debian/Ubuntu for the Google Cloud SDK install step.
+# On macOS or Fedora, install gcloud separately and run the remaining steps manually.
 .devcontainer/postCreateCommand.sh
 
 # Configure the web app for local emulators
