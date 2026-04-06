@@ -103,6 +103,7 @@ export function useTeams(): UseTeamsResult {
     const handler = (e: BeforeUnloadEvent) => {
       if (isSavingRef.current) {
         e.preventDefault();
+        e.returnValue = '';
       }
     };
     window.addEventListener('beforeunload', handler);
@@ -122,12 +123,17 @@ export function useTeams(): UseTeamsResult {
     storeSetTeams(collectionTeamsToStore(apiTeams));
   }, [apiTeams, storeSetTeams]);
 
-  // Helper: save a team slot after an optimistic store update, rolling back on failure.
+  // Helper: save a team slot after an optimistic store update, rolling back on failure
+  // only if the store still reflects this request's optimistic value.
   const saveAfterMutation = useCallback(
     (slot: TeamSlot, previousTeam: Team) => {
-      const updatedTeam = useTeamStore.getState().teams[slot];
-      saveTeamApi(teamToSavePayload(updatedTeam), {
+      const optimisticTeam = useTeamStore.getState().teams[slot];
+      saveTeamApi(teamToSavePayload(optimisticTeam), {
         onError: () => {
+          if (useTeamStore.getState().teams[slot] !== optimisticTeam) {
+            toast.error('Failed to save team.');
+            return;
+          }
           storeSetTeam(slot, previousTeam);
           toast.error('Failed to save team. Change has been reverted.');
         },
@@ -196,8 +202,13 @@ export function useTeams(): UseTeamsResult {
       const previousTeam = { ...useTeamStore.getState().teams[slot] };
       storeClearTeam(slot);
       if (isAuthenticated) {
+        const optimisticClearedTeam = useTeamStore.getState().teams[slot];
         deleteTeamApi(slot, {
           onError: () => {
+            if (useTeamStore.getState().teams[slot] !== optimisticClearedTeam) {
+              toast.error('Failed to clear team.');
+              return;
+            }
             storeSetTeam(slot, previousTeam);
             toast.error('Failed to clear team. Change has been reverted.');
           },
