@@ -5,22 +5,59 @@
 set -euo pipefail
 set -x
 
-# Install pnpm globally
-npm install -g pnpm@9.15.4
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib.sh
+source "${SCRIPT_DIR}/lib.sh"
 
-# Install gcloud CLI
+# ---------------------------------------------------------------------------
+# 1. Package manager
+# ---------------------------------------------------------------------------
+step "Installing pnpm via corepack"
+
+corepack enable
+corepack install
+
+# ---------------------------------------------------------------------------
+# 2. Google Cloud SDK
+# ---------------------------------------------------------------------------
+step "Installing Google Cloud SDK"
+
 curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg && \
 echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list && \
 sudo apt-get update && sudo apt-get install -y google-cloud-sdk
 
-# Install project dependencies
+# ---------------------------------------------------------------------------
+# 3. Project dependencies
+# ---------------------------------------------------------------------------
+step "Installing project dependencies"
+
 pnpm install
 
-# Install pre-commit hooks
+# ---------------------------------------------------------------------------
+# 4. Pre-commit hooks
+# ---------------------------------------------------------------------------
+step "Installing pre-commit hooks"
+
 pre-commit install
 
-# Install reuse-tool (SPDX license compliance checker)
+# ---------------------------------------------------------------------------
+# 5. SPDX license compliance checker
+# ---------------------------------------------------------------------------
+step "Installing reuse-tool"
+
 pipx install reuse==6.2.0
 
-# Install Playwright Chromium and system dependencies for the Playwright MCP server
+# ---------------------------------------------------------------------------
+# 6. Playwright browsers (for Playwright MCP server)
+# ---------------------------------------------------------------------------
+step "Installing Playwright Chromium and Chrome"
+
 npx --yes playwright install --with-deps chromium chrome
+
+# ---------------------------------------------------------------------------
+# Verify and report
+# ---------------------------------------------------------------------------
+
+run_verification
+run_version_summary
+run_status
