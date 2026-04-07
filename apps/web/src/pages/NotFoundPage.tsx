@@ -16,7 +16,7 @@ export function NotFoundPage() {
           to="/"
           className="mt-6 inline-block rounded-md bg-primary px-6 py-3 text-primary-foreground transition hover:bg-primary/90"
         >
-          Back to Home
+          Back to Teams
         </Link>
       </div>
     </div>
