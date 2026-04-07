@@ -5,10 +5,9 @@ import { NavLink } from 'react-router-dom';
 
 export function Nav() {
   const navLinks = [
-    { to: '/', label: 'Home' },
+    { to: '/', label: 'Teams' },
     { to: '/characters', label: 'Characters' },
     { to: '/weapons', label: 'Weapons' },
-    { to: '/teams', label: 'Teams' },
     { to: '/chat', label: 'Chat' },
   ];
 
