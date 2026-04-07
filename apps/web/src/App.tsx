@@ -9,7 +9,6 @@ import { Toaster } from './components/ui/sonner';
 import { AuthProvider } from './features/auth';
 import { CharactersPage } from './pages/CharactersPage';
 import { ChatPage } from './pages/ChatPage';
-import { HomePage } from './pages/HomePage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { TeamsPage } from './pages/TeamsPage';
 import { WeaponsPage } from './pages/WeaponsPage';
@@ -23,10 +22,9 @@ export function App() {
         <Router>
           <Routes>
             <Route element={<Layout />}>
-              <Route path="/" element={<HomePage />} />
+              <Route path="/" element={<TeamsPage />} />
               <Route path="/characters" element={<CharactersPage />} />
               <Route path="/weapons" element={<WeaponsPage />} />
-              <Route path="/teams" element={<TeamsPage />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>

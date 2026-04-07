@@ -11,7 +11,7 @@ Follow the conventions in [code-generation.instructions.md](code-generation.inst
 
 Create a new page component at `apps/web/src/pages/${input:pageName}Page.tsx`.
 
-Use [HomePage.tsx](../../apps/web/src/pages/HomePage.tsx) as a reference for
+Use [CharactersPage.tsx](../../apps/web/src/pages/CharactersPage.tsx) as a reference for
 structure and style.
 
 ## Requirements
