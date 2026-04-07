@@ -16,7 +16,7 @@ SPDX-License-Identifier: MIT
 <!-- vale Google.Acronyms = YES -->
 <!-- markdownlint-enable MD041 -->
 
-# Genshin team builder
+# Genshin Planner
 
 By [Alex Brandt](https://github.com/alunduil) · [Repository](https://github.com/dungeon-studio/genshin.dungeon.studio)
 
@@ -24,7 +24,7 @@ By [Alex Brandt](https://github.com/alunduil) · [Repository](https://github.com
 
 ## About
 
-Experiment with team compositions without the spreadsheets. Genshin Team Builder is an early stage project that aims to let you describe your character collection to an AI assistant and, when implemented, get personalized team recommendations. Whether you're optimizing for Abyss clears or just want to try new playstyles, the goal is to provide suggestions tailored to _your_ roster.
+Experiment with team compositions without the spreadsheets. Genshin Planner is an early stage project that aims to let you describe your character collection to an AI assistant and, when implemented, get personalized team recommendations. Whether you're optimizing for Abyss clears or just want to try new playstyles, the goal is to provide suggestions tailored to _your_ roster.
 
 ## Who's it for
 
