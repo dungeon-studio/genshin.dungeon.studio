@@ -10,7 +10,7 @@ export function Footer() {
     <footer className="border-t border-border bg-muted py-8">
       <div className="mx-auto max-w-7xl px-4 text-center text-sm text-muted-foreground">
         <nav aria-label="Footer">
-          <ul className="flex justify-center gap-6">
+          <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2">
             <li>
               <a
                 href={`${GITHUB_REPO}/issues/new?template=bug-report.yml`}
