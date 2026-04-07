@@ -8,7 +8,6 @@ export function Nav() {
     { to: '/', label: 'Teams' },
     { to: '/characters', label: 'Characters' },
     { to: '/weapons', label: 'Weapons' },
-    { to: '/chat', label: 'Chat' },
   ];
 
   return (
