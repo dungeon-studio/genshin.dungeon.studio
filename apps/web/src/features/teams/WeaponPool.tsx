@@ -67,7 +67,7 @@ export function WeaponPool({
   }, [collectionWeapons]);
 
   return (
-    <div className="space-y-3">
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
       <WeaponFilters
         filters={filters}
         onChange={handleFilterChange}
@@ -79,30 +79,32 @@ export function WeaponPool({
         showWeaponTypes={false}
       />
 
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filteredWeapons.flatMap((weapon) => {
-          const instances = instancesByWeaponId.get(weapon.id) ?? [];
-          return instances.map((instance) => (
-            <PoolWeaponCard
-              key={instance.weaponInstanceId}
-              weapon={weapon}
-              refinementLevel={instance.refinementLevel}
-              selected={instance.weaponInstanceId === selectedCollectionWeaponId}
-              onClick={() => {
-                if (instance.weaponInstanceId === selectedCollectionWeaponId) {
-                  onClear();
-                } else {
-                  onSelect(instance.weaponInstanceId);
-                }
-              }}
-            />
-          ));
-        })}
-      </div>
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredWeapons.flatMap((weapon) => {
+            const instances = instancesByWeaponId.get(weapon.id) ?? [];
+            return instances.map((instance) => (
+              <PoolWeaponCard
+                key={instance.weaponInstanceId}
+                weapon={weapon}
+                refinementLevel={instance.refinementLevel}
+                selected={instance.weaponInstanceId === selectedCollectionWeaponId}
+                onClick={() => {
+                  if (instance.weaponInstanceId === selectedCollectionWeaponId) {
+                    onClear();
+                  } else {
+                    onSelect(instance.weaponInstanceId);
+                  }
+                }}
+              />
+            ));
+          })}
+        </div>
 
-      {filteredWeapons.length === 0 && (
-        <p className="py-8 text-center text-muted-foreground">No weapons match your filters.</p>
-      )}
+        {filteredWeapons.length === 0 && (
+          <p className="py-8 text-center text-muted-foreground">No weapons match your filters.</p>
+        )}
+      </div>
     </div>
   );
 }

@@ -43,7 +43,7 @@ export function CharacterPool({ characters, assignedIds, disabled, onAssign }: C
   }, [filters, ownedIds]);
 
   return (
-    <div className="space-y-3">
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
       <CharacterFilters
         filters={filters}
         onChange={handleFilterChange}
@@ -54,30 +54,34 @@ export function CharacterPool({ characters, assignedIds, disabled, onAssign }: C
         showOwnership={false}
       />
 
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filteredCharacters.map((character) => {
-          const owned = ownedIds.has(character.id);
-          const assigned = assignedIds.has(character.id);
-          const clickable = !disabled && owned;
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredCharacters.map((character) => {
+            const owned = ownedIds.has(character.id);
+            const assigned = assignedIds.has(character.id);
+            const clickable = !disabled && owned;
 
-          const entry = characters[character.id];
+            const entry = characters[character.id];
 
-          return (
-            <PoolCharacterCard
-              key={character.id}
-              character={character}
-              constellationLevel={entry?.constellationLevel ?? 0}
-              assigned={assigned}
-              disabled={!clickable}
-              onClick={() => onAssign(character.id)}
-            />
-          );
-        })}
+            return (
+              <PoolCharacterCard
+                key={character.id}
+                character={character}
+                constellationLevel={entry?.constellationLevel ?? 0}
+                assigned={assigned}
+                disabled={!clickable}
+                onClick={() => onAssign(character.id)}
+              />
+            );
+          })}
+        </div>
+
+        {filteredCharacters.length === 0 && (
+          <p className="py-8 text-center text-muted-foreground">
+            No characters match your filters.
+          </p>
+        )}
       </div>
-
-      {filteredCharacters.length === 0 && (
-        <p className="py-8 text-center text-muted-foreground">No characters match your filters.</p>
-      )}
     </div>
   );
 }
