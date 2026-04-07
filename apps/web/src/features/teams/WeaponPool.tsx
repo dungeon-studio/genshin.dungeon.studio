@@ -10,7 +10,7 @@ import { WeaponSummary } from '@/components/WeaponSummary';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
 import { WeaponFilters } from '@/features/collection/weapons/WeaponFilters';
-import { RARITY_BORDER_COLORS, RARITY_BORDER_COLORS_DIM } from '@/lib/rarityStyles';
+import { RARITY_BORDER_COLORS } from '@/lib/rarityStyles';
 import { cn } from '@/lib/utils';
 
 function poolFilterState(weaponType: WeaponType): WeaponFilterState {
@@ -115,15 +115,13 @@ interface PoolWeaponCardProps {
 }
 
 function PoolWeaponCard({ weapon, refinementLevel, selected, onClick }: PoolWeaponCardProps) {
-  const borderColors = selected ? RARITY_BORDER_COLORS : RARITY_BORDER_COLORS_DIM;
-
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
         'flex w-full items-center gap-3 rounded-lg border border-border border-l-4 bg-card p-3 text-left shadow-sm transition-colors',
-        borderColors[weapon.rarity] ?? 'border-l-border',
+        selected ? (RARITY_BORDER_COLORS[weapon.rarity] ?? 'border-l-border') : 'border-l-border',
         'cursor-pointer hover:bg-accent/50',
       )}
       aria-label={selected ? `Remove ${weapon.name} from team` : `Assign ${weapon.name} to team`}
