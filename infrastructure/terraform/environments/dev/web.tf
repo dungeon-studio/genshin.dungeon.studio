@@ -49,7 +49,7 @@ resource "google_firebase_hosting_custom_domain" "web" {
 resource "google_firebase_web_app" "web" {
   provider     = google-beta
   project      = var.gcp_dev_project_id
-  display_name = "Genshin Team Builder (dev)"
+  display_name = "Genshin Planner (dev)"
 
   depends_on = [google_firebase_project.default]
 }

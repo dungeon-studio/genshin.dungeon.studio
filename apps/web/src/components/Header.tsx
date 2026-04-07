@@ -32,7 +32,7 @@ export function Header() {
             height={32}
             className="hidden dark:block"
           />
-          Genshin Team Builder
+          Genshin Planner
         </Link>
         <div className="flex items-center gap-3">
           {!loading && (user ? <UserMenu user={user} /> : <LoginButton />)}

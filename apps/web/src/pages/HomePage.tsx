@@ -5,9 +5,9 @@ export function HomePage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-foreground">Welcome to Genshin Team Builder</h1>
+        <h1 className="text-4xl font-bold text-foreground">Welcome to Genshin Planner</h1>
         <p className="mt-4 text-lg text-muted-foreground">
-          AI-powered team building companion for Genshin Impact
+          Plan your teams and manage your collection
         </p>
       </div>
 
