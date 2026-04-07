@@ -66,4 +66,4 @@ export {
 } from './artifacts.js';
 
 // Versions
-export { compareVersions } from './versions.js';
+export { compareVersions, GAME_DATA_VERSION } from './versions.js';

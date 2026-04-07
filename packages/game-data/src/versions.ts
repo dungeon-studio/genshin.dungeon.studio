@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+/** The game version the static data in this package covers. */
+export const GAME_DATA_VERSION = 'Luna IV';
+
 // Luna versions map to [major, minor] tuples in the 6.x series (after 5.x, the last numeric era).
 const LUNA_VERSIONS: Record<string, readonly [number, number]> = {
   'Luna I': [6, 0],
