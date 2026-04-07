@@ -48,6 +48,7 @@ resource "google_project_iam_custom_role" "github_deployer_rw_applier" {
     "firebase.clients.delete",
     "firebase.clients.get",
     "firebase.clients.list",
+    "firebase.clients.update",
     "firebase.projects.get",
     "firebase.projects.update",
     "firebaseauth.configs.create",
