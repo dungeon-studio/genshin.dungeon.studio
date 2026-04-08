@@ -6,7 +6,6 @@ import type {
   CollectionTeam,
   CollectionWeaponId,
   Team,
-  TeamMember,
   TeamSlot,
 } from '@genshin/domain';
 import { initialTeams } from '@genshin/domain';
@@ -45,7 +44,7 @@ function collectionTeamsToStore(apiTeams: CollectionTeam[]): Record<TeamSlot, Te
   for (const ct of apiTeams) {
     const members: Team['members'] = [undefined, undefined, undefined, undefined];
     for (let i = 0; i < ct.members.length && i < 4; i++) {
-      members[i] = ct.members[i];
+      members[i] = ct.members[i] ?? undefined;
     }
     teams[ct.slot] = {
       slot: ct.slot,
@@ -64,7 +63,7 @@ function teamToSavePayload(team: Team): SaveTeamPayload {
   return {
     slot: team.slot,
     name: team.name,
-    members: team.members.filter((m): m is TeamMember => m !== undefined),
+    members: team.members.map((m) => m ?? null),
     description: team.description,
   };
 }

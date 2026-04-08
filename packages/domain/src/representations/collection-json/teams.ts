@@ -129,7 +129,9 @@ export function deserialiseTeam(item: Item): CollectionTeam {
   const data: Record<string, unknown> = Object.fromEntries(
     item.data.filter((d) => d.name !== 'members').map((d) => [d.name, d.value]),
   );
-  data.members = members.map((m: unknown, i: number) => deserialiseTeamMember(m, i));
+  data.members = members.map((m: unknown, i: number) =>
+    m === null ? null : deserialiseTeamMember(m, i),
+  );
   assertCollectionTeam(data);
   return data;
 }
