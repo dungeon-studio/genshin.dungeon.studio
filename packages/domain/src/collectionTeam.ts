@@ -10,8 +10,8 @@ import type { TeamMember } from './teamMember.js';
 /**
  * CollectionTeam is the persisted form of a user's team composition.
  *
- * Each user has up to 4 team loadout slots (1–4). Members is a 4-element
- * array where `null` represents an empty slot, preserving positional
+ * Each user has up to 4 team loadout slots (1–4). Members is an array with
+ * 0 to 4 entries where `null` represents an empty slot, preserving positional
  * information across API round-trips.
  */
 export interface CollectionTeam {
@@ -56,7 +56,8 @@ export function assertCollectionTeam(value: unknown): asserts value is Collectio
     );
   }
   for (const member of data.members) {
-    if (typeof member !== 'object' || member === null || typeof member.characterId !== 'string') {
+    if (member === null) continue;
+    if (typeof member !== 'object' || typeof member.characterId !== 'string') {
       throw new TypeError(
         `CollectionTeam.members entries must have a string characterId, got: ${JSON.stringify(member)}`,
       );
