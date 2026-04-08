@@ -489,11 +489,13 @@ export type ArtifactMinorAffix = (typeof ARTIFACT_MINOR_AFFIXES)[number];
  */
 export type ArtifactMainAffix = SandsMainAffix | GobletMainAffix | CircletMainAffix;
 
+const ARTIFACT_SETS_BY_ID = new Map(ARTIFACT_SETS.map((s) => [s.id, s]));
+
 /**
  * Helper to find artifact set by ID
  */
 export function getArtifactSetById(id: string): ArtifactSet | undefined {
-  return ARTIFACT_SETS.find((set) => set.id === id);
+  return ARTIFACT_SETS_BY_ID.get(id);
 }
 
 /**

@@ -4,10 +4,12 @@
 import type { CollectionWeapon, CollectionWeaponId, Team, TeamSlot } from '@genshin/domain';
 import { TEAM_SLOTS } from '@genshin/domain';
 import type { Weapon, WeaponType } from '@genshin/game-data';
-import { WEAPONS } from '@genshin/game-data';
-import { Lock } from 'lucide-react';
+import { getWeaponById, WEAPONS } from '@genshin/game-data';
+import { Lock, Swords } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 
+import { Button } from '@/components/ui/button';
 import { WeaponSummary } from '@/components/WeaponSummary';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
@@ -70,13 +72,23 @@ export function WeaponPool({
 
   const ownedCount = ownedWeaponIds.size;
 
+  const hasWeaponsOfType = useMemo(() => {
+    for (const id of ownedWeaponIds) {
+      const weapon = getWeaponById(id);
+      if (weapon?.type === weaponType) return true;
+    }
+    return false;
+  }, [ownedWeaponIds, weaponType]);
+
   const { filteredWeapons, filteredOwnedCount } = useMemo(() => {
+    if (ownedWeaponIds.size === 0 || !hasWeaponsOfType)
+      return { filteredWeapons: [] as Weapon[], filteredOwnedCount: 0 };
     const filtered = filterWeapons(WEAPONS, filters, ownedWeaponIds);
     return {
       filteredWeapons: filtered,
       filteredOwnedCount: filtered.filter((w) => ownedWeaponIds.has(w.id)).length,
     };
-  }, [filters, ownedWeaponIds]);
+  }, [filters, ownedWeaponIds, hasWeaponsOfType]);
 
   const instancesByWeaponId = useMemo(() => {
     const map = new Map<string, CollectionWeapon[]>();
@@ -87,6 +99,40 @@ export function WeaponPool({
     }
     return map;
   }, [collectionWeapons]);
+
+  if (ownedCount === 0) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 py-12">
+        <Swords className="h-10 w-10 text-muted-foreground" aria-hidden="true" focusable={false} />
+        <div className="text-center">
+          <p className="font-medium">No weapons in your collection</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Visit the weapons page to add weapons to your collection.
+          </p>
+        </div>
+        <Button asChild>
+          <Link to="/weapons">Go to Weapons</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  if (!hasWeaponsOfType) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 py-12">
+        <Swords className="h-10 w-10 text-muted-foreground" aria-hidden="true" focusable={false} />
+        <div className="text-center">
+          <p className="font-medium">No {weaponType} weapons in your collection</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Visit the weapons page to add {weaponType} weapons to your collection.
+          </p>
+        </div>
+        <Button asChild>
+          <Link to="/weapons">Go to Weapons</Link>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">

@@ -282,11 +282,13 @@ export const WEAPONS: Weapon[] = [
   },
 ];
 
+const WEAPONS_BY_ID = new Map(WEAPONS.map((w) => [w.id, w]));
+
 /**
  * Helper to find weapon by ID
  */
 export function getWeaponById(id: string): Weapon | undefined {
-  return WEAPONS.find((weapon) => weapon.id === id);
+  return WEAPONS_BY_ID.get(id);
 }
 
 /**

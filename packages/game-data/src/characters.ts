@@ -1165,11 +1165,13 @@ export const CHARACTERS: Character[] = [
   },
 ];
 
+const CHARACTERS_BY_ID = new Map(CHARACTERS.map((c) => [c.id, c]));
+
 /**
  * Helper to find character by ID
  */
 export function getCharacterById(id: string): Character | undefined {
-  return CHARACTERS.find((char) => char.id === id);
+  return CHARACTERS_BY_ID.get(id);
 }
 
 /**
