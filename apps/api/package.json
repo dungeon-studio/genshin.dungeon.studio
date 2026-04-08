@@ -15,12 +15,12 @@
     "@genshin/collection-json": "workspace:*",
     "@genshin/domain": "workspace:*",
     "@genshin/game-data": "workspace:*",
-    "@hono/node-server": "1.19.12",
+    "@hono/node-server": "1.19.13",
     "ajv": "8.18.0",
     "content-type": "1.0.5",
     "firebase-admin": "13.7.0",
     "google-gax": "5.0.6",
-    "hono": "4.12.10",
+    "hono": "4.12.12",
     "negotiator": "1.0.0"
   },
   "devDependencies": {
