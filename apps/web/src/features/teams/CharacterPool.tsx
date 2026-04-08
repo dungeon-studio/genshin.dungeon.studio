@@ -4,9 +4,12 @@
 import type { CharacterId, CollectionCharacter } from '@genshin/domain';
 import type { Character } from '@genshin/game-data';
 import { CHARACTERS } from '@genshin/game-data';
+import { Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { CharacterSummary } from '@/components/CharacterSummary';
+import { Button } from '@/components/ui/button';
 import { CharacterFilters } from '@/features/collection/characters/CharacterFilters';
 import type { CharacterFilterState } from '@/features/collection/characters/filtering';
 import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
@@ -41,6 +44,23 @@ export function CharacterPool({ characters, assignedIds, disabled, onAssign }: C
       filteredOwnedCount: filtered.filter((c) => ownedIds.has(c.id)).length,
     };
   }, [filters, ownedIds]);
+
+  if (ownedCount === 0) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 py-12">
+        <Users className="h-10 w-10 text-muted-foreground" aria-hidden="true" focusable={false} />
+        <div className="text-center">
+          <p className="font-medium">No characters in your collection</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Visit the characters page to add characters to your collection.
+          </p>
+        </div>
+        <Button asChild>
+          <Link to="/characters">Go to Characters</Link>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
