@@ -60,6 +60,11 @@ export {
   type TeamSlot,
 } from './team.js';
 export { type ArtifactPlan, type TeamMember } from './teamMember.js';
-export { validateTeam, validateTeamSlot, type TeamValidationContext } from './teamValidation.js';
+export {
+  validateTeam,
+  validateTeams,
+  validateTeamSlot,
+  type TeamValidationContext,
+} from './teamValidation.js';
 export { type ProfileUpdate, type UserProfile } from './userProfile.js';
 export type { UUID } from './uuid.js';

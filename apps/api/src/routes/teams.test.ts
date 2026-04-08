@@ -211,6 +211,7 @@ describe('Team routes', () => {
     beforeEach(() => {
       mockCharacterOwned();
       mockWeaponOwned();
+      vi.mocked(listTeams).mockResolvedValue([]);
     });
 
     let res: Response;
@@ -422,6 +423,66 @@ describe('Team routes', () => {
         expect(res.status).toBe(400);
         const body = (await res.json()) as { detail: string };
         expect(body.detail).toContain('Weapon instance not in collection');
+      });
+
+      it('returns 400 when duplicate weapon instance IDs in same team', async () => {
+        const res = await app.request(
+          authedRequest('PUT', '/api/teams/1', {
+            members: [
+              { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' },
+              { characterId: 'xingqiu', weaponInstanceId: 'uuid-1' },
+            ],
+          }),
+        );
+
+        expect(res.status).toBe(400);
+        const body = (await res.json()) as { detail: string };
+        expect(body.detail).toContain('Duplicate weapon instance IDs in team');
+      });
+
+      it('returns 400 when weapon equipped by different character in another team', async () => {
+        vi.mocked(listTeams).mockResolvedValue([
+          {
+            ...FAKE_TEAM,
+            slot: 2,
+            members: [{ characterId: 'ganyu', weaponInstanceId: 'uuid-1' as UUID }],
+          },
+        ]);
+
+        const res = await app.request(
+          authedRequest('PUT', '/api/teams/1', {
+            members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }],
+          }),
+        );
+
+        expect(res.status).toBe(400);
+        const body = (await res.json()) as { detail: string };
+        expect(body.detail).toContain('already equipped by character');
+      });
+
+      it('allows same character to carry same weapon across teams', async () => {
+        vi.mocked(listTeams).mockResolvedValue([
+          {
+            ...FAKE_TEAM,
+            slot: 2,
+            members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' as UUID }],
+          },
+        ]);
+        vi.mocked(saveTeam).mockResolvedValue({
+          team: {
+            ...FAKE_TEAM,
+            members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' as UUID }],
+          },
+          created: false,
+        });
+
+        const res = await app.request(
+          authedRequest('PUT', '/api/teams/1', {
+            members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }],
+          }),
+        );
+
+        expect(res.status).toBe(200);
       });
 
       it('returns 400 for unknown artifact set', async () => {

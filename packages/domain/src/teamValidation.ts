@@ -15,6 +15,7 @@
 import type { ValidationIssue } from '@genshin/validation';
 import { issue, prefixPaths } from '@genshin/validation';
 import { validateArtifactPlan } from './artifactPlanValidation.js';
+import type { TeamSlot } from './team.js';
 import type { TeamMember } from './teamMember.js';
 
 /**
@@ -93,11 +94,77 @@ export function validateTeam(
     }
   }
 
+  // Per-team weapon uniqueness: no duplicate weapon instance IDs ------
+  const seenWeapons = new Set<string>();
+  for (const [i, member] of team.members.entries()) {
+    if (member.weaponInstanceId) {
+      if (seenWeapons.has(member.weaponInstanceId)) {
+        issues.push(
+          issue(
+            `Duplicate weapon instance ID: ${member.weaponInstanceId}`,
+            `members[${i}].weaponInstanceId`,
+          ),
+        );
+      }
+      seenWeapons.add(member.weaponInstanceId);
+    }
+  }
+
   // Per-member artifact plan validation --------------------------------
   for (const [i, member] of team.members.entries()) {
     if (member.artifactPlan) {
       issues.push(
         ...prefixPaths(validateArtifactPlan(member.artifactPlan), `members[${i}].artifactPlan`),
+      );
+    }
+  }
+
+  return issues;
+}
+
+// ---------------------------------------------------------------------------
+// validateTeams
+// ---------------------------------------------------------------------------
+
+/**
+ * Validate cross-team invariants for the team being saved.
+ *
+ * Currently checks weapon uniqueness: a weapon instance can only be equipped
+ * by one character at a time across all teams. The same character carrying
+ * the same weapon on multiple teams is allowed (Genshin Impact semantics).
+ *
+ * @param slot - The team slot being saved.
+ * @param currentMembers - Members of the team being saved.
+ * @param allTeams - All persisted teams for the user (may include the team being saved).
+ */
+export function validateTeams(
+  slot: TeamSlot,
+  currentMembers: TeamMember[],
+  allTeams: { slot: TeamSlot; members: TeamMember[] }[],
+): ValidationIssue[] {
+  const issues: ValidationIssue[] = [];
+
+  // Build a map of weaponInstanceId → characterId from other teams.
+  const equippedWeapons = new Map<string, string>();
+  for (const team of allTeams) {
+    if (team.slot === slot) continue;
+    for (const member of team.members) {
+      if (member.weaponInstanceId) {
+        equippedWeapons.set(member.weaponInstanceId, member.characterId);
+      }
+    }
+  }
+
+  for (const [i, member] of currentMembers.entries()) {
+    if (!member.weaponInstanceId) continue;
+
+    const existingOwner = equippedWeapons.get(member.weaponInstanceId);
+    if (existingOwner && existingOwner !== member.characterId) {
+      issues.push(
+        issue(
+          `Weapon instance ${member.weaponInstanceId} is already equipped by character ${existingOwner}`,
+          `members[${i}].weaponInstanceId`,
+        ),
       );
     }
   }

@@ -200,6 +200,8 @@ export function TeamsPage() {
                     collectionWeapons={collectionWeapons}
                     weaponType={selectedMemberWeaponType}
                     selectedCollectionWeaponId={selectedMember.weaponInstanceId}
+                    slot={selectedSlot!}
+                    memberIndex={selectedMemberIndex!}
                     onSelect={handleWeaponSelect}
                     onClear={handleWeaponClear}
                   />
