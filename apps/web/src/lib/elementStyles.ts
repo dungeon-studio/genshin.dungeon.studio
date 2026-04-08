@@ -52,3 +52,13 @@ export const ELEMENT_BG_COLORS: Record<Element, string> = {
   Geo: 'bg-geo-dark text-white',
   Dendro: 'bg-dendro-dark text-white',
 };
+
+export const ELEMENT_BORDER_ALL_COLORS: Record<Element, string> = {
+  Pyro: 'border-pyro',
+  Hydro: 'border-hydro',
+  Electro: 'border-electro',
+  Cryo: 'border-cryo',
+  Anemo: 'border-anemo',
+  Geo: 'border-geo',
+  Dendro: 'border-dendro',
+};

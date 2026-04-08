@@ -102,7 +102,7 @@ export function TeamPlanner({
           <button
             type="button"
             onClick={onEdit}
-            className="ml-auto rounded-md bg-muted px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+            className="ml-auto hidden rounded-md bg-muted px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground sm:block"
             aria-label={`Edit ${name}`}
           >
             Edit

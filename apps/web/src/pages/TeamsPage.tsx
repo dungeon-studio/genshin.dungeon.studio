@@ -11,6 +11,7 @@ import { useCollection } from '@/features/collection/characters/useCharacterColl
 import { useWeaponCollection } from '@/features/collection/weapons/useWeaponCollection';
 import { CharacterPool } from '@/features/teams/CharacterPool';
 import { TeamPlanner } from '@/features/teams/TeamPlanner';
+import { TeamStrip } from '@/features/teams/TeamStrip';
 import { WeaponPool } from '@/features/teams/WeaponPool';
 import { useTeams } from '@/features/teams/useTeams';
 
@@ -110,6 +111,10 @@ export function TeamsPage() {
                 setSelectedSlot(slot);
                 setSelectedMemberIndex(null);
               }}
+              onMemberSelect={(memberIndex) => {
+                setSelectedSlot(slot);
+                setSelectedMemberIndex(memberIndex);
+              }}
             />
           </section>
         ))}
@@ -127,23 +132,31 @@ export function TeamsPage() {
       >
         <SheetContent
           side="bottom"
-          className="mx-auto flex w-full max-w-7xl flex-col overflow-y-auto rounded-t-xl top-[124px]"
+          className="mx-auto flex w-full max-w-7xl flex-col overflow-hidden rounded-t-xl top-0 sm:top-[124px]"
         >
           {selectedSlot !== null && selectedTeam && (
             <>
-              <TeamPlanner
-                slot={selectedSlot}
-                name={selectedTeam.name}
+              <TeamStrip
                 members={selectedTeam.members}
-                getCharacter={getCharacter}
-                getCollectionWeapon={getCollectionWeapon}
-                selectedMemberIndex={selectedMemberIndex}
-                onMemberSelect={setSelectedMemberIndex}
-                onNameChange={(name) => setTeamName(selectedSlot, name)}
-                onArtifactPlanChange={(memberIndex, plan) =>
-                  setArtifactPlan(selectedSlot, memberIndex, plan)
-                }
+                selectedIndex={selectedMemberIndex}
+                onSelect={setSelectedMemberIndex}
               />
+
+              <div className="hidden sm:block">
+                <TeamPlanner
+                  slot={selectedSlot}
+                  name={selectedTeam.name}
+                  members={selectedTeam.members}
+                  getCharacter={getCharacter}
+                  getCollectionWeapon={getCollectionWeapon}
+                  selectedMemberIndex={selectedMemberIndex}
+                  onMemberSelect={setSelectedMemberIndex}
+                  onNameChange={(name) => setTeamName(selectedSlot, name)}
+                  onArtifactPlanChange={(memberIndex, plan) =>
+                    setArtifactPlan(selectedSlot, memberIndex, plan)
+                  }
+                />
+              </div>
 
               <nav className="mt-4 flex gap-4 border-b border-border" aria-label="Team editor tabs">
                 <button
@@ -172,7 +185,7 @@ export function TeamsPage() {
                 </button>
               </nav>
 
-              <div className="mt-3 flex-1">
+              <div className="mt-3 flex min-h-0 flex-1 flex-col">
                 {activeTab === 'characters' && (
                   <CharacterPool
                     characters={characters}
