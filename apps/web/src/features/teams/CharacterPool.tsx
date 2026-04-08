@@ -38,6 +38,8 @@ export function CharacterPool({ characters, assignedIds, disabled, onAssign }: C
   const ownedCount = ownedIds.size;
 
   const { filteredCharacters, filteredOwnedCount } = useMemo(() => {
+    if (ownedIds.size === 0)
+      return { filteredCharacters: [] as Character[], filteredOwnedCount: 0 };
     const filtered = filterCharacters(CHARACTERS, filters, ownedIds);
     return {
       filteredCharacters: filtered,

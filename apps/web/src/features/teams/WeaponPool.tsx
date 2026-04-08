@@ -81,12 +81,14 @@ export function WeaponPool({
   }, [ownedWeaponIds, weaponType]);
 
   const { filteredWeapons, filteredOwnedCount } = useMemo(() => {
+    if (ownedWeaponIds.size === 0 || !hasWeaponsOfType)
+      return { filteredWeapons: [] as Weapon[], filteredOwnedCount: 0 };
     const filtered = filterWeapons(WEAPONS, filters, ownedWeaponIds);
     return {
       filteredWeapons: filtered,
       filteredOwnedCount: filtered.filter((w) => ownedWeaponIds.has(w.id)).length,
     };
-  }, [filters, ownedWeaponIds]);
+  }, [filters, ownedWeaponIds, hasWeaponsOfType]);
 
   const instancesByWeaponId = useMemo(() => {
     const map = new Map<string, CollectionWeapon[]>();
