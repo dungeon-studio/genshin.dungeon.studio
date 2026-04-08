@@ -136,6 +136,12 @@ async function validateMembers(userId: string, members: TeamMember[]): Promise<v
     throw new HTTPException(400, { message: 'Duplicate character IDs in team' });
   }
 
+  // No duplicate weapon instance IDs
+  const weaponIds = members.filter((m) => m.weaponInstanceId).map((m) => m.weaponInstanceId!);
+  if (new Set(weaponIds).size !== weaponIds.length) {
+    throw new HTTPException(400, { message: 'Duplicate weapon instance IDs in team' });
+  }
+
   await Promise.all(
     members.map(async (member) => {
       // Character must be in user's collection

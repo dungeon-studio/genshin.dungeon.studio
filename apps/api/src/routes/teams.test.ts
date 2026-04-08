@@ -425,6 +425,21 @@ describe('Team routes', () => {
         expect(body.detail).toContain('Weapon instance not in collection');
       });
 
+      it('returns 400 when duplicate weapon instance IDs in same team', async () => {
+        const res = await app.request(
+          authedRequest('PUT', '/api/teams/1', {
+            members: [
+              { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' },
+              { characterId: 'xingqiu', weaponInstanceId: 'uuid-1' },
+            ],
+          }),
+        );
+
+        expect(res.status).toBe(400);
+        const body = (await res.json()) as { detail: string };
+        expect(body.detail).toContain('Duplicate weapon instance IDs in team');
+      });
+
       it('returns 400 when weapon equipped by different character in another team', async () => {
         vi.mocked(listTeams).mockResolvedValue([
           {
