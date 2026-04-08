@@ -43,6 +43,16 @@ export function Footer() {
             </li>
             <li>
               <a
+                href={`${GITHUB_REPO}/blob/develop/CHANGELOG.md`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline-offset-4 hover:underline"
+              >
+                Changelog
+              </a>
+            </li>
+            <li>
+              <a
                 href={GITHUB_REPO}
                 target="_blank"
                 rel="noopener noreferrer"

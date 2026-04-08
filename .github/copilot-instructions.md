@@ -112,6 +112,16 @@
   - Avoid duplicating long guidance across files; link to canonical docs instead.
   - State plans explicitly as planned or not yet implemented.
 
+## Changelog rules
+
+- `CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+- Write entries from the **user's perspective**. Describe what someone using Genshin Planner can see or do, not the implementation.
+- Don't include infrastructure, CI/CD, developer tooling, dependency updates, refactors, or internal package changes. Those are invisible to users.
+- Use the standard sections: Added, Changed, Deprecated, Removed, Fixed, Security. Each section is relative to the **previous release**, not the previous commit.
+- Before the first release, only **Added** applies. Other sections require a released baseline to compare against.
+- Keep entries concise. One bullet per user-visible change; combine related commits into a single entry.
+- Don't mention technology choices such as "zustand store" or "TanStack Query" unless the user directly interacts with that technology.
+
 ## Workflow guardrails
 
 - Never bypass pre-commit with `--no-verify`; fix root causes.
