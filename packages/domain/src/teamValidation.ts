@@ -54,7 +54,7 @@ export function validateTeamSlot(slot: unknown): ValidationIssue[] {
  * offline / anonymous validation on the web).
  */
 export function validateTeam(
-  team: { name: string; members: TeamMember[]; description?: string },
+  team: { name: string; members: (TeamMember | null)[]; description?: string },
   context?: TeamValidationContext,
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
@@ -67,6 +67,7 @@ export function validateTeam(
   // Per-team uniqueness: no duplicate character IDs --------------------
   const seen = new Set<string>();
   for (const [i, member] of team.members.entries()) {
+    if (member === null) continue;
     if (seen.has(member.characterId)) {
       issues.push(
         issue(`Duplicate character ID: ${member.characterId}`, `members[${i}].characterId`),
@@ -78,6 +79,7 @@ export function validateTeam(
   // Ownership checks (when collection context is available) ------------
   if (context) {
     for (const [i, member] of team.members.entries()) {
+      if (member === null) continue;
       if (!context.ownedCharacterIds.has(member.characterId)) {
         issues.push(
           issue(`Character not in collection: ${member.characterId}`, `members[${i}].characterId`),
@@ -97,6 +99,7 @@ export function validateTeam(
   // Per-team weapon uniqueness: no duplicate weapon instance IDs ------
   const seenWeapons = new Set<string>();
   for (const [i, member] of team.members.entries()) {
+    if (member === null) continue;
     if (member.weaponInstanceId) {
       if (seenWeapons.has(member.weaponInstanceId)) {
         issues.push(
@@ -112,6 +115,7 @@ export function validateTeam(
 
   // Per-member artifact plan validation --------------------------------
   for (const [i, member] of team.members.entries()) {
+    if (member === null) continue;
     if (member.artifactPlan) {
       issues.push(
         ...prefixPaths(validateArtifactPlan(member.artifactPlan), `members[${i}].artifactPlan`),
@@ -139,8 +143,8 @@ export function validateTeam(
  */
 export function validateTeams(
   slot: TeamSlot,
-  currentMembers: TeamMember[],
-  allTeams: { slot: TeamSlot; members: TeamMember[] }[],
+  currentMembers: (TeamMember | null)[],
+  allTeams: { slot: TeamSlot; members: (TeamMember | null)[] }[],
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
 
@@ -149,14 +153,14 @@ export function validateTeams(
   for (const team of allTeams) {
     if (team.slot === slot) continue;
     for (const member of team.members) {
-      if (member.weaponInstanceId) {
+      if (member !== null && member.weaponInstanceId) {
         equippedWeapons.set(member.weaponInstanceId, member.characterId);
       }
     }
   }
 
   for (const [i, member] of currentMembers.entries()) {
-    if (!member.weaponInstanceId) continue;
+    if (member === null || !member.weaponInstanceId) continue;
 
     const existingOwner = equippedWeapons.get(member.weaponInstanceId);
     if (existingOwner && existingOwner !== member.characterId) {

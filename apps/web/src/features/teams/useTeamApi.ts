@@ -11,7 +11,7 @@ import { apiDelete, apiGet, apiPut } from '@/lib/api';
 export interface SaveTeamPayload {
   slot: TeamSlot;
   name: string;
-  members: TeamMember[];
+  members: (TeamMember | null)[];
   description?: string;
 }
 

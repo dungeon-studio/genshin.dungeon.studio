@@ -24,9 +24,11 @@ export const teamPutRequestV1 = {
       },
       members: {
         type: 'array',
-        items: { $ref: '#/$defs/teamMember' },
+        items: {
+          oneOf: [{ $ref: '#/$defs/teamMember' }, { type: 'null' }],
+        },
         maxItems: 4,
-        description: 'Team members (0-4; partial teams are valid)',
+        description: 'Team members (0-4; null represents an empty slot)',
       },
     },
     additionalProperties: false,

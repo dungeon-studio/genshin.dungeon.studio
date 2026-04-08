@@ -10,13 +10,14 @@ import type { TeamMember } from './teamMember.js';
 /**
  * CollectionTeam is the persisted form of a user's team composition.
  *
- * Each user has up to 4 team loadout slots (1–4). Members is 0–4 entries;
- * partial teams (with holes) are valid input for downstream optimizers.
+ * Each user has up to 4 team loadout slots (1–4). Members is a 4-element
+ * array where `null` represents an empty slot, preserving positional
+ * information across API round-trips.
  */
 export interface CollectionTeam {
   slot: TeamSlot;
   name: string;
-  members: TeamMember[];
+  members: (TeamMember | null)[];
   description?: string;
   createdAt: ISOTimestamp;
   updatedAt: ISOTimestamp;

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionTeam, ISOTimestamp, TeamSlot } from '@genshin/domain';
+import type { CollectionTeam, ISOTimestamp, TeamMember, TeamSlot } from '@genshin/domain';
 
 export interface MemberDocumentData {
   characterId: string;
@@ -18,21 +18,33 @@ export interface MemberDocumentData {
 
 export interface DocumentData {
   name: string;
-  members: MemberDocumentData[];
+  members: (MemberDocumentData | null)[];
   description?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+function memberFromDocument(m: MemberDocumentData): TeamMember {
+  return {
+    characterId: m.characterId,
+    ...(m.weaponInstanceId ? { weaponInstanceId: m.weaponInstanceId } : {}),
+    ...(m.artifactPlan ? { artifactPlan: m.artifactPlan } : {}),
+  } as TeamMember;
+}
+
+function memberToDocument(m: TeamMember): MemberDocumentData {
+  return {
+    characterId: m.characterId,
+    ...(m.weaponInstanceId ? { weaponInstanceId: m.weaponInstanceId } : {}),
+    ...(m.artifactPlan ? { artifactPlan: m.artifactPlan } : {}),
+  };
 }
 
 export function fromDocument(slot: TeamSlot, data: DocumentData): CollectionTeam {
   return {
     slot,
     name: data.name,
-    members: data.members.map((m) => ({
-      characterId: m.characterId,
-      ...(m.weaponInstanceId ? { weaponInstanceId: m.weaponInstanceId } : {}),
-      ...(m.artifactPlan ? { artifactPlan: m.artifactPlan } : {}),
-    })) as CollectionTeam['members'],
+    members: data.members.map((m) => (m === null ? null : memberFromDocument(m))),
     ...(data.description !== undefined ? { description: data.description } : {}),
     createdAt: data.createdAt as ISOTimestamp,
     updatedAt: data.updatedAt as ISOTimestamp,
@@ -42,11 +54,7 @@ export function fromDocument(slot: TeamSlot, data: DocumentData): CollectionTeam
 export function toDocument(team: CollectionTeam): DocumentData {
   return {
     name: team.name,
-    members: team.members.map((m) => ({
-      characterId: m.characterId,
-      ...(m.weaponInstanceId ? { weaponInstanceId: m.weaponInstanceId } : {}),
-      ...(m.artifactPlan ? { artifactPlan: m.artifactPlan } : {}),
-    })),
+    members: team.members.map((m) => (m === null ? null : memberToDocument(m))),
     ...(team.description !== undefined ? { description: team.description } : {}),
     createdAt: team.createdAt,
     updatedAt: team.updatedAt,

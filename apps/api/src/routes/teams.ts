@@ -40,7 +40,7 @@ teams.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: teamItem
 interface UpdateTeamBody {
   name?: string;
   description?: string;
-  members?: TeamMember[];
+  members?: (TeamMember | null)[];
 }
 
 function parseSlot(param: string): TeamSlot {
@@ -93,14 +93,17 @@ teams.put(
     const body = c.get('validatedBody') as UpdateTeamBody;
 
     if (body.members && body.members.length > 0) {
-      await validateMembers(userId, body.members);
+      const nonNullMembers = body.members.filter((m): m is TeamMember => m !== null);
+      if (nonNullMembers.length > 0) {
+        await validateMembers(userId, nonNullMembers);
 
-      // Cross-team weapon uniqueness: a weapon instance can only be equipped
-      // by one character at a time across all teams (#635).
-      const allTeams = await listTeams(userId);
-      const crossTeamIssues = validateTeams(slot, body.members, allTeams);
-      if (crossTeamIssues.length > 0) {
-        throw new HTTPException(400, { message: crossTeamIssues[0].message });
+        // Cross-team weapon uniqueness: a weapon instance can only be equipped
+        // by one character at a time across all teams (#635).
+        const allTeams = await listTeams(userId);
+        const crossTeamIssues = validateTeams(slot, nonNullMembers, allTeams);
+        if (crossTeamIssues.length > 0) {
+          throw new HTTPException(400, { message: crossTeamIssues[0].message });
+        }
       }
     }
 
