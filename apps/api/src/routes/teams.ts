@@ -21,6 +21,7 @@ import {
   teamItemDocument,
   teamListDocument,
   validateArtifactPlan,
+  validateTeams,
 } from '@genshin/domain';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -93,6 +94,14 @@ teams.put(
 
     if (body.members && body.members.length > 0) {
       await validateMembers(userId, body.members);
+
+      // Cross-team weapon uniqueness: a weapon instance can only be equipped
+      // by one character at a time across all teams (#635).
+      const allTeams = await listTeams(userId);
+      const crossTeamIssues = validateTeams(slot, body.members, allTeams);
+      if (crossTeamIssues.length > 0) {
+        throw new HTTPException(400, { message: crossTeamIssues[0].message });
+      }
     }
 
     const { team, created } = await saveTeam(userId, slot, {
