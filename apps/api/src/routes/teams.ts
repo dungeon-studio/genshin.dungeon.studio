@@ -100,7 +100,7 @@ teams.put(
         // Cross-team weapon uniqueness: a weapon instance can only be equipped
         // by one character at a time across all teams (#635).
         const allTeams = await listTeams(userId);
-        const crossTeamIssues = validateTeams(slot, nonNullMembers, allTeams);
+        const crossTeamIssues = validateTeams(slot, body.members, allTeams);
         if (crossTeamIssues.length > 0) {
           throw new HTTPException(400, { message: crossTeamIssues[0].message });
         }
