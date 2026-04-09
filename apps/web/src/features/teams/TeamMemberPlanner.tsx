@@ -11,7 +11,7 @@ import { getCharacterById } from '@genshin/game-data';
 
 import { ArtifactPlanner } from '@/components/ArtifactPlanner';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { ELEMENT_BORDER_COLORS } from '@/lib/elementStyles';
+import { elementBorderClass } from '@/lib/elementStyles';
 import { cn } from '@/lib/utils';
 
 import { TeamMemberSummary } from './TeamMemberSummary';
@@ -35,9 +35,7 @@ export function TeamMemberPlanner({
 }: TeamMemberPlannerProps) {
   const character = member ? getCharacterById(member.characterId) : undefined;
 
-  const borderClass = character
-    ? ELEMENT_BORDER_COLORS[character.element]
-    : 'border-dashed border-muted-foreground/30';
+  const borderClass = elementBorderClass(character?.element);
 
   return (
     <Card

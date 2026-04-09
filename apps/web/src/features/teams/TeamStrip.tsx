@@ -10,7 +10,7 @@ import type {
 import { MAX_TEAM_MEMBERS } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
 
-import { ELEMENT_BORDER_COLORS } from '@/lib/elementStyles';
+import { elementBorderClass } from '@/lib/elementStyles';
 import { cn } from '@/lib/utils';
 
 import { TeamMemberSummary } from './TeamMemberSummary';
@@ -38,9 +38,7 @@ export function TeamStrip({
         const character = member ? getCharacterById(member.characterId) : undefined;
 
         const selected = selectedIndex === i;
-        const borderClass = character
-          ? ELEMENT_BORDER_COLORS[character.element]
-          : 'border-l-dashed border-l-muted-foreground/30';
+        const borderClass = elementBorderClass(character?.element);
 
         return (
           <button
