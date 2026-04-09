@@ -184,6 +184,11 @@ export function TeamsPage() {
                     onAssign={handleToggleCharacter}
                   />
                 )}
+                {activeTab === 'characters' && selectedMemberIndex === null && (
+                  <p className="text-sm text-muted-foreground">
+                    Select a team member to choose a character.
+                  </p>
+                )}
                 {activeTab === 'weapons' && selectedMember && selectedMemberWeaponType && (
                   <WeaponPool
                     key={selectedMemberWeaponType}
