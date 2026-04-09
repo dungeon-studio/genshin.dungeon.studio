@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionWeaponId, TeamMember, TeamSlot } from '@genshin/domain';
+import type { CollectionWeaponId, TeamSlot } from '@genshin/domain';
 import { TEAM_SLOTS } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
 import { useCallback, useMemo, useState } from 'react';
@@ -43,16 +43,6 @@ export function TeamsPage() {
   } = useTeams();
 
   const selectedTeam = selectedSlot !== null ? teams[selectedSlot] : null;
-
-  const assignedIds = useMemo(
-    () =>
-      new Set(
-        selectedTeam?.members
-          .filter((m): m is TeamMember => m !== undefined)
-          .map((m) => m.characterId) ?? [],
-      ),
-    [selectedTeam?.members],
-  );
 
   const selectedMember =
     selectedTeam && selectedMemberIndex !== null
@@ -186,13 +176,18 @@ export function TeamsPage() {
               </nav>
 
               <div className="mt-3 flex min-h-0 flex-1 flex-col">
-                {activeTab === 'characters' && (
+                {activeTab === 'characters' && selectedMemberIndex !== null && (
                   <CharacterPool
                     characters={characters}
-                    assignedIds={assignedIds}
-                    disabled={selectedMemberIndex === null}
+                    slot={selectedSlot!}
+                    memberIndex={selectedMemberIndex}
                     onAssign={handleToggleCharacter}
                   />
+                )}
+                {activeTab === 'characters' && selectedMemberIndex === null && (
+                  <p className="text-sm text-muted-foreground">
+                    Select a team member to choose a character.
+                  </p>
                 )}
                 {activeTab === 'weapons' && selectedMember && selectedMemberWeaponType && (
                   <WeaponPool
