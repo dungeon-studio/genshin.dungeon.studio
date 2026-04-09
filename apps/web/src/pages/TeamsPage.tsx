@@ -6,7 +6,7 @@ import { TEAM_SLOTS } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
 import { useCallback, useMemo, useState } from 'react';
 
-import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { useCollection } from '@/features/collection/characters/useCharacterCollection';
 import { useWeaponCollection } from '@/features/collection/weapons/useWeaponCollection';
 import { CharacterPool } from '@/features/teams/CharacterPool';
@@ -126,27 +126,15 @@ export function TeamsPage() {
         >
           {selectedSlot !== null && selectedTeam && (
             <>
-              <TeamStrip
-                members={selectedTeam.members}
-                selectedIndex={selectedMemberIndex}
-                onSelect={setSelectedMemberIndex}
-              />
-
-              <div className="hidden sm:block">
-                <TeamPlanner
-                  slot={selectedSlot}
-                  name={selectedTeam.name}
+              <SheetHeader className="pt-6">
+                <TeamStrip
                   members={selectedTeam.members}
+                  selectedIndex={selectedMemberIndex}
+                  onSelect={setSelectedMemberIndex}
                   getCharacter={getCharacter}
                   getCollectionWeapon={getCollectionWeapon}
-                  selectedMemberIndex={selectedMemberIndex}
-                  onMemberSelect={setSelectedMemberIndex}
-                  onNameChange={(name) => setTeamName(selectedSlot, name)}
-                  onArtifactPlanChange={(memberIndex, plan) =>
-                    setArtifactPlan(selectedSlot, memberIndex, plan)
-                  }
                 />
-              </div>
+              </SheetHeader>
 
               <nav className="mt-4 flex gap-4 border-b border-border" aria-label="Team editor tabs">
                 <button

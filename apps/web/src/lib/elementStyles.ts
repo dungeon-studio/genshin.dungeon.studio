@@ -62,3 +62,7 @@ export const ELEMENT_BORDER_ALL_COLORS: Record<Element, string> = {
   Geo: 'border-geo',
   Dendro: 'border-dendro',
 };
+
+export function elementBorderClass(element?: Element): string {
+  return element ? ELEMENT_BORDER_COLORS[element] : 'border-dashed border-muted-foreground/30';
+}
