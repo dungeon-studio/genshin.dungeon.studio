@@ -149,7 +149,7 @@ function PoolCharacterCard({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'flex w-full items-center gap-3 rounded-lg border border-border border-l-4 bg-card p-3 text-left shadow-sm transition-colors',
+        'flex w-full items-center gap-3 rounded-lg border border-border border-l-4 bg-card p-3 text-left shadow-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
         ELEMENT_BORDER_COLORS[character.element],
         assignedToCurrentSlot && `ring-2 ring-inset ${ELEMENT_SELECTED_RINGS[character.element]}`,
         disabled && 'cursor-not-allowed opacity-40',
