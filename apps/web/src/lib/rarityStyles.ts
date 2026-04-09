@@ -10,3 +10,11 @@ export const RARITY_BORDER_COLORS: Record<Rarity, string> = {
   2: 'border-l-muted-foreground',
   1: 'border-l-muted-foreground',
 };
+
+export const RARITY_SELECTED_RINGS: Record<Rarity, string> = {
+  5: 'ring-geo-dark',
+  4: 'ring-geo',
+  3: 'ring-muted-foreground',
+  2: 'ring-muted-foreground',
+  1: 'ring-muted-foreground',
+};

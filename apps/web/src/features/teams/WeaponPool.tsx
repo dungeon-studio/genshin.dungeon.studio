@@ -15,7 +15,7 @@ import type { WeaponFilterState } from '@/features/collection/weapons/filtering'
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
 import { WeaponFilters } from '@/features/collection/weapons/WeaponFilters';
 import { useTeamStore } from '@/features/teams/useTeamStore';
-import { RARITY_BORDER_COLORS } from '@/lib/rarityStyles';
+import { RARITY_BORDER_COLORS, RARITY_SELECTED_RINGS } from '@/lib/rarityStyles';
 import { cn } from '@/lib/utils';
 
 function buildEquippedWeapons(teams: Record<TeamSlot, Team>): Map<CollectionWeaponId, string> {
@@ -210,13 +210,14 @@ function PoolWeaponCard({
       disabled={equipped}
       className={cn(
         'flex w-full items-center gap-3 rounded-lg border border-border border-l-4 bg-card p-3 text-left shadow-sm transition-colors',
-        selected ? (RARITY_BORDER_COLORS[weapon.rarity] ?? 'border-l-border') : 'border-l-border',
-        equipped ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-accent/50',
+        RARITY_BORDER_COLORS[weapon.rarity] ?? 'border-l-border',
+        selected && `ring-2 ring-inset ${RARITY_SELECTED_RINGS[weapon.rarity] ?? 'ring-border'}`,
+        equipped ? 'cursor-not-allowed opacity-40' : 'cursor-pointer hover:bg-accent/50',
       )}
       aria-label={weaponCardLabel(weapon, equipped, selected)}
       aria-pressed={selected}
     >
-      <WeaponSummary weapon={weapon} dimmed={!selected || equipped} />
+      <WeaponSummary weapon={weapon} dimmed={false} />
       {equipped && (
         <Lock
           className="shrink-0 text-destructive"
