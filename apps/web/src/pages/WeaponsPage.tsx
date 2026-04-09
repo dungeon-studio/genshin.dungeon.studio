@@ -4,7 +4,11 @@
 import { WEAPONS } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
+
+import type { WeaponType } from '@genshin/game-data';
+import { WEAPON_TYPES } from '@genshin/game-data';
 
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
@@ -25,7 +29,17 @@ export function WeaponsPage() {
     error,
   } = useWeaponCollection();
 
-  const [filters, setFilters] = useState<WeaponFilterState>(initialFilterState);
+  const [searchParams] = useSearchParams();
+
+  const [filters, setFilters] = useState<WeaponFilterState>(() => {
+    const state = initialFilterState();
+    const typeParam = searchParams.get('type');
+    const weaponTypeValues = Object.values(WEAPON_TYPES) as WeaponType[];
+    if (typeParam && weaponTypeValues.includes(typeParam as WeaponType)) {
+      state.weaponTypes = new Set<WeaponType>([typeParam as WeaponType]);
+    }
+    return state;
+  });
   const [selectedWeaponId, setSelectedWeaponId] = useState<string | null>(null);
 
   const effectiveSelectedWeaponId = isAuthenticated ? selectedWeaponId : null;

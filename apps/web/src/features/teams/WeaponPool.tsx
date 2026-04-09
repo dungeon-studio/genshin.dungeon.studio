@@ -128,7 +128,7 @@ export function WeaponPool({
           </p>
         </div>
         <Button asChild>
-          <Link to="/weapons">Go to Weapons</Link>
+          <Link to={`/weapons?type=${weaponType}`}>Go to Weapons</Link>
         </Button>
       </div>
     );
