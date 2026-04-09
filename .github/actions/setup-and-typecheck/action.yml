@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 name: Setup and typecheck
-description: Checkout, install Node.js + pnpm, and run typecheck for a workspace package
+description: Install Node.js + pnpm, and run typecheck for a workspace package
 
 inputs:
   filter:
@@ -14,9 +14,6 @@ runs:
   using: composite
 
   steps:
-    - name: Checkout repository
-      uses: actions/checkout@v6
-
     - uses: ./.github/actions/setup-node-pnpm
 
     - name: Typecheck

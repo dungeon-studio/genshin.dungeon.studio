@@ -19,6 +19,9 @@ jobs:
     timeout-minutes: 15
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - uses: ./.github/actions/setup-and-typecheck
         with:
           filter: '@genshin/web'
@@ -43,6 +46,9 @@ jobs:
     timeout-minutes: 15
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - uses: ./.github/actions/setup-and-typecheck
         with:
           filter: '@genshin/api'
@@ -64,6 +70,9 @@ jobs:
     timeout-minutes: 15
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - uses: ./.github/actions/setup-and-typecheck
         with:
           filter: '@genshin/game-data'
@@ -85,6 +94,9 @@ jobs:
     timeout-minutes: 15
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - uses: ./.github/actions/setup-and-typecheck
         with:
           filter: '@genshin/domain'
@@ -98,6 +110,9 @@ jobs:
     timeout-minutes: 15
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - uses: ./.github/actions/setup-and-typecheck
         with:
           filter: '@genshin/collection-json'
@@ -119,6 +134,9 @@ jobs:
     timeout-minutes: 15
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - uses: ./.github/actions/setup-and-typecheck
         with:
           filter: '@genshin/validation'
