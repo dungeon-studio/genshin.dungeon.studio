@@ -10,7 +10,6 @@
     "lint:css": "stylelint 'src/**/*.css' --fix",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:ui": "vitest --ui",
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
