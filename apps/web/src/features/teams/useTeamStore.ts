@@ -35,13 +35,27 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
     const team = get().teams[slot];
     if (team.members.some((m) => m?.characterId === characterId)) return;
 
+    // Auto-populate weapon from another team where this character already has one equipped.
+    const allTeams = get().teams;
+    let existingWeaponId: CollectionWeaponId | undefined;
+    for (const other of Object.values(allTeams)) {
+      if (other.slot === slot) continue;
+      const match = other.members.find((m) => m?.characterId === characterId && m.weaponInstanceId);
+      if (match?.weaponInstanceId) {
+        existingWeaponId = match.weaponInstanceId;
+        break;
+      }
+    }
+
     set((state) => ({
       teams: {
         ...state.teams,
         [slot]: {
           ...state.teams[slot],
           members: state.teams[slot].members.map((m, i) =>
-            i === memberIndex ? { characterId } : m,
+            i === memberIndex
+              ? { characterId, ...(existingWeaponId && { weaponInstanceId: existingWeaponId }) }
+              : m,
           ) as Team['members'],
         },
       },
