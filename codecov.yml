@@ -28,6 +28,9 @@ flag_management:
     - name: game-data
       paths:
         - packages/game-data/src/**
+    - name: web
+      paths:
+        - apps/web/src/**
 
 component_management:
   individual_components:
@@ -67,6 +70,24 @@ component_management:
         - packages/game-data/src/versions.ts
       flag_regexes:
         - game-data
+    - component_id: web-components
+      name: 'Web: Components'
+      paths:
+        - apps/web/src/components/**
+      flag_regexes:
+        - web
+    - component_id: web-features
+      name: 'Web: Features'
+      paths:
+        - apps/web/src/features/**
+      flag_regexes:
+        - web
+    - component_id: web-lib
+      name: 'Web: Lib'
+      paths:
+        - apps/web/src/lib/**
+      flag_regexes:
+        - web
     - component_id: collection-json
       name: Collection JSON
       paths:

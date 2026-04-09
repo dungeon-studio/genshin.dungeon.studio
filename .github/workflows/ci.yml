@@ -22,10 +22,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup-node-pnpm
+      - uses: ./.github/actions/setup-and-typecheck
+        with:
+          filter: '@genshin/web'
 
-      - name: Typecheck
-        run: pnpm turbo run typecheck --filter=@genshin/web
+      - uses: ./.github/actions/test-and-upload-coverage
+        with:
+          filter: '@genshin/web'
+          coverage-file: apps/web/coverage/lcov.info
+          results-file: apps/web/test-results/junit.xml
+          flag: web
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Build
         run: pnpm turbo run build --filter=@genshin/web
@@ -42,10 +49,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup-node-pnpm
-
-      - name: Typecheck
-        run: pnpm turbo run typecheck --filter=@genshin/api
+      - uses: ./.github/actions/setup-and-typecheck
+        with:
+          filter: '@genshin/api'
 
       - uses: ./.github/actions/test-and-upload-coverage
         with:
@@ -67,13 +73,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup-node-pnpm
-
-      - name: Build
-        run: pnpm turbo run build --filter=@genshin/game-data
-
-      - name: Typecheck
-        run: pnpm turbo run typecheck --filter=@genshin/game-data
+      - uses: ./.github/actions/setup-and-typecheck
+        with:
+          filter: '@genshin/game-data'
 
       - uses: ./.github/actions/test-and-upload-coverage
         with:
@@ -82,6 +84,9 @@ jobs:
           results-file: packages/game-data/test-results/junit.xml
           flag: game-data
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Build
+        run: pnpm turbo run build --filter=@genshin/game-data
 
   domain:
     name: Domain
@@ -92,13 +97,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup-node-pnpm
+      - uses: ./.github/actions/setup-and-typecheck
+        with:
+          filter: '@genshin/domain'
 
       - name: Build
         run: pnpm turbo run build --filter=@genshin/domain
-
-      - name: Typecheck
-        run: pnpm turbo run typecheck --filter=@genshin/domain
 
   collection-json:
     name: Collection JSON
@@ -109,13 +113,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup-node-pnpm
-
-      - name: Build
-        run: pnpm turbo run build --filter=@genshin/collection-json
-
-      - name: Typecheck
-        run: pnpm turbo run typecheck --filter=@genshin/collection-json
+      - uses: ./.github/actions/setup-and-typecheck
+        with:
+          filter: '@genshin/collection-json'
 
       - uses: ./.github/actions/test-and-upload-coverage
         with:
@@ -124,6 +124,9 @@ jobs:
           results-file: packages/collection-json/test-results/junit.xml
           flag: collection-json
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Build
+        run: pnpm turbo run build --filter=@genshin/collection-json
 
   validation:
     name: Validation
@@ -134,13 +137,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup-node-pnpm
+      - uses: ./.github/actions/setup-and-typecheck
+        with:
+          filter: '@genshin/validation'
 
       - name: Build
         run: pnpm turbo run build --filter=@genshin/validation
-
-      - name: Typecheck
-        run: pnpm turbo run typecheck --filter=@genshin/validation
 
 # ---------------------------------------------------------------------------
 # Maintenance notes
