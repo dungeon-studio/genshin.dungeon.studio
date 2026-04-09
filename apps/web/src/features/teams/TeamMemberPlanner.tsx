@@ -7,14 +7,14 @@ import type {
   CollectionWeapon,
   TeamMember,
 } from '@genshin/domain';
-import { getCharacterById, getWeaponById } from '@genshin/game-data';
+import { getCharacterById } from '@genshin/game-data';
 
 import { ArtifactPlanner } from '@/components/ArtifactPlanner';
-import { CharacterSummary } from '@/components/CharacterSummary';
-import { WeaponSummary } from '@/components/WeaponSummary';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ELEMENT_BORDER_COLORS } from '@/lib/elementStyles';
 import { cn } from '@/lib/utils';
+
+import { TeamMemberSummary } from './TeamMemberSummary';
 
 interface TeamMemberPlannerProps {
   member?: TeamMember;
@@ -34,7 +34,6 @@ export function TeamMemberPlanner({
   onArtifactPlanChange,
 }: TeamMemberPlannerProps) {
   const character = member ? getCharacterById(member.characterId) : undefined;
-  const weapon = collectionWeapon ? getWeaponById(collectionWeapon.weaponId) : undefined;
 
   const borderClass = character
     ? ELEMENT_BORDER_COLORS[character.element]
@@ -63,47 +62,19 @@ export function TeamMemberPlanner({
           : undefined
       }
     >
-      {/* Row 1: Character */}
       <CardHeader className="p-3 pb-1.5">
-        {character ? (
-          <div className="flex items-center gap-2">
-            <CharacterSummary character={character} />
-
-            {collectionCharacter && (
-              <span
-                className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-bold tabular-nums text-muted-foreground"
-                aria-label={`Constellation level ${collectionCharacter.constellationLevel}`}
-              >
-                C{collectionCharacter.constellationLevel}
-              </span>
-            )}
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <CharacterSummary />
-          </div>
-        )}
+        <TeamMemberSummary
+          member={member}
+          collectionCharacter={collectionCharacter}
+          collectionWeapon={collectionWeapon}
+        />
       </CardHeader>
 
-      <CardContent className="space-y-1.5 p-3 pt-0">
-        {/* Row 2: Weapon instance */}
-        <div className="flex items-center gap-2">
-          <WeaponSummary weapon={weapon} />
-          {weapon && collectionWeapon && (
-            <span
-              className="shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-muted-foreground"
-              aria-label={`Refinement rank ${collectionWeapon.refinementLevel}`}
-            >
-              R{collectionWeapon.refinementLevel}
-            </span>
-          )}
-        </div>
-
-        {/* Row 3: Artifact plan (only when character is assigned) */}
-        {character && member && (
+      {character && member && (
+        <CardContent className="p-3 pt-0">
           <ArtifactPlanner plan={member.artifactPlan} onChange={onArtifactPlanChange} />
-        )}
-      </CardContent>
+        </CardContent>
+      )}
     </Card>
   );
 }
