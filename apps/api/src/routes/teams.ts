@@ -92,7 +92,7 @@ teams.put(
     const slot = parseSlot(c.req.param('slot'));
     const body = c.get('validatedBody') as UpdateTeamBody;
 
-    if (body.members && body.members.length > 0) {
+    if (body.members) {
       const nonNullMembers = body.members.filter((m): m is CollectionTeamMember => m !== null);
       if (nonNullMembers.length > 0) {
         await validateMembers(userId, nonNullMembers);

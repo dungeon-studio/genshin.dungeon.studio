@@ -46,7 +46,7 @@ function teamToSavePayload(team: CollectionTeam): SaveTeamPayload {
   return {
     slot: team.slot,
     name: team.name,
-    members: [...team.members],
+    members: team.members,
     description: team.description,
   };
 }
