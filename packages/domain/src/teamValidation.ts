@@ -15,8 +15,7 @@
 import type { ValidationIssue } from '@genshin/validation';
 import { issue, prefixPaths } from '@genshin/validation';
 import { validateArtifactPlan } from './artifactPlanValidation.js';
-import type { TeamSlot } from './collectionTeam.js';
-import type { CollectionTeamMember } from './collectionTeamMember.js';
+import type { CollectionTeamMembers, TeamSlot } from './collectionTeam.js';
 
 /**
  * Caller-supplied ownership data for collection-aware validation.
@@ -42,15 +41,10 @@ export interface TeamValidationContext {
  * offline / anonymous validation on the web).
  */
 export function validateTeam(
-  team: { name: string; members: (CollectionTeamMember | null)[]; description?: string },
+  team: { name: string; members: CollectionTeamMembers; description?: string },
   context?: TeamValidationContext,
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
-
-  // Member count: 0-4 allowed (incomplete teams filled in later) -------
-  if (team.members.length > 4) {
-    issues.push(issue(`Team must have at most 4 members, got ${team.members.length}`, 'members'));
-  }
 
   // Per-team uniqueness: no duplicate character IDs --------------------
   const seen = new Set<string>();
@@ -131,8 +125,8 @@ export function validateTeam(
  */
 export function validateTeams(
   slot: TeamSlot,
-  currentMembers: (CollectionTeamMember | null)[],
-  allTeams: { slot: TeamSlot; members: (CollectionTeamMember | null)[] }[],
+  currentMembers: CollectionTeamMembers,
+  allTeams: { slot: TeamSlot; members: CollectionTeamMembers }[],
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
 
