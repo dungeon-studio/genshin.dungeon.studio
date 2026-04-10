@@ -18,7 +18,7 @@
     "@hono/node-server": "1.19.13",
     "ajv": "8.18.0",
     "content-type": "1.0.5",
-    "firebase-admin": "13.7.0",
+    "firebase-admin": "13.8.0",
     "google-gax": "5.0.6",
     "hono": "4.12.12",
     "negotiator": "1.0.0"
@@ -27,14 +27,14 @@
     "@eslint/js": "10.0.1",
     "@types/content-type": "1.1.9",
     "@types/negotiator": "0.6.4",
-    "@types/node": "25.5.2",
-    "@vitest/coverage-v8": "4.1.2",
-    "eslint": "10.1.0",
+    "@types/node": "25.6.0",
+    "@vitest/coverage-v8": "4.1.4",
+    "eslint": "10.2.0",
     "globals": "17.4.0",
     "tsc-alias": "1.8.16",
     "tsx": "4.21.0",
     "typescript": "6.0.2",
-    "typescript-eslint": "8.58.0",
-    "vitest": "4.1.2"
+    "typescript-eslint": "8.58.1",
+    "vitest": "4.1.4"
   }
 }
