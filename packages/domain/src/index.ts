@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 export { issue, isValid, prefixPaths, type ValidationIssue } from '@genshin/validation';
+export { type ArtifactPlan } from './artifactPlan.js';
 export { validateArtifactPlan } from './artifactPlanValidation.js';
 export type { AuthIdentity } from './authIdentity.js';
 export {
@@ -12,7 +13,21 @@ export {
   type CharacterId,
   type CollectionCharacter,
 } from './collectionCharacter.js';
-export { assertCollectionTeam, isValidTeamSlot, type CollectionTeam } from './collectionTeam.js';
+export {
+  assertCollectionTeam,
+  createEmptyTeam,
+  initialTeams,
+  isValidMemberIndex,
+  isValidTeamSlot,
+  MAX_TEAM_MEMBERS,
+  MAX_TEAM_SLOT,
+  MIN_TEAM_SLOT,
+  TEAM_SLOTS,
+  type CollectionTeam,
+  type CollectionTeamMembers,
+  type TeamSlot,
+} from './collectionTeam.js';
+export { type CollectionTeamMember } from './collectionTeamMember.js';
 export {
   assertCollectionWeapon,
   isValidRefinementLevel,
@@ -48,23 +63,7 @@ export {
   serialiseProfile,
   type ProfileResponse,
 } from './representations/json/profile.js';
-export {
-  createEmptyTeam,
-  initialTeams,
-  isValidMemberIndex,
-  MAX_TEAM_MEMBERS,
-  MAX_TEAM_SLOT,
-  MIN_TEAM_SLOT,
-  TEAM_SLOTS,
-  type Team,
-  type TeamSlot,
-} from './team.js';
-export { type ArtifactPlan, type TeamMember } from './teamMember.js';
-export {
-  validateTeam,
-  validateTeams,
-  validateTeamSlot,
-  type TeamValidationContext,
-} from './teamValidation.js';
+
+export { validateTeam, validateTeams, type TeamValidationContext } from './teamValidation.js';
 export { type ProfileUpdate, type UserProfile } from './userProfile.js';
 export type { UUID } from './uuid.js';

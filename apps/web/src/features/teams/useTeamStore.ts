@@ -1,12 +1,19 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { ArtifactPlan, CollectionWeaponId, Team, TeamSlot } from '@genshin/domain';
+import type {
+  ArtifactPlan,
+  CollectionTeam,
+  CollectionTeamMember,
+  CollectionTeamMembers,
+  CollectionWeaponId,
+  TeamSlot,
+} from '@genshin/domain';
 import { initialTeams, isValidMemberIndex } from '@genshin/domain';
 import { create } from 'zustand';
 
 interface TeamStoreState {
-  teams: Record<TeamSlot, Team>;
+  teams: Record<TeamSlot, CollectionTeam>;
 
   assignCharacter: (slot: TeamSlot, memberIndex: number, characterId: string) => void;
   removeCharacter: (slot: TeamSlot, memberIndex: number) => void;
@@ -19,11 +26,11 @@ interface TeamStoreState {
   setArtifactPlan: (slot: TeamSlot, memberIndex: number, plan: ArtifactPlan | undefined) => void;
   clearTeam: (slot: TeamSlot) => void;
   setTeamName: (slot: TeamSlot, name: string) => void;
-  setTeam: (slot: TeamSlot, team: Team) => void;
-  setTeams: (teams: Record<TeamSlot, Team>) => void;
+  setTeam: (slot: TeamSlot, team: CollectionTeam) => void;
+  setTeams: (teams: Record<TeamSlot, CollectionTeam>) => void;
   resetTeams: () => void;
 
-  getTeam: (slot: TeamSlot) => Team;
+  getTeam: (slot: TeamSlot) => CollectionTeam;
   isCharacterInTeam: (slot: TeamSlot, characterId: string) => boolean;
 }
 
@@ -37,14 +44,16 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
 
     // Auto-populate weapon from another team where this character already has one equipped.
     const allTeams = get().teams;
-    let existingWeaponId: CollectionWeaponId | undefined;
+    let existingWeaponId: CollectionTeamMember['weaponInstanceId'];
     for (const other of Object.values(allTeams)) {
       if (other.slot === slot) continue;
-      const match = other.members.find((m) => m?.characterId === characterId && m.weaponInstanceId);
-      if (match?.weaponInstanceId) {
-        existingWeaponId = match.weaponInstanceId;
-        break;
+      for (const member of other.members) {
+        if (member?.characterId === characterId && member.weaponInstanceId) {
+          existingWeaponId = member.weaponInstanceId;
+          break;
+        }
       }
+      if (existingWeaponId) break;
     }
 
     set((state) => ({
@@ -56,7 +65,7 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
             i === memberIndex
               ? { characterId, ...(existingWeaponId && { weaponInstanceId: existingWeaponId }) }
               : m,
-          ) as Team['members'],
+          ) as CollectionTeamMembers,
         },
       },
     }));
@@ -71,8 +80,8 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
         [slot]: {
           ...state.teams[slot],
           members: state.teams[slot].members.map((m, i) =>
-            i === memberIndex ? undefined : m,
-          ) as Team['members'],
+            i === memberIndex ? null : m,
+          ) as CollectionTeamMembers,
         },
       },
     }));
@@ -89,7 +98,7 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
           ...state.teams[slot],
           members: state.teams[slot].members.map((m, i) =>
             i === memberIndex && m ? { ...m, weaponInstanceId: collectionWeaponId } : m,
-          ) as Team['members'],
+          ) as CollectionTeamMembers,
         },
       },
     }));
@@ -106,7 +115,7 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
           ...state.teams[slot],
           members: state.teams[slot].members.map((m, i) =>
             i === memberIndex && m ? { ...m, weaponInstanceId: undefined } : m,
-          ) as Team['members'],
+          ) as CollectionTeamMembers,
         },
       },
     }));
@@ -123,7 +132,7 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
           ...state.teams[slot],
           members: state.teams[slot].members.map((m, i) =>
             i === memberIndex && m ? { ...m, artifactPlan: plan } : m,
-          ) as Team['members'],
+          ) as CollectionTeamMembers,
         },
       },
     }));
@@ -135,7 +144,7 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
         ...state.teams,
         [slot]: {
           ...state.teams[slot],
-          members: [undefined, undefined, undefined, undefined],
+          members: [null, null, null, null],
         },
       },
     }));

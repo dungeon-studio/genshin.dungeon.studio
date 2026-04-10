@@ -129,7 +129,7 @@ export function TeamsPage() {
               <SheetHeader className="pt-6">
                 <TeamStrip
                   members={selectedTeam.members}
-                  selectedIndex={selectedMemberIndex}
+                  selectedMemberIndex={selectedMemberIndex}
                   onSelect={setSelectedMemberIndex}
                   getCharacter={getCharacter}
                   getCollectionWeapon={getCollectionWeapon}

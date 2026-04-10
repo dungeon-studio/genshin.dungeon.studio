@@ -1,14 +1,14 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionCharacter, CollectionWeapon, TeamMember } from '@genshin/domain';
+import type { CollectionCharacter, CollectionTeamMember, CollectionWeapon } from '@genshin/domain';
 import { getCharacterById, getWeaponById } from '@genshin/game-data';
 
 import { CharacterSummary } from '@/components/CharacterSummary';
 import { WeaponSummary } from '@/components/WeaponSummary';
 
 interface TeamMemberSummaryProps {
-  member?: TeamMember;
+  member: CollectionTeamMember | null;
   collectionCharacter?: CollectionCharacter;
   collectionWeapon?: CollectionWeapon;
 }

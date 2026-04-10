@@ -21,10 +21,10 @@ import {
   type Template,
 } from '@genshin/collection-json';
 
-import type { CollectionTeam } from '../../collectionTeam.js';
-import { assertCollectionTeam } from '../../collectionTeam.js';
-import { MAX_TEAM_MEMBERS } from '../../team.js';
-import type { ArtifactPlan, TeamMember } from '../../teamMember.js';
+import type { ArtifactPlan } from '../../artifactPlan.js';
+import type { CollectionTeam, CollectionTeamMembers } from '../../collectionTeam.js';
+import { assertCollectionTeam, MAX_TEAM_MEMBERS } from '../../collectionTeam.js';
+import type { CollectionTeamMember } from '../../collectionTeamMember.js';
 
 const TEAM_TEMPLATE: Template = {
   data: [
@@ -32,7 +32,7 @@ const TEAM_TEMPLATE: Template = {
     { name: 'description', prompt: 'Team description (optional, max 200 characters)' },
     {
       name: 'members',
-      prompt: `Team members (0-${MAX_TEAM_MEMBERS} members as JSON; partial teams are valid)`,
+      prompt: `Team members (exactly ${MAX_TEAM_MEMBERS} elements as JSON; null represents an empty position)`,
     },
   ],
 };
@@ -88,7 +88,7 @@ function deserialiseArtifactPlan(value: unknown): ArtifactPlan {
   return value as ArtifactPlan;
 }
 
-function deserialiseTeamMember(value: unknown, index: number): TeamMember {
+function deserialiseCollectionTeamMember(value: unknown, index: number): CollectionTeamMember {
   if (typeof value !== 'object' || value === null) {
     throw new TypeError(
       `members[${index}] must be a non-null object, got: ${JSON.stringify(value)}`,
@@ -108,7 +108,7 @@ function deserialiseTeamMember(value: unknown, index: number): TeamMember {
   if (raw.artifactPlan !== undefined) {
     deserialiseArtifactPlan(raw.artifactPlan);
   }
-  return value as TeamMember;
+  return value as CollectionTeamMember;
 }
 
 export function deserialiseTeam(item: Item): CollectionTeam {
@@ -129,9 +129,15 @@ export function deserialiseTeam(item: Item): CollectionTeam {
   const data: Record<string, unknown> = Object.fromEntries(
     item.data.filter((d) => d.name !== 'members').map((d) => [d.name, d.value]),
   );
-  data.members = members.map((m: unknown, i: number) =>
-    m === null ? null : deserialiseTeamMember(m, i),
+  const mapped = members.map((m: unknown, i: number) =>
+    m === null ? null : deserialiseCollectionTeamMember(m, i),
   );
+  data.members = [
+    mapped[0] ?? null,
+    mapped[1] ?? null,
+    mapped[2] ?? null,
+    mapped[3] ?? null,
+  ] as CollectionTeamMembers;
   assertCollectionTeam(data);
   return data;
 }

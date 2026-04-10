@@ -1,7 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionTeam, ISOTimestamp, TeamMember, TeamSlot } from '@genshin/domain';
+import type {
+  CollectionTeam,
+  CollectionTeamMember,
+  CollectionTeamMembers,
+  ISOTimestamp,
+  TeamSlot,
+} from '@genshin/domain';
 
 export interface MemberDocumentData {
   characterId: string;
@@ -24,15 +30,15 @@ export interface DocumentData {
   updatedAt: string;
 }
 
-function memberFromDocument(m: MemberDocumentData): TeamMember {
+function memberFromDocument(m: MemberDocumentData): CollectionTeamMember {
   return {
     characterId: m.characterId,
     ...(m.weaponInstanceId ? { weaponInstanceId: m.weaponInstanceId } : {}),
     ...(m.artifactPlan ? { artifactPlan: m.artifactPlan } : {}),
-  } as TeamMember;
+  } as CollectionTeamMember;
 }
 
-function memberToDocument(m: TeamMember): MemberDocumentData {
+function memberToDocument(m: CollectionTeamMember): MemberDocumentData {
   return {
     characterId: m.characterId,
     ...(m.weaponInstanceId ? { weaponInstanceId: m.weaponInstanceId } : {}),
@@ -41,10 +47,16 @@ function memberToDocument(m: TeamMember): MemberDocumentData {
 }
 
 export function fromDocument(slot: TeamSlot, data: DocumentData): CollectionTeam {
+  const mapped = data.members.map((m) => (m === null ? null : memberFromDocument(m)));
   return {
     slot,
     name: data.name,
-    members: data.members.map((m) => (m === null ? null : memberFromDocument(m))),
+    members: [
+      mapped[0] ?? null,
+      mapped[1] ?? null,
+      mapped[2] ?? null,
+      mapped[3] ?? null,
+    ] as CollectionTeamMembers,
     ...(data.description !== undefined ? { description: data.description } : {}),
     createdAt: data.createdAt as ISOTimestamp,
     updatedAt: data.updatedAt as ISOTimestamp,

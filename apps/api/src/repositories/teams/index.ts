@@ -56,7 +56,7 @@ export async function saveTeam(
         ? updates.members
         : existingData
           ? fromDocument(slot, existingData).members
-          : [],
+          : [null, null, null, null],
     ...(updates.description !== undefined
       ? { description: updates.description }
       : existingData?.description !== undefined

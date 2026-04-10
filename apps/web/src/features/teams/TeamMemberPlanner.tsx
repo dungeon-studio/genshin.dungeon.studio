@@ -4,8 +4,8 @@
 import type {
   ArtifactPlan,
   CollectionCharacter,
+  CollectionTeamMember,
   CollectionWeapon,
-  TeamMember,
 } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
 
@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
 import { TeamMemberSummary } from './TeamMemberSummary';
 
 interface TeamMemberPlannerProps {
-  member?: TeamMember;
+  member: CollectionTeamMember | null;
   collectionCharacter?: CollectionCharacter;
   collectionWeapon?: CollectionWeapon;
   selected?: boolean;

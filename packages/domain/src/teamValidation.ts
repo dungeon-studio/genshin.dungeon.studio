@@ -15,8 +15,8 @@
 import type { ValidationIssue } from '@genshin/validation';
 import { issue, prefixPaths } from '@genshin/validation';
 import { validateArtifactPlan } from './artifactPlanValidation.js';
-import type { TeamSlot } from './team.js';
-import type { TeamMember } from './teamMember.js';
+import type { TeamSlot } from './collectionTeam.js';
+import type { CollectionTeamMember } from './collectionTeamMember.js';
 
 /**
  * Caller-supplied ownership data for collection-aware validation.
@@ -32,18 +32,6 @@ export interface TeamValidationContext {
 }
 
 // ---------------------------------------------------------------------------
-// validateTeamSlot
-// ---------------------------------------------------------------------------
-
-export function validateTeamSlot(slot: unknown): ValidationIssue[] {
-  if (typeof slot !== 'number' || !Number.isInteger(slot) || slot < 1 || slot > 4) {
-    return [issue('Team slot must be an integer between 1 and 4', 'slot')];
-  }
-
-  return [];
-}
-
-// ---------------------------------------------------------------------------
 // validateTeam
 // ---------------------------------------------------------------------------
 
@@ -54,7 +42,7 @@ export function validateTeamSlot(slot: unknown): ValidationIssue[] {
  * offline / anonymous validation on the web).
  */
 export function validateTeam(
-  team: { name: string; members: (TeamMember | null)[]; description?: string },
+  team: { name: string; members: (CollectionTeamMember | null)[]; description?: string },
   context?: TeamValidationContext,
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
@@ -143,8 +131,8 @@ export function validateTeam(
  */
 export function validateTeams(
   slot: TeamSlot,
-  currentMembers: (TeamMember | null)[],
-  allTeams: { slot: TeamSlot; members: (TeamMember | null)[] }[],
+  currentMembers: (CollectionTeamMember | null)[],
+  allTeams: { slot: TeamSlot; members: (CollectionTeamMember | null)[] }[],
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
 
@@ -153,7 +141,7 @@ export function validateTeams(
   for (const team of allTeams) {
     if (team.slot === slot) continue;
     for (const member of team.members) {
-      if (member !== null && member.weaponInstanceId) {
+      if (member?.weaponInstanceId) {
         equippedWeapons.set(member.weaponInstanceId, member.characterId);
       }
     }

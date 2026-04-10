@@ -30,12 +30,12 @@ interface CharacterPoolProps {
 
 export function CharacterPool({ characters, slot, memberIndex, onAssign }: CharacterPoolProps) {
   const members = useTeamStore((s) => s.teams[slot].members);
-  const currentSlotCharacterId = members[memberIndex]?.characterId;
-  const otherSlotIds = useMemo(
+  const currentMemberCharacterId = members[memberIndex]?.characterId;
+  const otherMemberIds = useMemo(
     () =>
       new Set(
         members
-          .filter((m, i): m is NonNullable<typeof m> => m !== undefined && i !== memberIndex)
+          .filter((m, i): m is NonNullable<typeof m> => m !== null && i !== memberIndex)
           .map((m) => m.characterId),
       ),
     [members, memberIndex],
@@ -92,9 +92,9 @@ export function CharacterPool({ characters, slot, memberIndex, onAssign }: Chara
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredCharacters.map((character) => {
             const owned = ownedIds.has(character.id);
-            const assignedToCurrentSlot = character.id === currentSlotCharacterId;
-            const assignedToOtherSlot = otherSlotIds.has(character.id);
-            const clickable = owned && !assignedToOtherSlot;
+            const assignedToCurrentMember = character.id === currentMemberCharacterId;
+            const assignedToOtherMember = otherMemberIds.has(character.id);
+            const clickable = owned && !assignedToOtherMember;
 
             const entry = characters[character.id];
 
@@ -103,8 +103,8 @@ export function CharacterPool({ characters, slot, memberIndex, onAssign }: Chara
                 key={character.id}
                 character={character}
                 constellationLevel={entry?.constellationLevel ?? 0}
-                assignedToCurrentSlot={assignedToCurrentSlot}
-                assignedToOtherSlot={assignedToOtherSlot}
+                assignedToCurrentMember={assignedToCurrentMember}
+                assignedToOtherMember={assignedToOtherMember}
                 disabled={!clickable}
                 onClick={() => onAssign(character.id)}
               />
@@ -125,8 +125,8 @@ export function CharacterPool({ characters, slot, memberIndex, onAssign }: Chara
 interface PoolCharacterCardProps {
   character: Character;
   constellationLevel: number;
-  assignedToCurrentSlot: boolean;
-  assignedToOtherSlot: boolean;
+  assignedToCurrentMember: boolean;
+  assignedToOtherMember: boolean;
   disabled: boolean;
   onClick: () => void;
 }
@@ -134,14 +134,14 @@ interface PoolCharacterCardProps {
 function PoolCharacterCard({
   character,
   constellationLevel,
-  assignedToCurrentSlot,
-  assignedToOtherSlot,
+  assignedToCurrentMember,
+  assignedToOtherMember,
   disabled,
   onClick,
 }: PoolCharacterCardProps) {
-  let ariaLabel = `Add ${character.name} to slot`;
-  if (assignedToCurrentSlot) ariaLabel = `Remove ${character.name} from slot`;
-  else if (assignedToOtherSlot) ariaLabel = `${character.name} is assigned to another slot`;
+  let ariaLabel = `Add ${character.name} to team`;
+  if (assignedToCurrentMember) ariaLabel = `Remove ${character.name} from team`;
+  else if (assignedToOtherMember) ariaLabel = `${character.name} is assigned to another position`;
 
   return (
     <button
@@ -151,15 +151,15 @@ function PoolCharacterCard({
       className={cn(
         'flex w-full items-center gap-3 rounded-lg border border-border border-l-4 bg-card p-3 text-left shadow-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
         ELEMENT_BORDER_COLORS[character.element],
-        assignedToCurrentSlot && `ring-2 ring-inset ${ELEMENT_SELECTED_RINGS[character.element]}`,
+        assignedToCurrentMember && `ring-2 ring-inset ${ELEMENT_SELECTED_RINGS[character.element]}`,
         disabled && 'cursor-not-allowed opacity-40',
         !disabled && 'cursor-pointer hover:bg-accent/50',
       )}
       aria-label={ariaLabel}
-      aria-pressed={assignedToCurrentSlot}
+      aria-pressed={assignedToCurrentMember}
     >
       <CharacterSummary character={character} dimmed={false} />
-      {assignedToOtherSlot && (
+      {assignedToOtherMember && (
         <Lock
           className="shrink-0 text-destructive"
           size={14}

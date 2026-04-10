@@ -1,13 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type {
-  ArtifactPlan,
-  CollectionTeam,
-  CollectionWeaponId,
-  Team,
-  TeamSlot,
-} from '@genshin/domain';
+import type { ArtifactPlan, CollectionTeam, CollectionWeaponId, TeamSlot } from '@genshin/domain';
 import { initialTeams } from '@genshin/domain';
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
@@ -19,7 +13,7 @@ import { useDeleteTeamMutation, useSaveTeamMutation, useTeamsQuery } from './use
 import { useTeamStore } from './useTeamStore';
 
 export interface UseTeamsResult {
-  teams: Record<TeamSlot, Team>;
+  teams: Record<TeamSlot, CollectionTeam>;
   assignCharacter: (slot: TeamSlot, memberIndex: number, characterId: string) => void;
   removeCharacter: (slot: TeamSlot, memberIndex: number) => void;
   assignWeapon: (
@@ -31,39 +25,28 @@ export interface UseTeamsResult {
   setArtifactPlan: (slot: TeamSlot, memberIndex: number, plan: ArtifactPlan | undefined) => void;
   clearTeam: (slot: TeamSlot) => void;
   setTeamName: (slot: TeamSlot, name: string) => void;
-  getTeam: (slot: TeamSlot) => Team;
+  getTeam: (slot: TeamSlot) => CollectionTeam;
   isCharacterInTeam: (slot: TeamSlot, characterId: string) => boolean;
   isSaving: boolean;
   isLoading: boolean;
   error: Error | null;
 }
 
-function collectionTeamsToStore(apiTeams: CollectionTeam[]): Record<TeamSlot, Team> {
+function collectionTeamsToStore(apiTeams: CollectionTeam[]): Record<TeamSlot, CollectionTeam> {
   const teams = initialTeams();
 
   for (const ct of apiTeams) {
-    const members: Team['members'] = [undefined, undefined, undefined, undefined];
-    for (let i = 0; i < ct.members.length && i < 4; i++) {
-      members[i] = ct.members[i] ?? undefined;
-    }
-    teams[ct.slot] = {
-      slot: ct.slot,
-      name: ct.name,
-      members,
-      description: ct.description,
-      createdAt: ct.createdAt,
-      updatedAt: ct.updatedAt,
-    };
+    teams[ct.slot] = ct;
   }
 
   return teams;
 }
 
-function teamToSavePayload(team: Team): SaveTeamPayload {
+function teamToSavePayload(team: CollectionTeam): SaveTeamPayload {
   return {
     slot: team.slot,
     name: team.name,
-    members: team.members.map((m) => m ?? null),
+    members: [...team.members],
     description: team.description,
   };
 }
@@ -125,7 +108,7 @@ export function useTeams(): UseTeamsResult {
   // Helper: save a team slot after an optimistic store update, rolling back on failure
   // only if the store still reflects this request's optimistic value.
   const saveAfterMutation = useCallback(
-    (slot: TeamSlot, previousTeam: Team) => {
+    (slot: TeamSlot, previousTeam: CollectionTeam) => {
       const optimisticTeam = useTeamStore.getState().teams[slot];
       saveTeamApi(teamToSavePayload(optimisticTeam), {
         onError: () => {
