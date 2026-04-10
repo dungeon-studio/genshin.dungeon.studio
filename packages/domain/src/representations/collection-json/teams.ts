@@ -126,6 +126,11 @@ export function deserialiseTeam(item: Item): CollectionTeam {
   if (!Array.isArray(members)) {
     throw new TypeError(`members must be an array, got: ${JSON.stringify(members)}`);
   }
+  if (members.length !== MAX_TEAM_MEMBERS) {
+    throw new TypeError(
+      `members must have exactly ${MAX_TEAM_MEMBERS} elements, got: ${members.length}`,
+    );
+  }
   const data: Record<string, unknown> = Object.fromEntries(
     item.data.filter((d) => d.name !== 'members').map((d) => [d.name, d.value]),
   );

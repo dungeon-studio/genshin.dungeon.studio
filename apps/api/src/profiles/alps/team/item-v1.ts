@@ -31,7 +31,7 @@ export const teamItemV1 = {
           type: 'semantic',
           doc: {
             value:
-              'Team members (0-4 character positions; partial teams are valid for optimizer input)',
+              'Team members (exactly 4 character positions; null represents an empty position)',
           },
           descriptor: [
             {

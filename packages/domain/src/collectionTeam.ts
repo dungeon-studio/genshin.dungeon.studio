@@ -80,9 +80,9 @@ export function assertCollectionTeam(value: unknown): asserts value is Collectio
       `CollectionTeam.members must be an array, got: ${JSON.stringify(data.members)}`,
     );
   }
-  if (data.members.length > MAX_TEAM_MEMBERS) {
+  if (data.members.length !== MAX_TEAM_MEMBERS) {
     throw new TypeError(
-      `CollectionTeam.members must have at most ${MAX_TEAM_MEMBERS} entries, got: ${data.members.length}`,
+      `CollectionTeam.members must have exactly ${MAX_TEAM_MEMBERS} entries, got: ${data.members.length}`,
     );
   }
   for (const member of data.members) {
