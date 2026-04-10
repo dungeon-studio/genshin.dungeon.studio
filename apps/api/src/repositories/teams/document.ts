@@ -8,6 +8,7 @@ import type {
   ISOTimestamp,
   TeamSlot,
 } from '@genshin/domain';
+import { MAX_TEAM_MEMBERS } from '@genshin/domain';
 
 export interface MemberDocumentData {
   characterId: string;
@@ -47,6 +48,11 @@ function memberToDocument(m: CollectionTeamMember): MemberDocumentData {
 }
 
 export function fromDocument(slot: TeamSlot, data: DocumentData): CollectionTeam {
+  if (data.members.length > MAX_TEAM_MEMBERS) {
+    throw new TypeError(
+      `Document members must have at most ${MAX_TEAM_MEMBERS} entries, got: ${data.members.length}`,
+    );
+  }
   const mapped = data.members.map((m) => (m === null ? null : memberFromDocument(m)));
   return {
     slot,

@@ -46,7 +46,7 @@ export function TeamStrip({
             type="button"
             onClick={() => onSelect(i)}
             className={cn(
-              'rounded-lg border border-border border-l-4 p-2 text-left transition-colors',
+              'rounded-lg border border-border border-l-4 p-2 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
               borderClass,
               'cursor-pointer hover:bg-accent/50',
               selected && 'bg-accent/50',
