@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 SPDX-License-Identifier: MIT
 -->
 
-# Cryo element icon prompts
+# Claymore weapon type icon prompts
 
 ## Light mode variant
 
@@ -14,9 +14,9 @@ SPDX-License-Identifier: MIT
 > A flat vector icon on a solid white background, 512×512 pixels, bold shape
 > with clean edges, suitable for display at small sizes (32px). No text, no
 > gradients, no photorealistic detail. Original design, not based on any
-> existing game artwork. A stylized snowflake icon in sky blue (#38BDF8). A
-> six-pointed snowflake with clean geometric symmetry. The icon should have
-> good contrast on a white background.
+> existing game artwork. A stylized greatsword icon in dark iron gray (#57534E).
+> A wide, heavy blade with a broad crossguard, bold silhouette with minimal
+> internal detail. The icon should have good contrast on a white background.
 
 <!-- vale on -->
 
@@ -37,9 +37,9 @@ SPDX-License-Identifier: MIT
 > detail, no patterns. Original design, not based on any existing game artwork.
 > The entire background is a single uniform flat fill of pure black (#000000)
 > with absolutely no checkerboard, no tiles, no texture, and no variation. A
-> stylized snowflake icon in bright light blue (#C0E7FF). A six-pointed
-> snowflake with clean geometric symmetry. The icon should be prominent and
-> visible on the black background.
+> stylized greatsword icon in bright iron gray (#D6D3D1). A wide, heavy blade
+> with a broad crossguard, bold silhouette with minimal internal detail. The
+> icon should be prominent and visible on the black background.
 
 <!-- vale on -->
 

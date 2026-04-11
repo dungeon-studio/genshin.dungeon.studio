@@ -103,6 +103,8 @@ Renovate
 
 # Web assets
 favicon
+polearm
+Polearm
 
 # Development workflow
 dev

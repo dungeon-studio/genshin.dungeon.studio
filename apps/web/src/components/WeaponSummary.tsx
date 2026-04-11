@@ -5,6 +5,7 @@ import type { Weapon } from '@genshin/game-data';
 import { CircleHelp } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { getWeaponTypeIconPath } from '@/lib/weaponTypes';
 
 interface WeaponSummaryProps {
   /** Static weapon definition (name, rarity, type), not a collection instance. */
@@ -33,14 +34,13 @@ export function WeaponSummary({ weapon, dimmed = false }: WeaponSummaryProps) {
 
   return (
     <>
-      <div
-        className={cn(
-          'flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-bold text-muted-foreground',
-          dimmed && 'opacity-30',
-        )}
-      >
-        {weapon.type.slice(0, 3)}
-      </div>
+      <img
+        src={getWeaponTypeIconPath(weapon.type)}
+        alt={weapon.type}
+        loading="lazy"
+        decoding="async"
+        className={cn('h-10 w-10 shrink-0', dimmed && 'opacity-30')}
+      />
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-card-foreground">{weapon.name}</p>

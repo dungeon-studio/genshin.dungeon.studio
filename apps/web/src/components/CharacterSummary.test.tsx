@@ -28,7 +28,7 @@ describe('CharacterSummary', () => {
     render(<CharacterSummary character={AMBER} />);
 
     const img = screen.getByAltText('Pyro');
-    expect(img).toHaveAttribute('src', '/elements/pyro.png');
+    expect(img).toHaveAttribute('src', '/elements/pyro-light.png');
   });
 
   it('applies dimmed styling when dimmed prop is true', () => {
