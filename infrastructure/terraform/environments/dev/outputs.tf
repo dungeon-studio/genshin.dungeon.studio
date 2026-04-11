@@ -41,5 +41,5 @@ output "firebase_web_app_config" {
     messaging_sender_id = data.google_firebase_web_app_config.web.messaging_sender_id
     app_id              = google_firebase_web_app.web.app_id
   }
-  sensitive = false
+  sensitive = true
 }
