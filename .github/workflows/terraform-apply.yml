@@ -23,7 +23,6 @@ jobs:
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: core
-      service_account_secret: GCP_RW_CORE_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
     secrets: inherit # pragma: allowlist secret
 
   dev:
@@ -32,7 +31,6 @@ jobs:
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: dev
-      service_account_secret: GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
     secrets: inherit # pragma: allowlist secret
 
   staging:
@@ -41,5 +39,4 @@ jobs:
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: staging
-      service_account_secret: GCP_RW_STAGING_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
     secrets: inherit # pragma: allowlist secret
