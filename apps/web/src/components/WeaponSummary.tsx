@@ -36,14 +36,16 @@ export function WeaponSummary({ weapon, dimmed = false }: WeaponSummaryProps) {
     <>
       <img
         src={getWeaponTypeIconPath(weapon.type, 'light')}
-        alt={weapon.type}
+        alt=""
+        aria-hidden="true"
         loading="lazy"
         decoding="async"
         className={cn('h-10 w-10 shrink-0 dark:hidden', dimmed && 'opacity-30')}
       />
       <img
         src={getWeaponTypeIconPath(weapon.type, 'dark')}
-        alt={weapon.type}
+        alt=""
+        aria-hidden="true"
         loading="lazy"
         decoding="async"
         className={cn('hidden h-10 w-10 shrink-0 dark:block', dimmed && 'opacity-30')}
