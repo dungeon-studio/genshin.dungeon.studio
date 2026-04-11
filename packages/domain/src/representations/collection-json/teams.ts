@@ -67,7 +67,7 @@ export function teamItemDocument(team: CollectionTeam, baseUrl: string): Collect
 }
 
 function deserialiseArtifactPlan(value: unknown): ArtifactPlan {
-  if (typeof value !== 'object' || value === null) {
+  if (value === null || typeof value !== 'object') {
     throw new TypeError(`artifactPlan must be a non-null object, got: ${JSON.stringify(value)}`);
   }
   const plan = value as Record<string, unknown>;
@@ -89,7 +89,7 @@ function deserialiseArtifactPlan(value: unknown): ArtifactPlan {
 }
 
 function deserialiseCollectionTeamMember(value: unknown, index: number): CollectionTeamMember {
-  if (typeof value !== 'object' || value === null) {
+  if (value === null || typeof value !== 'object') {
     throw new TypeError(
       `members[${index}] must be a non-null object, got: ${JSON.stringify(value)}`,
     );
