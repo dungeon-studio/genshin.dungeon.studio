@@ -3,9 +3,9 @@
 
 import type {
   CollectionCharacter,
+  CollectionTeam,
   CollectionWeapon,
   CollectionWeaponId,
-  Team,
 } from '@genshin/domain';
 import { MAX_TEAM_MEMBERS } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
@@ -16,16 +16,16 @@ import { cn } from '@/lib/utils';
 import { TeamMemberSummary } from './TeamMemberSummary';
 
 interface TeamStripProps {
-  members: Team['members'];
-  selectedIndex: number | null;
-  onSelect: (index: number) => void;
+  members: CollectionTeam['members'];
+  selectedMemberIndex: number | null;
+  onSelect: (memberIndex: number) => void;
   getCharacter: (characterId: string) => CollectionCharacter | undefined;
   getCollectionWeapon: (collectionWeaponId: CollectionWeaponId) => CollectionWeapon | undefined;
 }
 
 export function TeamStrip({
   members,
-  selectedIndex,
+  selectedMemberIndex,
   onSelect,
   getCharacter,
   getCollectionWeapon,
@@ -37,7 +37,7 @@ export function TeamStrip({
       {slots.map((member, i) => {
         const character = member ? getCharacterById(member.characterId) : undefined;
 
-        const selected = selectedIndex === i;
+        const selected = selectedMemberIndex === i;
         const borderClass = elementBorderClass(character?.element);
 
         return (
@@ -46,12 +46,14 @@ export function TeamStrip({
             type="button"
             onClick={() => onSelect(i)}
             className={cn(
-              'rounded-lg border border-border border-l-4 p-2 text-left transition-colors',
+              'rounded-lg border border-border border-l-4 p-2 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
               borderClass,
               'cursor-pointer hover:bg-accent/50',
               selected && 'bg-accent/50',
             )}
-            aria-label={character ? `Select ${character.name}` : `Select empty slot ${i + 1}`}
+            aria-label={
+              character ? `Select ${character.name}` : `Select empty member position ${i + 1}`
+            }
             aria-pressed={selected}
           >
             <TeamMemberSummary

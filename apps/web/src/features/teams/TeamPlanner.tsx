@@ -4,9 +4,9 @@
 import type {
   ArtifactPlan,
   CollectionCharacter,
+  CollectionTeam,
   CollectionWeapon,
   CollectionWeaponId,
-  Team,
   TeamSlot,
 } from '@genshin/domain';
 import { MAX_TEAM_MEMBERS } from '@genshin/domain';
@@ -20,7 +20,7 @@ import { TeamMemberPlanner } from './TeamMemberPlanner';
 interface TeamPlannerProps {
   slot: TeamSlot;
   name: string;
-  members: Team['members'];
+  members: CollectionTeam['members'];
   getCharacter: (characterId: string) => CollectionCharacter | undefined;
   getCollectionWeapon: (collectionWeaponId: CollectionWeaponId) => CollectionWeapon | undefined;
   selectedMemberIndex?: number | null;

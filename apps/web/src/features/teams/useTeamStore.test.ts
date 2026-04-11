@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionWeaponId, ISOTimestamp, Team, TeamSlot } from '@genshin/domain';
+import type { CollectionTeam, CollectionWeaponId, ISOTimestamp, TeamSlot } from '@genshin/domain';
 import { initialTeams } from '@genshin/domain';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -21,18 +21,18 @@ describe('useTeamStore', () => {
         const team = teams[slot];
         expect(team.slot).toBe(slot);
         expect(team.name).toBe(`Team ${slot}`);
-        expect(team.members).toEqual([undefined, undefined, undefined, undefined]);
+        expect(team.members).toEqual([null, null, null, null]);
       }
     });
   });
 
   describe('assignCharacter', () => {
-    it('assigns a character to the specified slot and member index', () => {
+    it('assigns a character to the specified team slot and member position', () => {
       useTeamStore.getState().assignCharacter(1, 0, 'amber');
 
       const team = useTeamStore.getState().teams[1];
       expect(team.members[0]).toEqual({ characterId: 'amber' });
-      expect(team.members[1]).toBeUndefined();
+      expect(team.members[1]).toBeNull();
     });
 
     it('ignores invalid member indices', () => {
@@ -40,7 +40,7 @@ describe('useTeamStore', () => {
       useTeamStore.getState().assignCharacter(1, 4, 'amber');
 
       const team = useTeamStore.getState().teams[1];
-      expect(team.members).toEqual([undefined, undefined, undefined, undefined]);
+      expect(team.members).toEqual([null, null, null, null]);
     });
 
     it('prevents duplicate characters in the same team', () => {
@@ -49,7 +49,7 @@ describe('useTeamStore', () => {
 
       const team = useTeamStore.getState().teams[1];
       expect(team.members[0]).toEqual({ characterId: 'amber' });
-      expect(team.members[1]).toBeUndefined();
+      expect(team.members[1]).toBeNull();
     });
 
     it('auto-populates weapon from another team', () => {
@@ -70,7 +70,7 @@ describe('useTeamStore', () => {
       useTeamStore.getState().removeCharacter(1, 0);
 
       const team = useTeamStore.getState().teams[1];
-      expect(team.members[0]).toBeUndefined();
+      expect(team.members[0]).toBeNull();
     });
 
     it('ignores invalid member indices', () => {
@@ -90,11 +90,11 @@ describe('useTeamStore', () => {
       expect(useTeamStore.getState().teams[1].members[0]?.weaponInstanceId).toBe(weaponId);
     });
 
-    it('does nothing if no character occupies the slot', () => {
+    it('does nothing if no character occupies the position', () => {
       const weaponId = 'weapon-1' as CollectionWeaponId;
       useTeamStore.getState().assignWeapon(1, 0, weaponId);
 
-      expect(useTeamStore.getState().teams[1].members[0]).toBeUndefined();
+      expect(useTeamStore.getState().teams[1].members[0]).toBeNull();
     });
   });
 
@@ -115,12 +115,7 @@ describe('useTeamStore', () => {
       useTeamStore.getState().assignCharacter(1, 1, 'xiangling');
       useTeamStore.getState().clearTeam(1);
 
-      expect(useTeamStore.getState().teams[1].members).toEqual([
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-      ]);
+      expect(useTeamStore.getState().teams[1].members).toEqual([null, null, null, null]);
     });
   });
 
@@ -149,7 +144,7 @@ describe('useTeamStore', () => {
       useTeamStore.getState().resetTeams();
 
       const { teams } = useTeamStore.getState();
-      expect(teams[1].members[0]).toBeUndefined();
+      expect(teams[1].members[0]).toBeNull();
       expect(teams[2].name).toBe('Team 2');
     });
   });
@@ -175,11 +170,11 @@ describe('useTeamStore', () => {
       expect(useTeamStore.getState().teams[1].members[0]?.artifactPlan).toEqual(plan);
     });
 
-    it('does nothing if no character occupies the slot', () => {
+    it('does nothing if no character occupies the position', () => {
       const plan = { sands: 'ATK Percentage' as const };
       useTeamStore.getState().setArtifactPlan(1, 0, plan);
 
-      expect(useTeamStore.getState().teams[1].members[0]).toBeUndefined();
+      expect(useTeamStore.getState().teams[1].members[0]).toBeNull();
     });
 
     it('clears an artifact plan when given undefined', () => {
@@ -193,10 +188,10 @@ describe('useTeamStore', () => {
 
   describe('setTeam', () => {
     it('replaces a single team', () => {
-      const custom: Team = {
+      const custom: CollectionTeam = {
         slot: 3,
         name: 'Freeze',
-        members: [{ characterId: 'ganyu' }, undefined, undefined, undefined],
+        members: [{ characterId: 'ganyu' }, null, null, null],
         createdAt: '2026-01-01T00:00:00.000Z' as ISOTimestamp,
         updatedAt: '2026-01-01T00:00:00.000Z' as ISOTimestamp,
       };

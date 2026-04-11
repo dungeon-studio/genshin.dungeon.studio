@@ -1,23 +1,53 @@
 /* SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> */
 /* SPDX-License-Identifier: MIT */
 
+import type { CollectionTeamMember } from './collectionTeamMember.js';
 import type { ISOTimestamp } from './isoTimestamp.js';
-import { isISOTimestamp } from './isoTimestamp.js';
-import type { TeamSlot } from './team.js';
-import { MAX_TEAM_MEMBERS, MAX_TEAM_SLOT, MIN_TEAM_SLOT } from './team.js';
-import type { TeamMember } from './teamMember.js';
+import { isISOTimestamp, nowTimestamp } from './isoTimestamp.js';
+
+export const MIN_TEAM_SLOT = 1;
+export const MAX_TEAM_SLOT = 4;
+export const MAX_TEAM_MEMBERS = 4;
 
 /**
- * CollectionTeam is the persisted form of a user's team composition.
+ * Team loadout slot index for a user (1-indexed, 1-4).
  *
- * Each user has up to 4 team loadout slots (1–4). Members is an array with
- * 0 to 4 entries where `null` represents an empty slot, preserving positional
+ * This identifies which team loadout in a user's collection this team
+ * corresponds to, not the index of an individual party member.
+ */
+export type TeamSlot = 1 | 2 | 3 | 4;
+
+/**
+ * All valid team loadout slot values.
+ */
+export const TEAM_SLOTS: readonly TeamSlot[] = Array.from(
+  { length: MAX_TEAM_SLOT - MIN_TEAM_SLOT + 1 },
+  (_, i) => (MIN_TEAM_SLOT + i) as TeamSlot,
+);
+
+export function isValidMemberIndex(index: number): boolean {
+  return Number.isInteger(index) && index >= 0 && index < MAX_TEAM_MEMBERS;
+}
+
+/** A fixed-length 4-tuple of team member positions where `null` is an empty position. */
+export type CollectionTeamMembers = [
+  CollectionTeamMember | null,
+  CollectionTeamMember | null,
+  CollectionTeamMember | null,
+  CollectionTeamMember | null,
+];
+
+/**
+ * CollectionTeam is a user's team composition in their collection.
+ *
+ * Each user has up to 4 team loadout slots (1–4). Members is a fixed-length
+ * 4-tuple where `null` represents an empty position, preserving positional
  * information across API round-trips.
  */
 export interface CollectionTeam {
   slot: TeamSlot;
   name: string;
-  members: (TeamMember | null)[];
+  members: CollectionTeamMembers;
   description?: string;
   createdAt: ISOTimestamp;
   updatedAt: ISOTimestamp;
@@ -50,9 +80,9 @@ export function assertCollectionTeam(value: unknown): asserts value is Collectio
       `CollectionTeam.members must be an array, got: ${JSON.stringify(data.members)}`,
     );
   }
-  if (data.members.length > MAX_TEAM_MEMBERS) {
+  if (data.members.length !== MAX_TEAM_MEMBERS) {
     throw new TypeError(
-      `CollectionTeam.members must have at most ${MAX_TEAM_MEMBERS} entries, got: ${data.members.length}`,
+      `CollectionTeam.members must have exactly ${MAX_TEAM_MEMBERS} entries, got: ${data.members.length}`,
     );
   }
   for (const member of data.members) {
@@ -73,4 +103,22 @@ export function assertCollectionTeam(value: unknown): asserts value is Collectio
       `CollectionTeam.updatedAt must be an ISO 8601 timestamp, got: ${JSON.stringify(data.updatedAt)}`,
     );
   }
+}
+
+export function createEmptyTeam(slot: TeamSlot): CollectionTeam {
+  const now = nowTimestamp();
+  return {
+    slot,
+    name: `Team ${slot}`,
+    members: [null, null, null, null],
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
+export function initialTeams(): Record<TeamSlot, CollectionTeam> {
+  return Object.fromEntries(TEAM_SLOTS.map((slot) => [slot, createEmptyTeam(slot)])) as Record<
+    TeamSlot,
+    CollectionTeam
+  >;
 }

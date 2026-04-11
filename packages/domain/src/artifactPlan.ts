@@ -4,13 +4,10 @@
 import type {
   ArtifactMinorAffix,
   ArtifactSet,
-  Character,
   CircletMainAffix,
   GobletMainAffix,
   SandsMainAffix,
 } from '@genshin/game-data';
-
-import type { UUID } from './uuid.js';
 
 /**
  * Artifact plan configuration for a team member.
@@ -34,16 +31,4 @@ export interface ArtifactPlan {
   priorityMinorAffixes?: ArtifactMinorAffix[];
   /** 0–3 secondary minor affixes (must be disjoint from priorityMinorAffixes) */
   secondaryMinorAffixes?: ArtifactMinorAffix[];
-}
-
-/**
- * TeamMember represents a single character slot in a team with equipped weapon and artifacts.
- *
- * Character details should be looked up from @genshin/game-data using characterId.
- * The weaponInstanceId references a specific weapon instance in the user's collection.
- */
-export interface TeamMember {
-  characterId: Character['id'];
-  weaponInstanceId?: UUID;
-  artifactPlan?: ArtifactPlan;
 }

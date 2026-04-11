@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { assertCollectionDocument } from '@genshin/collection-json';
-import type { CollectionTeam, TeamMember, TeamSlot } from '@genshin/domain';
+import type { CollectionTeam, CollectionTeamMembers, TeamSlot } from '@genshin/domain';
 import { deserialiseTeam } from '@genshin/domain';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -11,7 +11,7 @@ import { apiDelete, apiGet, apiPut } from '@/lib/api';
 export interface SaveTeamPayload {
   slot: TeamSlot;
   name: string;
-  members: (TeamMember | null)[];
+  members: CollectionTeamMembers;
   description?: string;
 }
 

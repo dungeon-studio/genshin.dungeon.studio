@@ -15,7 +15,7 @@ import { getCharacter } from '@/repositories/characters/index.js';
 import { deleteTeam, getTeam, listTeams, saveTeam } from '@/repositories/teams/index.js';
 import { getWeapon } from '@/repositories/weapons/index.js';
 import { COLLECTION_JSON } from '@genshin/collection-json';
-import type { CollectionTeam, TeamMember, TeamSlot, UUID } from '@genshin/domain';
+import type { CollectionTeamMember, CollectionTeamMembers, TeamSlot, UUID } from '@genshin/domain';
 import {
   isValidTeamSlot,
   teamItemDocument,
@@ -40,7 +40,7 @@ teams.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: teamItem
 interface UpdateTeamBody {
   name?: string;
   description?: string;
-  members?: (TeamMember | null)[];
+  members?: CollectionTeamMembers;
 }
 
 function parseSlot(param: string): TeamSlot {
@@ -92,8 +92,8 @@ teams.put(
     const slot = parseSlot(c.req.param('slot'));
     const body = c.get('validatedBody') as UpdateTeamBody;
 
-    if (body.members && body.members.length > 0) {
-      const nonNullMembers = body.members.filter((m): m is TeamMember => m !== null);
+    if (body.members) {
+      const nonNullMembers = body.members.filter((m): m is CollectionTeamMember => m !== null);
       if (nonNullMembers.length > 0) {
         await validateMembers(userId, nonNullMembers);
 
@@ -109,7 +109,7 @@ teams.put(
 
     const { team, created } = await saveTeam(userId, slot, {
       name: body.name,
-      members: body.members ? (body.members as CollectionTeam['members']) : undefined,
+      members: body.members,
       description: body.description,
     });
 
@@ -132,7 +132,7 @@ teams.delete('/:slot', async (c) => {
   return c.body(null, 204);
 });
 
-async function validateMembers(userId: string, members: TeamMember[]): Promise<void> {
+async function validateMembers(userId: string, members: CollectionTeamMember[]): Promise<void> {
   // No duplicate character IDs
   const characterIds = members.map((m) => m.characterId);
   if (new Set(characterIds).size !== characterIds.length) {

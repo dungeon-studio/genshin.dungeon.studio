@@ -1,8 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionWeapon, CollectionWeaponId, Team, TeamSlot } from '@genshin/domain';
-import { TEAM_SLOTS } from '@genshin/domain';
+import type {
+  CollectionTeam,
+  CollectionWeapon,
+  CollectionWeaponId,
+  TeamSlot,
+} from '@genshin/domain';
 import type { Weapon, WeaponType } from '@genshin/game-data';
 import { getWeaponById, WEAPONS } from '@genshin/game-data';
 import { Lock, Swords } from 'lucide-react';
@@ -18,12 +22,14 @@ import { useTeamStore } from '@/features/teams/useTeamStore';
 import { RARITY_BORDER_COLORS, RARITY_SELECTED_RINGS } from '@/lib/rarityStyles';
 import { cn } from '@/lib/utils';
 
-function buildEquippedWeapons(teams: Record<TeamSlot, Team>): Map<CollectionWeaponId, string> {
+function buildEquippedWeapons(
+  teams: Record<TeamSlot, CollectionTeam>,
+): Map<CollectionWeaponId, string> {
   const map = new Map<CollectionWeaponId, string>();
-  for (const slot of TEAM_SLOTS) {
-    for (const m of teams[slot].members) {
-      if (m?.weaponInstanceId) {
-        map.set(m.weaponInstanceId, m.characterId);
+  for (const team of Object.values(teams)) {
+    for (const member of team.members) {
+      if (member?.weaponInstanceId) {
+        map.set(member.weaponInstanceId, member.characterId);
       }
     }
   }
