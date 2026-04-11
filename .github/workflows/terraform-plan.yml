@@ -35,9 +35,10 @@ jobs:
         with:
           terraform_version: '1.9.0'
 
-      # Authenticate to GCP using Workload Identity
-      # Each environment maps to an explicit secret to avoid passing all secrets
-      # to the runner (fixes CodeQL actions/excessive-secrets-exposure).
+      # Authenticate to GCP using Workload Identity.
+      # Each environment maps to an explicit secret reference so this step
+      # narrows which secret is passed to the action input and avoids dynamic
+      # secret indexing (fixes CodeQL actions/excessive-secrets-exposure).
       - uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: ${{ secrets.GCP_RO_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
