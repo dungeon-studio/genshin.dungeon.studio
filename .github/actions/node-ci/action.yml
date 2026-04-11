@@ -2,8 +2,8 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-name: Test and upload coverage
-description: Run vitest with coverage and upload results to Codecov
+name: Node CI
+description: Install Node.js + pnpm, typecheck, test with coverage, upload results to Codecov, and build
 
 inputs:
   filter:
@@ -26,6 +26,12 @@ runs:
   using: composite
 
   steps:
+    - uses: ./.github/actions/setup-node-pnpm
+
+    - name: Typecheck
+      shell: bash
+      run: pnpm turbo run typecheck --filter="${{ inputs.filter }}"
+
     - name: Test
       shell: bash
       run: pnpm turbo run test --filter="${{ inputs.filter }}" -- --coverage
@@ -46,3 +52,7 @@ runs:
         flags: ${{ inputs.flag }}
         report_type: test_results
         fail_ci_if_error: false
+
+    - name: Build
+      shell: bash
+      run: pnpm turbo run build --filter="${{ inputs.filter }}"

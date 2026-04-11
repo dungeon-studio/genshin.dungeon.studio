@@ -34,6 +34,9 @@ flag_management:
     - name: web
       paths:
         - apps/web/src/**
+    - name: validation
+      paths:
+        - packages/validation/src/**
 
 component_management:
   individual_components:
@@ -103,3 +106,9 @@ component_management:
         - packages/domain/src/**
       flag_regexes:
         - domain
+    - component_id: validation
+      name: Validation
+      paths:
+        - packages/validation/src/**
+      flag_regexes:
+        - validation

@@ -22,20 +22,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup-and-typecheck
-        with:
-          filter: '@genshin/web'
-
-      - uses: ./.github/actions/test-and-upload-coverage
+      - uses: ./.github/actions/node-ci
         with:
           filter: '@genshin/web'
           coverage-file: apps/web/coverage/lcov.info
           results-file: apps/web/test-results/junit.xml
           flag: web
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Build
-        run: pnpm turbo run build --filter=@genshin/web
 
       - name: Verify Build Artifacts
         run: bash apps/web/scripts/verify-build-output.sh
@@ -49,20 +42,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup-and-typecheck
-        with:
-          filter: '@genshin/api'
-
-      - uses: ./.github/actions/test-and-upload-coverage
+      - uses: ./.github/actions/node-ci
         with:
           filter: '@genshin/api'
           coverage-file: apps/api/coverage/lcov.info
           results-file: apps/api/test-results/junit.xml
           flag: api
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Build
-        run: pnpm turbo run build --filter=@genshin/api
 
   game-data:
     name: Game Data
@@ -73,20 +59,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup-and-typecheck
-        with:
-          filter: '@genshin/game-data'
-
-      - uses: ./.github/actions/test-and-upload-coverage
+      - uses: ./.github/actions/node-ci
         with:
           filter: '@genshin/game-data'
           coverage-file: packages/game-data/coverage/lcov.info
           results-file: packages/game-data/test-results/junit.xml
           flag: game-data
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Build
-        run: pnpm turbo run build --filter=@genshin/game-data
 
   domain:
     name: Domain
@@ -97,20 +76,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup-and-typecheck
-        with:
-          filter: '@genshin/domain'
-
-      - uses: ./.github/actions/test-and-upload-coverage
+      - uses: ./.github/actions/node-ci
         with:
           filter: '@genshin/domain'
           coverage-file: packages/domain/coverage/lcov.info
           results-file: packages/domain/test-results/junit.xml
           flag: domain
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Build
-        run: pnpm turbo run build --filter=@genshin/domain
 
   collection-json:
     name: Collection JSON
@@ -121,20 +93,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup-and-typecheck
-        with:
-          filter: '@genshin/collection-json'
-
-      - uses: ./.github/actions/test-and-upload-coverage
+      - uses: ./.github/actions/node-ci
         with:
           filter: '@genshin/collection-json'
           coverage-file: packages/collection-json/coverage/lcov.info
           results-file: packages/collection-json/test-results/junit.xml
           flag: collection-json
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Build
-        run: pnpm turbo run build --filter=@genshin/collection-json
 
   validation:
     name: Validation
@@ -145,12 +110,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup-and-typecheck
+      - uses: ./.github/actions/node-ci
         with:
           filter: '@genshin/validation'
-
-      - name: Build
-        run: pnpm turbo run build --filter=@genshin/validation
+          coverage-file: packages/validation/coverage/lcov.info
+          results-file: packages/validation/test-results/junit.xml
+          flag: validation
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
 # ---------------------------------------------------------------------------
 # Maintenance notes
