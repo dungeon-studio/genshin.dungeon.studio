@@ -25,6 +25,9 @@ flag_management:
     - name: collection-json
       paths:
         - packages/collection-json/src/**
+    - name: domain
+      paths:
+        - packages/domain/src/**
     - name: game-data
       paths:
         - packages/game-data/src/**
@@ -94,3 +97,9 @@ component_management:
         - packages/collection-json/src/**
       flag_regexes:
         - collection-json
+    - component_id: domain
+      name: Domain
+      paths:
+        - packages/domain/src/**
+      flag_regexes:
+        - domain
