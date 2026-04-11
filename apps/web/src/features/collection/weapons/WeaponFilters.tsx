@@ -8,6 +8,7 @@ import { ArrowDownWideNarrow, ArrowUpNarrowWide, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { getWeaponTypeIconPath } from '@/lib/weaponTypes';
 
 import type { SortField, WeaponFilterState } from './filtering';
 
@@ -136,7 +137,7 @@ export function WeaponFilters({
               type="button"
               onClick={() => toggleWeaponType(type)}
               className={cn(
-                'rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
+                'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
                 filters.weaponTypes.has(type)
                   ? 'bg-foreground text-background'
                   : 'bg-muted text-muted-foreground hover:bg-muted/80',
@@ -144,6 +145,18 @@ export function WeaponFilters({
               aria-pressed={filters.weaponTypes.has(type)}
               aria-label={`Filter by ${type}`}
             >
+              <img
+                src={getWeaponTypeIconPath(type, 'light')}
+                alt=""
+                className="h-3.5 w-3.5 dark:hidden"
+                aria-hidden="true"
+              />
+              <img
+                src={getWeaponTypeIconPath(type, 'dark')}
+                alt=""
+                className="hidden h-3.5 w-3.5 dark:block"
+                aria-hidden="true"
+              />
               {type}
             </button>
           ))}

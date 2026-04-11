@@ -22,10 +22,20 @@ describe('WeaponSummary', () => {
     expect(screen.getByText('No weapon')).toBeInTheDocument();
   });
 
+  it('renders the weapon type icon with correct src path', () => {
+    const { container } = render(<WeaponSummary weapon={AMOS_BOW} />);
+
+    const images = container.querySelectorAll('img');
+    expect(images).toHaveLength(2);
+    expect(images[0]).toHaveAttribute('src', '/weapon-types/bow-light.png');
+    expect(images[1]).toHaveAttribute('src', '/weapon-types/bow-dark.png');
+  });
+
   it('applies dimmed styling when dimmed prop is true', () => {
     const { container } = render(<WeaponSummary weapon={AMOS_BOW} dimmed />);
 
-    const typeBox = container.querySelector('.opacity-30');
-    expect(typeBox).toBeInTheDocument();
+    const images = container.querySelectorAll('img');
+    expect(images[0].className).toContain('opacity-30');
+    expect(images[1].className).toContain('opacity-30');
   });
 });

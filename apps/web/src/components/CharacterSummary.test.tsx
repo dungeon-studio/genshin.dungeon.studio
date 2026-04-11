@@ -27,14 +27,17 @@ describe('CharacterSummary', () => {
   it('renders the element icon with correct src path', () => {
     render(<CharacterSummary character={AMBER} />);
 
-    const img = screen.getByAltText('Pyro');
-    expect(img).toHaveAttribute('src', '/elements/pyro.png');
+    const images = screen.getAllByAltText('Pyro');
+    expect(images).toHaveLength(2);
+    expect(images[0]).toHaveAttribute('src', '/elements/pyro-light.png');
+    expect(images[1]).toHaveAttribute('src', '/elements/pyro-dark.png');
   });
 
   it('applies dimmed styling when dimmed prop is true', () => {
     render(<CharacterSummary character={AMBER} dimmed />);
 
-    const img = screen.getByAltText('Pyro');
-    expect(img.className).toContain('opacity-30');
+    const images = screen.getAllByAltText('Pyro');
+    expect(images[0].className).toContain('opacity-30');
+    expect(images[1].className).toContain('opacity-30');
   });
 });
