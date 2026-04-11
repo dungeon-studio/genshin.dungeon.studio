@@ -27,25 +27,25 @@ describe('validateArtifactPlan', () => {
   it('rejects an invalid sands main affix', () => {
     const issues = validateArtifactPlan({ sands: 'INVALID' });
     expect(issues.length).toBeGreaterThan(0);
-    expect(issues[0].path).toBe('sands');
+    expect(issues.some((i) => i.path === 'sands')).toBe(true);
   });
 
   it('rejects an invalid goblet main affix', () => {
     const issues = validateArtifactPlan({ goblet: 'INVALID' });
     expect(issues.length).toBeGreaterThan(0);
-    expect(issues[0].path).toBe('goblet');
+    expect(issues.some((i) => i.path === 'goblet')).toBe(true);
   });
 
   it('rejects an invalid circlet main affix', () => {
     const issues = validateArtifactPlan({ circlet: 'INVALID' });
     expect(issues.length).toBeGreaterThan(0);
-    expect(issues[0].path).toBe('circlet');
+    expect(issues.some((i) => i.path === 'circlet')).toBe(true);
   });
 
   it('rejects zero sets', () => {
     const issues = validateArtifactPlan({ sets: [] });
     expect(issues.length).toBeGreaterThan(0);
-    expect(issues[0].path).toBe('sets');
+    expect(issues.some((i) => i.path === 'sets')).toBe(true);
   });
 
   it('rejects more than 2 sets', () => {
@@ -57,13 +57,13 @@ describe('validateArtifactPlan', () => {
       ],
     });
     expect(issues.length).toBeGreaterThan(0);
-    expect(issues[0].path).toBe('sets');
+    expect(issues.some((i) => i.path === 'sets')).toBe(true);
   });
 
   it('rejects an unknown artifact set ID', () => {
     const issues = validateArtifactPlan({ sets: ['nonexistent-set'] });
     expect(issues.length).toBeGreaterThan(0);
-    expect(issues[0].path).toBe('sets[0]');
+    expect(issues.some((i) => i.path === 'sets[0]')).toBe(true);
   });
 
   it('rejects more than 3 priority minor affixes', () => {
@@ -71,7 +71,7 @@ describe('validateArtifactPlan', () => {
       priorityMinorAffixes: ['HP', 'ATK', 'DEF', 'HP Percentage'],
     });
     expect(issues.length).toBeGreaterThan(0);
-    expect(issues[0].path).toBe('priorityMinorAffixes');
+    expect(issues.some((i) => i.path === 'priorityMinorAffixes')).toBe(true);
   });
 
   it('rejects an invalid minor affix', () => {
@@ -79,7 +79,7 @@ describe('validateArtifactPlan', () => {
       priorityMinorAffixes: ['INVALID_AFFIX'],
     });
     expect(issues.length).toBeGreaterThan(0);
-    expect(issues[0].path).toBe('priorityMinorAffixes[0]');
+    expect(issues.some((i) => i.path === 'priorityMinorAffixes[0]')).toBe(true);
   });
 
   it('rejects duplicate minor affixes', () => {

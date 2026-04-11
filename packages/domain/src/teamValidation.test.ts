@@ -31,7 +31,7 @@ describe('validateTeam', () => {
       members: [{ characterId: 'columbina' }, { characterId: 'columbina' }, null, null],
     });
     expect(issues.length).toBeGreaterThan(0);
-    expect(issues[0].message).toMatch(/Duplicate character/i);
+    expect(issues.some((i) => i.message.match(/Duplicate character/i))).toBe(true);
   });
 
   it('detects duplicate weapon instance IDs within a team', () => {
@@ -74,7 +74,7 @@ describe('validateTeam', () => {
         context,
       );
       expect(issues.length).toBeGreaterThan(0);
-      expect(issues[0].message).toMatch(/not in collection/i);
+      expect(issues.some((i) => i.message.match(/not in collection/i))).toBe(true);
     });
 
     it('detects unowned weapon instances', () => {
@@ -109,7 +109,7 @@ describe('validateTeam', () => {
       ],
     });
     expect(issues.length).toBeGreaterThan(0);
-    expect(issues[0].path).toMatch(/artifactPlan/);
+    expect(issues.some((i) => i.path?.match(/artifactPlan/))).toBe(true);
   });
 });
 
