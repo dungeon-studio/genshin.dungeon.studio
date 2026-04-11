@@ -10,9 +10,6 @@ on:
       environment:
         required: true
         type: string
-      service_account_secret:
-        required: true
-        type: string
 
 jobs:
   terraform-apply:
@@ -37,10 +34,17 @@ jobs:
           terraform_version: '1.9.0'
 
       # Authenticate to GCP using Workload Identity
+      # Each environment maps to an explicit secret to avoid passing all secrets
+      # to the runner (fixes CodeQL actions/excessive-secrets-exposure).
       - uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: ${{ secrets.GCP_RW_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
-          service_account: ${{ secrets[inputs.service_account_secret] }} # pragma: allowlist secret
+          service_account: >-
+            ${{
+              inputs.environment == 'core' && secrets.GCP_RW_CORE_SERVICE_ACCOUNT_EMAIL ||
+              inputs.environment == 'dev' && secrets.GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL ||
+              inputs.environment == 'staging' && secrets.GCP_RW_STAGING_SERVICE_ACCOUNT_EMAIL
+            }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v3

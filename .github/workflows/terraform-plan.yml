@@ -25,11 +25,8 @@ jobs:
       matrix:
         include:
           - environment: core
-            service_account_secret: GCP_RO_CORE_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
           - environment: dev
-            service_account_secret: GCP_RO_DEV_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
           - environment: staging
-            service_account_secret: GCP_RO_STAGING_SERVICE_ACCOUNT_EMAIL # pragma: allowlist secret
 
     steps:
       - uses: actions/checkout@v6
@@ -39,10 +36,17 @@ jobs:
           terraform_version: '1.9.0'
 
       # Authenticate to GCP using Workload Identity
+      # Each environment maps to an explicit secret to avoid passing all secrets
+      # to the runner (fixes CodeQL actions/excessive-secrets-exposure).
       - uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: ${{ secrets.GCP_RO_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
-          service_account: ${{ secrets[matrix.service_account_secret] }} # pragma: allowlist secret
+          service_account: >-
+            ${{
+              matrix.environment == 'core' && secrets.GCP_RO_CORE_SERVICE_ACCOUNT_EMAIL ||
+              matrix.environment == 'dev' && secrets.GCP_RO_DEV_SERVICE_ACCOUNT_EMAIL ||
+              matrix.environment == 'staging' && secrets.GCP_RO_STAGING_SERVICE_ACCOUNT_EMAIL
+            }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v3
