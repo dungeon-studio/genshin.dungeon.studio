@@ -101,6 +101,14 @@ jobs:
         with:
           filter: '@genshin/domain'
 
+      - uses: ./.github/actions/test-and-upload-coverage
+        with:
+          filter: '@genshin/domain'
+          coverage-file: packages/domain/coverage/lcov.info
+          results-file: packages/domain/test-results/junit.xml
+          flag: domain
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
+
       - name: Build
         run: pnpm turbo run build --filter=@genshin/domain
 
