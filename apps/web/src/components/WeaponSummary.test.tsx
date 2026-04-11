@@ -25,14 +25,17 @@ describe('WeaponSummary', () => {
   it('renders the weapon type icon with correct src path', () => {
     render(<WeaponSummary weapon={AMOS_BOW} />);
 
-    const img = screen.getByAltText('Bow');
-    expect(img).toHaveAttribute('src', '/weapon-types/bow-light.png');
+    const images = screen.getAllByAltText('Bow');
+    expect(images).toHaveLength(2);
+    expect(images[0]).toHaveAttribute('src', '/weapon-types/bow-light.png');
+    expect(images[1]).toHaveAttribute('src', '/weapon-types/bow-dark.png');
   });
 
   it('applies dimmed styling when dimmed prop is true', () => {
     render(<WeaponSummary weapon={AMOS_BOW} dimmed />);
 
-    const img = screen.getByAltText('Bow');
-    expect(img.className).toContain('opacity-30');
+    const images = screen.getAllByAltText('Bow');
+    expect(images[0].className).toContain('opacity-30');
+    expect(images[1].className).toContain('opacity-30');
   });
 });

@@ -35,11 +35,18 @@ export function WeaponSummary({ weapon, dimmed = false }: WeaponSummaryProps) {
   return (
     <>
       <img
-        src={getWeaponTypeIconPath(weapon.type)}
+        src={getWeaponTypeIconPath(weapon.type, 'light')}
         alt={weapon.type}
         loading="lazy"
         decoding="async"
-        className={cn('h-10 w-10 shrink-0', dimmed && 'opacity-30')}
+        className={cn('h-10 w-10 shrink-0 dark:hidden', dimmed && 'opacity-30')}
+      />
+      <img
+        src={getWeaponTypeIconPath(weapon.type, 'dark')}
+        alt={weapon.type}
+        loading="lazy"
+        decoding="async"
+        className={cn('hidden h-10 w-10 shrink-0 dark:block', dimmed && 'opacity-30')}
       />
 
       <div className="min-w-0 flex-1">

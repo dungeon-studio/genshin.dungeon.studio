@@ -142,9 +142,15 @@ export function CharacterFilters({
             aria-label={`Filter by ${element}`}
           >
             <img
-              src={getElementIconPath(element)}
+              src={getElementIconPath(element, 'light')}
               alt=""
-              className="h-3.5 w-3.5"
+              className="h-3.5 w-3.5 dark:hidden"
+              aria-hidden="true"
+            />
+            <img
+              src={getElementIconPath(element, 'dark')}
+              alt=""
+              className="hidden h-3.5 w-3.5 dark:block"
               aria-hidden="true"
             />
             {element}

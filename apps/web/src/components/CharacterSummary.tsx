@@ -27,16 +27,21 @@ export function CharacterSummary({ character, dimmed = false }: CharacterSummary
     );
   }
 
-  const elementIconSrc = getElementIconPath(character.element);
-
   return (
     <>
       <img
-        src={elementIconSrc}
+        src={getElementIconPath(character.element, 'light')}
         alt={character.element}
         loading="lazy"
         decoding="async"
-        className={cn('h-10 w-10 shrink-0', dimmed && 'opacity-30')}
+        className={cn('h-10 w-10 shrink-0 dark:hidden', dimmed && 'opacity-30')}
+      />
+      <img
+        src={getElementIconPath(character.element, 'dark')}
+        alt={character.element}
+        loading="lazy"
+        decoding="async"
+        className={cn('hidden h-10 w-10 shrink-0 dark:block', dimmed && 'opacity-30')}
       />
 
       <div className="min-w-0 flex-1">

@@ -146,9 +146,15 @@ export function WeaponFilters({
               aria-label={`Filter by ${type}`}
             >
               <img
-                src={getWeaponTypeIconPath(type)}
+                src={getWeaponTypeIconPath(type, 'light')}
                 alt=""
-                className="h-3.5 w-3.5"
+                className="h-3.5 w-3.5 dark:hidden"
+                aria-hidden="true"
+              />
+              <img
+                src={getWeaponTypeIconPath(type, 'dark')}
+                alt=""
+                className="hidden h-3.5 w-3.5 dark:block"
                 aria-hidden="true"
               />
               {type}
