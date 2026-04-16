@@ -20,7 +20,7 @@
     "content-type": "1.0.5",
     "firebase-admin": "13.8.0",
     "google-gax": "5.0.6",
-    "hono": "4.12.12",
+    "hono": "4.12.14",
     "negotiator": "1.0.0"
   },
   "devDependencies": {
