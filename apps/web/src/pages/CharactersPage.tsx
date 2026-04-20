@@ -57,47 +57,54 @@ export function CharactersPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12">
+    <>
       <h1 className="sr-only">Characters</h1>
 
-      {error && (
-        <p className="mb-4 rounded-md bg-destructive/10 px-4 py-3 text-center text-sm text-destructive">
-          Failed to sync collection. Local data is still available.
-        </p>
-      )}
-
-      <CharacterFilters
-        filters={filters}
-        onChange={setFilters}
-        filteredCount={filteredCharacters.length}
-        totalCount={CHARACTERS.length}
-        ownedCount={ownedCount}
-        filteredOwnedCount={filteredOwnedCount}
-      />
-
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filteredCharacters.map((character) => {
-          const owned = isOwned(character.id);
-          const entry = owned ? characters[character.id] : undefined;
-
-          return (
-            <div key={character.id}>
-              <CharacterCard
-                character={character}
-                owned={owned}
-                constellationLevel={entry?.constellationLevel}
-                onAdd={addCharacter}
-                onRemove={removeCharacter}
-                onConstellationChange={handleConstellationChange}
-              />
-            </div>
-          );
-        })}
+      <div className="sticky top-0 z-10 bg-background shadow-sm">
+        <div className="mx-auto max-w-7xl px-4 py-4">
+          {error && (
+            <p className="mb-3 rounded-md bg-destructive/10 px-4 py-3 text-center text-sm text-destructive">
+              Failed to sync collection. Local data is still available.
+            </p>
+          )}
+          <CharacterFilters
+            filters={filters}
+            onChange={setFilters}
+            filteredCount={filteredCharacters.length}
+            totalCount={CHARACTERS.length}
+            ownedCount={ownedCount}
+            filteredOwnedCount={filteredOwnedCount}
+          />
+        </div>
       </div>
 
-      {filteredCharacters.length === 0 && (
-        <p className="py-12 text-center text-muted-foreground">No characters match your filters.</p>
-      )}
-    </div>
+      <div className="mx-auto max-w-7xl px-4 pb-12 pt-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredCharacters.map((character) => {
+            const owned = isOwned(character.id);
+            const entry = owned ? characters[character.id] : undefined;
+
+            return (
+              <div key={character.id}>
+                <CharacterCard
+                  character={character}
+                  owned={owned}
+                  constellationLevel={entry?.constellationLevel}
+                  onAdd={addCharacter}
+                  onRemove={removeCharacter}
+                  onConstellationChange={handleConstellationChange}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        {filteredCharacters.length === 0 && (
+          <p className="py-12 text-center text-muted-foreground">
+            No characters match your filters.
+          </p>
+        )}
+      </div>
+    </>
   );
 }

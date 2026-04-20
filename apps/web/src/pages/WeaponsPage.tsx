@@ -121,39 +121,44 @@ export function WeaponsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12">
+    <>
       <h1 className="sr-only">Weapons</h1>
 
-      {error && (
-        <p className="mb-4 rounded-md bg-destructive/10 px-4 py-3 text-center text-sm text-destructive">
-          Failed to sync weapon collection.
-        </p>
-      )}
-
-      <WeaponFilters
-        filters={filters}
-        onChange={setFilters}
-        filteredCount={filteredWeapons.length}
-        totalCount={WEAPONS.length}
-        ownedCount={ownedWeaponIds.size}
-        filteredOwnedCount={filteredOwnedCount}
-      />
-
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filteredWeapons.map((weapon) => (
-          <WeaponCard
-            key={weapon.id}
-            weapon={weapon}
-            instanceCount={instanceCounts[weapon.id] ?? 0}
-            selected={effectiveSelectedWeaponId === weapon.id}
-            onClick={handleWeaponClick}
+      <div className="sticky top-0 z-10 bg-background shadow-sm">
+        <div className="mx-auto max-w-7xl px-4 py-4">
+          {error && (
+            <p className="mb-3 rounded-md bg-destructive/10 px-4 py-3 text-center text-sm text-destructive">
+              Failed to sync weapon collection.
+            </p>
+          )}
+          <WeaponFilters
+            filters={filters}
+            onChange={setFilters}
+            filteredCount={filteredWeapons.length}
+            totalCount={WEAPONS.length}
+            ownedCount={ownedWeaponIds.size}
+            filteredOwnedCount={filteredOwnedCount}
           />
-        ))}
+        </div>
       </div>
 
-      {filteredWeapons.length === 0 && (
-        <p className="py-12 text-center text-muted-foreground">No weapons match your filters.</p>
-      )}
+      <div className="mx-auto max-w-7xl px-4 pb-12 pt-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredWeapons.map((weapon) => (
+            <WeaponCard
+              key={weapon.id}
+              weapon={weapon}
+              instanceCount={instanceCounts[weapon.id] ?? 0}
+              selected={effectiveSelectedWeaponId === weapon.id}
+              onClick={handleWeaponClick}
+            />
+          ))}
+        </div>
+
+        {filteredWeapons.length === 0 && (
+          <p className="py-12 text-center text-muted-foreground">No weapons match your filters.</p>
+        )}
+      </div>
 
       <WeaponInstanceSidebar
         weaponId={effectiveSelectedWeaponId}
@@ -163,6 +168,6 @@ export function WeaponsPage() {
         onRemove={removeWeapon}
         onRefinementChange={setRefinementLevel}
       />
-    </div>
+    </>
   );
 }
