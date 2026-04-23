@@ -12,13 +12,7 @@ import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { weaponItemV1 } from '@/profiles/alps/weapon/item-v1.js';
 import { weaponPatchRequestV1 } from '@/profiles/json-schema/weapons/patch-request-v1.js';
 import { weaponPostRequestV1 } from '@/profiles/json-schema/weapons/post-request-v1.js';
-import {
-  createWeapon,
-  deleteWeapon,
-  getWeapon,
-  listWeapons,
-  updateWeapon,
-} from '@/repositories/weapons/index.js';
+import * as Weapons from '@/repositories/weapons/index.js';
 import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
 import type { UUID } from '@genshin/domain';
 import { serialiseWeapon, weaponItemHref, weaponRepresentation } from '@genshin/domain';
@@ -61,7 +55,7 @@ weapons.get('/', async (c) => {
       throw new HTTPException(400, { message: `Unknown weapon: ${weaponId}` });
     }
 
-    const instances = await listWeapons(userId, weaponId);
+    const instances = await Weapons.list(userId, weaponId);
 
     return c.body(
       JSON.stringify(
@@ -77,7 +71,7 @@ weapons.get('/', async (c) => {
     );
   }
 
-  const items = await listWeapons(userId);
+  const items = await Weapons.list(userId);
 
   return c.body(
     JSON.stringify(
@@ -106,7 +100,7 @@ weapons.post(
       throw new HTTPException(400, { message: `Unknown weapon: ${weaponId}` });
     }
 
-    const weapon = await createWeapon(userId, weaponId, refinementLevel);
+    const weapon = await Weapons.create(userId, weaponId, refinementLevel);
     const baseUrl = new URL(c.req.url).origin;
 
     return c.body(
@@ -131,7 +125,7 @@ weapons.get('/:weaponInstanceId', async (c) => {
   const userId = c.get('user').uid;
   const weaponInstanceId = c.req.param('weaponInstanceId') as UUID;
 
-  const weapon = await getWeapon(userId, weaponInstanceId);
+  const weapon = await Weapons.get(userId, weaponInstanceId);
 
   if (!weapon) {
     throw new HTTPException(404, { message: 'Weapon instance not found' });
@@ -162,7 +156,7 @@ weapons.patch(
 
     const { refinementLevel } = c.get('validatedBody') as UpdateWeaponBody;
 
-    const weapon = await updateWeapon(userId, weaponInstanceId, refinementLevel);
+    const weapon = await Weapons.update(userId, weaponInstanceId, refinementLevel);
 
     if (!weapon) {
       throw new HTTPException(404, { message: 'Weapon instance not found' });
@@ -188,7 +182,7 @@ weapons.delete('/:weaponInstanceId', async (c) => {
   const userId = c.get('user').uid;
   const weaponInstanceId = c.req.param('weaponInstanceId') as UUID;
 
-  await deleteWeapon(userId, weaponInstanceId);
+  await Weapons.remove(userId, weaponInstanceId);
 
   return c.body(null, 204);
 });

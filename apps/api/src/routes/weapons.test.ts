@@ -9,11 +9,11 @@ vi.mock('@/lib/firebase/auth.js', () => ({
 }));
 
 vi.mock('@/repositories/weapons/index.js', () => ({
-  listWeapons: vi.fn(),
-  getWeapon: vi.fn(),
-  createWeapon: vi.fn(),
-  updateWeapon: vi.fn(),
-  deleteWeapon: vi.fn(),
+  list: vi.fn(),
+  get: vi.fn(),
+  create: vi.fn(),
+  update: vi.fn(),
+  remove: vi.fn(),
 }));
 
 vi.mock('@genshin/game-data', () => ({
@@ -24,13 +24,7 @@ import { app } from '@/app.js';
 import { verifyToken } from '@/lib/firebase/auth.js';
 import { toMediaTypeString } from '@/middleware/negotiate-content.js';
 import { weaponItemV1 } from '@/profiles/alps/weapon/item-v1.js';
-import {
-  createWeapon,
-  deleteWeapon,
-  getWeapon,
-  listWeapons,
-  updateWeapon,
-} from '@/repositories/weapons/index.js';
+import * as Weapons from '@/repositories/weapons/index.js';
 import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
 import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
@@ -71,7 +65,7 @@ describe('Weapon routes', () => {
     let body: CollectionDocument;
 
     beforeEach(async () => {
-      vi.mocked(listWeapons).mockResolvedValue([FAKE_WEAPON]);
+      vi.mocked(Weapons.list).mockResolvedValue([FAKE_WEAPON]);
       res = await app.request(authedRequest('GET', '/api/weapons'));
       body = (await res.json()) as CollectionDocument;
     });
@@ -102,7 +96,7 @@ describe('Weapon routes', () => {
     });
 
     it('returns empty items when no weapons exist', async () => {
-      vi.mocked(listWeapons).mockResolvedValue([]);
+      vi.mocked(Weapons.list).mockResolvedValue([]);
 
       const res = await app.request(authedRequest('GET', '/api/weapons'));
 
@@ -111,7 +105,7 @@ describe('Weapon routes', () => {
     });
 
     it('returns 500 when repository throws', async () => {
-      vi.mocked(listWeapons).mockRejectedValue(new Error('Firestore unavailable'));
+      vi.mocked(Weapons.list).mockRejectedValue(new Error('Firestore unavailable'));
 
       const res = await app.request(authedRequest('GET', '/api/weapons'));
 
@@ -130,7 +124,7 @@ describe('Weapon routes', () => {
         id: 'mistsplitter-reforged',
         name: 'Mistsplitter Reforged',
       } as ReturnType<typeof getWeaponById>);
-      vi.mocked(listWeapons).mockResolvedValue([FAKE_WEAPON]);
+      vi.mocked(Weapons.list).mockResolvedValue([FAKE_WEAPON]);
       res = await app.request(authedRequest('GET', '/api/weapons?weaponId=mistsplitter-reforged'));
       body = (await res.json()) as CollectionDocument;
     });
@@ -163,7 +157,7 @@ describe('Weapon routes', () => {
     });
 
     it('returns empty items when no instances exist', async () => {
-      vi.mocked(listWeapons).mockResolvedValue([]);
+      vi.mocked(Weapons.list).mockResolvedValue([]);
 
       const res = await app.request(
         authedRequest('GET', '/api/weapons?weaponId=mistsplitter-reforged'),
@@ -201,7 +195,7 @@ describe('Weapon routes', () => {
         id: 'mistsplitter-reforged',
         name: 'Mistsplitter Reforged',
       } as ReturnType<typeof getWeaponById>);
-      vi.mocked(createWeapon).mockResolvedValue(FAKE_WEAPON);
+      vi.mocked(Weapons.create).mockResolvedValue(FAKE_WEAPON);
       res = await app.request(
         authedRequest('POST', '/api/weapons', {
           weaponId: 'mistsplitter-reforged',
@@ -335,7 +329,7 @@ describe('Weapon routes', () => {
     });
 
     it('accepts refinementLevel at minimum boundary', async () => {
-      vi.mocked(createWeapon).mockResolvedValue({
+      vi.mocked(Weapons.create).mockResolvedValue({
         ...FAKE_WEAPON,
         refinementLevel: MIN_REFINEMENT_LEVEL,
       });
@@ -351,7 +345,7 @@ describe('Weapon routes', () => {
     });
 
     it('accepts refinementLevel at maximum boundary', async () => {
-      vi.mocked(createWeapon).mockResolvedValue({
+      vi.mocked(Weapons.create).mockResolvedValue({
         ...FAKE_WEAPON,
         refinementLevel: MAX_REFINEMENT_LEVEL,
       });
@@ -372,7 +366,7 @@ describe('Weapon routes', () => {
     let body: CollectionDocument;
 
     beforeEach(async () => {
-      vi.mocked(getWeapon).mockResolvedValue(FAKE_WEAPON);
+      vi.mocked(Weapons.get).mockResolvedValue(FAKE_WEAPON);
       res = await app.request(authedRequest('GET', '/api/weapons/instance-uuid-1'));
       body = (await res.json()) as CollectionDocument;
     });
@@ -394,7 +388,7 @@ describe('Weapon routes', () => {
     });
 
     it('returns 404 when weapon instance not found', async () => {
-      vi.mocked(getWeapon).mockResolvedValue(null);
+      vi.mocked(Weapons.get).mockResolvedValue(null);
 
       const res = await app.request(authedRequest('GET', '/api/weapons/nonexistent'));
 
@@ -409,7 +403,7 @@ describe('Weapon routes', () => {
     let body: CollectionDocument;
 
     beforeEach(async () => {
-      vi.mocked(updateWeapon).mockResolvedValue(FAKE_WEAPON);
+      vi.mocked(Weapons.update).mockResolvedValue(FAKE_WEAPON);
       res = await app.request(
         authedRequest('PATCH', '/api/weapons/instance-uuid-1', {
           refinementLevel: 1,
@@ -435,7 +429,7 @@ describe('Weapon routes', () => {
     });
 
     it('returns 404 when weapon instance not found', async () => {
-      vi.mocked(updateWeapon).mockResolvedValue(null);
+      vi.mocked(Weapons.update).mockResolvedValue(null);
 
       const res = await app.request(
         authedRequest('PATCH', '/api/weapons/nonexistent', {
@@ -482,7 +476,7 @@ describe('Weapon routes', () => {
     });
 
     it('updates refinementLevel', async () => {
-      vi.mocked(updateWeapon).mockResolvedValue({
+      vi.mocked(Weapons.update).mockResolvedValue({
         ...FAKE_WEAPON,
         refinementLevel: 3,
       });
@@ -499,7 +493,7 @@ describe('Weapon routes', () => {
 
   describe('DELETE /api/weapons/:weaponInstanceId', () => {
     it('returns 204 with no body', async () => {
-      vi.mocked(deleteWeapon).mockResolvedValue();
+      vi.mocked(Weapons.remove).mockResolvedValue();
 
       const res = await app.request(authedRequest('DELETE', '/api/weapons/instance-uuid-1'));
 

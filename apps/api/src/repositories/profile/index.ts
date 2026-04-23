@@ -4,23 +4,23 @@
 import { db } from '@/lib/firebase/firestore.js';
 import type { ISOTimestamp, ProfileUpdate, UserProfile } from '@genshin/domain';
 
-import { fromDocument, toDocument, type DocumentData } from './document.js';
+import { fromDocument, toDocument } from './document.js';
 
 function docRef(userId: string) {
   return db.collection('users').doc(userId);
 }
 
-export async function getProfile(userId: string): Promise<UserProfile | null> {
+export async function get(userId: string): Promise<UserProfile | null> {
   const doc = await docRef(userId).get();
 
   if (!doc.exists) {
     return null;
   }
 
-  return fromDocument(doc.data() as DocumentData);
+  return fromDocument(doc.data()!);
 }
 
-export async function updateProfile(userId: string, fields: ProfileUpdate): Promise<UserProfile> {
+export async function update(userId: string, fields: ProfileUpdate): Promise<UserProfile> {
   const ref = docRef(userId);
   const existing = await ref.get();
   const now = new Date().toISOString() as ISOTimestamp;
@@ -36,7 +36,7 @@ export async function updateProfile(userId: string, fields: ProfileUpdate): Prom
     return profile;
   }
 
-  const current = fromDocument(existing.data() as DocumentData);
+  const current = fromDocument(existing.data()!);
   const updated: UserProfile = {
     ...current,
     ...fields,

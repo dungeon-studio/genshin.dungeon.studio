@@ -48,6 +48,21 @@ formatters
 # Backend and database
 Firebase
 Firestore
+Verzod
+
+# Schema tooling
+backfilled
+deserializer
+jsoncompat
+Memcache
+optionalslop
+Ostrow
+Parseable
+rollouts
+serializer
+SRECon
+superset
+Zod
 Hono
 
 # Environment and deployment

@@ -11,7 +11,7 @@ import type { ValidatedRequestBodyVariables } from '@/middleware/validate-reques
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { profileGetResponseV1 } from '@/profiles/json-schema/profile/get-response-v1.js';
 import { profilePatchRequestV1 } from '@/profiles/json-schema/profile/patch-request-v1.js';
-import { getProfile, updateProfile } from '@/repositories/profile/index.js';
+import * as Profile from '@/repositories/profile/index.js';
 import { serialiseProfile, type AuthIdentity, type ProfileUpdate } from '@genshin/domain';
 import type { DecodedIdToken } from 'firebase-admin/auth';
 import { Hono } from 'hono';
@@ -44,7 +44,7 @@ userProfile.use(
 // GET /api/profile — Return the authenticated user's composite profile
 userProfile.get('/', async (c) => {
   const decoded = c.get('user');
-  const profile = await getProfile(decoded.uid);
+  const profile = await Profile.get(decoded.uid);
 
   if (!profile) {
     throw new HTTPException(404, { message: 'Profile not found' });
@@ -63,7 +63,7 @@ userProfile.patch(
   async (c) => {
     const decoded = c.get('user');
     const body = c.get('validatedBody') as ProfileUpdate;
-    const updated = await updateProfile(decoded.uid, body);
+    const updated = await Profile.update(decoded.uid, body);
 
     return c.json(serialiseProfile(toAuthIdentity(decoded), updated), 200, {
       'Content-Type': c.get('negotiatedMediaType'),

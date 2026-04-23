@@ -11,9 +11,9 @@ import type { ValidatedRequestBodyVariables } from '@/middleware/validate-reques
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { teamItemV1 } from '@/profiles/alps/team/item-v1.js';
 import { teamPutRequestV1 } from '@/profiles/json-schema/teams/put-request-v1.js';
-import { getCharacter } from '@/repositories/characters/index.js';
-import { deleteTeam, getTeam, listTeams, saveTeam } from '@/repositories/teams/index.js';
-import { getWeapon } from '@/repositories/weapons/index.js';
+import * as Characters from '@/repositories/characters/index.js';
+import * as Teams from '@/repositories/teams/index.js';
+import * as Weapons from '@/repositories/weapons/index.js';
 import { COLLECTION_JSON } from '@genshin/collection-json';
 import type { CollectionTeamMember, CollectionTeamMembers, TeamSlot, UUID } from '@genshin/domain';
 import {
@@ -56,7 +56,7 @@ function parseSlot(param: string): TeamSlot {
 // GET /api/teams — List user's teams
 teams.get('/', async (c) => {
   const userId = c.get('user').uid;
-  const items = await listTeams(userId);
+  const items = await Teams.list(userId);
   const baseUrl = new URL(c.req.url).origin;
 
   return c.body(JSON.stringify(teamListDocument(items, baseUrl)), {
@@ -69,7 +69,7 @@ teams.get('/:slot', async (c) => {
   const userId = c.get('user').uid;
   const slot = parseSlot(c.req.param('slot'));
 
-  const team = await getTeam(userId, slot);
+  const team = await Teams.get(userId, slot);
 
   if (!team) {
     throw new HTTPException(404, { message: 'Team not found' });
@@ -99,7 +99,7 @@ teams.put(
 
         // Cross-team weapon uniqueness: a weapon instance can only be equipped
         // by one character at a time across all teams (#635).
-        const allTeams = await listTeams(userId);
+        const allTeams = await Teams.list(userId);
         const crossTeamIssues = validateTeams(slot, body.members, allTeams);
         if (crossTeamIssues.length > 0) {
           throw new HTTPException(400, { message: crossTeamIssues[0].message });
@@ -107,7 +107,7 @@ teams.put(
       }
     }
 
-    const { team, created } = await saveTeam(userId, slot, {
+    const { team, created } = await Teams.save(userId, slot, {
       name: body.name,
       members: body.members,
       description: body.description,
@@ -127,7 +127,7 @@ teams.delete('/:slot', async (c) => {
   const userId = c.get('user').uid;
   const slot = parseSlot(c.req.param('slot'));
 
-  await deleteTeam(userId, slot);
+  await Teams.remove(userId, slot);
 
   return c.body(null, 204);
 });
@@ -148,7 +148,7 @@ async function validateMembers(userId: string, members: CollectionTeamMember[]):
   await Promise.all(
     members.map(async (member) => {
       // Character must be in user's collection
-      const character = await getCharacter(userId, member.characterId);
+      const character = await Characters.get(userId, member.characterId);
       if (!character) {
         throw new HTTPException(400, {
           message: `Character not in collection: ${member.characterId}`,
@@ -157,7 +157,7 @@ async function validateMembers(userId: string, members: CollectionTeamMember[]):
 
       // Weapon instance must be in user's collection (if provided)
       if (member.weaponInstanceId) {
-        const weapon = await getWeapon(userId, member.weaponInstanceId as UUID);
+        const weapon = await Weapons.get(userId, member.weaponInstanceId as UUID);
         if (!weapon) {
           throw new HTTPException(400, {
             message: `Weapon instance not in collection: ${member.weaponInstanceId}`,
