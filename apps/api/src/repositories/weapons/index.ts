@@ -5,22 +5,22 @@ import { db } from '@/lib/firebase/firestore.js';
 import type { CollectionWeapon, ISOTimestamp, UUID } from '@genshin/domain';
 import { randomUUID } from 'node:crypto';
 
-import { fromDocument, toDocument, type DocumentData } from './document.js';
+import { fromDocument, toDocument } from './document.js';
 
 function collectionRef(userId: string) {
   return db.collection('users').doc(userId).collection('weapons');
 }
 
-export async function listWeapons(userId: string, weaponId?: string): Promise<CollectionWeapon[]> {
+export async function list(userId: string, weaponId?: string): Promise<CollectionWeapon[]> {
   const ref = weaponId
     ? collectionRef(userId).where('weaponId', '==', weaponId)
     : collectionRef(userId);
   const snapshot = await ref.get();
 
-  return snapshot.docs.map((doc) => fromDocument(doc.id as UUID, doc.data() as DocumentData));
+  return snapshot.docs.map((doc) => fromDocument(doc.id as UUID, doc.data()!));
 }
 
-export async function getWeapon(
+export async function get(
   userId: string,
   weaponInstanceId: UUID,
 ): Promise<CollectionWeapon | null> {
@@ -30,10 +30,10 @@ export async function getWeapon(
     return null;
   }
 
-  return fromDocument(weaponInstanceId, doc.data() as DocumentData);
+  return fromDocument(weaponInstanceId, doc.data()!);
 }
 
-export async function createWeapon(
+export async function create(
   userId: string,
   weaponId: string,
   refinementLevel: number,
@@ -54,7 +54,7 @@ export async function createWeapon(
   return weapon;
 }
 
-export async function updateWeapon(
+export async function update(
   userId: string,
   weaponInstanceId: UUID,
   refinementLevel: number,
@@ -66,14 +66,14 @@ export async function updateWeapon(
     return null;
   }
 
-  const existingData = existing.data() as DocumentData;
+  const existingWeapon = fromDocument(weaponInstanceId, existing.data()!);
   const now = new Date().toISOString() as ISOTimestamp;
 
   const weapon: CollectionWeapon = {
     weaponInstanceId,
-    weaponId: existingData.weaponId,
+    weaponId: existingWeapon.weaponId,
     refinementLevel,
-    createdAt: existingData.createdAt as ISOTimestamp,
+    createdAt: existingWeapon.createdAt,
     updatedAt: now,
   };
 
@@ -82,6 +82,6 @@ export async function updateWeapon(
   return weapon;
 }
 
-export async function deleteWeapon(userId: string, weaponInstanceId: UUID): Promise<void> {
+export async function remove(userId: string, weaponInstanceId: UUID): Promise<void> {
   await collectionRef(userId).doc(weaponInstanceId).delete();
 }

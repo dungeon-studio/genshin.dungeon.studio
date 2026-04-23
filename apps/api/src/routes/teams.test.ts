@@ -9,25 +9,25 @@ vi.mock('@/lib/firebase/auth.js', () => ({
 }));
 
 vi.mock('@/repositories/teams/index.js', () => ({
-  listTeams: vi.fn(),
-  getTeam: vi.fn(),
-  saveTeam: vi.fn(),
-  deleteTeam: vi.fn(),
+  list: vi.fn(),
+  get: vi.fn(),
+  save: vi.fn(),
+  remove: vi.fn(),
 }));
 
 vi.mock('@/repositories/characters/index.js', () => ({
-  getCharacter: vi.fn(),
+  get: vi.fn(),
 }));
 
 vi.mock('@/repositories/weapons/index.js', () => ({
-  getWeapon: vi.fn(),
+  get: vi.fn(),
 }));
 
 import { app } from '@/app.js';
 import { verifyToken } from '@/lib/firebase/auth.js';
-import { getCharacter } from '@/repositories/characters/index.js';
-import { deleteTeam, getTeam, listTeams, saveTeam } from '@/repositories/teams/index.js';
-import { getWeapon } from '@/repositories/weapons/index.js';
+import * as Characters from '@/repositories/characters/index.js';
+import * as Teams from '@/repositories/teams/index.js';
+import * as Weapons from '@/repositories/weapons/index.js';
 import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
 
@@ -61,7 +61,7 @@ const EXPECTED_CONTENT_TYPE = toMediaTypeString(
 );
 
 function mockCharacterOwned() {
-  vi.mocked(getCharacter).mockResolvedValue({
+  vi.mocked(Characters.get).mockResolvedValue({
     characterId: 'hu-tao',
     constellationLevel: 0,
     createdAt: '2026-01-01T00:00:00.000Z',
@@ -70,7 +70,7 @@ function mockCharacterOwned() {
 }
 
 function mockWeaponOwned() {
-  vi.mocked(getWeapon).mockResolvedValue({
+  vi.mocked(Weapons.get).mockResolvedValue({
     weaponInstanceId: 'uuid-1' as UUID,
     weaponId: 'staff-of-homa',
     refinementLevel: 1,
@@ -93,7 +93,7 @@ describe('Team routes', () => {
     let body: CollectionDocument;
 
     beforeEach(async () => {
-      vi.mocked(listTeams).mockResolvedValue([FAKE_TEAM, FAKE_EMPTY_TEAM]);
+      vi.mocked(Teams.list).mockResolvedValue([FAKE_TEAM, FAKE_EMPTY_TEAM]);
       res = await app.request(authedRequest('GET', '/api/teams'));
       body = (await res.json()) as CollectionDocument;
     });
@@ -120,7 +120,7 @@ describe('Team routes', () => {
     });
 
     it('returns empty items when no teams exist', async () => {
-      vi.mocked(listTeams).mockResolvedValue([]);
+      vi.mocked(Teams.list).mockResolvedValue([]);
 
       const res = await app.request(authedRequest('GET', '/api/teams'));
 
@@ -129,7 +129,7 @@ describe('Team routes', () => {
     });
 
     it('returns 500 when repository throws', async () => {
-      vi.mocked(listTeams).mockRejectedValue(new Error('Firestore unavailable'));
+      vi.mocked(Teams.list).mockRejectedValue(new Error('Firestore unavailable'));
 
       const res = await app.request(authedRequest('GET', '/api/teams'));
 
@@ -144,7 +144,7 @@ describe('Team routes', () => {
     let body: CollectionDocument;
 
     beforeEach(async () => {
-      vi.mocked(getTeam).mockResolvedValue(FAKE_TEAM);
+      vi.mocked(Teams.get).mockResolvedValue(FAKE_TEAM);
       res = await app.request(authedRequest('GET', '/api/teams/1'));
       body = (await res.json()) as CollectionDocument;
     });
@@ -171,7 +171,7 @@ describe('Team routes', () => {
     });
 
     it('returns 404 when team not found', async () => {
-      vi.mocked(getTeam).mockResolvedValue(null);
+      vi.mocked(Teams.get).mockResolvedValue(null);
 
       const res = await app.request(authedRequest('GET', '/api/teams/1'));
 
@@ -211,14 +211,14 @@ describe('Team routes', () => {
     beforeEach(() => {
       mockCharacterOwned();
       mockWeaponOwned();
-      vi.mocked(listTeams).mockResolvedValue([]);
+      vi.mocked(Teams.list).mockResolvedValue([]);
     });
 
     let res: Response;
     let body: CollectionDocument;
 
     beforeEach(async () => {
-      vi.mocked(saveTeam).mockResolvedValue({
+      vi.mocked(Teams.save).mockResolvedValue({
         team: FAKE_TEAM,
         created: true,
       });
@@ -253,7 +253,7 @@ describe('Team routes', () => {
     });
 
     it('returns 200 when team is updated', async () => {
-      vi.mocked(saveTeam).mockResolvedValue({
+      vi.mocked(Teams.save).mockResolvedValue({
         team: FAKE_TEAM,
         created: false,
       });
@@ -276,7 +276,7 @@ describe('Team routes', () => {
     });
 
     it('allows name-only update', async () => {
-      vi.mocked(saveTeam).mockResolvedValue({
+      vi.mocked(Teams.save).mockResolvedValue({
         team: { ...FAKE_TEAM, name: 'Renamed' },
         created: false,
       });
@@ -287,7 +287,7 @@ describe('Team routes', () => {
     });
 
     it('allows clearing all members', async () => {
-      vi.mocked(saveTeam).mockResolvedValue({
+      vi.mocked(Teams.save).mockResolvedValue({
         team: FAKE_EMPTY_TEAM,
         created: false,
       });
@@ -300,7 +300,7 @@ describe('Team routes', () => {
     });
 
     it('allows partial team with null placeholders', async () => {
-      vi.mocked(saveTeam).mockResolvedValue({
+      vi.mocked(Teams.save).mockResolvedValue({
         team: {
           ...FAKE_TEAM,
           members: [
@@ -323,7 +323,7 @@ describe('Team routes', () => {
     });
 
     it('allows member without weapon (optimizer placeholder)', async () => {
-      vi.mocked(saveTeam).mockResolvedValue({
+      vi.mocked(Teams.save).mockResolvedValue({
         team: {
           ...FAKE_TEAM,
           members: [{ characterId: 'hu-tao' }, null, null, null],
@@ -405,7 +405,7 @@ describe('Team routes', () => {
       });
 
       it('returns 400 when character not in collection', async () => {
-        vi.mocked(getCharacter).mockResolvedValue(null);
+        vi.mocked(Characters.get).mockResolvedValue(null);
 
         const res = await app.request(
           authedRequest('PUT', '/api/teams/1', {
@@ -424,7 +424,7 @@ describe('Team routes', () => {
       });
 
       it('returns 400 when weapon instance not in collection', async () => {
-        vi.mocked(getWeapon).mockResolvedValue(null);
+        vi.mocked(Weapons.get).mockResolvedValue(null);
 
         const res = await app.request(
           authedRequest('PUT', '/api/teams/1', {
@@ -460,7 +460,7 @@ describe('Team routes', () => {
       });
 
       it('returns 400 when weapon equipped by different character in another team', async () => {
-        vi.mocked(listTeams).mockResolvedValue([
+        vi.mocked(Teams.list).mockResolvedValue([
           {
             ...FAKE_TEAM,
             slot: 2,
@@ -485,7 +485,7 @@ describe('Team routes', () => {
       });
 
       it('allows same character to carry same weapon across teams', async () => {
-        vi.mocked(listTeams).mockResolvedValue([
+        vi.mocked(Teams.list).mockResolvedValue([
           {
             ...FAKE_TEAM,
             slot: 2,
@@ -497,7 +497,7 @@ describe('Team routes', () => {
             ],
           },
         ]);
-        vi.mocked(saveTeam).mockResolvedValue({
+        vi.mocked(Teams.save).mockResolvedValue({
           team: {
             ...FAKE_TEAM,
             members: [
@@ -576,7 +576,7 @@ describe('Team routes', () => {
       });
 
       it('accepts valid artifact plan', async () => {
-        vi.mocked(saveTeam).mockResolvedValue({
+        vi.mocked(Teams.save).mockResolvedValue({
           team: FAKE_TEAM,
           created: true,
         });
@@ -607,7 +607,7 @@ describe('Team routes', () => {
       });
 
       it('accepts partial artifact plan with only main stats', async () => {
-        vi.mocked(saveTeam).mockResolvedValue({
+        vi.mocked(Teams.save).mockResolvedValue({
           team: FAKE_TEAM,
           created: true,
         });
@@ -635,7 +635,7 @@ describe('Team routes', () => {
       });
 
       it('accepts partial artifact plan with only sets', async () => {
-        vi.mocked(saveTeam).mockResolvedValue({
+        vi.mocked(Teams.save).mockResolvedValue({
           team: FAKE_TEAM,
           created: true,
         });
@@ -661,7 +661,7 @@ describe('Team routes', () => {
       });
 
       it('accepts empty artifact plan', async () => {
-        vi.mocked(saveTeam).mockResolvedValue({
+        vi.mocked(Teams.save).mockResolvedValue({
           team: FAKE_TEAM,
           created: true,
         });
@@ -688,7 +688,7 @@ describe('Team routes', () => {
 
   describe('DELETE /api/teams/:slot', () => {
     it('returns 204 with no body', async () => {
-      vi.mocked(deleteTeam).mockResolvedValue();
+      vi.mocked(Teams.remove).mockResolvedValue();
 
       const res = await app.request(authedRequest('DELETE', '/api/teams/1'));
 
@@ -697,7 +697,7 @@ describe('Team routes', () => {
     });
 
     it('returns 204 when team does not exist', async () => {
-      vi.mocked(deleteTeam).mockResolvedValue();
+      vi.mocked(Teams.remove).mockResolvedValue();
 
       const res = await app.request(authedRequest('DELETE', '/api/teams/4'));
 

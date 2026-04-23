@@ -11,13 +11,13 @@ vi.mock('@/lib/firebase/auth.js', () => ({
 }));
 
 vi.mock('@/repositories/profile/index.js', () => ({
-  getProfile: vi.fn(),
-  updateProfile: vi.fn(),
+  get: vi.fn(),
+  update: vi.fn(),
 }));
 
 import { app } from '@/app.js';
 import { verifyToken } from '@/lib/firebase/auth.js';
-import { getProfile, updateProfile } from '@/repositories/profile/index.js';
+import * as Profile from '@/repositories/profile/index.js';
 import { FAKE_UID, authedRequest } from '@/test/auth-requests.js';
 
 const ajv = new Ajv2020();
@@ -85,7 +85,7 @@ describe('Profile routes', () => {
 
   describe('GET /api/profile', () => {
     it('returns 200 with a response matching the profile schema', async () => {
-      vi.mocked(getProfile).mockResolvedValue(FAKE_PROFILE);
+      vi.mocked(Profile.get).mockResolvedValue(FAKE_PROFILE);
 
       const res = await app.request(authedRequest('GET', '/api/profile'));
 
@@ -97,7 +97,7 @@ describe('Profile routes', () => {
     });
 
     it('returns 404 when profile does not exist', async () => {
-      vi.mocked(getProfile).mockResolvedValue(null);
+      vi.mocked(Profile.get).mockResolvedValue(null);
 
       const res = await app.request(authedRequest('GET', '/api/profile'));
 
@@ -107,7 +107,7 @@ describe('Profile routes', () => {
     });
 
     it('returns 500 when repository throws', async () => {
-      vi.mocked(getProfile).mockRejectedValue(new Error('Firestore unavailable'));
+      vi.mocked(Profile.get).mockRejectedValue(new Error('Firestore unavailable'));
 
       const res = await app.request(authedRequest('GET', '/api/profile'));
 
@@ -120,7 +120,7 @@ describe('Profile routes', () => {
   describe('PATCH /api/profile', () => {
     it('returns 200 with a response matching the profile schema', async () => {
       const updated = { ...FAKE_PROFILE, name: 'Aether' };
-      vi.mocked(updateProfile).mockResolvedValue(updated);
+      vi.mocked(Profile.update).mockResolvedValue(updated);
 
       const res = await app.request(authedRequest('PATCH', '/api/profile', { name: 'Aether' }));
 

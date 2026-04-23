@@ -11,12 +11,7 @@ import type { ValidatedRequestBodyVariables } from '@/middleware/validate-reques
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { characterItemV1 } from '@/profiles/alps/character/item-v1.js';
 import { characterPutRequestV1 } from '@/profiles/json-schema/characters/put-request-v1.js';
-import {
-  deleteCharacter,
-  getCharacter,
-  listCharacters,
-  saveCharacter,
-} from '@/repositories/characters/index.js';
+import * as Characters from '@/repositories/characters/index.js';
 import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
 import { characterItemHref, characterRepresentation, serialiseCharacter } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
@@ -41,7 +36,7 @@ interface SaveCharacterBody {
 // GET /api/characters — List user's character collection
 characters.get('/', async (c) => {
   const userId = c.get('user').uid;
-  const items = await listCharacters(userId);
+  const items = await Characters.list(userId);
   const baseUrl = new URL(c.req.url).origin;
 
   return c.body(
@@ -63,7 +58,7 @@ characters.get('/:characterId', async (c) => {
   const userId = c.get('user').uid;
   const { characterId } = c.req.param();
 
-  const character = await getCharacter(userId, characterId);
+  const character = await Characters.get(userId, characterId);
 
   if (!character) {
     throw new HTTPException(404, { message: 'Character not found in collection' });
@@ -97,7 +92,7 @@ characters.put(
     }
 
     const { constellationLevel } = c.get('validatedBody') as SaveCharacterBody;
-    const { character, created } = await saveCharacter(userId, characterId, constellationLevel);
+    const { character, created } = await Characters.save(userId, characterId, constellationLevel);
     const baseUrl = new URL(c.req.url).origin;
 
     return c.body(
@@ -119,7 +114,7 @@ characters.delete('/:characterId', async (c) => {
   const userId = c.get('user').uid;
   const { characterId } = c.req.param();
 
-  await deleteCharacter(userId, characterId);
+  await Characters.remove(userId, characterId);
 
   return c.body(null, 204);
 });

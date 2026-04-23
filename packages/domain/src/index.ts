@@ -65,5 +65,5 @@ export {
 } from './representations/json/profile.js';
 
 export { validateTeam, validateTeams, type TeamValidationContext } from './teamValidation.js';
-export { type ProfileUpdate, type UserProfile } from './userProfile.js';
+export { assertUserProfile, type ProfileUpdate, type UserProfile } from './userProfile.js';
 export type { UUID } from './uuid.js';

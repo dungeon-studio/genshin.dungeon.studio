@@ -9,10 +9,10 @@ vi.mock('@/lib/firebase/auth.js', () => ({
 }));
 
 vi.mock('@/repositories/characters/index.js', () => ({
-  listCharacters: vi.fn(),
-  getCharacter: vi.fn(),
-  saveCharacter: vi.fn(),
-  deleteCharacter: vi.fn(),
+  list: vi.fn(),
+  get: vi.fn(),
+  save: vi.fn(),
+  remove: vi.fn(),
 }));
 
 vi.mock('@genshin/game-data', () => ({
@@ -23,12 +23,7 @@ import { app } from '@/app.js';
 import { verifyToken } from '@/lib/firebase/auth.js';
 import { toMediaTypeString } from '@/middleware/negotiate-content.js';
 import { characterItemV1 } from '@/profiles/alps/character/item-v1.js';
-import {
-  deleteCharacter,
-  getCharacter,
-  listCharacters,
-  saveCharacter,
-} from '@/repositories/characters/index.js';
+import * as Characters from '@/repositories/characters/index.js';
 import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
 import { MAX_CONSTELLATION_LEVEL, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
@@ -86,7 +81,7 @@ describe('Character routes', () => {
     let body: CollectionDocument;
 
     beforeEach(async () => {
-      vi.mocked(listCharacters).mockResolvedValue([FAKE_CHARACTER]);
+      vi.mocked(Characters.list).mockResolvedValue([FAKE_CHARACTER]);
       res = await app.request(authedRequest('GET', '/api/characters'));
       body = (await res.json()) as CollectionDocument;
     });
@@ -113,7 +108,7 @@ describe('Character routes', () => {
     });
 
     it('returns empty items when no characters exist', async () => {
-      vi.mocked(listCharacters).mockResolvedValue([]);
+      vi.mocked(Characters.list).mockResolvedValue([]);
 
       const res = await app.request(authedRequest('GET', '/api/characters'));
 
@@ -122,7 +117,7 @@ describe('Character routes', () => {
     });
 
     it('returns 500 when repository throws', async () => {
-      vi.mocked(listCharacters).mockRejectedValue(new Error('Firestore unavailable'));
+      vi.mocked(Characters.list).mockRejectedValue(new Error('Firestore unavailable'));
 
       const res = await app.request(authedRequest('GET', '/api/characters'));
 
@@ -137,7 +132,7 @@ describe('Character routes', () => {
     let body: CollectionDocument;
 
     beforeEach(async () => {
-      vi.mocked(getCharacter).mockResolvedValue(FAKE_CHARACTER);
+      vi.mocked(Characters.get).mockResolvedValue(FAKE_CHARACTER);
       res = await app.request(authedRequest('GET', '/api/characters/albedo'));
       body = (await res.json()) as CollectionDocument;
     });
@@ -164,7 +159,7 @@ describe('Character routes', () => {
     });
 
     it('returns 404 when character not in collection', async () => {
-      vi.mocked(getCharacter).mockResolvedValue(null);
+      vi.mocked(Characters.get).mockResolvedValue(null);
 
       const res = await app.request(authedRequest('GET', '/api/characters/albedo'));
 
@@ -186,7 +181,7 @@ describe('Character routes', () => {
     let body: CollectionDocument;
 
     beforeEach(async () => {
-      vi.mocked(saveCharacter).mockResolvedValue({
+      vi.mocked(Characters.save).mockResolvedValue({
         character: FAKE_CHARACTER,
         created: true,
       });
@@ -218,7 +213,7 @@ describe('Character routes', () => {
     });
 
     it('returns 200 when character is updated', async () => {
-      vi.mocked(saveCharacter).mockResolvedValue({
+      vi.mocked(Characters.save).mockResolvedValue({
         character: FAKE_CHARACTER,
         created: false,
       });
@@ -305,7 +300,7 @@ describe('Character routes', () => {
     });
 
     it('accepts constellationLevel at minimum boundary', async () => {
-      vi.mocked(saveCharacter).mockResolvedValue({
+      vi.mocked(Characters.save).mockResolvedValue({
         character: { ...FAKE_CHARACTER, constellationLevel: MIN_CONSTELLATION_LEVEL },
         created: true,
       });
@@ -320,7 +315,7 @@ describe('Character routes', () => {
     });
 
     it('accepts constellationLevel at maximum boundary', async () => {
-      vi.mocked(saveCharacter).mockResolvedValue({
+      vi.mocked(Characters.save).mockResolvedValue({
         character: { ...FAKE_CHARACTER, constellationLevel: MAX_CONSTELLATION_LEVEL },
         created: true,
       });
@@ -337,7 +332,7 @@ describe('Character routes', () => {
 
   describe('DELETE /api/characters/:characterId', () => {
     it('returns 204 with no body', async () => {
-      vi.mocked(deleteCharacter).mockResolvedValue();
+      vi.mocked(Characters.remove).mockResolvedValue();
 
       const res = await app.request(authedRequest('DELETE', '/api/characters/albedo'));
 
@@ -346,7 +341,7 @@ describe('Character routes', () => {
     });
 
     it('returns 204 when character does not exist', async () => {
-      vi.mocked(deleteCharacter).mockResolvedValue();
+      vi.mocked(Characters.remove).mockResolvedValue();
 
       const res = await app.request(authedRequest('DELETE', '/api/characters/nonexistent'));
 

@@ -4,19 +4,19 @@
 import { db } from '@/lib/firebase/firestore.js';
 import type { CollectionCharacter, ISOTimestamp } from '@genshin/domain';
 
-import { fromDocument, toDocument, type DocumentData } from './document.js';
+import { fromDocument, toDocument } from './document.js';
 
 function collectionRef(userId: string) {
   return db.collection('users').doc(userId).collection('characters');
 }
 
-export async function listCharacters(userId: string): Promise<CollectionCharacter[]> {
+export async function list(userId: string): Promise<CollectionCharacter[]> {
   const snapshot = await collectionRef(userId).get();
 
-  return snapshot.docs.map((doc) => fromDocument(doc.id, doc.data() as DocumentData));
+  return snapshot.docs.map((doc) => fromDocument(doc.id, doc.data()!));
 }
 
-export async function getCharacter(
+export async function get(
   userId: string,
   characterId: string,
 ): Promise<CollectionCharacter | null> {
@@ -26,19 +26,19 @@ export async function getCharacter(
     return null;
   }
 
-  return fromDocument(characterId, doc.data() as DocumentData);
+  return fromDocument(characterId, doc.data()!);
 }
 
-export interface SaveCharacterResult {
+export interface SaveResult {
   character: CollectionCharacter;
   created: boolean;
 }
 
-export async function saveCharacter(
+export async function save(
   userId: string,
   characterId: string,
   constellationLevel: number,
-): Promise<SaveCharacterResult> {
+): Promise<SaveResult> {
   const docRef = collectionRef(userId).doc(characterId);
   const existing = await docRef.get();
   const now = new Date().toISOString() as ISOTimestamp;
@@ -46,9 +46,7 @@ export async function saveCharacter(
   const character: CollectionCharacter = {
     characterId,
     constellationLevel,
-    createdAt: existing.exists
-      ? ((existing.data() as DocumentData).createdAt as ISOTimestamp)
-      : now,
+    createdAt: existing.exists ? fromDocument(characterId, existing.data()!).createdAt : now,
     updatedAt: now,
   };
 
@@ -57,6 +55,6 @@ export async function saveCharacter(
   return { character, created: !existing.exists };
 }
 
-export async function deleteCharacter(userId: string, characterId: string): Promise<void> {
+export async function remove(userId: string, characterId: string): Promise<void> {
   await collectionRef(userId).doc(characterId).delete();
 }

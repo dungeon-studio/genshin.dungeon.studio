@@ -8,53 +8,42 @@ import type {
   ISOTimestamp,
   TeamSlot,
 } from '@genshin/domain';
-import { MAX_TEAM_MEMBERS } from '@genshin/domain';
+import { assertCollectionTeam } from '@genshin/domain';
 
-export interface MemberDocumentData {
-  characterId: string;
-  weaponInstanceId?: string;
-  artifactPlan?: {
-    sands?: string;
-    goblet?: string;
-    circlet?: string;
-    sets?: string[];
-    priorityMinorAffixes?: string[];
-    secondaryMinorAffixes?: string[];
-  };
-}
+import {
+  entity,
+  CURRENT_VERSION,
+  type V1Team,
+  type V0Team,
+  type V1Member,
+} from './schemas/index.js';
 
-export interface DocumentData {
-  name: string;
-  members: (MemberDocumentData | null)[];
-  description?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export { CURRENT_VERSION, type V1Team, type V0Team };
 
-function memberFromDocument(m: MemberDocumentData): CollectionTeamMember {
+function memberFromDocument(m: V1Member): CollectionTeamMember {
   return {
     characterId: m.characterId,
-    ...(m.weaponInstanceId ? { weaponInstanceId: m.weaponInstanceId } : {}),
-    ...(m.artifactPlan ? { artifactPlan: m.artifactPlan } : {}),
+    ...(m.weaponInstanceId !== undefined ? { weaponInstanceId: m.weaponInstanceId } : {}),
+    ...(m.artifactPlan !== undefined ? { artifactPlan: m.artifactPlan } : {}),
   } as CollectionTeamMember;
 }
 
-function memberToDocument(m: CollectionTeamMember): MemberDocumentData {
+function memberToDocument(m: CollectionTeamMember): V1Member {
   return {
     characterId: m.characterId,
-    ...(m.weaponInstanceId ? { weaponInstanceId: m.weaponInstanceId } : {}),
-    ...(m.artifactPlan ? { artifactPlan: m.artifactPlan } : {}),
+    ...(m.weaponInstanceId !== undefined ? { weaponInstanceId: m.weaponInstanceId } : {}),
+    ...(m.artifactPlan !== undefined ? { artifactPlan: m.artifactPlan } : {}),
   };
 }
 
-export function fromDocument(slot: TeamSlot, data: DocumentData): CollectionTeam {
-  if (data.members.length > MAX_TEAM_MEMBERS) {
-    throw new TypeError(
-      `Document members must have at most ${MAX_TEAM_MEMBERS} entries, got: ${data.members.length}`,
-    );
+export function fromDocument(slot: TeamSlot, raw: Record<string, unknown>): CollectionTeam {
+  const result = entity.safeParse(raw);
+  if (result.type !== 'ok') {
+    throw new TypeError(`Invalid team document: ${result.error.type}`);
   }
+  const data = result.value;
   const mapped = data.members.map((m) => (m === null ? null : memberFromDocument(m)));
-  return {
+  const team = {
     slot,
     name: data.name,
     members: [
@@ -67,10 +56,13 @@ export function fromDocument(slot: TeamSlot, data: DocumentData): CollectionTeam
     createdAt: data.createdAt as ISOTimestamp,
     updatedAt: data.updatedAt as ISOTimestamp,
   };
+  assertCollectionTeam(team);
+  return team;
 }
 
-export function toDocument(team: CollectionTeam): DocumentData {
+export function toDocument(team: CollectionTeam): V1Team {
   return {
+    schemaVersion: CURRENT_VERSION,
     name: team.name,
     members: team.members.map((m) => (m === null ? null : memberToDocument(m))),
     ...(team.description !== undefined ? { description: team.description } : {}),
