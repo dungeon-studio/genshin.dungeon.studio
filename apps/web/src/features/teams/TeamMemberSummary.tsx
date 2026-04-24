@@ -36,7 +36,7 @@ export function TeamMemberSummary({
       </div>
 
       <div className="flex items-center gap-2">
-        <WeaponSummary weapon={weapon} />
+        <WeaponSummary weapon={weapon} weaponType={character?.weaponType} />
         {weapon && collectionWeapon && (
           <span
             className="shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-muted-foreground"
