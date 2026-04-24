@@ -109,6 +109,12 @@ keyless
 Claude
 Anthropic
 Copilot
+claustre
+Claustre
+
+# Git concepts
+worktree
+worktrees
 
 # DevOps and automation
 GitHub Actions
