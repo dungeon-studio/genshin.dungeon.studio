@@ -20,20 +20,20 @@ SPDX-License-Identifier: MIT
 
 By [Alex Brandt](https://github.com/alunduil) · [Repository](https://github.com/dungeon-studio/genshin.dungeon.studio)
 
-🚧 **Pre-Alpha**: not yet ready for general use, but contributors are welcome.
+🔬 **Alpha**: core features work end-to-end; expect rough edges. Contributors welcome.
 
 ## About
 
-Experiment with team compositions without the spreadsheets. Genshin Planner is an early stage project that aims to let you describe your character collection to an AI assistant and, when implemented, get personalized team recommendations. Whether you're optimizing for Abyss clears or just want to try new playstyles, the goal is to provide suggestions tailored to _your_ roster.
+Build Genshin Impact teams without the spreadsheets. Genshin Planner lets you track your character and weapon collection, assemble team compositions, and plan your roster. AI-powered team recommendations are planned for a future release.
 
 ## Who's it for
 
 Anyone who plays Genshin Impact and wants to:
 
-- Discover team compositions that work for _your_ characters, not tier lists
-- Experiment with different team combinations
-- Get AI-powered suggestions based on your actual roster
-- Explore synergies without manual research
+- Track their character and weapon collection in one place
+- Experiment with different team compositions
+- Plan builds and artifact sets for each team member
+- Explore synergies across their actual roster
 
 ## Getting started
 
