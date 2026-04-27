@@ -41,6 +41,7 @@
 ## Build and CI rules
 
 - Always use `pnpm turbo run <task>` for `build`, `typecheck`, and `test` in CI, Docker, and deploy workflows. Never use raw `pnpm --filter <pkg> <task>` for these because pnpm doesn't automatically build workspace dependencies first; turbo handles dependency ordering via `^build` in `turbo.json`.
+- When adding or modifying Turborepo task inputs, follow the [cache invalidation patterns](../docs/explanation/turbo-cache-strategy.md) to avoid stale cache hits.
 - The API uses `tsconfig.json` (includes tests) for typechecking and `tsconfig.build.json` (excludes tests) for emit. The build config extends `tsconfig.json`, so compiler options stay in sync automatically; only the exclude patterns differ.
 
 ## State usage
