@@ -25,6 +25,27 @@
 - `packages/game-data`: Source of truth for static game data; use exported helpers, never hard-code.
 - `packages/domain`: Shared domain model: types, invariants, and wire format representations.
 
+## Dependency management in the monorepo
+
+### Version management strategy
+
+- Root `package.json` is the source of truth for shared tooling versions: TypeScript, ESLint, Prettier, and Stylelint.
+- Pin exact versions without `^` or `~` prefixes for hermetic, reproducible installs.
+- Renovate handles automated dependency updates on a weekly schedule; see `renovate.json` for the configuration.
+- `pnpm-workspace.yaml` declares workspace package globs and engine constraints only; don't use it for version overrides.
+
+### Where dependencies go
+
+- **Root `package.json`**: monorepo-wide tooling shared across all workspaces: turbo, concurrently, TypeScript, ESLint, Prettier, and Stylelint.
+- **Workspace `package.json`**: app-specific and package-specific dependencies. Each workspace declares every direct dependency it imports, even when the same package exists at the root.
+- Explicit declaration ensures each workspace dependency graph is self-describing and survives hoisting changes.
+
+### Best practices
+
+- Declare every direct import in the consuming workspace `package.json`. Relying on hoisting from the root is fragile and breaks when someone removes the root dependency or the hoisting strategy changes.
+- When a shared tool like TypeScript or ESLint appears in both root and workspace `package.json`, keep the versions identical.
+- Don't put version overrides in `pnpm-workspace.yaml`. Version overrides are a last resort for transitive dependency conflicts, not a substitute for pinning in `package.json`.
+
 ## Core coding rules
 
 - Use strict TypeScript and keep components/functions focused.
