@@ -121,6 +121,10 @@ GitHub Actions
 CodeQL
 Dependabot
 Renovate
+Trivy
+SARIF
+misconfiguration
+misconfigurations
 
 # Web assets
 favicon
