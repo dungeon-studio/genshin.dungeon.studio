@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+exclude_path = [
+  "node_modules",
+  "dist",
+  "build",
+  ".turbo",
+  ".pnpm-store",
+  ".styles",
+]
+
+max_concurrency = 4
+timeout = 30
+max_retries = 3

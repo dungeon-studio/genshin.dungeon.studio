@@ -240,7 +240,3 @@ Verify deployment via:
 - [Cache Control Headers (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control)
 - [Cloud Storage Static Website Hosting](https://cloud.google.com/storage/docs/hosting-static-website)
 - [SPA Routing in Static Hosting](https://firebase.google.com/docs/hosting/redirect-behavior#spa)
-
-## See also
-
-- How-to: [Manually Redeploy the Web App](../how-tos/deploy-web-to-cloud-storage.md)
