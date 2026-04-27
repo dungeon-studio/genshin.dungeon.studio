@@ -84,6 +84,14 @@
 - Use `pnpm why <package>` to detect duplicate transitive versions and pin when needed.
 - ESLint uses flat config via workspace-local `eslint.config.js` files; configure ignore patterns with `ignores`, not `.eslintignore`.
 
+## Dependabot maintenance
+
+- YAML anchors and aliases aren't supported in `dependabot.yml`. All configuration must be explicit.
+- A package-ecosystem and directory pair must be unique. Don't create separate entries for the same combo (for example, one for weekly updates and another for daily security). Security updates are automatic and independent of the version update schedule.
+- Omit default values like `open-pull-requests-limit: 5` and `allow: [{dependency-type: "all"}]`. They clutter the config without changing behavior.
+- Use the specific directory where the manifest lives. For the `devcontainers` ecosystem, use `/.devcontainer`, the directory containing `devcontainer.json`, not `/`.
+- The `prefix-scope` commit-message option doesn't exist in Dependabot's schema. Valid options are `prefix`, `prefix-development`, and `include`.
+
 ## Documentation rules
 
 - Put information in the right place, in this priority order:
