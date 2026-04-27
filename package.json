@@ -2,7 +2,7 @@
   "name": "genshin-dungeon-studio",
   "version": "0.1.0",
   "private": true,
-  "description": "AI-powered team building companion for Genshin Impact",
+  "description": "Team building companion for Genshin Impact",
   "keywords": [
     "genshin-impact",
     "team-builder",
