@@ -42,7 +42,7 @@
 
 - Always use `pnpm turbo run <task>` for `build`, `typecheck`, and `test` in CI, Docker, and deploy workflows. Never use raw `pnpm --filter <pkg> <task>` for these because pnpm doesn't automatically build workspace dependencies first; turbo handles dependency ordering via `^build` in `turbo.json`.
 - The API uses `tsconfig.json` (includes tests) for typechecking and `tsconfig.build.json` (excludes tests) for emit. The build config extends `tsconfig.json`, so compiler options stay in sync automatically; only the exclude patterns differ.
-- When `tsconfig.json` uses project references (`references` field with `"files": []`), type-check with build mode: `tsc -b --noEmit`. Plain `tsc --noEmit` won't follow references and type-checks nothing. Example: `apps/web` references `tsconfig.app.json` and `tsconfig.node.json`.
+- When `tsconfig.json` uses project references, type-check with `tsc -b --noEmit`. Plain `tsc --noEmit` won't follow references.
 - Turbo 2.0+ renamed `pipeline` to `tasks` in `turbo.json`. When upgrading Turbo major versions, check the `turbo.json` schema for deprecated fields.
 
 ## State usage
@@ -84,7 +84,7 @@
   - `dependencies`: runtime code shipped to production.
   - `devDependencies`: build tools, plugins, type definitions, and local tooling.
 - Use `pnpm why <package>` to detect duplicate transitive versions and pin when needed.
-- New workspace packages should include these `package.json` fields: `description` (one-line summary, no trailing period), `keywords`, `author` (name and email), `homepage`, `bugs` (link to issue tracker), and `license`. See the root `package.json` as a template.
+- New workspace packages should match the root `package.json` metadata fields (`description`, `keywords`, `author`, `homepage`, `bugs`, `license`).
 - ESLint uses flat config via workspace-local `eslint.config.js` files; configure ignore patterns with `ignores`, not `.eslintignore`.
 
 ## Documentation rules
