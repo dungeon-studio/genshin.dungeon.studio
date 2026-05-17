@@ -14,8 +14,8 @@ permissions:
   contents: read
 
 jobs:
-  iac:
-    name: Infrastructure Scanning
+  terraform:
+    name: Terraform
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -44,7 +44,7 @@ jobs:
           category: trivy-terraform
 
   dockerfile:
-    name: Dockerfile Scanning
+    name: Dockerfile
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -73,7 +73,7 @@ jobs:
           category: trivy-dockerfile
 
   container:
-    name: Container Image Scanning
+    name: Container Image
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -98,7 +98,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Scan container image
+      - name: Scan Container Image
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: api-trivy:scan
@@ -107,7 +107,7 @@ jobs:
           exit-code: '1'
           severity: HIGH,CRITICAL
 
-      - name: Upload container SARIF
+      - name: Upload Container SARIF
         uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
