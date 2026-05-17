@@ -4,7 +4,9 @@
 # Trivy configuration for infrastructure scanning
 # See https://aquasecurity.github.io/trivy/ for documentation
 
-severity: HIGH,CRITICAL
+severity:
+  - HIGH
+  - CRITICAL
 exit-code: 1
 
 scan:

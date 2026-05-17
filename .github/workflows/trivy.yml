@@ -33,6 +33,7 @@ jobs:
           scan-ref: infrastructure/terraform
           format: sarif
           output: terraform-results.sarif
+          trivy-config: .trivy.yaml
 
       - name: Upload Terraform SARIF
         uses: github/codeql-action/upload-sarif@v3
@@ -60,6 +61,7 @@ jobs:
           scan-ref: apps/api
           format: sarif
           output: dockerfile-results.sarif
+          trivy-config: .trivy.yaml
 
       - name: Upload Dockerfile SARIF
         uses: github/codeql-action/upload-sarif@v3
@@ -100,6 +102,7 @@ jobs:
           image-ref: api-trivy:scan
           format: sarif
           output: container-results.sarif
+          trivy-config: .trivy.yaml
 
       - name: Upload Container SARIF
         uses: github/codeql-action/upload-sarif@v3
