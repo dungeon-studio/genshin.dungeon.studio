@@ -25,6 +25,14 @@
 - `packages/game-data`: Source of truth for static game data; use exported helpers, never hard-code.
 - `packages/domain`: Shared domain model: types, invariants, and wire format representations.
 
+## Dependency management in the monorepo
+
+- Pin exact versions without `^` or `~` prefixes; Renovate handles updates weekly.
+- Root `package.json` is the source of truth for shared tooling: turbo, concurrently, TypeScript, ESLint, Prettier, and Stylelint.
+- Workspace `package.json` holds app-specific dependencies. Declare every direct import explicitly, even when the same package exists at the root.
+- When a shared tool appears in both root and workspace `package.json`, keep the versions identical.
+- `pnpm-workspace.yaml` declares workspace package globs and engine constraints only; don't use it for version overrides.
+
 ## Core coding rules
 
 - Use strict TypeScript and keep components/functions focused.
@@ -42,6 +50,8 @@
 
 - Always use `pnpm turbo run <task>` for `build`, `typecheck`, and `test` in CI, Docker, and deploy workflows. Never use raw `pnpm --filter <pkg> <task>` for these because pnpm doesn't automatically build workspace dependencies first; turbo handles dependency ordering via `^build` in `turbo.json`.
 - The API uses `tsconfig.json` (includes tests) for typechecking and `tsconfig.build.json` (excludes tests) for emit. The build config extends `tsconfig.json`, so compiler options stay in sync automatically; only the exclude patterns differ.
+- When `tsconfig.json` uses project references, type-check with `tsc -b --noEmit`. Plain `tsc --noEmit` won't follow references.
+- Turbo 2.0+ renamed `pipeline` to `tasks` in `turbo.json`. When upgrading Turbo major versions, check the `turbo.json` schema for deprecated fields.
 
 ## State usage
 
@@ -82,6 +92,7 @@
   - `dependencies`: runtime code shipped to production.
   - `devDependencies`: build tools, plugins, type definitions, and local tooling.
 - Use `pnpm why <package>` to detect duplicate transitive versions and pin when needed.
+- New workspace packages should match the root `package.json` metadata fields (`description`, `keywords`, `author`, `homepage`, `bugs`, `license`).
 - ESLint uses flat config via workspace-local `eslint.config.js` files; configure ignore patterns with `ignores`, not `.eslintignore`.
 
 ## Documentation rules
@@ -106,6 +117,7 @@
 - Don't modify third-party Vale styles generated under `.styles/`, except `.styles/config/`.
 - Every source file needs SPDX headers. For files without comment syntax, declare them in `.reuse/dep5`; see [How to add SPDX headers to new files](../docs/how-tos/add-spdx-headers.md).
 - Wrap file and directory paths in backticks when they appear in prose (for example, `apps/web`, `packages/game-data/src/index.ts`). Markdown link targets don't need backticks.
+- When adding features, keep these descriptions in sync: `package.json` `description`, `README.md` tagline or summary, and `CONTRIBUTING.md` references to commands or scripts.
 - Documentation principles:
   - Prefer concise, factual, present-tense writing.
   - Keep guidance implementation-oriented, not aspirational.
