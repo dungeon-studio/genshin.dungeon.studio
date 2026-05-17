@@ -6,6 +6,8 @@ import contentType from 'content-type';
 import type { MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
+const MEDIA_TYPE_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
+
 /**
  * Extract the pathname from a profile URL or path.
  *
@@ -51,14 +53,24 @@ export function negotiateRequestSchema(profiles: ProfileLink[]): MiddlewareHandl
     let profile: string | undefined;
 
     if (header) {
+      // contentType.parse is lenient and does not throw on malformed input,
+      // so reject anything that isn't a well-formed RFC 9110 media-type here.
+      let parsed: ReturnType<typeof contentType.parse>;
       try {
-        const parsed = contentType.parse(header);
-        profile = parsed.parameters['profile'];
+        parsed = contentType.parse(header);
       } catch {
         throw new HTTPException(400, {
           message: 'Malformed Content-Type header',
         });
       }
+
+      if (!MEDIA_TYPE_REGEXP.test(parsed.type)) {
+        throw new HTTPException(400, {
+          message: 'Malformed Content-Type header',
+        });
+      }
+
+      profile = parsed.parameters['profile'];
     }
 
     let matched: string;
