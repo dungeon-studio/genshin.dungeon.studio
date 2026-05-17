@@ -18,5 +18,4 @@ misconfiguration:
     vars:
       - infrastructure/terraform/environments/dev/terraform.tfvars
 
-report:
-  ignorefile: .trivyignore.yaml
+ignorefile: .trivyignore.yaml
