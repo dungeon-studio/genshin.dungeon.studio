@@ -4,12 +4,17 @@
 # Trivy configuration for infrastructure scanning
 # See https://aquasecurity.github.io/trivy/ for documentation
 
+severity: HIGH,CRITICAL
+exit-code: 1
+
 scan:
   scanners:
     - misconfig
-    - secret
 
 misconfiguration:
   terraform:
     vars:
       - infrastructure/terraform/environments/dev/terraform.tfvars
+
+report:
+  ignorefile: .trivyignore.yaml

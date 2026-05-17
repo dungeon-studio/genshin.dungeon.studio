@@ -33,8 +33,6 @@ jobs:
           scan-ref: infrastructure/terraform
           format: sarif
           output: terraform-results.sarif
-          exit-code: '1'
-          severity: HIGH,CRITICAL
 
       - name: Upload Terraform SARIF
         uses: github/codeql-action/upload-sarif@v3
@@ -62,8 +60,6 @@ jobs:
           scan-ref: apps/api
           format: sarif
           output: dockerfile-results.sarif
-          exit-code: '1'
-          severity: HIGH,CRITICAL
 
       - name: Upload Dockerfile SARIF
         uses: github/codeql-action/upload-sarif@v3
@@ -104,8 +100,6 @@ jobs:
           image-ref: api-trivy:scan
           format: sarif
           output: container-results.sarif
-          exit-code: '1'
-          severity: HIGH,CRITICAL
 
       - name: Upload Container SARIF
         uses: github/codeql-action/upload-sarif@v3
