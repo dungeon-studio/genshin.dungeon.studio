@@ -6,6 +6,11 @@ packages:
   - 'apps/*'
   - 'packages/*'
 
+allowBuilds:
+  '@firebase/util': true
+  esbuild: true
+  protobufjs: true
+
 # Ensure pnpm version compatibility
 engines:
   pnpm: '>=9.15.4'
