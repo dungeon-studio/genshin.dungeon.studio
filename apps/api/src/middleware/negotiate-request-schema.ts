@@ -51,8 +51,12 @@ export function negotiateRequestSchema(profiles: ProfileLink[]): MiddlewareHandl
     let profile: string | undefined;
 
     if (header) {
+      // contentType.parse is lenient and does not throw on malformed input;
+      // round-trip through format to surface invalid type, parameter names,
+      // or values via its TypeError.
       try {
         const parsed = contentType.parse(header);
+        contentType.format(parsed);
         profile = parsed.parameters['profile'];
       } catch {
         throw new HTTPException(400, {
