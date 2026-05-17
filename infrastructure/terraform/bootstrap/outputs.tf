@@ -25,6 +25,12 @@ output "staging_project_id" {
   sensitive   = false
 }
 
+output "prod_project_id" {
+  value       = module.prod.project_id
+  description = "Prod project ID"
+  sensitive   = false
+}
+
 output "workload_identity_provider" {
   value       = google_iam_workload_identity_pool_provider.github.name
   description = "Workload Identity Provider resource name for GitHub Actions"
@@ -67,6 +73,18 @@ output "github_deployer_ro_staging_service_account_email" {
   sensitive   = false
 }
 
+output "github_deployer_rw_prod_service_account_email" {
+  value       = module.prod.github_deployer_rw_email
+  description = "GitHub Applier service account email for prod environment"
+  sensitive   = false
+}
+
+output "github_deployer_ro_prod_service_account_email" {
+  value       = module.prod.github_deployer_ro_email
+  description = "GitHub Planner service account email for prod environment"
+  sensitive   = false
+}
+
 # Copy-pastable GitHub secrets configuration
 output "github_secrets_setup" {
   value       = <<-EOT
@@ -79,6 +97,7 @@ output "github_secrets_setup" {
     GCP_RO_CORE_SERVICE_ACCOUNT_EMAIL = ${module.core.github_deployer_ro_email}
     GCP_RO_DEV_SERVICE_ACCOUNT_EMAIL = ${module.dev.github_deployer_ro_email}
     GCP_RO_STAGING_SERVICE_ACCOUNT_EMAIL = ${module.staging.github_deployer_ro_email}
+    GCP_RO_PROD_SERVICE_ACCOUNT_EMAIL = ${module.prod.github_deployer_ro_email}
 
     == Dependabot secrets (Settings → Secrets and variables → Dependabot): ==
 
@@ -86,6 +105,7 @@ output "github_secrets_setup" {
     GCP_RO_CORE_SERVICE_ACCOUNT_EMAIL = ${module.core.github_deployer_ro_email}
     GCP_RO_DEV_SERVICE_ACCOUNT_EMAIL = ${module.dev.github_deployer_ro_email}
     GCP_RO_STAGING_SERVICE_ACCOUNT_EMAIL = ${module.staging.github_deployer_ro_email}
+    GCP_RO_PROD_SERVICE_ACCOUNT_EMAIL = ${module.prod.github_deployer_ro_email}
 
     == Environment-level secrets for 'core' (Settings → Environments → core → Secrets): ==
 
@@ -101,6 +121,11 @@ output "github_secrets_setup" {
 
     GCP_RW_WORKLOAD_IDENTITY_PROVIDER = ${google_iam_workload_identity_pool_provider.github.name}
     GCP_RW_STAGING_SERVICE_ACCOUNT_EMAIL = ${module.staging.github_deployer_rw_email}
+
+    == Environment-level secrets for 'prod' (Settings → Environments → prod → Secrets): ==
+
+    GCP_RW_WORKLOAD_IDENTITY_PROVIDER = ${google_iam_workload_identity_pool_provider.github.name}
+    GCP_RW_PROD_SERVICE_ACCOUNT_EMAIL = ${module.prod.github_deployer_rw_email}
   EOT
   description = "Copy-pastable guide for setting up GitHub secrets"
   sensitive   = false
