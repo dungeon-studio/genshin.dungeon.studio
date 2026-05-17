@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+# Trivy suppression file. Every entry needs a justification and an
+# expiry date so accepted findings get re-reviewed instead of
+# calcifying. Format reference:
+# https://aquasecurity.github.io/trivy/latest/docs/configuration/filtering/#trivyignoreyaml
+#
+# Example:
+#   misconfigurations:
+#     - id: AVD-AWS-0001
+#       paths:
+#         - infrastructure/terraform/example.tf
+#       statement: Accepted because <reason>; revisit when <condition>.
+#       expired_at: 2026-12-31
+
+misconfigurations: []
+vulnerabilities: []
+secrets: []

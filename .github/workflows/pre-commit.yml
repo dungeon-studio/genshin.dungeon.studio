@@ -47,3 +47,17 @@ jobs:
         uses: pre-commit/action@v3.0.1
         with:
           extra_args: --all-files terraform_fmt
+
+      - name: Install Trivy
+        run: |
+          set -euo pipefail
+          TRIVY_INSTALL=https://raw.githubusercontent.com/aquasecurity/trivy
+          curl -fsSL "$TRIVY_INSTALL/main/contrib/install.sh" \
+            | sh -s -- -b /usr/local/bin
+
+      - name: Run Terraform Trivy hook
+        uses: pre-commit/action@v3.0.1
+        env:
+          TRIVY_CONFIG: ${{ github.workspace }}/.trivy.yaml
+        with:
+          extra_args: --all-files terraform_trivy

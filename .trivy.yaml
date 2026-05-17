@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+# Trivy configuration for infrastructure scanning
+# See https://aquasecurity.github.io/trivy/ for documentation
+
+severity:
+  - HIGH
+  - CRITICAL
+exit-code: 1
+
+scan:
+  scanners:
+    - misconfig
+
+misconfiguration:
+  terraform:
+    vars:
+      - infrastructure/terraform/environments/dev/terraform.tfvars
+
+ignorefile: .trivyignore.yaml
