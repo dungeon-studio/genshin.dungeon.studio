@@ -113,7 +113,11 @@
   4. Never bulk-ignore suggestions or skip the suggestions pass.
 - Vale's `Microsoft.Dashes` rule flags em dashes adjacent to backtick-wrapped text as having spaces. Rephrase the sentence to avoid the adjacency rather than suppressing the rule.
 - When Vale's `Vale.Terms` rule enforces casing for a term such as `cacheable`, the Vale rule wins over prose formatting conventions like capitalized bold labels.
-- For valid product and tool names flagged by Vale, update `.styles/config/vocabularies/Project/accept.txt`.
+- Vale vocabulary categorization when a term is flagged:
+  - Proper nouns (products, tools, libraries, people, conferences): add to `.styles/config/vocabularies/Project/accept.txt`.
+  - Prose terms (technical English such as `monorepo`, `cacheable`; naming conventions such as `camelCase`, `PascalCase`): add to `accept.txt`.
+  - Code identifiers (field names such as `createdAt`, function names such as `toDocument()`, variable names): wrap in backticks in prose, never in `accept.txt`. Vale skips backtick-wrapped content.
+  - Case corrections and preference enforcement (`firebase` → `Firebase`, `npm` → `pnpm`): add to `reject.txt` as substitution rules.
 - Don't modify third-party Vale styles generated under `.styles/`, except `.styles/config/`.
 - Every source file needs SPDX headers. For files without comment syntax, declare them in `.reuse/dep5`; see [How to add SPDX headers to new files](../docs/how-tos/add-spdx-headers.md).
 - Wrap file and directory paths in backticks when they appear in prose (for example, `apps/web`, `packages/game-data/src/index.ts`). Markdown link targets don't need backticks.
