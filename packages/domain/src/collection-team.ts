@@ -1,9 +1,9 @@
 /* SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> */
 /* SPDX-License-Identifier: MIT */
 
-import type { CollectionTeamMember } from './collectionTeamMember.js';
-import type { ISOTimestamp } from './isoTimestamp.js';
-import { isISOTimestamp, nowTimestamp } from './isoTimestamp.js';
+import type { CollectionTeamMember } from './collection-team-member.js';
+import type { ISOTimestamp } from './iso-timestamp.js';
+import { isISOTimestamp, nowTimestamp } from './iso-timestamp.js';
 
 export const MIN_TEAM_SLOT = 1;
 export const MAX_TEAM_SLOT = 4;

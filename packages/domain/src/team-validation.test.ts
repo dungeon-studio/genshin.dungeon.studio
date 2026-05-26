@@ -3,10 +3,10 @@
 
 import { describe, expect, it } from 'vitest';
 
-import type { ArtifactPlan } from './artifactPlan.js';
-import type { CollectionTeamMembers, TeamSlot } from './collectionTeam.js';
-import type { TeamValidationContext } from './teamValidation.js';
-import { validateTeam, validateTeams } from './teamValidation.js';
+import type { ArtifactPlan } from './artifact-plan.js';
+import type { CollectionTeamMembers, TeamSlot } from './collection-team.js';
+import type { TeamValidationContext } from './team-validation.js';
+import { validateTeam, validateTeams } from './team-validation.js';
 import type { UUID } from './uuid.js';
 
 const EMPTY_MEMBERS: CollectionTeamMembers = [null, null, null, null];

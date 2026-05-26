@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 export { issue, isValid, prefixPaths, type ValidationIssue } from '@genshin/validation';
-export { type ArtifactPlan } from './artifactPlan.js';
-export { validateArtifactPlan } from './artifactPlanValidation.js';
-export type { AuthIdentity } from './authIdentity.js';
+export { type ArtifactPlan } from './artifact-plan.js';
+export { validateArtifactPlan } from './artifact-plan-validation.js';
+export type { AuthIdentity } from './auth-identity.js';
 export {
   assertCollectionCharacter,
   isValidConstellationLevel,
@@ -12,7 +12,7 @@ export {
   MIN_CONSTELLATION_LEVEL,
   type CharacterId,
   type CollectionCharacter,
-} from './collectionCharacter.js';
+} from './collection-character.js';
 export {
   assertCollectionTeam,
   createEmptyTeam,
@@ -26,8 +26,8 @@ export {
   type CollectionTeam,
   type CollectionTeamMembers,
   type TeamSlot,
-} from './collectionTeam.js';
-export { type CollectionTeamMember } from './collectionTeamMember.js';
+} from './collection-team.js';
+export { type CollectionTeamMember } from './collection-team-member.js';
 export {
   assertCollectionWeapon,
   isValidRefinementLevel,
@@ -35,9 +35,9 @@ export {
   MIN_REFINEMENT_LEVEL,
   type CollectionWeapon,
   type CollectionWeaponId,
-} from './collectionWeapon.js';
-export { isISOTimestamp, nowTimestamp, type ISOTimestamp } from './isoTimestamp.js';
-export type { ProblemDetail } from './problemDetail.js';
+} from './collection-weapon.js';
+export { isISOTimestamp, nowTimestamp, type ISOTimestamp } from './iso-timestamp.js';
+export type { ProblemDetail } from './problem-detail.js';
 export {
   characterItemHref,
   characterRepresentation,
@@ -64,6 +64,6 @@ export {
   type ProfileResponse,
 } from './representations/json/profile.js';
 
-export { validateTeam, validateTeams, type TeamValidationContext } from './teamValidation.js';
-export { assertUserProfile, type ProfileUpdate, type UserProfile } from './userProfile.js';
+export { validateTeam, validateTeams, type TeamValidationContext } from './team-validation.js';
+export { assertUserProfile, type ProfileUpdate, type UserProfile } from './user-profile.js';
 export type { UUID } from './uuid.js';

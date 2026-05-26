@@ -3,7 +3,7 @@
 
 import type { Character } from '@genshin/game-data';
 
-import type { ArtifactPlan } from './artifactPlan.js';
+import type { ArtifactPlan } from './artifact-plan.js';
 import type { UUID } from './uuid.js';
 
 /**

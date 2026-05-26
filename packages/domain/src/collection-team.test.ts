@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import type { CollectionTeamMembers, TeamSlot } from './collectionTeam.js';
+import type { CollectionTeamMembers, TeamSlot } from './collection-team.js';
 import {
   assertCollectionTeam,
   createEmptyTeam,
@@ -11,9 +11,9 @@ import {
   isValidTeamSlot,
   MAX_TEAM_MEMBERS,
   TEAM_SLOTS,
-} from './collectionTeam.js';
-import type { ISOTimestamp } from './isoTimestamp.js';
-import { isISOTimestamp } from './isoTimestamp.js';
+} from './collection-team.js';
+import type { ISOTimestamp } from './iso-timestamp.js';
+import { isISOTimestamp } from './iso-timestamp.js';
 
 const VALID_TIMESTAMP = '2024-01-15T12:00:00Z' as ISOTimestamp;
 

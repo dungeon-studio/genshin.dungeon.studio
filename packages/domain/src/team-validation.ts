@@ -14,8 +14,8 @@
 
 import type { ValidationIssue } from '@genshin/validation';
 import { issue, prefixPaths } from '@genshin/validation';
-import { validateArtifactPlan } from './artifactPlanValidation.js';
-import type { CollectionTeamMembers, TeamSlot } from './collectionTeam.js';
+import { validateArtifactPlan } from './artifact-plan-validation.js';
+import type { CollectionTeamMembers, TeamSlot } from './collection-team.js';
 
 /**
  * Caller-supplied ownership data for collection-aware validation.

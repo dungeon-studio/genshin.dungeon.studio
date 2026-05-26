@@ -8,8 +8,8 @@ import {
   isValidRefinementLevel,
   MAX_REFINEMENT_LEVEL,
   MIN_REFINEMENT_LEVEL,
-} from './collectionWeapon.js';
-import type { ISOTimestamp } from './isoTimestamp.js';
+} from './collection-weapon.js';
+import type { ISOTimestamp } from './iso-timestamp.js';
 import type { UUID } from './uuid.js';
 
 const VALID_TIMESTAMP = '2024-01-15T12:00:00Z' as ISOTimestamp;

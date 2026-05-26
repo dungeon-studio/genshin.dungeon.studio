@@ -1,8 +1,8 @@
 /* SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> */
 /* SPDX-License-Identifier: MIT */
 
-import type { ISOTimestamp } from './isoTimestamp.js';
-import { isISOTimestamp } from './isoTimestamp.js';
+import type { ISOTimestamp } from './iso-timestamp.js';
+import { isISOTimestamp } from './iso-timestamp.js';
 
 /**
  * User-controlled fields stored in Firestore.

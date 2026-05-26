@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { isISOTimestamp, nowTimestamp } from './isoTimestamp.js';
+import { isISOTimestamp, nowTimestamp } from './iso-timestamp.js';
 
 describe('isISOTimestamp', () => {
   it('accepts a valid UTC timestamp', () => {

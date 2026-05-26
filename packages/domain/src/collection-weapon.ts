@@ -4,8 +4,8 @@
 import type { Weapon } from '@genshin/game-data';
 import { getWeaponById } from '@genshin/game-data';
 
-import type { ISOTimestamp } from './isoTimestamp.js';
-import { isISOTimestamp } from './isoTimestamp.js';
+import type { ISOTimestamp } from './iso-timestamp.js';
+import { isISOTimestamp } from './iso-timestamp.js';
 import type { UUID } from './uuid.js';
 
 export const MIN_REFINEMENT_LEVEL = 1;

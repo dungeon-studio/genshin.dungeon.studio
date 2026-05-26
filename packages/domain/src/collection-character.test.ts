@@ -8,8 +8,8 @@ import {
   isValidConstellationLevel,
   MAX_CONSTELLATION_LEVEL,
   MIN_CONSTELLATION_LEVEL,
-} from './collectionCharacter.js';
-import type { ISOTimestamp } from './isoTimestamp.js';
+} from './collection-character.js';
+import type { ISOTimestamp } from './iso-timestamp.js';
 
 const VALID_TIMESTAMP = '2024-01-15T12:00:00Z' as ISOTimestamp;
 

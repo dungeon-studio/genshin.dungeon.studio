@@ -3,9 +3,9 @@
 
 import { describe, expect, it } from 'vitest';
 
-import type { AuthIdentity } from '../../authIdentity.js';
-import type { ISOTimestamp } from '../../isoTimestamp.js';
-import type { UserProfile } from '../../userProfile.js';
+import type { AuthIdentity } from '../../auth-identity.js';
+import type { ISOTimestamp } from '../../iso-timestamp.js';
+import type { UserProfile } from '../../user-profile.js';
 import { deserialiseProfile, serialiseProfile } from './profile.js';
 
 const VALID_TIMESTAMP = '2024-01-15T12:00:00Z' as ISOTimestamp;

@@ -4,8 +4,8 @@
 import type { Character } from '@genshin/game-data';
 import { getCharacterById } from '@genshin/game-data';
 
-import type { ISOTimestamp } from './isoTimestamp.js';
-import { isISOTimestamp } from './isoTimestamp.js';
+import type { ISOTimestamp } from './iso-timestamp.js';
+import { isISOTimestamp } from './iso-timestamp.js';
 
 export const MIN_CONSTELLATION_LEVEL = 0;
 export const MAX_CONSTELLATION_LEVEL = 6;

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import { isValid } from '@genshin/validation';
 
-import { validateArtifactPlan } from './artifactPlanValidation.js';
+import { validateArtifactPlan } from './artifact-plan-validation.js';
 
 describe('validateArtifactPlan', () => {
   it('returns no issues for an empty plan', () => {
