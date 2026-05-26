@@ -159,7 +159,7 @@ Use descriptive, specific names for files and modules. Avoid generic names like 
 
 ### Shared types
 
-Branded types in `packages/domain/` each get their own file (for example, `uuid.ts`, `isoTimestamp.ts`). Export both the type and any related validation functions from the same file.
+Branded types in `packages/domain/` each get their own file (for example, `uuid.ts`, `iso-timestamp.ts`). Export both the type and any related validation functions from the same file.
 
 ### Test utilities
 

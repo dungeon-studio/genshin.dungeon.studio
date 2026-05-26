@@ -180,9 +180,18 @@
 
 ## File naming
 
-- Non-React TypeScript: lowercase file names like `user.ts`, or camelCase compounds like `teamMember.ts`.
-- React components: PascalCase file names like `HomePage.tsx`.
-- `shadcn/ui` components: lowercase file names like `button.tsx` and `card.tsx`.
+Enforced by `ls-lint` (see `.ls-lint.yml`).
+
+- Files and directories: `kebab-case` (`user-profile.ts`, `team-member.ts`,
+  `features/collection/characters/`).
+- React component files (`.tsx`): `PascalCase` (`HomePage.tsx`,
+  `CharacterCard.tsx`) or `kebab-case` for `shadcn/ui`-style components
+  (`button.tsx`, `dropdown-menu.tsx`). Component identifiers themselves
+  remain `PascalCase` regardless of file name.
+- Co-located test files mirror their source: `use-auth.ts` →
+  `use-auth.test.ts`; `CharacterCard.tsx` → `CharacterCard.test.tsx`.
+- Terraform (`infrastructure/terraform/**`): HashiCorp-style `snake_case`
+  for `.tf`, `.tfvars`, `.hcl`, and module directories.
 
 ## When unsure
 
