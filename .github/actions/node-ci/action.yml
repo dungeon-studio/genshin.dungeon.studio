@@ -37,7 +37,7 @@ runs:
       run: pnpm turbo run test --filter="${{ inputs.filter }}" -- --coverage
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v6
+      uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6
       with:
         token: ${{ inputs.codecov-token }}
         files: ${{ inputs.coverage-file }}
@@ -45,7 +45,7 @@ runs:
         fail_ci_if_error: false
 
     - name: Upload test results to Codecov
-      uses: codecov/codecov-action@v6
+      uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6
       with:
         token: ${{ inputs.codecov-token }}
         files: ${{ inputs.results-file }}
