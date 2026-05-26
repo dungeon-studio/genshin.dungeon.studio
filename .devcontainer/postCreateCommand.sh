@@ -45,7 +45,7 @@ pre-commit install
 # ---------------------------------------------------------------------------
 step "Installing reuse-tool"
 
-pipx install reuse==6.2.0
+"${SCRIPT_DIR}/../scripts/install-reuse.sh"
 
 # ---------------------------------------------------------------------------
 # 6. Playwright browsers (for Playwright MCP server)

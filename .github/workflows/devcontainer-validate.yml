@@ -1,0 +1,49 @@
+---
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+name: devcontainer-validate
+
+on:
+  pull_request:
+    paths:
+      - '.devcontainer/**'
+      - '.vscode/extensions.json'
+      - 'scripts/install-reuse.sh'
+      - 'scripts/validate-workspace.ts'
+      - '.github/workflows/devcontainer-validate.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+  push:
+    branches:
+      - develop
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate inside devcontainer
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Build devcontainer and run pnpm validate
+        uses: devcontainers/ci@v0.3
+        with:
+          imageName: genshin-planner-devcontainer
+          push: never
+          runCmd: pnpm validate
+
+# ---------------------------------------------------------------------------
+# Maintenance notes
+# - Cold devcontainer build (no cache) is the slow path. The job ceiling
+#   leaves headroom for first-time builds without retries.
+# - Runs pnpm validate (lint + typecheck + reuse + workspace consistency)
+#   inside the built image so devcontainer drift surfaces here, not in
+#   contributor terminals.
+# ---------------------------------------------------------------------------
