@@ -115,6 +115,13 @@ repos:
     hooks:
       - id: detect-secrets
 
+  # Renovate config validation
+  - repo: https://github.com/renovatebot/pre-commit-hooks
+    rev: 43.99.1
+    hooks:
+      - id: renovate-config-validator
+        args: [--strict, --no-global]
+
   # ESLint - JavaScript/TypeScript linting
   - repo: local
     hooks:
