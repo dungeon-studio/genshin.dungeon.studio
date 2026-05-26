@@ -15,12 +15,12 @@ import {
   type Template,
 } from '@genshin/collection-json';
 
-import type { CollectionCharacter } from '../../collectionCharacter.js';
+import type { CollectionCharacter } from '../../collection-character.js';
 import {
   assertCollectionCharacter,
   MAX_CONSTELLATION_LEVEL,
   MIN_CONSTELLATION_LEVEL,
-} from '../../collectionCharacter.js';
+} from '../../collection-character.js';
 
 const CHARACTER_TEMPLATE: Template = {
   data: [

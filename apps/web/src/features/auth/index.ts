@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-export { AuthProvider } from './AuthProvider';
-export { LoginButton } from './LoginButton';
-export { LogoutButton } from './LogoutButton';
-export { ProtectedRoute } from './ProtectedRoute';
-export { useAuth } from './useAuth';
+export { AuthProvider } from './auth-provider';
+export { LoginButton } from './login-button';
+export { LogoutButton } from './logout-button';
+export { ProtectedRoute } from './protected-route';
+export { useAuth } from './use-auth';

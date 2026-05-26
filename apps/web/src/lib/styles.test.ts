@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { elementBorderClass } from './elementStyles';
+import { elementBorderClass } from './element-styles';
 
 describe('elementBorderClass', () => {
   it('returns a dashed fallback when element is undefined', () => {

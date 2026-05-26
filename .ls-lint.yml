@@ -1,0 +1,64 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+ls:
+  .dir: kebab-case
+
+  .ts: kebab-case
+  .tsx: kebab-case
+  .js: kebab-case
+  .jsx: kebab-case
+  .mjs: kebab-case
+  .cjs: kebab-case
+
+  # Compound extensions (longest match wins in ls-lint; rules must be
+  # declared explicitly or files would be silently skipped).
+  .test.ts: kebab-case
+  .test.tsx: kebab-case
+  .config.ts: kebab-case
+  .config.js: kebab-case
+  .d.ts: kebab-case
+
+  .json: kebab-case
+  .jsonc: kebab-case
+  .md: kebab-case
+  .yml: kebab-case
+  .yaml: kebab-case
+  .css: kebab-case
+  .html: kebab-case
+  .sh: kebab-case
+
+  # Terraform: HashiCorp style uses snake_case for files and directories.
+  infrastructure/terraform:
+    .dir: snake_case
+    .tf: snake_case
+    .tfvars: snake_case
+    .hcl: snake_case
+
+ignore:
+  - '**/node_modules'
+  - '**/.pnpm-store'
+  - '**/dist'
+  - '**/build'
+  - '**/coverage'
+  - '**/.turbo'
+  - '**/.vite'
+  - '**/.vite-temp'
+  - '**/.tmp'
+  - '**/test-results'
+  - .git
+  # Tool-convention directories (names dictated by external tooling):
+  - .devcontainer
+  - .github
+  - .reuse
+  - .styles
+  - .vscode
+  # REUSE license texts use SPDX identifiers (MIT.txt, etc.):
+  - LICENSES
+  # Files with conventional upper-case names by ecosystem precedent:
+  - '**/README.md'
+  - CHANGELOG.md
+  - LICENSE
+  - CONTRIBUTING.md
+  - CLAUDE.md
+  - pnpm-lock.yaml

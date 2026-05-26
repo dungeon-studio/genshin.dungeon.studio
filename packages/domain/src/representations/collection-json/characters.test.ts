@@ -3,8 +3,8 @@
 
 import { describe, expect, it } from 'vitest';
 
-import type { CollectionCharacter } from '../../collectionCharacter.js';
-import type { ISOTimestamp } from '../../isoTimestamp.js';
+import type { CollectionCharacter } from '../../collection-character.js';
+import type { ISOTimestamp } from '../../iso-timestamp.js';
 import { deserialiseCharacter, serialiseCharacter } from './characters.js';
 
 const BASE_URL = 'http://localhost:8080';

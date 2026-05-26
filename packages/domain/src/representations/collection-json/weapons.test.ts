@@ -3,8 +3,8 @@
 
 import { describe, expect, it } from 'vitest';
 
-import type { CollectionWeapon } from '../../collectionWeapon.js';
-import type { ISOTimestamp } from '../../isoTimestamp.js';
+import type { CollectionWeapon } from '../../collection-weapon.js';
+import type { ISOTimestamp } from '../../iso-timestamp.js';
 import type { UUID } from '../../uuid.js';
 import { deserialiseWeapon, serialiseWeapon } from './weapons.js';
 
