@@ -30,21 +30,24 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "typecheck": "turbo run typecheck",
     "clean": "turbo run clean",
-    "reuse:check": "reuse lint"
+    "reuse:check": "reuse lint",
+    "validate:workspace": "tsx scripts/validate-workspace.ts",
+    "validate": "pnpm lint && pnpm typecheck && pnpm reuse:check && pnpm validate:workspace"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@ls-lint/ls-lint": "^2.3.1",
-    "@types/node": "25.8.0",
+    "@types/node": "25.9.1",
     "concurrently": "9.2.1",
-    "eslint": "10.3.0",
+    "eslint": "10.4.0",
     "prettier": "3.8.3",
-    "stylelint": "17.11.1",
+    "stylelint": "17.12.0",
     "stylelint-config-standard": "40.0.0",
+    "tsx": "4.22.3",
     "turbo": "2.9.14",
     "typescript": "6.0.3"
   },
-  "packageManager": "pnpm@11.1.2",
+  "packageManager": "pnpm@11.2.2",
   "engines": {
     "node": ">=20.0.0"
   }
