@@ -37,25 +37,23 @@ jobs:
         with:
           terraform_version: '1.9.0'
 
-      # Org allowlist requires literal pre-commit/action@v3.* — SHA pin
-      # would be rejected. Applies to every pre-commit/action use below.
       - name: Run ESLint hook
-        uses: pre-commit/action@v3.0.1
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
         with:
           extra_args: --all-files eslint
 
       - name: Run Prettier hook
-        uses: pre-commit/action@v3.0.1
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
         with:
           extra_args: --all-files prettier
 
       - name: Run Stylelint hook
-        uses: pre-commit/action@v3.0.1
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
         with:
           extra_args: --all-files stylelint
 
       - name: Run Terraform fmt hook
-        uses: pre-commit/action@v3.0.1
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
         with:
           extra_args: --all-files terraform_fmt
 
@@ -67,14 +65,14 @@ jobs:
             | sh -s -- -b /usr/local/bin
 
       - name: Run Terraform Trivy hook
-        uses: pre-commit/action@v3.0.1
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
         env:
           TRIVY_CONFIG: ${{ github.workspace }}/.trivy.yaml
         with:
           extra_args: --all-files terraform_trivy
 
       - name: Run Renovate config validator hook
-        uses: pre-commit/action@v3.0.1
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
         with:
           extra_args: --all-files renovate-config-validator
 
@@ -88,6 +86,6 @@ jobs:
           sudo chmod +x /usr/local/bin/hadolint
 
       - name: Run hadolint hook
-        uses: pre-commit/action@v3.0.1
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
         with:
           extra_args: --all-files hadolint

@@ -15,8 +15,7 @@ runs:
         node-version: '24'
 
     - name: Install pnpm
-      # Org allowlist requires literal @v4|@v5|@v6 — SHA pin would be rejected.
-      uses: pnpm/action-setup@v6
+      uses: pnpm/action-setup@ac6db6d3c1f721f886538a378a2d73e85697340a # v6
       with:
         run_install: false
 
