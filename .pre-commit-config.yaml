@@ -33,6 +33,7 @@ ci:
     - typescript-check
     - terraform_fmt
     - terraform_trivy
+    - renovate-config-validator
 
 repos:
   # Basic file checks
