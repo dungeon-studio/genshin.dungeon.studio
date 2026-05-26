@@ -36,6 +36,7 @@ ci:
     - terraform_trivy
     - renovate-config-validator
     - hadolint
+    - ls-lint
 
 repos:
   # Basic file checks
@@ -155,3 +156,10 @@ repos:
         entry: hadolint
         language: system
         types: [dockerfile]
+
+      - id: ls-lint
+        name: file naming conventions
+        entry: pnpm exec ls-lint
+        language: system
+        pass_filenames: false
+        always_run: true

@@ -9,7 +9,7 @@ import { characters } from '@/routes/characters.js';
 import { jsonSchemaProfiles } from '@/routes/json-schema-profiles.js';
 import { root } from '@/routes/root.js';
 import { teams } from '@/routes/teams.js';
-import { userProfile } from '@/routes/userProfile.js';
+import { userProfile } from '@/routes/user-profile.js';
 import { weapons } from '@/routes/weapons.js';
 import type { ProblemDetail } from '@genshin/domain';
 import { GoogleError } from 'google-gax';

@@ -3,8 +3,8 @@
 
 import { describe, expect, it } from 'vitest';
 
-import type { CollectionTeam, CollectionTeamMembers, TeamSlot } from '../../collectionTeam.js';
-import type { ISOTimestamp } from '../../isoTimestamp.js';
+import type { CollectionTeam, CollectionTeamMembers, TeamSlot } from '../../collection-team.js';
+import type { ISOTimestamp } from '../../iso-timestamp.js';
 import type { UUID } from '../../uuid.js';
 import { deserialiseTeam, serialiseTeam } from './teams.js';
 

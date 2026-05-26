@@ -26,6 +26,7 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",
+    "lint:names": "ls-lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "typecheck": "turbo run typecheck",
     "clean": "turbo run clean",
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@ls-lint/ls-lint": "^2.3.1",
     "@types/node": "25.9.1",
     "concurrently": "9.2.1",
     "eslint": "10.4.0",
