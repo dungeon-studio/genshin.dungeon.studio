@@ -8,9 +8,9 @@ import { Lock, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { CharacterSummary } from '@/components/CharacterSummary';
+import { CharacterSummary } from '@/components/character-summary';
 import { Button } from '@/components/ui/button';
-import { CharacterFilters } from '@/features/collection/characters/CharacterFilters';
+import { CharacterFilters } from '@/features/collection/characters/character-filters';
 import type { CharacterFilterState } from '@/features/collection/characters/filtering';
 import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
 import { useTeamStore } from '@/features/teams/use-team-store';

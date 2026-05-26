@@ -6,8 +6,8 @@ import { CHARACTERS } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-import { CharacterCard } from '@/features/collection/characters/CharacterCard';
-import { CharacterFilters } from '@/features/collection/characters/CharacterFilters';
+import { CharacterCard } from '@/features/collection/characters/character-card';
+import { CharacterFilters } from '@/features/collection/characters/character-filters';
 import type { CharacterFilterState } from '@/features/collection/characters/filtering';
 import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
 import { useCollection } from '@/features/collection/characters/use-character-collection';

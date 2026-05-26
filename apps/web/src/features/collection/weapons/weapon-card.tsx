@@ -3,7 +3,7 @@
 
 import type { Weapon } from '@genshin/game-data';
 
-import { WeaponSummary } from '@/components/WeaponSummary';
+import { WeaponSummary } from '@/components/weapon-summary';
 import { RARITY_BORDER_COLORS } from '@/lib/rarity-styles';
 import { cn } from '@/lib/utils';
 

@@ -9,12 +9,12 @@ import type {
 } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
 
-import { ArtifactPlanner } from '@/components/ArtifactPlanner';
+import { ArtifactPlanner } from '@/components/artifact-planner';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { elementBorderClass } from '@/lib/element-styles';
 import { cn } from '@/lib/utils';
 
-import { TeamMemberSummary } from './TeamMemberSummary';
+import { TeamMemberSummary } from './team-member-summary';
 
 interface TeamMemberPlannerProps {
   member: CollectionTeamMember | null;

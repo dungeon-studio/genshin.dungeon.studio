@@ -4,7 +4,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { CharacterSummary } from './CharacterSummary';
+import { CharacterSummary } from './character-summary';
 
 const AMBER = {
   id: 'amber',

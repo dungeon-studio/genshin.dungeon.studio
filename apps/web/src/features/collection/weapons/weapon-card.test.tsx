@@ -5,7 +5,7 @@ import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { WeaponCard } from './WeaponCard';
+import { WeaponCard } from './weapon-card';
 
 const SWORD = {
   id: 'dull-blade',

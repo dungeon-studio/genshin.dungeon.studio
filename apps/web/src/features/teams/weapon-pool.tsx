@@ -14,10 +14,10 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
-import { WeaponSummary } from '@/components/WeaponSummary';
+import { WeaponSummary } from '@/components/weapon-summary';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
-import { WeaponFilters } from '@/features/collection/weapons/WeaponFilters';
+import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
 import { useTeamStore } from '@/features/teams/use-team-store';
 import { RARITY_BORDER_COLORS, RARITY_SELECTED_RINGS } from '@/lib/rarity-styles';
 import { cn } from '@/lib/utils';

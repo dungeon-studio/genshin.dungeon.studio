@@ -182,14 +182,14 @@
 
 Enforced by `ls-lint` (see `.ls-lint.yml`).
 
-- Files and directories: `kebab-case` (`user-profile.ts`, `team-member.ts`,
-  `features/collection/characters/`).
-- React component files (`.tsx`): `PascalCase` (`HomePage.tsx`,
-  `CharacterCard.tsx`) or `kebab-case` for `shadcn/ui`-style components
-  (`button.tsx`, `dropdown-menu.tsx`). Component identifiers themselves
-  remain `PascalCase` regardless of file name.
-- Co-located test files mirror their source: `use-auth.ts` →
-  `use-auth.test.ts`; `CharacterCard.tsx` → `CharacterCard.test.tsx`.
+- All files and directories: `kebab-case` (`user-profile.ts`,
+  `character-card.tsx`, `features/collection/characters/`). React
+  component files use the same `kebab-case` filename style as `shadcn/ui`.
+  Component _identifiers_ remain `PascalCase`
+  (`function CharacterCard() {}`); only the filename is kebab.
+- Co-located test files mirror their source:
+  `use-auth.ts` → `use-auth.test.ts`;
+  `character-card.tsx` → `character-card.test.tsx`.
 - Terraform (`infrastructure/terraform/**`): HashiCorp-style `snake_case`
   for `.tf`, `.tfvars`, `.hcl`, and module directories.
 

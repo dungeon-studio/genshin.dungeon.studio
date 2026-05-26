@@ -13,7 +13,7 @@ import { getCharacterById } from '@genshin/game-data';
 import { elementBorderClass } from '@/lib/element-styles';
 import { cn } from '@/lib/utils';
 
-import { TeamMemberSummary } from './TeamMemberSummary';
+import { TeamMemberSummary } from './team-member-summary';
 
 interface TeamStripProps {
   members: CollectionTeam['members'];

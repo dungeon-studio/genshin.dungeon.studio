@@ -4,8 +4,8 @@
 import type { CollectionCharacter, CollectionTeamMember, CollectionWeapon } from '@genshin/domain';
 import { getCharacterById, getWeaponById } from '@genshin/game-data';
 
-import { CharacterSummary } from '@/components/CharacterSummary';
-import { WeaponSummary } from '@/components/WeaponSummary';
+import { CharacterSummary } from '@/components/character-summary';
+import { WeaponSummary } from '@/components/weapon-summary';
 
 interface TeamMemberSummaryProps {
   member: CollectionTeamMember | null;

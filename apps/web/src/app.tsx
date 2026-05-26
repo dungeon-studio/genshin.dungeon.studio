@@ -4,13 +4,13 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
-import { Layout } from './components/Layout';
+import { Layout } from './components/layout';
 import { Toaster } from './components/ui/sonner';
 import { AuthProvider } from './features/auth';
-import { CharactersPage } from './pages/CharactersPage';
-import { NotFoundPage } from './pages/NotFoundPage';
-import { TeamsPage } from './pages/TeamsPage';
-import { WeaponsPage } from './pages/WeaponsPage';
+import { CharactersPage } from './pages/characters-page';
+import { NotFoundPage } from './pages/not-found-page';
+import { TeamsPage } from './pages/teams-page';
+import { WeaponsPage } from './pages/weapons-page';
 
 const queryClient = new QueryClient();
 

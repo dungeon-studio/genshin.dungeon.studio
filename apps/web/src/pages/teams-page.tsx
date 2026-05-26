@@ -9,10 +9,10 @@ import { useCallback, useMemo, useState } from 'react';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
-import { CharacterPool } from '@/features/teams/CharacterPool';
-import { TeamPlanner } from '@/features/teams/TeamPlanner';
-import { TeamStrip } from '@/features/teams/TeamStrip';
-import { WeaponPool } from '@/features/teams/WeaponPool';
+import { CharacterPool } from '@/features/teams/character-pool';
+import { TeamPlanner } from '@/features/teams/team-planner';
+import { TeamStrip } from '@/features/teams/team-strip';
+import { WeaponPool } from '@/features/teams/weapon-pool';
 import { useTeams } from '@/features/teams/use-teams';
 
 type SheetTab = 'characters' | 'weapons';

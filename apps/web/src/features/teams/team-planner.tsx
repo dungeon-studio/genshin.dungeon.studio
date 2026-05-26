@@ -15,7 +15,7 @@ import { useRef, useState } from 'react';
 
 import { Input } from '@/components/ui/input';
 
-import { TeamMemberPlanner } from './TeamMemberPlanner';
+import { TeamMemberPlanner } from './team-member-planner';
 
 interface TeamPlannerProps {
   slot: TeamSlot;

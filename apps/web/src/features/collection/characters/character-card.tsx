@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
-import { CharacterSummary } from '@/components/CharacterSummary';
+import { CharacterSummary } from '@/components/character-summary';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   ELEMENT_BORDER_COLORS,

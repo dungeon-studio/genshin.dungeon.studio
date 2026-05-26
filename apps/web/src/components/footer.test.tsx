@@ -4,7 +4,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { Footer } from './Footer';
+import { Footer } from './footer';
 
 describe('Footer', () => {
   it('opens links in new tabs with proper security attributes', () => {

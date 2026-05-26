@@ -13,9 +13,9 @@ import { WEAPON_TYPES } from '@genshin/game-data';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
-import { WeaponCard } from '@/features/collection/weapons/WeaponCard';
-import { WeaponFilters } from '@/features/collection/weapons/WeaponFilters';
-import { WeaponInstanceSidebar } from '@/features/collection/weapons/WeaponInstanceSidebar';
+import { WeaponCard } from '@/features/collection/weapons/weapon-card';
+import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
+import { WeaponInstanceSidebar } from '@/features/collection/weapons/weapon-instance-sidebar';
 
 export function WeaponsPage() {
   const {

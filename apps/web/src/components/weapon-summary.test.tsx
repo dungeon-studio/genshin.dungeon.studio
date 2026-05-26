@@ -4,7 +4,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { WeaponSummary } from './WeaponSummary';
+import { WeaponSummary } from './weapon-summary';
 
 const AMOS_BOW = {
   id: 'amos-bow',

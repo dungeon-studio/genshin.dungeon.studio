@@ -3,7 +3,7 @@
 
 import { Link } from 'react-router-dom';
 
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { LoginButton, LogoutButton, useAuth } from '@/features/auth';
 
 export function Header() {

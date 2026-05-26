@@ -5,16 +5,16 @@ ls:
   .dir: kebab-case
 
   .ts: kebab-case
-  .tsx: kebab-case | PascalCase
+  .tsx: kebab-case
   .js: kebab-case
-  .jsx: kebab-case | PascalCase
+  .jsx: kebab-case
   .mjs: kebab-case
   .cjs: kebab-case
 
   # Compound extensions (longest match wins in ls-lint; rules must be
   # declared explicitly or files would be silently skipped).
   .test.ts: kebab-case
-  .test.tsx: kebab-case | PascalCase
+  .test.tsx: kebab-case
   .config.ts: kebab-case
   .config.js: kebab-case
   .d.ts: kebab-case
