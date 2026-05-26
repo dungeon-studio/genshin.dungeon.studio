@@ -7,13 +7,13 @@ import { getCharacterById } from '@genshin/game-data';
 import { useCallback, useMemo, useState } from 'react';
 
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
-import { useCollection } from '@/features/collection/characters/useCharacterCollection';
-import { useWeaponCollection } from '@/features/collection/weapons/useWeaponCollection';
+import { useCollection } from '@/features/collection/characters/use-character-collection';
+import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
 import { CharacterPool } from '@/features/teams/CharacterPool';
 import { TeamPlanner } from '@/features/teams/TeamPlanner';
 import { TeamStrip } from '@/features/teams/TeamStrip';
 import { WeaponPool } from '@/features/teams/WeaponPool';
-import { useTeams } from '@/features/teams/useTeams';
+import { useTeams } from '@/features/teams/use-teams';
 
 type SheetTab = 'characters' | 'weapons';
 

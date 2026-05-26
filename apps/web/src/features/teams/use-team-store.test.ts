@@ -5,7 +5,7 @@ import type { CollectionTeam, CollectionWeaponId, ISOTimestamp, TeamSlot } from 
 import { initialTeams } from '@genshin/domain';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { useTeamStore } from './useTeamStore';
+import { useTeamStore } from './use-team-store';
 
 describe('useTeamStore', () => {
   beforeEach(() => {

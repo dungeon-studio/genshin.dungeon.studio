@@ -5,7 +5,7 @@ import type { Weapon, WeaponType } from '@genshin/game-data';
 import { CircleHelp } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-import { getWeaponTypeIconPath } from '@/lib/weaponTypes';
+import { getWeaponTypeIconPath } from '@/lib/weapon-types';
 
 interface WeaponSummaryProps {
   /** Static weapon definition (name, rarity, type), not a collection instance. */

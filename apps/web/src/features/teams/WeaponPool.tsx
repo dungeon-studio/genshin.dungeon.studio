@@ -18,8 +18,8 @@ import { WeaponSummary } from '@/components/WeaponSummary';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
 import { WeaponFilters } from '@/features/collection/weapons/WeaponFilters';
-import { useTeamStore } from '@/features/teams/useTeamStore';
-import { RARITY_BORDER_COLORS, RARITY_SELECTED_RINGS } from '@/lib/rarityStyles';
+import { useTeamStore } from '@/features/teams/use-team-store';
+import { RARITY_BORDER_COLORS, RARITY_SELECTED_RINGS } from '@/lib/rarity-styles';
 import { cn } from '@/lib/utils';
 
 function buildEquippedWeapons(

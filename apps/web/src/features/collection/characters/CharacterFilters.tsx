@@ -7,7 +7,7 @@ import { ArrowDownWideNarrow, ArrowUpNarrowWide, Search } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ELEMENT_BG_COLORS } from '@/lib/elementStyles';
+import { ELEMENT_BG_COLORS } from '@/lib/element-styles';
 import { getElementIconPath } from '@/lib/elements';
 import { cn } from '@/lib/utils';
 

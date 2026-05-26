@@ -8,7 +8,7 @@ import { ArrowDownWideNarrow, ArrowUpNarrowWide, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { getWeaponTypeIconPath } from '@/lib/weaponTypes';
+import { getWeaponTypeIconPath } from '@/lib/weapon-types';
 
 import type { SortField, WeaponFilterState } from './filtering';
 

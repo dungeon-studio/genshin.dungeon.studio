@@ -6,11 +6,11 @@ import { initialTeams } from '@genshin/domain';
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
-import { useAuth } from '@/features/auth/useAuth';
+import { useAuth } from '@/features/auth/use-auth';
 
-import type { SaveTeamPayload } from './useTeamApi';
-import { useDeleteTeamMutation, useSaveTeamMutation, useTeamsQuery } from './useTeamApi';
-import { useTeamStore } from './useTeamStore';
+import type { SaveTeamPayload } from './use-team-api';
+import { useDeleteTeamMutation, useSaveTeamMutation, useTeamsQuery } from './use-team-api';
+import { useTeamStore } from './use-team-store';
 
 export interface UseTeamsResult {
   teams: Record<TeamSlot, CollectionTeam>;

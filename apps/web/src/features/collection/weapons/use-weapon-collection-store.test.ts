@@ -5,7 +5,7 @@ import type { CollectionWeapon, CollectionWeaponId, ISOTimestamp } from '@genshi
 import type { Weapon } from '@genshin/game-data';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { useWeaponCollectionStore } from './useWeaponCollectionStore';
+import { useWeaponCollectionStore } from './use-weapon-collection-store';
 
 function makeWeapon(
   weaponInstanceId: string,

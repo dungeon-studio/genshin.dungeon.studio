@@ -10,7 +10,7 @@ import type {
 import { MAX_TEAM_MEMBERS } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
 
-import { elementBorderClass } from '@/lib/elementStyles';
+import { elementBorderClass } from '@/lib/element-styles';
 import { cn } from '@/lib/utils';
 
 import { TeamMemberSummary } from './TeamMemberSummary';

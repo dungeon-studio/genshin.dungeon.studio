@@ -8,16 +8,16 @@ import { toast } from 'sonner';
 
 import { isValidRefinementLevel } from '@genshin/domain';
 
-import { useAuth } from '@/features/auth/useAuth';
+import { useAuth } from '@/features/auth/use-auth';
 
-import type { WeaponMutationResult } from './useWeaponCollectionApi';
+import type { WeaponMutationResult } from './use-weapon-collection-api';
 import {
   useAddWeaponMutation,
   useRemoveWeaponMutation,
   useSetRefinementLevelMutation,
   useWeaponCollectionQuery,
-} from './useWeaponCollectionApi';
-import { useWeaponCollectionStore } from './useWeaponCollectionStore';
+} from './use-weapon-collection-api';
+import { useWeaponCollectionStore } from './use-weapon-collection-store';
 
 export interface UseWeaponCollectionResult {
   weapons: Record<CollectionWeaponId, CollectionWeapon>;

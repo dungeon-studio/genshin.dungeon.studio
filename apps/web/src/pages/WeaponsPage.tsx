@@ -12,7 +12,7 @@ import { WEAPON_TYPES } from '@genshin/game-data';
 
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
-import { useWeaponCollection } from '@/features/collection/weapons/useWeaponCollection';
+import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
 import { WeaponCard } from '@/features/collection/weapons/WeaponCard';
 import { WeaponFilters } from '@/features/collection/weapons/WeaponFilters';
 import { WeaponInstanceSidebar } from '@/features/collection/weapons/WeaponInstanceSidebar';

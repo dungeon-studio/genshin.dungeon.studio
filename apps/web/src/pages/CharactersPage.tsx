@@ -10,7 +10,7 @@ import { CharacterCard } from '@/features/collection/characters/CharacterCard';
 import { CharacterFilters } from '@/features/collection/characters/CharacterFilters';
 import type { CharacterFilterState } from '@/features/collection/characters/filtering';
 import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
-import { useCollection } from '@/features/collection/characters/useCharacterCollection';
+import { useCollection } from '@/features/collection/characters/use-character-collection';
 
 export function CharactersPage() {
   const {

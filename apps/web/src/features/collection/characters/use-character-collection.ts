@@ -7,16 +7,16 @@ import { toast } from 'sonner';
 import type { CharacterId, CollectionCharacter } from '@genshin/domain';
 import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 
-import { useAuth } from '@/features/auth/useAuth';
+import { useAuth } from '@/features/auth/use-auth';
 
-import type { MutationResult } from './useCharacterCollectionApi';
+import type { MutationResult } from './use-character-collection-api';
 import {
   useAddCharacterMutation,
   useCharacterCollectionQuery,
   useRemoveCharacterMutation,
   useSetConstellationLevelMutation,
-} from './useCharacterCollectionApi';
-import { mergeCollections, useCollectionStore } from './useCharacterCollectionStore';
+} from './use-character-collection-api';
+import { mergeCollections, useCollectionStore } from './use-character-collection-store';
 
 export interface UseCollectionResult {
   characters: Record<CharacterId, CollectionCharacter>;

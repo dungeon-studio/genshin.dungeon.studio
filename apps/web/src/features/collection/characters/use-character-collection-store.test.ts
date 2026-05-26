@@ -4,7 +4,7 @@
 import type { CharacterId, CollectionCharacter, ISOTimestamp } from '@genshin/domain';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { mergeCollections, useCollectionStore } from './useCharacterCollectionStore';
+import { mergeCollections, useCollectionStore } from './use-character-collection-store';
 
 function makeCharacter(id: string, constellationLevel = 0): CollectionCharacter {
   return {

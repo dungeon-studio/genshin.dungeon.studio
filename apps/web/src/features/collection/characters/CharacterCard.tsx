@@ -14,7 +14,7 @@ import {
   ELEMENT_BORDER_COLORS_DIM,
   ELEMENT_FOCUS_RINGS,
   ELEMENT_SELECTED_RINGS,
-} from '@/lib/elementStyles';
+} from '@/lib/element-styles';
 import { cn } from '@/lib/utils';
 
 const CONSTELLATION_LEVELS = Array.from(

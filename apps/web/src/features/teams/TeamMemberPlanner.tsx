@@ -11,7 +11,7 @@ import { getCharacterById } from '@genshin/game-data';
 
 import { ArtifactPlanner } from '@/components/ArtifactPlanner';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { elementBorderClass } from '@/lib/elementStyles';
+import { elementBorderClass } from '@/lib/element-styles';
 import { cn } from '@/lib/utils';
 
 import { TeamMemberSummary } from './TeamMemberSummary';

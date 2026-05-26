@@ -13,8 +13,8 @@ import { Button } from '@/components/ui/button';
 import { CharacterFilters } from '@/features/collection/characters/CharacterFilters';
 import type { CharacterFilterState } from '@/features/collection/characters/filtering';
 import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
-import { useTeamStore } from '@/features/teams/useTeamStore';
-import { ELEMENT_BORDER_COLORS, ELEMENT_SELECTED_RINGS } from '@/lib/elementStyles';
+import { useTeamStore } from '@/features/teams/use-team-store';
+import { ELEMENT_BORDER_COLORS, ELEMENT_SELECTED_RINGS } from '@/lib/element-styles';
 import { cn } from '@/lib/utils';
 
 function poolFilterState(): CharacterFilterState {
