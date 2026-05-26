@@ -36,12 +36,16 @@ ls:
     .hcl: snake_case
 
 ignore:
-  - node_modules
-  - .pnpm-store
-  - dist
-  - build
-  - coverage
-  - .turbo
+  - '**/node_modules'
+  - '**/.pnpm-store'
+  - '**/dist'
+  - '**/build'
+  - '**/coverage'
+  - '**/.turbo'
+  - '**/.vite'
+  - '**/.vite-temp'
+  - '**/.tmp'
+  - '**/test-results'
   - .git
   # Tool-convention directories (names dictated by external tooling):
   - .devcontainer
