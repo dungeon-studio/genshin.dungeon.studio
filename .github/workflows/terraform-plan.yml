@@ -11,6 +11,10 @@ on:
       - 'infrastructure/terraform/environments/**'
       - '.github/workflows/terraform-plan.yml'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   terraform-plan:
     name: ${{ matrix.environment }}
