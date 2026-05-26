@@ -14,11 +14,15 @@ on:
       - '.github/workflows/deploy.yml'
       - '.github/actions/setup-node-pnpm/**'
 
+permissions:
+  contents: read
+
 jobs:
   web:
     if: github.ref == 'refs/heads/develop'
     name: Web
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment: dev
     env:
       GCP_PROJECT_ID: dungeon-studio-genshin-dev
@@ -89,6 +93,7 @@ jobs:
     if: github.ref == 'refs/heads/develop'
     name: API
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment: dev
     env:
       GCP_DEV_PROJECT_ID: dungeon-studio-genshin-dev

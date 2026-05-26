@@ -11,6 +11,9 @@ on:
       - 'infrastructure/terraform/environments/**'
       - '.github/workflows/terraform-plan.yml'
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -19,6 +22,7 @@ jobs:
   terraform-plan:
     name: ${{ matrix.environment }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
       id-token: write

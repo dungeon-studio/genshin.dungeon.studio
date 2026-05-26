@@ -11,9 +11,13 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   terraform-apply:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment: ${{ inputs.environment }}
     permissions:
       contents: read
