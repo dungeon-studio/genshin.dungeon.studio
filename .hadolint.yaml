@@ -4,4 +4,5 @@
 # hadolint configuration for Dockerfile linting
 # See https://github.com/hadolint/hadolint for documentation
 
-failure-threshold: warning
+trustedRegistries:
+  - docker.io
