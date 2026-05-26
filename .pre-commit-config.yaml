@@ -35,6 +35,7 @@ ci:
     - terraform_fmt
     - terraform_trivy
     - renovate-config-validator
+    - hadolint
 
 repos:
   # Basic file checks
@@ -148,3 +149,9 @@ repos:
         types: [ts, tsx]
         pass_filenames: false
         stages: [manual]
+
+      - id: hadolint
+        name: hadolint
+        entry: hadolint
+        language: system
+        types: [dockerfile]

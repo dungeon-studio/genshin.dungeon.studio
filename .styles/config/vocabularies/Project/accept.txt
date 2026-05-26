@@ -34,6 +34,7 @@ ESLint
 Prettier
 Stylelint
 Vitest
+hadolint
 markdownlint
 yamllint
 Colocate

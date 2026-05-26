@@ -30,13 +30,13 @@ COPY packages/validation/package.json ./packages/validation/
 
 RUN pnpm install --frozen-lockfile
 
-# Copy source and build — turbo handles dependency ordering via ^build
+# Copy source, build, then prune to production-only dependencies — turbo
+# handles dependency ordering via ^build, and the build must run before
+# the prune so dev dependencies are still present.
 COPY packages ./packages
 COPY apps/api ./apps/api
-RUN pnpm turbo run build --filter=@genshin/api
-
-# Install production-only dependencies
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm turbo run build --filter=@genshin/api && \
+    pnpm install --prod --frozen-lockfile
 
 # Production stage
 FROM node:25.9.0-slim
