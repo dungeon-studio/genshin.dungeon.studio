@@ -38,6 +38,11 @@ jobs:
         with:
           extra_args: --all-files eslint
 
+      - name: Run Prettier hook
+        uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: --all-files prettier
+
       - name: Run Stylelint hook
         uses: pre-commit/action@v3.0.1
         with:
