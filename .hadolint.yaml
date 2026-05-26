@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+# hadolint configuration for Dockerfile linting
+# See https://github.com/hadolint/hadolint for documentation
+
+failure-threshold: warning

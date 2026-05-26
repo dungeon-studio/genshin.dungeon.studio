@@ -61,3 +61,17 @@ jobs:
           TRIVY_CONFIG: ${{ github.workspace }}/.trivy.yaml
         with:
           extra_args: --all-files terraform_trivy
+
+      - name: Install hadolint
+        run: |
+          set -euo pipefail
+          HADOLINT_VERSION=v2.12.0
+          sudo curl -fsSL \
+            "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64" \
+            -o /usr/local/bin/hadolint
+          sudo chmod +x /usr/local/bin/hadolint
+
+      - name: Run hadolint hook
+        uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: --all-files hadolint

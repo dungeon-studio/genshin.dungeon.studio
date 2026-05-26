@@ -48,7 +48,18 @@ step "Installing reuse-tool"
 pipx install reuse==6.2.0
 
 # ---------------------------------------------------------------------------
-# 6. Playwright browsers (for Playwright MCP server)
+# 6. Dockerfile linter
+# ---------------------------------------------------------------------------
+step "Installing hadolint"
+
+HADOLINT_VERSION="v2.12.0"
+sudo curl -fsSL \
+  "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64" \
+  -o /usr/local/bin/hadolint
+sudo chmod +x /usr/local/bin/hadolint
+
+# ---------------------------------------------------------------------------
+# 7. Playwright browsers (for Playwright MCP server)
 # ---------------------------------------------------------------------------
 step "Installing Playwright Chromium and Chrome"
 
