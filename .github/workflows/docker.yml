@@ -38,31 +38,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Smoke-test container startup
-        run: |
-          set -euo pipefail
-
-          docker run -d --name api-smoke \
-            -e PORT=8080 \
-            -e FRONTEND_ORIGIN=http://localhost:5173 \
-            -p 8080:8080 \
-            api-smoke:test
-
-          # Wait for the server to be ready (up to 15 seconds)
-          for i in $(seq 1 15); do
-            if curl -fsSL http://localhost:8080/health > /dev/null 2>&1; then
-              echo "Health check passed on attempt $i"
-              break
-            fi
-            if [ "$i" -eq 15 ]; then
-              echo "Container failed to respond after 15 seconds"
-              docker logs api-smoke
-              exit 1
-            fi
-            sleep 1
-          done
-
-          # Verify the response shape
-          curl -fsSL http://localhost:8080/health | jq -e '.status == "ok"'
+        run: bash apps/api/scripts/smoke-test-container.sh
 
       - name: Dump container logs on failure
         if: failure()

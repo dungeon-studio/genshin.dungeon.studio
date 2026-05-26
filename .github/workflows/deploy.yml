@@ -50,22 +50,8 @@ jobs:
         id: firebase-config
         working-directory: infrastructure/terraform/environments/dev
         run: |
-          set -euo pipefail
           terraform init -backend=true -input=false
-          CFG=$(terraform output -json firebase_web_app_config)
-
-          echo "VITE_FIREBASE_API_KEY=$(echo "$CFG" | jq -er .api_key)" \
-            >> "$GITHUB_OUTPUT"
-          echo "VITE_FIREBASE_AUTH_DOMAIN=$(echo "$CFG" | jq -er .auth_domain)" \
-            >> "$GITHUB_OUTPUT"
-          echo "VITE_FIREBASE_PROJECT_ID=$(echo "$CFG" | jq -er .project_id)" \
-            >> "$GITHUB_OUTPUT"
-          echo "VITE_FIREBASE_STORAGE_BUCKET=$(echo "$CFG" | jq -er .storage_bucket)" \
-            >> "$GITHUB_OUTPUT"
-          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=$(echo "$CFG" \
-            | jq -er .messaging_sender_id)" >> "$GITHUB_OUTPUT"
-          echo "VITE_FIREBASE_APP_ID=$(echo "$CFG" | jq -er .app_id)" \
-            >> "$GITHUB_OUTPUT"
+          bash "$GITHUB_WORKSPACE/apps/web/scripts/firebase-config-to-outputs.sh"
 
       - name: Build
         run: pnpm turbo run build --filter=@genshin/web
