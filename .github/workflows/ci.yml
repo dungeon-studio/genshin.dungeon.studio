@@ -17,10 +17,39 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/develop' }}
 
 jobs:
-  web:
-    name: Web
+  test:
+    name: ${{ matrix.display }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - display: Web
+            filter: '@genshin/web'
+            path-prefix: apps/web
+            flag: web
+          - display: API
+            filter: '@genshin/api'
+            path-prefix: apps/api
+            flag: api
+          - display: Game Data
+            filter: '@genshin/game-data'
+            path-prefix: packages/game-data
+            flag: game-data
+          - display: Domain
+            filter: '@genshin/domain'
+            path-prefix: packages/domain
+            flag: domain
+          - display: Collection JSON
+            filter: '@genshin/collection-json'
+            path-prefix: packages/collection-json
+            flag: collection-json
+          - display: Validation
+            filter: '@genshin/validation'
+            path-prefix: packages/validation
+            flag: validation
 
     steps:
       - name: Checkout repository
@@ -28,102 +57,19 @@ jobs:
 
       - uses: ./.github/actions/node-ci
         with:
-          filter: '@genshin/web'
-          coverage-file: apps/web/coverage/lcov.info
-          results-file: apps/web/test-results/junit.xml
-          flag: web
+          filter: ${{ matrix.filter }}
+          coverage-file: ${{ matrix.path-prefix }}/coverage/lcov.info
+          results-file: ${{ matrix.path-prefix }}/test-results/junit.xml
+          flag: ${{ matrix.flag }}
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Verify Build Artifacts
+        if: matrix.flag == 'web'
         run: bash apps/web/scripts/verify-build-output.sh
-
-  api:
-    name: API
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-
-      - uses: ./.github/actions/node-ci
-        with:
-          filter: '@genshin/api'
-          coverage-file: apps/api/coverage/lcov.info
-          results-file: apps/api/test-results/junit.xml
-          flag: api
-          codecov-token: ${{ secrets.CODECOV_TOKEN }}
-
-  game-data:
-    name: Game Data
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-
-      - uses: ./.github/actions/node-ci
-        with:
-          filter: '@genshin/game-data'
-          coverage-file: packages/game-data/coverage/lcov.info
-          results-file: packages/game-data/test-results/junit.xml
-          flag: game-data
-          codecov-token: ${{ secrets.CODECOV_TOKEN }}
-
-  domain:
-    name: Domain
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-
-      - uses: ./.github/actions/node-ci
-        with:
-          filter: '@genshin/domain'
-          coverage-file: packages/domain/coverage/lcov.info
-          results-file: packages/domain/test-results/junit.xml
-          flag: domain
-          codecov-token: ${{ secrets.CODECOV_TOKEN }}
-
-  collection-json:
-    name: Collection JSON
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-
-      - uses: ./.github/actions/node-ci
-        with:
-          filter: '@genshin/collection-json'
-          coverage-file: packages/collection-json/coverage/lcov.info
-          results-file: packages/collection-json/test-results/junit.xml
-          flag: collection-json
-          codecov-token: ${{ secrets.CODECOV_TOKEN }}
-
-  validation:
-    name: Validation
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-
-      - uses: ./.github/actions/node-ci
-        with:
-          filter: '@genshin/validation'
-          coverage-file: packages/validation/coverage/lcov.info
-          results-file: packages/validation/test-results/junit.xml
-          flag: validation
-          codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
 # ---------------------------------------------------------------------------
 # Maintenance notes
-# - Add a new job when new apps or packages are added.
+# - Add a new matrix entry under strategy.matrix.include when new apps or
+#   packages are added.
 # - Keep caching strategy aligned with package manager changes.
 # ---------------------------------------------------------------------------
