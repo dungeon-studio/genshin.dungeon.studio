@@ -62,6 +62,24 @@
       "groupName": "pre-commit hooks",
       "groupSlug": "pre-commit",
       "addLabels": ["pre-commit"]
+    },
+    {
+      "description": "Bump fsfe/reuse-tool in lockstep across pre-commit and install-reuse.sh",
+      "matchDepNames": ["fsfe/reuse-tool"],
+      "groupName": "pre-commit hooks",
+      "groupSlug": "pre-commit",
+      "addLabels": ["pre-commit"]
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Track REUSE_VERSION in scripts/install-reuse.sh against fsfe/reuse-tool releases",
+      "managerFilePatterns": ["/^scripts/install-reuse\\.sh$/"],
+      "matchStrings": ["REUSE_VERSION=\"\\$\\{REUSE_VERSION:-(?<currentValue>[^}]+)\\}\""],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "fsfe/reuse-tool",
+      "extractVersionTemplate": "^v(?<version>.+)$"
     }
   ]
 }
