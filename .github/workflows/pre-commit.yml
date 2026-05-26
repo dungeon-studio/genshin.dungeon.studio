@@ -85,3 +85,8 @@ jobs:
         uses: pre-commit/action@v3.0.1
         with:
           extra_args: --all-files hadolint
+
+      - name: Run ls-lint hook
+        uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: --all-files ls-lint
