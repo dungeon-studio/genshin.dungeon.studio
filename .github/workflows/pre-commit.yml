@@ -66,3 +66,8 @@ jobs:
           TRIVY_CONFIG: ${{ github.workspace }}/.trivy.yaml
         with:
           extra_args: --all-files terraform_trivy
+
+      - name: Run Renovate config validator hook
+        uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: --all-files renovate-config-validator
