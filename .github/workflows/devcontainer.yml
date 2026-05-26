@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-name: devcontainer-validate
+name: devcontainer
 
 on:
   pull_request:
@@ -11,7 +11,7 @@ on:
       - '.vscode/extensions.json'
       - 'scripts/install-reuse.sh'
       - 'scripts/validate-workspace.ts'
-      - '.github/workflows/devcontainer-validate.yml'
+      - '.github/workflows/devcontainer.yml'
       - 'package.json'
       - 'pnpm-lock.yaml'
   push:
@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   validate:
-    name: Validate inside devcontainer
+    name: Validate
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
