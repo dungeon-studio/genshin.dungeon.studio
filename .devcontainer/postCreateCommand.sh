@@ -6,6 +6,7 @@ set -euo pipefail
 set -x
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(git -C "${SCRIPT_DIR}" rev-parse --show-toplevel)"
 # shellcheck source=lib.sh
 source "${SCRIPT_DIR}/lib.sh"
 
@@ -45,7 +46,7 @@ pre-commit install
 # ---------------------------------------------------------------------------
 step "Installing reuse-tool"
 
-pipx install reuse==6.2.0
+"${REPO_ROOT}/scripts/install-reuse.sh"
 
 # ---------------------------------------------------------------------------
 # 6. Dockerfile linter
