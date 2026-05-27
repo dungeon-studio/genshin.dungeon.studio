@@ -10,6 +10,7 @@ allowBuilds:
   '@firebase/util': true
   esbuild: true
   protobufjs: true
+  unrs-resolver: true
 
 # Ensure pnpm version compatibility
 engines:

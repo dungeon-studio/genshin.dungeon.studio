@@ -87,7 +87,7 @@
 ## Dependencies and linting
 
 - `package.json` is source of truth; run `pnpm install` and commit `pnpm-lock.yaml` after dependency changes.
-- Every import must exist in `dependencies` or `devDependencies`.
+- Every import must exist in `dependencies` or `devDependencies`. Enforced by `import-x/no-extraneous-dependencies` in every workspace `eslint.config.js`; `devDependencies` may appear in test files (`*.test.ts`, `**/test/**`) and tooling configs (`eslint.config.js`, `*.config.{ts,js}`) but never in production source.
 - Classify packages correctly:
   - `dependencies`: runtime code shipped to production.
   - `devDependencies`: build tools, plugins, type definitions, and local tooling.
