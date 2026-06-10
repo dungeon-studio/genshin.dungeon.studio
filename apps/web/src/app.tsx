@@ -6,7 +6,7 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 import { Layout } from './components/layout';
 import { Toaster } from './components/ui/sonner';
-import { AuthProvider } from './features/auth';
+import { AuthProvider, ProfilePage, ProtectedRoute } from './features/auth';
 import { CharactersPage } from './pages/characters-page';
 import { NotFoundPage } from './pages/not-found-page';
 import { TeamsPage } from './pages/teams-page';
@@ -24,6 +24,9 @@ export function App() {
               <Route path="/" element={<TeamsPage />} />
               <Route path="/characters" element={<CharactersPage />} />
               <Route path="/weapons" element={<WeaponsPage />} />
+              <Route element={<ProtectedRoute />}>
+                <Route path="/profile" element={<ProfilePage />} />
+              </Route>
               <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Routes>

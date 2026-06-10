@@ -46,16 +46,21 @@ export function Header() {
 function UserMenu({ user }: { user: { displayName: string | null; photoURL: string | null } }) {
   return (
     <div className="flex items-center gap-3">
-      {user.photoURL ? (
-        <img
-          src={user.photoURL}
-          alt=""
-          aria-hidden="true"
-          className="h-8 w-8 rounded-full"
-          referrerPolicy="no-referrer"
-        />
-      ) : null}
-      <span className="text-sm font-medium text-foreground">{user.displayName ?? 'User'}</span>
+      <Link
+        to="/profile"
+        className="flex items-center gap-3 text-foreground hover:text-foreground/80"
+      >
+        {user.photoURL ? (
+          <img
+            src={user.photoURL}
+            alt=""
+            aria-hidden="true"
+            className="h-8 w-8 rounded-full"
+            referrerPolicy="no-referrer"
+          />
+        ) : null}
+        <span className="text-sm font-medium">{user.displayName ?? 'User'}</span>
+      </Link>
       <LogoutButton />
     </div>
   );

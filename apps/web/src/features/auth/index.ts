@@ -4,5 +4,6 @@
 export { AuthProvider } from './auth-provider';
 export { LoginButton } from './login-button';
 export { LogoutButton } from './logout-button';
+export { ProfilePage } from './profile-page';
 export { ProtectedRoute } from './protected-route';
 export { useAuth } from './use-auth';
