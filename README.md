@@ -18,7 +18,7 @@ SPDX-License-Identifier: MIT
 
 # Genshin Planner
 
-By [Alex Brandt](https://github.com/alunduil) · [Repository](https://github.com/dungeon-studio/genshin.dungeon.studio)
+By [Alex Brandt](https://github.com/alunduil) · [Repository](https://github.com/dungeon-studio/genshin.dungeon.studio) · [Try it](https://develop.genshin.dungeon.studio)
 
 🔬 **Alpha**: core features work end-to-end; expect rough edges. Contributors welcome.
 
@@ -37,7 +37,7 @@ Anyone who plays Genshin Impact and wants to:
 
 ## Getting started
 
-The quickest way to explore the project or contribute is to use VS Code with DevContainers:
+The quickest way to explore the project or contribute is to use VS Code with DevContainers. You'll need [Docker](https://www.docker.com/get-started/), [VS Code](https://code.visualstudio.com/), and the [DevContainers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) installed first.
 
 1. **Clone and open** in VS Code
 2. Click **"Reopen in Container"** when prompted
@@ -52,4 +52,6 @@ See the [Manual Setup Guide](./docs/how-tos/manual-setup.md) for Node.js 20+ and
 ## Learn more
 
 - **Contributing**: See [CONTRIBUTING.md](./CONTRIBUTING.md) for development workflow and how to help
+- **Documentation**: Browse [docs/](./docs/) for how-tos, references, and explanations
 - **Planning & Roadmap**: See [GitHub Issues & Milestones](https://github.com/dungeon-studio/genshin.dungeon.studio/milestones) for what's next
+- **License**: [MIT](./LICENSE)
