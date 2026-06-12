@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+# lychee link checker configuration.
+#
+# Internal links (on-disk file paths) are verified on every pull request and
+# block merge. External URLs are verified on a weekly schedule and reported via
+# a GitHub issue rather than blocking, since transient outages and rate limits
+# make per-PR external checks flaky. See .github/workflows/link-check.yml.
+
+# Skip vendored dependencies and build output; only project docs are ours to
+# keep healthy. A "**/*.md" glob expands into these otherwise.
+exclude_path = [
+  "node_modules",
+  ".pnpm-store",
+  "dist",
+  "build",
+  ".turbo",
+  ".styles",
+]
+
+# Cache results so the weekly external run doesn't re-request every URL.
+cache = true
+max_cache_age = "2d"
+
+# Local dev servers referenced in docs (e.g. http://localhost:8080) aren't
+# reachable from CI; treat loopback addresses as valid.
+exclude_loopback = true
+
+# Accept rate-limited and auth-gated responses as live rather than broken.
+accept = ["200..=299", "403", "429"]

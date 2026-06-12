@@ -1,0 +1,74 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+name: Link Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+      - main
+  schedule:
+    # Mondays at 06:00 UTC.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/main' }}
+
+jobs:
+  # Internal cross-references must resolve on disk. Runs on every pull request
+  # (no path filter, so it always reports a status and is safe to require) and
+  # blocks merge on failure. --offline skips all network requests.
+  internal:
+    name: Internal Links
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Check internal links
+        uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2.8.0
+        with:
+          args: --offline --no-progress "**/*.md"
+          fail: true
+
+  # External URLs rot independently of our changes, so checking them per-PR
+  # produces flaky failures. Instead, verify them weekly and open an issue when
+  # something breaks. Never blocks.
+  external:
+    name: External Links
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Check all links
+        id: lychee
+        uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2.8.0
+        with:
+          args: --no-progress "**/*.md"
+          fail: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Open issue on broken links
+        if: steps.lychee.outputs.exit_code != 0
+        uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6.0.0
+        with:
+          title: Link Checker Report
+          content-filepath: ./lychee/out.md
+          labels: documentation
