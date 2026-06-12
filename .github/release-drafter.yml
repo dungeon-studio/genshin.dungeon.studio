@@ -25,6 +25,9 @@ categories:
     labels:
       - 'dependencies'
       - 'automated'
+  - title: '🧰 Chores'
+    labels:
+      - 'chore'
 
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&'
@@ -43,6 +46,7 @@ version-resolver:
       - 'documentation'
       - 'dependencies'
       - 'automated'
+      - 'chore'
   default: patch
 
 # Apply category labels from conventional-commit PR titles so the categories
@@ -64,6 +68,10 @@ autolabeler:
   - label: 'dependencies'
     title:
       - '/^(chore|build|fix)\(deps(-dev)?\)/i'
+  - label: 'chore'
+    title:
+      - '/^(chore|build)(?!\(deps)(\(.+\))?:/i'
+      - '/^(ci|style|refactor|test|perf)(\(.+\))?:/i'
   - label: 'breaking-change'
     title:
       - '/^\w+(\(.+\))?!:/'
