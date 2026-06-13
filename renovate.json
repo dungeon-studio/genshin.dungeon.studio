@@ -7,6 +7,7 @@
   "labels": ["dependencies", "automated"],
   "reviewers": ["alunduil"],
   "branchPrefix": "renovate/",
+  "rangeStrategy": "pin",
   "minimumReleaseAge": "3 days",
   "internalChecksFilter": "strict",
   "osvVulnerabilityAlerts": true,

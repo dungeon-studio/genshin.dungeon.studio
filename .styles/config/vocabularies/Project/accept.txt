@@ -37,6 +37,7 @@ Vitest
 hadolint
 markdownlint
 yamllint
+syncpack
 Colocate
 middleware
 tooltip
