@@ -38,6 +38,12 @@ exclude-labels:
   - 'invalid'
   - 'wontfix'
 
+# Strip the conventional-commit prefix from each bullet; the category heading
+# already conveys the type, so 'feat: add X' reads as 'add X'.
+replacers:
+  - search: '/^(\s*-\s)(?:feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(?:\([^)]*\))?!?:\s+/gim'
+    replace: '$1'
+
 version-resolver:
   major:
     labels:
