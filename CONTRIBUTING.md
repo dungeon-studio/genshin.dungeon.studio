@@ -220,6 +220,39 @@ When creating release branches, derive the name from the root `package.json` ver
 
 ---
 
+## Changelog
+
+[CHANGELOG.md](CHANGELOG.md) is hand-curated and follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). It's a separate artifact from the GitHub Release notes that [Release Drafter](.github/release-drafter.yml) aggregates from merged pull requests: the release notes stay pull-request-centric for GitHub readers, while the changelog stays curated for humans.
+
+### When to add an entry
+
+Add a line to the `[Unreleased]` section when your pull request changes something a user of the deployed app would notice: a new or removed feature, a change to existing behavior, a user-facing bug fix, or a security fix. Skip internal refactors, test-only changes, dependency bumps users don't perceive, and documentation fixes—those belong in the commit history, not the changelog.
+
+The test: would a user notice or care? If not, leave the changelog alone.
+
+### Current format
+
+Until `0.1.0` ships, the project has no released version to describe deltas from, so every entry collects under a single `### Added` bucket. Once the first release cuts, later unreleased changes split into the standard sections below.
+
+### Categorizing entries (after the first release)
+
+Classify each kept change by what the user experiences, using your commit type as a guide:
+
+- `feat:` → **Added**
+- `fix:` → **Fixed**
+- `feat(security):` / `fix(security):` → **Security**
+- a breaking removal (`feat!:`, `remove:`) → **Removed**
+- a breaking deprecation (`deprecate:`) → **Deprecated**
+- a user-visible change to existing behavior (`refactor:`, `chore:`, `docs:` only when the change is user-facing) → **Changed**
+
+Most `docs:`, `refactor:`, `chore:`, `style:`, and `test:` commits produce no changelog entry at all, since they aren't user-visible. The map tells you which section to use _if_ the change clears the "would a user notice?" test, not that every commit of that type earns a line.
+
+### At release time
+
+Freeze the `[Unreleased]` section into a versioned section (`## [X.Y.Z] - YYYY-MM-DD`), add its comparison link at the bottom of the file, and start a fresh empty `[Unreleased]`. The Release Drafter output is a useful prompt for what merged since the last release, but copy and curate—don't paste the raw pull-request log.
+
+---
+
 ## Platform compatibility
 
 This project runs on Windows, macOS, and Linux.

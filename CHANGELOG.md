@@ -5,7 +5,13 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+This project hasn't yet cut its first release, so every entry collects under a
+single `### Added` bucket in `[Unreleased]`. Once `0.1.0` ships, later unreleased
+changes split into the standard Added, Changed, Deprecated, Removed, Fixed, and
+Security sections, since they then describe deltas from a shipped release.
 
 ## [Unreleased]
 
