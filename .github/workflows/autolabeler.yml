@@ -1,0 +1,37 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+name: Autolabeler
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  autolabel:
+    name: Autolabel Pull Request
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: release-drafter/release-drafter/autolabeler@693d20e7c1ce1a81d3a41962f85914253b518449 # v7.3.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+# ---------------------------------------------------------------------------
+# Maintenance notes
+# - Rules (label <- PR-title prefix) live in .github/release-drafter.yml under
+#   the autolabeler key.
+# - Labels same-repo PRs only; fork PRs run with a read-only token. Switch the
+#   trigger to pull_request_target to label fork PRs (see the release-drafter
+#   README) once outside contributions arrive.
+# ---------------------------------------------------------------------------
