@@ -1,0 +1,17 @@
+{
+  "versionGroups": [
+    {
+      "label": "Local packages must use the workspace protocol",
+      "dependencies": ["$LOCAL"],
+      "dependencyTypes": ["dev", "prod"],
+      "pinVersion": "workspace:*"
+    }
+  ],
+  "semverGroups": [
+    {
+      "label": "Pin every external dependency to an exact version (no ^ or ~)",
+      "dependencyTypes": ["prod", "dev", "peer", "resolutions", "overrides", "pnpmOverrides"],
+      "range": ""
+    }
+  ]
+}
