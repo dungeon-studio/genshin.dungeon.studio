@@ -3,6 +3,8 @@
 
 import { NavLink } from 'react-router-dom';
 
+import { Container } from '@/components/container';
+
 export function Nav() {
   const navLinks = [
     { to: '/', label: 'Teams' },
@@ -12,7 +14,7 @@ export function Nav() {
 
   return (
     <nav className="border-b border-border bg-muted" aria-label="Main navigation">
-      <div className="mx-auto max-w-7xl px-4">
+      <Container>
         <div className="flex gap-8">
           {navLinks.map((link) => (
             <NavLink
@@ -31,7 +33,7 @@ export function Nav() {
             </NavLink>
           ))}
         </div>
-      </div>
+      </Container>
     </nav>
   );
 }
