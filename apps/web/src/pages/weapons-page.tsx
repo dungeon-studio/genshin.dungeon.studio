@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import type { WeaponType } from '@genshin/game-data';
 import { WEAPON_TYPES } from '@genshin/game-data';
 
+import { Container } from '@/components/container';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
@@ -106,7 +107,7 @@ export function WeaponsPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-12">
+      <Container className="py-12">
         <h1 className="sr-only">Weapons</h1>
         <div className="flex items-center justify-center py-24">
           <Loader2
@@ -116,7 +117,7 @@ export function WeaponsPage() {
           />
           <span className="sr-only">Loading collection</span>
         </div>
-      </div>
+      </Container>
     );
   }
 
@@ -125,7 +126,7 @@ export function WeaponsPage() {
       <h1 className="sr-only">Weapons</h1>
 
       <div className="sticky top-0 z-10 bg-background shadow-sm">
-        <div className="mx-auto max-w-7xl px-4 py-4">
+        <Container className="py-4">
           {error && (
             <p className="mb-3 rounded-md bg-destructive/10 px-4 py-3 text-center text-sm text-destructive">
               Failed to sync weapon collection.
@@ -139,10 +140,10 @@ export function WeaponsPage() {
             ownedCount={ownedWeaponIds.size}
             filteredOwnedCount={filteredOwnedCount}
           />
-        </div>
+        </Container>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 pb-12 pt-4">
+      <Container className="pb-12 pt-4">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredWeapons.map((weapon) => (
             <WeaponCard
@@ -158,7 +159,7 @@ export function WeaponsPage() {
         {filteredWeapons.length === 0 && (
           <p className="py-12 text-center text-muted-foreground">No weapons match your filters.</p>
         )}
-      </div>
+      </Container>
 
       <WeaponInstanceSidebar
         weaponId={effectiveSelectedWeaponId}

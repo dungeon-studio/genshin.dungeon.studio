@@ -3,12 +3,14 @@
 
 import { GAME_DATA_VERSION } from '@genshin/game-data';
 
+import { Container } from '@/components/container';
+
 const GITHUB_REPO = 'https://github.com/dungeon-studio/genshin.dungeon.studio';
 
 export function Footer() {
   return (
     <footer className="border-t border-border bg-muted py-8">
-      <div className="mx-auto max-w-7xl px-4 text-center text-sm text-muted-foreground">
+      <Container className="text-center text-sm text-muted-foreground">
         <nav aria-label="Footer">
           <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2">
             <li>
@@ -67,7 +69,7 @@ export function Footer() {
           Game data current as of {GAME_DATA_VERSION}
         </p>
         <p className="mt-1 text-xs text-muted-foreground/70">© 2026 Dungeon Studio</p>
-      </div>
+      </Container>
     </footer>
   );
 }
