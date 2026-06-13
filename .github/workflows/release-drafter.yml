@@ -1,0 +1,41 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+name: Release Drafter
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  update_release_draft:
+    name: Update Release Draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: read
+
+    steps:
+      - uses: release-drafter/release-drafter@693d20e7c1ce1a81d3a41962f85914253b518449 # v7.3.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+# ---------------------------------------------------------------------------
+# Maintenance notes
+# - Configuration (categories, autolabeler, version-resolver) lives in
+#   .github/release-drafter.yml.
+# - PR labeling is a separate concern; see .github/workflows/autolabeler.yml.
+# - Notes are collected from PRs merged into develop (commitish in the config).
+#   At release time, publish the running draft and set its tag target to the
+#   main merge commit so the tag lands on main per git flow.
+# ---------------------------------------------------------------------------

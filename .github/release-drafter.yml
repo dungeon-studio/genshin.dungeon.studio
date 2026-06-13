@@ -1,0 +1,96 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+
+# Collect notes from PRs merged into develop. The tag is retargeted to main at
+# publish time (git flow); see .github/workflows/release-drafter.yml.
+commitish: refs/heads/develop
+
+categories:
+  - title: '🚀 Features'
+    labels:
+      - 'enhancement'
+  - title: '🐛 Fixes'
+    labels:
+      - 'bug'
+  - title: '🔒 Security'
+    labels:
+      - 'security'
+  - title: '📝 Documentation'
+    labels:
+      - 'documentation'
+  - title: '⬆️ Dependencies'
+    labels:
+      - 'dependencies'
+      - 'automated'
+  - title: '🧰 Chores'
+    labels:
+      - 'chore'
+
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-title-escapes: '\<*_&'
+
+# Keep triage-only pull requests out of the notes.
+exclude-labels:
+  - 'duplicate'
+  - 'invalid'
+  - 'wontfix'
+
+# Strip the conventional-commit prefix from each bullet; the category heading
+# already conveys the type, so 'feat: add X' reads as 'add X'.
+replacers:
+  - search: '/^(\s*-\s)(?:feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(?:\([^)]*\))?!?:\s+/gim'
+    replace: '$1'
+
+version-resolver:
+  major:
+    labels:
+      - 'breaking-change'
+  minor:
+    labels:
+      - 'enhancement'
+  patch:
+    labels:
+      - 'bug'
+      - 'security'
+      - 'documentation'
+      - 'dependencies'
+      - 'automated'
+      - 'chore'
+  default: patch
+
+# Apply category labels from conventional-commit PR titles so the categories
+# above are driven by commit prefixes without manual labeling. A breaking-change
+# marker (type!:) adds the major-bump label on top of the type label.
+autolabeler:
+  - label: 'enhancement'
+    title:
+      - '/^feat(\(.+\))?!?:/i'
+  - label: 'bug'
+    title:
+      - '/^fix(\(.+\))?!?:/i'
+  - label: 'documentation'
+    title:
+      - '/^docs(\(.+\))?:/i'
+  - label: 'security'
+    title:
+      - '/^(feat|fix|chore)\(security\)/i'
+  - label: 'dependencies'
+    title:
+      - '/^(chore|build|fix)\(deps(-dev)?\)/i'
+  - label: 'chore'
+    title:
+      - '/^(chore|build)(?!\(deps)(\(.+\))?:/i'
+      - '/^(ci|style|refactor|test|perf)(\(.+\))?:/i'
+  - label: 'breaking-change'
+    title:
+      - '/^\w+(\(.+\))?!:/'
+
+template: |
+  ## What's Changed
+
+  $CHANGES
+
+  **Full Changelog**: https://github.com/$OWNER/$REPO/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
