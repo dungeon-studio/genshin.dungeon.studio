@@ -11,7 +11,7 @@ Follow the conventions in [code-generation.instructions.md](code-generation.inst
 
 Create a new page component at `apps/web/src/pages/${input:pageName}Page.tsx`.
 
-Use [CharactersPage.tsx](../../apps/web/src/pages/CharactersPage.tsx) as a reference for
+Use [characters-page.tsx](../../apps/web/src/pages/characters-page.tsx) as a reference for
 structure and style.
 
 ## Requirements
@@ -26,7 +26,7 @@ structure and style.
 2. Use a named function export: `export function ${input:pageName}Page()`.
 3. Use semantic HTML with a `<div className="mx-auto max-w-7xl px-4 py-12">` wrapper.
 4. Include an `<h1>` heading as the first visible content.
-5. Add the route to [App.tsx](../../apps/web/src/App.tsx) inside the
+5. Add the route to [app.tsx](../../apps/web/src/app.tsx) inside the
    `<Route element={<Layout />}>` group.
 6. Import the page: `import { ${input:pageName}Page } from './pages/${input:pageName}Page';`.
 7. Run `pnpm typecheck` to verify the new route compiles.
