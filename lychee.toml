@@ -9,19 +9,17 @@
 # make per-PR external checks flaky. See .github/workflows/link-check.yml.
 
 # Skip vendored dependencies and build output; only project docs are ours to
-# keep healthy. A "**/*.md" glob expands into these otherwise.
+# keep healthy. A "**/*.md" glob expands into these otherwise. Entries are
+# regex anchored to a path segment so they can't match a legitimate file such
+# as docs/how-to-build.md.
 exclude_path = [
-  "node_modules",
-  ".pnpm-store",
-  "dist",
-  "build",
-  ".turbo",
-  ".styles",
+  "(^|/)node_modules/",
+  "(^|/)\\.pnpm-store/",
+  "(^|/)dist/",
+  "(^|/)build/",
+  "(^|/)\\.turbo/",
+  "(^|/)\\.styles/",
 ]
-
-# Cache results so the weekly external run doesn't re-request every URL.
-cache = true
-max_cache_age = "2d"
 
 # Local dev servers referenced in docs (e.g. http://localhost:8080) aren't
 # reachable from CI; treat loopback addresses as valid.

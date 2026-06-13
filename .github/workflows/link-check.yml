@@ -10,10 +10,10 @@ on:
       - develop
       - main
   schedule:
-    # Fridays at 18:00 Europe/London. GitHub cron is UTC-only with no DST,
-    # so this is pinned to 17:00 UTC (18:00 BST); during GMT/winter it fires
-    # at 17:00 London.
-    - cron: '0 17 * * 5'
+    # Fridays at 18:00 Europe/London. The timezone field (GitHub Actions
+    # support added March 2026) handles BST/GMT automatically.
+    - cron: '0 18 * * 5'
+      timezone: Europe/London
   workflow_dispatch:
 
 permissions:
