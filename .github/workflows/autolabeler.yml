@@ -29,8 +29,8 @@ jobs:
 
 # ---------------------------------------------------------------------------
 # Maintenance notes
-# - Rules (label <- PR-title prefix) live in .github/release-drafter.yml under
-#   the autolabeler key.
+# - Rules live in .github/release-drafter.yml under the autolabeler key: type
+#   labels from the PR-title prefix, component labels from changed file paths.
 # - Labels same-repo PRs only; fork PRs run with a read-only token. Switch the
 #   trigger to pull_request_target to label fork PRs (see the release-drafter
 #   README) once outside contributions arrive.
