@@ -220,6 +220,14 @@ When creating release branches, derive the name from the root `package.json` ver
 
 ---
 
+## Changelog
+
+[CHANGELOG.md](CHANGELOG.md) is hand-curated and follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). It's a separate artifact from the GitHub Release notes that [Release Drafter](.github/release-drafter.yml) aggregates from merged pull requests: the release notes stay pull-request-centric for GitHub readers, while the changelog stays curated for humans.
+
+When your pull request changes something a user of the deployed app would notice—a new or removed feature, a change to existing behavior, a user-facing bug fix, or a security fix—add a line under `### Added` in the `[Unreleased]` section. Skip internal refactors, test-only changes, dependency bumps users don't perceive, and documentation fixes. The test is whether a user would notice or care. The [CHANGELOG.md](CHANGELOG.md) header describes the entry layout before and after the first release.
+
+---
+
 ## Platform compatibility
 
 This project runs on Windows, macOS, and Linux.
