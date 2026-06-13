@@ -32,6 +32,7 @@ ci:
     - prettier
     - stylelint
     - typescript-check
+    - knip
     - terraform_fmt
     - terraform_trivy
     - renovate-config-validator
@@ -152,6 +153,17 @@ repos:
         language: system
         types: [ts, tsx]
         pass_filenames: false
+        stages: [manual]
+
+      # knip analyzes the whole workspace graph, so it can't be file-scoped.
+      # Manual stage like typescript-check: run with `pre-commit run knip
+      # --hook-stage manual`; every PR is enforced by knip.yml.
+      - id: knip
+        name: knip (unused files, dependencies, exports)
+        entry: pnpm exec knip
+        language: system
+        pass_filenames: false
+        always_run: true
         stages: [manual]
 
       - id: hadolint

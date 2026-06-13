@@ -1,0 +1,43 @@
+// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+// SPDX-License-Identifier: MIT
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+
+  // `reuse` is a Python tool installed via scripts/install-reuse.sh, not an npm
+  // package; the `reuse:check` script invokes it as a binary knip can't resolve.
+  "ignoreBinaries": ["reuse"],
+
+  "workspaces": {
+    ".": {
+      // stylelint runs at the repo root via pre-commit (`pnpm exec stylelint`),
+      // which knip can't see; its config and a workspace-local copy live in
+      // apps/web. Neither root devDependency is referenced by a root config.
+      "ignoreDependencies": ["stylelint", "stylelint-config-standard"]
+    },
+    "apps/api": {
+      // verify-deployment.ts is a deploy-time entry invoked from deploy.yml,
+      // not imported by application code.
+      "entry": ["scripts/verify-deployment.ts"]
+    },
+    "apps/web": {
+      // env.d.ts holds Vite ambient client types referenced via tsconfig, not imports.
+      "ignore": ["src/env.d.ts"],
+      // prettier-plugin-tailwindcss is declared but not yet wired into a prettier
+      // config; tracked for removal/wiring in the export-cleanup follow-up.
+      "ignoreDependencies": ["prettier-plugin-tailwindcss"]
+    }
+  },
+
+  // Unused exports/types across the existing codebase mix intentional public
+  // surface (versioned `V0*` schemas kept for document migration, the shadcn
+  // components/ui kit) with genuine dead code. Report them without blocking CI
+  // until they're triaged; see the export-cleanup follow-up issue.
+  "rules": {
+    "exports": "warn",
+    "types": "warn",
+    "nsExports": "warn",
+    "nsTypes": "warn",
+    "enumMembers": "warn",
+    "duplicates": "warn"
+  }
+}

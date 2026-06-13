@@ -28,6 +28,7 @@ Dockerfile
 
 # Code quality tools
 Codecov
+knip
 jq
 pipx
 ESLint
@@ -45,6 +46,7 @@ tooltip
 config
 configs
 formatters
+enum
 
 # Backend and database
 Firebase
