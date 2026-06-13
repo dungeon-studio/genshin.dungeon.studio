@@ -3,131 +3,53 @@ SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 SPDX-License-Identifier: MIT
 -->
 
-# How to add Genshin Impact weapons
+# How to update Genshin Impact weapons
 
-<!-- vale alex.ProfanityUnlikely = NO -->
-
-Add new weapon data to the game-data package when Genshin Impact releases new weapons.
-
-<!-- vale alex.ProfanityUnlikely = YES -->
+A generator builds the `WEAPONS` array in `packages/game-data/src/weapons.ts`
+from the offline [`genshin-db`](https://www.npmjs.com/package/genshin-db)
+dataset. Don't hand-edit weapon entries: the region between the
+`BEGIN GENERATED WEAPONS` and `END GENERATED WEAPONS` markers is overwritten on
+every regeneration.
 
 ## When to update
 
-<!-- vale alex.ProfanityUnlikely = NO -->
-
-- Genshin Impact releases new 5-star, 4-star, or 3-star weapons.
-- The game updates weapon balance significantly.
-- Developers add or modify passive effects.
-
-<!-- vale alex.ProfanityUnlikely = YES -->
-
-## Prerequisites
-
-- Access to [Genshin Impact Wiki - Weapons](https://genshin-impact.fandom.com/wiki/Weapons)
-- Familiarity with the game-data package structure
+- A new game version ships weapons and `genshin-db` has published a release covering them.
+- A weapon's stats or passive text changed upstream.
 
 ## Steps
 
-### 1. Gather information
+### 1. Bump `genshin-db`
 
-From the wiki, collect:
-
-- Name and ID
-
-<!-- vale alex.ProfanityUnlikely = NO -->
-<!-- vale alex.ProfanityMaybe = NO -->
-<!-- vale Google.Parens = NO -->
-
-- Type, rarity, base Attack (ATK)
-
-<!-- vale alex.ProfanityUnlikely = YES -->
-<!-- vale alex.ProfanityMaybe = YES -->
-<!-- vale Google.Parens = YES -->
-
-- Secondary stat, if any
-- Passive ability name and description
-- Release version, for example, "1.0," "2.1," "5.2"
-
-### 2. Update `packages/game-data/src/weapons.ts`
-
-<!-- vale alex.ProfanityUnlikely = NO -->
-
-Add the weapon to the `WEAPONS` array. Use the `Weapon` interface:
-
-<!-- vale alex.ProfanityUnlikely = YES -->
-
-```typescript
-interface Weapon {
-  id: string; // kebab-case unique identifier
-  name: string; // Display name
-  type: WeaponType; // Use WEAPON_TYPES constants
-  rarity: Rarity; // Rarity level (1–5; this package typically uses 3–5)
-  baseATK: number; // Base Attack (ATK) value
-  version: string; // Release version (for example, "1.0", "2.1", "5.2")
-  subStat?: {
-    // Optional secondary stat
-    type: WeaponStatType;
-    value: number;
-  };
-  passiveName?: string; // Passive ability name
-  passiveDescription?: string; // Passive ability text
-}
-```
-
-**Example:**
-
-```typescript
-{
-  id: 'staff-of-homa',
-  name: 'Staff of Homa',
-  type: 'Polearm',
-  rarity: 5,
-  baseATK: 46,
-  version: '1.5',
-  subStat: {
-    type: WEAPON_STAT_TYPES.CRIT_DMG,
-    value: 14.4,
-  },
-  passiveName: 'Reckless Cinnabar',
-  passiveDescription: 'HP is increased. The wielder receives an ATK bonus based on Max HP.',
-}
-```
-
-### 3. Keep array organized
-
-Group weapons by:
-
-- Type
-- Rarity within each type: 5-star first, then 4-star, then 3-star
-- Release date within each category
-
-### 4. Update version comment
-
-Update the version comment at the top of `weapons.ts` with the latest version and a brief description of the changes.
-
-### 5. Verify and test
+`genshin-db` ships a release per game patch every six weeks or so. Renovate opens
+the bump automatically. To do it by hand:
 
 ```bash
-# Type check
-pnpm --filter @genshin/game-data typecheck
-
-# Build
-pnpm --filter @genshin/game-data build
-
-# Lint
-pnpm --filter @genshin/game-data lint
+pnpm --filter @genshin/game-data up genshin-db
 ```
 
-## Tips
+### 2. Regenerate the roster
 
-<!-- vale alex.ProfanityUnlikely = NO -->
+```bash
+pnpm --filter @genshin/game-data generate:weapons
+```
 
-- Use lowercase, kebab-case for IDs, for example, `mistsplitter-reforged`, `lost-prayer-to-the-sacred-winds`.
-- You can find base ATK values on the wiki for each weapon.
-- Copy passive descriptions directly from in-game text for accuracy.
-- Consider the primary users when adding to the list.
+This rewrites the `WEAPONS` array with the full obtainable roster of 3-star to
+5-star weapons, sorted 5-star first, then by version descending. Review the
+resulting diff: it's the human-readable record of what changed in the data.
 
-<!-- vale alex.ProfanityUnlikely = YES -->
+### 3. Verify
+
+```bash
+pnpm turbo run typecheck test lint --filter @genshin/game-data
+```
+
+## Adding a new sub-stat
+
+`genshin-db` reports each sub-stat as a `FIGHT_PROP_*` constant. If a weapon
+introduces a sub-stat not yet in `WEAPON_STAT_TYPES`, the generator throws with
+the unmapped name. Add the member to `WEAPON_STAT_TYPES` in `weapons.ts` and its
+mapping to `STAT_TYPE_KEY_BY_GENSHIN_DB` in `scripts/generate-weapons.ts`, then
+regenerate.
 
 ## See also
 

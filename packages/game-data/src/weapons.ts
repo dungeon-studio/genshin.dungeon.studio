@@ -26,6 +26,8 @@ export const WEAPON_STAT_TYPES = {
   ENERGY_RECHARGE: 'Energy Recharge',
   ELEMENTAL_MASTERY: 'Elemental Mastery',
   PHYSICAL_DMG: 'Physical DMG Bonus',
+  HP_PERCENT: 'HP%',
+  DEF_PERCENT: 'DEF%',
 } as const;
 
 export type WeaponStatType = (typeof WEAPON_STAT_TYPES)[keyof typeof WEAPON_STAT_TYPES];
@@ -48,14 +50,743 @@ export interface Weapon {
   passiveDescription?: string;
 }
 
-/**
- * Weapon data
- * Currently contains starter set of popular weapons (16 of ~220)
- * See #145 for automated parser to expand to complete weapon roster
- * Sorted by rarity (5-star first), then by version descending (newest first)
- */
+// BEGIN GENERATED WEAPONS — regenerate with: pnpm --filter @genshin/game-data generate:weapons
 export const WEAPONS: Weapon[] = [
-  // 5-Star Swords
+  {
+    id: 'angelos-heptades',
+    name: "Angelos' Heptades",
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 49,
+    version: '6.6',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 3.6,
+    },
+    passiveName: 'Crown of the Final Scion',
+    passiveDescription:
+      'ATK is increased by 12%. After the equipping character creates a Shield, they gain "Pathfinder\'s Light" for 20s: Increases your active party member\'s DMG by 10% for every 1,000 ATK the equipping character has, up to a maximum of 26%. Additionally, when the equipping character creates a Shield, they will also gain "Guide\'s Contentment": Restores 14 Elemental Energy to the equipping character. The aforementioned effect can trigger once every 14s, and can also be triggered when any type of chest is opened outside of combat. The equipping character may trigger this effect even when they are an off-field.\nHexerei: Secret Rite: When your own Hexerei character is off-field in the party, they will also gain 50% of the DMG increase from Pathfinder\'s Light.',
+  },
+  {
+    id: 'disaster-and-remorse',
+    name: 'Disaster and Remorse',
+    type: 'Polearm',
+    rarity: 5,
+    baseATK: 48,
+    version: '6.6',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 4.8,
+    },
+    passiveName: 'Dolorous Stroke',
+    passiveDescription:
+      'After the equipping character uses an Elemental Skill, they gain "Path of Conflict" for 17s, as well as "Unforgivable" and "Irreparable" for 3s each. This effect can trigger once every 18s.\nUnforgivable: Increases the equipping character\'s Normal Attack and Charged Attack DMG by 40%.\nIrreparable: Increases the equipping character\'s Elemental Skill and Elemental Burst DMG by 40%.\nWhile Path of Conflict is in effect, when the equipping character hits an opponent with a Normal Attack or Charged Attack, Irreparable\'s duration will be increased by 1s. When the equipping character hits an opponent with their Elemental Skill or Elemental Burst, Unforgivable\'s duration will be increased by 1s. Each of the above effects can be triggered once every 0.1s. When Path of Conflict ends or the equipping character leaves the field, both Unforgivable and Irreparable will be removed.\nHexerei: Secret Rite: The above DMG boosts are increased by 75%.',
+  },
+  {
+    id: 'golden-frostbound-oath',
+    name: 'Golden Frostbound Oath',
+    type: 'Bow',
+    rarity: 5,
+    baseATK: 44,
+    version: '6.5',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 19.2,
+    },
+    passiveName: "Dawn's Salutation Returned",
+    passiveDescription:
+      "Increase DEF by 16%. When the equipping character's Elemental Skill or Lunar-Crystallize attacks hit opponents, gain the Frost Fae's Favor effect for 6s: Geo DMG inflicted by the equipping character increases by 40%, Lunar-Crystallize Reaction DMG increases by 40%. While this effect is active, if there are Moondrifts near the equipping character, all other nearby party members will gain the Frost Fae's Mischief effect: Geo DMG dealt increases by 20% and Lunar-Crystallize Reaction DMG increases by 20%. This effect can be triggered even when the equipping character is off-field.",
+  },
+  {
+    id: 'gest-of-the-mighty-wolf',
+    name: 'Gest of the Mighty Wolf',
+    type: 'Claymore',
+    rarity: 5,
+    baseATK: 46,
+    version: '6.4',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 7.2,
+    },
+    passiveName: 'Indomitable Chivalry',
+    passiveDescription:
+      "Increase ATK SPD by 10%. Every time the equipping character's Normal Attack(s) hit opponent(s), when they cast their Elemental Skill, or when they begin their Charged Attack(s), gain 1/2/2 stacks of Four Winds' Hymn respectively: DMG dealt is increased by 7.5% for 4s. Max 4 stacks. This effect can be triggered once every 0.01s.\nAdditionally, when the party has the \"Hexerei: Secret Rite\" effect, each stack of Four Winds' Hymn also increases the equipping character's CRIT DMG by 7.5%.",
+  },
+  {
+    id: 'lightbearing-moonshard',
+    name: 'Lightbearing Moonshard',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 44,
+    version: '6.3',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 19.2,
+    },
+    passiveName: 'Legacy of Lang-Gan',
+    passiveDescription:
+      'Increases DEF by 20%. DMG inflicted by Lunar-Crystallize reactions increases by 64% for 5s after the equipping character uses an Elemental Skill.',
+  },
+  {
+    id: 'nocturnes-curtain-call',
+    name: "Nocturne's Curtain Call",
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 44,
+    version: '6.3',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 19.2,
+    },
+    passiveName: 'Ballad of the Crossroads',
+    passiveDescription:
+      "Max HP increases by 10%. When triggering Lunar reactions or inflicting Lunar Reaction DMG on opponents, the equipping character will recover 14 Energy, and receive the Bountiful Sea's Sacred Wine effect for 12s: Max HP increases by an additional 14%, CRIT DMG from Lunar Reaction DMG increases by 60%. The Energy recovery effect can be triggered at most once every 18s, and can be triggered even when the equipping character is off-field.",
+  },
+  {
+    id: 'athame-artis',
+    name: 'Athame Artis',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 46,
+    version: '6.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 7.2,
+    },
+    passiveName: "Day King's Splendor Solis",
+    passiveDescription:
+      'CRIT DMG from Elemental Bursts is increased by 16%. When an Elemental Burst hits an opponent, gain the Blade of the Daylight Hours effect: ATK is increased by 20%. Nearby active party members other than the equipping character have their ATK increased by 16% for 3s.\nAdditionally, when the party possesses Hexerei: Secret Rite effects, the effects of Blade of the Daylight Hours are increased by an additional 75%. This effect can be triggered even if the equipping character is off-field.',
+  },
+  {
+    id: 'the-daybreak-chronicles',
+    name: 'The Daybreak Chronicles',
+    type: 'Bow',
+    rarity: 5,
+    baseATK: 48,
+    version: '6.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 9.6,
+    },
+    passiveName: 'Ode Beyond Time',
+    passiveDescription:
+      "The equipping character gains Stirring Dawn Breeze: 3s after leaving combat, Normal Attack, Elemental Skill, and Elemental Burst DMG is increased by 60%. While in combat, this DMG Bonus will decrease by 10% per second until it reaches 0%. When the equipping character's Normal Attacks, Elemental Skills, or Elemental Bursts hit an opponent, the DMG Bonus for the corresponding DMG type is increased by 10% until it reaches 60%. This effect can be triggered once every 0.1s for each of the attack types mentioned above. This effect can be triggered even if the equipping character is off-field.\nAdditionally, when the party possesses Hexerei: Secret Rite effects, when the equipping character's Normal Attacks, Elemental Skills, or Elemental Bursts hit an opponent, the DMG Bonus for all these DMG types is increased by 20% instead.",
+  },
+  {
+    id: 'reliquary-of-truth',
+    name: 'Reliquary of Truth',
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 44,
+    version: '6.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 19.2,
+    },
+    passiveName: 'Essence of Falsity',
+    passiveDescription:
+      'CRIT Rate is increased by 8%. When the equipping character unleashes an Elemental Skill, they gain the Secret of Lies effect: Elemental Mastery is increased by 80 for 12s. When the equipping character deals Lunar-Bloom DMG to an opponent, they gain the Moon of Truth effect: CRIT DMG is increased by 24% for 4s. When both the Secret of Lies and Moon of Truth effects are active at the same time, the results of both effects will be increased by 50%.',
+  },
+  {
+    id: 'bloodsoaked-ruins',
+    name: 'Bloodsoaked Ruins',
+    type: 'Polearm',
+    rarity: 5,
+    baseATK: 48,
+    version: '6.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 4.8,
+    },
+    passiveName: 'Mournful Tribute',
+    passiveDescription:
+      "For 3.5s after using an Elemental Burst, the equipping character's Lunar-Charged DMG dealt to opponents is increased by 36%. Additionally, after triggering a Lunar-Charged reaction, the equipping character will gain Requiem of Ruin: CRIT DMG is increased by 28% for 6s. They will also regain 12 Elemental Energy. Elemental Energy can be restored this way once every 14s.",
+  },
+  {
+    id: 'nightweavers-looking-glass',
+    name: "Nightweaver's Looking Glass",
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 44,
+    version: '6.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 58,
+    },
+    passiveName: 'Millennial Hymn',
+    passiveDescription:
+      "When the equipping character's Elemental Skill deals Hydro or Dendro DMG, they will gain Prayer of the Far North: Elemental Mastery is increased by 60 for 4.5s. When nearby party members trigger Lunar-Bloom reactions, the equipping character gains New Moon Verse: Elemental Mastery is increased by 60 for 10s. When both Prayer of the Far North and New Moon Verse are in effect, all nearby party members' Bloom DMG is increased by 120%, their Hyperbloom and Burgeon DMG is increased by 80%, and their Lunar-Bloom DMG is increased by 40%. This effect cannot stack. The aforementioned effects can be triggered even if the equipping character is off-field.",
+  },
+  {
+    id: 'fractured-halo',
+    name: 'Fractured Halo',
+    type: 'Polearm',
+    rarity: 5,
+    baseATK: 46,
+    version: '5.8',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 14.4,
+    },
+    passiveName: 'Purifying Crown',
+    passiveDescription:
+      'After an Elemental Skill or Elemental Burst is used, ATK is increased by 24% for 20s. If the equipping character creates a Shield while this effect is active, they will gain the Electrifying Edict effect for 20s: All nearby party members deal 40% more Lunar-Charged DMG.',
+  },
+  {
+    id: 'azurelight',
+    name: 'Azurelight',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 48,
+    version: '5.7',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 4.8,
+    },
+    passiveName: "Whitehill's Bestowal",
+    passiveDescription:
+      'Within 12s after an Elemental Skill is used, ATK is increased by 24%. During this time, when the equipping character has 0 Energy, ATK will be further increased by 24%, and CRIT DMG will be increased by 40%.',
+  },
+  {
+    id: 'symphonist-of-scents',
+    name: 'Symphonist of Scents',
+    type: 'Polearm',
+    rarity: 5,
+    baseATK: 46,
+    version: '5.6',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 14.4,
+    },
+    passiveName: 'Seasoned Symphony',
+    passiveDescription:
+      'ATK is increased by 12%. When the equipping character is off-field, ATK is increased by an additional 12%. After initiating healing, the equipping character and the character(s) they have healed will obtain the "Sweet Echoes" effect, increasing their ATK by 32% for 3s. This effect can be triggered even if the equipping character is off-field.',
+  },
+  {
+    id: 'vivid-notions',
+    name: 'Vivid Notions',
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 48,
+    version: '5.5',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 9.6,
+    },
+    passiveName: "Falling Rainbow's Wish",
+    passiveDescription:
+      'ATK is increased by 28%. When you use a Plunging Attack, you will gain the "Dawn\'s First Hue" effect: Plunging Attack CRIT DMG is increased by 28%. When you use an Elemental Skill or Burst, you will gain the "Twilight\'s Splendor" effect: Plunging Attack CRIT DMG is increased by 40%. The two effects above each last for 15s, and will be canceled 0.1s after the ground impact hits a target.',
+  },
+  {
+    id: 'sunny-morning-sleep-in',
+    name: 'Sunny Morning Sleep-In',
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 44,
+    version: '5.4',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 58,
+    },
+    passiveName: 'Bathhouses, Hawks, and Narukami',
+    passiveDescription:
+      "Elemental Mastery increases by 120 for 6s after triggering Swirl. Elemental Mastery increases by 96 for 9s after the wielder's Elemental Skill hits an opponent. Elemental Mastery increases by 32 for 30s after the wielder's Elemental Burst hits an opponent.",
+  },
+  {
+    id: 'a-thousand-blazing-suns',
+    name: 'A Thousand Blazing Suns',
+    type: 'Claymore',
+    rarity: 5,
+    baseATK: 49,
+    version: '5.3',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 2.4,
+    },
+    passiveName: 'Sunset Reignites the Dawn',
+    passiveDescription:
+      'Gain the "Scorching Brilliance" effect when using an Elemental Skill or Burst: CRIT DMG increased by 20% and ATK increased by 28% for 6s. This effect can trigger once every 10s.\nWhile a "Scorching Brilliance" instance is active, its duration is increased by 2s after Normal or Charged attacks deal Elemental DMG. This effect can trigger once every second, and the max duration increase is 6s.\nAdditionally, when the equipping character is in the Nightsoul\'s Blessing state, "Scorching Brilliance" effects are increased by 75%, and its duration will not count down when the equipping character is off-field.',
+  },
+  {
+    id: 'starcallers-watch',
+    name: "Starcaller's Watch",
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 44,
+    version: '5.3',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 58,
+    },
+    passiveName: 'Offering Unto Wind and Sun',
+    passiveDescription:
+      'Increases Elemental Mastery by 100. Gain the "Mirror of Night" effect within 15s after the equipping character creates a shield: The current active party member deals 28% increased DMG to nearby opponents. You can gain the "Mirror of Night" effect once every 14s.',
+  },
+  {
+    id: 'astral-vultures-crimson-plumage',
+    name: "Astral Vulture's Crimson Plumage",
+    type: 'Bow',
+    rarity: 5,
+    baseATK: 46,
+    version: '5.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 14.4,
+    },
+    passiveName: 'The Moonring Sighted',
+    passiveDescription:
+      "For 12s after triggering a Swirl reaction, ATK increases by 24%. In addition, when 1/2 or more characters in the party are of a different Elemental Type from the equipping character, the DMG dealt by the equipping character's Charged Attacks is increased by 20%/48% and Elemental Burst DMG dealt is increased by 10%/24%.",
+  },
+  {
+    id: 'peak-patrol-song',
+    name: 'Peak Patrol Song',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 44,
+    version: '5.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.DEF_PERCENT,
+      value: 18,
+    },
+    passiveName: 'Halcyon Years Unending',
+    passiveDescription:
+      'Gain "Ode to Flowers" after Normal or Plunging Attacks hit an opponent: DEF increases by 8% and gain a 10% All Elemental DMG Bonus for 6s. Max 2 stacks. Can trigger once per 0.1s. When this effect reaches 2 stacks or the 2nd stack\'s duration is refreshed, increase all nearby party members\' All Elemental DMG Bonus by 8% for every 1,000 DEF the equipping character has, up to a maximum of 25.6%, for 15s.',
+  },
+  {
+    id: 'fang-of-the-mountain-king',
+    name: 'Fang of the Mountain King',
+    type: 'Claymore',
+    rarity: 5,
+    baseATK: 49,
+    version: '5.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 2.4,
+    },
+    passiveName: 'Turquoise Hunt',
+    passiveDescription:
+      "Gain 1 stack of Canopy's Favor after hitting an opponent with an Elemental Skill. This can be triggered once every 0.5s. After a nearby party member triggers a Burning or Burgeon reaction, the equipping character will gain 3 stacks. This effect can be triggered once every 2s and can be triggered even when the triggering party member is off-field. Canopy's Favor: Elemental Skill and Burst DMG is increased by 10% for 6s. Max 6 stacks. Each stack is counted independently.",
+  },
+  {
+    id: 'surfs-up',
+    name: "Surf's Up",
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 44,
+    version: '5.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 19.2,
+    },
+    passiveName: 'Aqua Remembrance',
+    passiveDescription:
+      'Max HP increased by 20%. Once every 15s, for the 14s after using an Elemental Skill: Gain 4 Scorching Summer stacks. Each stack increases Normal Attack DMG by 12%. For the duration of the effect, once every 1.5s, lose 1 stack after a Normal Attack hits an opponent; once every 1.5s, gain 1 stack after triggering a Vaporize reaction on an opponent. Max 4 Scorching Summer stacks.',
+  },
+  {
+    id: 'lumidouce-elegy',
+    name: 'Lumidouce Elegy',
+    type: 'Polearm',
+    rarity: 5,
+    baseATK: 46,
+    version: '4.8',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 7.2,
+    },
+    passiveName: 'Bright Dawn Overture',
+    passiveDescription:
+      'ATK increased by 15%. After the equipping character triggers Burning on an opponent or deals Dendro DMG to Burning opponents, the DMG dealt is increased by 18%. This effect lasts for 8s, max 2 stacks. When 2 stacks are reached or when the duration is refreshed at 2 stacks, restore 12 Energy. Energy can be restored this way once every 12s. The 2 aforementioned effects can be triggered even when the character is off-field.',
+  },
+  {
+    id: 'absolution',
+    name: 'Absolution',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 48,
+    version: '4.7',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 9.6,
+    },
+    passiveName: 'Deathly Pact',
+    passiveDescription:
+      'CRIT DMG increased by 20%. Increasing the value of a Bond of Life increases the DMG the equipping character deals by 16% for 6s. Max 3 stacks.',
+  },
+  {
+    id: 'silvershower-heartstrings',
+    name: 'Silvershower Heartstrings',
+    type: 'Bow',
+    rarity: 5,
+    baseATK: 44,
+    version: '4.7',
+    subStat: {
+      type: WEAPON_STAT_TYPES.HP_PERCENT,
+      value: 14.4,
+    },
+    passiveName: "Dryas's Nocturne",
+    passiveDescription:
+      "The equipping character can gain the Remedy effect. When they possess 1/2/3 Remedy stacks, Max HP will increase by 12%/24%/40%. 1 stack may be gained when the following conditions are met: 1 stack for 25s when using an Elemental Skill; 1 stack for 25s when the value of a Bond of Life value increases; 1 stack for 20s for performing healing. Stacks can still be triggered when the equipping character is not on the field. Each stack's duration is counted independently. In addition, when 3 stacks are active, Elemental Burst CRIT Rate will be increased by 28%. This effect will be canceled 4s after falling under 3 stacks.",
+  },
+  {
+    id: 'crimson-moons-semblance',
+    name: "Crimson Moon's Semblance",
+    type: 'Polearm',
+    rarity: 5,
+    baseATK: 48,
+    version: '4.6',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 4.8,
+    },
+    passiveName: "Ashen Sun's Shadow",
+    passiveDescription:
+      'Grants a Bond of Life equal to 25% of Max HP when a Charged Attack hits an opponent. This effect can be triggered up to once every 14s. In addition, when the equipping character has a Bond of Life, they gain a 12% DMG Bonus; if the value of the Bond of Life is greater than or equal to 30% of Max HP, then gain an additional 24% DMG Bonus.',
+  },
+  {
+    id: 'uraku-misugiri',
+    name: 'Uraku Misugiri',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 44,
+    version: '4.5',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 19.2,
+    },
+    passiveName: 'Brocade Bloom, Shrine Sword',
+    passiveDescription:
+      "Normal Attack DMG is increased by 16% and Elemental Skill DMG is increased by 24%. After a nearby active character deals Geo DMG, the aforementioned effects increase by 100% for 15s. Additionally, the wielder's DEF is increased by 20%.",
+  },
+  {
+    id: 'cranes-echoing-call',
+    name: "Crane's Echoing Call",
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 49,
+    version: '4.4',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 3.6,
+    },
+    passiveName: 'Cloudfall Axiom',
+    passiveDescription:
+      "After the equipping character hits an opponent with a Plunging Attack, all nearby party members' Plunging Attacks will deal 28% increased DMG for 20s. When nearby party members hit opponents with Plunging Attacks, they will restore 2.5 Energy to the equipping character. Energy can be restored this way every 0.7s. This energy regain effect can be triggered even if the equipping character is not on the field.",
+  },
+  {
+    id: 'verdict',
+    name: 'Verdict',
+    type: 'Claymore',
+    rarity: 5,
+    baseATK: 48,
+    version: '4.3',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 4.8,
+    },
+    passiveName: 'Many Oaths of Dawn and Dusk',
+    passiveDescription:
+      "Increases ATK by 20%. When party members obtain Elemental Shards from Crystallize or trigger Lunar-Crystallize reactions, the equipping character will gain 1 Seal, increasing Elemental Skill DMG by 18%. The Seal lasts for 15s, and the equipper may have up to 2 Seals at once. All of the equipper's Seals will disappear 0.2s after their Elemental Skill deals DMG. Up to 1 Seal may be obtained every second through the Lunar-Crystallize reaction.",
+  },
+  {
+    id: 'splendor-of-tranquil-waters',
+    name: 'Splendor of Tranquil Waters',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 44,
+    version: '4.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 19.2,
+    },
+    passiveName: 'Dawn and Dusk by the Lake',
+    passiveDescription:
+      "When the equipping character's current HP increases or decreases, Elemental Skill DMG dealt will be increased by 8% for 6s. Max 3 stacks. This effect can be triggered once every 0.2s. When other party members' current HP increases or decreases, the equipping character's Max HP will be increased by 14% for 6s. Max 2 stacks. This effect can be triggered once every 0.2s. The aforementioned effects can be triggered even if the wielder is off-field.",
+  },
+  {
+    id: 'cashflow-supervision',
+    name: 'Cashflow Supervision',
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 48,
+    version: '4.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 4.8,
+    },
+    passiveName: 'Golden Blood-Tide',
+    passiveDescription:
+      'ATK is increased by 16%. When current HP increases or decreases, Normal Attack DMG will be increased by 16% and Charged Attack DMG will be increased by 14% for 4s. Max 3 stacks. This effect can be triggered once every 0.3s. When the wielder has 3 stacks, ATK SPD will be increased by 8%.',
+  },
+  {
+    id: 'tome-of-the-eternal-flow',
+    name: 'Tome of the Eternal Flow',
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 44,
+    version: '4.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 19.2,
+    },
+    passiveName: 'Aeon Wave',
+    passiveDescription:
+      "HP is increased by 16%. When current HP increases or decreases, Charged Attack DMG will be increased by 14% for 4s. Max 3 stacks. This effect can be triggered once every 0.3s. When the character has 3 stacks or a third stack's duration refreshes, 8 Energy will be restored. This Energy restoration effect can be triggered once every 12s.",
+  },
+  {
+    id: 'the-first-great-magic',
+    name: 'The First Great Magic',
+    type: 'Bow',
+    rarity: 5,
+    baseATK: 46,
+    version: '4.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 14.4,
+    },
+    passiveName: 'Parsifal the Great',
+    passiveDescription:
+      'DMG dealt by Charged Attacks increased by 16%. For every party member with the same Elemental Type as the wielder (including the wielder themselves), gain 1 Gimmick stack. For every party member with a different Elemental Type from the wielder, gain 1 Theatrics stack. When the wielder has 1/2/3 or more Gimmick stacks, ATK will be increased by 16%/32%/48%. When the wielder has 1/2/3 or more Theatrics stacks, Movement SPD will be increased by 4%/7%/10%.',
+  },
+  {
+    id: 'jadefalls-splendor',
+    name: "Jadefall's Splendor",
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 46,
+    version: '3.6',
+    subStat: {
+      type: WEAPON_STAT_TYPES.HP_PERCENT,
+      value: 10.8,
+    },
+    passiveName: 'Primordial Jade Regalia',
+    passiveDescription:
+      'For 3s after using an Elemental Burst or creating a shield, the equipping character can gain the Primordial Jade Regalia effect: Restore 4.5 Energy every 2.5s, and gain 0.3% Elemental DMG Bonus for their corresponding Elemental Type for every 1,000 Max HP they possess, up to 12%. Primordial Jade Regalia will still take effect even if the equipping character is not on the field.',
+  },
+  {
+    id: 'beacon-of-the-reed-sea',
+    name: 'Beacon of the Reed Sea',
+    type: 'Claymore',
+    rarity: 5,
+    baseATK: 46,
+    version: '3.5',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 7.2,
+    },
+    passiveName: 'Desert Watch',
+    passiveDescription:
+      "After the character's Elemental Skill hits an opponent, their ATK will be increased by 20% for 8s. After the character takes DMG, their ATK will be increased by 20% for 8s. The 2 aforementioned effects can be triggered even when the character is not on the field. Additionally, when not protected by a shield, the character's Max HP will be increased by 32%.",
+  },
+  {
+    id: 'light-of-foliar-incision',
+    name: 'Light of Foliar Incision',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 44,
+    version: '3.4',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 19.2,
+    },
+    passiveName: 'Whitemoon Bristle',
+    passiveDescription:
+      'CRIT Rate is increased by 4%. After Normal Attacks deal Elemental DMG, the Foliar Incision effect will be obtained, increasing DMG dealt by Normal Attacks and Elemental Skills by 120% of Elemental Mastery. This effect will disappear after 28 DMG instances or 12s. You can obtain Foliar Incision once every 12s.',
+  },
+  {
+    id: 'tulaytullahs-remembrance',
+    name: "Tulaytullah's Remembrance",
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 48,
+    version: '3.3',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 9.6,
+    },
+    passiveName: 'Bygone Azure Teardrop',
+    passiveDescription:
+      'Normal Attack SPD is increased by 10%. After the wielder unleashes an Elemental Skill, Normal Attack DMG will increase by 4.8% every second for 14s. After hitting an opponent with a Normal Attack during this duration, Normal Attack DMG will be increased by 9.6%. This increase can be triggered once every 0.3s. The maximum Normal Attack DMG increase per single duration of the overall effect is 48%. The effect will be removed when the wielder leaves the field, and using the Elemental Skill again will reset all DMG buffs.',
+  },
+  {
+    id: 'a-thousand-floating-dreams',
+    name: 'A Thousand Floating Dreams',
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 44,
+    version: '3.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 58,
+    },
+    passiveName: "A Thousand Nights' Dawnsong",
+    passiveDescription:
+      "Party members other than the equipping character will provide the equipping character with buffs based on whether their Elemental Type is the same as the latter or not. If their Elemental Types are the same, increase Elemental Mastery by 32. If not, increase the equipping character's DMG Bonus from their Elemental Type by 10%. Each of the aforementioned effects can have up to 3 stacks. Additionally, all nearby party members other than the equipping character will have their Elemental Mastery increased by 40. Multiple such effects from multiple such weapons can stack.",
+  },
+  {
+    id: 'key-of-khaj-nisut',
+    name: 'Key of Khaj-Nisut',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 44,
+    version: '3.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.HP_PERCENT,
+      value: 14.4,
+    },
+    passiveName: 'Sunken Song of the Sands',
+    passiveDescription:
+      "HP increased by 20%. When an Elemental Skill hits opponents, you gain the Grand Hymn effect for 20s. This effect increases the equipping character's Elemental Mastery by 0.12% of their Max HP. This effect can trigger once every 0.3s. Max 3 stacks. When this effect gains 3 stacks, or when the third stack's duration is refreshed, the Elemental Mastery of all nearby party members will be increased by 0.2% of the equipping character's max HP for 20s.",
+  },
+  {
+    id: 'staff-of-the-scarlet-sands',
+    name: 'Staff of the Scarlet Sands',
+    type: 'Polearm',
+    rarity: 5,
+    baseATK: 44,
+    version: '3.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 9.6,
+    },
+    passiveName: "Heat Haze at Horizon's End",
+    passiveDescription:
+      'The equipping character gains 52% of their Elemental Mastery as bonus ATK. When an Elemental Skill hits opponents, the Dream of the Scarlet Sands effect will be gained for 10s: The equipping character will gain 28% of their Elemental Mastery as bonus ATK. Max 3 stacks.',
+  },
+  {
+    id: 'hunters-path',
+    name: "Hunter's Path",
+    type: 'Bow',
+    rarity: 5,
+    baseATK: 44,
+    version: '3.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 9.6,
+    },
+    passiveName: 'At the End of the Beast-Paths',
+    passiveDescription:
+      'Gain 12% All Elemental DMG Bonus. Obtain the Tireless Hunt effect after hitting an opponent with a Charged Attack. This effect increases Charged Attack DMG by 160% of Elemental Mastery. This effect will be removed after 12 Charged Attacks or 10s. Only 1 instance of Tireless Hunt can be gained every 12s.',
+  },
+  {
+    id: 'aqua-simulacra',
+    name: 'Aqua Simulacra',
+    type: 'Bow',
+    rarity: 5,
+    baseATK: 44,
+    version: '2.7',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 19.2,
+    },
+    passiveName: 'The Cleansing Form',
+    passiveDescription:
+      'HP is increased by 16%. When there are opponents nearby, the DMG dealt by the wielder of this weapon is increased by 20%. This will take effect whether the character is on-field or not.',
+  },
+  {
+    id: 'haran-geppaku-futsu',
+    name: 'Haran Geppaku Futsu',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 46,
+    version: '2.6',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 7.2,
+    },
+    passiveName: 'Honed Flow',
+    passiveDescription:
+      'Obtain 12% All Elemental DMG Bonus. When other nearby party members use Elemental Skills, the character equipping this weapon will gain 1 Wavespike stack. Max 2 stacks. This effect can be triggered once every 0.3s. When the character equipping this weapon uses an Elemental Skill, all stacks of Wavespike will be consumed to gain Rippling Upheaval: each stack of Wavespike consumed will increase Normal Attack DMG by 20% for 8s.',
+  },
+  {
+    id: 'kaguras-verity',
+    name: "Kagura's Verity",
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 46,
+    version: '2.5',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 14.4,
+    },
+    passiveName: 'Kagura Dance of the Sacred Sakura',
+    passiveDescription:
+      'Gains the Kagura Dance effect when using an Elemental Skill, causing the Elemental Skill DMG of the character wielding this weapon to increase by 12% for 16s. Max 3 stacks. This character will gain 12% All Elemental DMG Bonus when they possess 3 stacks.',
+  },
+  {
+    id: 'calamity-queller',
+    name: 'Calamity Queller',
+    type: 'Polearm',
+    rarity: 5,
+    baseATK: 49,
+    version: '2.4',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 3.6,
+    },
+    passiveName: 'Extinguishing Precept',
+    passiveDescription:
+      "Gain 12% All Elemental DMG Bonus. Obtain Consummation for 20s after using an Elemental Skill, causing ATK to increase by 3.2% per second. This ATK increase has a maximum of 6 stacks. When the character equipped with this weapon is not on the field, Consummation's ATK increase is doubled.",
+  },
+  {
+    id: 'redhorn-stonethresher',
+    name: 'Redhorn Stonethresher',
+    type: 'Claymore',
+    rarity: 5,
+    baseATK: 44,
+    version: '2.3',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 19.2,
+    },
+    passiveName: 'Gokadaiou Otogibanashi',
+    passiveDescription:
+      'DEF is increased by 28%. Normal and Charged Attack DMG is increased by 40% of DEF.',
+  },
+  {
+    id: 'polar-star',
+    name: 'Polar Star',
+    type: 'Bow',
+    rarity: 5,
+    baseATK: 46,
+    version: '2.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 7.2,
+    },
+    passiveName: "Daylight's Augury",
+    passiveDescription:
+      'Elemental Skill and Elemental Burst DMG increased by 12%. After a Normal Attack, Charged Attack, Elemental Skill or Elemental Burst hits an opponent, 1 stack of Ashen Nightstar will be gained for 12s. When 1/2/3/4 stacks of Ashen Nightstar are present, ATK is increased by 10/20/30/48%. The stack of Ashen Nightstar created by the Normal Attack, Charged Attack, Elemental Skill or Elemental Burst will be counted independently of the others.',
+  },
+  {
+    id: 'engulfing-lightning',
+    name: 'Engulfing Lightning',
+    type: 'Polearm',
+    rarity: 5,
+    baseATK: 46,
+    version: '2.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 12,
+    },
+    passiveName: 'Timeless Dream: Eternal Stove',
+    passiveDescription:
+      'ATK increased by 28% of Energy Recharge over the base 100%. You can gain a maximum bonus of 80% ATK. Gain 30% Energy Recharge for 12s after using an Elemental Burst.',
+  },
+  {
+    id: 'everlasting-moonglow',
+    name: 'Everlasting Moonglow',
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 46,
+    version: '2.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.HP_PERCENT,
+      value: 10.8,
+    },
+    passiveName: 'Byakuya Kougetsu',
+    passiveDescription:
+      'Healing Bonus increased by 10%, Normal Attack DMG is increased by 1% of the Max HP of the character equipping this weapon. For 12s after using an Elemental Burst, Normal Attacks that hit opponents will restore 0.6 Energy. Energy can be restored this way once every 0.1s.',
+  },
   {
     id: 'mistsplitter-reforged',
     name: 'Mistsplitter Reforged',
@@ -68,69 +799,9 @@ export const WEAPONS: Weapon[] = [
       value: 9.6,
     },
     passiveName: "Mistsplitter's Edge",
-    passiveDescription: "Gain Elemental DMG Bonus based on Mistsplitter's Emblem stacks",
-  },
-  {
-    id: 'primordial-jade-cutter',
-    name: 'Primordial Jade Cutter',
-    type: 'Sword',
-    rarity: 5,
-    baseATK: 44,
-    version: '1.3',
-    subStat: {
-      type: WEAPON_STAT_TYPES.CRIT_RATE,
-      value: 9.6,
-    },
-    passiveName: "Protector's Virtue",
-    passiveDescription: 'HP increased by 20%. Additionally, provides an ATK Bonus based on HP.',
-  },
-  // 5-Star Claymores
-  {
-    id: 'wolfs-gravestone',
-    name: "Wolf's Gravestone",
-    type: 'Claymore',
-    rarity: 5,
-    baseATK: 46,
-    version: '1.0',
-    subStat: {
-      type: WEAPON_STAT_TYPES.ATK_PERCENT,
-      value: 10.8,
-    },
-    passiveName: 'Wolfish Tracker',
     passiveDescription:
-      "Increases ATK. On hit, attacks against opponents with less than 30% HP increase all party members' ATK.",
+      "Gain a 12% Elemental DMG Bonus for all elements and receive the might of the Mistsplitter's Emblem. At stack levels 1/2/3, the Mistsplitter's Emblem provides a 8/16/28% Elemental DMG Bonus for the character's Elemental Type. The character will obtain 1 stack of Mistsplitter's Emblem in each of the following scenarios: Normal Attack deals Elemental DMG (stack lasts 5s), casting Elemental Burst (stack lasts 10s); Energy is less than 100% (stack disappears when Energy is full). Each stack's duration is calculated independently.",
   },
-  // 5-Star Polearms
-  {
-    id: 'engulfing-lightning',
-    name: 'Engulfing Lightning',
-    type: 'Polearm',
-    rarity: 5,
-    baseATK: 46,
-    version: '2.1',
-    subStat: {
-      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
-      value: 12.0,
-    },
-    passiveName: 'Timeless Dream: Eternal Stove',
-    passiveDescription:
-      'ATK increased based on Energy Recharge. Gain Energy Recharge after using Elemental Burst.',
-  },
-  {
-    id: 'staff-of-homa',
-    name: 'Staff of Homa',
-    type: 'Polearm',
-    rarity: 5,
-    baseATK: 46,
-    version: '1.3',
-    subStat: {
-      type: WEAPON_STAT_TYPES.CRIT_DMG,
-      value: 14.4,
-    },
-    passiveName: 'Reckless Cinnabar',
-    passiveDescription: 'HP increased. Additionally, provides an ATK Bonus based on Max HP.',
-  },
-  // 5-Star Bows
   {
     id: 'thundering-pulse',
     name: 'Thundering Pulse',
@@ -144,9 +815,173 @@ export const WEAPONS: Weapon[] = [
     },
     passiveName: 'Rule by Thunder',
     passiveDescription:
-      'Increases ATK and grants Thunder Emblem stacks for Normal Attack DMG bonus.',
+      "Increases ATK by 20% and grants the might of the Thunder Emblem. At stack levels 1/2/3, the Thunder Emblem increases Normal Attack DMG by 12/24/40%. The character will obtain 1 stack of Thunder Emblem in each of the following scenarios: Normal Attack deals DMG (stack lasts 5s), casting Elemental Skill (stack lasts 10s); Energy is less than 100% (stack disappears when Energy is full). Each stack's duration is calculated independently.",
   },
-  // 5-Star Catalysts
+  {
+    id: 'freedom-sworn',
+    name: 'Freedom-Sworn',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 46,
+    version: '1.6',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 43,
+    },
+    passiveName: 'Revolutionary Chorale',
+    passiveDescription:
+      'A part of the "Millennial Movement" that wanders amidst the winds. Increases DMG by 10%. When the character wielding this weapon triggers Elemental Reactions, they gain a Sigil of Rebellion. This effect can be triggered once every 0.5s and can be triggered even if said character is not on the field. When you possess 2 Sigils of Rebellion, all of them will be consumed and all nearby party members will obtain "Millennial Movement: Song of Resistance" for 12s. "Millennial Movement: Song of Resistance" increases Normal, Charged and Plunging Attack DMG by 16% and increases ATK by 20%. Once this effect is triggered, you will not gain Sigils of Rebellion for 20s. Of the many effects of the "Millennial Movement," buffs of the same type will not stack.',
+  },
+  {
+    id: 'song-of-broken-pines',
+    name: 'Song of Broken Pines',
+    type: 'Claymore',
+    rarity: 5,
+    baseATK: 49,
+    version: '1.5',
+    subStat: {
+      type: WEAPON_STAT_TYPES.PHYSICAL_DMG,
+      value: 4.5,
+    },
+    passiveName: "Rebel's Banner-Hymn",
+    passiveDescription:
+      'A part of the "Millennial Movement" that wanders amidst the winds. Increases ATK by 16%, and when Normal or Charged Attacks hit opponents, the character gains a Sigil of Whispers. This effect can be triggered once every 0.3s. When you possess 4 Sigils of Whispers, all of them will be consumed and all nearby party members will obtain the "Millennial Movement: Banner-Hymn" effect for 12s. "Millennial Movement: Banner-Hymn" increases Normal ATK SPD by 12% and increases ATK by 20%. Once this effect is triggered, you will not gain Sigils of Whispers for 20s. Of the many effects of the "Millennial Movement," buffs of the same type will not stack.',
+  },
+  {
+    id: 'elegy-for-the-end',
+    name: 'Elegy for the End',
+    type: 'Bow',
+    rarity: 5,
+    baseATK: 46,
+    version: '1.4',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 12,
+    },
+    passiveName: 'The Parting Refrain',
+    passiveDescription:
+      'A part of the "Millennial Movement" that wanders amidst the winds. Increases Elemental Mastery by 60. When the Elemental Skills or Elemental Bursts of the character wielding this weapon hit opponents, that character gains a Sigil of Remembrance. This effect can be triggered once every 0.2s and can be triggered even if said character is not on the field. When you possess 4 Sigils of Remembrance, all of them will be consumed and all nearby party members will obtain the "Millennial Movement: Farewell Song" effect for 12s. "Millennial Movement: Farewell Song" increases Elemental Mastery by 100 and increases ATK by 20%. Once this effect is triggered, you will not gain Sigils of Remembrance for 20s. Of the many effects of the "Millennial Movement," buffs of the same type will not stack.',
+  },
+  {
+    id: 'primordial-jade-cutter',
+    name: 'Primordial Jade Cutter',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 44,
+    version: '1.3',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 9.6,
+    },
+    passiveName: "Protector's Virtue",
+    passiveDescription:
+      "HP increased by 20%. Additionally, provides an ATK Bonus based on 1.2% of the wielder's Max HP.",
+  },
+  {
+    id: 'staff-of-homa',
+    name: 'Staff of Homa',
+    type: 'Polearm',
+    rarity: 5,
+    baseATK: 46,
+    version: '1.3',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 14.4,
+    },
+    passiveName: 'Reckless Cinnabar',
+    passiveDescription:
+      "HP increased by 20%. Additionally, provides an ATK Bonus based on 0.8% of the wielder's Max HP. When the wielder's HP is less than 50%, this ATK Bonus is increased by an additional 1% of Max HP.",
+  },
+  {
+    id: 'summit-shaper',
+    name: 'Summit Shaper',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 46,
+    version: '1.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 10.8,
+    },
+    passiveName: 'Golden Majesty',
+    passiveDescription:
+      'Increases Shield Strength by 20%. Scoring hits on opponents increases ATK by 4% for 8s. Max 5 stacks. Can only occur once every 0.3s. While protected by a shield, this ATK increase effect is increased by 100%.',
+  },
+  {
+    id: 'memory-of-dust',
+    name: 'Memory of Dust',
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 46,
+    version: '1.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 10.8,
+    },
+    passiveName: 'Golden Majesty',
+    passiveDescription:
+      'Increases Shield Strength by 20%. Scoring hits on opponents increases ATK by 4% for 8s. Max 5 stacks. Can only occur once every 0.3s. While protected by a shield, this ATK increase effect is increased by 100%.',
+  },
+  {
+    id: 'the-unforged',
+    name: 'The Unforged',
+    type: 'Claymore',
+    rarity: 5,
+    baseATK: 46,
+    version: '1.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 10.8,
+    },
+    passiveName: 'Golden Majesty',
+    passiveDescription:
+      'Increases Shield Strength by 20%. Scoring hits on opponents increases ATK by 4% for 8s. Max 5 stacks. Can only occur once every 0.3s. While protected by a shield, this ATK increase effect is increased by 100%.',
+  },
+  {
+    id: 'vortex-vanquisher',
+    name: 'Vortex Vanquisher',
+    type: 'Polearm',
+    rarity: 5,
+    baseATK: 46,
+    version: '1.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 10.8,
+    },
+    passiveName: 'Golden Majesty',
+    passiveDescription:
+      'Increases Shield Strength by 20%. Scoring hits on opponents increases ATK by 4% for 8s. Max 5 stacks. Can only occur once every 0.3s. While protected by a shield, this ATK increase effect is increased by 100%.',
+  },
+  {
+    id: 'amos-bow',
+    name: "Amos' Bow",
+    type: 'Bow',
+    rarity: 5,
+    baseATK: 46,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 10.8,
+    },
+    passiveName: 'Strong-Willed',
+    passiveDescription:
+      'Increases Normal and Charged Attack DMG by 12%. After a Normal or Charged Attack is fired, DMG dealt increases by a further 8% every 0.1s the arrow is in the air for up to 5 times.',
+  },
+  {
+    id: 'aquila-favonia',
+    name: 'Aquila Favonia',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 48,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.PHYSICAL_DMG,
+      value: 9,
+    },
+    passiveName: "Falcon's Defiance",
+    passiveDescription:
+      'ATK is increased by 20%. Triggers on taking DMG: the soul of the Falcon of the West awakens, holding the banner of resistance aloft, regenerating HP equal to 100% of ATK and dealing 200% of ATK as DMG to surrounding opponents. This effect can only occur once every 15s.',
+  },
   {
     id: 'lost-prayer-to-the-sacred-winds',
     name: 'Lost Prayer to the Sacred Winds',
@@ -159,23 +994,1875 @@ export const WEAPONS: Weapon[] = [
       value: 7.2,
     },
     passiveName: 'Boundless Blessing',
-    passiveDescription: 'Increases Movement SPD. Gains Elemental DMG Bonus every 4s.',
+    passiveDescription:
+      'Increases Movement SPD by 10%. When in battle, gain an 8% Elemental DMG Bonus every 4s. Max 4 stacks. Lasts until the character falls or leaves combat.',
   },
-  // 4-Star Swords
   {
-    id: 'the-flute',
-    name: 'The Flute',
+    id: 'primordial-jade-winged-spear',
+    name: 'Primordial Jade Winged-Spear',
+    type: 'Polearm',
+    rarity: 5,
+    baseATK: 48,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 4.8,
+    },
+    passiveName: 'Eagle Spear of Justice',
+    passiveDescription:
+      'On hit, increases ATK by 3.2% for 6s. Max 7 stacks. This effect can only occur once every 0.3s. While in possession of the maximum possible stacks, DMG dealt is increased by 12%.',
+  },
+  {
+    id: 'skyward-atlas',
+    name: 'Skyward Atlas',
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 48,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 7.2,
+    },
+    passiveName: 'Wandering Clouds',
+    passiveDescription:
+      'Increases Elemental DMG Bonus by 12%. Normal Attack hits have a 50% chance to earn the favor of the clouds, which actively seek out nearby opponents to attack for 15s, dealing 160% ATK DMG. Can only occur once every 30s.',
+  },
+  {
+    id: 'skyward-blade',
+    name: 'Skyward Blade',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 46,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 12,
+    },
+    passiveName: 'Sky-Piercing Fang',
+    passiveDescription:
+      'CRIT Rate increased by 4%. Gains Skypiercing Might upon using an Elemental Burst: Increases Movement SPD by 10%, increases ATK SPD by 10%, and Normal and Charged hits deal additional DMG equal to 20% of ATK. Skypiercing Might lasts for 12s.',
+  },
+  {
+    id: 'skyward-harp',
+    name: 'Skyward Harp',
+    type: 'Bow',
+    rarity: 5,
+    baseATK: 48,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 4.8,
+    },
+    passiveName: 'Echoing Ballad',
+    passiveDescription:
+      'Increases CRIT DMG by 20%. Hits have a 60% chance to inflict a small AoE attack, dealing 125% Physical ATK DMG. Can only occur once every 4s.',
+  },
+  {
+    id: 'skyward-pride',
+    name: 'Skyward Pride',
+    type: 'Claymore',
+    rarity: 5,
+    baseATK: 48,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 8,
+    },
+    passiveName: 'Sky-ripping Dragon Spine',
+    passiveDescription:
+      'Increases all DMG by 8%. After using an Elemental Burst, a vacuum blade that does 80% of ATK as DMG to opponents along its path will be created when Normal or Charged Attacks hit. Lasts for 20s or 8 vacuum blades.',
+  },
+  {
+    id: 'skyward-spine',
+    name: 'Skyward Spine',
+    type: 'Polearm',
+    rarity: 5,
+    baseATK: 48,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 8,
+    },
+    passiveName: 'Black Wing',
+    passiveDescription:
+      'Increases CRIT Rate by 8% and increases Normal ATK SPD by 12%. Additionally, Normal and Charged Attacks hits on opponents have a 50% chance to trigger a vacuum blade that deals 40% of ATK as DMG in a small AoE. This effect can occur no more than once every 2s.',
+  },
+  {
+    id: 'wolfs-gravestone',
+    name: "Wolf's Gravestone",
+    type: 'Claymore',
+    rarity: 5,
+    baseATK: 46,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 10.8,
+    },
+    passiveName: 'Wolfish Tracker',
+    passiveDescription:
+      "Increases ATK by 20%. On hit, attacks against opponents with less than 30% HP increase all party members' ATK by 40% for 12s. Can only occur once every 30s.",
+  },
+  {
+    id: 'rainbow-serpents-rain-bow',
+    name: "Rainbow Serpent's Rain Bow",
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 42,
+    version: '6.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 10,
+    },
+    passiveName: 'Astral Whispers Beyond the Sacred Throne',
+    passiveDescription:
+      "ATK is increased by 28% for 8s after the equipping character's attacks hit an opponent while the equipping character is off-field.",
+  },
+  {
+    id: 'dawning-frost',
+    name: 'Dawning Frost',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 42,
+    version: '6.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 12,
+    },
+    passiveName: 'Nocturnal Dreams',
+    passiveDescription:
+      'For 10s after a Charged Attack hits an opponent, Elemental Mastery is increased by 72. For 10s after an Elemental Skill hits an opponent, Elemental Mastery is increased by 48.',
+  },
+  {
+    id: 'sacrificers-staff',
+    name: "Sacrificer's Staff",
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 45,
+    version: '6.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 2,
+    },
+    passiveName: 'Untainted Desire',
+    passiveDescription:
+      'For 6s after an Elemental Skill hits an opponent, ATK is increased by 8% and Energy Recharge is increased by 6%. Max 3 stacks. This effect can be triggered even when the equipping character is off-field.',
+  },
+  {
+    id: 'blackmarrow-lantern',
+    name: 'Blackmarrow Lantern',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 41,
+    version: '6.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 48,
+    },
+    passiveName: 'Token of Covenant',
+    passiveDescription:
+      'Bloom DMG is increased by 48%, and Lunar-Bloom DMG is increased by 12%. Moonsign: Ascendant Gleam: Lunar-Bloom DMG is increased by an additional 12%.',
+  },
+  {
+    id: 'etherlight-spindlelute',
+    name: 'Etherlight Spindlelute',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 42,
+    version: '6.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 10,
+    },
+    passiveName: 'Last Singer',
+    passiveDescription:
+      "For 20s after using an Elemental Skill, the equipping character's Elemental Mastery is increased by 100.",
+  },
+  {
+    id: 'master-key',
+    name: 'Master Key',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 41,
+    version: '6.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 13.3,
+    },
+    passiveName: 'Fall Into Place',
+    passiveDescription:
+      'Upon causing an Elemental Reaction, increases Elemental Mastery by 60 for 12s. Moonsign: Ascendant Gleam: Elemental Mastery from this effect is further increased by 60. This effect can be triggered even if the equipping character is off-field.',
+  },
+  {
+    id: 'moonweavers-dawn',
+    name: "Moonweaver's Dawn",
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 44,
+    version: '6.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: "Secret Silver's Testament",
+    passiveDescription:
+      "Increases Elemental Burst DMG by 20%. When the equipping character's Energy Capacity does not exceed 60/40, their Elemental Burst DMG is increased by an additional 16%/28%.",
+  },
+  {
+    id: 'prospectors-shovel',
+    name: "Prospector's Shovel",
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 42,
+    version: '6.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Swift and Sure',
+    passiveDescription:
+      'Electro-Charged DMG is increased by 48%, and Lunar-Charged DMG is increased by 12%. Moonsign: Ascendant Gleam: Lunar-Charged DMG is increased by an additional 12%.',
+  },
+  {
+    id: 'serenitys-call',
+    name: "Serenity's Call",
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 41,
+    version: '6.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 13.3,
+    },
+    passiveName: 'Solemn Silence',
+    passiveDescription:
+      'Upon causing an Elemental Reaction, increases Max HP by 16% for 12s. Moonsign: Ascendant Gleam: Max HP from this effect is further increased by 16%. This effect can be triggered even if the equipping character is off-field.',
+  },
+  {
+    id: 'snare-hook',
+    name: 'Snare Hook',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 41,
+    version: '6.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 13.3,
+    },
+    passiveName: 'Phantom Flash',
+    passiveDescription:
+      'Upon causing an Elemental Reaction, increases Elemental Mastery by 60 for 12s. Moonsign: Ascendant Gleam: Elemental Mastery from this effect is further increased by 60. This effect can be triggered even if the equipping character is off-field.',
+  },
+  {
+    id: 'flame-forged-insight',
+    name: 'Flame-Forged Insight',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 42,
+    version: '5.8',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 36,
+    },
+    passiveName: 'Mind in Bloom',
+    passiveDescription:
+      'When Electro-Charged, Lunar-Charged, Bloom, Lunar-Bloom, Crystallize or Lunar-Crystallize is triggered, restore 12 Elemental Energy and increase Elemental Mastery by 60 for 15 seconds. This effect can be triggered at most once every 15s and can be triggered even when the equipping character is off-field.',
+  },
+  {
+    id: 'sequence-of-solitude',
+    name: 'Sequence of Solitude',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 42,
+    version: '5.6',
+    subStat: {
+      type: WEAPON_STAT_TYPES.HP_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Silent Trigger',
+    passiveDescription:
+      'When an attack hits an opponent, deal AoE DMG equal to 40% of Max HP at the target location. This effect can be triggered once every 15s.',
+  },
+  {
+    id: 'tamayuratei-no-ohanashi',
+    name: 'Tamayuratei no Ohanashi',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 44,
+    version: '5.4',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 6.7,
+    },
+    passiveName: "Busybody's Running Light",
+    passiveDescription:
+      'Increase ATK by 20% and Movement SPD by 10% for 10s when using an Elemental Skill.',
+  },
+  {
+    id: 'calamity-of-eshu',
+    name: 'Calamity of Eshu',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 44,
+    version: '5.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: 'Diffusing Boundary',
+    passiveDescription:
+      'While characters are protected by a Shield, DMG dealt by Normal and Charged Attacks is increased by 20%, and Normal and Charged Attack CRIT Rate is increased by 8%.',
+  },
+  {
+    id: 'flower-wreathed-feathers',
+    name: 'Flower-Wreathed Feathers',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 42,
+    version: '5.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Inflorescence Unattainable',
+    passiveDescription:
+      'Decreases Gliding Stamina consumption by 15%. When using Aimed Shots, the DMG dealt by Charged Attacks increases by 6% every 0.5s. This effect can stack up to 6 times and will be removed 10s after leaving Aiming Mode.',
+  },
+  {
+    id: 'waveriding-whirl',
+    name: 'Waveriding Whirl',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 41,
+    version: '5.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 13.3,
+    },
+    passiveName: 'Fangs Flying To and Fro',
+    passiveDescription:
+      'Decreases Swimming Stamina consumption by 15%. In addition, for 10s after using an Elemental Skill, Max HP is increased by 20%. For every Hydro Elemental Type character in the party, Max HP is increased by another 12%, and the maximum increase that can be achieved in this way is 24%. Can be triggered once every 15s.',
+  },
+  {
+    id: 'fruitful-hook',
+    name: 'Fruitful Hook',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 44,
+    version: '5.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: 'The Weight of Falling Branches',
+    passiveDescription:
+      'Increase Plunging Attack CRIT Rate by 16%; After a Plunging Attack hits an opponent, Normal, Charged, and Plunging Attack DMG increased by 16% for 10s.',
+  },
+  {
+    id: 'mountain-bracing-bolt',
+    name: 'Mountain-Bracing Bolt',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 44,
+    version: '5.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 6.7,
+    },
+    passiveName: 'Hope Beyond the Peaks',
+    passiveDescription:
+      "Decreases Climbing Stamina Consumption by 15% and increases Elemental Skill DMG by 12%. Also, after other nearby party members use Elemental Skills, the equipping character's Elemental Skill DMG will also increase by 12% for 8s.",
+  },
+  {
+    id: 'sturdy-bone',
+    name: 'Sturdy Bone',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 44,
+    version: '5.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: "Trapper's Pride",
+    passiveDescription:
+      'Sprint or Alternate Sprint Stamina Consumption decreased by 15%. Additionally, after using Sprint or Alternate Sprint, Normal Attack DMG is increased by 16% of ATK. This effect expires after triggering 18 times or 7s.',
+  },
+  {
+    id: 'ash-graven-drinking-horn',
+    name: 'Ash-Graven Drinking Horn',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 42,
+    version: '5.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.HP_PERCENT,
+      value: 9,
+    },
+    passiveName: "Tupac's Grip",
+    passiveDescription:
+      'When an attack hits an opponent, deal AoE DMG equal to 40% of Max HP at the target location. This effect can be triggered once every 15s.',
+  },
+  {
+    id: 'chain-breaker',
+    name: 'Chain Breaker',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 44,
+    version: '5.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: 'Flower-Feather Song',
+    passiveDescription:
+      'For every party member from Natlan or who has a different Elemental Type from the equipping character, the equipping character gains 4.8% increased ATK. When there are no less than 3 of the aforementioned characters, the equipping character gains 24 Elemental Mastery.',
+  },
+  {
+    id: 'earth-shaker',
+    name: 'Earth Shaker',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 44,
+    version: '5.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: 'Oath of Qhapaq Nan',
+    passiveDescription:
+      "After a party member triggers a Pyro-related reaction, the equipping character's Elemental Skill DMG is increased by 16% for 8s. This effect can be triggered even when the triggering party member is not on the field.",
+  },
+  {
+    id: 'flute-of-ezpitzal',
+    name: 'Flute of Ezpitzal',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 41,
+    version: '5.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.DEF_PERCENT,
+      value: 15,
+    },
+    passiveName: 'Smoke-and-Mirror Mystery',
+    passiveDescription: 'Using an Elemental Skill increases DEF by 16% for 15s.',
+  },
+  {
+    id: 'footprint-of-the-rainbow',
+    name: 'Footprint of the Rainbow',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 42,
+    version: '5.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.DEF_PERCENT,
+      value: 11.3,
+    },
+    passiveName: 'Pact of Flowing Springs',
+    passiveDescription: 'Using an Elemental Skill increases DEF by 16% for 15s.',
+  },
+  {
+    id: 'ring-of-yaxche',
+    name: 'Ring of Yaxche',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 42,
+    version: '5.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.HP_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Echoes of the Plentiful Land',
+    passiveDescription:
+      'Using an Elemental Skill grants the Jade-Forged Crown effect: Every 1,000 Max HP will increase the Normal Attack DMG dealt by the equipping character by 0.6% for 10s. Normal Attack DMG can be increased this way by a maximum of 16%.',
+  },
+  {
+    id: 'cloudforged',
+    name: 'Cloudforged',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 42,
+    version: '4.7',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 36,
+    },
+    passiveName: 'Crag-Chiseled Forge',
+    passiveDescription:
+      "After Elemental Energy is decreased, the equipping character's Elemental Mastery will increase by 40 for 18s. Max 2 stacks.",
+  },
+  {
+    id: 'dialogues-of-the-desert-sages',
+    name: 'Dialogues of the Desert Sages',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 42,
+    version: '4.5',
+    subStat: {
+      type: WEAPON_STAT_TYPES.HP_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Principle of Equilibrium',
+    passiveDescription:
+      'When the wielder performs healing, restore 8 Energy. This effect can be triggered once every 10s and can occur even when the character is not on the field.',
+  },
+  {
+    id: 'ultimate-overlords-mega-magic-sword',
+    name: '"Ultimate Overlord\'s Mega Magic Sword"',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 44,
+    version: '4.3',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 6.7,
+    },
+    passiveName: 'Melussistance!',
+    passiveDescription:
+      "ATK increased by 12%. That's not all! The support from all Melusines you've helped in Merusea Village fills you with strength! Based on the number of them you've helped, your ATK is increased by up to an additional 12%.",
+  },
+  {
+    id: 'sword-of-narzissenkreuz',
+    name: 'Sword of Narzissenkreuz',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: '4.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 9,
+    },
+    passiveName: "Hero's Blade",
+    passiveDescription:
+      'When the equipping character does not have an Arkhe: When Normal Attacks, Charged Attacks, or Plunging Attacks strike, a Pneuma or Ousia energy blast will be unleashed, dealing 160% of ATK as DMG. This effect can be triggered once every 12s. The energy blast type is determined by the current type of the Sword of Narzissenkreuz.',
+  },
+  {
+    id: 'ballad-of-the-boundless-blue',
+    name: 'Ballad of the Boundless Blue',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 44,
+    version: '4.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 6.7,
+    },
+    passiveName: 'Azure Skies',
+    passiveDescription:
+      'Within 6s after Normal or Charged Attacks hit an opponent, Normal Attack DMG will be increased by 8% and Charged Attack DMG will be increased by 6%. Max 3 stacks. This effect can be triggered once every 0.3s.',
+  },
+  {
+    id: 'portable-power-saw',
+    name: 'Portable Power Saw',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 41,
+    version: '4.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.HP_PERCENT,
+      value: 12,
+    },
+    passiveName: 'Sea Shanty',
+    passiveDescription:
+      "When the wielder is healed or heals others, they will gain a Stoic's Symbol that lasts 30s, up to a maximum of 3 Symbols. When using their Elemental Skill or Burst, all Symbols will be consumed and the Roused effect will be granted for 10s. For each Symbol consumed, gain 40 Elemental Mastery, and 2s after the effect occurs, 2 Energy per Symbol consumed will be restored for said character. The Roused effect can be triggered once every 15s, and Symbols can be gained even when the character is not on the field.",
+  },
+  {
+    id: 'prospectors-drill',
+    name: "Prospector's Drill",
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 44,
+    version: '4.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: "Masons' Ditty",
+    passiveDescription:
+      "When the wielder is healed or heals others, they will gain a Unity's Symbol that lasts 30s, up to a maximum of 3 Symbols. When using their Elemental Skill or Burst, all Symbols will be consumed and the Struggle effect will be granted for 10s. For each Symbol consumed, gain 3% ATK and 7% All Elemental DMG Bonus. The Struggle effect can be triggered once every 15s, and Symbols can be gained even when the character is not on the field.",
+  },
+  {
+    id: 'range-gauge',
+    name: 'Range Gauge',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 44,
+    version: '4.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: "Masons' Ditty",
+    passiveDescription:
+      "When the wielder is healed or heals others, they will gain a Unity's Symbol that lasts 30s, up to a maximum of 3 Symbols. When using their Elemental Skill or Burst, all Symbols will be consumed and the Struggle effect will be granted for 10s. For each Symbol consumed, gain 3% ATK and 7% All Elemental DMG Bonus. The Struggle effect can be triggered once every 15s, and Symbols can be gained even when the character is not on the field.",
+  },
+  {
+    id: 'the-dockhands-assistant',
+    name: "The Dockhand's Assistant",
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: '4.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.HP_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Sea Shanty',
+    passiveDescription:
+      "When the wielder is healed or heals others, they will gain a Stoic's Symbol that lasts 30s, up to a maximum of 3 Symbols. When using their Elemental Skill or Burst, all Symbols will be consumed and the Roused effect will be granted for 10s. For each Symbol consumed, gain 40 Elemental Mastery, and 2s after the effect occurs, 2 Energy per Symbol consumed will be restored for said character. The Roused effect can be triggered once every 15s, and Symbols can be gained even when the character is not on the field.",
+  },
+  {
+    id: 'ballad-of-the-fjords',
+    name: 'Ballad of the Fjords',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 42,
+    version: '4.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 6,
+    },
+    passiveName: 'Tales of the Tundra',
+    passiveDescription:
+      'When there are at least 3 different Elemental Types in your party, Elemental Mastery will be increased by 120.',
+  },
+  {
+    id: 'finale-of-the-deep',
+    name: 'Finale of the Deep',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 44,
+    version: '4.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: 'An End Sublime',
+    passiveDescription:
+      'When using an Elemental Skill, ATK will be increased by 12% for 15s, and a Bond of Life worth 25% of Max HP will be granted. This effect can be triggered once every 10s. When the Bond of Life is cleared, a maximum of 150 ATK will be gained based on 2.4% of the total amount of the Life Bond cleared, lasting for 15s.',
+  },
+  {
+    id: 'fleuve-cendre-ferryman',
+    name: 'Fleuve Cendre Ferryman',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: '4.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 10,
+    },
+    passiveName: 'Ironbone',
+    passiveDescription:
+      'Increases Elemental Skill CRIT Rate by 8%. Additionally, increases Energy Recharge by 16% for 5s after using an Elemental Skill.',
+  },
+  {
+    id: 'flowing-purity',
+    name: 'Flowing Purity',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 44,
+    version: '4.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: 'Unfinished Masterpiece',
+    passiveDescription:
+      'When using an Elemental Skill, All Elemental DMG Bonus will be increased by 8% for 15s, and a Bond of Life worth 24% of Max HP will be granted. This effect can be triggered once every 10s. When the Bond of Life is cleared, every 1,000 HP cleared in the process will provide 2% All Elemental DMG Bonus, up to a maximum of 12%. This effect lasts 15s.',
+  },
+  {
+    id: 'rightful-reward',
+    name: 'Rightful Reward',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 44,
+    version: '4.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.HP_PERCENT,
+      value: 6,
+    },
+    passiveName: 'Tip of the Spear',
+    passiveDescription:
+      'When the wielder is healed, restore 8 Energy. This effect can be triggered once every 10s, and can occur even when the character is not on the field.',
+  },
+  {
+    id: 'sacrificial-jade',
+    name: 'Sacrificial Jade',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 41,
+    version: '4.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 8,
+    },
+    passiveName: 'Jade Circulation',
+    passiveDescription:
+      'When not on the field for more than 5s, Max HP will be increased by 32% and Elemental Mastery will be increased by 40. These effects will be canceled after the wielder has been on the field for 10s.',
+  },
+  {
+    id: 'scion-of-the-blazing-sun',
+    name: 'Scion of the Blazing Sun',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 44,
+    version: '4.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 4,
+    },
+    passiveName: 'The Way of Sunfire',
+    passiveDescription:
+      'After a Charged Attack hits an opponent, a Sunfire Arrow will descend upon the opponent hit, dealing 60% ATK as DMG, and applying the Heartsearer effect to the opponent damaged by said Arrow for 10s. Opponents affected by Heartsearer take 28% more Charged Attack DMG from the wielder. A Sunfire Arrow can be triggered once every 10s.',
+  },
+  {
+    id: 'song-of-stillness',
+    name: 'Song of Stillness',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 42,
+    version: '4.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Benthic Pulse',
+    passiveDescription:
+      'After the wielder is healed, they will deal 16% more DMG for 8s. This can be triggered even when the character is not on the field.',
+  },
+  {
+    id: 'talking-stick',
+    name: 'Talking Stick',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 44,
+    version: '4.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 4,
+    },
+    passiveName: '"The Silver Tongue"',
+    passiveDescription:
+      'ATK will be increased by 16% for 15s after being affected by Pyro. This effect can be triggered once every 12s. All Elemental DMG Bonus will be increased by 12% for 15s after being affected by Hydro, Cryo, Electro, or Dendro. This effect can be triggered once every 12s.',
+  },
+  {
+    id: 'tidal-shadow',
+    name: 'Tidal Shadow',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 42,
+    version: '4.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 9,
+    },
+    passiveName: 'White Cruising Wave',
+    passiveDescription:
+      'After the wielder is healed, ATK will be increased by 24% for 8s. This can be triggered even when the character is not on the field.',
+  },
+  {
+    id: 'wolf-fang',
+    name: 'Wolf-Fang',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: '4.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 6,
+    },
+    passiveName: 'Northwind Wolf',
+    passiveDescription:
+      'DMG dealt by Elemental Skill and Elemental Burst is increased by 16%. When an Elemental Skill hits an opponent, its CRIT Rate will be increased by 2%. When an Elemental Burst hits an opponent, its CRIT Rate will be increased by 2%. Both of these effects last 10s separately, have 4 max stacks, and can be triggered once every 0.1s.',
+  },
+  {
+    id: 'ibis-piercer',
+    name: 'Ibis Piercer',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 44,
+    version: '3.7',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: "Secret Wisdom's Favor",
+    passiveDescription:
+      "The character's Elemental Mastery will increase by 40 within 6s after Charged Attacks hit opponents. Max 2 stacks. This effect can be triggered once every 0.5s.",
+  },
+  {
+    id: 'mailed-flower',
+    name: 'Mailed Flower',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 44,
+    version: '3.5',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 24,
+    },
+    passiveName: 'Whispers of Wind and Flower',
+    passiveDescription:
+      "Within 8s after the character's Elemental Skill hits an opponent or the character triggers an Elemental Reaction, their ATK and Elemental Mastery will be increased by 12% and 48 respectively.",
+  },
+  {
+    id: 'toukabou-shigure',
+    name: 'Toukabou Shigure',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: '3.3',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 36,
+    },
+    passiveName: 'Kaidan: Rainfall Earthbinder',
+    passiveDescription:
+      "After an attack hits opponents, it will inflict an instance of Cursed Parasol upon one of them for 10s. This effect can be triggered once every 15s. If this opponent is defeated during Cursed Parasol's duration, Cursed Parasol's CD will be refreshed immediately. The character wielding this weapon will deal 16% more DMG to the opponent affected by Cursed Parasol.",
+  },
+  {
+    id: 'makhaira-aquamarine',
+    name: 'Makhaira Aquamarine',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 42,
+    version: '3.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 36,
+    },
+    passiveName: 'Desert Pavilion',
+    passiveDescription:
+      'The following effect will trigger every 10s: The equipping character will gain 24% of their Elemental Mastery as bonus ATK for 12s, with nearby party members gaining 30% of this buff for the same duration. Multiple instances of this weapon can allow this buff to stack. This effect will still trigger even if the character is not on the field.',
+  },
+  {
+    id: 'missive-windspear',
+    name: 'Missive Windspear',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 42,
+    version: '3.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 9,
+    },
+    passiveName: 'The Wind Unattained',
+    passiveDescription:
+      'Within 10s after an Elemental Reaction is triggered, ATK is increased by 12% and Elemental Mastery is increased by 48.',
+  },
+  {
+    id: 'wandering-evenstar',
+    name: 'Wandering Evenstar',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 42,
+    version: '3.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 36,
+    },
+    passiveName: 'Wildling Nightstar',
+    passiveDescription:
+      'The following effect will trigger every 10s: The equipping character will gain 24% of their Elemental Mastery as bonus ATK for 12s, with nearby party members gaining 30% of this buff for the same duration. Multiple instances of this weapon can allow this buff to stack. This effect will still trigger even if the character is not on the field.',
+  },
+  {
+    id: 'xiphos-moonlight',
+    name: "Xiphos' Moonlight",
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: '3.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 36,
+    },
+    passiveName: "Jinni's Whisper",
+    passiveDescription:
+      'The following effect will trigger every 10s: The equipping character will gain 0.036% Energy Recharge for each point of Elemental Mastery they possess for 12s, with nearby party members gaining 30% of this buff for the same duration. Multiple instances of this weapon can allow this buff to stack. This effect will still trigger even if the character is not on the field.',
+  },
+  {
+    id: 'end-of-the-line',
+    name: 'End of the Line',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 42,
+    version: '3.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 10,
+    },
+    passiveName: 'Net Snapper',
+    passiveDescription:
+      'Triggers the Flowrider effect after using an Elemental Skill, dealing 80% ATK as AoE DMG upon hitting an opponent with an attack. Flowrider will be removed after 15s or after causing 3 instances of AoE DMG. Only 1 instance of AoE DMG can be caused every 2s in this way. Flowrider can be triggered once every 12s.',
+  },
+  {
+    id: 'forest-regalia',
+    name: 'Forest Regalia',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 44,
+    version: '3.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 6.7,
+    },
+    passiveName: 'Forest Sanctuary',
+    passiveDescription:
+      "After triggering Burning, Quicken, Aggravate, Spread, Bloom, Lunar-Bloom, Hyperbloom, or Burgeon, a Leaf of Consciousness will be created around the character for a maximum of 10s. When picked up, the Leaf will grant the character 60 Elemental Mastery for 12s. Only 1 Leaf can be generated this way every 20s. This effect can still be triggered if the character is not on the field. The Leaf of Consciousness' effect cannot stack.",
+  },
+  {
+    id: 'fruit-of-fulfillment',
+    name: 'Fruit of Fulfillment',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 42,
+    version: '3.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 10,
+    },
+    passiveName: 'Full Circle',
+    passiveDescription:
+      'Obtain the "Wax and Wane" effect after an Elemental Reaction is triggered, gaining 24 Elemental Mastery while losing 5% ATK. For every 0.3s, 1 stack of Wax and Wane can be gained. Max 5 stacks. For every 6s that go by without an Elemental Reaction being triggered, 1 stack will be lost. This effect can be triggered even when the character is off-field.',
+  },
+  {
+    id: 'kings-squire',
+    name: "King's Squire",
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 41,
+    version: '3.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 12,
+    },
+    passiveName: "Labyrinth Lord's Instruction",
+    passiveDescription:
+      'Obtain the Teachings of the Forest effect when unleashing Elemental Skills and Bursts, increasing Elemental Mastery by 60 for 12s. This effect will be removed when switching characters. When the Teachings of the Forest effect ends or is removed, it will deal 100% of ATK as DMG to 1 nearby opponent. The Teachings of the Forest effect can be triggered once every 20s.',
+  },
+  {
+    id: 'moonpiercer',
+    name: 'Moonpiercer',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 44,
+    version: '3.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 24,
+    },
+    passiveName: 'Stillwood Moonshadow',
+    passiveDescription:
+      'After triggering Burning, Quicken, Aggravate, Spread, Bloom, Lunar-Bloom, Hyperbloom, or Burgeon, a Leaf of Revival will be created around the character for a maximum of 10s. When picked up, the Leaf will grant the character 16% ATK for 12s. Only 1 Leaf can be generated this way every 20s. This effect can still be triggered if the character is not on the field.',
+  },
+  {
+    id: 'sapwood-blade',
+    name: 'Sapwood Blade',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 44,
+    version: '3.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 6.7,
+    },
+    passiveName: 'Forest Sanctuary',
+    passiveDescription:
+      "After triggering Burning, Quicken, Aggravate, Spread, Bloom, Lunar-Bloom, Hyperbloom, or Burgeon, a Leaf of Consciousness will be created around the character for a maximum of 10s. When picked up, the Leaf will grant the character 60 Elemental Mastery for 12s. Only 1 Leaf can be generated this way every 20s. This effect can still be triggered if the character is not on the field. The Leaf of Consciousness' effect cannot stack.",
+  },
+  {
+    id: 'kagotsurube-isshin',
+    name: 'Kagotsurube Isshin',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: '2.8',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Isshin Art Clarity',
+    passiveDescription:
+      'When a Normal, Charged, or Plunging Attack hits an opponent, it will whip up a Hewing Gale, dealing AoE DMG equal to 180% of ATK and increasing ATK by 15% for 8s. This effect can be triggered once every 8s.',
+  },
+  {
+    id: 'fading-twilight',
+    name: 'Fading Twilight',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 44,
+    version: '2.7',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 6.7,
+    },
+    passiveName: 'Radiance of the Deeps',
+    passiveDescription:
+      'Has three states, Evengleam, Afterglow, and Dawnblaze, which increase DMG dealt by 6%/10%/14% respectively. When attacks hit opponents, this weapon will switch to the next state. This weapon can change states once every 7s. The character equipping this weapon can still trigger the state switch while not on the field.',
+  },
+  {
+    id: 'oathsworn-eye',
+    name: 'Oathsworn Eye',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 44,
+    version: '2.5',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: 'People of the Faltering Light',
+    passiveDescription: 'Increases Energy Recharge by 24% for 10s after using an Elemental Skill.',
+  },
+  {
+    id: 'cinnabar-spindle',
+    name: 'Cinnabar Spindle',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 41,
+    version: '2.3',
+    subStat: {
+      type: WEAPON_STAT_TYPES.DEF_PERCENT,
+      value: 15,
+    },
+    passiveName: 'Spotless Heart',
+    passiveDescription:
+      'Elemental Skill DMG is increased by 40% of DEF. The effect will be triggered no more than once every 1.5s and will be cleared 0.1s after the Elemental Skill deals DMG.',
+  },
+  {
+    id: 'akuoumaru',
+    name: 'Akuoumaru',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 42,
+    version: '2.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Watatsumi Wavewalker',
+    passiveDescription:
+      "For every point of the entire party's combined maximum Energy capacity, the Elemental Burst DMG of the character equipping this weapon is increased by 0.12%. A maximum of 40% increased Elemental Burst DMG can be achieved this way.",
+  },
+  {
+    id: 'mouuns-moon',
+    name: "Mouun's Moon",
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 44,
+    version: '2.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: 'Watatsumi Wavewalker',
+    passiveDescription:
+      "For every point of the entire party's combined maximum Energy capacity, the Elemental Burst DMG of the character equipping this weapon is increased by 0.12%. A maximum of 40% increased Elemental Burst DMG can be achieved this way.",
+  },
+  {
+    id: 'wavebreakers-fin',
+    name: "Wavebreaker's Fin",
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 45,
+    version: '2.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 3,
+    },
+    passiveName: 'Watatsumi Wavewalker',
+    passiveDescription:
+      "For every point of the entire party's combined maximum Energy capacity, the Elemental Burst DMG of the character equipping this weapon is increased by 0.12%. A maximum of 40% increased Elemental Burst DMG can be achieved this way.",
+  },
+  {
+    id: 'the-catch',
+    name: '"The Catch"',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 42,
+    version: '2.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 10,
+    },
+    passiveName: 'Shanty',
+    passiveDescription: 'Increases Elemental Burst DMG by 16% and Elemental Burst CRIT Rate by 6%.',
+  },
+  {
+    id: 'luxurious-sea-lord',
+    name: 'Luxurious Sea-Lord',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 41,
+    version: '2.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 12,
+    },
+    passiveName: 'Oceanic Victory',
+    passiveDescription:
+      'Increases Elemental Burst DMG by 12%. When Elemental Burst hits opponents, there is a 100% chance of summoning a huge onrush of tuna that deals 100% ATK as AoE DMG. This effect can occur once every 15s.',
+  },
+  {
+    id: 'predator',
+    name: 'Predator',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 42,
+    version: '2.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Strong Strike',
+    passiveDescription:
+      'Effective only on the following platform: \n"PlayStation™Network"\nDealing Cryo DMG to opponents increases this character\'s Normal and Charged Attack DMG by 10% for 6s. This effect can have a maximum of 2 stacks. Additionally, when Aloy equips Predator, ATK is increased by 66.',
+  },
+  {
+    id: 'amenoma-kageuchi',
+    name: 'Amenoma Kageuchi',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 41,
+    version: '2.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 12,
+    },
+    passiveName: 'Iwakura Succession',
+    passiveDescription:
+      'After casting an Elemental Skill, gain 1 Succession Seed. This effect can be triggered once every 5s. The Succession Seed lasts for 30s. Up to 3 Succession Seeds may exist simultaneously. After using an Elemental Burst, all Succession Seeds are consumed and after 2s, the character regenerates 6 Energy for each seed consumed.',
+  },
+  {
+    id: 'hakushin-ring',
+    name: 'Hakushin Ring',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 44,
+    version: '2.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 6.7,
+    },
+    passiveName: 'Sakura Saiguu',
+    passiveDescription:
+      'After the character equipped with this weapon triggers an Electro elemental reaction, nearby party members of an Elemental Type involved in the elemental reaction receive a 10% Elemental DMG Bonus for their element, lasting 6s. Elemental Bonuses gained in this way cannot be stacked.',
+  },
+  {
+    id: 'hamayumi',
+    name: 'Hamayumi',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 41,
+    version: '2.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 12,
+    },
+    passiveName: 'Full Draw',
+    passiveDescription:
+      "Increases Normal Attack DMG by 16% and Charged Attack DMG by 12%. When the equipping character's Energy reaches 100%, this effect is increased by 100%.",
+  },
+  {
+    id: 'katsuragikiri-nagamasa',
+    name: 'Katsuragikiri Nagamasa',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 42,
+    version: '2.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 10,
+    },
+    passiveName: 'Samurai Conduct',
+    passiveDescription:
+      'Increases Elemental Skill DMG by 6%. After Elemental Skill hits an opponent, the character loses 3 Energy but regenerates 3 Energy every 2s for the next 6s. This effect can occur once every 10s. Can be triggered even when the character is not on the field.',
+  },
+  {
+    id: 'kitain-cross-spear',
+    name: 'Kitain Cross Spear',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 44,
+    version: '2.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 24,
+    },
+    passiveName: 'Samurai Conduct',
+    passiveDescription:
+      'Increases Elemental Skill DMG by 6%. After Elemental Skill hits an opponent, the character loses 3 Energy but regenerates 3 Energy every 2s for the next 6s. This effect can occur once every 10s. Can be triggered even when the character is not on the field.',
+  },
+  {
+    id: 'dodoco-tales',
+    name: 'Dodoco Tales',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 41,
+    version: '1.6',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 12,
+    },
+    passiveName: 'Dodoventure!',
+    passiveDescription:
+      'Normal Attack hits on opponents increase Charged Attack DMG by 16% for 6s. Charged Attack hits on opponents increase ATK by 8% for 6s.',
+  },
+  {
+    id: 'mitternachts-waltz',
+    name: 'Mitternachts Waltz',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.6',
+    subStat: {
+      type: WEAPON_STAT_TYPES.PHYSICAL_DMG,
+      value: 11.3,
+    },
+    passiveName: 'Evernight Duet',
+    passiveDescription:
+      'Normal Attack hits on opponents increase Elemental Skill DMG by 20% for 5s. Elemental Skill hits on opponents increase Normal Attack DMG by 20% for 5s.',
+  },
+  {
+    id: 'alley-hunter',
+    name: 'Alley Hunter',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 44,
+    version: '1.4',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: 'Oppidan Ambush',
+    passiveDescription:
+      'While the character equipped with this weapon is in the party but not on the field, their DMG increases by 2% every second up to a max of 20%. When the character is on the field for more than 4s, the aforementioned DMG buff decreases by 4% per second until it reaches 0%.',
+  },
+  {
+    id: 'the-alley-flash',
+    name: 'The Alley Flash',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 45,
+    version: '1.4',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 12,
+    },
+    passiveName: 'Itinerant Hero',
+    passiveDescription:
+      'Increases DMG dealt by the character equipping this weapon by 12%. Taking DMG disables this effect for 5s.',
+  },
+  {
+    id: 'windblume-ode',
+    name: 'Windblume Ode',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.4',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 36,
+    },
+    passiveName: 'Windblume Wish',
+    passiveDescription:
+      'After using an Elemental Skill, receive a boon from the ancient wish of the Windblume, increasing ATK by 16% for 6s.',
+  },
+  {
+    id: 'wine-and-song',
+    name: 'Wine and Song',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 44,
+    version: '1.4',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 6.7,
+    },
+    passiveName: 'Ever-Changing',
+    passiveDescription:
+      'Hitting an opponent with a Normal Attack decreases the Stamina consumption of Sprint or Alternate Sprint by 14% for 5s. Additionally, using a Sprint or Alternate Sprint ability increases ATK by 20% for 5s.',
+  },
+  {
+    id: 'lithic-blade',
+    name: 'Lithic Blade',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.3',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Lithic Axiom: Unity',
+    passiveDescription:
+      'For every character in the party who hails from Liyue, the character who equips this weapon gains a 7% ATK increase and a 3% CRIT Rate increase. This effect stacks up to 4 times.',
+  },
+  {
+    id: 'lithic-spear',
+    name: 'Lithic Spear',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 44,
+    version: '1.3',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: 'Lithic Axiom: Unity',
+    passiveDescription:
+      'For every character in the party who hails from Liyue, the character who equips this weapon gains a 7% ATK increase and a 3% CRIT Rate increase. This effect stacks up to 4 times.',
+  },
+  {
+    id: 'dragonspine-spear',
+    name: 'Dragonspine Spear',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 41,
+    version: '1.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.PHYSICAL_DMG,
+      value: 15,
+    },
+    passiveName: 'Frost Burial',
+    passiveDescription:
+      'Hitting an opponent with Normal and Charged Attacks has a 60% chance of forming and dropping an Everfrost Icicle above them, dealing AoE DMG equal to 80% of ATK. Opponents affected by Cryo are instead dealt DMG equal to 200% of ATK. Can only occur once every 10s.',
+  },
+  {
+    id: 'festering-desire',
+    name: 'Festering Desire',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 10,
+    },
+    passiveName: 'Undying Admiration',
+    passiveDescription: 'Increases Elemental Skill DMG by 16% and Elemental Skill CRIT Rate by 6%.',
+  },
+  {
+    id: 'frostbearer',
+    name: 'Frostbearer',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Frost Burial',
+    passiveDescription:
+      'Hitting an opponent with Normal and Charged Attacks has a 60% chance of forming and dropping an Everfrost Icicle above them, dealing AoE DMG equal to 80% of ATK. Opponents affected by Cryo are instead dealt DMG equal to 200% of ATK. Can only occur once every 10s.',
+  },
+  {
+    id: 'snow-tombed-starsilver',
+    name: 'Snow-Tombed Starsilver',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 44,
+    version: '1.2',
+    subStat: {
+      type: WEAPON_STAT_TYPES.PHYSICAL_DMG,
+      value: 7.5,
+    },
+    passiveName: 'Frost Burial',
+    passiveDescription:
+      'Hitting an opponent with Normal and Charged Attacks has a 60% chance of forming and dropping an Everfrost Icicle above them, dealing AoE DMG equal to 80% of ATK. Opponents affected by Cryo are instead dealt DMG equal to 200% of ATK. Can only occur once every 10s.',
+  },
+  {
+    id: 'royal-spear',
+    name: 'Royal Spear',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 44,
+    version: '1.1',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: 'Focus',
+    passiveDescription:
+      'Upon damaging an opponent, increases CRIT Rate by 8%. Max 5 stacks. A CRIT Hit removes all stacks.',
+  },
+  {
+    id: 'blackcliff-agate',
+    name: 'Blackcliff Agate',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 12,
+    },
+    passiveName: 'Press the Advantage',
+    passiveDescription:
+      'After defeating an enemy, ATK is increased by 12% for 30s. This effect has a maximum of 3 stacks, and the duration of each stack is independent of the others.',
+  },
+  {
+    id: 'blackcliff-longsword',
+    name: 'Blackcliff Longsword',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 44,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 8,
+    },
+    passiveName: 'Press the Advantage',
+    passiveDescription:
+      'After defeating an opponent, ATK is increased by 12% for 30s. This effect has a maximum of 3 stacks, and the duration of each stack is independent of the others.',
+  },
+  {
+    id: 'blackcliff-pole',
+    name: 'Blackcliff Pole',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 12,
+    },
+    passiveName: 'Press the Advantage',
+    passiveDescription:
+      'After defeating an enemy, ATK is increased by 12% for 30s. This effect has a maximum of 3 stacks, and the duration of each stack is independent of the others.',
+  },
+  {
+    id: 'blackcliff-slasher',
+    name: 'Blackcliff Slasher',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 12,
+    },
+    passiveName: 'Press the Advantage',
+    passiveDescription:
+      'After defeating an opponent, ATK is increased by 12% for 30s. This effect has a maximum of 3 stacks, and the duration of each stack is independent of the others.',
+  },
+  {
+    id: 'blackcliff-warbow',
+    name: 'Blackcliff Warbow',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 44,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 8,
+    },
+    passiveName: 'Press the Advantage',
+    passiveDescription:
+      'After defeating an enemy, ATK is increased by 12% for 30s. This effect has a maximum of 3 stacks, and the duration of each stack is independent of the others.',
+  },
+  {
+    id: 'compound-bow',
+    name: 'Compound Bow',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 41,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.PHYSICAL_DMG,
+      value: 15,
+    },
+    passiveName: 'Infusion Arrow',
+    passiveDescription:
+      'Normal Attack and Charged Attack hits increase ATK by 4% and Normal ATK SPD by 1.2% for 6s. Max 4 stacks. Can only occur once every 0.3s.',
+  },
+  {
+    id: 'crescent-pike',
+    name: 'Crescent Pike',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 44,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.PHYSICAL_DMG,
+      value: 7.5,
+    },
+    passiveName: 'Infusion Needle',
+    passiveDescription:
+      'After picking up an Elemental Orb/Particle, Normal and Charged Attacks deal additional DMG equal to 20% of ATK for 5s.',
+  },
+  {
+    id: 'deathmatch',
+    name: 'Deathmatch',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 41,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 8,
+    },
+    passiveName: 'Gladiator',
+    passiveDescription:
+      'If there are at least 2 opponents nearby, ATK is increased by 16% and DEF is increased by 16%. If there are fewer than 2 opponents nearby, ATK is increased by 24%.',
+  },
+  {
+    id: 'dragons-bane',
+    name: "Dragon's Bane",
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 41,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 48,
+    },
+    passiveName: 'Bane of Flame and Water',
+    passiveDescription: 'Increases DMG against opponents affected by Hydro or Pyro by 20%.',
+  },
+  {
+    id: 'eye-of-perception',
+    name: 'Eye of Perception',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 41,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 12,
+    },
+    passiveName: 'Echo',
+    passiveDescription:
+      'Normal and Charged Attacks have a 50% chance to fire a Bolt of Perception, dealing 240% ATK as DMG. This bolt can bounce between opponents a maximum of 4 times. This effect can occur once every 12s.',
+  },
+  {
+    id: 'favonius-codex',
+    name: 'Favonius Codex',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 10,
+    },
+    passiveName: 'Windfall',
+    passiveDescription:
+      'CRIT Hits have a 60% chance to generate a small amount of Elemental Particles, which will regenerate 6 Energy for the character. Can only occur once every 12s.',
+  },
+  {
+    id: 'favonius-greatsword',
+    name: 'Favonius Greatsword',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 41,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 13.3,
+    },
+    passiveName: 'Windfall',
+    passiveDescription:
+      'CRIT Hits have a 60% chance to generate a small amount of Elemental Particles, which will regenerate 6 Energy for the character. Can only occur once every 12s.',
+  },
+  {
+    id: 'favonius-lance',
+    name: 'Favonius Lance',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 44,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 6.7,
+    },
+    passiveName: 'Windfall',
+    passiveDescription:
+      'CRIT Hits have a 60% chance to generate a small amount of Elemental Particles, which will regenerate 6 Energy for the character. Can only occur once every 12s.',
+  },
+  {
+    id: 'favonius-sword',
+    name: 'Favonius Sword',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 41,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 13.3,
+    },
+    passiveName: 'Windfall',
+    passiveDescription:
+      'CRIT Hits have a 60% chance to generate a small amount of Elemental Particles, which will regenerate 6 Energy for the character. Can only occur once every 12s.',
+  },
+  {
+    id: 'favonius-warbow',
+    name: 'Favonius Warbow',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 41,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 13.3,
+    },
+    passiveName: 'Windfall',
+    passiveDescription:
+      'CRIT Hits have a 60% chance to generate a small amount of Elemental Particles, which will regenerate 6 Energy for the character. Can only occur once every 12s.',
+  },
+  {
+    id: 'iron-sting',
+    name: 'Iron Sting',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 36,
+    },
+    passiveName: 'Infusion Stinger',
+    passiveDescription:
+      'Dealing Elemental DMG increases all DMG by 6% for 6s. Max 2 stacks. Can occur once every 1s.',
+  },
+  {
+    id: 'lions-roar',
+    name: "Lion's Roar",
     type: 'Sword',
     rarity: 4,
     baseATK: 42,
     version: '1.0',
     subStat: {
       type: WEAPON_STAT_TYPES.ATK_PERCENT,
-      value: 9.0,
+      value: 9,
     },
-    passiveName: 'Chord',
+    passiveName: 'Bane of Fire and Thunder',
+    passiveDescription: 'Increases DMG against opponents affected by Pyro or Electro by 20%.',
+  },
+  {
+    id: 'mappa-mare',
+    name: 'Mappa Mare',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 44,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 24,
+    },
+    passiveName: 'Infusion Scroll',
     passiveDescription:
-      'Normal or Charged Attacks grant Harmonic. After 5 Harmonics, deal AoE DMG.',
+      'Triggering an Elemental reaction grants a 8% Elemental DMG Bonus for 10s. Max 2 stacks.',
+  },
+  {
+    id: 'prototype-amber',
+    name: 'Prototype Amber',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.HP_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Gilding',
+    passiveDescription:
+      'Using an Elemental Burst regenerates 4 Energy every 2s for 6s. All party members will regenerate 4% HP every 2s for this duration.',
+  },
+  {
+    id: 'prototype-archaic',
+    name: 'Prototype Archaic',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 44,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: 'Crush',
+    passiveDescription:
+      'On hit, Normal or Charged Attacks have a 50% chance to deal an additional 240% ATK DMG to opponents within a small AoE. Can only occur once every 15s.',
+  },
+  {
+    id: 'prototype-crescent',
+    name: 'Prototype Crescent',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Unreturning',
+    passiveDescription:
+      'Charged Attack hits on weak points increase Movement SPD by 10% and ATK by 36% for 10s.',
+  },
+  {
+    id: 'prototype-rancour',
+    name: 'Prototype Rancour',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 44,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.PHYSICAL_DMG,
+      value: 7.5,
+    },
+    passiveName: 'Smashed Stone',
+    passiveDescription:
+      'On hit, Normal or Charged Attacks increase ATK and DEF by 4% for 6s. Max 4 stacks. This effect can only occur once every 0.3s.',
+  },
+  {
+    id: 'prototype-starglitter',
+    name: 'Prototype Starglitter',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 10,
+    },
+    passiveName: 'Magic Affinity',
+    passiveDescription:
+      'After using an Elemental Skill, increases Normal and Charged Attack DMG by 8% for 12s. Max 2 stacks.',
+  },
+  {
+    id: 'rainslasher',
+    name: 'Rainslasher',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 36,
+    },
+    passiveName: 'Bane of Storm and Tide',
+    passiveDescription: 'Increases DMG against opponents affected by Hydro or Electro by 20%.',
+  },
+  {
+    id: 'royal-bow',
+    name: 'Royal Bow',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Focus',
+    passiveDescription:
+      'Upon damaging an opponent, increases CRIT Rate by 8%. Max 5 stacks. A CRIT Hit removes all stacks.',
+  },
+  {
+    id: 'royal-greatsword',
+    name: 'Royal Greatsword',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 44,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: 'Focus',
+    passiveDescription:
+      'Upon damaging an opponent, increases CRIT Rate by 8%. Max 5 stacks. A CRIT Hit removes all stacks.',
+  },
+  {
+    id: 'royal-grimoire',
+    name: 'Royal Grimoire',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 44,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 6,
+    },
+    passiveName: 'Focus',
+    passiveDescription:
+      'Upon damaging an opponent, increases CRIT Rate by 8%. Max 5 stacks. A CRIT Hit removes all stacks.',
+  },
+  {
+    id: 'royal-longsword',
+    name: 'Royal Longsword',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Focus',
+    passiveDescription:
+      'Upon damaging an opponent, increases CRIT Rate by 8%. Max 5 stacks. A CRIT Hit removes all stacks.',
+  },
+  {
+    id: 'rust',
+    name: 'Rust',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Rapid Firing',
+    passiveDescription:
+      'Increases Normal Attack DMG by 40% but decreases Charged Attack DMG by 10%.',
+  },
+  {
+    id: 'sacrificial-bow',
+    name: 'Sacrificial Bow',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 44,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 6.7,
+    },
+    passiveName: 'Composed',
+    passiveDescription:
+      'After damaging an opponent with an Elemental Skill, the skill has a 40% chance to end its own CD. Can only occur once every 30s.',
+  },
+  {
+    id: 'sacrificial-fragments',
+    name: 'Sacrificial Fragments',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 41,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 48,
+    },
+    passiveName: 'Composed',
+    passiveDescription:
+      'After damaging an opponent with an Elemental Skill, the skill has a 40% chance to end its own CD. Can only occur once every 30s.',
+  },
+  {
+    id: 'sacrificial-greatsword',
+    name: 'Sacrificial Greatsword',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 44,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 6.7,
+    },
+    passiveName: 'Composed',
+    passiveDescription:
+      'After damaging an opponent with an Elemental Skill, the skill has a 40% chance to end its own CD. Can only occur once every 30s.',
   },
   {
     id: 'sacrificial-sword',
@@ -190,55 +2877,100 @@ export const WEAPONS: Weapon[] = [
     },
     passiveName: 'Composed',
     passiveDescription:
-      'After dealing damage with an Elemental Skill, has a chance to end its own CD.',
+      'After damaging an opponent with an Elemental Skill, the skill has a 40% chance to end its own CD. Can only occur once every 30s.',
   },
-  // 4-Star Claymores
   {
-    id: 'prototype-archaic',
-    name: 'Prototype Archaic',
+    id: 'serpent-spine',
+    name: 'Serpent Spine',
     type: 'Claymore',
     rarity: 4,
-    baseATK: 44,
+    baseATK: 42,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 6,
+    },
+    passiveName: 'Wavesplitter',
+    passiveDescription:
+      'Every 4s a character is on the field, they will deal 6% more DMG and take 3% more DMG. This effect has a maximum of 5 stacks and will not be reset if the character leaves the field, but will be reduced by 1 stack when the character takes DMG.',
+  },
+  {
+    id: 'solar-pearl',
+    name: 'Solar Pearl',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 6,
+    },
+    passiveName: 'Solar Shine',
+    passiveDescription:
+      'Normal Attack hits increase Elemental Skill and Elemental Burst DMG by 20% for 6s. Likewise, Elemental Skill or Elemental Burst hits increase Normal Attack DMG by 20% for 6s.',
+  },
+  {
+    id: 'sword-of-descension',
+    name: 'Sword of Descension',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 39,
     version: '1.0',
     subStat: {
       type: WEAPON_STAT_TYPES.ATK_PERCENT,
-      value: 6.0,
+      value: 7.7,
     },
-    passiveName: 'Crush',
-    passiveDescription: 'Normal or Charged Attacks have a chance to deal additional AoE DMG.',
+    passiveName: 'Descension',
+    passiveDescription:
+      'Effective only on the following platform: \n"PlayStation™Network"\nHitting opponents with Normal and Charged Attacks grants a 50% chance to deal 200% ATK as DMG in a small AoE. This effect can only occur once every 10s. Additionally, if the Traveler equips the Sword of Descension, their ATK is increased by 66.',
   },
-  // 4-Star Polearms
   {
-    id: 'the-catch',
-    name: 'The Catch',
-    type: 'Polearm',
+    id: 'the-bell',
+    name: 'The Bell',
+    type: 'Claymore',
     rarity: 4,
     baseATK: 42,
-    version: '2.1',
-    subStat: {
-      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
-      value: 10.0,
-    },
-    passiveName: 'Shanty',
-    passiveDescription: 'Increases Elemental Burst CRIT Rate and DMG.',
-  },
-  {
-    id: 'dragons-bane',
-    name: "Dragon's Bane",
-    type: 'Polearm',
-    rarity: 4,
-    baseATK: 41,
     version: '1.0',
     subStat: {
-      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
-      value: 48,
+      type: WEAPON_STAT_TYPES.HP_PERCENT,
+      value: 9,
     },
-    passiveName: 'Bane of Flame and Water',
-    passiveDescription: 'Increases DMG against opponents affected by Hydro or Pyro.',
+    passiveName: 'Rebellious Guardian',
+    passiveDescription:
+      'Taking DMG generates a shield which absorbs DMG up to 20% of Max HP. This shield lasts for 10s or until broken, and can only be triggered once every 45s. While protected by a shield, the character gains 12% increased DMG.',
   },
-  // 4-Star Bows
   {
-    id: 'stringless',
+    id: 'the-black-sword',
+    name: 'The Black Sword',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 6,
+    },
+    passiveName: 'Justice',
+    passiveDescription:
+      'Increases DMG dealt by Normal and Charged Attacks by 20%. Additionally, regenerates 60% of ATK as HP when Normal and Charged Attacks score a CRIT Hit. This effect can occur once every 5s.',
+  },
+  {
+    id: 'the-flute',
+    name: 'The Flute',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 9,
+    },
+    passiveName: 'Chord',
+    passiveDescription:
+      'Normal or Charged Attacks grant a Harmonic on hits. Gaining 5 Harmonics triggers the power of music and deals 100% ATK DMG to surrounding opponents. Harmonics last up to 30s, and a maximum of 1 can be gained every 0.5s.',
+  },
+  {
+    id: 'the-stringless',
     name: 'The Stringless',
     type: 'Bow',
     rarity: 4,
@@ -249,9 +2981,23 @@ export const WEAPONS: Weapon[] = [
       value: 36,
     },
     passiveName: 'Arrowless Song',
-    passiveDescription: 'Increases Elemental Skill and Elemental Burst DMG.',
+    passiveDescription: 'Increases Elemental Skill and Elemental Burst DMG by 24%.',
   },
-  // 4-Star Catalysts
+  {
+    id: 'the-viridescent-hunt',
+    name: 'The Viridescent Hunt',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 42,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 6,
+    },
+    passiveName: 'Verdant Wind',
+    passiveDescription:
+      'Upon hit, Normal and Charged Attacks have a 50% chance to generate a Cyclone, which will continuously attract surrounding opponents, dealing 40% of ATK as DMG to these opponents every 0.5s for 4s. This effect can only occur once every 14s.',
+  },
   {
     id: 'the-widsith',
     name: 'The Widsith',
@@ -261,26 +3007,376 @@ export const WEAPONS: Weapon[] = [
     version: '1.0',
     subStat: {
       type: WEAPON_STAT_TYPES.CRIT_DMG,
-      value: 12.0,
+      value: 12,
     },
     passiveName: 'Debut',
-    passiveDescription: 'When a character takes the field, gain a random theme song buff.',
+    passiveDescription:
+      'When the character takes the field, they will gain a random theme song for 10s. This can only occur once every 30s. Recitative: ATK is increased by 60%. Aria: Increases all Elemental DMG by 48%. Interlude: Elemental Mastery is increased by 240.',
   },
   {
-    id: 'favonius-codex',
-    name: 'Favonius Codex',
-    type: 'Catalyst',
+    id: 'whiteblind',
+    name: 'Whiteblind',
+    type: 'Claymore',
     rarity: 4,
     baseATK: 42,
     version: '1.0',
     subStat: {
-      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
-      value: 10.0,
+      type: WEAPON_STAT_TYPES.DEF_PERCENT,
+      value: 11.3,
     },
-    passiveName: 'Windfall',
-    passiveDescription: 'CRIT hits have a chance to generate Elemental Particles.',
+    passiveName: 'Infusion Blade',
+    passiveDescription:
+      'On hit, Normal or Charged Attacks increase ATK and DEF by 6% for 6s. Max 4 stacks. This effect can only occur once every 0.5s.',
+  },
+  {
+    id: 'black-tassel',
+    name: 'Black Tassel',
+    type: 'Polearm',
+    rarity: 3,
+    baseATK: 38,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.HP_PERCENT,
+      value: 10.2,
+    },
+    passiveName: 'Bane of the Soft',
+    passiveDescription: 'Increases DMG against slimes by 40%.',
+  },
+  {
+    id: 'bloodtainted-greatsword',
+    name: 'Bloodtainted Greatsword',
+    type: 'Claymore',
+    rarity: 3,
+    baseATK: 38,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 41,
+    },
+    passiveName: 'Bane of Fire and Thunder',
+    passiveDescription: 'Increases DMG dealt against opponents affected by Pyro or Electro by 12%.',
+  },
+  {
+    id: 'cool-steel',
+    name: 'Cool Steel',
+    type: 'Sword',
+    rarity: 3,
+    baseATK: 39,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 7.7,
+    },
+    passiveName: 'Bane of Water and Ice',
+    passiveDescription: 'Increases DMG against opponents affected by Hydro or Cryo by 12%.',
+  },
+  {
+    id: 'dark-iron-sword',
+    name: 'Dark Iron Sword',
+    type: 'Sword',
+    rarity: 3,
+    baseATK: 39,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 31,
+    },
+    passiveName: 'Overloaded',
+    passiveDescription:
+      'Upon causing an Overloaded, Superconduct, Electro-Charged, Quicken, Aggravate, Hyperbloom, Lunar-Charged, or Electro-infused Swirl reaction, ATK is increased by 20% for 12s.',
+  },
+  {
+    id: 'debate-club',
+    name: 'Debate Club',
+    type: 'Claymore',
+    rarity: 3,
+    baseATK: 39,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 7.7,
+    },
+    passiveName: 'Blunt Conclusion',
+    passiveDescription:
+      'After using an Elemental Skill, on hit, Normal and Charged Attacks deal additional DMG equal to 60% of ATK in a small AoE. Effect lasts 15s. DMG can only occur once every 3s.',
+  },
+  {
+    id: 'emerald-orb',
+    name: 'Emerald Orb',
+    type: 'Catalyst',
+    rarity: 3,
+    baseATK: 40,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 20,
+    },
+    passiveName: 'Rapids',
+    passiveDescription:
+      'Upon causing a Vaporize, Electro-Charged, Frozen, Bloom, Lunar-Charged, Lunar-Bloom, or a Hydro-infused Swirl reaction, ATK is increased by 20% for 12s.',
+  },
+  {
+    id: 'ferrous-shadow',
+    name: 'Ferrous Shadow',
+    type: 'Claymore',
+    rarity: 3,
+    baseATK: 39,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.HP_PERCENT,
+      value: 7.7,
+    },
+    passiveName: 'Unbending',
+    passiveDescription:
+      'When HP falls below 70%, increases Charged Attack DMG by 30% and Charged Attacks become harder to interrupt.',
+  },
+  {
+    id: 'fillet-blade',
+    name: 'Fillet Blade',
+    type: 'Sword',
+    rarity: 3,
+    baseATK: 39,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 7.7,
+    },
+    passiveName: 'Gash',
+    passiveDescription:
+      'On hit, has a 50% chance to deal 240% ATK DMG to a single opponent. Can only occur once every 15s.',
+  },
+  {
+    id: 'halberd',
+    name: 'Halberd',
+    type: 'Polearm',
+    rarity: 3,
+    baseATK: 40,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ATK_PERCENT,
+      value: 5.1,
+    },
+    passiveName: 'Heavy',
+    passiveDescription:
+      'Normal Attacks deal an additional 160% ATK as DMG. Can only occur once every 10s.',
+  },
+  {
+    id: 'harbinger-of-dawn',
+    name: 'Harbinger of Dawn',
+    type: 'Sword',
+    rarity: 3,
+    baseATK: 39,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 10.2,
+    },
+    passiveName: 'Vigorous',
+    passiveDescription: 'When HP is above 90%, increases CRIT Rate by 14%.',
+  },
+  {
+    id: 'magic-guide',
+    name: 'Magic Guide',
+    type: 'Catalyst',
+    rarity: 3,
+    baseATK: 38,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 41,
+    },
+    passiveName: 'Bane of Storm and Tide',
+    passiveDescription: 'Increases DMG against opponents affected by Hydro or Electro by 12%.',
+  },
+  {
+    id: 'messenger',
+    name: 'Messenger',
+    type: 'Bow',
+    rarity: 3,
+    baseATK: 40,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 6.8,
+    },
+    passiveName: "Archer's Message",
+    passiveDescription:
+      'Charged Attack hits on weak points deal an additional 100% ATK DMG as CRIT DMG. Can only occur once every 10s.',
+  },
+  {
+    id: 'otherworldly-story',
+    name: 'Otherworldly Story',
+    type: 'Catalyst',
+    rarity: 3,
+    baseATK: 39,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 8.5,
+    },
+    passiveName: 'Energy Shower',
+    passiveDescription: 'Picking up an Elemental Energy Orb/Particle recovers 1% HP.',
+  },
+  {
+    id: 'raven-bow',
+    name: 'Raven Bow',
+    type: 'Bow',
+    rarity: 3,
+    baseATK: 40,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
+      value: 20,
+    },
+    passiveName: 'Bane of Flame and Water',
+    passiveDescription: 'Increases DMG against opponents affected by Hydro or Pyro by 12%.',
+  },
+  {
+    id: 'recurve-bow',
+    name: 'Recurve Bow',
+    type: 'Bow',
+    rarity: 3,
+    baseATK: 38,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.HP_PERCENT,
+      value: 10.2,
+    },
+    passiveName: 'Cull the Weak',
+    passiveDescription: 'Defeating an opponent restores 8% HP.',
+  },
+  {
+    id: 'sharpshooters-oath',
+    name: "Sharpshooter's Oath",
+    type: 'Bow',
+    rarity: 3,
+    baseATK: 39,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_DMG,
+      value: 10.2,
+    },
+    passiveName: 'Precise',
+    passiveDescription: 'Increases DMG against weak spots by 24%.',
+  },
+  {
+    id: 'skyrider-greatsword',
+    name: 'Skyrider Greatsword',
+    type: 'Claymore',
+    rarity: 3,
+    baseATK: 39,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.PHYSICAL_DMG,
+      value: 9.6,
+    },
+    passiveName: 'Courage',
+    passiveDescription:
+      'On hit, Normal or Charged Attacks increase ATK by 6% for 6s. Max 4 stacks. Can occur once every 0.5s.',
+  },
+  {
+    id: 'skyrider-sword',
+    name: 'Skyrider Sword',
+    type: 'Sword',
+    rarity: 3,
+    baseATK: 38,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
+      value: 11.3,
+    },
+    passiveName: 'Determination',
+    passiveDescription:
+      'Using an Elemental Burst grants a 12% increase in ATK and Movement SPD for 15s.',
+  },
+  {
+    id: 'slingshot',
+    name: 'Slingshot',
+    type: 'Bow',
+    rarity: 3,
+    baseATK: 38,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 6.8,
+    },
+    passiveName: 'Slingshot',
+    passiveDescription:
+      'If a Normal or Charged Attack hits a target within 0.3s of being fired, increases DMG by 36%. Otherwise, decreases DMG by 10%.',
+  },
+  {
+    id: 'thrilling-tales-of-dragon-slayers',
+    name: 'Thrilling Tales of Dragon Slayers',
+    type: 'Catalyst',
+    rarity: 3,
+    baseATK: 39,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.HP_PERCENT,
+      value: 7.7,
+    },
+    passiveName: 'Heritage',
+    passiveDescription:
+      'When switching characters, the new character taking the field has their ATK increased by 24% for 10s. This effect can only occur once every 20s.',
+  },
+  {
+    id: 'travelers-handy-sword',
+    name: "Traveler's Handy Sword",
+    type: 'Sword',
+    rarity: 3,
+    baseATK: 40,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.DEF_PERCENT,
+      value: 6.4,
+    },
+    passiveName: 'Journey',
+    passiveDescription: 'Each Elemental Orb or Particle collected restores 1% HP.',
+  },
+  {
+    id: 'twin-nephrite',
+    name: 'Twin Nephrite',
+    type: 'Catalyst',
+    rarity: 3,
+    baseATK: 40,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 3.4,
+    },
+    passiveName: 'Guerilla Tactics',
+    passiveDescription: 'Defeating an opponent increases Movement SPD and ATK by 12% for 15s.',
+  },
+  {
+    id: 'white-iron-greatsword',
+    name: 'White Iron Greatsword',
+    type: 'Claymore',
+    rarity: 3,
+    baseATK: 39,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.DEF_PERCENT,
+      value: 9.6,
+    },
+    passiveName: 'Cull the Weak',
+    passiveDescription: 'Defeating an opponent restores 8% HP.',
+  },
+  {
+    id: 'white-tassel',
+    name: 'White Tassel',
+    type: 'Polearm',
+    rarity: 3,
+    baseATK: 39,
+    version: '1.0',
+    subStat: {
+      type: WEAPON_STAT_TYPES.CRIT_RATE,
+      value: 5.1,
+    },
+    passiveName: 'Sharp',
+    passiveDescription: 'Increases Normal Attack DMG by 24%.',
   },
 ];
+// END GENERATED WEAPONS
 
 const WEAPONS_BY_ID = new Map(WEAPONS.map((w) => [w.id, w]));
 
