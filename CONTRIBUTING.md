@@ -91,7 +91,6 @@ Pre-commit enforces formatting, linting, documentation, secrets, and hygiene che
 - [.github/workflows/pre-commit.yml](.github/workflows/pre-commit.yml) runs only hooks that can't run in pre-commit.ci.
 - [.github/workflows/ci.yml](.github/workflows/ci.yml) runs build and type check jobs for apps and packages.
 - [.github/workflows/link-check.yml](.github/workflows/link-check.yml) blocks pull requests on broken internal documentation links ([lychee](https://lychee.cli.rs), offline); [.github/workflows/external-link-check.yml](.github/workflows/external-link-check.yml) checks external URLs weekly and reports breakage via a GitHub issue.
-- The `knip` pre-commit hook blocks unused dependencies, files, and binaries ([knip](https://knip.dev)); unused exports run at warn severity. It runs in CI via [.github/workflows/pre-commit.yml](.github/workflows/pre-commit.yml). See [docs/how-tos/check-unused-dependencies.md](docs/how-tos/check-unused-dependencies.md).
 - Feature work adds tests and enforces them when it introduces testable behavior.
 
 **Commit types**. Use these prefixes in your commit messages:

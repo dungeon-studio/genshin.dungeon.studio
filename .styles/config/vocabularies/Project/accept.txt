@@ -46,7 +46,6 @@ tooltip
 config
 configs
 formatters
-enum
 
 # Backend and database
 Firebase
