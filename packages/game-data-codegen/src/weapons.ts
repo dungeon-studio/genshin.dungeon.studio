@@ -1,26 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-/**
- * Regenerate `src/weapons.ts` from the offline `genshin-db` dataset.
- *
- * genshin-db is a generation-time input only: this script reads its bundled
- * records and rewrites the `WEAPONS` array between the GENERATED markers in
- * `weapons.ts`. The committed output stays static TypeScript, so the app never
- * depends on genshin-db at runtime.
- *
- * Run with: pnpm --filter @genshin/game-data generate:weapons
- */
-
 import { readFileSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
+import { compareVersions } from '@genshin/game-data';
+import type { Rarity, WeaponType } from '@genshin/game-data';
 import gdb from 'genshin-db';
-
-import type { Rarity } from '../src/rarities.js';
-import { compareVersions } from '../src/versions.js';
-import type { WeaponType } from '../src/weapons.js';
 
 /** Lowest rarity included in the roster; 1–2 star fodder is irrelevant to team building. */
 const MINIMUM_RARITY = 3;
@@ -45,6 +32,8 @@ const STAT_TYPE_KEY_BY_GENSHIN_DB: Record<string, string> = {
   FIGHT_PROP_DEFENSE_PERCENT: 'DEF_PERCENT',
 };
 
+const MARKER = /\/\/ BEGIN GENERATED WEAPONS[\s\S]*?\/\/ END GENERATED WEAPONS/;
+
 interface GeneratedWeapon {
   id: string;
   name: string;
@@ -67,13 +56,13 @@ function toKebabCase(name: string): string {
 }
 
 function buildWeapons(): GeneratedWeapon[] {
-  gdb.setOptions({ queryLanguages: ['English'], resultLanguage: 'English' });
+  gdb.setOptions({ queryLanguages: [gdb.Language.English], resultLanguage: gdb.Language.English });
 
   const names = gdb.weapons('names', { matchCategories: true });
   const weapons: GeneratedWeapon[] = [];
 
   for (const name of names) {
-    const record = gdb.weapon(name);
+    const record = gdb.weapons(name);
     // `dupealias` marks non-obtainable duplicates (e.g. Prized Isshin Blade).
     if (!record || record.dupealias || record.rarity < MINIMUM_RARITY) continue;
 
@@ -145,26 +134,34 @@ function serializeWeapon(weapon: GeneratedWeapon): string {
   return lines.join('\n');
 }
 
-function main(): void {
+/** Locates `weapons.ts` in the installed `@genshin/game-data` workspace package. */
+function resolveWeaponsSource(): string {
+  const require = createRequire(import.meta.url);
+  const packageJson = require.resolve('@genshin/game-data/package.json');
+  return resolve(dirname(packageJson), 'src/weapons.ts');
+}
+
+/**
+ * Regenerate the `WEAPONS` array in `@genshin/game-data` from genshin-db.
+ * Returns the number of weapons written.
+ */
+export function generateWeapons(): number {
   const weapons = buildWeapons();
 
   const block = [
-    '// BEGIN GENERATED WEAPONS — regenerate with: pnpm --filter @genshin/game-data generate:weapons',
+    '// BEGIN GENERATED WEAPONS — regenerate with: pnpm --filter @genshin/game-data-codegen generate weapons',
     'export const WEAPONS: Weapon[] = [',
     weapons.map(serializeWeapon).join('\n'),
     '];',
     '// END GENERATED WEAPONS',
   ].join('\n');
 
-  const weaponsPath = resolve(dirname(fileURLToPath(import.meta.url)), '../src/weapons.ts');
+  const weaponsPath = resolveWeaponsSource();
   const source = readFileSync(weaponsPath, 'utf8');
-  const marker = /\/\/ BEGIN GENERATED WEAPONS[\s\S]*?\/\/ END GENERATED WEAPONS/;
-  if (!marker.test(source)) {
+  if (!MARKER.test(source)) {
     throw new Error('GENERATED WEAPONS markers not found in weapons.ts');
   }
 
-  writeFileSync(weaponsPath, source.replace(marker, block));
-  console.log(`Generated ${weapons.length} weapons into src/weapons.ts`);
+  writeFileSync(weaponsPath, source.replace(MARKER, block));
+  return weapons.length;
 }
-
-main();

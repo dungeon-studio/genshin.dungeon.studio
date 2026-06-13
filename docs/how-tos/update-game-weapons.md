@@ -5,11 +5,11 @@ SPDX-License-Identifier: MIT
 
 # How to update Genshin Impact weapons
 
-A generator builds the `WEAPONS` array in `packages/game-data/src/weapons.ts`
-from the offline [`genshin-db`](https://www.npmjs.com/package/genshin-db)
-dataset. Don't hand-edit weapon entries: the region between the
-`BEGIN GENERATED WEAPONS` and `END GENERATED WEAPONS` markers is overwritten on
-every regeneration.
+The `@genshin/game-data-codegen` package builds the `WEAPONS` array in
+`packages/game-data/src/weapons.ts` from the offline
+[`genshin-db`](https://www.npmjs.com/package/genshin-db) dataset. Don't hand-edit
+weapon entries: the region between the `BEGIN GENERATED WEAPONS` and
+`END GENERATED WEAPONS` markers is overwritten on every regeneration.
 
 ## When to update
 
@@ -24,18 +24,21 @@ every regeneration.
 the bump automatically. To do it by hand:
 
 ```bash
-pnpm --filter @genshin/game-data up genshin-db
+pnpm --filter @genshin/game-data-codegen up genshin-db
 ```
 
 ### 2. Regenerate the roster
 
 ```bash
-pnpm --filter @genshin/game-data generate:weapons
+pnpm turbo run build --filter @genshin/game-data-codegen
+pnpm --filter @genshin/game-data-codegen generate weapons
 ```
 
-This rewrites the `WEAPONS` array with the full obtainable roster of 3-star to
-5-star weapons, sorted 5-star first, then by version descending. Review the
-resulting diff: it's the human-readable record of what changed in the data.
+The first command builds the code generator and its workspace dependencies; the
+second runs its CLI. This rewrites the `WEAPONS` array with the full obtainable
+roster of 3-star to 5-star weapons, sorted 5-star first, then by version
+descending. Review the resulting diff: it's the human-readable record of what
+changed in the data.
 
 ### 3. Verify
 
@@ -47,9 +50,10 @@ pnpm turbo run typecheck test lint --filter @genshin/game-data
 
 `genshin-db` reports each sub-stat as a `FIGHT_PROP_*` constant. If a weapon
 introduces a sub-stat not yet in `WEAPON_STAT_TYPES`, the generator throws with
-the unmapped name. Add the member to `WEAPON_STAT_TYPES` in `weapons.ts` and its
-mapping to `STAT_TYPE_KEY_BY_GENSHIN_DB` in `scripts/generate-weapons.ts`, then
-regenerate.
+the unmapped name. Add the member to `WEAPON_STAT_TYPES` in
+`packages/game-data/src/weapons.ts` and its mapping to
+`STAT_TYPE_KEY_BY_GENSHIN_DB` in
+`packages/game-data-codegen/src/weapons.ts`, then regenerate.
 
 ## See also
 

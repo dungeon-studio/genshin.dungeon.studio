@@ -1,0 +1,28 @@
+{
+  "name": "@genshin/game-data-codegen",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Code generators that build @genshin/game-data sources from genshin-db",
+  "type": "module",
+  "bin": {
+    "game-data-codegen": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "generate": "node ./dist/cli.js"
+  },
+  "dependencies": {
+    "@genshin/game-data": "workspace:*",
+    "commander": "14.0.1",
+    "genshin-db": "5.2.11"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "25.9.1",
+    "eslint": "10.4.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.60.0"
+  }
+}

@@ -50,7 +50,7 @@ export interface Weapon {
   passiveDescription?: string;
 }
 
-// BEGIN GENERATED WEAPONS — regenerate with: pnpm --filter @genshin/game-data generate:weapons
+// BEGIN GENERATED WEAPONS — regenerate with: pnpm --filter @genshin/game-data-codegen generate weapons
 export const WEAPONS: Weapon[] = [
   {
     id: 'angelos-heptades',

@@ -10,22 +10,20 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "lint": "eslint .",
-    "generate:weapons": "tsx scripts/generate-weapons.ts"
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@types/node": "25.9.1",
     "@vitest/coverage-v8": "4.1.7",
     "eslint": "10.4.0",
-    "genshin-db": "5.2.11",
-    "tsx": "4.22.3",
     "typescript": "6.0.3",
     "typescript-eslint": "8.60.0",
     "vitest": "4.1.7"
