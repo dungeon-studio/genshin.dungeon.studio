@@ -9,9 +9,9 @@ SPDX-License-Identifier: MIT
 
 <!-- vale Microsoft.Headings = YES -->
 
-CI runs [knip](https://knip.dev) on every pull request via the `knip.yml`
-workflow. Use this guide to reproduce its findings locally or check changes
-before pushing.
+[knip](https://knip.dev) runs as a pre-commit hook on every commit, and in CI
+via the `pre-commit.yml` workflow. Use this guide to reproduce its findings
+directly or check changes before committing.
 
 ## Run the check
 
@@ -26,10 +26,10 @@ needs dependencies installed first:
 pnpm install
 ```
 
-The same check is available as a manual pre-commit hook:
+The pre-commit hook runs the same check on every commit. To run it on demand:
 
 ```bash
-pre-commit run knip --hook-stage manual
+pre-commit run knip --all-files
 ```
 
 ## What blocks a pull request
