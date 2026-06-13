@@ -28,6 +28,7 @@ Dockerfile
 
 # Code quality tools
 Codecov
+knip
 jq
 pipx
 ESLint

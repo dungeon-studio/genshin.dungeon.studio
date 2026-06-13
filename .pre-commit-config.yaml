@@ -32,6 +32,7 @@ ci:
     - prettier
     - stylelint
     - typescript-check
+    - knip
     - terraform_fmt
     - terraform_trivy
     - renovate-config-validator
@@ -154,6 +155,16 @@ repos:
         types: [ts, tsx]
         pass_filenames: false
         stages: [manual]
+
+      # knip analyzes the whole workspace graph, so it can't be file-scoped;
+      # it runs on every commit (always_run) like ls-lint. Fast enough (~1s)
+      # to gate commits. CI runs it via the same hook in pre-commit.yml.
+      - id: knip
+        name: knip (unused files, dependencies, exports)
+        entry: pnpm exec knip
+        language: system
+        pass_filenames: false
+        always_run: true
 
       - id: hadolint
         name: hadolint
