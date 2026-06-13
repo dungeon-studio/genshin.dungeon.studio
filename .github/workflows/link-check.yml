@@ -10,8 +10,10 @@ on:
       - develop
       - main
   schedule:
-    # Mondays at 06:00 UTC.
-    - cron: '0 6 * * 1'
+    # Fridays at 18:00 Europe/London. GitHub cron is UTC-only with no DST,
+    # so this is pinned to 17:00 UTC (18:00 BST); during GMT/winter it fires
+    # at 17:00 London.
+    - cron: '0 17 * * 5'
   workflow_dispatch:
 
 permissions:
@@ -65,10 +67,23 @@ jobs:
           fail: false
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Open issue on broken links
+      # Reuse the open report if one exists so repeated breakage updates a
+      # single issue instead of filing a new one every week.
+      - name: Find existing report issue
+        if: steps.lychee.outputs.exit_code != 0
+        id: report
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          number=$(gh issue list --repo "${{ github.repository }}" --state open \
+            --search 'Link Checker Report in:title' --json number --jq '.[0].number // empty')
+          echo "number=${number}" >> "${GITHUB_OUTPUT}"
+
+      - name: Open or update issue on broken links
         if: steps.lychee.outputs.exit_code != 0
         uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6.0.0
         with:
           title: Link Checker Report
           content-filepath: ./lychee/out.md
+          issue-number: ${{ steps.report.outputs.number }}
           labels: documentation
