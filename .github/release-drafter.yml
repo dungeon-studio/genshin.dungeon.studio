@@ -32,6 +32,12 @@ categories:
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&'
 
+# Keep triage-only pull requests out of the notes.
+exclude-labels:
+  - 'duplicate'
+  - 'invalid'
+  - 'wontfix'
+
 version-resolver:
   major:
     labels:

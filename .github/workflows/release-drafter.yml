@@ -19,22 +19,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Draft only, on trusted refs. The releaser needs contents: write, so it never
+  # runs in a pull_request context.
   update_release_draft:
     name: Update Release Draft
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
       contents: write
-      pull-requests: write
+      pull-requests: read
 
     steps:
       - uses: release-drafter/release-drafter@693d20e7c1ce1a81d3a41962f85914253b518449 # v7.3.1
-        with:
-          # Pull-request events autolabel only; push and manual dispatch draft
-          # the release only. Splitting the two avoids drafting on every PR sync
-          # and keeps the draft a single source for develop's merged PRs.
-          disable-autolabeler: ${{ github.event_name != 'pull_request' }}
-          disable-releaser: ${{ github.event_name == 'pull_request' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Label only, on pull requests. The dedicated autolabeler sub-action needs
+  # just pull-requests: write — no contents access.
+  autolabel:
+    name: Autolabel Pull Request
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: release-drafter/release-drafter/autolabeler@693d20e7c1ce1a81d3a41962f85914253b518449 # v7.3.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -45,6 +57,7 @@ jobs:
 # - Notes are collected from PRs merged into develop (commitish in the config).
 #   At release time, publish the running draft and set its tag target to the
 #   main merge commit so the tag lands on main per git flow.
-# - Autolabeler labels same-repo PRs only; fork PRs run with a read-only token
-#   and are left for manual labeling.
+# - Autolabeler labels same-repo PRs only; fork PRs run with a read-only token.
+#   Switch the trigger to pull_request_target to label fork PRs (see the
+#   release-drafter README) once outside contributions arrive.
 # ---------------------------------------------------------------------------
