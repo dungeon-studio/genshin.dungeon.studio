@@ -38,6 +38,7 @@ ci:
     - renovate-config-validator
     - hadolint
     - ls-lint
+    - syncpack
     # lychee is a binary not installable in pre-commit.ci; its CI coverage
     # lives in link-check.yml, not pre-commit.yml.
     - lychee
@@ -183,3 +184,10 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
+
+      - id: syncpack
+        name: exact dependency versions
+        entry: pnpm exec syncpack lint
+        language: system
+        files: (^|/)package\.json$
+        pass_filenames: false
