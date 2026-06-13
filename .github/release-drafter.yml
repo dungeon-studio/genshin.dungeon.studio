@@ -87,6 +87,31 @@ autolabeler:
   - label: 'breaking-change'
     title:
       - '/^\w+(\(.+\))?!:/'
+  # Component labels from the changed file paths, so a PR is tagged by the part
+  # of the monorepo it touches without manual labeling. Matchers are evaluated
+  # independently, so a cross-cutting PR collects every component it touches.
+  - label: 'web'
+    files:
+      - 'apps/web/**'
+  - label: 'api'
+    files:
+      - 'apps/api/**'
+  - label: 'infrastructure'
+    files:
+      - 'infrastructure/**'
+  - label: 'actions'
+    files:
+      - '.github/**'
+  - label: 'documentation'
+    files:
+      - 'docs/**'
+      - '*.md'
+  - label: 'types'
+    files:
+      - 'packages/domain/**'
+  - label: 'game-data'
+    files:
+      - 'packages/game-data/**'
 
 template: |
   ## What's Changed
