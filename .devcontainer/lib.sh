@@ -52,6 +52,7 @@ run_verification() {
   verify "pre-commit"           pre-commit --version
   verify "reuse"                reuse --version
   verify "hadolint"             hadolint --version
+  verify "lychee"               lychee --version
   verify "firebase"             firebase --version
   verify "playwright-cli"       npx --yes playwright --version
   verify "playwright-browsers"  npx --yes playwright install --list
@@ -74,6 +75,7 @@ run_version_summary() {
   print_version "pre-commit" pre-commit --version
   print_version "reuse"      reuse --version
   print_version "hadolint"   hadolint --version
+  print_version "lychee"     lychee --version
   print_version "firebase"   firebase --version
   print_version "playwright" npx --yes playwright --version
   eval "${_xtrace}"

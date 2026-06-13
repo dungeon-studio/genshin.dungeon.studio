@@ -37,6 +37,9 @@ ci:
     - renovate-config-validator
     - hadolint
     - ls-lint
+    # lychee is a binary not installable in pre-commit.ci; its CI coverage
+    # lives in link-check.yml, not pre-commit.yml.
+    - lychee
 
 repos:
   # Basic file checks
@@ -156,6 +159,12 @@ repos:
         entry: hadolint
         language: system
         types: [dockerfile]
+
+      - id: lychee
+        name: lychee (internal links)
+        entry: lychee --offline --no-progress
+        language: system
+        types: [markdown]
 
       - id: ls-lint
         name: file naming conventions

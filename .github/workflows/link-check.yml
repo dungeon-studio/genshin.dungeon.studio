@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+name: Link Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/main' }}
+
+jobs:
+  # Internal cross-references must resolve on disk. Runs on every pull request
+  # (no path filter, so it always reports a status and is safe to require) and
+  # blocks merge on failure. --offline skips all network requests, so external
+  # rot — checked weekly in external-link-check.yml — never blocks a PR.
+  internal:
+    name: Internal Links
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Check internal links
+        uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2.8.0
+        with:
+          args: --offline --no-progress "**/*.md"
+          fail: true

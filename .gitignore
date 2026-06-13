@@ -29,6 +29,7 @@ pids
 # Linter/formatter cache
 .eslintcache
 .stylelintcache
+.lycheecache
 
 # npm/pnpm specific
 .npm
