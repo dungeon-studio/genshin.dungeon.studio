@@ -17,6 +17,7 @@ ls:
   .test.tsx: kebab-case
   .config.ts: kebab-case
   .config.js: kebab-case
+  .generated.ts: kebab-case
   .d.ts: kebab-case
 
   .json: kebab-case
