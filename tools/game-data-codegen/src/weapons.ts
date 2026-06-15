@@ -9,8 +9,8 @@ import { compareVersions, WEAPON_STAT_TYPES } from '@genshin/game-data';
 import type { Rarity, WeaponStatType, WeaponType } from '@genshin/game-data';
 import genshinDb from 'genshin-db';
 
-/** Lowest rarity included in the roster; 1–2 star fodder is irrelevant to team building. */
-const MINIMUM_RARITY = 3;
+/** Lowest rarity included in the roster; 1–3 star weapons are fodder for team building. */
+const MINIMUM_RARITY = 4;
 
 const WEAPON_TYPE_BY_GENSHIN_DB: Record<string, WeaponType> = {
   WEAPON_SWORD_ONE_HAND: 'Sword',
