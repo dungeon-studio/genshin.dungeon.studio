@@ -36,7 +36,7 @@ with no mapping. To add one:
 
 1. Add the member to `WEAPON_STAT_TYPES` in `packages/game-data/src/weapons.ts`.
 2. Map the `FIGHT_PROP_*` name to it in `SUB_STAT_BY_GENSHIN_DB` in
-   `packages/game-data-codegen/src/weapons.ts`.
+   `tools/game-data-codegen/src/weapons.ts`.
 3. Regenerate the roster.
 
 ## See also
