@@ -69,6 +69,7 @@ function buildWeapons(): GeneratedWeapon[] {
     if (!type) throw new Error(`Unknown weapon type "${record.weaponType}" for ${record.name}`);
 
     const id = toKebabCase(record.name);
+    if (!id) throw new Error(`Weapon name "${record.name}" produced an empty id`);
     const collision = idToName.get(id);
     if (collision) {
       throw new Error(`Duplicate weapon id "${id}" from "${collision}" and "${record.name}"`);
