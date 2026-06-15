@@ -7,7 +7,7 @@ import { dirname, resolve } from 'node:path';
 
 import { compareVersions, WEAPON_STAT_TYPES } from '@genshin/game-data';
 import type { Rarity, WeaponStatType, WeaponType } from '@genshin/game-data';
-import gdb from 'genshin-db';
+import genshinDb from 'genshin-db';
 
 /** Lowest rarity included in the roster; 1–2 star fodder is irrelevant to team building. */
 const MINIMUM_RARITY = 3;
@@ -54,14 +54,17 @@ function toKebabCase(name: string): string {
 }
 
 function buildWeapons(): GeneratedWeapon[] {
-  gdb.setOptions({ queryLanguages: [gdb.Language.English], resultLanguage: gdb.Language.English });
+  genshinDb.setOptions({
+    queryLanguages: [genshinDb.Language.English],
+    resultLanguage: genshinDb.Language.English,
+  });
 
-  const names = gdb.weapons('names', { matchCategories: true });
+  const names = genshinDb.weapons('names', { matchCategories: true });
   const weapons: GeneratedWeapon[] = [];
   const idToName = new Map<string, string>();
 
   for (const name of names) {
-    const record = gdb.weapons(name);
+    const record = genshinDb.weapons(name);
     // `dupealias` marks non-obtainable duplicates (e.g. Prized Isshin Blade).
     if (!record || record.dupealias || record.rarity < MINIMUM_RARITY) continue;
 
