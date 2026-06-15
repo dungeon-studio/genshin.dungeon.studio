@@ -32,7 +32,7 @@ const SUB_STAT_BY_GENSHIN_DB: Record<string, WeaponStatType> = {
   FIGHT_PROP_DEFENSE_PERCENT: WEAPON_STAT_TYPES.DEF_PERCENT,
 };
 
-interface GeneratedWeapon {
+export interface GeneratedWeapon {
   id: string;
   name: string;
   type: WeaponType;
@@ -45,7 +45,7 @@ interface GeneratedWeapon {
   passiveDescription?: string;
 }
 
-function toKebabCase(name: string): string {
+export function toKebabCase(name: string): string {
   return name
     .toLowerCase()
     .replace(/['’]/g, '')
@@ -53,7 +53,7 @@ function toKebabCase(name: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-function buildWeapons(): GeneratedWeapon[] {
+export function buildWeapons(): GeneratedWeapon[] {
   genshinDb.setOptions({
     queryLanguages: [genshinDb.Language.English],
     resultLanguage: genshinDb.Language.English,
