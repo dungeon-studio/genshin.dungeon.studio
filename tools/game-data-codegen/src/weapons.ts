@@ -58,6 +58,7 @@ function buildWeapons(): GeneratedWeapon[] {
 
   const names = gdb.weapons('names', { matchCategories: true });
   const weapons: GeneratedWeapon[] = [];
+  const idToName = new Map<string, string>();
 
   for (const name of names) {
     const record = gdb.weapons(name);
@@ -67,8 +68,15 @@ function buildWeapons(): GeneratedWeapon[] {
     const type = WEAPON_TYPE_BY_GENSHIN_DB[record.weaponType];
     if (!type) throw new Error(`Unknown weapon type "${record.weaponType}" for ${record.name}`);
 
+    const id = toKebabCase(record.name);
+    const collision = idToName.get(id);
+    if (collision) {
+      throw new Error(`Duplicate weapon id "${id}" from "${collision}" and "${record.name}"`);
+    }
+    idToName.set(id, record.name);
+
     const weapon: GeneratedWeapon = {
-      id: toKebabCase(record.name),
+      id,
       name: record.name,
       type,
       rarity: record.rarity as Rarity,

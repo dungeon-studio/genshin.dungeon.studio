@@ -14,11 +14,6 @@ describe('WEAPONS roster', () => {
     expect(WEAPONS.length).toBeGreaterThan(0);
   });
 
-  it('has unique ids', () => {
-    const ids = WEAPONS.map((weapon) => weapon.id);
-    expect(new Set(ids).size).toBe(ids.length);
-  });
-
   it('uses kebab-case ids', () => {
     for (const weapon of WEAPONS) {
       expect(weapon.id).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
