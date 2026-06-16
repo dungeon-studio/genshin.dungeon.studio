@@ -117,3 +117,9 @@ component_management:
         - packages/validation/src/**
       flag_regexes:
         - validation
+    - component_id: game-data-codegen
+      name: Game Data Codegen
+      paths:
+        - tools/game-data-codegen/src/**
+      flag_regexes:
+        - game-data-codegen

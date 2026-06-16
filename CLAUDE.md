@@ -23,6 +23,7 @@ Turborepo + pnpm monorepo. TypeScript 6.0 strict mode throughout.
 - `packages/game-data/` --- Static game data; use exported helpers, never hard-code
 - `packages/collection-json/` --- Collection+JSON media type
 - `packages/validation/` --- Validation utilities
+- `tools/game-data-codegen/` --- CLI that generates `game-data` sources from `genshin-db`
 - `infrastructure/` --- Terraform IaC
 - `docs/` --- How-tos, references, and explanations following Diátaxis
 

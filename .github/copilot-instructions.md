@@ -24,6 +24,7 @@
 - `apps/api`: API server.
 - `packages/game-data`: Source of truth for static game data; use exported helpers, never hard-code.
 - `packages/domain`: Shared domain model: types, invariants, and wire format representations.
+- `tools/game-data-codegen`: CLI that generates `game-data` sources like `weapons.generated.ts` from `genshin-db`. Never hand-edit generated files.
 
 ## Dependency management in the monorepo
 
