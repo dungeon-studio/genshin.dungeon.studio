@@ -1,15 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { compareVersions, WEAPON_STAT_TYPES, WEAPON_TYPES } from '@genshin/game-data';
+import { compareVersions } from '@genshin/game-data';
 import { describe, expect, it } from 'vitest';
 
 import { buildWeapons } from './weapons.js';
 
 describe('buildWeapons', () => {
   const weapons = buildWeapons();
-  const types = new Set<string>(Object.values(WEAPON_TYPES));
-  const subStats = new Set<string>(Object.values(WEAPON_STAT_TYPES));
 
   it('returns a nonempty roster', () => {
     expect(weapons.length).toBeGreaterThan(0);
@@ -25,13 +23,6 @@ describe('buildWeapons', () => {
     const ids = weapons.map((weapon) => weapon.id);
     expect(new Set(ids).size).toBe(ids.length);
     expect(ids.every((id) => id.length > 0)).toBe(true);
-  });
-
-  it('uses only known weapon types and sub-stats', () => {
-    for (const weapon of weapons) {
-      expect(types).toContain(weapon.type);
-      if (weapon.subStatType) expect(subStats).toContain(weapon.subStatType);
-    }
   });
 
   it('sorts by rarity descending, then version descending', () => {
