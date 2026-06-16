@@ -27,7 +27,7 @@ describe('buildWeapons', () => {
     expect(ids.every((id) => id.length > 0)).toBe(true);
   });
 
-  it('maps every type and sub-stat into the domain vocabulary', () => {
+  it('uses only known weapon types and sub-stats', () => {
     for (const weapon of weapons) {
       expect(types).toContain(weapon.type);
       if (weapon.subStatType) expect(subStats).toContain(weapon.subStatType);
