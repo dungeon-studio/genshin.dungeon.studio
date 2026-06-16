@@ -50,6 +50,10 @@ jobs:
             filter: '@genshin/validation'
             path-prefix: packages/validation
             flag: validation
+          - display: Game Data Codegen
+            filter: '@genshin/game-data-codegen'
+            path-prefix: tools/game-data-codegen
+            flag: game-data-codegen
 
     steps:
       - name: Checkout repository

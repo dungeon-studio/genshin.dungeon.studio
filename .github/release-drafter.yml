@@ -112,6 +112,7 @@ autolabeler:
   - label: 'game-data'
     files:
       - 'packages/game-data/**'
+      - 'tools/game-data-codegen/**'
 
 template: |
   ## What's Changed

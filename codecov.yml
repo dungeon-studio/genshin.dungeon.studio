@@ -33,6 +33,9 @@ flag_management:
     - name: game-data
       paths:
         - packages/game-data/src/**
+    - name: game-data-codegen
+      paths:
+        - tools/game-data-codegen/src/**
     - name: web
       paths:
         - apps/web/src/**
@@ -114,3 +117,9 @@ component_management:
         - packages/validation/src/**
       flag_regexes:
         - validation
+    - component_id: game-data-codegen
+      name: Game Data Codegen
+      paths:
+        - tools/game-data-codegen/src/**
+      flag_regexes:
+        - game-data-codegen

@@ -1,23 +1,23 @@
 {
-  "name": "@genshin/game-data",
+  "name": "@genshin/game-data-codegen",
   "version": "0.1.0",
   "private": true,
-  "description": "Genshin Impact game data including characters, weapons, elements, and artifacts",
+  "description": "Code generators that build @genshin/game-data sources from genshin-db",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./package.json": "./package.json"
+  "bin": {
+    "game-data-codegen": "./dist/cli.js"
   },
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "generate": "node ./dist/cli.js"
+  },
+  "dependencies": {
+    "@genshin/game-data": "workspace:*",
+    "commander": "14.0.1",
+    "genshin-db": "5.2.11"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
