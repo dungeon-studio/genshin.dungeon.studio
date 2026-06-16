@@ -9,6 +9,8 @@ import { compareVersions, WEAPON_STAT_TYPES } from '@genshin/game-data';
 import type { Rarity, WeaponStatType, WeaponType } from '@genshin/game-data';
 import genshinDb from 'genshin-db';
 
+import { toKebabCase } from './slug.js';
+
 /** Lowest rarity included in the roster; 1–3 star weapons are fodder for team building. */
 const MINIMUM_RARITY = 4;
 
@@ -43,14 +45,6 @@ export interface GeneratedWeapon {
   subStatValue?: number;
   passiveName?: string;
   passiveDescription?: string;
-}
-
-export function toKebabCase(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/['’]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
 }
 
 export function buildWeapons(): GeneratedWeapon[] {
