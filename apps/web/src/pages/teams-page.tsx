@@ -6,6 +6,7 @@ import { TEAM_SLOTS } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
 import { useCallback, useMemo, useState } from 'react';
 
+import { Container } from '@/components/container';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
@@ -83,7 +84,7 @@ export function TeamsPage() {
   }, [selectedSlot, selectedMemberIndex, removeWeapon]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12">
+    <Container className="py-12">
       <h1 className="sr-only">Teams</h1>
 
       <div className="space-y-4">
@@ -199,6 +200,6 @@ export function TeamsPage() {
           )}
         </SheetContent>
       </Sheet>
-    </div>
+    </Container>
   );
 }

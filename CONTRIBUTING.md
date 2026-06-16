@@ -122,6 +122,7 @@ Pre-commit hooks automatically enforce key checks, including:
 - CSS linting with Tailwind directives
 - Documentation and config linting for Markdown, YAML, and prose
 - Safety and repository hygiene checks for secrets, merge conflict markers, large files, trailing whitespace, line endings, and YAML/JSON validation
+- Exact dependency versions via [syncpack](https://jamiemason.github.io/syncpack/): `package.json` dependencies stay pinned with no `^` or `~` ranges. Run `pnpm exec syncpack fix` to pin offenders
 
 Pull requests must pass type checks in [ci.yml](.github/workflows/ci.yml). Run type checks locally before committing when your change affects TypeScript code:
 

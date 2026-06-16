@@ -6,6 +6,7 @@ import { CHARACTERS } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+import { Container } from '@/components/container';
 import { CharacterCard } from '@/features/collection/characters/character-card';
 import { CharacterFilters } from '@/features/collection/characters/character-filters';
 import type { CharacterFilterState } from '@/features/collection/characters/filtering';
@@ -42,7 +43,7 @@ export function CharactersPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-12">
+      <Container className="py-12">
         <h1 className="sr-only">Characters</h1>
         <div className="flex items-center justify-center py-24">
           <Loader2
@@ -52,7 +53,7 @@ export function CharactersPage() {
           />
           <span className="sr-only">Loading collection</span>
         </div>
-      </div>
+      </Container>
     );
   }
 
@@ -61,7 +62,7 @@ export function CharactersPage() {
       <h1 className="sr-only">Characters</h1>
 
       <div className="sticky top-0 z-10 bg-background shadow-sm">
-        <div className="mx-auto max-w-7xl px-4 py-4">
+        <Container className="py-4">
           {error && (
             <p className="mb-3 rounded-md bg-destructive/10 px-4 py-3 text-center text-sm text-destructive">
               Failed to sync collection. Local data is still available.
@@ -75,10 +76,10 @@ export function CharactersPage() {
             ownedCount={ownedCount}
             filteredOwnedCount={filteredOwnedCount}
           />
-        </div>
+        </Container>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 pb-12 pt-4">
+      <Container className="pb-12 pt-4">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredCharacters.map((character) => {
             const owned = isOwned(character.id);
@@ -104,7 +105,7 @@ export function CharactersPage() {
             No characters match your filters.
           </p>
         )}
-      </div>
+      </Container>
     </>
   );
 }

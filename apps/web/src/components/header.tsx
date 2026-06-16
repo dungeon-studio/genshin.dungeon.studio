@@ -3,6 +3,7 @@
 
 import { Link } from 'react-router-dom';
 
+import { Container } from '@/components/container';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LoginButton, LogoutButton, useAuth } from '@/features/auth';
 
@@ -11,7 +12,7 @@ export function Header() {
 
   return (
     <header className="border-b border-border bg-background">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
+      <Container className="flex items-center justify-between py-4">
         <Link
           to="/"
           className="flex items-center gap-2 text-2xl font-bold text-foreground hover:text-foreground/80"
@@ -38,7 +39,7 @@ export function Header() {
           {!loading && (user ? <UserMenu user={user} /> : <LoginButton />)}
           <ThemeToggle />
         </div>
-      </div>
+      </Container>
     </header>
   );
 }

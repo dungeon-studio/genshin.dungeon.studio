@@ -28,6 +28,7 @@ Dockerfile
 
 # Code quality tools
 Codecov
+knip
 jq
 pipx
 ESLint
@@ -37,6 +38,7 @@ Vitest
 hadolint
 markdownlint
 yamllint
+syncpack
 Colocate
 middleware
 tooltip

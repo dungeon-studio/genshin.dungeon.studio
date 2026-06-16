@@ -3,9 +3,11 @@
 
 import { Link } from 'react-router-dom';
 
+import { Container } from '@/components/container';
+
 export function NotFoundPage() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12">
+    <Container className="py-12">
       <div className="text-center">
         <h1 className="text-6xl font-bold text-foreground">404</h1>
         <p className="mt-4 text-2xl font-semibold text-foreground">Page Not Found</p>
@@ -19,6 +21,6 @@ export function NotFoundPage() {
           Back to Teams
         </Link>
       </div>
-    </div>
+    </Container>
   );
 }
