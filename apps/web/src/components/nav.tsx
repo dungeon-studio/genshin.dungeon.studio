@@ -4,19 +4,14 @@
 import { NavLink } from 'react-router-dom';
 
 import { Container } from '@/components/container';
+import { NAV_LINKS } from '@/components/nav-links';
 
 export function Nav() {
-  const navLinks = [
-    { to: '/', label: 'Teams' },
-    { to: '/characters', label: 'Characters' },
-    { to: '/weapons', label: 'Weapons' },
-  ];
-
   return (
-    <nav className="border-b border-border bg-muted" aria-label="Main navigation">
+    <nav className="hidden border-b border-border bg-muted sm:block" aria-label="Main navigation">
       <Container>
         <div className="flex gap-8">
-          {navLinks.map((link) => (
+          {NAV_LINKS.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}

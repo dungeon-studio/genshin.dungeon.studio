@@ -4,6 +4,7 @@
 import { Link } from 'react-router-dom';
 
 import { Container } from '@/components/container';
+import { MobileNav } from '@/components/mobile-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LoginButton, LogoutButton, useAuth } from '@/features/auth';
 
@@ -13,28 +14,31 @@ export function Header() {
   return (
     <header className="border-b border-border bg-background">
       <Container className="flex items-center justify-between py-4">
-        <Link
-          to="/"
-          className="flex items-center gap-2 text-2xl font-bold text-foreground hover:text-foreground/80"
-        >
-          <img
-            src="/favicon-32x32.png"
-            alt=""
-            aria-hidden="true"
-            width={32}
-            height={32}
-            className="dark:hidden"
-          />
-          <img
-            src="/favicon-32x32-dark.png"
-            alt=""
-            aria-hidden="true"
-            width={32}
-            height={32}
-            className="hidden dark:block"
-          />
-          Genshin Planner
-        </Link>
+        <div className="flex items-center gap-2">
+          <MobileNav />
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-2xl font-bold text-foreground hover:text-foreground/80"
+          >
+            <img
+              src="/favicon-32x32.png"
+              alt=""
+              aria-hidden="true"
+              width={32}
+              height={32}
+              className="dark:hidden"
+            />
+            <img
+              src="/favicon-32x32-dark.png"
+              alt=""
+              aria-hidden="true"
+              width={32}
+              height={32}
+              className="hidden dark:block"
+            />
+            <span className="sr-only sm:not-sr-only">Genshin Planner</span>
+          </Link>
+        </div>
         <div className="flex items-center gap-3">
           {!loading && (user ? <UserMenu user={user} /> : <LoginButton />)}
           <ThemeToggle />
@@ -56,7 +60,9 @@ function UserMenu({ user }: { user: { displayName: string | null; photoURL: stri
           referrerPolicy="no-referrer"
         />
       ) : null}
-      <span className="text-sm font-medium text-foreground">{user.displayName ?? 'User'}</span>
+      <span className="hidden text-sm font-medium text-foreground sm:inline">
+        {user.displayName ?? 'User'}
+      </span>
       <LogoutButton />
     </div>
   );
