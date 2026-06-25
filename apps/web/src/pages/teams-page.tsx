@@ -13,8 +13,8 @@ import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-co
 import { CharacterPool } from '@/features/teams/character-pool';
 import { TeamPlanner } from '@/features/teams/team-planner';
 import { TeamStrip } from '@/features/teams/team-strip';
-import { WeaponPool } from '@/features/teams/weapon-pool';
 import { useTeams } from '@/features/teams/use-teams';
+import { WeaponPool } from '@/features/teams/weapon-pool';
 
 type SheetTab = 'characters' | 'weapons';
 

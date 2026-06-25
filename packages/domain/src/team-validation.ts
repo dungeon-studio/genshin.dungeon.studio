@@ -14,6 +14,7 @@
 
 import type { ValidationIssue } from '@genshin/validation';
 import { issue, prefixPaths } from '@genshin/validation';
+
 import { validateArtifactPlan } from './artifact-plan-validation.js';
 import type { CollectionTeamMembers, TeamSlot } from './collection-team.js';
 

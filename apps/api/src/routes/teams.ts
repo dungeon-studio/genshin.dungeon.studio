@@ -1,6 +1,18 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { COLLECTION_JSON } from '@genshin/collection-json';
+import type { CollectionTeamMember, CollectionTeamMembers, TeamSlot, UUID } from '@genshin/domain';
+import {
+  isValidTeamSlot,
+  teamItemDocument,
+  teamListDocument,
+  validateArtifactPlan,
+  validateTeams,
+} from '@genshin/domain';
+import { Hono } from 'hono';
+import { HTTPException } from 'hono/http-exception';
+
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
 import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
@@ -14,17 +26,6 @@ import { teamPutRequestV1 } from '@/profiles/json-schema/teams/put-request-v1.js
 import * as Characters from '@/repositories/characters/index.js';
 import * as Teams from '@/repositories/teams/index.js';
 import * as Weapons from '@/repositories/weapons/index.js';
-import { COLLECTION_JSON } from '@genshin/collection-json';
-import type { CollectionTeamMember, CollectionTeamMembers, TeamSlot, UUID } from '@genshin/domain';
-import {
-  isValidTeamSlot,
-  teamItemDocument,
-  teamListDocument,
-  validateArtifactPlan,
-  validateTeams,
-} from '@genshin/domain';
-import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
 
 export const teams = new Hono<{
   Variables: AuthVariables &

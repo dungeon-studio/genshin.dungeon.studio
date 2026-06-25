@@ -22,9 +22,9 @@ import {
 } from '@genshin/collection-json';
 
 import type { ArtifactPlan } from '../../artifact-plan.js';
+import type { CollectionTeamMember } from '../../collection-team-member.js';
 import type { CollectionTeam, CollectionTeamMembers } from '../../collection-team.js';
 import { assertCollectionTeam, MAX_TEAM_MEMBERS } from '../../collection-team.js';
-import type { CollectionTeamMember } from '../../collection-team-member.js';
 
 const TEAM_TEMPLATE: Template = {
   data: [

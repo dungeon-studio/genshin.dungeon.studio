@@ -1,11 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { useCallback, useEffect, useRef } from 'react';
-import { toast } from 'sonner';
-
 import type { CharacterId, CollectionCharacter } from '@genshin/domain';
 import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import { useCallback, useEffect, useRef } from 'react';
+import { toast } from 'sonner';
 
 import { useAuth } from '@/features/auth/use-auth';
 

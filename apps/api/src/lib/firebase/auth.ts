@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { app } from '@/lib/firebase/app.js';
 import { type DecodedIdToken, getAuth } from 'firebase-admin/auth';
+
+import { app } from '@/lib/firebase/app.js';
 
 const auth = getAuth(app);
 

@@ -1,6 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
+import { characterItemHref, characterRepresentation, serialiseCharacter } from '@genshin/domain';
+import { getCharacterById } from '@genshin/game-data';
+import { Hono } from 'hono';
+import { HTTPException } from 'hono/http-exception';
+
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
 import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
@@ -12,11 +18,6 @@ import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { characterItemV1 } from '@/profiles/alps/character/item-v1.js';
 import { characterPutRequestV1 } from '@/profiles/json-schema/characters/put-request-v1.js';
 import * as Characters from '@/repositories/characters/index.js';
-import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
-import { characterItemHref, characterRepresentation, serialiseCharacter } from '@genshin/domain';
-import { getCharacterById } from '@genshin/game-data';
-import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
 
 export const characters = new Hono<{
   Variables: AuthVariables &

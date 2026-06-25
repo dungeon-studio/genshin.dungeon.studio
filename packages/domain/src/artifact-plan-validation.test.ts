@@ -1,9 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { describe, expect, it } from 'vitest';
-
 import { isValid } from '@genshin/validation';
+import { describe, expect, it } from 'vitest';
 
 import { validateArtifactPlan } from './artifact-plan-validation.js';
 

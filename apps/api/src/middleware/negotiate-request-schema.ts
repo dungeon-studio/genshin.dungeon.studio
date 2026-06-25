@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { ProfileLink } from '@/middleware/profile-link.js';
 import contentType from 'content-type';
 import type { MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+
+import type { ProfileLink } from '@/middleware/profile-link.js';
 
 /**
  * Extract the pathname from a profile URL or path.

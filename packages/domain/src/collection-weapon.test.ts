@@ -70,13 +70,11 @@ describe('assertCollectionWeapon', () => {
   });
 
   it('throws for missing weaponInstanceId', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { weaponInstanceId: _, ...rest } = VALID_WEAPON;
     expect(() => assertCollectionWeapon(rest)).toThrow(/weaponInstanceId/);
   });
 
   it('throws for missing weaponId', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { weaponId: _, ...rest } = VALID_WEAPON;
     expect(() => assertCollectionWeapon(rest)).toThrow(/weaponId/);
   });

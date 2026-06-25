@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { app } from '@/app.js';
-import { rootGetResponseV1 } from '@/profiles/json-schema/root/get-response-v1.js';
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import { beforeEach, describe, expect, it } from 'vitest';
+
+import { app } from '@/app.js';
+import { rootGetResponseV1 } from '@/profiles/json-schema/root/get-response-v1.js';
 
 const ajv = new Ajv2020();
 const validateGetSchema = ajv.compile(rootGetResponseV1.schema);

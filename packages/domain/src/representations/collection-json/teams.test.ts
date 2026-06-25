@@ -3,10 +3,10 @@
 
 import { describe, expect, it } from 'vitest';
 
+import { deserialiseTeam, serialiseTeam } from './teams.js';
 import type { CollectionTeam, CollectionTeamMembers, TeamSlot } from '../../collection-team.js';
 import type { ISOTimestamp } from '../../iso-timestamp.js';
 import type { UUID } from '../../uuid.js';
-import { deserialiseTeam, serialiseTeam } from './teams.js';
 
 const BASE_URL = 'http://localhost:8080';
 const VALID_TIMESTAMP = '2024-01-15T12:00:00Z' as ISOTimestamp;

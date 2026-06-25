@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { alpsRegistry } from '@/profiles/alps/registry.js';
 import { Hono } from 'hono';
+
+import { alpsRegistry } from '@/profiles/alps/registry.js';
 
 export const alpsProfiles = new Hono();
 

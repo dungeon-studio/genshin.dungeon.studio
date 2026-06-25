@@ -1,12 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
-import { negotiateContent } from '@/middleware/negotiate-content.js';
-import { rootGetResponseV1 } from '@/profiles/json-schema/root/get-response-v1.js';
 import type { Env, Hono as HonoApp } from 'hono';
 import { Hono } from 'hono';
 import { findTargetHandler, isMiddleware } from 'hono/utils/handler';
+
+import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
+import { negotiateContent } from '@/middleware/negotiate-content.js';
+import { rootGetResponseV1 } from '@/profiles/json-schema/root/get-response-v1.js';
 
 /**
  * Discover top-level resource paths from the app's registered routes.

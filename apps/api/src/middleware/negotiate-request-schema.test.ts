@@ -1,9 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { ProfileLink } from '@/middleware/profile-link.js';
 import { Hono } from 'hono';
 import { describe, expect, it } from 'vitest';
+
+import type { ProfileLink } from '@/middleware/profile-link.js';
 
 import type { NegotiatedRequestSchemaVariables } from './negotiate-request-schema.js';
 import { negotiateRequestSchema } from './negotiate-request-schema.js';

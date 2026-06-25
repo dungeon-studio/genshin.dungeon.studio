@@ -1,6 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
+import type { UUID } from '@genshin/domain';
+import { serialiseWeapon, weaponItemHref, weaponRepresentation } from '@genshin/domain';
+import { getWeaponById } from '@genshin/game-data';
+import { Hono } from 'hono';
+import { HTTPException } from 'hono/http-exception';
+
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
 import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
@@ -13,12 +20,6 @@ import { weaponItemV1 } from '@/profiles/alps/weapon/item-v1.js';
 import { weaponPatchRequestV1 } from '@/profiles/json-schema/weapons/patch-request-v1.js';
 import { weaponPostRequestV1 } from '@/profiles/json-schema/weapons/post-request-v1.js';
 import * as Weapons from '@/repositories/weapons/index.js';
-import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
-import type { UUID } from '@genshin/domain';
-import { serialiseWeapon, weaponItemHref, weaponRepresentation } from '@genshin/domain';
-import { getWeaponById } from '@genshin/game-data';
-import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
 
 export const weapons = new Hono<{
   Variables: AuthVariables &

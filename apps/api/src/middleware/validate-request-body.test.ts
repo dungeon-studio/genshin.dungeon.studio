@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
-import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
 import { Hono } from 'hono';
 import { describe, expect, it } from 'vitest';
+
+import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
+import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
 
 import type { ValidatedRequestBodyVariables } from './validate-request-body.js';
 import { validateRequestBody } from './validate-request-body.js';
