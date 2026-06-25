@@ -3,9 +3,9 @@
 
 import { describe, expect, it } from 'vitest';
 
+import { deserialiseCharacter, serialiseCharacter } from './characters.js';
 import type { CollectionCharacter } from '../../collection-character.js';
 import type { ISOTimestamp } from '../../iso-timestamp.js';
-import { deserialiseCharacter, serialiseCharacter } from './characters.js';
 
 const BASE_URL = 'http://localhost:8080';
 const VALID_TIMESTAMP = '2024-01-15T12:00:00Z' as ISOTimestamp;

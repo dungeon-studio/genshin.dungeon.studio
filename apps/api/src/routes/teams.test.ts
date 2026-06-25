@@ -1,8 +1,18 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
 import type { CollectionCharacter, CollectionTeam, CollectionWeapon, UUID } from '@genshin/domain';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { app } from '@/app.js';
+import { verifyToken } from '@/lib/firebase/auth.js';
+import { toMediaTypeString } from '@/middleware/negotiate-content.js';
+import { teamItemV1 } from '@/profiles/alps/team/item-v1.js';
+import * as Characters from '@/repositories/characters/index.js';
+import * as Teams from '@/repositories/teams/index.js';
+import * as Weapons from '@/repositories/weapons/index.js';
+import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
 
 vi.mock('@/lib/firebase/auth.js', () => ({
   verifyToken: vi.fn(),
@@ -22,17 +32,6 @@ vi.mock('@/repositories/characters/index.js', () => ({
 vi.mock('@/repositories/weapons/index.js', () => ({
   get: vi.fn(),
 }));
-
-import { app } from '@/app.js';
-import { verifyToken } from '@/lib/firebase/auth.js';
-import * as Characters from '@/repositories/characters/index.js';
-import * as Teams from '@/repositories/teams/index.js';
-import * as Weapons from '@/repositories/weapons/index.js';
-import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
-import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
-
-import { toMediaTypeString } from '@/middleware/negotiate-content.js';
-import { teamItemV1 } from '@/profiles/alps/team/item-v1.js';
 
 const FAKE_TEAM: CollectionTeam = {
   slot: 1,

@@ -1,8 +1,18 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
 import type { CollectionCharacter } from '@genshin/domain';
+import { MAX_CONSTELLATION_LEVEL, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import { getCharacterById } from '@genshin/game-data';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { app } from '@/app.js';
+import { verifyToken } from '@/lib/firebase/auth.js';
+import { toMediaTypeString } from '@/middleware/negotiate-content.js';
+import { characterItemV1 } from '@/profiles/alps/character/item-v1.js';
+import * as Characters from '@/repositories/characters/index.js';
+import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
 
 vi.mock('@/lib/firebase/auth.js', () => ({
   verifyToken: vi.fn(),
@@ -18,16 +28,6 @@ vi.mock('@/repositories/characters/index.js', () => ({
 vi.mock('@genshin/game-data', () => ({
   getCharacterById: vi.fn(),
 }));
-
-import { app } from '@/app.js';
-import { verifyToken } from '@/lib/firebase/auth.js';
-import { toMediaTypeString } from '@/middleware/negotiate-content.js';
-import { characterItemV1 } from '@/profiles/alps/character/item-v1.js';
-import * as Characters from '@/repositories/characters/index.js';
-import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
-import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
-import { MAX_CONSTELLATION_LEVEL, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
-import { getCharacterById } from '@genshin/game-data';
 
 const FAKE_CHARACTER: CollectionCharacter = {
   characterId: 'albedo',

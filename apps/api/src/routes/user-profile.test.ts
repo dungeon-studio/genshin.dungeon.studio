@@ -1,10 +1,15 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { profileGetResponseV1 } from '@/profiles/json-schema/profile/get-response-v1.js';
 import type { UserProfile } from '@genshin/domain';
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { app } from '@/app.js';
+import { verifyToken } from '@/lib/firebase/auth.js';
+import { profileGetResponseV1 } from '@/profiles/json-schema/profile/get-response-v1.js';
+import * as Profile from '@/repositories/profile/index.js';
+import { FAKE_UID, authedRequest } from '@/test/auth-requests.js';
 
 vi.mock('@/lib/firebase/auth.js', () => ({
   verifyToken: vi.fn(),
@@ -14,11 +19,6 @@ vi.mock('@/repositories/profile/index.js', () => ({
   get: vi.fn(),
   update: vi.fn(),
 }));
-
-import { app } from '@/app.js';
-import { verifyToken } from '@/lib/firebase/auth.js';
-import * as Profile from '@/repositories/profile/index.js';
-import { FAKE_UID, authedRequest } from '@/test/auth-requests.js';
 
 const ajv = new Ajv2020();
 const validateGetSchema = ajv.compile(profileGetResponseV1.schema);

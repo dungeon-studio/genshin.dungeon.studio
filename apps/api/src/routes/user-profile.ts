@@ -1,6 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { serialiseProfile, type AuthIdentity, type ProfileUpdate } from '@genshin/domain';
+import type { DecodedIdToken } from 'firebase-admin/auth';
+import { Hono } from 'hono';
+import { HTTPException } from 'hono/http-exception';
+
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
 import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
@@ -12,10 +17,6 @@ import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { profileGetResponseV1 } from '@/profiles/json-schema/profile/get-response-v1.js';
 import { profilePatchRequestV1 } from '@/profiles/json-schema/profile/patch-request-v1.js';
 import * as Profile from '@/repositories/profile/index.js';
-import { serialiseProfile, type AuthIdentity, type ProfileUpdate } from '@genshin/domain';
-import type { DecodedIdToken } from 'firebase-admin/auth';
-import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
 
 function toAuthIdentity({ uid, email, email_verified, picture }: DecodedIdToken): AuthIdentity {
   return { uid, email, emailVerified: email_verified, picture };

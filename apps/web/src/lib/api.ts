@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { auth } from '@/lib/firebase';
 import type { ProblemDetail } from '@genshin/domain';
+
+import { auth } from '@/lib/firebase';
 
 export type { ProblemDetail };
 

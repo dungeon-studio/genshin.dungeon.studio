@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
+import { isValidRefinementLevel } from '@genshin/domain';
 import type { Weapon } from '@genshin/game-data';
 import { useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
-
-import { isValidRefinementLevel } from '@genshin/domain';
 
 import { useAuth } from '@/features/auth/use-auth';
 

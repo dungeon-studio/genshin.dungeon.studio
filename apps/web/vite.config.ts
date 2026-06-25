@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import react from '@vitejs/plugin-react';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+
+import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
 const requiredEnvVars: readonly string[] = [
