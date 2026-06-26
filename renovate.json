@@ -72,7 +72,7 @@
       "addLabels": ["pre-commit"]
     },
     {
-      "description": "Bump Node.js in lockstep across .nvmrc, the devcontainer feature, and the API runtime (apps/api/Dockerfile) so dev, CI, and production track one version. Renovate follows the latest major; LTS is not required.",
+      "description": "Group the Node.js version across .nvmrc, the devcontainer feature, and the API runtime Dockerfile into a single PR, keeping dev, CI, and production on one version.",
       "matchManagers": ["nvm", "devcontainer", "dockerfile"],
       "matchDepNames": ["node"],
       "groupName": "node",
