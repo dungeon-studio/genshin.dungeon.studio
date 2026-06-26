@@ -50,6 +50,8 @@ export default function importConfig(packageDir) {
             alphabetize: { order: 'asc', caseInsensitive: true },
           },
         ],
+        'import-x/no-duplicates': 'error',
+        'import-x/newline-after-import': 'error',
         // `unused-imports` owns unused-symbol reporting so removals are
         // autofixable; the recommended `no-unused-vars` rules are disabled to
         // avoid double-reporting.
