@@ -72,10 +72,9 @@
       "addLabels": ["pre-commit"]
     },
     {
-      "description": "Bump Node.js in lockstep across .nvmrc, the devcontainer feature, and the API runtime (apps/api/Dockerfile). Constrained to even/LTS majors so Renovate tracks 24 -> 26 -> 28 together and never offers the odd Current releases (e.g. the now-EOL 25).",
+      "description": "Bump Node.js in lockstep across .nvmrc, the devcontainer feature, and the API runtime (apps/api/Dockerfile) so dev, CI, and production track one version. Renovate follows the latest major; LTS is not required.",
       "matchManagers": ["nvm", "devcontainer", "dockerfile"],
       "matchDepNames": ["node"],
-      "allowedVersions": "/^\\d*[02468]\\./",
       "groupName": "node",
       "groupSlug": "node",
       "addLabels": ["node"]
