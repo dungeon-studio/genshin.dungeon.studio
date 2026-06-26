@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 name: Setup Node.js and pnpm
-description: Install Node.js 20, pnpm (version from package.json), and restore dependency cache
+description: Install Node.js, pnpm (version from package.json), and restore dependency cache
 
 runs:
   using: composite
@@ -12,7 +12,10 @@ runs:
     - name: Set up Node.js
       uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
       with:
-        node-version: '24'
+        # Pinned exactly: the floating '24' tag resolved to Node 24.17.0, whose
+        # http.Agent keep-alive regression (the CVE-2026-48931 fix, nodejs/node#63989)
+        # broke the STS token exchange inside `firebase deploy`. Fixed in 24.18.0.
+        node-version: '24.18.0'
 
     - name: Install pnpm
       uses: pnpm/action-setup@ac6db6d3c1f721f886538a378a2d73e85697340a # v6

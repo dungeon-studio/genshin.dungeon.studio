@@ -11,8 +11,12 @@ allowBuilds:
   '@firebase/util': true
   esbuild: true
   protobufjs: true
+  re2: true
   unrs-resolver: true
 
 # Ensure pnpm version compatibility
 engines:
   pnpm: '>=9.15.4'
+
+minimumReleaseAgeExclude:
+  - firebase-tools@15.22.3

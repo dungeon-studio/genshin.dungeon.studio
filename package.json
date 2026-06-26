@@ -43,6 +43,7 @@
     "eslint-import-resolver-typescript": "4.4.4",
     "eslint-plugin-import-x": "4.16.2",
     "eslint-plugin-unused-imports": "4.4.1",
+    "firebase-tools": "15.22.3",
     "knip": "6.16.1",
     "prettier": "3.8.3",
     "stylelint": "17.12.0",
