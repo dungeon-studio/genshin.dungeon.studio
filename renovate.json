@@ -72,17 +72,12 @@
       "addLabels": ["pre-commit"]
     },
     {
-      "description": "Bump the Node.js toolchain version in lockstep across .nvmrc and the devcontainer feature",
-      "matchManagers": ["nvm", "devcontainer"],
+      "description": "Bump Node.js in lockstep across .nvmrc, the devcontainer feature, and the API runtime (apps/api/Dockerfile). Constrained to even/LTS majors so Renovate tracks 24 -> 26 -> 28 together and never offers the odd Current releases (e.g. the now-EOL 25).",
+      "matchManagers": ["nvm", "devcontainer", "dockerfile"],
       "matchDepNames": ["node"],
+      "allowedVersions": "/^\\d*[02468]\\./",
       "groupName": "node",
       "groupSlug": "node",
-      "addLabels": ["node"]
-    },
-    {
-      "description": "Label the API runtime Node bump for discoverability; it stays in the docker group, separate from the toolchain",
-      "matchManagers": ["dockerfile"],
-      "matchDepNames": ["node"],
       "addLabels": ["node"]
     }
   ],
