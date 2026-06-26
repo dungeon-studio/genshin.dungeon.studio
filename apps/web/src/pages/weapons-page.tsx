@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { WeaponType } from '@genshin/game-data';
-import { WEAPONS } from '@genshin/game-data';
-import { WEAPON_TYPES } from '@genshin/game-data';
+import { WEAPONS, WEAPON_TYPES } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
