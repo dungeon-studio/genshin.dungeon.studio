@@ -49,7 +49,7 @@ License: MIT
 
 # Configuration files that don't support comments
 
-Files: *.json .prettierrc
+Files: *.json .prettierrc .nvmrc
 Copyright: 2026 Alex Brandt <alunduil@gmail.com>
 License: MIT
 
