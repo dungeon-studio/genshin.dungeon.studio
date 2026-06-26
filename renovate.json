@@ -78,6 +78,12 @@
       "groupName": "node",
       "groupSlug": "node",
       "addLabels": ["node"]
+    },
+    {
+      "description": "Label the API runtime Node bump for discoverability; it stays in the docker group, separate from the toolchain",
+      "matchManagers": ["dockerfile"],
+      "matchDepNames": ["node"],
+      "addLabels": ["node"]
     }
   ],
   "customManagers": [
