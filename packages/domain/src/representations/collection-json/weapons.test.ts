@@ -34,7 +34,11 @@ describe('weapon serialisation round-trip', () => {
   it('includes a collection link for the weapon type', () => {
     const item = serialiseWeapon(VALID_WEAPON, BASE_URL);
     expect(item.links).toBeDefined();
-    expect(item.links![0].rel).toBe('collection');
+    const links = item.links;
+    if (links === undefined) {
+      throw new Error('expected item to have links');
+    }
+    expect(links[0].rel).toBe('collection');
   });
 
   it('preserves refinement level through round-trip', () => {

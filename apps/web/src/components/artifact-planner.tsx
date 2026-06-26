@@ -16,6 +16,7 @@ import {
   type SandsMainAffix,
 } from '@genshin/game-data';
 import { Check, ChevronsUpDown, GripVertical, Minus, Shield } from 'lucide-react';
+import type { JSX } from 'react';
 import { useState } from 'react';
 
 import {
@@ -34,7 +35,7 @@ interface ArtifactPlannerProps {
   onChange?: (plan: ArtifactPlan) => void;
 }
 
-export function ArtifactPlanner({ plan, onChange }: ArtifactPlannerProps) {
+export function ArtifactPlanner({ plan, onChange }: ArtifactPlannerProps): JSX.Element {
   const updatePlan = (fields: ArtifactPlan) => {
     onChange?.({ ...plan, ...fields });
   };
@@ -133,7 +134,8 @@ function SetConfiguration({
   };
 
   const handleSecondChange = (setId: ArtifactSet['id']) => {
-    onChange([sets![0], setId]);
+    if (sets === undefined) return;
+    onChange([sets[0], setId]);
   };
 
   const handleClearSecond = () => {

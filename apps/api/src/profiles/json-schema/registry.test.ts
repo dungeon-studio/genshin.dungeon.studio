@@ -38,8 +38,11 @@ describe('jsonSchemaRegistry', () => {
 
       const relative = file.replace(schemasDir, '');
       expect(entry, `${relative} does not export a JsonSchemaProfile`).toBeDefined();
-      expect(registeredPaths, `${entry!.path} from ${relative} is not in the registry`).toContain(
-        entry!.path,
+      if (entry === undefined) {
+        throw new Error(`${relative} does not export a JsonSchemaProfile`);
+      }
+      expect(registeredPaths, `${entry.path} from ${relative} is not in the registry`).toContain(
+        entry.path,
       );
     }
   });

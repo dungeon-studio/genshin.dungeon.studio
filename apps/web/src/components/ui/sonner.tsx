@@ -1,12 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { ComponentProps } from 'react';
+import type { ComponentProps, JSX } from 'react';
 import { Toaster as Sonner } from 'sonner';
 
 type ToasterProps = ComponentProps<typeof Sonner>;
 
-export function Toaster(props: ToasterProps) {
+export function Toaster(props: ToasterProps): JSX.Element {
   return (
     <Sonner
       className="toaster group"

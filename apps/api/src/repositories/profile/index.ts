@@ -17,7 +17,12 @@ export async function get(userId: string): Promise<UserProfile | null> {
     return null;
   }
 
-  return fromDocument(doc.data()!);
+  const data = doc.data();
+  if (data === undefined) {
+    return null;
+  }
+
+  return fromDocument(data);
 }
 
 export async function update(userId: string, fields: ProfileUpdate): Promise<UserProfile> {
@@ -36,7 +41,12 @@ export async function update(userId: string, fields: ProfileUpdate): Promise<Use
     return profile;
   }
 
-  const current = fromDocument(existing.data()!);
+  const existingData = existing.data();
+  if (existingData === undefined) {
+    throw new Error('Profile document exists but has no data');
+  }
+
+  const current = fromDocument(existingData);
   const updated: UserProfile = {
     ...current,
     ...fields,

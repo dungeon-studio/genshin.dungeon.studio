@@ -38,8 +38,11 @@ describe('alpsRegistry', () => {
 
       const relative = file.replace(profilesDir, '');
       expect(entry, `${relative} does not export an AlpsProfile`).toBeDefined();
-      expect(registeredPaths, `${entry!.path} from ${relative} is not in the registry`).toContain(
-        entry!.path,
+      if (entry === undefined) {
+        throw new Error(`${relative} does not export an AlpsProfile`);
+      }
+      expect(registeredPaths, `${entry.path} from ${relative} is not in the registry`).toContain(
+        entry.path,
       );
     }
   });

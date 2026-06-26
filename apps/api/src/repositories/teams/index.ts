@@ -15,7 +15,7 @@ export async function list(userId: string): Promise<CollectionTeam[]> {
 
   return snapshot.docs
     .filter((doc) => /^[1-4]$/.test(doc.id))
-    .map((doc) => fromDocument(Number(doc.id) as TeamSlot, doc.data()!));
+    .map((doc) => fromDocument(Number(doc.id) as TeamSlot, doc.data()));
 }
 
 export async function get(userId: string, slot: TeamSlot): Promise<CollectionTeam | null> {
@@ -25,7 +25,12 @@ export async function get(userId: string, slot: TeamSlot): Promise<CollectionTea
     return null;
   }
 
-  return fromDocument(slot, doc.data()!);
+  const data = doc.data();
+  if (data === undefined) {
+    return null;
+  }
+
+  return fromDocument(slot, data);
 }
 
 export interface SaveResult {
@@ -46,7 +51,8 @@ export async function save(
   const existing = await docRef.get();
   const now = new Date().toISOString() as ISOTimestamp;
 
-  const existingTeam = existing.exists ? fromDocument(slot, existing.data()!) : null;
+  const existingData = existing.exists ? existing.data() : undefined;
+  const existingTeam = existingData ? fromDocument(slot, existingData) : null;
 
   const team: CollectionTeam = {
     slot,

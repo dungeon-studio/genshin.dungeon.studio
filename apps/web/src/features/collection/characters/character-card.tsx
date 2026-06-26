@@ -5,6 +5,7 @@ import { MAX_CONSTELLATION_LEVEL, MIN_CONSTELLATION_LEVEL } from '@genshin/domai
 import type { Character } from '@genshin/game-data';
 import { motion } from 'framer-motion';
 import { Trash2 } from 'lucide-react';
+import type { JSX } from 'react';
 import { useState } from 'react';
 
 import { CharacterSummary } from '@/components/character-summary';
@@ -40,7 +41,7 @@ export function CharacterCard({
   onAdd,
   onRemove,
   onConstellationChange,
-}: CharacterCardProps) {
+}: CharacterCardProps): JSX.Element {
   const [popoverOpen, setPopoverOpen] = useState(false);
 
   const borderColors = owned ? ELEMENT_BORDER_COLORS : ELEMENT_BORDER_COLORS_DIM;

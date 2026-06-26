@@ -1,11 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { JSX } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
 import { useAuth } from './use-auth';
 
-export function ProtectedRoute() {
+export function ProtectedRoute(): JSX.Element {
   const { user, loading } = useAuth();
 
   if (loading) {

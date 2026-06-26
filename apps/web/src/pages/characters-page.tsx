@@ -4,6 +4,7 @@
 import type { Character } from '@genshin/game-data';
 import { CHARACTERS } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
+import type { JSX } from 'react';
 import { useMemo, useState } from 'react';
 
 import { Container } from '@/components/container';
@@ -13,7 +14,7 @@ import type { CharacterFilterState } from '@/features/collection/characters/filt
 import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
 
-export function CharactersPage() {
+export function CharactersPage(): JSX.Element {
   const {
     characters,
     addCharacter,

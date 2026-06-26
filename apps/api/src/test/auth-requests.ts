@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { verifyToken } from '@/lib/firebase/auth.js';
+import type { verifyToken } from '@/lib/firebase/auth.js';
 
 export const FAKE_UID = 'test-user-123';
 export const FAKE_TOKEN = { uid: FAKE_UID } as Awaited<ReturnType<typeof verifyToken>>;
@@ -16,7 +16,7 @@ export function authedRequest(
   path: string,
   body?: unknown,
   options?: AuthedRequestOptions,
-) {
+): Request {
   const init: RequestInit = {
     method,
     headers: { Authorization: 'Bearer valid-token' },

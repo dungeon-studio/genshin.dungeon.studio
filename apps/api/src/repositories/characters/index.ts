@@ -13,7 +13,7 @@ function collectionRef(userId: string) {
 export async function list(userId: string): Promise<CollectionCharacter[]> {
   const snapshot = await collectionRef(userId).get();
 
-  return snapshot.docs.map((doc) => fromDocument(doc.id, doc.data()!));
+  return snapshot.docs.map((doc) => fromDocument(doc.id, doc.data()));
 }
 
 export async function get(
@@ -26,7 +26,12 @@ export async function get(
     return null;
   }
 
-  return fromDocument(characterId, doc.data()!);
+  const data = doc.data();
+  if (data === undefined) {
+    return null;
+  }
+
+  return fromDocument(characterId, data);
 }
 
 export interface SaveResult {
@@ -43,10 +48,12 @@ export async function save(
   const existing = await docRef.get();
   const now = new Date().toISOString() as ISOTimestamp;
 
+  const existingData = existing.exists ? existing.data() : undefined;
+
   const character: CollectionCharacter = {
     characterId,
     constellationLevel,
-    createdAt: existing.exists ? fromDocument(characterId, existing.data()!).createdAt : now,
+    createdAt: existingData ? fromDocument(characterId, existingData).createdAt : now,
     updatedAt: now,
   };
 
