@@ -4,6 +4,7 @@
 import type { Rarity, WeaponType } from '@genshin/game-data';
 import { WEAPON_TYPES } from '@genshin/game-data';
 import { ArrowDownWideNarrow, ArrowUpNarrowWide, Search } from 'lucide-react';
+import type { JSX } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,7 +41,7 @@ export function WeaponFilters({
   filteredOwnedCount,
   showOwnership = true,
   showWeaponTypes = true,
-}: WeaponFiltersProps) {
+}: WeaponFiltersProps): JSX.Element {
   function toggleWeaponType(type: WeaponType) {
     const next = new Set(filters.weaponTypes);
     if (next.has(type)) {

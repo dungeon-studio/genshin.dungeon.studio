@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { Monitor, Moon, Sun } from 'lucide-react';
+import type { JSX } from 'react';
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -33,7 +34,7 @@ const LABELS: Record<Theme, string> = {
   system: 'System theme',
 };
 
-export function ThemeToggle() {
+export function ThemeToggle(): JSX.Element {
   const [theme, setTheme] = useState<Theme>(getStoredTheme);
 
   useEffect(() => {

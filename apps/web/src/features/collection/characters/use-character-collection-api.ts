@@ -4,6 +4,7 @@
 import { assertCollectionDocument } from '@genshin/collection-json';
 import type { CharacterId, CollectionCharacter } from '@genshin/domain';
 import { deserialiseCharacter, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPut } from '@/lib/api';
@@ -45,7 +46,9 @@ function parseSingleCharacterResponse(response: unknown): MutationResult {
   };
 }
 
-export function useCharacterCollectionQuery(userId: string | undefined) {
+export function useCharacterCollectionQuery(
+  userId: string | undefined,
+): UseQueryResult<CharacterRecord, Error> {
   return useQuery({
     queryKey: collectionKey(userId ?? ''),
     queryFn: async () => {
@@ -56,7 +59,9 @@ export function useCharacterCollectionQuery(userId: string | undefined) {
   });
 }
 
-export function useAddCharacterMutation(userId: string | undefined) {
+export function useAddCharacterMutation(
+  userId: string | undefined,
+): UseMutationResult<MutationResult, Error, CharacterId> {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -72,7 +77,9 @@ export function useAddCharacterMutation(userId: string | undefined) {
   });
 }
 
-export function useRemoveCharacterMutation(userId: string | undefined) {
+export function useRemoveCharacterMutation(
+  userId: string | undefined,
+): UseMutationResult<void, Error, CharacterId> {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -85,7 +92,9 @@ export function useRemoveCharacterMutation(userId: string | undefined) {
   });
 }
 
-export function useSetConstellationLevelMutation(userId: string | undefined) {
+export function useSetConstellationLevelMutation(
+  userId: string | undefined,
+): UseMutationResult<MutationResult, Error, { characterId: CharacterId; level: number }> {
   const queryClient = useQueryClient();
 
   return useMutation({

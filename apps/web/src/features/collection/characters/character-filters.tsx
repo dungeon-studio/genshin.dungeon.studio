@@ -4,6 +4,7 @@
 import type { Element, Rarity } from '@genshin/game-data';
 import { ELEMENTS } from '@genshin/game-data';
 import { ArrowDownWideNarrow, ArrowUpNarrowWide, Search } from 'lucide-react';
+import type { JSX } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,7 +40,7 @@ export function CharacterFilters({
   ownedCount,
   filteredOwnedCount,
   showOwnership = true,
-}: CharacterFiltersProps) {
+}: CharacterFiltersProps): JSX.Element {
   function toggleElement(element: Element) {
     const next = new Set(filters.elements);
     if (next.has(element)) {

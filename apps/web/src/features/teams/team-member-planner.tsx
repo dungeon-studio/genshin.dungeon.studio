@@ -8,6 +8,7 @@ import type {
   CollectionWeapon,
 } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
+import type { JSX } from 'react';
 
 import { ArtifactPlanner } from '@/components/artifact-planner';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -32,7 +33,7 @@ export function TeamMemberPlanner({
   selected = false,
   onSelect,
   onArtifactPlanChange,
-}: TeamMemberPlannerProps) {
+}: TeamMemberPlannerProps): JSX.Element {
   const character = member ? getCharacterById(member.characterId) : undefined;
 
   const borderClass = elementBorderClass(character?.element);

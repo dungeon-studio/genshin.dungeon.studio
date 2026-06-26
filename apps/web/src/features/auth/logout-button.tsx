@@ -3,11 +3,12 @@
 
 import { signOut } from 'firebase/auth';
 import { LogOut } from 'lucide-react';
+import type { JSX } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { auth } from '@/lib/firebase';
 
-export function LogoutButton() {
+export function LogoutButton(): JSX.Element {
   async function handleLogout() {
     try {
       await signOut(auth);

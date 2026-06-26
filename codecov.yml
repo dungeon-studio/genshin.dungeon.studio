@@ -1,6 +1,14 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 ---
+# Repository index.ts files are thin Firestore I/O adapters, exercised only
+# through route tests that mock them (`vi.mock('@/repositories/.../index.js')`),
+# so they carry no direct unit coverage by design. document.ts (the
+# fromDocument/toDocument logic) stays covered. teams.save merge logic is
+# tracked for real tests separately.
+ignore:
+  - 'apps/api/src/repositories/*/index.ts'
+
 coverage:
   status:
     project:

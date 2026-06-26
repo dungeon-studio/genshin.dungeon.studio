@@ -3,6 +3,7 @@
 
 import type { Character } from '@genshin/game-data';
 import { CircleHelp } from 'lucide-react';
+import type { JSX } from 'react';
 
 import { getElementIconPath } from '@/lib/elements';
 import { cn } from '@/lib/utils';
@@ -12,7 +13,10 @@ interface CharacterSummaryProps {
   dimmed?: boolean;
 }
 
-export function CharacterSummary({ character, dimmed = false }: CharacterSummaryProps) {
+export function CharacterSummary({
+  character,
+  dimmed = false,
+}: CharacterSummaryProps): JSX.Element {
   if (!character) {
     return (
       <>

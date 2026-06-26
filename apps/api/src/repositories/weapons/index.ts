@@ -19,7 +19,7 @@ export async function list(userId: string, weaponId?: string): Promise<Collectio
     : collectionRef(userId);
   const snapshot = await ref.get();
 
-  return snapshot.docs.map((doc) => fromDocument(doc.id as UUID, doc.data()!));
+  return snapshot.docs.map((doc) => fromDocument(doc.id as UUID, doc.data()));
 }
 
 export async function get(
@@ -32,7 +32,12 @@ export async function get(
     return null;
   }
 
-  return fromDocument(weaponInstanceId, doc.data()!);
+  const data = doc.data();
+  if (data === undefined) {
+    return null;
+  }
+
+  return fromDocument(weaponInstanceId, data);
 }
 
 export async function create(
@@ -68,7 +73,12 @@ export async function update(
     return null;
   }
 
-  const existingWeapon = fromDocument(weaponInstanceId, existing.data()!);
+  const existingData = existing.data();
+  if (existingData === undefined) {
+    return null;
+  }
+
+  const existingWeapon = fromDocument(weaponInstanceId, existingData);
   const now = new Date().toISOString() as ISOTimestamp;
 
   const weapon: CollectionWeapon = {

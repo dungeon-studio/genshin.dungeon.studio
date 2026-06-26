@@ -5,6 +5,7 @@ import type { CharacterId, CollectionCharacter, TeamSlot } from '@genshin/domain
 import type { Character } from '@genshin/game-data';
 import { CHARACTERS } from '@genshin/game-data';
 import { Lock, Users } from 'lucide-react';
+import type { JSX } from 'react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -28,7 +29,12 @@ interface CharacterPoolProps {
   onAssign: (characterId: string) => void;
 }
 
-export function CharacterPool({ characters, slot, memberIndex, onAssign }: CharacterPoolProps) {
+export function CharacterPool({
+  characters,
+  slot,
+  memberIndex,
+  onAssign,
+}: CharacterPoolProps): JSX.Element {
   const members = useTeamStore((s) => s.teams[slot].members);
   const currentMemberCharacterId = members[memberIndex]?.characterId;
   const otherMemberIds = useMemo(

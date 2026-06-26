@@ -4,6 +4,7 @@
 import type { WeaponType } from '@genshin/game-data';
 import { WEAPONS, WEAPON_TYPES } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
+import type { JSX } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -16,7 +17,7 @@ import { WeaponCard } from '@/features/collection/weapons/weapon-card';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
 import { WeaponInstanceSidebar } from '@/features/collection/weapons/weapon-instance-sidebar';
 
-export function WeaponsPage() {
+export function WeaponsPage(): JSX.Element {
   const {
     weapons,
     isAuthenticated,

@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: MIT
 
 import { GAME_DATA_VERSION } from '@genshin/game-data';
+import type { JSX } from 'react';
 
 import { Container } from '@/components/container';
 
 const GITHUB_REPO = 'https://github.com/dungeon-studio/genshin.dungeon.studio';
 
-export function Footer() {
+export function Footer(): JSX.Element {
   return (
     <footer className="border-t border-border bg-muted py-8">
       <Container className="text-center text-sm text-muted-foreground">

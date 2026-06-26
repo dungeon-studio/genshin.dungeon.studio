@@ -4,6 +4,7 @@
 import { assertCollectionDocument } from '@genshin/collection-json';
 import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
 import { deserialiseWeapon, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
+import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPatch, apiPost } from '@/lib/api';
@@ -41,7 +42,9 @@ function parseSingleWeaponResponse(response: unknown): WeaponMutationResult {
   return { weapon };
 }
 
-export function useWeaponCollectionQuery(userId: string | undefined) {
+export function useWeaponCollectionQuery(
+  userId: string | undefined,
+): UseQueryResult<WeaponRecord, Error> {
   return useQuery({
     queryKey: weaponCollectionKey(userId ?? ''),
     queryFn: async () => {
@@ -52,7 +55,9 @@ export function useWeaponCollectionQuery(userId: string | undefined) {
   });
 }
 
-export function useAddWeaponMutation(userId: string | undefined) {
+export function useAddWeaponMutation(
+  userId: string | undefined,
+): UseMutationResult<WeaponMutationResult, Error, string> {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -70,7 +75,9 @@ export function useAddWeaponMutation(userId: string | undefined) {
   });
 }
 
-export function useRemoveWeaponMutation(userId: string | undefined) {
+export function useRemoveWeaponMutation(
+  userId: string | undefined,
+): UseMutationResult<void, Error, CollectionWeaponId> {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -84,7 +91,13 @@ export function useRemoveWeaponMutation(userId: string | undefined) {
   });
 }
 
-export function useSetRefinementLevelMutation(userId: string | undefined) {
+export function useSetRefinementLevelMutation(
+  userId: string | undefined,
+): UseMutationResult<
+  WeaponMutationResult,
+  Error,
+  { collectionWeaponId: CollectionWeaponId; level: number }
+> {
   const queryClient = useQueryClient();
 
   return useMutation({

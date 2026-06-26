@@ -11,6 +11,7 @@ import type {
 } from '@genshin/domain';
 import { MAX_TEAM_MEMBERS } from '@genshin/domain';
 import { Pencil } from 'lucide-react';
+import type { JSX } from 'react';
 import { useRef, useState } from 'react';
 
 import { Input } from '@/components/ui/input';
@@ -41,7 +42,7 @@ export function TeamPlanner({
   onNameChange,
   onArtifactPlanChange,
   onEdit,
-}: TeamPlannerProps) {
+}: TeamPlannerProps): JSX.Element {
   const slots = Array.from({ length: MAX_TEAM_MEMBERS }, (_, i) => members[i]);
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(name);

@@ -3,13 +3,14 @@
 
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { LogIn } from 'lucide-react';
+import type { JSX } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { auth } from '@/lib/firebase';
 
 const googleProvider = new GoogleAuthProvider();
 
-export function LoginButton() {
+export function LoginButton(): JSX.Element {
   async function handleLogin() {
     try {
       await signInWithPopup(auth, googleProvider);

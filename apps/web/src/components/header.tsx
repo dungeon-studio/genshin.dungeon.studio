@@ -1,13 +1,14 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { JSX } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Container } from '@/components/container';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LoginButton, LogoutButton, useAuth } from '@/features/auth';
 
-export function Header() {
+export function Header(): JSX.Element {
   const { user, loading } = useAuth();
 
   return (

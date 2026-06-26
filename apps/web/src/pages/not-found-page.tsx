@@ -1,11 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { JSX } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Container } from '@/components/container';
 
-export function NotFoundPage() {
+export function NotFoundPage(): JSX.Element {
   return (
     <Container className="py-12">
       <div className="text-center">
