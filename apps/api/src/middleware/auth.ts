@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { DecodedIdToken } from '@/lib/firebase/auth.js';
-import { verifyToken } from '@/lib/firebase/auth.js';
 import { createMiddleware } from 'hono/factory';
 import { HTTPException } from 'hono/http-exception';
+
+import type { DecodedIdToken } from '@/lib/firebase/auth.js';
+import { verifyToken } from '@/lib/firebase/auth.js';
 
 export type AuthVariables = {
   user: DecodedIdToken;

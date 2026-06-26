@@ -1,15 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { WEAPONS } from '@genshin/game-data';
+import type { WeaponType } from '@genshin/game-data';
+import { WEAPONS, WEAPON_TYPES } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
 import type { JSX } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-
-import type { WeaponType } from '@genshin/game-data';
-import { WEAPON_TYPES } from '@genshin/game-data';
 
 import { Container } from '@/components/container';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';

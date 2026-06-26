@@ -6,6 +6,7 @@ import { resolve } from 'node:path';
 import js from '@eslint/js';
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 import importX from 'eslint-plugin-import-x';
+import unusedImports from 'eslint-plugin-unused-imports';
 import tseslint from 'typescript-eslint';
 
 /**
@@ -50,7 +51,7 @@ export default function genshinConfig(packageDir) {
     },
     {
       files: ['**/*.{ts,tsx,js,mjs,cjs}'],
-      plugins: { 'import-x': importX },
+      plugins: { 'import-x': importX, 'unused-imports': unusedImports },
       settings: {
         'import-x/resolver-next': [createTypeScriptImportResolver({ alwaysTryTypes: true })],
       },
@@ -66,6 +67,26 @@ export default function genshinConfig(packageDir) {
             ],
             packageDir: [packageDir, resolve(packageDir, '../..')],
           },
+        ],
+        'import-x/order': [
+          'error',
+          {
+            groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index']],
+            'newlines-between': 'always',
+            alphabetize: { order: 'asc', caseInsensitive: true },
+          },
+        ],
+        'import-x/no-duplicates': 'error',
+        'import-x/newline-after-import': 'error',
+        // `unused-imports` owns unused-symbol reporting so removals are
+        // autofixable; the recommended `no-unused-vars` rules are disabled to
+        // avoid double-reporting.
+        'no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': 'off',
+        'unused-imports/no-unused-imports': 'error',
+        'unused-imports/no-unused-vars': [
+          'error',
+          { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
         ],
       },
     },

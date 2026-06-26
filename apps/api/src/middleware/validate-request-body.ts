@@ -1,11 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
 import type { ErrorObject, SchemaObject } from 'ajv/dist/2020.js';
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import type { MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+
+import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
 
 const ajv = new Ajv2020({ allErrors: true });
 

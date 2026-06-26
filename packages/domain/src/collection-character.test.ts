@@ -68,7 +68,6 @@ describe('assertCollectionCharacter', () => {
   });
 
   it('throws for missing characterId', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { characterId: _, ...rest } = VALID_CHARACTER;
     expect(() => assertCollectionCharacter(rest)).toThrow(/characterId/);
   });

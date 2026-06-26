@@ -15,7 +15,6 @@ import {
   GOBLET_MAIN_AFFIXES,
   SANDS_MAIN_AFFIXES,
 } from '@genshin/game-data';
-
 import type { ValidationIssue } from '@genshin/validation';
 import { issue } from '@genshin/validation';
 

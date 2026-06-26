@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { ProfileLink } from '@/middleware/profile-link.js';
 import type { MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import Negotiator from 'negotiator';
+
+import type { ProfileLink } from '@/middleware/profile-link.js';
 
 export type { ProfileLink } from '@/middleware/profile-link.js';
 

@@ -1,8 +1,18 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
 import type { CollectionWeapon, UUID } from '@genshin/domain';
+import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
+import { getWeaponById } from '@genshin/game-data';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { app } from '@/app.js';
+import { verifyToken } from '@/lib/firebase/auth.js';
+import { toMediaTypeString } from '@/middleware/negotiate-content.js';
+import { weaponItemV1 } from '@/profiles/alps/weapon/item-v1.js';
+import * as Weapons from '@/repositories/weapons/index.js';
+import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
 
 vi.mock('@/lib/firebase/auth.js', () => ({
   verifyToken: vi.fn(),
@@ -19,16 +29,6 @@ vi.mock('@/repositories/weapons/index.js', () => ({
 vi.mock('@genshin/game-data', () => ({
   getWeaponById: vi.fn(),
 }));
-
-import { app } from '@/app.js';
-import { verifyToken } from '@/lib/firebase/auth.js';
-import { toMediaTypeString } from '@/middleware/negotiate-content.js';
-import { weaponItemV1 } from '@/profiles/alps/weapon/item-v1.js';
-import * as Weapons from '@/repositories/weapons/index.js';
-import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
-import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
-import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
-import { getWeaponById } from '@genshin/game-data';
 
 const FAKE_WEAPON: CollectionWeapon = {
   weaponInstanceId: 'instance-uuid-1' as UUID,

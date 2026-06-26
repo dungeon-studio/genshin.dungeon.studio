@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { jsonSchemaRegistry } from '@/profiles/json-schema/registry.js';
 import { Hono } from 'hono';
+
+import { jsonSchemaRegistry } from '@/profiles/json-schema/registry.js';
 
 export const jsonSchemaProfiles = new Hono();
 

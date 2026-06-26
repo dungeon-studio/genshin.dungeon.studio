@@ -5,9 +5,10 @@ import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
+import { describe, expect, it } from 'vitest';
+
 import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
 import { jsonSchemaRegistry } from '@/profiles/json-schema/registry.js';
-import { describe, expect, it } from 'vitest';
 
 const schemasDir = fileURLToPath(new URL('.', import.meta.url));
 const infraFiles = new Set(['registry.ts', 'registry.test.ts', 'json-schema-profile.ts']);

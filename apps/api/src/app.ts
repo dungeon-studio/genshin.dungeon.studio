@@ -1,6 +1,16 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { readFileSync } from 'node:fs';
+import { STATUS_CODES } from 'node:http';
+
+import type { ProblemDetail } from '@genshin/domain';
+import { GoogleError } from 'google-gax';
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { HTTPException } from 'hono/http-exception';
+import { logger } from 'hono/logger';
+
 import type { AuthVariables } from '@/middleware/auth.js';
 import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
 import { firestoreErrorToHttpException } from '@/repositories/firestore-error.js';
@@ -11,14 +21,6 @@ import { root } from '@/routes/root.js';
 import { teams } from '@/routes/teams.js';
 import { userProfile } from '@/routes/user-profile.js';
 import { weapons } from '@/routes/weapons.js';
-import type { ProblemDetail } from '@genshin/domain';
-import { GoogleError } from 'google-gax';
-import { Hono } from 'hono';
-import { cors } from 'hono/cors';
-import { HTTPException } from 'hono/http-exception';
-import { logger } from 'hono/logger';
-import { readFileSync } from 'node:fs';
-import { STATUS_CODES } from 'node:http';
 
 // Read version from package.json to maintain single source of truth
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf-8'));

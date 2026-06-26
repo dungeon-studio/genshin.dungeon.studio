@@ -5,9 +5,10 @@ import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
+import { describe, expect, it } from 'vitest';
+
 import type { AlpsProfile } from '@/profiles/alps/profile.js';
 import { alpsRegistry } from '@/profiles/alps/registry.js';
-import { describe, expect, it } from 'vitest';
 
 const profilesDir = fileURLToPath(new URL('.', import.meta.url));
 const infraFiles = new Set(['registry.ts', 'registry.test.ts', 'profile.ts']);

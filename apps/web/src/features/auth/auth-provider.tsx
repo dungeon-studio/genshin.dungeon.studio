@@ -3,8 +3,8 @@
 
 import type { User as FirebaseUser } from 'firebase/auth';
 import { onAuthStateChanged } from 'firebase/auth';
-import { useEffect, useState, type ReactNode } from 'react';
-import type { JSX } from 'react';
+import { useEffect, useState } from 'react';
+import type { JSX, ReactNode } from 'react';
 
 import { auth } from '@/lib/firebase';
 

@@ -1,9 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { beforeEach, describe, expect, it } from 'vitest';
+
 import { app } from '@/app.js';
 import { jsonSchemaRegistry } from '@/profiles/json-schema/registry.js';
-import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('Schema serving routes', () => {
   describe('GET known schema', () => {
