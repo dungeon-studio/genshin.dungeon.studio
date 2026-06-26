@@ -70,6 +70,14 @@
       "groupName": "pre-commit hooks",
       "groupSlug": "pre-commit",
       "addLabels": ["pre-commit"]
+    },
+    {
+      "description": "Group the Node.js version across .nvmrc, the devcontainer feature, and the API runtime Dockerfile into a single PR, keeping dev, CI, and production on one version.",
+      "matchManagers": ["nvm", "devcontainer", "dockerfile"],
+      "matchDepNames": ["node"],
+      "groupName": "node",
+      "groupSlug": "node",
+      "addLabels": ["node"]
     }
   ],
   "customManagers": [

@@ -26,7 +26,6 @@ jobs:
     environment: dev
     env:
       GCP_PROJECT_ID: dungeon-studio-genshin-dev
-      FIREBASE_TOOLS: npx -y firebase-tools@15.9.0
     permissions:
       contents: read
       id-token: write
@@ -69,7 +68,7 @@ jobs:
         run: bash apps/web/scripts/verify-build-output.sh
 
       - name: Deploy
-        run: $FIREBASE_TOOLS deploy --only hosting --project "$GCP_PROJECT_ID"
+        run: pnpm exec firebase deploy --only hosting --project "$GCP_PROJECT_ID"
         working-directory: apps/web
 
       - name: Verify
