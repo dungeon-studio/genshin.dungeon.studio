@@ -22,11 +22,10 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@eslint/js": "10.0.1",
+    "@genshin/eslint-config": "workspace:*",
     "@vitest/coverage-v8": "4.1.7",
     "eslint": "10.4.0",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.60.0",
     "vitest": "4.1.7"
   }
 }

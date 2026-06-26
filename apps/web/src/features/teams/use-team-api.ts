@@ -4,6 +4,7 @@
 import { assertCollectionDocument } from '@genshin/collection-json';
 import type { CollectionTeam, CollectionTeamMembers, TeamSlot } from '@genshin/domain';
 import { deserialiseTeam } from '@genshin/domain';
+import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPut } from '@/lib/api';
@@ -24,7 +25,7 @@ export function parseTeamsResponse(response: unknown): CollectionTeam[] {
   return response.collection.items.map((item) => deserialiseTeam(item));
 }
 
-export function useTeamsQuery(userId: string | undefined) {
+export function useTeamsQuery(userId: string | undefined): UseQueryResult<CollectionTeam[], Error> {
   return useQuery({
     queryKey: teamKey(userId ?? ''),
     queryFn: async () => {
@@ -35,7 +36,9 @@ export function useTeamsQuery(userId: string | undefined) {
   });
 }
 
-export function useSaveTeamMutation(userId: string | undefined) {
+export function useSaveTeamMutation(
+  userId: string | undefined,
+): UseMutationResult<void, Error, SaveTeamPayload> {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -48,7 +51,9 @@ export function useSaveTeamMutation(userId: string | undefined) {
   });
 }
 
-export function useDeleteTeamMutation(userId: string | undefined) {
+export function useDeleteTeamMutation(
+  userId: string | undefined,
+): UseMutationResult<void, Error, TeamSlot> {
   const queryClient = useQueryClient();
 
   return useMutation({

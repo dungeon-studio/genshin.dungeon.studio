@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { Weapon } from '@genshin/game-data';
+import type { JSX } from 'react';
 
 import { WeaponSummary } from '@/components/weapon-summary';
 import { RARITY_BORDER_COLORS } from '@/lib/rarity-styles';
@@ -14,7 +15,12 @@ interface WeaponCardProps {
   onClick?: (weaponId: Weapon['id']) => void;
 }
 
-export function WeaponCard({ weapon, instanceCount, selected = false, onClick }: WeaponCardProps) {
+export function WeaponCard({
+  weapon,
+  instanceCount,
+  selected = false,
+  onClick,
+}: WeaponCardProps): JSX.Element {
   const owned = instanceCount > 0;
 
   return (

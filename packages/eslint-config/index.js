@@ -3,26 +3,52 @@
 
 import { resolve } from 'node:path';
 
+import js from '@eslint/js';
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 import importX from 'eslint-plugin-import-x';
 import unusedImports from 'eslint-plugin-unused-imports';
+import tseslint from 'typescript-eslint';
 
 /**
- * Shared import-management config for every workspace package.
+ * Shared flat-config base for every workspace in the monorepo.
  *
- * Holds the import rules that must stay identical across packages: dependency
- * hygiene, deterministic ordering, and unused-import removal. Spread the result
- * into a package's flat config after `js`/`typescript-eslint` recommended sets
- * so these rules win on conflict (`unused-imports` supersedes the recommended
- * `no-unused-vars`).
- *
- * @param {string} packageDir - the consuming package's `import.meta.dirname`,
- *   used to resolve its own and the workspace-root `package.json` for the
- *   extraneous-dependencies check.
- * @returns {import('eslint').Linter.Config[]}
+ * @param {string} packageDir - the consuming workspace's directory
+ *   (`import.meta.dirname`). Used to resolve
+ *   `import-x/no-extraneous-dependencies` against the workspace and the repo
+ *   root, so it must be the consumer's path, not this package's.
+ * @returns {import('eslint').Linter.Config[]} flat config entries to spread.
  */
-export default function importConfig(packageDir) {
+export default function genshinConfig(packageDir) {
   return [
+    { ignores: ['dist', 'node_modules'] },
+    js.configs.recommended,
+    ...tseslint.configs.recommended,
+    {
+      files: ['**/*.{ts,tsx}'],
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'error',
+        '@typescript-eslint/no-non-null-assertion': 'error',
+        '@typescript-eslint/explicit-module-boundary-types': [
+          'error',
+          {
+            allowArgumentsExplicitlyTypedAsAny: false,
+            allowDirectConstAssertionInArrowFunctions: true,
+            allowHigherOrderFunctions: true,
+          },
+        ],
+        '@typescript-eslint/consistent-type-imports': [
+          'error',
+          { prefer: 'type-imports', fixStyle: 'separate-type-imports' },
+        ],
+        'no-restricted-syntax': [
+          'error',
+          {
+            selector: 'TSEnumDeclaration',
+            message: 'Use const objects or union types instead of enums.',
+          },
+        ],
+      },
+    },
     {
       files: ['**/*.{ts,tsx,js,mjs,cjs}'],
       plugins: { 'import-x': importX, 'unused-imports': unusedImports },

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { JSX } from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 import { Layout } from './components/layout';
@@ -14,7 +15,7 @@ import { WeaponsPage } from './pages/weapons-page';
 
 const queryClient = new QueryClient();
 
-export function App() {
+export function App(): JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

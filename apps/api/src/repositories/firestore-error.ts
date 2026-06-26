@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { GoogleError, Status } from 'google-gax';
+import type { GoogleError } from 'google-gax';
+import { Status } from 'google-gax';
 import { HTTPException } from 'hono/http-exception';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
 

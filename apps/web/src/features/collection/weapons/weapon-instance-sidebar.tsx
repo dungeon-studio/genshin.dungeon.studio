@@ -6,6 +6,7 @@ import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
 import type { Weapon } from '@genshin/game-data';
 import { getWeaponById } from '@genshin/game-data';
 import { Plus, Trash2 } from 'lucide-react';
+import type { JSX } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -38,7 +39,7 @@ export function WeaponInstanceSidebar({
   onAdd,
   onRemove,
   onRefinementChange,
-}: WeaponInstanceSidebarProps) {
+}: WeaponInstanceSidebarProps): JSX.Element {
   const weapon: Weapon | undefined = weaponId ? getWeaponById(weaponId) : undefined;
 
   return (

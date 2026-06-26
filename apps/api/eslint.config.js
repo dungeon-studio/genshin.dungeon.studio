@@ -1,18 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import js from '@eslint/js';
+import genshinConfig from '@genshin/eslint-config';
 import globals from 'globals';
-import tseslint from 'typescript-eslint';
-
-import importConfig from '../../eslint.config.base.mjs';
 
 export default [
-  {
-    ignores: ['dist'],
-  },
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
+  ...genshinConfig(import.meta.dirname),
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
@@ -20,5 +13,4 @@ export default [
       globals: globals.node,
     },
   },
-  ...importConfig(import.meta.dirname),
 ];

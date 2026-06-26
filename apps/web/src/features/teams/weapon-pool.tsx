@@ -10,6 +10,7 @@ import type {
 import type { Weapon, WeaponType } from '@genshin/game-data';
 import { getWeaponById, WEAPONS } from '@genshin/game-data';
 import { Lock, Swords } from 'lucide-react';
+import type { JSX } from 'react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -58,7 +59,7 @@ export function WeaponPool({
   memberIndex,
   onSelect,
   onClear,
-}: WeaponPoolProps) {
+}: WeaponPoolProps): JSX.Element {
   const teams = useTeamStore((s) => s.teams);
   const currentCharacterId = teams[slot].members[memberIndex]?.characterId;
   const equippedWeapons = useMemo(() => buildEquippedWeapons(teams), [teams]);

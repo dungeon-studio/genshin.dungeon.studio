@@ -9,6 +9,7 @@ import type {
 } from '@genshin/domain';
 import { MAX_TEAM_MEMBERS } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
+import type { JSX } from 'react';
 
 import { elementBorderClass } from '@/lib/element-styles';
 import { cn } from '@/lib/utils';
@@ -29,7 +30,7 @@ export function TeamStrip({
   onSelect,
   getCharacter,
   getCollectionWeapon,
-}: TeamStripProps) {
+}: TeamStripProps): JSX.Element {
   const slots = Array.from({ length: MAX_TEAM_MEMBERS }, (_, i) => members[i]);
 
   return (

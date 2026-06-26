@@ -141,7 +141,7 @@ async function validateMembers(userId: string, members: CollectionTeamMember[]):
   }
 
   // No duplicate weapon instance IDs
-  const weaponIds = members.filter((m) => m.weaponInstanceId).map((m) => m.weaponInstanceId!);
+  const weaponIds = members.flatMap((m) => (m.weaponInstanceId ? [m.weaponInstanceId] : []));
   if (new Set(weaponIds).size !== weaponIds.length) {
     throw new HTTPException(400, { message: 'Duplicate weapon instance IDs in team' });
   }

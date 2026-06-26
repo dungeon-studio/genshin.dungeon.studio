@@ -1,11 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { JSX } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import { Container } from '@/components/container';
 
-export function Nav() {
+export function Nav(): JSX.Element {
   const navLinks = [
     { to: '/', label: 'Teams' },
     { to: '/characters', label: 'Characters' },

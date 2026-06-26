@@ -4,6 +4,7 @@
 import type { CollectionWeaponId, TeamSlot } from '@genshin/domain';
 import { TEAM_SLOTS } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
+import type { JSX } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
 import { Container } from '@/components/container';
@@ -18,7 +19,7 @@ import { WeaponPool } from '@/features/teams/weapon-pool';
 
 type SheetTab = 'characters' | 'weapons';
 
-export function TeamsPage() {
+export function TeamsPage(): JSX.Element {
   const { characters, getCharacter } = useCollection();
   const { weapons } = useWeaponCollection();
 
@@ -168,7 +169,7 @@ export function TeamsPage() {
                 {activeTab === 'characters' && selectedMemberIndex !== null && (
                   <CharacterPool
                     characters={characters}
-                    slot={selectedSlot!}
+                    slot={selectedSlot}
                     memberIndex={selectedMemberIndex}
                     onAssign={handleToggleCharacter}
                   />
@@ -178,18 +179,21 @@ export function TeamsPage() {
                     Select a team member to choose a character.
                   </p>
                 )}
-                {activeTab === 'weapons' && selectedMember && selectedMemberWeaponType && (
-                  <WeaponPool
-                    key={selectedMemberWeaponType}
-                    collectionWeapons={collectionWeapons}
-                    weaponType={selectedMemberWeaponType}
-                    selectedCollectionWeaponId={selectedMember.weaponInstanceId}
-                    slot={selectedSlot!}
-                    memberIndex={selectedMemberIndex!}
-                    onSelect={handleWeaponSelect}
-                    onClear={handleWeaponClear}
-                  />
-                )}
+                {activeTab === 'weapons' &&
+                  selectedMember &&
+                  selectedMemberWeaponType &&
+                  selectedMemberIndex !== null && (
+                    <WeaponPool
+                      key={selectedMemberWeaponType}
+                      collectionWeapons={collectionWeapons}
+                      weaponType={selectedMemberWeaponType}
+                      selectedCollectionWeaponId={selectedMember.weaponInstanceId}
+                      slot={selectedSlot}
+                      memberIndex={selectedMemberIndex}
+                      onSelect={handleWeaponSelect}
+                      onClear={handleWeaponClear}
+                    />
+                  )}
                 {activeTab === 'weapons' && !selectedMember && (
                   <p className="text-sm text-muted-foreground">
                     Select a team member with an assigned character to choose a weapon.

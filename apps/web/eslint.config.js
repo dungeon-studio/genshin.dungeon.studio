@@ -1,21 +1,14 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import js from '@eslint/js';
+import genshinConfig from '@genshin/eslint-config';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
-import tseslint from 'typescript-eslint';
-
-import importConfig from '../../eslint.config.base.mjs';
 
 export default [
-  {
-    ignores: ['dist'],
-  },
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
+  ...genshinConfig(import.meta.dirname),
   {
     files: ['**/*.{ts,tsx}'],
     plugins: {
@@ -52,5 +45,4 @@ export default [
       'react/function-component-definition': 'off',
     },
   },
-  ...importConfig(import.meta.dirname),
 ];

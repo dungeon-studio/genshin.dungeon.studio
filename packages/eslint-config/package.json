@@ -1,0 +1,27 @@
+{
+  "name": "@genshin/eslint-config",
+  "version": "0.0.0",
+  "description": "Shared ESLint flat config for the monorepo",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.js"
+  },
+  "main": "./index.js",
+  "files": [
+    "index.js"
+  ],
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint-import-resolver-typescript": "4.4.4",
+    "eslint-plugin-import-x": "4.16.2",
+    "eslint-plugin-unused-imports": "4.4.1",
+    "typescript-eslint": "8.60.0"
+  },
+  "peerDependencies": {
+    "eslint": "10.4.0"
+  }
+}

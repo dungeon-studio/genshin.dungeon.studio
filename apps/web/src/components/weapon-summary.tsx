@@ -3,6 +3,7 @@
 
 import type { Weapon, WeaponType } from '@genshin/game-data';
 import { CircleHelp } from 'lucide-react';
+import type { JSX } from 'react';
 
 import { cn } from '@/lib/utils';
 import { getWeaponTypeIconPath } from '@/lib/weapon-types';
@@ -19,7 +20,11 @@ interface WeaponSummaryProps {
  * Presentational fragment for weapon type info (name, rarity, weapon type).
  * Instance-level details like refinement are composed by the parent.
  */
-export function WeaponSummary({ weapon, weaponType, dimmed = false }: WeaponSummaryProps) {
+export function WeaponSummary({
+  weapon,
+  weaponType,
+  dimmed = false,
+}: WeaponSummaryProps): JSX.Element {
   const iconType = weapon?.type ?? weaponType;
 
   if (!iconType) {

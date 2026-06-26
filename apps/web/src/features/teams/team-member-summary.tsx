@@ -3,6 +3,7 @@
 
 import type { CollectionCharacter, CollectionTeamMember, CollectionWeapon } from '@genshin/domain';
 import { getCharacterById, getWeaponById } from '@genshin/game-data';
+import type { JSX } from 'react';
 
 import { CharacterSummary } from '@/components/character-summary';
 import { WeaponSummary } from '@/components/weapon-summary';
@@ -17,7 +18,7 @@ export function TeamMemberSummary({
   member,
   collectionCharacter,
   collectionWeapon,
-}: TeamMemberSummaryProps) {
+}: TeamMemberSummaryProps): JSX.Element {
   const character = member ? getCharacterById(member.characterId) : undefined;
   const weapon = collectionWeapon ? getWeaponById(collectionWeapon.weaponId) : undefined;
 
