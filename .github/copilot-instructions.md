@@ -62,7 +62,6 @@
 
 - Use the [REST API conventions reference](../docs/reference/rest-api-conventions.md) as guidance for API route shape, methods, status codes, error format, pagination, and auth handling.
 - All error responses use RFC 9457 Problem Details (`application/problem+json`). Always include a `detail` field, even for generic errors, to keep a stable schema for clients.
-- Validate API success responses against the published JSON Schema in tests using AJV, not just individual field assertions. Keep one sanity-check assertion per test for a specific value.
 - Prefer explicit types over type munging. For example, define `ProfileUpdate` rather than using `Partial<Pick<UserProfile, 'name'>>` inline.
 
 ## Schema module conventions
@@ -72,6 +71,13 @@
 - Name files `{method}-{direction}-v{n}.ts` (for example, `get-response-v1.ts`, `put-request-v1.ts`). `{method}` is the lowercase HTTP method and `{direction}` is `request` or `response`. The serving path mirrors the filename: `/profiles/json-schema/{module}/{method}-{direction}-v{n}.json`. See [DSGEP-005](../docs/explanation/dsgep-005-schema-direction-segment.md).
 - Register every schema module in `apps/api/src/profiles/json-schema/registry.ts`. The registry completeness test discovers files on disk and asserts the registry contains each one.
 - The schema route stamps `$id` from the request origin at serve time. Don't declare `$id` in schema modules.
+
+## Testing
+
+- Test behavior, not constant values, and don't test what a library, the language, or config already guarantees.
+- Annotate fixtures with `satisfies` to validate their shape without changing the inferred type.
+- Validate route responses against the published JSON Schema with AJV first, then make one field-level spot check; don't re-assert the schema field by field.
+- See [`CONTRIBUTING.md`](../CONTRIBUTING.md) for the full testing principles.
 
 ## Frontend rules
 

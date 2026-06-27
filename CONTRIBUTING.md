@@ -169,6 +169,16 @@ Shared API test utilities live in `apps/api/src/test/` with descriptive file nam
 
 ---
 
+## Testing
+
+- **Test behavior, not values**: assert what code does, not what a constant equals.
+- **Don't test what a library should encapsulate**: library behavior, language semantics, and configuration values are already tested by their authors.
+- **Assert only the necessary properties**: keep each assertion as close to the property under test as possible; redundant assertions obscure what the test proves.
+- **Use `satisfies` for fixture annotations**: it validates the fixture shape at the declaration site without changing the inferred type, avoiding index-signature assignability errors.
+- **One schema assertion per route test, then field-level spot checks**: validate the response against the published JSON Schema with AJV first, then assert one specific value; don't re-test the schema field by field.
+
+---
+
 ## Pull request workflow
 
 ### Branch flow for infrastructure
