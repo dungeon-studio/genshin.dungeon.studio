@@ -3,8 +3,15 @@
 
 import fc from 'fast-check';
 
-// Pin the fast-check seed so property-test failures reproduce identically on
-// every run, locally and in CI. fast-check prints the seed on failure; fixing
-// it up front means a CI failure replays deterministically without first
-// hunting for the seed from the logs.
-fc.configureGlobal({ seed: 0x9e3779b1 });
+// Default to a fresh random seed each run so the generators keep exploring new
+// inputs — that exploration is the whole point of property testing. fast-check
+// prints the failing seed and counterexample on any failure; replay it with
+// FAST_CHECK_SEED=<seed> to reproduce that run deterministically.
+const requestedSeed = process.env.FAST_CHECK_SEED;
+if (requestedSeed !== undefined && requestedSeed !== '') {
+  const seed = Number(requestedSeed);
+  if (!Number.isInteger(seed)) {
+    throw new Error(`FAST_CHECK_SEED must be an integer, got: ${JSON.stringify(requestedSeed)}`);
+  }
+  fc.configureGlobal({ seed });
+}
