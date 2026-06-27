@@ -12,6 +12,10 @@ export const profileGetResponseV1 = {
       'Composite user profile combining auth identity fields (read-only, from DecodedIdToken) with Firestore profile fields (mutable via PATCH).',
     type: 'object',
     properties: {
+      schemaVersion: {
+        const: 1,
+        description: 'Serialisation format version, stamped for migration on deserialisation',
+      },
       uid: {
         type: 'string',
         description: 'Firebase Auth user identifier (read-only)',
@@ -41,7 +45,7 @@ export const profileGetResponseV1 = {
         description: 'ISO 8601 UTC timestamp when the profile was last modified (system-managed)',
       },
     },
-    required: ['uid', 'email', 'emailVerified', 'name', 'createdAt', 'updatedAt'],
+    required: ['schemaVersion', 'uid', 'email', 'emailVerified', 'name', 'createdAt', 'updatedAt'],
     additionalProperties: false,
   },
 } as const satisfies JsonSchemaProfile;

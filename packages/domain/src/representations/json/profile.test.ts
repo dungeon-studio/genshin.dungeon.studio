@@ -3,7 +3,13 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { deserialiseProfile, serialiseProfile } from './profile.js';
+import {
+  CURRENT_VERSION,
+  deserialiseProfile,
+  serialiseProfile,
+  type V0ProfileResponse,
+  type V1ProfileResponse,
+} from './profile.js';
 import type { AuthIdentity } from '../../auth-identity.js';
 import type { ISOTimestamp } from '../../iso-timestamp.js';
 import type { UserProfile } from '../../user-profile.js';
@@ -56,5 +62,51 @@ describe('profile serialisation round-trip', () => {
     const { auth } = deserialiseProfile(wire);
     expect(auth.email).toBeUndefined();
     expect(auth.picture).toBeUndefined();
+  });
+});
+
+describe('schemaVersion migration', () => {
+  it('stamps the current schema version on serialisation', () => {
+    const wire = serialiseProfile(AUTH, PROFILE);
+    expect(wire.schemaVersion).toBe(CURRENT_VERSION);
+  });
+
+  it('migrates a V0 payload (no schemaVersion) on deserialisation', () => {
+    const v0 = {
+      uid: 'user-123',
+      email: 'test@example.com',
+      emailVerified: true,
+      picture: 'https://example.com/photo.jpg',
+      name: 'Traveler',
+      createdAt: VALID_TIMESTAMP,
+      updatedAt: VALID_TIMESTAMP,
+    } satisfies V0ProfileResponse;
+
+    const { auth, profile } = deserialiseProfile(v0);
+    expect(auth).toEqual(AUTH);
+    expect(profile).toEqual(PROFILE);
+  });
+
+  it('deserialises a V1 payload', () => {
+    const v1 = {
+      schemaVersion: 1,
+      uid: 'user-123',
+      email: 'test@example.com',
+      emailVerified: true,
+      picture: 'https://example.com/photo.jpg',
+      name: 'Traveler',
+      createdAt: VALID_TIMESTAMP,
+      updatedAt: VALID_TIMESTAMP,
+    } satisfies V1ProfileResponse;
+
+    const { auth, profile } = deserialiseProfile(v1);
+    expect(auth).toEqual(AUTH);
+    expect(profile).toEqual(PROFILE);
+  });
+
+  it('throws on a structurally invalid payload', () => {
+    expect(() => deserialiseProfile({ uid: 'user-123' } as unknown as V0ProfileResponse)).toThrow(
+      TypeError,
+    );
   });
 });

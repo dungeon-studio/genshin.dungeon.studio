@@ -59,9 +59,12 @@ export {
   weaponRepresentation,
 } from './representations/collection-json/weapons.js';
 export {
+  CURRENT_VERSION as PROFILE_RESPONSE_VERSION,
   deserialiseProfile,
   serialiseProfile,
   type ProfileResponse,
+  type V0ProfileResponse,
+  type V1ProfileResponse,
 } from './representations/json/profile.js';
 
 export { validateTeam, validateTeams, type TeamValidationContext } from './team-validation.js';
