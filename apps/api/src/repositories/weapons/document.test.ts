@@ -1,15 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import {
-  MAX_REFINEMENT_LEVEL,
-  MIN_REFINEMENT_LEVEL,
-  type ISOTimestamp,
-  type UUID,
-} from '@genshin/domain';
-import { WEAPONS } from '@genshin/game-data';
+import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL, type UUID } from '@genshin/domain';
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
+
+import { arbTimestamp, arbWeaponId } from '@/test/arbitraries.js';
 
 import {
   CURRENT_VERSION,
@@ -22,19 +18,9 @@ import {
 const TIMESTAMP = '2024-01-15T12:00:00.000Z';
 const WEAPON_INSTANCE_ID = '11111111-1111-1111-1111-111111111111' as UUID;
 
-// toISOString emits a 4-digit year only inside this range; outside it the
-// expanded `±YYYYYY` form would not satisfy isISOTimestamp.
-const arbTimestamp = fc
-  .date({
-    min: new Date('0001-01-01T00:00:00.000Z'),
-    max: new Date('9999-12-31T23:59:59.999Z'),
-    noInvalidDate: true,
-  })
-  .map((value) => value.toISOString() as ISOTimestamp);
-
 const arbWeapon = fc.record({
   weaponInstanceId: fc.uuid().map((id) => id as UUID),
-  weaponId: fc.constantFrom(...WEAPONS.map((weapon) => weapon.id)),
+  weaponId: arbWeaponId,
   refinementLevel: fc.integer({ min: MIN_REFINEMENT_LEVEL, max: MAX_REFINEMENT_LEVEL }),
   createdAt: arbTimestamp,
   updatedAt: arbTimestamp,

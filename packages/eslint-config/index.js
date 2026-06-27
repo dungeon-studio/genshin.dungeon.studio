@@ -61,7 +61,6 @@ export default function genshinConfig(packageDir) {
           {
             devDependencies: [
               '**/*.{test,spec}.{ts,tsx}',
-              '**/*.setup.{ts,tsx}',
               '**/test/**',
               'eslint.config.js',
               '*.config.{ts,js,mjs,cjs}',
