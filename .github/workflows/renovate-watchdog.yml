@@ -1,0 +1,75 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+name: Renovate Watchdog
+
+# A failed Renovate job on Mend's hosted runner stalls silently with no retry:
+# the repo went 29 days without updates before anyone noticed. This watchdog
+# fails (and thus emails repo admins) when Renovate's Dependency Dashboard has
+# not been refreshed within the staleness window, turning a silent stall into
+# a weekly alert.
+
+on:
+  schedule:
+    # Daily 09:00 UTC. A passing run is silent; only a stale dashboard fails
+    # (and emails admins), so daily costs nothing when healthy but bounds
+    # detection latency to roughly a day once the staleness window is crossed.
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  check-freshness:
+    name: Check Renovate freshness
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Fail if the Dependency Dashboard is stale
+        uses: actions/github-script@373c709c69115d41ff229c7e5df9f8788daa9553 # v9
+        with:
+          script: |
+            const STALE_DAYS = 10;
+
+            const q = [
+              `repo:${context.repo.owner}/${context.repo.repo}`,
+              'is:issue',
+              'is:open',
+              'in:title "Dependency Dashboard"',
+              'author:app/renovate',
+            ].join(' ');
+
+            const { data } = await github.rest.search.issuesAndPullRequests({ q });
+            const dashboard = data.items[0];
+
+            if (!dashboard) {
+              core.setFailed(
+                'No open Renovate "Dependency Dashboard" issue found. Renovate may ' +
+                'be uninstalled or disabled on this repository.',
+              );
+              return;
+            }
+
+            const updatedAt = new Date(dashboard.updated_at);
+            const ageDays = (Date.now() - updatedAt.getTime()) / 86_400_000;
+            const summary =
+              `Dependency Dashboard (#${dashboard.number}) last updated ` +
+              `${updatedAt.toISOString()} (${ageDays.toFixed(1)} days ago).`;
+
+            if (ageDays > STALE_DAYS) {
+              core.setFailed(
+                `${summary} Exceeds the ${STALE_DAYS}-day staleness window — ` +
+                'Renovate has likely stalled (check the Mend job log for ' +
+                'kernel-out-of-memory). Trigger a manual run to recover.',
+              );
+              return;
+            }
+
+            core.info(`${summary} Within the ${STALE_DAYS}-day window.`);
