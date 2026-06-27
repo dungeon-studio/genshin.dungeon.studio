@@ -55,7 +55,9 @@ workspace dependencies first. Turbo handles dependency ordering via `^build`.
 - Run `pre-commit run vale --all-files` for Vale, not `vale .`. Vale has no
   directory-ignore and scans `node_modules`.
 - API error responses use RFC 9457 Problem Details, `application/problem+json`.
-- Validate API responses with published JSON Schema using AJV in tests.
+- Testing: follow the Testing section in `CONTRIBUTING.md` (test behavior not
+  values, `satisfies` for fixtures, one schema assertion per route test then a
+  spot check).
 
 ## Detailed coding rules
 
