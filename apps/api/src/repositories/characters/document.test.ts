@@ -1,6 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import {
+  MAX_CONSTELLATION_LEVEL,
+  MIN_CONSTELLATION_LEVEL,
+  type ISOTimestamp,
+} from '@genshin/domain';
+import { CHARACTERS } from '@genshin/game-data';
+import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -12,6 +19,26 @@ import {
 } from './document.js';
 
 const TIMESTAMP = '2024-01-15T12:00:00.000Z';
+
+// toISOString emits a 4-digit year only inside this range; outside it the
+// expanded `±YYYYYY` form would not satisfy isISOTimestamp.
+const arbTimestamp = fc
+  .date({
+    min: new Date('0001-01-01T00:00:00.000Z'),
+    max: new Date('9999-12-31T23:59:59.999Z'),
+    noInvalidDate: true,
+  })
+  .map((value) => value.toISOString() as ISOTimestamp);
+
+const arbCharacter = fc.record({
+  characterId: fc.constantFrom(...CHARACTERS.map((character) => character.id)),
+  constellationLevel: fc.integer({
+    min: MIN_CONSTELLATION_LEVEL,
+    max: MAX_CONSTELLATION_LEVEL,
+  }),
+  createdAt: arbTimestamp,
+  updatedAt: arbTimestamp,
+});
 
 function makeV1Document(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   const base = {
@@ -57,5 +84,17 @@ describe('toDocument', () => {
     const doc = toDocument(char);
     const restored = fromDocument('columbina', doc as unknown as Record<string, unknown>);
     expect(restored).toEqual(char);
+  });
+
+  it('round-trips any valid character (property)', () => {
+    fc.assert(
+      fc.property(arbCharacter, (character) => {
+        const restored = fromDocument(
+          character.characterId,
+          toDocument(character) as unknown as Record<string, unknown>,
+        );
+        expect(restored).toEqual(character);
+      }),
+    );
   });
 });

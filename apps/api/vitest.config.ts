@@ -13,6 +13,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    setupFiles: ['./vitest.setup.ts'],
     reporters: ['default', 'junit'],
     outputFile: {
       junit: './test-results/junit.xml',

@@ -1,11 +1,56 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import {
+  TEAM_SLOTS,
+  type CollectionTeamMember,
+  type ISOTimestamp,
+  type UUID,
+} from '@genshin/domain';
+import { CHARACTERS } from '@genshin/game-data';
+import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 
 import { CURRENT_VERSION, fromDocument, toDocument, type V1Team, type V0Team } from './document.js';
 
 const TIMESTAMP = '2024-01-15T12:00:00.000Z';
+
+// toISOString emits a 4-digit year only inside this range; outside it the
+// expanded `±YYYYYY` form would not satisfy isISOTimestamp.
+const arbTimestamp = fc
+  .date({
+    min: new Date('0001-01-01T00:00:00.000Z'),
+    max: new Date('9999-12-31T23:59:59.999Z'),
+    noInvalidDate: true,
+  })
+  .map((value) => value.toISOString() as ISOTimestamp);
+
+const arbMember: fc.Arbitrary<CollectionTeamMember> = fc.record(
+  {
+    characterId: fc.constantFrom(...CHARACTERS.map((character) => character.id)),
+    weaponInstanceId: fc.uuid().map((id) => id as UUID),
+  },
+  { requiredKeys: ['characterId'] },
+);
+
+const arbMembers = fc.tuple(
+  fc.option(arbMember, { nil: null }),
+  fc.option(arbMember, { nil: null }),
+  fc.option(arbMember, { nil: null }),
+  fc.option(arbMember, { nil: null }),
+);
+
+const arbTeam = fc.record(
+  {
+    slot: fc.constantFrom(...TEAM_SLOTS),
+    name: fc.string(),
+    members: arbMembers,
+    description: fc.string(),
+    createdAt: arbTimestamp,
+    updatedAt: arbTimestamp,
+  },
+  { requiredKeys: ['slot', 'name', 'members', 'createdAt', 'updatedAt'] },
+);
 
 function makeV1Document(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   const base = {
@@ -102,5 +147,17 @@ describe('toDocument', () => {
     const doc = toDocument(team);
     const restored = fromDocument(1, doc as unknown as Record<string, unknown>);
     expect(restored).toEqual(team);
+  });
+
+  it('round-trips any valid team (property)', () => {
+    fc.assert(
+      fc.property(arbTeam, (team) => {
+        const restored = fromDocument(
+          team.slot,
+          toDocument(team) as unknown as Record<string, unknown>,
+        );
+        expect(restored).toEqual(team);
+      }),
+    );
   });
 });
