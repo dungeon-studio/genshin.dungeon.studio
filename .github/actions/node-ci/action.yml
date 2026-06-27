@@ -32,6 +32,16 @@ runs:
       shell: bash
       run: pnpm turbo run typecheck --filter="${{ inputs.filter }}"
 
+    # Seed property-based tests from the commit under test: a re-run of the same
+    # commit replays identical inputs (so a failure reproduces), while a new
+    # commit or PR draws fresh inputs (so the generators keep exploring). The
+    # first 8 hex digits of the SHA become a 32-bit integer seed.
+    - name: Derive fast-check seed
+      shell: bash
+      env:
+        SEED_SOURCE: ${{ github.event.pull_request.head.sha || github.sha }}
+      run: echo "FAST_CHECK_SEED=$((16#${SEED_SOURCE:0:8}))" >> "$GITHUB_ENV"
+
     - name: Test
       shell: bash
       run: pnpm turbo run test --filter="${{ inputs.filter }}" -- --coverage
