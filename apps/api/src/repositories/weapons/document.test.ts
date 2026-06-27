@@ -1,8 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { UUID } from '@genshin/domain';
+import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL, type UUID } from '@genshin/domain';
+import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
+
+import { arbTimestamp, arbWeaponId } from '@/test/arbitraries.js';
 
 import {
   CURRENT_VERSION,
@@ -14,6 +17,14 @@ import {
 
 const TIMESTAMP = '2024-01-15T12:00:00.000Z';
 const WEAPON_INSTANCE_ID = '11111111-1111-1111-1111-111111111111' as UUID;
+
+const arbWeapon = fc.record({
+  weaponInstanceId: fc.uuid().map((id) => id as UUID),
+  weaponId: arbWeaponId,
+  refinementLevel: fc.integer({ min: MIN_REFINEMENT_LEVEL, max: MAX_REFINEMENT_LEVEL }),
+  createdAt: arbTimestamp,
+  updatedAt: arbTimestamp,
+});
 
 function makeV1Document(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   const base = {
@@ -61,5 +72,17 @@ describe('toDocument', () => {
     const doc = toDocument(weapon);
     const restored = fromDocument(WEAPON_INSTANCE_ID, doc as unknown as Record<string, unknown>);
     expect(restored).toEqual(weapon);
+  });
+
+  it('round-trips any valid weapon (property)', () => {
+    fc.assert(
+      fc.property(arbWeapon, (weapon) => {
+        const restored = fromDocument(
+          weapon.weaponInstanceId,
+          toDocument(weapon) as unknown as Record<string, unknown>,
+        );
+        expect(restored).toEqual(weapon);
+      }),
+    );
   });
 });

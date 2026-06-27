@@ -1,7 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
+
+import { arbTimestamp } from '@/test/arbitraries.js';
 
 import {
   CURRENT_VERSION,
@@ -12,6 +15,12 @@ import {
 } from './document.js';
 
 const TIMESTAMP = '2024-01-15T12:00:00.000Z';
+
+const arbProfile = fc.record({
+  name: fc.string({ minLength: 1 }),
+  createdAt: arbTimestamp,
+  updatedAt: arbTimestamp,
+});
 
 function makeV1Document(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   const base = {
@@ -55,5 +64,14 @@ describe('toDocument', () => {
     const doc = toDocument(profile);
     const restored = fromDocument(doc as unknown as Record<string, unknown>);
     expect(restored).toEqual(profile);
+  });
+
+  it('round-trips any valid profile (property)', () => {
+    fc.assert(
+      fc.property(arbProfile, (profile) => {
+        const restored = fromDocument(toDocument(profile) as unknown as Record<string, unknown>);
+        expect(restored).toEqual(profile);
+      }),
+    );
   });
 });

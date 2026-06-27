@@ -1,11 +1,42 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { TEAM_SLOTS, type CollectionTeamMember, type UUID } from '@genshin/domain';
+import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
+
+import { arbCharacterId, arbTimestamp } from '@/test/arbitraries.js';
 
 import { CURRENT_VERSION, fromDocument, toDocument, type V1Team, type V0Team } from './document.js';
 
 const TIMESTAMP = '2024-01-15T12:00:00.000Z';
+
+const arbMember: fc.Arbitrary<CollectionTeamMember> = fc.record(
+  {
+    characterId: arbCharacterId,
+    weaponInstanceId: fc.uuid().map((id) => id as UUID),
+  },
+  { requiredKeys: ['characterId'] },
+);
+
+const arbMembers = fc.tuple(
+  fc.option(arbMember, { nil: null }),
+  fc.option(arbMember, { nil: null }),
+  fc.option(arbMember, { nil: null }),
+  fc.option(arbMember, { nil: null }),
+);
+
+const arbTeam = fc.record(
+  {
+    slot: fc.constantFrom(...TEAM_SLOTS),
+    name: fc.string(),
+    members: arbMembers,
+    description: fc.string(),
+    createdAt: arbTimestamp,
+    updatedAt: arbTimestamp,
+  },
+  { requiredKeys: ['slot', 'name', 'members', 'createdAt', 'updatedAt'] },
+);
 
 function makeV1Document(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   const base = {
@@ -102,5 +133,17 @@ describe('toDocument', () => {
     const doc = toDocument(team);
     const restored = fromDocument(1, doc as unknown as Record<string, unknown>);
     expect(restored).toEqual(team);
+  });
+
+  it('round-trips any valid team (property)', () => {
+    fc.assert(
+      fc.property(arbTeam, (team) => {
+        const restored = fromDocument(
+          team.slot,
+          toDocument(team) as unknown as Record<string, unknown>,
+        );
+        expect(restored).toEqual(team);
+      }),
+    );
   });
 });

@@ -23,7 +23,8 @@
     },
     "test": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**", "package.json", "vite.config.*", "vitest.config.*", "tsconfig*.json"]
+      "inputs": ["src/**", "package.json", "vite.config.*", "vitest.config.*", "tsconfig*.json"],
+      "env": ["FAST_CHECK_SEED"]
     },
     "typecheck": {
       "dependsOn": ["^build"],
