@@ -15,7 +15,7 @@
  * `SupportedRepresentation`.
  */
 export interface JsonSchemaProfile {
-  /** Absolute URL path where the schema is served (e.g. `/profiles/json-schema/profile/get-response-v1.json`). */
+  /** Absolute URL path where the schema is served (e.g. `/profiles/json-schema/root/get-response-v1.json`). */
   readonly path: string;
   // Intentionally `Record<string, unknown>` rather than AJV's `SchemaObject`
   // to keep this interface free of validation-library coupling. The

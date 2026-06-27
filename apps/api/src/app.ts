@@ -19,7 +19,6 @@ import { characters } from '@/routes/characters.js';
 import { jsonSchemaProfiles } from '@/routes/json-schema-profiles.js';
 import { root } from '@/routes/root.js';
 import { teams } from '@/routes/teams.js';
-import { userProfile } from '@/routes/user-profile.js';
 import { weapons } from '@/routes/weapons.js';
 
 // Read version from package.json to maintain single source of truth
@@ -99,7 +98,6 @@ app.get('/health', (c) =>
 app.route('/profiles/json-schema', jsonSchemaProfiles);
 app.route('/profiles/alps', alpsProfiles);
 app.route('/api/characters', characters);
-app.route('/api/profile', userProfile);
 app.route('/api/teams', teams);
 app.route('/api/weapons', weapons);
 

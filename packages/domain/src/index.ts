@@ -4,7 +4,6 @@
 export { issue, isValid, prefixPaths, type ValidationIssue } from '@genshin/validation';
 export { type ArtifactPlan } from './artifact-plan.js';
 export { validateArtifactPlan } from './artifact-plan-validation.js';
-export type { AuthIdentity } from './auth-identity.js';
 export {
   assertCollectionCharacter,
   isValidConstellationLevel,
@@ -58,15 +57,5 @@ export {
   weaponItemHref,
   weaponRepresentation,
 } from './representations/collection-json/weapons.js';
-export {
-  CURRENT_VERSION as PROFILE_RESPONSE_VERSION,
-  deserialiseProfile,
-  serialiseProfile,
-  type ProfileResponse,
-  type V0ProfileResponse,
-  type V1ProfileResponse,
-} from './representations/json/profile.js';
-
 export { validateTeam, validateTeams, type TeamValidationContext } from './team-validation.js';
-export { assertUserProfile, type ProfileUpdate, type UserProfile } from './user-profile.js';
 export type { UUID } from './uuid.js';

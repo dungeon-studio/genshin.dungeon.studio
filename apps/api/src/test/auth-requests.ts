@@ -3,7 +3,7 @@
 
 import type { verifyToken } from '@/lib/firebase/auth.js';
 
-export const FAKE_UID = 'test-user-123';
+const FAKE_UID = 'test-user-123';
 export const FAKE_TOKEN = { uid: FAKE_UID } as Awaited<ReturnType<typeof verifyToken>>;
 
 export interface AuthedRequestOptions {
