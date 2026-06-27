@@ -61,7 +61,7 @@ importers:
         version: link:../../packages/game-data
       '@hono/node-server':
         specifier: 2.0.4
-        version: 2.0.4(hono@4.12.23)
+        version: 2.0.4(hono@4.12.25)
       ajv:
         specifier: 8.20.0
         version: 8.20.0
@@ -75,8 +75,8 @@ importers:
         specifier: 5.0.6
         version: 5.0.6
       hono:
-        specifier: 4.12.23
-        version: 4.12.23
+        specifier: 4.12.25
+        version: 4.12.25
       negotiator:
         specifier: 1.0.0
         version: 1.0.0
@@ -3903,8 +3903,8 @@ packages:
   highlight.js@10.7.3:
     resolution: {integrity: sha512-tzcUFauisWKNHaRkN4Wjl/ZA07gENAjFl3J/c480dprkGTg5EQstgaNFqBfUqCq54kZRIEcreTsAgF/m2quD7A==}
 
-  hono@4.12.23:
-    resolution: {integrity: sha512-eIaZ9qDgu7XV0pxOCrg7/WhnQ6Ivm22UcxhXx/A3dcbqbbYgBEkc6e/J/s7j2tS96zoB0S9VBdLwQNCWwUo4LA==}
+  hono@4.12.25:
+    resolution: {integrity: sha512-2NFaIyNVgJmBs/ecmtGzlmluTFs5cHEWGTdu0t1HBwYzoGXOL5nUQBRMXsXWla5i4KkG//QMzVP88m1+I3fdAQ==}
     engines: {node: '>=16.9.0'}
 
   hookified@1.15.1:
@@ -7177,13 +7177,13 @@ snapshots:
       protobufjs: 7.6.0
       yargs: 17.7.2
 
-  '@hono/node-server@1.19.14(hono@4.12.23)':
+  '@hono/node-server@1.19.14(hono@4.12.25)':
     dependencies:
-      hono: 4.12.23
+      hono: 4.12.25
 
-  '@hono/node-server@2.0.4(hono@4.12.23)':
+  '@hono/node-server@2.0.4(hono@4.12.25)':
     dependencies:
-      hono: 4.12.23
+      hono: 4.12.25
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -7374,7 +7374,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.29.0(zod@4.4.3)':
     dependencies:
-      '@hono/node-server': 1.19.14(hono@4.12.23)
+      '@hono/node-server': 1.19.14(hono@4.12.25)
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
       content-type: 1.0.5
@@ -7384,7 +7384,7 @@ snapshots:
       eventsource-parser: 3.1.0
       express: 5.2.1
       express-rate-limit: 8.5.2(express@5.2.1)
-      hono: 4.12.23
+      hono: 4.12.25
       jose: 6.2.3
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -10194,7 +10194,7 @@ snapshots:
 
   highlight.js@10.7.3: {}
 
-  hono@4.12.23: {}
+  hono@4.12.25: {}
 
   hookified@1.15.1: {}
 
