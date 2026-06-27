@@ -74,7 +74,7 @@
 
 ## Testing
 
-- Test behavior, not constant values, and don't test what a library, the language, or config already guarantees.
+- Test behavior, not constant values; don't assert what's true by definition or what a library, the language, or config already guarantees.
 - Annotate fixtures with `satisfies` to validate their shape without changing the inferred type.
 - Validate route responses against the published JSON Schema with AJV first, then make one field-level spot check; don't re-assert the schema field by field.
 - See [`CONTRIBUTING.md`](../CONTRIBUTING.md) for the full testing principles.
