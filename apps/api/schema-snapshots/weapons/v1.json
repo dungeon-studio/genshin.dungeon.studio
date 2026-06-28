@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "weaponId": {
+      "type": "string"
+    },
+    "refinementLevel": {
+      "type": "number"
+    },
+    "createdAt": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "weaponId",
+    "refinementLevel",
+    "createdAt",
+    "updatedAt"
+  ],
+  "additionalProperties": false
+}

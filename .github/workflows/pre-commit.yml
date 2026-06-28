@@ -104,3 +104,18 @@ jobs:
         uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
         with:
           extra_args: --all-files syncpack
+
+      # schema-compat compares the PR's schemas against the last shipped ones on
+      # develop, so the base branch must be reachable as origin/develop.
+      - name: Fetch base branch for schema compatibility
+        run: git fetch --no-tags --depth=1 origin develop:refs/remotes/origin/develop
+
+      - name: Run schema snapshots hook
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+        with:
+          extra_args: --all-files schema-snapshots
+
+      - name: Run schema compatibility hook
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+        with:
+          extra_args: --all-files schema-compat

@@ -30,6 +30,19 @@
       "dependsOn": ["^build"],
       "inputs": ["src/**/*.{ts,tsx}", "package.json", "vite.config.*", "tsconfig*.json"]
     },
+    "schemas:export": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/repositories/*/schemas/**",
+        "scripts/export-schemas.ts",
+        "scripts/schema-registry.ts"
+      ],
+      "outputs": ["schema-snapshots/**"]
+    },
+    "schemas:check": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
     "clean": {
       "cache": false
     }
