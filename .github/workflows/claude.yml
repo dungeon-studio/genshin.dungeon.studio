@@ -1,0 +1,37 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+name: Claude
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  actions: read
+
+jobs:
+  claude:
+    name: Claude
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: contains(github.event.comment.body, '@claude')
+
+    steps:
+      - uses: anthropics/claude-code-action@a92e7c70a4da9793dc164451d829089dc057a464 # v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          trigger_phrase: '@claude'
+
+# ---------------------------------------------------------------------------
+# Maintenance notes
+# - Requires the ANTHROPIC_API_KEY secret (org- or repo-level), added manually
+#   by a maintainer. It is the Anthropic API credential, separate from any
+#   GitHub App install; the built-in GITHUB_TOKEN handles posting comments.
+# - Comment "@claude" (or "@claude review") on a PR or issue to trigger a run.
+# ---------------------------------------------------------------------------
