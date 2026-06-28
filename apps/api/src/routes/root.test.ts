@@ -32,7 +32,6 @@ describe('GET /', () => {
     expect(body.links).toEqual(
       expect.objectContaining({
         characters: { href: '/api/characters' },
-        profile: { href: '/api/profile' },
         weapons: { href: '/api/weapons' },
         health: { href: '/health' },
       }),
