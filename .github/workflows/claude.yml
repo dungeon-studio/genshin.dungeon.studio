@@ -10,7 +10,7 @@ on:
     types: [created]
 
 permissions:
-  contents: write
+  contents: read
   issues: write
   pull-requests: write
   actions: read
@@ -27,6 +27,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           trigger_phrase: '@claude'
+          claude_args: '--model sonnet --max-turns 15 --disallowedTools WebSearch,WebFetch'
 
 # ---------------------------------------------------------------------------
 # Maintenance notes
@@ -34,4 +35,10 @@ jobs:
 #   by a maintainer. It is the Anthropic API credential, separate from any
 #   GitHub App install; the built-in GITHUB_TOKEN handles posting comments.
 # - Comment "@claude" (or "@claude review") on a PR or issue to trigger a run.
+# - Public-repo posture: only users with write access can trigger this (the
+#   action's default; allowed_non_write_users is intentionally unset). Scoped
+#   to review/advise -- contents: read (no pushes) and web tools disabled --
+#   so a prompt-injection from untrusted PR content cannot push code or reach
+#   the network. Bash stays enabled for review context. Raise capability
+#   deliberately if "@claude fix it and push" is ever wanted.
 # ---------------------------------------------------------------------------
