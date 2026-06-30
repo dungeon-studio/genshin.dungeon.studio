@@ -40,7 +40,6 @@ ci:
     - ls-lint
     - syncpack
     - schema-snapshots
-    - schema-compat
     # lychee is a binary not installable in pre-commit.ci; its CI coverage
     # lives in link-check.yml, not pre-commit.yml.
     - lychee
@@ -194,20 +193,15 @@ repos:
         files: (^|/)package\.json$
         pass_filenames: false
 
-      # Firestore document schema evolution gate. See CONTRIBUTING.md
-      # "Firestore schema evolution". Both run through turbo so the workspace
-      # packages the schemas import are built first; CI coverage is in
-      # pre-commit.yml (turbo can't run in pre-commit.ci).
+      # Keeps the committed JSON Schema snapshots faithful to their Zod source.
+      # A pure function of the working tree, so it belongs here; the base-branch
+      # compatibility proof is a PR-level concern and runs in ci.yml instead. See
+      # CONTRIBUTING.md "Firestore schema evolution". Runs through turbo so the
+      # workspace packages the schemas import are built first; turbo can't run in
+      # pre-commit.ci, so CI coverage is in pre-commit.yml.
       - id: schema-snapshots
         name: schema snapshots (regenerate from Zod)
         entry: pnpm exec turbo run schemas:export --filter=@genshin/api
-        language: system
-        files: ^apps/api/(src/repositories/[^/]+/schemas/|schema-snapshots/)
-        pass_filenames: false
-
-      - id: schema-compat
-        name: schema compatibility (jsoncompat)
-        entry: pnpm exec turbo run schemas:check --filter=@genshin/api
         language: system
         files: ^apps/api/(src/repositories/[^/]+/schemas/|schema-snapshots/)
         pass_filenames: false

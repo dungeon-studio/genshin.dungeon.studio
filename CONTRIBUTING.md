@@ -171,10 +171,10 @@ Shared API test utilities live in `apps/api/src/test/` with descriptive file nam
 
 [Verzod](https://github.com/AngeloChecked/verzod) versions the Firestore document schemas in `apps/api/src/repositories/*/schemas/`: the writer always stamps the current version, and the reader identifies older documents by their `schemaVersion` and migrates them up. Because documents written under an old schema still live in Firestore, **a released version's schema may only ever widen**: it must accept a superset of what it accepted before. Narrowing it (removing a field, tightening a type, adding a required field) would make stored documents fail validation on read.
 
-Two pre-commit hooks enforce this:
+Two checks enforce this:
 
-- `schema-snapshots` regenerates the JSON Schema snapshots under `apps/api/schema-snapshots/` from the Zod schemas (via `pnpm --filter @genshin/api schemas:export`) and fails if the committed snapshots are stale.
-- `schema-compat` proves with [jsoncompat](https://jsoncompat.com) that each version still accepts everything the version shipped on `develop` accepted (the deserializer direction), and that no version was dropped.
+- The `schema-snapshots` pre-commit hook regenerates the JSON Schema snapshots under `apps/api/schema-snapshots/` from the Zod schemas (via `pnpm --filter @genshin/api schemas:export`) and fails if the committed snapshots are stale. It's a pure function of the working tree, so it runs on every commit.
+- A CI step ([ci.yml](.github/workflows/ci.yml)) proves with [jsoncompat](https://jsoncompat.com) that each version still accepts everything the schemas on the base branch accepted (the deserializer direction), and that the change drops no version. This is a branch-vs-base invariant, not a per-commit one, so it lives in CI rather than a pre-commit hook. Run it locally with `pnpm --filter @genshin/api schemas:check`.
 
 To make an **additive** change (a new optional field) to the current version, edit the Zod schema and commit the regenerated snapshot. To make a **breaking** change, add a new version instead: a new `vN` schema with an `up` migration and a bumped `CURRENT_VERSION`. Never edit a released version in place, and never delete a version while documents may still exist under it.
 

@@ -7,9 +7,12 @@
 // version (a new `schemaVersion` branch with an `up` migration), never an
 // in-place edit. See CONTRIBUTING.md "Firestore schema evolution".
 //
-// The comparison is against the snapshot committed on the base branch (the last
-// shipped schema), not the regenerated working-tree snapshot — comparing a
-// change to itself would always look compatible.
+// This compares the working-tree schemas against the snapshots committed on the
+// PR's base branch, so it is a branch-vs-base invariant rather than a property
+// of any single commit. It runs in ci.yml (which passes the real base ref via
+// SCHEMA_COMPAT_BASE), not in a pre-commit hook — reaching for a base ref on the
+// local commit path would be non-hermetic and network-coupled. Run it locally
+// with `pnpm --filter @genshin/api schemas:check`.
 
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';

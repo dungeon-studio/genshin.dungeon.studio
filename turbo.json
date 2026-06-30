@@ -41,6 +41,7 @@
     },
     "schemas:check": {
       "dependsOn": ["^build"],
+      "passThroughEnv": ["SCHEMA_COMPAT_BASE"],
       "cache": false
     },
     "clean": {
