@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "name": {
+      "type": "string"
+    },
+    "members": {
+      "maxItems": 4,
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "null"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "characterId": {
+                "type": "string"
+              },
+              "weaponInstanceId": {
+                "type": "string"
+              },
+              "artifactPlan": {
+                "type": "object",
+                "properties": {
+                  "sands": {
+                    "type": "string"
+                  },
+                  "goblet": {
+                    "type": "string"
+                  },
+                  "circlet": {
+                    "type": "string"
+                  },
+                  "sets": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "priorityMinorAffixes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "secondaryMinorAffixes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "characterId"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "description": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "name",
+    "members",
+    "createdAt",
+    "updatedAt"
+  ],
+  "additionalProperties": false
+}

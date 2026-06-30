@@ -71,6 +71,19 @@ jobs:
         if: matrix.flag == 'web'
         run: bash apps/web/scripts/verify-build-output.sh
 
+      # Prove the PR's document schemas stay backward-compatible with the ones on
+      # its base branch (see CONTRIBUTING.md "Firestore schema evolution"). This
+      # is a branch-vs-base invariant, so it lives in CI where the real base ref
+      # is available — not in a pre-commit hook on the local commit path.
+      - name: Check schema compatibility
+        if: matrix.flag == 'api' && github.event_name == 'pull_request'
+        env:
+          SCHEMA_COMPAT_BASE: origin/${{ github.base_ref }}
+        run: |
+          git fetch --no-tags --depth=1 \
+            origin "${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}"
+          pnpm turbo run schemas:check --filter=@genshin/api
+
 # ---------------------------------------------------------------------------
 # Maintenance notes
 # - Add a new matrix entry under strategy.matrix.include when new apps or

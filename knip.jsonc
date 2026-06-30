@@ -17,9 +17,13 @@
       "ignoreDependencies": ["stylelint", "stylelint-config-standard", "syncpack", "eslint"]
     },
     "apps/api": {
-      // verify-deployment.ts is a deploy-time entry invoked from deploy.yml,
-      // not imported by application code.
-      "entry": ["scripts/verify-deployment.ts"]
+      // Scripts invoked from pre-commit/CI (turbo `schemas:*`, deploy.yml), not
+      // imported by application code.
+      "entry": [
+        "scripts/verify-deployment.ts",
+        "scripts/export-schemas.ts",
+        "scripts/check-schema-compat.ts"
+      ]
     },
     "apps/web": {
       // env.d.ts holds Vite ambient client types referenced via tsconfig, not imports.
