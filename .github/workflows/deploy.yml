@@ -31,16 +31,16 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
-      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
           workload_identity_provider: ${{ secrets.GCP_RW_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
           service_account: ${{ secrets.GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL }} # pragma: allowlist secret
 
       - uses: ./.github/actions/setup-node-pnpm
 
-      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
           terraform_version: '1.9.0'
           terraform_wrapper: false
@@ -91,25 +91,25 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
-      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
           workload_identity_provider: ${{ secrets.GCP_RW_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
           service_account: ${{ secrets.GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL }} # pragma: allowlist secret
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
 
       - name: Configure Docker Auth
         run: gcloud auth configure-docker "${CLOUD_RUN_REGION}-docker.pkg.dev" --quiet
 
       - name: Setup Buildx
-        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
 
       - name: Extract Metadata
         id: meta
-        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v6
+        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v6.1.0
         with:
           images: ${{ env.CLOUD_RUN_REGION }}-docker.pkg.dev/${{ env.GCP_DEV_PROJECT_ID }}/${{
             env.ARTIFACT_REPOSITORY }}/${{ env.CLOUD_RUN_SERVICE_NAME }}
@@ -118,7 +118,7 @@ jobs:
             type=sha,prefix={{branch}}-,format=short
 
       - name: Build & Push Image
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
         with:
           context: .
           file: ./apps/api/Dockerfile
@@ -147,7 +147,7 @@ jobs:
       # This split is intentional and may diverge further for release/prod.
       - name: Deploy
         id: deploy
-        uses: google-github-actions/deploy-cloudrun@2028e2d7d30a78c6910e0632e48dd561b064884d # v3
+        uses: google-github-actions/deploy-cloudrun@2028e2d7d30a78c6910e0632e48dd561b064884d # v3.0.1
         with:
           project_id: ${{ env.GCP_DEV_PROJECT_ID }}
           region: ${{ env.CLOUD_RUN_REGION }}
@@ -172,7 +172,7 @@ jobs:
 
       - name: Generate Verify Token
         id: verify-token
-        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
           workload_identity_provider: ${{ secrets.GCP_RW_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
           service_account: ${{ secrets.GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL }} # pragma: allowlist secret
