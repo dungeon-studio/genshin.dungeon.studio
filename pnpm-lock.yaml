@@ -108,6 +108,9 @@ importers:
       globals:
         specifier: 17.6.0
         version: 17.6.0
+      jsoncompat:
+        specifier: 0.4.1
+        version: 0.4.1
       tsc-alias:
         specifier: 1.8.17
         version: 1.8.17
@@ -4310,6 +4313,9 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
+  jsoncompat@0.4.1:
+    resolution: {integrity: sha512-GWloAH4QvUgoVCJIutxf8D0vd3S6AO8uODRCGp34t5b+9yXOxk/JcHMzFg03I0ZBu2BvfQKqz4u2euer9tLEog==}
+
   jsonfile@6.2.1:
     resolution: {integrity: sha512-zwOTdL3rFQ/lRdBnntKVOX6k5cKJwEc1HdilT71BWEu7J41gXIB2MRp+vxduPSwZJPWBxEzv4yH1wYLJGUHX4Q==}
 
@@ -8145,7 +8151,7 @@ snapshots:
       debug: 4.4.3
       minimatch: 10.2.5
       semver: 7.8.0
-      tinyglobby: 0.2.16
+      tinyglobby: 0.2.17
       ts-api-utils: 2.5.0(typescript@6.0.3)
       typescript: 6.0.3
     transitivePeerDependencies:
@@ -10589,6 +10595,8 @@ snapshots:
   json-stable-stringify-without-jsonify@1.0.1: {}
 
   json5@2.2.3: {}
+
+  jsoncompat@0.4.1: {}
 
   jsonfile@6.2.1:
     dependencies:

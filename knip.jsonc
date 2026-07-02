@@ -17,8 +17,8 @@
       "ignoreDependencies": ["stylelint", "stylelint-config-standard", "syncpack", "eslint"]
     },
     "apps/api": {
-      // verify-deployment.ts is a deploy-time entry invoked from deploy.yml,
-      // not imported by application code.
+      // verify-deployment.ts is invoked from deploy.yml, so knip can't see it.
+      // The schemas:* scripts are auto-detected from their package.json entries.
       "entry": ["scripts/verify-deployment.ts"]
     },
     "apps/web": {

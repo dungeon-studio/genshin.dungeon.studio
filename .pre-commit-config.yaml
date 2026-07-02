@@ -39,6 +39,7 @@ ci:
     - hadolint
     - ls-lint
     - syncpack
+    - schema-snapshots
     # lychee is a binary not installable in pre-commit.ci; its CI coverage
     # lives in link-check.yml, not pre-commit.yml.
     - lychee
@@ -192,4 +193,15 @@ repos:
         entry: pnpm exec syncpack lint
         language: system
         files: (^|/)package\.json$
+        pass_filenames: false
+
+      # Keeps the committed JSON Schema snapshots faithful to their Zod source — a
+      # pure function of the working tree, unlike the base-branch compatibility
+      # proof, which is a PR-level check in ci.yml. Runs through turbo so the
+      # workspace packages the schemas import build first.
+      - id: schema-snapshots
+        name: schema snapshots (regenerate from Zod)
+        entry: pnpm exec turbo run schemas:export --filter=@genshin/api
+        language: system
+        files: ^apps/api/(src/repositories/[^/]+/schemas/|schema-snapshots/)
         pass_filenames: false
