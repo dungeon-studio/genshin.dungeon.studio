@@ -76,3 +76,9 @@ License: MIT
 Files: .github/copilot/*.prompt.md
 Copyright: 2026 Alex Brandt <alunduil@gmail.com>
 License: MIT
+
+# Claude Code slash commands (frontmatter must be first line, no room for SPDX)
+
+Files: .claude/commands/*.md
+Copyright: 2026 Alex Brandt <alunduil@gmail.com>
+License: MIT

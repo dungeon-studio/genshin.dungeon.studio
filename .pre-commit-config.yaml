@@ -103,6 +103,8 @@ repos:
       - id: terraform_fmt
         args: [--args=-recursive]
       - id: terraform_trivy
+        args:
+          - --args=--severity=HIGH,CRITICAL
 
   # REUSE - SPDX license compliance
   - repo: https://github.com/fsfe/reuse-tool

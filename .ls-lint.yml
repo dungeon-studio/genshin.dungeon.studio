@@ -49,6 +49,7 @@ ignore:
   - '**/test-results'
   - .git
   # Tool-convention directories (names dictated by external tooling):
+  - .claude
   - .devcontainer
   - .github
   - .reuse

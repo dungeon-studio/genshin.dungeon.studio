@@ -15,7 +15,9 @@ Copy `infrastructure/terraform/bootstrap/dev.tf` to `infrastructure/terraform/bo
 
 - Rename module blocks and resource names from `dev` to `<environment>`
 - Set `environment`, `project_id`, and `project_name`
-- Keep the same `github_oidc_bindings_<environment>` pattern
+- Keep the same `github_oidc_bindings_<environment>` pattern, and set its
+  `github_environment` to the GitHub Actions environment name the apply job
+  runs in (it must match exactly, or RW Workload Identity auth fails closed)
 - Keep cross-project viewer access to `module.core` for RO and RW service accounts
 - Keep any environment-scoped IAM needed for plan/apply
 
