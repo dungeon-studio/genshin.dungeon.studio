@@ -32,3 +32,13 @@ variable "wif_pool_project_number" {
     error_message = "Project number must be exactly 12 digits (e.g., '123456789012')"
   }
 }
+
+variable "github_environment" {
+  type        = string
+  description = "GitHub Actions environment name whose OIDC tokens may impersonate the RW service account (e.g. 'dev', 'staging')"
+
+  validation {
+    condition     = can(regex("^[a-z][a-z0-9-]*$", var.github_environment))
+    error_message = "GitHub environment name must be lowercase alphanumeric with hyphens (e.g., 'dev')"
+  }
+}

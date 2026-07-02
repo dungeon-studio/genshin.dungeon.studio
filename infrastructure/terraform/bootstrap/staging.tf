@@ -22,6 +22,7 @@ module "github_oidc_bindings_staging" {
   service_account_rw_email = module.staging.github_deployer_rw_email
   service_account_ro_email = module.staging.github_deployer_ro_email
   wif_pool_project_number  = module.shared.project_number
+  github_environment       = "staging"
 
   depends_on = [google_iam_workload_identity_pool_provider.github, module.staging]
 }

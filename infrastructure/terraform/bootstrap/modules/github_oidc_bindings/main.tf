@@ -12,9 +12,17 @@ terraform {
   }
 }
 
-# Construct the WIF principal for the repository
 locals {
-  wif_principal = "principalSet://iam.googleapis.com/projects/${var.wif_pool_project_number}/locations/global/workloadIdentityPools/github/attribute.repository/dungeon-studio/genshin.dungeon.studio"
+  wif_pool = "iam.googleapis.com/projects/${var.wif_pool_project_number}/locations/global/workloadIdentityPools/github"
+
+  # RW (deploy / terraform-apply) always runs inside a GitHub environment, so it
+  # is scoped to that environment claim: a workflow outside the environment
+  # cannot impersonate the deployer service account, even on this repository.
+  rw_principal = "principalSet://${local.wif_pool}/attribute.environment/${var.github_environment}"
+
+  # RO (terraform-plan) runs on pull_request with no environment claim, so it is
+  # scoped to the repository.
+  ro_principal = "principalSet://${local.wif_pool}/attribute.repository/dungeon-studio/genshin.dungeon.studio"
 }
 
 # ============================================
@@ -25,14 +33,14 @@ locals {
 resource "google_service_account_iam_binding" "rw_workload_identity" {
   service_account_id = "projects/-/serviceAccounts/${var.service_account_rw_email}"
   role               = "roles/iam.workloadIdentityUser"
-  members            = [local.wif_principal]
+  members            = [local.rw_principal]
 }
 
 # RW: serviceAccountTokenCreator role
 resource "google_service_account_iam_binding" "rw_token_creator" {
   service_account_id = "projects/-/serviceAccounts/${var.service_account_rw_email}"
   role               = "roles/iam.serviceAccountTokenCreator"
-  members            = [local.wif_principal]
+  members            = [local.rw_principal]
 }
 
 # ============================================
@@ -43,12 +51,12 @@ resource "google_service_account_iam_binding" "rw_token_creator" {
 resource "google_service_account_iam_binding" "ro_workload_identity" {
   service_account_id = "projects/-/serviceAccounts/${var.service_account_ro_email}"
   role               = "roles/iam.workloadIdentityUser"
-  members            = [local.wif_principal]
+  members            = [local.ro_principal]
 }
 
 # RO: serviceAccountTokenCreator role
 resource "google_service_account_iam_binding" "ro_token_creator" {
   service_account_id = "projects/-/serviceAccounts/${var.service_account_ro_email}"
   role               = "roles/iam.serviceAccountTokenCreator"
-  members            = [local.wif_principal]
+  members            = [local.ro_principal]
 }
