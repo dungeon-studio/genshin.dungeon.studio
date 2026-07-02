@@ -38,7 +38,7 @@ variable "github_environment" {
   description = "GitHub Actions environment name whose OIDC tokens may impersonate the RW service account (e.g., 'dev' or 'staging')"
 
   validation {
-    condition     = can(regex("^[a-z][a-z0-9-]*$", var.github_environment))
-    error_message = "GitHub environment name must be lowercase alphanumeric with hyphens (e.g., 'dev')"
+    condition     = length(var.github_environment) >= 1 && length(var.github_environment) <= 255
+    error_message = "GitHub environment name must be between 1 and 255 characters."
   }
 }
