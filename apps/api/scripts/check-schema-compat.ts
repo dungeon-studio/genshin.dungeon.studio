@@ -1,20 +1,14 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-// Proves that every Firestore document schema only ever *widens* relative to
-// the last shipped version, so the reader keeps accepting documents already
-// stored under an older schema. Breaking changes must go through a new verzod
-// version (a new `schemaVersion` branch with an `up` migration), never an
-// in-place edit. See CONTRIBUTING.md "Firestore schema evolution".
+// Rejects a schema change that would make documents already stored in Firestore
+// fail to read. See CONTRIBUTING.md "Firestore schema evolution" for the contract.
 //
-// Compares the committed snapshots at HEAD against those committed on the PR's
-// base branch — a branch-vs-base invariant, not a property of any single commit.
-// It trusts the `schema-snapshots` drift hook to keep HEAD's snapshots faithful
-// to their Zod source, so it needs no workspace build: it diffs JSON against
-// JSON. It runs in ci.yml (which passes the real base ref via SCHEMA_COMPAT_BASE),
-// not in a pre-commit hook — reaching for a base ref on the local commit path
-// would be non-hermetic and network-coupled. Run it locally with
-// `pnpm --filter @genshin/api schemas:check`.
+// Compares the committed snapshots against those on the base branch, trusting the
+// schema-snapshots drift hook to keep them faithful to their Zod source — so it's
+// a JSON-vs-JSON diff with no workspace build, and a branch-vs-base check that
+// runs in CI (ci.yml passes the base ref via SCHEMA_COMPAT_BASE) rather than a
+// per-commit hook.
 
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
