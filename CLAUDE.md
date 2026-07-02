@@ -52,6 +52,11 @@ workspace dependencies first. Turbo handles dependency ordering via `^build`.
 - Never bypass pre-commit with `--no-verify`; fix root causes.
 - Never use `git commit --amend` or `git push --force`.
 - Fixes after hook failures should be new commits; squash merge handles cleanup.
+- At session start, check `git status` for pre-existing `M` files outside your
+  task's scope; don't attribute their breakage to your changes.
+- After changing `pnpm-lock.yaml`, run `pnpm install` and restart any running
+  dev server. Vite caches module resolution at startup, so a stale server throws
+  misleading `Cannot find module` errors.
 - Run `pre-commit run vale --all-files` for Vale, not `vale .`. Vale has no
   directory-ignore and scans `node_modules`.
 - API error responses use RFC 9457 Problem Details, `application/problem+json`.
