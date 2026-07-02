@@ -174,7 +174,7 @@ Shared API test utilities live in `apps/api/src/test/` with descriptive file nam
 Two checks enforce this:
 
 - The `schema-snapshots` pre-commit hook regenerates the JSON Schema snapshots under `apps/api/schema-snapshots/` from the Zod schemas (via `pnpm --filter @genshin/api schemas:export`) and fails if the committed snapshots are stale. It's a pure function of the working tree, so it runs on every commit.
-- A CI step ([ci.yml](.github/workflows/ci.yml)) proves with [jsoncompat](https://jsoncompat.com) that each version still accepts everything the schemas on the base branch accepted (the deserializer direction), and that the change drops no version. This is a branch-vs-base invariant, not a per-commit one, so it lives in CI rather than a pre-commit hook. Run it locally with `pnpm --filter @genshin/api schemas:check`.
+- A dedicated CI job ([ci.yml](.github/workflows/ci.yml)) proves with [jsoncompat](https://jsoncompat.com) that each version still accepts everything the schemas on the base branch accepted (the deserializer direction), and that the change drops no version. It diffs the committed snapshots on the head branch against those on the base branch: a branch-vs-base invariant, not a per-commit one, so it lives in CI rather than a pre-commit hook. Run it locally with `pnpm --filter @genshin/api schemas:check`.
 
 To make an **additive** change (a new optional field) to the current version, edit the Zod schema and commit the regenerated snapshot. To make a **breaking** change, add a new version instead: a new `vN` schema with an `up` migration and a bumped `CURRENT_VERSION`. Never edit a released version in place, and never delete a version while documents may still exist under it.
 

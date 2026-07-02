@@ -7,29 +7,42 @@
 // version (a new `schemaVersion` branch with an `up` migration), never an
 // in-place edit. See CONTRIBUTING.md "Firestore schema evolution".
 //
-// This compares the working-tree schemas against the snapshots committed on the
-// PR's base branch, so it is a branch-vs-base invariant rather than a property
-// of any single commit. It runs in ci.yml (which passes the real base ref via
-// SCHEMA_COMPAT_BASE), not in a pre-commit hook — reaching for a base ref on the
-// local commit path would be non-hermetic and network-coupled. Run it locally
-// with `pnpm --filter @genshin/api schemas:check`.
+// Compares the committed snapshots at HEAD against those committed on the PR's
+// base branch — a branch-vs-base invariant, not a property of any single commit.
+// It trusts the `schema-snapshots` drift hook to keep HEAD's snapshots faithful
+// to their Zod source, so it needs no workspace build: it diffs JSON against
+// JSON. It runs in ci.yml (which passes the real base ref via SCHEMA_COMPAT_BASE),
+// not in a pre-commit hook — reaching for a base ref on the local commit path
+// would be non-hermetic and network-coupled. Run it locally with
+// `pnpm --filter @genshin/api schemas:check`.
 
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import { join } from 'node:path';
 
 import { check_compat, initSync } from 'jsoncompat';
-
-import { SCHEMA_REGISTRY, toSnapshot } from './schema-registry.js';
 
 const require = createRequire(import.meta.url);
 initSync({ module: readFileSync(require.resolve('jsoncompat/jsoncompat_wasm_bg.wasm')) });
 
 const SNAPSHOT_PREFIX = 'apps/api/schema-snapshots';
 
+const repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
+
+// Run every git invocation from the repo root so pathspecs resolve consistently
+// regardless of the caller's directory (the package script runs from apps/api).
+function git(args: string[]): string {
+  return execFileSync('git', args, {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'ignore'],
+  });
+}
+
 /**
  * The git ref holding the last-shipped schemas. Defaults to `origin/develop`
- * (the merge target) when available, falling back to `HEAD` for local commits
+ * (the merge target) when available, falling back to `HEAD` for local runs
  * before the branch is pushed. Override with `SCHEMA_COMPAT_BASE`.
  */
 function resolveBaseRef(): string {
@@ -37,26 +50,24 @@ function resolveBaseRef(): string {
   if (override) return override;
 
   try {
-    execFileSync('git', ['rev-parse', '--verify', '--quiet', 'origin/develop'], {
-      stdio: 'ignore',
-    });
+    git(['rev-parse', '--verify', '--quiet', 'origin/develop']);
     return 'origin/develop';
   } catch {
     return 'HEAD';
   }
 }
 
-/** The snapshot committed for `repository`/`version` at `baseRef`, or null if it did not exist. */
-function snapshotAtBase(baseRef: string, repository: string, version: number): string | null {
+/** Snapshot paths (repo-root-relative) committed under the snapshot prefix at `ref`. */
+function snapshotPathsAt(ref: string): string[] {
+  return git(['ls-tree', '-r', '--name-only', ref, '--', SNAPSHOT_PREFIX])
+    .split('\n')
+    .filter((line) => line.endsWith('.json'));
+}
+
+/** File contents at `ref:path`, or null when the path does not exist there. */
+function showAt(ref: string, path: string): string | null {
   try {
-    return execFileSync(
-      'git',
-      ['show', `${baseRef}:${SNAPSHOT_PREFIX}/${repository}/v${version}.json`],
-      {
-        encoding: 'utf8',
-        stdio: ['ignore', 'pipe', 'ignore'],
-      },
-    );
+    return git(['show', `${ref}:${path}`]);
   } catch {
     return null;
   }
@@ -65,33 +76,34 @@ function snapshotAtBase(baseRef: string, repository: string, version: number): s
 const baseRef = resolveBaseRef();
 const violations: string[] = [];
 
-for (const [repository, { versions, currentVersion }] of Object.entries(SCHEMA_REGISTRY)) {
-  if (currentVersion !== versions.length - 1) {
+// Drive off the versions the base branch shipped: those are the schemas with
+// documents already in Firestore that HEAD must keep accepting. Versions HEAD
+// adds beyond the base carry no compatibility constraint.
+for (const path of snapshotPathsAt(baseRef)) {
+  const base = showAt(baseRef, path);
+  if (base === null) continue; // race-proofing; ls-tree already filtered to base.
+
+  const label = path
+    .slice(`${SNAPSHOT_PREFIX}/`.length)
+    .replace(/\.json$/, '')
+    .replace('/', ' ');
+
+  let head: string;
+  try {
+    head = readFileSync(join(repoRoot, path), 'utf8');
+  } catch {
     violations.push(
-      `${repository}: CURRENT_VERSION is ${String(currentVersion)} but the latest defined schema is v${String(versions.length - 1)}.`,
+      `${label} was shipped but its snapshot is gone. Removing a version orphans documents still stored under it.`,
     );
+    continue;
   }
 
-  // Walk every version the base branch shipped. Stop at the first gap: verzod
-  // versions are contiguous from 0, so a missing version means none follow.
-  for (let version = 0; ; version++) {
-    const base = snapshotAtBase(baseRef, repository, version);
-    if (base === null) break;
-
-    if (version >= versions.length) {
-      violations.push(
-        `${repository}: v${String(version)} was shipped but is no longer defined. Removing a version orphans documents still stored under it.`,
-      );
-      continue;
-    }
-
-    // "deserializer" compatibility holds when the new schema accepts everything
-    // the old one did (L(old) ⊆ L(new)) — i.e. the change only widens.
-    if (!check_compat(base, toSnapshot(versions[version]), 'deserializer')) {
-      violations.push(
-        `${repository}: v${String(version)} narrows the schema. Documents stored under it would no longer validate. Add a new version with an \`up\` migration instead of editing v${String(version)} in place.`,
-      );
-    }
+  // "deserializer" compatibility holds when the new schema accepts everything
+  // the old one did (L(old) ⊆ L(new)) — i.e. the change only widens.
+  if (!check_compat(base, head, 'deserializer')) {
+    violations.push(
+      `${label} narrows the schema. Documents stored under it would no longer validate. Add a new version with an \`up\` migration instead of editing it in place.`,
+    );
   }
 }
 

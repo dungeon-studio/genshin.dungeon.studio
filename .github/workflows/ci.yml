@@ -71,18 +71,32 @@ jobs:
         if: matrix.flag == 'web'
         run: bash apps/web/scripts/verify-build-output.sh
 
-      # Prove the PR's document schemas stay backward-compatible with the ones on
-      # its base branch (see CONTRIBUTING.md "Firestore schema evolution"). This
-      # is a branch-vs-base invariant, so it lives in CI where the real base ref
-      # is available — not in a pre-commit hook on the local commit path.
-      - name: Check schema compatibility
-        if: matrix.flag == 'api' && github.event_name == 'pull_request'
-        env:
-          SCHEMA_COMPAT_BASE: origin/${{ github.base_ref }}
+  # Proves the PR's Firestore document schemas stay backward-compatible with the
+  # ones on its base branch (see CONTRIBUTING.md "Firestore schema evolution").
+  # A branch-vs-base invariant, so it's its own PR-only job with the base ref in
+  # hand — not a step in the per-package matrix above. It diffs committed JSON
+  # snapshots, so it needs the install but no workspace build.
+  schema-compat:
+    name: Schema Compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Fetch base branch
         run: |
           git fetch --no-tags --depth=1 \
             origin "${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}"
-          pnpm turbo run schemas:check --filter=@genshin/api
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Check schema compatibility
+        env:
+          SCHEMA_COMPAT_BASE: origin/${{ github.base_ref }}
+        run: pnpm --filter @genshin/api schemas:check
 
 # ---------------------------------------------------------------------------
 # Maintenance notes
