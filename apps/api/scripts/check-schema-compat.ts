@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 // Rejects a schema change that would make documents already stored in Firestore
-// fail to read. See CONTRIBUTING.md "Firestore schema evolution" for the contract.
+// fail to read: a released version's schema may only widen, so a breaking change
+// must add a new verzod version rather than edit an existing one in place.
 //
 // Compares the committed snapshots against those on the base branch, trusting the
 // schema-snapshots drift hook to keep them faithful to their Zod source — so it's
@@ -77,17 +78,18 @@ for (const path of snapshotPathsAt(baseRef)) {
   const base = showAt(baseRef, path);
   if (base === null) continue; // race-proofing; ls-tree already filtered to base.
 
-  const label = path
+  const [repository, version] = path
     .slice(`${SNAPSHOT_PREFIX}/`.length)
     .replace(/\.json$/, '')
-    .replace('/', ' ');
+    .split('/');
+  const source = `apps/api/src/repositories/${repository}/schemas/${version}.ts`;
 
   let head: string;
   try {
     head = readFileSync(join(repoRoot, path), 'utf8');
   } catch {
     violations.push(
-      `${label} was shipped but its snapshot is gone. Removing a version orphans documents still stored under it.`,
+      `${repository} ${version} shipped on the base branch but its snapshot is gone. Restore the version at ${source} and re-export; removing it orphans documents still stored under it.`,
     );
     continue;
   }
@@ -96,7 +98,7 @@ for (const path of snapshotPathsAt(baseRef)) {
   // the old one did (L(old) ⊆ L(new)) — i.e. the change only widens.
   if (!check_compat(base, head, 'deserializer')) {
     violations.push(
-      `${label} narrows the schema. Documents stored under it would no longer validate. Add a new version with an \`up\` migration instead of editing it in place.`,
+      `${source} narrows the schema: it no longer accepts documents already stored under ${repository} ${version}. Widen it back, or add a new version with an \`up\` migration instead of editing ${version} in place.`,
     );
   }
 }

@@ -195,9 +195,8 @@ repos:
 
       # Keeps the committed JSON Schema snapshots faithful to their Zod source — a
       # pure function of the working tree, unlike the base-branch compatibility
-      # proof, which is a PR-level check in ci.yml. See CONTRIBUTING.md "Firestore
-      # schema evolution". Runs through turbo so the workspace packages the schemas
-      # import build first.
+      # proof, which is a PR-level check in ci.yml. Runs through turbo so the
+      # workspace packages the schemas import build first.
       - id: schema-snapshots
         name: schema snapshots (regenerate from Zod)
         entry: pnpm exec turbo run schemas:export --filter=@genshin/api
