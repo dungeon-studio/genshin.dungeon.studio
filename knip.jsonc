@@ -17,13 +17,9 @@
       "ignoreDependencies": ["stylelint", "stylelint-config-standard", "syncpack", "eslint"]
     },
     "apps/api": {
-      // Scripts invoked from pre-commit/CI (turbo `schemas:*`, deploy.yml), not
-      // imported by application code.
-      "entry": [
-        "scripts/verify-deployment.ts",
-        "scripts/export-schemas.ts",
-        "scripts/check-schema-compat.ts"
-      ]
+      // verify-deployment.ts is invoked from deploy.yml, so knip can't see it.
+      // The schemas:* scripts are auto-detected from their package.json entries.
+      "entry": ["scripts/verify-deployment.ts"]
     },
     "apps/web": {
       // env.d.ts holds Vite ambient client types referenced via tsconfig, not imports.
