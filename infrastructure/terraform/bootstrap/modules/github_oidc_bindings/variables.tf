@@ -32,3 +32,13 @@ variable "wif_pool_project_number" {
     error_message = "Project number must be exactly 12 digits (e.g., '123456789012')"
   }
 }
+
+variable "github_environment" {
+  type        = string
+  description = "GitHub Actions environment name whose OIDC tokens may impersonate the RW service account (e.g., 'dev' or 'staging')"
+
+  validation {
+    condition     = length(var.github_environment) >= 1 && length(var.github_environment) <= 255
+    error_message = "GitHub environment name must be between 1 and 255 characters."
+  }
+}

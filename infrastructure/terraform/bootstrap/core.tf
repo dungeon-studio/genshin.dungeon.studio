@@ -22,6 +22,7 @@ module "github_oidc_bindings_core" {
   service_account_rw_email = module.core.github_deployer_rw_email
   service_account_ro_email = module.core.github_deployer_ro_email
   wif_pool_project_number  = module.shared.project_number
+  github_environment       = "core"
 
   depends_on = [google_iam_workload_identity_pool_provider.github, module.core]
 }
