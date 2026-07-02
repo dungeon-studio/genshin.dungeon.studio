@@ -15,13 +15,14 @@ terraform {
 locals {
   wif_pool = "iam.googleapis.com/projects/${var.wif_pool_project_number}/locations/global/workloadIdentityPools/github"
 
-  # RW (deploy / terraform-apply) always runs inside a GitHub environment, so it
-  # is scoped to that environment claim: a workflow outside the environment
-  # cannot impersonate the deployer service account, even on this repository.
+  # The RW deployer is assumed only by jobs inside a GitHub environment (deploy,
+  # terraform-apply), so its trust is scoped to that environment claim: a
+  # workflow outside the environment cannot impersonate it, even from this
+  # repository.
   rw_principal = "principalSet://${local.wif_pool}/attribute.environment/${var.github_environment}"
 
-  # RO (terraform-plan) runs on pull_request with no environment claim, so it is
-  # scoped to the repository.
+  # The RO planner is assumed by terraform-plan on pull_request, which carries no
+  # environment claim, so its trust stays scoped to the repository.
   ro_principal = "principalSet://${local.wif_pool}/attribute.repository/dungeon-studio/genshin.dungeon.studio"
 }
 

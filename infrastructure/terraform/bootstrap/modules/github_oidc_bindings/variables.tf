@@ -35,7 +35,7 @@ variable "wif_pool_project_number" {
 
 variable "github_environment" {
   type        = string
-  description = "GitHub Actions environment name whose OIDC tokens may impersonate the RW service account (e.g. 'dev', 'staging')"
+  description = "GitHub Actions environment name whose OIDC tokens may impersonate the RW service account (e.g., 'dev' or 'staging')"
 
   validation {
     condition     = can(regex("^[a-z][a-z0-9-]*$", var.github_environment))
