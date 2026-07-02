@@ -37,18 +37,16 @@ jobs:
         with:
           terraform_version: '1.9.0'
 
-      # Authenticate to GCP using Workload Identity. The provider and
-      # per-environment service account are non-secret configuration stored as
-      # environment variables; each environment maps to an explicit reference to
-      # keep the per-environment wiring obvious.
+      # Each environment maps to an explicit secret to avoid dynamic secret
+      # indexing, which fixes CodeQL actions/excessive-secrets-exposure.
       - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
         with:
-          workload_identity_provider: ${{ vars.GCP_RW_WORKLOAD_IDENTITY_PROVIDER }}
+          workload_identity_provider: ${{ secrets.GCP_RW_WORKLOAD_IDENTITY_PROVIDER }} # pragma: allowlist secret
           service_account: >-
             ${{
-              inputs.environment == 'core' && vars.GCP_RW_CORE_SERVICE_ACCOUNT_EMAIL ||
-              inputs.environment == 'dev' && vars.GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL ||
-              inputs.environment == 'staging' && vars.GCP_RW_STAGING_SERVICE_ACCOUNT_EMAIL
+              inputs.environment == 'core' && secrets.GCP_RW_CORE_SERVICE_ACCOUNT_EMAIL ||
+              inputs.environment == 'dev' && secrets.GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL ||
+              inputs.environment == 'staging' && secrets.GCP_RW_STAGING_SERVICE_ACCOUNT_EMAIL
             }}
 
       - name: Set up Cloud SDK

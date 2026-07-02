@@ -30,13 +30,11 @@ Use naming based on infrastructure environment names such as `dev`, `staging`, a
 Update `infrastructure/terraform/bootstrap/outputs.tf`:
 
 - Add project and service-account outputs for the new environment
-- Update `github_actions_setup` with:
-  - repository-level RO variable mapping
-  - environment-level RW variable mapping
+- Update `github_secrets_setup` with:
+  - repository/Dependabot RO secret mapping
+  - environment-level RW secret mapping
 
-Keep variable names aligned with infrastructure environment names. The
-Workload Identity provider and service-account emails are non-secret
-configuration; store them as GitHub Actions variables, not secrets.
+Keep secret names aligned with infrastructure environment names.
 
 ---
 
@@ -74,9 +72,9 @@ Don't commit `.terraform/` directories.
 
 ## 5) Align GitHub workflows
 
-- In `.github/workflows/terraform-plan.yml`, copy one matrix entry and add `<environment>` to the RO service-account variable mapping.
-- In `.github/workflows/terraform-apply.yml`, copy one job and set job id and `with.environment`.
-- In `.github/workflows/terraform-apply-reusable.yml`, add `<environment>` to the RW service-account variable mapping.
+- In `.github/workflows/terraform-plan.yml`, copy one matrix entry and set `<environment>` + RO secret.
+- In `.github/workflows/terraform-apply.yml`, copy one job and set job id, `with.environment`, and RW secret.
+- Keep `.github/workflows/terraform-apply-reusable.yml` unchanged.
 
 ---
 
@@ -84,7 +82,7 @@ Don't commit `.terraform/` directories.
 
 After merge, apply bootstrap so the new project, service accounts, and IAM bindings exist before relying on CI plan/apply jobs.
 
-Then set/update GitHub Actions variables from `github_actions_setup` output.
+Then set/update GitHub secrets from `github_secrets_setup` output.
 
 ---
 

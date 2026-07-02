@@ -178,7 +178,6 @@
   - `.github/workflows/terraform-apply.yml`
   - `.github/workflows/pre-commit.yml`, when Terraform is in use
 - Current Terraform version baseline: `1.9.0`.
-- Workflows authenticate to GCP via Workload Identity. The provider and service-account emails are non-secret configuration: store them as repository variables (RO) and environment variables (RW), referenced with `${{ vars.* }}`. Reserve Actions secrets for genuine third-party tokens such as `CODECOV_TOKEN` and `CLAUDE_API_KEY`.
 
 ## Docker rules
 
