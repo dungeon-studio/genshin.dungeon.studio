@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@genshin/game-data": "workspace:*",
-    "commander": "14.0.1",
+    "commander": "15.0.0",
     "genshin-db": "5.2.11"
   },
   "devDependencies": {
