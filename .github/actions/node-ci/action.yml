@@ -30,7 +30,9 @@ runs:
 
     - name: Typecheck
       shell: bash
-      run: pnpm turbo run typecheck --filter="${{ inputs.filter }}"
+      env:
+        FILTER: ${{ inputs.filter }}
+      run: pnpm turbo run typecheck --filter="$FILTER"
 
     # Seed property-based tests from the commit under test: a re-run of the same
     # commit replays identical inputs (so a failure reproduces), while a new
@@ -40,14 +42,18 @@ runs:
       shell: bash
       env:
         SEED_SOURCE: ${{ github.event.pull_request.head.sha || github.sha }}
-      run: echo "FAST_CHECK_SEED=$((16#${SEED_SOURCE:0:8}))" >> "$GITHUB_ENV"
+      # SEED_SOURCE is a commit SHA (trusted, hex), not attacker-controlled;
+      # low-confidence finding tracked for recheck in the follow-up issue.
+      run: echo "FAST_CHECK_SEED=$((16#${SEED_SOURCE:0:8}))" >> "$GITHUB_ENV" # zizmor: ignore[github-env]
 
     - name: Test
       shell: bash
-      run: pnpm turbo run test --filter="${{ inputs.filter }}" -- --coverage
+      env:
+        FILTER: ${{ inputs.filter }}
+      run: pnpm turbo run test --filter="$FILTER" -- --coverage
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7
       with:
         token: ${{ inputs.codecov-token }}
         files: ${{ inputs.coverage-file }}
@@ -55,7 +61,7 @@ runs:
         fail_ci_if_error: false
 
     - name: Upload test results to Codecov
-      uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7
       with:
         token: ${{ inputs.codecov-token }}
         files: ${{ inputs.results-file }}
@@ -65,4 +71,6 @@ runs:
 
     - name: Build
       shell: bash
-      run: pnpm turbo run build --filter="${{ inputs.filter }}"
+      env:
+        FILTER: ${{ inputs.filter }}
+      run: pnpm turbo run build --filter="$FILTER"
