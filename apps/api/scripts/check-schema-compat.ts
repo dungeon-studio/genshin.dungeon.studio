@@ -1,9 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-// Rejects a schema change that would make documents already stored in Firestore
-// fail to read: a released version's schema may only widen, so a breaking change
-// must add a new verzod version rather than edit an existing one in place.
+// Repo-wide gate (hosted in the api package, which already carries the jsoncompat
+// dep): rejects a schema change that would make data a released build already
+// persisted fail to read — Firestore documents (apps/api) and localStorage
+// snapshots written by zustand `persist` (apps/web). A released version's schema
+// may only widen, so a breaking change must add a new schema version rather than
+// edit an existing one in place.
 //
 // Compares the committed snapshots against those on the base branch, trusting the
 // schema-snapshots drift hook to keep them faithful to their Zod source — so it's
@@ -21,7 +24,23 @@ import { check_compat, initSync } from 'jsoncompat';
 const require = createRequire(import.meta.url);
 initSync({ module: readFileSync(require.resolve('jsoncompat/jsoncompat_wasm_bg.wasm')) });
 
-const SNAPSHOT_PREFIX = 'apps/api/schema-snapshots';
+// Each committed snapshot root, paired with a resolver from (repository, version)
+// back to the Zod source file named in violation messages.
+const SNAPSHOT_ROOTS: ReadonlyArray<{
+  prefix: string;
+  sourceFor: (repository: string, version: string) => string;
+}> = [
+  {
+    prefix: 'apps/api/schema-snapshots',
+    sourceFor: (repository, version) =>
+      `apps/api/src/repositories/${repository}/schemas/${version}.ts`,
+  },
+  {
+    prefix: 'apps/web/schema-snapshots',
+    sourceFor: (_repository, version) =>
+      `apps/web/src/features/collection/characters/schemas/${version}.ts`,
+  },
+];
 
 const repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
 
@@ -52,9 +71,9 @@ function resolveBaseRef(): string {
   }
 }
 
-/** Snapshot paths (repo-root-relative) committed under the snapshot prefix at `ref`. */
-function snapshotPathsAt(ref: string): string[] {
-  return git(['ls-tree', '-r', '--name-only', ref, '--', SNAPSHOT_PREFIX])
+/** Snapshot paths (repo-root-relative) committed under `prefix` at `ref`. */
+function snapshotPathsAt(ref: string, prefix: string): string[] {
+  return git(['ls-tree', '-r', '--name-only', ref, '--', prefix])
     .split('\n')
     .filter((line) => line.endsWith('.json'));
 }
@@ -72,34 +91,36 @@ const baseRef = resolveBaseRef();
 const violations: string[] = [];
 
 // Drive off the versions the base branch shipped: those are the schemas with
-// documents already in Firestore that HEAD must keep accepting. Versions HEAD
-// adds beyond the base carry no compatibility constraint.
-for (const path of snapshotPathsAt(baseRef)) {
-  const base = showAt(baseRef, path);
-  if (base === null) continue; // race-proofing; ls-tree already filtered to base.
+// data already persisted that HEAD must keep accepting. Versions HEAD adds
+// beyond the base carry no compatibility constraint.
+for (const { prefix, sourceFor } of SNAPSHOT_ROOTS) {
+  for (const path of snapshotPathsAt(baseRef, prefix)) {
+    const base = showAt(baseRef, path);
+    if (base === null) continue; // race-proofing; ls-tree already filtered to base.
 
-  const [repository, version] = path
-    .slice(`${SNAPSHOT_PREFIX}/`.length)
-    .replace(/\.json$/, '')
-    .split('/');
-  const source = `apps/api/src/repositories/${repository}/schemas/${version}.ts`;
+    const [repository, version] = path
+      .slice(`${prefix}/`.length)
+      .replace(/\.json$/, '')
+      .split('/');
+    const source = sourceFor(repository, version);
 
-  let head: string;
-  try {
-    head = readFileSync(join(repoRoot, path), 'utf8');
-  } catch {
-    violations.push(
-      `${repository} ${version} shipped on the base branch but its snapshot is gone. Restore the version at ${source} and re-export; removing it orphans documents still stored under it.`,
-    );
-    continue;
-  }
+    let head: string;
+    try {
+      head = readFileSync(join(repoRoot, path), 'utf8');
+    } catch {
+      violations.push(
+        `${repository} ${version} shipped on the base branch but its snapshot is gone. Restore the version at ${source} and re-export; removing it orphans data still stored under it.`,
+      );
+      continue;
+    }
 
-  // "deserializer" compatibility holds when the new schema accepts everything
-  // the old one did (L(old) ⊆ L(new)) — i.e. the change only widens.
-  if (!check_compat(base, head, 'deserializer')) {
-    violations.push(
-      `${source} narrows the schema: it no longer accepts documents already stored under ${repository} ${version}. Widen it back, or add a new version with an \`up\` migration instead of editing ${version} in place.`,
-    );
+    // "deserializer" compatibility holds when the new schema accepts everything
+    // the old one did (L(old) ⊆ L(new)) — i.e. the change only widens.
+    if (!check_compat(base, head, 'deserializer')) {
+      violations.push(
+        `${source} narrows the schema: it no longer accepts data already stored under ${repository} ${version}. Widen it back, or add a new version with a migration instead of editing ${version} in place.`,
+      );
+    }
   }
 }
 

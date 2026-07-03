@@ -73,11 +73,12 @@ jobs:
         if: matrix.flag == 'web'
         run: bash apps/web/scripts/verify-build-output.sh
 
-  # Proves the PR's Firestore document schemas stay backward-compatible with the
-  # ones on its base branch. A branch-vs-base invariant, so it's its own PR-only
-  # job with the base ref in hand — not a step in the per-package matrix above.
-  # It diffs committed JSON snapshots, so it needs the install but no workspace
-  # build.
+  # Proves the PR's persisted-data schemas stay backward-compatible with the ones
+  # on its base branch — Firestore documents (apps/api) and localStorage snapshots
+  # written by zustand `persist` (apps/web). A branch-vs-base invariant, so it's
+  # its own PR-only job with the base ref in hand — not a step in the per-package
+  # matrix above. It diffs committed JSON snapshots, so it needs the install but
+  # no workspace build.
   schema-compat:
     name: Schema Compatibility
     runs-on: ubuntu-latest
