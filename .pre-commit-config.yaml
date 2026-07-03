@@ -195,7 +195,7 @@ repos:
       # workspace packages the schemas import build first.
       - id: schema-snapshots
         name: schema snapshots (regenerate from Zod)
-        entry: pnpm exec turbo run schemas:export --filter=@genshin/api
+        entry: pnpm exec turbo run schemas:export
         language: system
-        files: ^apps/api/(src/repositories/[^/]+/schemas/|schema-snapshots/)
+        files: ^apps/[^/]+/(src/.+/schemas/|schema-snapshots/)
         pass_filenames: false

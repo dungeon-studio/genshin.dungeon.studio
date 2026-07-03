@@ -27,12 +27,13 @@ The strict write type and the union read type are distinct—don't share them.
 
 ## Boundary taxonomy
 
-| Boundary            | Shared medium          | Skew window                           |
-| ------------------- | ---------------------- | ------------------------------------- |
-| Firestore documents | Database collection    | Until all documents are backfilled    |
-| REST API            | HTTP                   | Until all clients are updated         |
-| Queue / event bus   | Message broker         | Until all consumers drain the queue   |
-| Cache               | Redis / Memcache / CDN | Until TTL expires or cache is flushed |
+| Boundary            | Shared medium          | Skew window                                     |
+| ------------------- | ---------------------- | ----------------------------------------------- |
+| Firestore documents | Database collection    | Until all documents are backfilled              |
+| Local storage       | Browser origin storage | Until the user clears it or a build migrates it |
+| REST API            | HTTP                   | Until all clients are updated                   |
+| Queue / event bus   | Message broker         | Until all consumers drain the queue             |
+| Cache               | Redis / Memcache / CDN | Until TTL expires or cache is flushed           |
 
 The skew window determines how many old writer versions the reader must tolerate.
 
@@ -66,6 +67,26 @@ document.ts      fromDocument(), toDocument() — the public boundary
 
 Version numbers appear on every exported type—there's no unversioned
 `Character` because "latest" changes meaning silently when a new version ships.
+
+---
+
+## Implementation: Browser storage (zustand persist)
+
+The `apps/web` stores that use zustand's `persist` middleware version their
+snapshots the same way, without Verzod—`persist` owns version dispatch. Each
+store keeps a Zod schema per version under
+`src/features/.../schemas/v{n}.ts`, stamps every write through `persist`'s
+`version`, and validates the old snapshot in `migrate` when the store reloads.
+`migrate` drops records that no longer satisfy the domain model; a signed-in
+user re-merges from the server afterward, so a dropped local record is never a
+real loss.
+
+The committed snapshots live under `apps/web/schema-snapshots/{store}/v{n}.json`,
+keyed by the `persist` store name. They regenerate from their Zod source through
+the same `schemas:export` drift hook, and the same base-branch widening check
+(`apps/api/scripts/check-schema-compat.ts`, run in CI) scans both the Firestore
+and the browser-storage snapshot roots—a released version's schema may only
+widen.
 
 ---
 
