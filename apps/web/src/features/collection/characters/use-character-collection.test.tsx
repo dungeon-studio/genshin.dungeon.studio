@@ -7,6 +7,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { User } from 'firebase/auth';
 import { http, HttpResponse } from 'msw';
 import type { ReactNode } from 'react';
+import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AuthContext } from '@/features/auth/auth-context';
@@ -125,5 +126,34 @@ describe('useCollection merge-on-first-login', () => {
 
     await waitFor(() => expect(result.current.getCharacter(ESCOFFIER)?.constellationLevel).toBe(2));
     expect(result.current.getCharacter(SKIRK)).toBeUndefined();
+  });
+});
+
+describe('useCollection mutations', () => {
+  it('restores a removed character when the delete fails', async () => {
+    server.use(
+      http.get('http://localhost:8080/api/characters', () =>
+        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 3)])),
+      ),
+      http.delete(
+        'http://localhost:8080/api/characters/skirk',
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    const { result } = renderHook(() => useCollection(), {
+      wrapper: createWrapper({ user: fakeUser('user-1') }),
+    });
+
+    await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
+
+    act(() => {
+      result.current.removeCharacter(SKIRK);
+    });
+
+    // Optimistically gone, then restored at its prior level once the delete errors.
+    expect(result.current.getCharacter(SKIRK)).toBeUndefined();
+    await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
+    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
   });
 });

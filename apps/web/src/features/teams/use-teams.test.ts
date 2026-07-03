@@ -1,12 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { CollectionTeamMembers } from '@genshin/domain';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { teamsDocument } from '@/test/fixtures';
+import { makeTeam, teamsDocument } from '@/test/fixtures';
 import { server } from '@/test/msw/server';
 import { createWrapper, fakeUser } from '@/test/render';
 
@@ -16,6 +17,7 @@ import { useTeams } from './use-teams';
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
 const CHARACTER = 'skirk';
+const MEMBERS: CollectionTeamMembers = [{ characterId: CHARACTER }, null, null, null];
 
 beforeEach(() => {
   useTeamStore.getState().resetTeams();
@@ -44,6 +46,33 @@ describe('useTeams (authenticated)', () => {
 
     // Save fails, so the member is reverted and the user is notified.
     await waitFor(() => expect(result.current.getTeam(1).members[0]).toBeNull());
+    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+  });
+
+  it('restores a cleared team when the delete fails', async () => {
+    server.use(
+      http.get('http://localhost:8080/api/teams', () =>
+        HttpResponse.json(teamsDocument([makeTeam(1, { members: MEMBERS })])),
+      ),
+      http.delete(
+        'http://localhost:8080/api/teams/1',
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    const { result } = renderHook(() => useTeams(), {
+      wrapper: createWrapper({ user: fakeUser('user-1') }),
+    });
+
+    await waitFor(() => expect(result.current.getTeam(1).members[0]?.characterId).toBe(CHARACTER));
+
+    act(() => {
+      result.current.clearTeam(1);
+    });
+
+    // Optimistically emptied, then restored once the delete errors.
+    expect(result.current.getTeam(1).members[0]).toBeNull();
+    await waitFor(() => expect(result.current.getTeam(1).members[0]?.characterId).toBe(CHARACTER));
     expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
   });
 

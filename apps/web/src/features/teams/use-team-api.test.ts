@@ -10,7 +10,7 @@ import { makeTeam, teamsDocument } from '@/test/fixtures';
 import { server } from '@/test/msw/server';
 import { createWrapper } from '@/test/render';
 
-import { useDeleteTeamMutation, useSaveTeamMutation, useTeamsQuery } from './use-team-api';
+import { useSaveTeamMutation, useTeamsQuery } from './use-team-api';
 
 const USER_ID = 'user-1';
 const EMPTY_MEMBERS: CollectionTeamMembers = [null, null, null, null];
@@ -85,28 +85,5 @@ describe('useSaveTeamMutation', () => {
     });
 
     await waitFor(() => expect(getCount).toBe(2));
-  });
-});
-
-describe('useDeleteTeamMutation', () => {
-  it('sends a DELETE to the slot path', async () => {
-    let deleted = false;
-    server.use(
-      http.delete('http://localhost:8080/api/teams/3', () => {
-        deleted = true;
-        return new HttpResponse(null, { status: 204 });
-      }),
-    );
-
-    const { result } = renderHook(() => useDeleteTeamMutation(USER_ID), {
-      wrapper: createWrapper(),
-    });
-
-    act(() => {
-      result.current.mutate(3 as TeamSlot);
-    });
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(deleted).toBe(true);
   });
 });

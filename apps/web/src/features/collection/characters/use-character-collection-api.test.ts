@@ -14,7 +14,6 @@ import { createWrapper } from '@/test/render';
 import {
   useAddCharacterMutation,
   useCharacterCollectionQuery,
-  useRemoveCharacterMutation,
   useSetConstellationLevelMutation,
 } from './use-character-collection-api';
 
@@ -94,29 +93,6 @@ describe('useAddCharacterMutation', () => {
     });
 
     await waitFor(() => expect(getCount).toBe(2));
-  });
-});
-
-describe('useRemoveCharacterMutation', () => {
-  it('sends a DELETE to the character path', async () => {
-    let deleted = false;
-    server.use(
-      http.delete('http://localhost:8080/api/characters/skirk', () => {
-        deleted = true;
-        return new HttpResponse(null, { status: 204 });
-      }),
-    );
-
-    const { result } = renderHook(() => useRemoveCharacterMutation(USER_ID), {
-      wrapper: createWrapper(),
-    });
-
-    act(() => {
-      result.current.mutate(CHARACTER);
-    });
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(deleted).toBe(true);
   });
 });
 

@@ -13,7 +13,6 @@ import { createWrapper } from '@/test/render';
 
 import {
   useAddWeaponMutation,
-  useRemoveWeaponMutation,
   useSetRefinementLevelMutation,
   useWeaponCollectionQuery,
 } from './use-weapon-collection-api';
@@ -89,29 +88,6 @@ describe('useAddWeaponMutation', () => {
     });
 
     await waitFor(() => expect(getCount).toBe(2));
-  });
-});
-
-describe('useRemoveWeaponMutation', () => {
-  it('sends a DELETE to the instance path', async () => {
-    let deleted = false;
-    server.use(
-      http.delete('http://localhost:8080/api/weapons/weapon-instance-1', () => {
-        deleted = true;
-        return new HttpResponse(null, { status: 204 });
-      }),
-    );
-
-    const { result } = renderHook(() => useRemoveWeaponMutation(USER_ID), {
-      wrapper: createWrapper(),
-    });
-
-    act(() => {
-      result.current.mutate(INSTANCE_ID);
-    });
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(deleted).toBe(true);
   });
 });
 
