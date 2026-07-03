@@ -18,6 +18,20 @@ const requiredEnvVars: readonly string[] = [
   'VITE_API_BASE_URL',
 ];
 
+const appVersion: string = JSON.parse(
+  fs.readFileSync(path.resolve(__dirname, 'package.json'), 'utf-8'),
+).version;
+
+function shortSha(): string {
+  try {
+    return execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim();
+  } catch {
+    return 'unknown';
+  }
+}
+
+const buildSha: string = shortSha();
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -36,16 +50,17 @@ export default defineConfig({
     {
       name: 'generate-version',
       closeBundle() {
-        const sha = execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim();
         const timestamp = new Date().toISOString();
-        const pkgPath = path.resolve(__dirname, 'package.json');
-        const version = JSON.parse(fs.readFileSync(pkgPath, 'utf-8')).version;
-        const metadata = { version, sha, timestamp };
+        const metadata = { version: appVersion, sha: buildSha, timestamp };
         const distPath = path.resolve(__dirname, 'dist');
         fs.writeFileSync(path.join(distPath, 'version.json'), JSON.stringify(metadata, null, 2));
       },
     },
   ],
+  define: {
+    __APP_VERSION__: JSON.stringify(appVersion),
+    __BUILD_SHA__: JSON.stringify(buildSha),
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

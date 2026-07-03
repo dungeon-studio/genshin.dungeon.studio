@@ -3,12 +3,42 @@
 
 import { GAME_DATA_VERSION } from '@genshin/game-data';
 import type { JSX } from 'react';
+import { useLocation } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import { Container } from '@/components/container';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/features/auth';
+import { formatDebugInfo } from '@/lib/debug-info';
 
 const GITHUB_REPO = 'https://github.com/dungeon-studio/genshin.dungeon.studio';
 
 export function Footer(): JSX.Element {
+  const { user } = useAuth();
+  const location = useLocation();
+
+  async function copyDebugInfo(): Promise<void> {
+    const debugInfo = formatDebugInfo({
+      appVersion: __APP_VERSION__,
+      buildSha: __BUILD_SHA__,
+      gameDataVersion: GAME_DATA_VERSION,
+      route: location.pathname,
+      authenticated: user !== null,
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      screenWidth: window.screen.width,
+      screenHeight: window.screen.height,
+      pixelRatio: window.devicePixelRatio,
+    });
+
+    try {
+      await navigator.clipboard.writeText(debugInfo);
+      toast.success('Debug info copied to clipboard.');
+    } catch {
+      toast.error('Could not copy debug info.');
+    }
+  }
+
   return (
     <footer className="border-t border-border bg-muted py-8">
       <Container className="text-center text-sm text-muted-foreground">
@@ -63,6 +93,16 @@ export function Footer(): JSX.Element {
               >
                 GitHub
               </a>
+            </li>
+            <li>
+              <Button
+                type="button"
+                variant="link"
+                onClick={copyDebugInfo}
+                className="h-auto p-0 text-sm font-normal text-muted-foreground"
+              >
+                Copy debug info
+              </Button>
             </li>
           </ul>
         </nav>

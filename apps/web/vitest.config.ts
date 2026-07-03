@@ -13,6 +13,8 @@ export default defineConfig({
   },
   define: {
     'import.meta.env.VITE_API_BASE_URL': JSON.stringify('http://localhost:8080'),
+    __APP_VERSION__: JSON.stringify('0.0.0-test'),
+    __BUILD_SHA__: JSON.stringify('testsha'),
   },
   test: {
     globals: true,
