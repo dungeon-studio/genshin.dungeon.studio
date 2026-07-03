@@ -82,8 +82,12 @@ user re-merges from the server afterward, so a dropped local record is never a
 real loss.
 
 The committed snapshots live under `apps/web/schema-snapshots/{store}/v{n}.json`,
-keyed by the `persist` store name. They regenerate from their Zod source through
-the same `schemas:export` drift hook, and the same base-branch widening check
+keyed by the `persist` store name. Each snapshots the **per-record entry**, not
+the whole-store blob—jsoncompat can't see into a `Record` value
+(`additionalProperties`), so gating the wrapper would leave the entry fields
+unchecked. This matches the Firestore side, which snapshots one document rather
+than the collection. They regenerate from their Zod source through the same
+`schemas:export` drift hook, and the same base-branch widening check
 (`apps/api/scripts/check-schema-compat.ts`, run in CI) scans both the Firestore
 and the browser-storage snapshot roots—a released version's schema may only
 widen.

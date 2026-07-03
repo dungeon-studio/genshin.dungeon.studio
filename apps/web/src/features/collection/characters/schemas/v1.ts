@@ -3,20 +3,23 @@
 
 import { z } from 'zod';
 
-// Structural shape of one persisted collection entry. Kept as loose as the
-// Firestore-side V1CharacterSchema (apps/api): the snapshot this generates gates
-// structural compatibility, while assertCollectionCharacter enforces the domain
-// semantics (known character, constellation range, ISO timestamps) at migrate time.
-const V1CollectionCharacterSchema = z.object({
+// The per-record shape: one persisted collection entry. This is the unit the
+// compatibility gate snapshots — jsoncompat can't see into a `Record` value
+// (`additionalProperties`), and the collection blob keys every entry under one,
+// so the whole-store schema would leave these fields ungated. Kept as loose as
+// the Firestore-side V1CharacterSchema (apps/api): the snapshot gates structural
+// compatibility, while assertCollectionCharacter enforces the domain semantics
+// (known character, constellation range, ISO timestamps) at migrate time.
+export const V1CollectionCharacterSchema = z.object({
   characterId: z.string(),
   constellationLevel: z.number(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
 
-// The persisted localStorage shape for the `genshin-collection` store: exactly
-// what `partialize` emits, so the JSON Schema snapshot stays faithful to what a
-// released version wrote.
+// The full persisted localStorage shape for the `genshin-collection` store —
+// exactly what `partialize` emits. Used to structurally validate the blob in
+// `migrate`; the committed snapshot is the entry schema above, not this wrapper.
 export const V1PersistedCollectionSchema = z.object({
   characters: z.record(z.string(), V1CollectionCharacterSchema),
 });

@@ -4,7 +4,7 @@
 import { z } from 'zod';
 
 import { CURRENT_VERSION as collectionCurrent } from '../src/features/collection/characters/schemas/index.js';
-import { V1PersistedCollectionSchema } from '../src/features/collection/characters/schemas/v1.js';
+import { V1CollectionCharacterSchema } from '../src/features/collection/characters/schemas/v1.js';
 
 interface StoreSchemas {
   /** Zod schema for each persisted version, keyed by the version zustand stamps. */
@@ -16,12 +16,15 @@ interface StoreSchemas {
 /**
  * Every localStorage-persisted zustand store whose shape evolution is gated.
  *
- * Keyed by the `persist` store name, so the snapshot path matches the key a
- * released build actually wrote to localStorage.
+ * Keyed by the `persist` store name. The schema is the per-record entry, not the
+ * whole-store blob: the collection keys entries under a `Record`, and jsoncompat
+ * can't see into a `Record` value, so snapshotting the wrapper would leave the
+ * entry fields ungated. This mirrors the api side, which snapshots one Firestore
+ * document rather than the collection.
  */
 export const SCHEMA_REGISTRY: Record<string, StoreSchemas> = {
   'genshin-collection': {
-    versions: { 1: V1PersistedCollectionSchema },
+    versions: { 1: V1CollectionCharacterSchema },
     currentVersion: collectionCurrent,
   },
 };
