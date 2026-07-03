@@ -7,6 +7,7 @@ import { profileGetResponseV1 } from '@/profiles/json-schema/profile/get-respons
 import { profilePatchRequestV1 } from '@/profiles/json-schema/profile/patch-request-v1.js';
 import { rootGetResponseV1 } from '@/profiles/json-schema/root/get-response-v1.js';
 import { teamPutRequestV1 } from '@/profiles/json-schema/teams/put-request-v1.js';
+import { teamPutRequestV2 } from '@/profiles/json-schema/teams/put-request-v2.js';
 import { weaponPatchRequestV1 } from '@/profiles/json-schema/weapons/patch-request-v1.js';
 import { weaponPostRequestV1 } from '@/profiles/json-schema/weapons/post-request-v1.js';
 
@@ -16,6 +17,7 @@ export const jsonSchemaRegistry: readonly JsonSchemaProfile[] = [
   profilePatchRequestV1,
   characterPutRequestV1,
   teamPutRequestV1,
+  teamPutRequestV2,
   weaponPostRequestV1,
   weaponPatchRequestV1,
 ];

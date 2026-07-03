@@ -3,8 +3,8 @@
 
 import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
 
-export const teamPutRequestV1 = {
-  path: '/profiles/json-schema/teams/put-request-v1.json',
+export const teamPutRequestV2 = {
+  path: '/profiles/json-schema/teams/put-request-v2.json',
   schema: {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
     title: 'Update Team Request',
@@ -42,7 +42,7 @@ export const teamPutRequestV1 = {
             minLength: 1,
             description: 'Character ID from game data',
           },
-          weaponInstanceId: {
+          collectionWeaponId: {
             type: 'string',
             minLength: 1,
             description: "Weapon instance UUID from user's collection",

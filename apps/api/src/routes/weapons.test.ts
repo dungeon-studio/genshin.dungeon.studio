@@ -10,7 +10,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { app } from '@/app.js';
 import { verifyToken } from '@/lib/firebase/auth.js';
 import { toMediaTypeString } from '@/middleware/negotiate-content.js';
-import { weaponItemV1 } from '@/profiles/alps/weapon/item-v1.js';
+import { weaponItemV2 } from '@/profiles/alps/weapon/item-v2.js';
 import * as Weapons from '@/repositories/weapons/index.js';
 import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
 
@@ -47,7 +47,7 @@ const FAKE_WEAPON_ITEM_DATA = [
 ];
 
 const EXPECTED_CONTENT_TYPE = toMediaTypeString(
-  { mediaType: COLLECTION_JSON, profile: weaponItemV1 },
+  { mediaType: COLLECTION_JSON, profile: weaponItemV2 },
   'http://localhost',
 );
 

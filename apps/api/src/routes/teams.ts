@@ -21,8 +21,8 @@ import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-re
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
 import type { ValidatedRequestBodyVariables } from '@/middleware/validate-request-body.js';
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
-import { teamItemV1 } from '@/profiles/alps/team/item-v1.js';
-import { teamPutRequestV1 } from '@/profiles/json-schema/teams/put-request-v1.js';
+import { teamItemV2 } from '@/profiles/alps/team/item-v2.js';
+import { teamPutRequestV2 } from '@/profiles/json-schema/teams/put-request-v2.js';
 import * as Characters from '@/repositories/characters/index.js';
 import * as Teams from '@/repositories/teams/index.js';
 import * as Weapons from '@/repositories/weapons/index.js';
@@ -36,7 +36,7 @@ export const teams = new Hono<{
 
 teams.use('*', auth);
 
-teams.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: teamItemV1 }]));
+teams.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: teamItemV2 }]));
 
 interface UpdateTeamBody {
   name?: string;
@@ -86,8 +86,8 @@ teams.get('/:slot', async (c) => {
 // PUT /api/teams/:slot — Create or update team composition (idempotent upsert)
 teams.put(
   '/:slot',
-  negotiateRequestSchema([teamPutRequestV1]),
-  validateRequestBody([teamPutRequestV1]),
+  negotiateRequestSchema([teamPutRequestV2]),
+  validateRequestBody([teamPutRequestV2]),
   async (c) => {
     const userId = c.get('user').uid;
     const slot = parseSlot(c.req.param('slot'));

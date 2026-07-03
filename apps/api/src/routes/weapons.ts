@@ -16,7 +16,7 @@ import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-re
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
 import type { ValidatedRequestBodyVariables } from '@/middleware/validate-request-body.js';
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
-import { weaponItemV1 } from '@/profiles/alps/weapon/item-v1.js';
+import { weaponItemV2 } from '@/profiles/alps/weapon/item-v2.js';
 import { weaponPatchRequestV1 } from '@/profiles/json-schema/weapons/patch-request-v1.js';
 import { weaponPostRequestV1 } from '@/profiles/json-schema/weapons/post-request-v1.js';
 import * as Weapons from '@/repositories/weapons/index.js';
@@ -30,7 +30,7 @@ export const weapons = new Hono<{
 
 weapons.use('*', auth);
 
-weapons.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: weaponItemV1 }]));
+weapons.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: weaponItemV2 }]));
 
 interface CreateWeaponBody {
   weaponId: string;

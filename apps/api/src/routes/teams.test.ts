@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { app } from '@/app.js';
 import { verifyToken } from '@/lib/firebase/auth.js';
 import { toMediaTypeString } from '@/middleware/negotiate-content.js';
-import { teamItemV1 } from '@/profiles/alps/team/item-v1.js';
+import { teamItemV2 } from '@/profiles/alps/team/item-v2.js';
 import * as Characters from '@/repositories/characters/index.js';
 import * as Teams from '@/repositories/teams/index.js';
 import * as Weapons from '@/repositories/weapons/index.js';
@@ -55,7 +55,7 @@ const FAKE_EMPTY_TEAM: CollectionTeam = {
 };
 
 const EXPECTED_CONTENT_TYPE = toMediaTypeString(
-  { mediaType: COLLECTION_JSON, profile: teamItemV1 },
+  { mediaType: COLLECTION_JSON, profile: teamItemV2 },
   'http://localhost',
 );
 

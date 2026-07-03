@@ -22,8 +22,6 @@ export const V1MemberSchema = z.object({
     .optional(),
 });
 
-export type V1Member = z.infer<typeof V1MemberSchema>;
-
 export const V1TeamSchema = z.object({
   schemaVersion: z.literal(1),
   name: z.string(),

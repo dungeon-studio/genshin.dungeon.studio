@@ -3,8 +3,8 @@
 
 import type { AlpsProfile } from '@/profiles/alps/profile.js';
 
-export const teamItemV1 = {
-  path: '/profiles/alps/team/item-v1.json',
+export const teamItemV2 = {
+  path: '/profiles/alps/team/item-v2.json',
   profile: {
     alps: {
       version: '1.0',
@@ -42,7 +42,7 @@ export const teamItemV1 = {
               },
             },
             {
-              id: 'weaponInstanceId',
+              id: 'collectionWeaponId',
               type: 'semantic',
               doc: {
                 value:

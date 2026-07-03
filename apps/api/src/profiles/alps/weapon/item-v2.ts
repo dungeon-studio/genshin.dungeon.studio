@@ -3,8 +3,8 @@
 
 import type { AlpsProfile } from '@/profiles/alps/profile.js';
 
-export const weaponItemV1 = {
-  path: '/profiles/alps/weapon/item-v1.json',
+export const weaponItemV2 = {
+  path: '/profiles/alps/weapon/item-v2.json',
   profile: {
     alps: {
       version: '1.0',
@@ -14,7 +14,7 @@ export const weaponItemV1 = {
       },
       descriptor: [
         {
-          id: 'weaponInstanceId',
+          id: 'collectionWeaponId',
           type: 'semantic',
           doc: {
             value: 'Unique identifier distinguishing one copy of a weapon from another',
