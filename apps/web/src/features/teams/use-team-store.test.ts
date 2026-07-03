@@ -3,7 +3,7 @@
 
 import type { CollectionTeam, CollectionWeaponId, ISOTimestamp, TeamSlot } from '@genshin/domain';
 import { initialTeams } from '@genshin/domain';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useTeamStore } from './use-team-store';
 
@@ -183,6 +183,68 @@ describe('useTeamStore', () => {
       useTeamStore.getState().setArtifactPlan(1, 0, undefined);
 
       expect(useTeamStore.getState().teams[1].members[0]?.artifactPlan).toBeUndefined();
+    });
+  });
+
+  describe('updatedAt', () => {
+    const weaponId = 'weapon-1' as CollectionWeaponId;
+
+    const cases: { name: string; setup?: () => void; mutate: () => void }[] = [
+      {
+        name: 'assignCharacter',
+        mutate: () => useTeamStore.getState().assignCharacter(1, 0, 'amber'),
+      },
+      {
+        name: 'removeCharacter',
+        setup: () => useTeamStore.getState().assignCharacter(1, 0, 'amber'),
+        mutate: () => useTeamStore.getState().removeCharacter(1, 0),
+      },
+      {
+        name: 'assignWeapon',
+        setup: () => useTeamStore.getState().assignCharacter(1, 0, 'amber'),
+        mutate: () => useTeamStore.getState().assignWeapon(1, 0, weaponId),
+      },
+      {
+        name: 'removeWeapon',
+        setup: () => {
+          useTeamStore.getState().assignCharacter(1, 0, 'amber');
+          useTeamStore.getState().assignWeapon(1, 0, weaponId);
+        },
+        mutate: () => useTeamStore.getState().removeWeapon(1, 0),
+      },
+      {
+        name: 'setArtifactPlan',
+        setup: () => useTeamStore.getState().assignCharacter(1, 0, 'amber'),
+        mutate: () => useTeamStore.getState().setArtifactPlan(1, 0, { sands: 'ATK Percentage' }),
+      },
+      {
+        name: 'clearTeam',
+        setup: () => useTeamStore.getState().assignCharacter(1, 0, 'amber'),
+        mutate: () => useTeamStore.getState().clearTeam(1),
+      },
+      { name: 'setTeamName', mutate: () => useTeamStore.getState().setTeamName(1, 'National') },
+    ];
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-01-01T00:00:00.000Z'));
+      useTeamStore.getState().resetTeams();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it.each(cases)('$name bumps updatedAt to the mutation time', ({ setup, mutate }) => {
+      setup?.();
+      const { createdAt } = useTeamStore.getState().teams[1];
+
+      vi.advanceTimersByTime(1000);
+      mutate();
+
+      const { updatedAt } = useTeamStore.getState().teams[1];
+      expect(updatedAt).not.toBe(createdAt);
+      expect(updatedAt).toBe('2026-01-01T00:00:01.000Z');
     });
   });
 
