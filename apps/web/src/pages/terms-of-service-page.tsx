@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 // Draft terms describing the service as of HEAD. Needs a legal review pass
-// (governing law, and a dedicated contact address) before the 1.0.0 tag; see
-// #647.
+// and a dedicated contact address before the 1.0.0 tag; see #647.
 
 import type { JSX } from 'react';
 import { Link } from 'react-router-dom';
@@ -71,6 +70,15 @@ export function TermsOfServicePage(): JSX.Element {
         <p className="mt-4 leading-relaxed">
           To the extent permitted by law, Dungeon Studio is not liable for any indirect, incidental,
           or consequential damages arising from your use of the app.
+        </p>
+
+        <h2 className="mt-8 text-xl font-semibold text-foreground">Governing law</h2>
+        <p className="mt-4 leading-relaxed">
+          These terms are governed by the laws of England and Wales, and any dispute will be subject
+          to the exclusive jurisdiction of the courts of England and Wales. If you are a consumer,
+          you may also be entitled to the protection of mandatory provisions of the law of the
+          country where you live, and nothing in these terms affects your rights as a consumer to
+          rely on those provisions.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold text-foreground">Changes to these terms</h2>
