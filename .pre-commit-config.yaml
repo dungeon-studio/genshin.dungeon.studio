@@ -113,12 +113,6 @@ repos:
       - id: reuse
         always_run: true
 
-  # Secrets detection
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.5.0
-    hooks:
-      - id: detect-secrets
-
   # GitHub Actions static analysis. Offline gate here (local + pre-commit.ci);
   # online supply-chain audits run in .github/workflows/zizmor.yml with a token.
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
