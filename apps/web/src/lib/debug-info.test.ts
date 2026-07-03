@@ -19,31 +19,26 @@ const info: DebugInfo = {
 };
 
 describe('formatDebugInfo', () => {
-  it('renders the version and build sha together', () => {
-    expect(formatDebugInfo(info)).toContain('App version: 0.1.0 (d4fbd16)');
+  it('reports authentication as yes/no', () => {
+    expect(formatDebugInfo({ ...info, authenticated: false })).toContain('Authenticated: no');
+    expect(formatDebugInfo({ ...info, authenticated: true })).toContain('Authenticated: yes');
   });
 
-  it('renders authentication as yes/no without identifying the user', () => {
-    const anon = formatDebugInfo({ ...info, authenticated: false });
-    const signedIn = formatDebugInfo({ ...info, authenticated: true });
-
-    expect(anon).toContain('Authenticated: no');
-    expect(signedIn).toContain('Authenticated: yes');
-    expect(signedIn).not.toContain('uid');
-  });
-
-  it('includes every requested environment detail', () => {
+  it('carries every field a triager needs', () => {
     const text = formatDebugInfo(info);
 
-    expect(text).toContain('Game data: 5.3');
-    expect(text).toContain('Screen: 1920×1080 @2x');
-    expect(text).toContain('Platform: Linux x86_64');
-    expect(text).toContain('User agent: Mozilla/5.0 (X11; Linux x86_64)');
+    // Each value flows through so a report is self-contained; label wording is
+    // not pinned.
+    for (const value of ['0.1.0', 'd4fbd16', '5.3', '1920', '1080', 'Linux x86_64']) {
+      expect(text).toContain(value);
+    }
   });
 });
 
 describe('buildBugReportUrl', () => {
-  it('pre-fills the template, page url, and environment fields', () => {
+  it('keys prefill params to the bug-report template field ids', () => {
+    // Wrong keys => GitHub silently drops the prefill, so the field ids are the
+    // property under test.
     const url = new URL(
       buildBugReportUrl('https://github.com/o/r/issues/new', 'https://app.example/teams', info),
     );

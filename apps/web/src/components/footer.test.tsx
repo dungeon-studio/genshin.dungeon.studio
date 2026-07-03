@@ -39,8 +39,8 @@ describe('Footer', () => {
     }
   });
 
-  it('pre-fills the bug report link with page and environment details', () => {
-    renderFooter({ uid: 'abc' } as FirebaseUser, '/weapons');
+  it('pre-fills the bug report link with page and auth state', () => {
+    renderFooter({ uid: 'signed-in-user' } as FirebaseUser, '/weapons');
 
     const href = screen.getByRole('link', { name: 'Report an issue' }).getAttribute('href') ?? '';
     const params = new URL(href).searchParams;
@@ -48,5 +48,14 @@ describe('Footer', () => {
     expect(params.get('template')).toBe('bug-report.yml');
     expect(params.get('url')).toContain('/weapons');
     expect(params.get('environment')).toContain('Authenticated: yes');
+  });
+
+  it('never leaks the signed-in user identity into the link', () => {
+    renderFooter({ uid: 'secret-uid-xyz', email: 'reporter@example.com' } as FirebaseUser, '/');
+
+    const href = screen.getByRole('link', { name: 'Report an issue' }).getAttribute('href') ?? '';
+
+    expect(href).not.toContain('secret-uid-xyz');
+    expect(href).not.toContain('reporter@example.com');
   });
 });
