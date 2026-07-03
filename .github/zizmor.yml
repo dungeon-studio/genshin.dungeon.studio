@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+rules:
+  ref-version-mismatch:
+    # SHA pins carry a major-version comment (# v6) by house convention; this
+    # audit wants the exact patch tag (# v6.0.2), which Renovate rewrites on the
+    # next bump. Comment hygiene, not a security signal, so opt out repo-wide.
+    disable: true
+
+  secrets-inherit:
+    # terraform-apply.yml uses secret inheritance into its reusable workflow
+    # because the GCP_RW_* credentials are environment-scoped (core/dev/staging).
+    # Only the reusable declares `environment:`, so the caller cannot resolve
+    # those credentials to pass them explicitly.
+    ignore:
+      - terraform-apply.yml
