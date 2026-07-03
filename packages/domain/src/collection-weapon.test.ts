@@ -15,7 +15,7 @@ import type { UUID } from './uuid.js';
 const VALID_TIMESTAMP = '2024-01-15T12:00:00Z' as ISOTimestamp;
 
 const VALID_WEAPON = {
-  weaponInstanceId: 'abc-123' as UUID,
+  collectionWeaponId: 'abc-123' as UUID,
   weaponId: 'mistsplitter-reforged',
   refinementLevel: 1,
   createdAt: VALID_TIMESTAMP,
@@ -69,9 +69,9 @@ describe('assertCollectionWeapon', () => {
     expect(() => assertCollectionWeapon('string')).toThrow(TypeError);
   });
 
-  it('throws for missing weaponInstanceId', () => {
-    const { weaponInstanceId: _, ...rest } = VALID_WEAPON;
-    expect(() => assertCollectionWeapon(rest)).toThrow(/weaponInstanceId/);
+  it('throws for missing collectionWeaponId', () => {
+    const { collectionWeaponId: _, ...rest } = VALID_WEAPON;
+    expect(() => assertCollectionWeapon(rest)).toThrow(/collectionWeaponId/);
   });
 
   it('throws for missing weaponId', () => {

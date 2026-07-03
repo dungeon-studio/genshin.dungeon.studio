@@ -19,7 +19,7 @@ const TIMESTAMP = '2024-01-15T12:00:00.000Z';
 const WEAPON_INSTANCE_ID = '11111111-1111-1111-1111-111111111111' as UUID;
 
 const arbWeapon = fc.record({
-  weaponInstanceId: fc.uuid().map((id) => id as UUID),
+  collectionWeaponId: fc.uuid().map((id) => id as UUID),
   weaponId: arbWeaponId,
   refinementLevel: fc.integer({ min: MIN_REFINEMENT_LEVEL, max: MAX_REFINEMENT_LEVEL }),
   createdAt: arbTimestamp,
@@ -78,7 +78,7 @@ describe('toDocument', () => {
     fc.assert(
       fc.property(arbWeapon, (weapon) => {
         const restored = fromDocument(
-          weapon.weaponInstanceId,
+          weapon.collectionWeaponId,
           toDocument(weapon) as unknown as Record<string, unknown>,
         );
         expect(restored).toEqual(weapon);

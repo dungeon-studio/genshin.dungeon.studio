@@ -37,10 +37,10 @@ const FAKE_TEAM: CollectionTeam = {
   slot: 1,
   name: 'Team 1',
   members: [
-    { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' as UUID },
-    { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' as UUID },
-    { characterId: 'zhongli', weaponInstanceId: 'uuid-3' as UUID },
-    { characterId: 'albedo', weaponInstanceId: 'uuid-4' as UUID },
+    { characterId: 'hu-tao', collectionWeaponId: 'uuid-1' as UUID },
+    { characterId: 'xingqiu', collectionWeaponId: 'uuid-2' as UUID },
+    { characterId: 'zhongli', collectionWeaponId: 'uuid-3' as UUID },
+    { characterId: 'albedo', collectionWeaponId: 'uuid-4' as UUID },
   ],
   createdAt: '2026-01-01T00:00:00.000Z' as CollectionTeam['createdAt'],
   updatedAt: '2026-03-13T00:00:00.000Z' as CollectionTeam['updatedAt'],
@@ -70,7 +70,7 @@ function mockCharacterOwned() {
 
 function mockWeaponOwned() {
   vi.mocked(Weapons.get).mockResolvedValue({
-    weaponInstanceId: 'uuid-1' as UUID,
+    collectionWeaponId: 'uuid-1' as UUID,
     weaponId: 'staff-of-homa',
     refinementLevel: 1,
     createdAt: '2026-01-01T00:00:00.000Z',
@@ -303,7 +303,7 @@ describe('Team routes', () => {
         team: {
           ...FAKE_TEAM,
           members: [
-            { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' as UUID },
+            { characterId: 'hu-tao', collectionWeaponId: 'uuid-1' as UUID },
             null,
             null,
             null,
@@ -314,7 +314,7 @@ describe('Team routes', () => {
 
       const res = await app.request(
         authedRequest('PUT', '/api/teams/1', {
-          members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }, null, null, null],
+          members: [{ characterId: 'hu-tao', collectionWeaponId: 'uuid-1' }, null, null, null],
         }),
       );
 
@@ -343,11 +343,11 @@ describe('Team routes', () => {
       const res = await app.request(
         authedRequest('PUT', '/api/teams/1', {
           members: [
-            { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' },
-            { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
-            { characterId: 'zhongli', weaponInstanceId: 'uuid-3' },
-            { characterId: 'albedo', weaponInstanceId: 'uuid-4' },
-            { characterId: 'ganyu', weaponInstanceId: 'uuid-5' },
+            { characterId: 'hu-tao', collectionWeaponId: 'uuid-1' },
+            { characterId: 'xingqiu', collectionWeaponId: 'uuid-2' },
+            { characterId: 'zhongli', collectionWeaponId: 'uuid-3' },
+            { characterId: 'albedo', collectionWeaponId: 'uuid-4' },
+            { characterId: 'ganyu', collectionWeaponId: 'uuid-5' },
           ],
         }),
       );
@@ -358,7 +358,7 @@ describe('Team routes', () => {
     it('returns 422 when members array has fewer than 4', async () => {
       const res = await app.request(
         authedRequest('PUT', '/api/teams/1', {
-          members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }],
+          members: [{ characterId: 'hu-tao', collectionWeaponId: 'uuid-1' }],
         }),
       );
 
@@ -390,10 +390,10 @@ describe('Team routes', () => {
         const res = await app.request(
           authedRequest('PUT', '/api/teams/1', {
             members: [
-              { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' },
-              { characterId: 'hu-tao', weaponInstanceId: 'uuid-2' },
-              { characterId: 'zhongli', weaponInstanceId: 'uuid-3' },
-              { characterId: 'albedo', weaponInstanceId: 'uuid-4' },
+              { characterId: 'hu-tao', collectionWeaponId: 'uuid-1' },
+              { characterId: 'hu-tao', collectionWeaponId: 'uuid-2' },
+              { characterId: 'zhongli', collectionWeaponId: 'uuid-3' },
+              { characterId: 'albedo', collectionWeaponId: 'uuid-4' },
             ],
           }),
         );
@@ -409,10 +409,10 @@ describe('Team routes', () => {
         const res = await app.request(
           authedRequest('PUT', '/api/teams/1', {
             members: [
-              { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' },
-              { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
-              { characterId: 'zhongli', weaponInstanceId: 'uuid-3' },
-              { characterId: 'albedo', weaponInstanceId: 'uuid-4' },
+              { characterId: 'hu-tao', collectionWeaponId: 'uuid-1' },
+              { characterId: 'xingqiu', collectionWeaponId: 'uuid-2' },
+              { characterId: 'zhongli', collectionWeaponId: 'uuid-3' },
+              { characterId: 'albedo', collectionWeaponId: 'uuid-4' },
             ],
           }),
         );
@@ -428,10 +428,10 @@ describe('Team routes', () => {
         const res = await app.request(
           authedRequest('PUT', '/api/teams/1', {
             members: [
-              { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' },
-              { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
-              { characterId: 'zhongli', weaponInstanceId: 'uuid-3' },
-              { characterId: 'albedo', weaponInstanceId: 'uuid-4' },
+              { characterId: 'hu-tao', collectionWeaponId: 'uuid-1' },
+              { characterId: 'xingqiu', collectionWeaponId: 'uuid-2' },
+              { characterId: 'zhongli', collectionWeaponId: 'uuid-3' },
+              { characterId: 'albedo', collectionWeaponId: 'uuid-4' },
             ],
           }),
         );
@@ -445,8 +445,8 @@ describe('Team routes', () => {
         const res = await app.request(
           authedRequest('PUT', '/api/teams/1', {
             members: [
-              { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' },
-              { characterId: 'xingqiu', weaponInstanceId: 'uuid-1' },
+              { characterId: 'hu-tao', collectionWeaponId: 'uuid-1' },
+              { characterId: 'xingqiu', collectionWeaponId: 'uuid-1' },
               null,
               null,
             ],
@@ -464,7 +464,7 @@ describe('Team routes', () => {
             ...FAKE_TEAM,
             slot: 2,
             members: [
-              { characterId: 'ganyu', weaponInstanceId: 'uuid-1' as UUID },
+              { characterId: 'ganyu', collectionWeaponId: 'uuid-1' as UUID },
               null,
               null,
               null,
@@ -474,7 +474,7 @@ describe('Team routes', () => {
 
         const res = await app.request(
           authedRequest('PUT', '/api/teams/1', {
-            members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }, null, null, null],
+            members: [{ characterId: 'hu-tao', collectionWeaponId: 'uuid-1' }, null, null, null],
           }),
         );
 
@@ -489,7 +489,7 @@ describe('Team routes', () => {
             ...FAKE_TEAM,
             slot: 2,
             members: [
-              { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' as UUID },
+              { characterId: 'hu-tao', collectionWeaponId: 'uuid-1' as UUID },
               null,
               null,
               null,
@@ -500,7 +500,7 @@ describe('Team routes', () => {
           team: {
             ...FAKE_TEAM,
             members: [
-              { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' as UUID },
+              { characterId: 'hu-tao', collectionWeaponId: 'uuid-1' as UUID },
               null,
               null,
               null,
@@ -511,7 +511,7 @@ describe('Team routes', () => {
 
         const res = await app.request(
           authedRequest('PUT', '/api/teams/1', {
-            members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }, null, null, null],
+            members: [{ characterId: 'hu-tao', collectionWeaponId: 'uuid-1' }, null, null, null],
           }),
         );
 
@@ -524,7 +524,7 @@ describe('Team routes', () => {
             members: [
               {
                 characterId: 'hu-tao',
-                weaponInstanceId: 'uuid-1',
+                collectionWeaponId: 'uuid-1',
                 artifactPlan: {
                   sands: 'HP Percentage',
                   goblet: 'Pyro DMG Bonus',
@@ -534,9 +534,9 @@ describe('Team routes', () => {
                   secondaryMinorAffixes: ['ATK Percentage'],
                 },
               },
-              { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
-              { characterId: 'zhongli', weaponInstanceId: 'uuid-3' },
-              { characterId: 'albedo', weaponInstanceId: 'uuid-4' },
+              { characterId: 'xingqiu', collectionWeaponId: 'uuid-2' },
+              { characterId: 'zhongli', collectionWeaponId: 'uuid-3' },
+              { characterId: 'albedo', collectionWeaponId: 'uuid-4' },
             ],
           }),
         );
@@ -552,7 +552,7 @@ describe('Team routes', () => {
             members: [
               {
                 characterId: 'hu-tao',
-                weaponInstanceId: 'uuid-1',
+                collectionWeaponId: 'uuid-1',
                 artifactPlan: {
                   sands: 'HP Percentage',
                   goblet: 'Pyro DMG Bonus',
@@ -562,9 +562,9 @@ describe('Team routes', () => {
                   secondaryMinorAffixes: ['CRIT Rate', 'ATK Percentage'],
                 },
               },
-              { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
-              { characterId: 'zhongli', weaponInstanceId: 'uuid-3' },
-              { characterId: 'albedo', weaponInstanceId: 'uuid-4' },
+              { characterId: 'xingqiu', collectionWeaponId: 'uuid-2' },
+              { characterId: 'zhongli', collectionWeaponId: 'uuid-3' },
+              { characterId: 'albedo', collectionWeaponId: 'uuid-4' },
             ],
           }),
         );
@@ -585,7 +585,7 @@ describe('Team routes', () => {
             members: [
               {
                 characterId: 'hu-tao',
-                weaponInstanceId: 'uuid-1',
+                collectionWeaponId: 'uuid-1',
                 artifactPlan: {
                   sands: 'HP Percentage',
                   goblet: 'Pyro DMG Bonus',
@@ -595,9 +595,9 @@ describe('Team routes', () => {
                   secondaryMinorAffixes: ['ATK Percentage', 'HP Percentage'],
                 },
               },
-              { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
-              { characterId: 'zhongli', weaponInstanceId: 'uuid-3' },
-              { characterId: 'albedo', weaponInstanceId: 'uuid-4' },
+              { characterId: 'xingqiu', collectionWeaponId: 'uuid-2' },
+              { characterId: 'zhongli', collectionWeaponId: 'uuid-3' },
+              { characterId: 'albedo', collectionWeaponId: 'uuid-4' },
             ],
           }),
         );
@@ -616,16 +616,16 @@ describe('Team routes', () => {
             members: [
               {
                 characterId: 'hu-tao',
-                weaponInstanceId: 'uuid-1',
+                collectionWeaponId: 'uuid-1',
                 artifactPlan: {
                   sands: 'HP Percentage',
                   goblet: 'Pyro DMG Bonus',
                   circlet: 'CRIT DMG',
                 },
               },
-              { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
-              { characterId: 'zhongli', weaponInstanceId: 'uuid-3' },
-              { characterId: 'albedo', weaponInstanceId: 'uuid-4' },
+              { characterId: 'xingqiu', collectionWeaponId: 'uuid-2' },
+              { characterId: 'zhongli', collectionWeaponId: 'uuid-3' },
+              { characterId: 'albedo', collectionWeaponId: 'uuid-4' },
             ],
           }),
         );
@@ -644,14 +644,14 @@ describe('Team routes', () => {
             members: [
               {
                 characterId: 'hu-tao',
-                weaponInstanceId: 'uuid-1',
+                collectionWeaponId: 'uuid-1',
                 artifactPlan: {
                   sets: ['crimson-witch-of-flames'],
                 },
               },
-              { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
-              { characterId: 'zhongli', weaponInstanceId: 'uuid-3' },
-              { characterId: 'albedo', weaponInstanceId: 'uuid-4' },
+              { characterId: 'xingqiu', collectionWeaponId: 'uuid-2' },
+              { characterId: 'zhongli', collectionWeaponId: 'uuid-3' },
+              { characterId: 'albedo', collectionWeaponId: 'uuid-4' },
             ],
           }),
         );
@@ -670,12 +670,12 @@ describe('Team routes', () => {
             members: [
               {
                 characterId: 'hu-tao',
-                weaponInstanceId: 'uuid-1',
+                collectionWeaponId: 'uuid-1',
                 artifactPlan: {},
               },
-              { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
-              { characterId: 'zhongli', weaponInstanceId: 'uuid-3' },
-              { characterId: 'albedo', weaponInstanceId: 'uuid-4' },
+              { characterId: 'xingqiu', collectionWeaponId: 'uuid-2' },
+              { characterId: 'zhongli', collectionWeaponId: 'uuid-3' },
+              { characterId: 'albedo', collectionWeaponId: 'uuid-4' },
             ],
           }),
         );

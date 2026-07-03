@@ -42,7 +42,7 @@ export const teamPutRequestV1 = {
             minLength: 1,
             description: 'Character ID from game data',
           },
-          weaponInstanceId: {
+          collectionWeaponId: {
             type: 'string',
             minLength: 1,
             description: "Weapon instance UUID from user's collection",

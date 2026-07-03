@@ -33,7 +33,7 @@ const WEAPON_TEMPLATE: Template = {
 };
 
 export function weaponItemHref(baseUrl: string, weapon: CollectionWeapon): string {
-  return `${baseUrl}/api/weapons/${weapon.weaponInstanceId}`;
+  return `${baseUrl}/api/weapons/${weapon.collectionWeaponId}`;
 }
 
 export function serialiseWeapon(weapon: CollectionWeapon, baseUrl: string): Item {
@@ -48,7 +48,7 @@ export function serialiseWeapon(weapon: CollectionWeapon, baseUrl: string): Item
   return buildItem(
     weaponItemHref(baseUrl, weapon),
     [
-      { name: 'weaponInstanceId', value: weapon.weaponInstanceId },
+      { name: 'collectionWeaponId', value: weapon.collectionWeaponId },
       { name: 'weaponId', value: weapon.weaponId },
       { name: 'refinementLevel', value: weapon.refinementLevel },
       { name: 'createdAt', value: weapon.createdAt },

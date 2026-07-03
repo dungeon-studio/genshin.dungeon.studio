@@ -29,8 +29,8 @@ function buildEquippedWeapons(
   const map = new Map<CollectionWeaponId, string>();
   for (const team of Object.values(teams)) {
     for (const member of team.members) {
-      if (member?.weaponInstanceId) {
-        map.set(member.weaponInstanceId, member.characterId);
+      if (member?.collectionWeaponId) {
+        map.set(member.collectionWeaponId, member.characterId);
       }
     }
   }
@@ -159,20 +159,20 @@ export function WeaponPool({
           {filteredWeapons.flatMap((weapon) => {
             const instances = instancesByWeaponId.get(weapon.id) ?? [];
             return instances.map((instance) => {
-              const equippedBy = equippedWeapons.get(instance.weaponInstanceId);
+              const equippedBy = equippedWeapons.get(instance.collectionWeaponId);
               const equippedByOther = equippedBy !== undefined && equippedBy !== currentCharacterId;
               return (
                 <PoolWeaponCard
-                  key={instance.weaponInstanceId}
+                  key={instance.collectionWeaponId}
                   weapon={weapon}
                   refinementLevel={instance.refinementLevel}
-                  selected={instance.weaponInstanceId === selectedCollectionWeaponId}
+                  selected={instance.collectionWeaponId === selectedCollectionWeaponId}
                   equipped={equippedByOther}
                   onClick={() => {
-                    if (instance.weaponInstanceId === selectedCollectionWeaponId) {
+                    if (instance.collectionWeaponId === selectedCollectionWeaponId) {
                       onClear();
                     } else {
-                      onSelect(instance.weaponInstanceId);
+                      onSelect(instance.collectionWeaponId);
                     }
                   }}
                 />

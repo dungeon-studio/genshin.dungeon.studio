@@ -12,14 +12,14 @@ export const MIN_REFINEMENT_LEVEL = 1;
 export const MAX_REFINEMENT_LEVEL = 5;
 
 export interface CollectionWeapon {
-  weaponInstanceId: UUID;
+  collectionWeaponId: UUID;
   weaponId: Weapon['id'];
   refinementLevel: number;
   createdAt: ISOTimestamp;
   updatedAt: ISOTimestamp;
 }
 
-export type CollectionWeaponId = CollectionWeapon['weaponInstanceId'];
+export type CollectionWeaponId = CollectionWeapon['collectionWeaponId'];
 
 export function isValidRefinementLevel(value: unknown): value is number {
   return (
@@ -37,9 +37,9 @@ export function assertCollectionWeapon(value: unknown): asserts value is Collect
     );
   }
   const obj = value as Record<string, unknown>;
-  if (typeof obj.weaponInstanceId !== 'string') {
+  if (typeof obj.collectionWeaponId !== 'string') {
     throw new TypeError(
-      `CollectionWeapon.weaponInstanceId must be a string, got: ${JSON.stringify(obj.weaponInstanceId)}`,
+      `CollectionWeapon.collectionWeaponId must be a string, got: ${JSON.stringify(obj.collectionWeaponId)}`,
     );
   }
   if (typeof obj.weaponId !== 'string') {

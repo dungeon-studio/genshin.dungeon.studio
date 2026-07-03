@@ -187,7 +187,7 @@ export function TeamsPage(): JSX.Element {
                       key={selectedMemberWeaponType}
                       collectionWeapons={collectionWeapons}
                       weaponType={selectedMemberWeaponType}
-                      selectedCollectionWeaponId={selectedMember.weaponInstanceId}
+                      selectedCollectionWeaponId={selectedMember.collectionWeaponId}
                       slot={selectedSlot}
                       memberIndex={selectedMemberIndex}
                       onSelect={handleWeaponSelect}

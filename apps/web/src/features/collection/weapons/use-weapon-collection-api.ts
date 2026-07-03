@@ -25,7 +25,7 @@ export function parseWeaponCollectionResponse(response: unknown): WeaponRecord {
 
   for (const item of response.collection.items) {
     const weapon = deserialiseWeapon(item);
-    record[weapon.weaponInstanceId] = weapon;
+    record[weapon.collectionWeaponId] = weapon;
   }
 
   return record;

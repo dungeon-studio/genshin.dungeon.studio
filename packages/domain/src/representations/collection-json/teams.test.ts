@@ -12,7 +12,7 @@ const BASE_URL = 'http://localhost:8080';
 const VALID_TIMESTAMP = '2024-01-15T12:00:00Z' as ISOTimestamp;
 
 const VALID_MEMBERS: CollectionTeamMembers = [
-  { characterId: 'columbina', weaponInstanceId: 'wep-001' as UUID },
+  { characterId: 'columbina', collectionWeaponId: 'wep-001' as UUID },
   { characterId: 'durin' },
   null,
   null,
@@ -58,7 +58,7 @@ describe('team serialisation round-trip', () => {
   it('preserves weapon instance IDs on members through round-trip', () => {
     const item = serialiseTeam(VALID_TEAM, BASE_URL);
     const result = deserialiseTeam(item);
-    expect(result.members[0]?.weaponInstanceId).toBe('wep-001');
+    expect(result.members[0]?.collectionWeaponId).toBe('wep-001');
   });
 
   it('preserves artifact plans on members through round-trip', () => {

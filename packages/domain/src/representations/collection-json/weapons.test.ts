@@ -12,7 +12,7 @@ const BASE_URL = 'http://localhost:8080';
 const VALID_TIMESTAMP = '2024-01-15T12:00:00Z' as ISOTimestamp;
 
 const VALID_WEAPON: CollectionWeapon = {
-  weaponInstanceId: 'wep-001' as UUID,
+  collectionWeaponId: 'wep-001' as UUID,
   weaponId: 'mistsplitter-reforged',
   refinementLevel: 3,
   createdAt: VALID_TIMESTAMP,

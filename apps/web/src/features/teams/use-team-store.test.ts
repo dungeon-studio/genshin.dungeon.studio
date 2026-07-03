@@ -60,7 +60,7 @@ describe('useTeamStore', () => {
       useTeamStore.getState().assignCharacter(2, 0, 'amber');
 
       const team2 = useTeamStore.getState().teams[2];
-      expect(team2.members[0]?.weaponInstanceId).toBe(weaponId);
+      expect(team2.members[0]?.collectionWeaponId).toBe(weaponId);
     });
   });
 
@@ -87,7 +87,7 @@ describe('useTeamStore', () => {
       useTeamStore.getState().assignCharacter(1, 0, 'amber');
       useTeamStore.getState().assignWeapon(1, 0, weaponId);
 
-      expect(useTeamStore.getState().teams[1].members[0]?.weaponInstanceId).toBe(weaponId);
+      expect(useTeamStore.getState().teams[1].members[0]?.collectionWeaponId).toBe(weaponId);
     });
 
     it('does nothing if no character occupies the position', () => {
@@ -105,7 +105,7 @@ describe('useTeamStore', () => {
       useTeamStore.getState().assignWeapon(1, 0, weaponId);
       useTeamStore.getState().removeWeapon(1, 0);
 
-      expect(useTeamStore.getState().teams[1].members[0]?.weaponInstanceId).toBeUndefined();
+      expect(useTeamStore.getState().teams[1].members[0]?.collectionWeaponId).toBeUndefined();
     });
   });
 

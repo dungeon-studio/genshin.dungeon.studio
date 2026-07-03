@@ -42,7 +42,7 @@ export const teamItemV1 = {
               },
             },
             {
-              id: 'weaponInstanceId',
+              id: 'collectionWeaponId',
               type: 'semantic',
               doc: {
                 value:

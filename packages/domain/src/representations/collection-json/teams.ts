@@ -100,9 +100,9 @@ function deserialiseCollectionTeamMember(value: unknown, index: number): Collect
       `members[${index}].characterId must be a string, got: ${JSON.stringify(raw.characterId)}`,
     );
   }
-  if (raw.weaponInstanceId !== undefined && typeof raw.weaponInstanceId !== 'string') {
+  if (raw.collectionWeaponId !== undefined && typeof raw.collectionWeaponId !== 'string') {
     throw new TypeError(
-      `members[${index}].weaponInstanceId must be a string, got: ${JSON.stringify(raw.weaponInstanceId)}`,
+      `members[${index}].collectionWeaponId must be a string, got: ${JSON.stringify(raw.collectionWeaponId)}`,
     );
   }
   if (raw.artifactPlan !== undefined) {

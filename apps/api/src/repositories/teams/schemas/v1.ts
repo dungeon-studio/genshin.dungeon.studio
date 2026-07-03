@@ -33,6 +33,8 @@ export const V1TeamSchema = z.object({
   updatedAt: z.string(),
 });
 
+export type V1Team = z.infer<typeof V1TeamSchema>;
+
 export const v1 = defineVersion({
   initial: false,
   schema: V1TeamSchema,

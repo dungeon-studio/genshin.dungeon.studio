@@ -31,7 +31,7 @@ vi.mock('@genshin/game-data', () => ({
 }));
 
 const FAKE_WEAPON: CollectionWeapon = {
-  weaponInstanceId: 'instance-uuid-1' as UUID,
+  collectionWeaponId: 'instance-uuid-1' as UUID,
   weaponId: 'mistsplitter-reforged',
   refinementLevel: 1,
   createdAt: '2026-01-01T00:00:00.000Z' as CollectionWeapon['createdAt'],
@@ -39,7 +39,7 @@ const FAKE_WEAPON: CollectionWeapon = {
 };
 
 const FAKE_WEAPON_ITEM_DATA = [
-  { name: 'weaponInstanceId', value: 'instance-uuid-1' },
+  { name: 'collectionWeaponId', value: 'instance-uuid-1' },
   { name: 'weaponId', value: 'mistsplitter-reforged' },
   { name: 'refinementLevel', value: 1 },
   { name: 'createdAt', value: '2026-01-01T00:00:00.000Z' },
@@ -361,7 +361,7 @@ describe('Weapon routes', () => {
     });
   });
 
-  describe('GET /api/weapons/:weaponInstanceId', () => {
+  describe('GET /api/weapons/:collectionWeaponId', () => {
     let res: Response;
     let body: CollectionDocument;
 
@@ -398,7 +398,7 @@ describe('Weapon routes', () => {
     });
   });
 
-  describe('PATCH /api/weapons/:weaponInstanceId', () => {
+  describe('PATCH /api/weapons/:collectionWeaponId', () => {
     let res: Response;
     let body: CollectionDocument;
 
@@ -491,7 +491,7 @@ describe('Weapon routes', () => {
     });
   });
 
-  describe('DELETE /api/weapons/:weaponInstanceId', () => {
+  describe('DELETE /api/weapons/:collectionWeaponId', () => {
     it('returns 204 with no body', async () => {
       vi.mocked(Weapons.remove).mockResolvedValue();
 

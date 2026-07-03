@@ -38,8 +38,8 @@ describe('validateTeam', () => {
     const issues = validateTeam({
       name: 'Dupe weapons',
       members: [
-        { characterId: 'columbina', weaponInstanceId: 'weapon-1' as UUID },
-        { characterId: 'durin', weaponInstanceId: 'weapon-1' as UUID },
+        { characterId: 'columbina', collectionWeaponId: 'weapon-1' as UUID },
+        { characterId: 'durin', collectionWeaponId: 'weapon-1' as UUID },
         null,
         null,
       ],
@@ -51,7 +51,7 @@ describe('validateTeam', () => {
   describe('with ownership context', () => {
     const context: TeamValidationContext = {
       ownedCharacterIds: new Set(['columbina', 'durin']),
-      ownedWeaponInstanceIds: new Set(['weapon-1']),
+      ownedCollectionWeaponIds: new Set(['weapon-1']),
     };
 
     it('returns no issues when all characters are owned', () => {
@@ -82,7 +82,7 @@ describe('validateTeam', () => {
         {
           name: 'Bad weapon',
           members: [
-            { characterId: 'columbina', weaponInstanceId: 'weapon-999' as UUID },
+            { characterId: 'columbina', collectionWeaponId: 'weapon-999' as UUID },
             null,
             null,
             null,
@@ -123,7 +123,7 @@ describe('validateTeams', () => {
 
   it('allows the same character with the same weapon on different teams', () => {
     const members: CollectionTeamMembers = [
-      { characterId: 'columbina', weaponInstanceId: 'weapon-1' as UUID },
+      { characterId: 'columbina', collectionWeaponId: 'weapon-1' as UUID },
       null,
       null,
       null,
@@ -134,7 +134,7 @@ describe('validateTeams', () => {
 
   it('detects weapon conflicts across teams', () => {
     const current: CollectionTeamMembers = [
-      { characterId: 'columbina', weaponInstanceId: 'weapon-1' as UUID },
+      { characterId: 'columbina', collectionWeaponId: 'weapon-1' as UUID },
       null,
       null,
       null,
@@ -142,7 +142,7 @@ describe('validateTeams', () => {
     const otherTeam = {
       slot: 2 as TeamSlot,
       members: [
-        { characterId: 'durin', weaponInstanceId: 'weapon-1' as UUID },
+        { characterId: 'durin', collectionWeaponId: 'weapon-1' as UUID },
         null,
         null,
         null,
@@ -155,7 +155,7 @@ describe('validateTeams', () => {
 
   it('ignores the same team slot when checking other teams', () => {
     const members: CollectionTeamMembers = [
-      { characterId: 'columbina', weaponInstanceId: 'weapon-1' as UUID },
+      { characterId: 'columbina', collectionWeaponId: 'weapon-1' as UUID },
       null,
       null,
       null,

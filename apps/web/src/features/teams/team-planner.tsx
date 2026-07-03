@@ -118,7 +118,9 @@ export function TeamPlanner({
             member={member}
             collectionCharacter={member ? getCharacter(member.characterId) : undefined}
             collectionWeapon={
-              member?.weaponInstanceId ? getCollectionWeapon(member.weaponInstanceId) : undefined
+              member?.collectionWeaponId
+                ? getCollectionWeapon(member.collectionWeaponId)
+                : undefined
             }
             selected={selectedMemberIndex === i}
             onSelect={onMemberSelect ? () => onMemberSelect(i) : undefined}

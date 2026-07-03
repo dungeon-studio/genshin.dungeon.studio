@@ -11,10 +11,10 @@ import type { UUID } from './uuid.js';
  * equipped weapon and artifacts.
  *
  * Character details should be looked up from @genshin/game-data using characterId.
- * The weaponInstanceId references a specific weapon instance in the user's collection.
+ * The collectionWeaponId references a specific weapon instance in the user's collection.
  */
 export interface CollectionTeamMember {
   characterId: Character['id'];
-  weaponInstanceId?: UUID;
+  collectionWeaponId?: UUID;
   artifactPlan?: ArtifactPlan;
 }

@@ -44,12 +44,12 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
 
     // Auto-populate weapon from another team where this character already has one equipped.
     const allTeams = get().teams;
-    let existingWeaponId: CollectionTeamMember['weaponInstanceId'];
+    let existingWeaponId: CollectionTeamMember['collectionWeaponId'];
     for (const other of Object.values(allTeams)) {
       if (other.slot === slot) continue;
       for (const member of other.members) {
-        if (member?.characterId === characterId && member.weaponInstanceId) {
-          existingWeaponId = member.weaponInstanceId;
+        if (member?.characterId === characterId && member.collectionWeaponId) {
+          existingWeaponId = member.collectionWeaponId;
           break;
         }
       }
@@ -63,7 +63,7 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
           ...state.teams[slot],
           members: state.teams[slot].members.map((m, i) =>
             i === memberIndex
-              ? { characterId, ...(existingWeaponId && { weaponInstanceId: existingWeaponId }) }
+              ? { characterId, ...(existingWeaponId && { collectionWeaponId: existingWeaponId }) }
               : m,
           ) as CollectionTeamMembers,
         },
@@ -97,7 +97,7 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
         [slot]: {
           ...state.teams[slot],
           members: state.teams[slot].members.map((m, i) =>
-            i === memberIndex && m ? { ...m, weaponInstanceId: collectionWeaponId } : m,
+            i === memberIndex && m ? { ...m, collectionWeaponId: collectionWeaponId } : m,
           ) as CollectionTeamMembers,
         },
       },
@@ -114,7 +114,7 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
         [slot]: {
           ...state.teams[slot],
           members: state.teams[slot].members.map((m, i) =>
-            i === memberIndex && m ? { ...m, weaponInstanceId: undefined } : m,
+            i === memberIndex && m ? { ...m, collectionWeaponId: undefined } : m,
           ) as CollectionTeamMembers,
         },
       },

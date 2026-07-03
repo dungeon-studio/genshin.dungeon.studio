@@ -61,7 +61,9 @@ export function TeamStrip({
               member={member}
               collectionCharacter={member ? getCharacter(member.characterId) : undefined}
               collectionWeapon={
-                member?.weaponInstanceId ? getCollectionWeapon(member.weaponInstanceId) : undefined
+                member?.collectionWeaponId
+                  ? getCollectionWeapon(member.collectionWeaponId)
+                  : undefined
               }
             />
           </button>

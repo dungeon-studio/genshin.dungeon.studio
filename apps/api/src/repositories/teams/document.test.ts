@@ -7,14 +7,15 @@ import { describe, expect, it } from 'vitest';
 
 import { arbCharacterId, arbTimestamp } from '@/test/arbitraries.js';
 
-import { CURRENT_VERSION, fromDocument, toDocument, type V1Team, type V0Team } from './document.js';
+import { CURRENT_VERSION, fromDocument, toDocument, type V0Team } from './document.js';
+import { type V1Team } from './schemas/v1.js';
 
 const TIMESTAMP = '2024-01-15T12:00:00.000Z';
 
 const arbMember: fc.Arbitrary<CollectionTeamMember> = fc.record(
   {
     characterId: arbCharacterId,
-    weaponInstanceId: fc.uuid().map((id) => id as UUID),
+    collectionWeaponId: fc.uuid().map((id) => id as UUID),
   },
   { requiredKeys: ['characterId'] },
 );
@@ -107,6 +108,17 @@ describe('fromDocument', () => {
       }),
     );
     expect(team.members[0]?.artifactPlan?.priorityMinorAffixes).toEqual(['crit-rate']);
+  });
+
+  it('migrates a v1 member weaponInstanceId → collectionWeaponId', () => {
+    const team = fromDocument(
+      1,
+      makeV1Document({
+        members: [{ characterId: 'columbina', weaponInstanceId: 'weapon-1' }, null, null, null],
+      }),
+    );
+    expect(team.members[0]?.collectionWeaponId).toBe('weapon-1');
+    expect(team.members[0]).not.toHaveProperty('weaponInstanceId');
   });
 
   it('throws for too many members', () => {

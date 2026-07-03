@@ -27,7 +27,7 @@ export const useWeaponCollectionStore = create<WeaponCollectionState>()((set, ge
     set((state) => ({
       weapons: {
         ...state.weapons,
-        [weapon.weaponInstanceId]: weapon,
+        [weapon.collectionWeaponId]: weapon,
       },
     }));
   },

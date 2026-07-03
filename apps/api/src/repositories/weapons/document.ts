@@ -9,7 +9,7 @@ import { entity, CURRENT_VERSION, type V1Weapon, type V0Weapon } from './schemas
 export { CURRENT_VERSION, type V1Weapon, type V0Weapon };
 
 export function fromDocument(
-  weaponInstanceId: UUID,
+  collectionWeaponId: UUID,
   raw: Record<string, unknown>,
 ): CollectionWeapon {
   const result = entity.safeParse(raw);
@@ -18,7 +18,7 @@ export function fromDocument(
   }
   const data = result.value;
   const weapon = {
-    weaponInstanceId,
+    collectionWeaponId,
     weaponId: data.weaponId,
     refinementLevel: data.refinementLevel,
     createdAt: data.createdAt as ISOTimestamp,

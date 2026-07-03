@@ -121,12 +121,12 @@ weapons.post(
   },
 );
 
-// GET /api/weapons/:weaponInstanceId — Get single weapon instance
-weapons.get('/:weaponInstanceId', async (c) => {
+// GET /api/weapons/:collectionWeaponId — Get single weapon instance
+weapons.get('/:collectionWeaponId', async (c) => {
   const userId = c.get('user').uid;
-  const weaponInstanceId = c.req.param('weaponInstanceId') as UUID;
+  const collectionWeaponId = c.req.param('collectionWeaponId') as UUID;
 
-  const weapon = await Weapons.get(userId, weaponInstanceId);
+  const weapon = await Weapons.get(userId, collectionWeaponId);
 
   if (!weapon) {
     throw new HTTPException(404, { message: 'Weapon instance not found' });
@@ -146,18 +146,18 @@ weapons.get('/:weaponInstanceId', async (c) => {
   );
 });
 
-// PATCH /api/weapons/:weaponInstanceId — Update weapon instance
+// PATCH /api/weapons/:collectionWeaponId — Update weapon instance
 weapons.patch(
-  '/:weaponInstanceId',
+  '/:collectionWeaponId',
   negotiateRequestSchema([weaponPatchRequestV1]),
   validateRequestBody([weaponPatchRequestV1]),
   async (c) => {
     const userId = c.get('user').uid;
-    const weaponInstanceId = c.req.param('weaponInstanceId') as UUID;
+    const collectionWeaponId = c.req.param('collectionWeaponId') as UUID;
 
     const { refinementLevel } = c.get('validatedBody') as UpdateWeaponBody;
 
-    const weapon = await Weapons.update(userId, weaponInstanceId, refinementLevel);
+    const weapon = await Weapons.update(userId, collectionWeaponId, refinementLevel);
 
     if (!weapon) {
       throw new HTTPException(404, { message: 'Weapon instance not found' });
@@ -178,12 +178,12 @@ weapons.patch(
   },
 );
 
-// DELETE /api/weapons/:weaponInstanceId — Delete weapon instance
-weapons.delete('/:weaponInstanceId', async (c) => {
+// DELETE /api/weapons/:collectionWeaponId — Delete weapon instance
+weapons.delete('/:collectionWeaponId', async (c) => {
   const userId = c.get('user').uid;
-  const weaponInstanceId = c.req.param('weaponInstanceId') as UUID;
+  const collectionWeaponId = c.req.param('collectionWeaponId') as UUID;
 
-  await Weapons.remove(userId, weaponInstanceId);
+  await Weapons.remove(userId, collectionWeaponId);
 
   return c.body(null, 204);
 });

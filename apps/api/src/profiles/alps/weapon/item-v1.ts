@@ -14,7 +14,7 @@ export const weaponItemV1 = {
       },
       descriptor: [
         {
-          id: 'weaponInstanceId',
+          id: 'collectionWeaponId',
           type: 'semantic',
           doc: {
             value: 'Unique identifier distinguishing one copy of a weapon from another',

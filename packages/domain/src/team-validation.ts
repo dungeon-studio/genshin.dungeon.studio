@@ -27,8 +27,8 @@ import type { CollectionTeamMembers, TeamSlot } from './collection-team.js';
 export interface TeamValidationContext {
   /** Character IDs the user owns. */
   ownedCharacterIds: ReadonlySet<string>;
-  /** Weapon instance IDs the user owns. */
-  ownedWeaponInstanceIds: ReadonlySet<string>;
+  /** Collection weapon IDs the user owns. */
+  ownedCollectionWeaponIds: ReadonlySet<string>;
 }
 
 // ---------------------------------------------------------------------------
@@ -68,11 +68,14 @@ export function validateTeam(
           issue(`Character not in collection: ${member.characterId}`, `members[${i}].characterId`),
         );
       }
-      if (member.weaponInstanceId && !context.ownedWeaponInstanceIds.has(member.weaponInstanceId)) {
+      if (
+        member.collectionWeaponId &&
+        !context.ownedCollectionWeaponIds.has(member.collectionWeaponId)
+      ) {
         issues.push(
           issue(
-            `Weapon instance not in collection: ${member.weaponInstanceId}`,
-            `members[${i}].weaponInstanceId`,
+            `Weapon instance not in collection: ${member.collectionWeaponId}`,
+            `members[${i}].collectionWeaponId`,
           ),
         );
       }
@@ -83,16 +86,16 @@ export function validateTeam(
   const seenWeapons = new Set<string>();
   for (const [i, member] of team.members.entries()) {
     if (member === null) continue;
-    if (member.weaponInstanceId) {
-      if (seenWeapons.has(member.weaponInstanceId)) {
+    if (member.collectionWeaponId) {
+      if (seenWeapons.has(member.collectionWeaponId)) {
         issues.push(
           issue(
-            `Duplicate weapon instance ID: ${member.weaponInstanceId}`,
-            `members[${i}].weaponInstanceId`,
+            `Duplicate weapon instance ID: ${member.collectionWeaponId}`,
+            `members[${i}].collectionWeaponId`,
           ),
         );
       }
-      seenWeapons.add(member.weaponInstanceId);
+      seenWeapons.add(member.collectionWeaponId);
     }
   }
 
@@ -131,26 +134,26 @@ export function validateTeams(
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
 
-  // Build a map of weaponInstanceId → characterId from other teams.
+  // Build a map of collectionWeaponId → characterId from other teams.
   const equippedWeapons = new Map<string, string>();
   for (const team of allTeams) {
     if (team.slot === slot) continue;
     for (const member of team.members) {
-      if (member?.weaponInstanceId) {
-        equippedWeapons.set(member.weaponInstanceId, member.characterId);
+      if (member?.collectionWeaponId) {
+        equippedWeapons.set(member.collectionWeaponId, member.characterId);
       }
     }
   }
 
   for (const [i, member] of currentMembers.entries()) {
-    if (member === null || !member.weaponInstanceId) continue;
+    if (member === null || !member.collectionWeaponId) continue;
 
-    const existingOwner = equippedWeapons.get(member.weaponInstanceId);
+    const existingOwner = equippedWeapons.get(member.collectionWeaponId);
     if (existingOwner && existingOwner !== member.characterId) {
       issues.push(
         issue(
-          `Weapon instance ${member.weaponInstanceId} is already equipped by character ${existingOwner}`,
-          `members[${i}].weaponInstanceId`,
+          `Weapon instance ${member.collectionWeaponId} is already equipped by character ${existingOwner}`,
+          `members[${i}].collectionWeaponId`,
         ),
       );
     }

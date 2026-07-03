@@ -100,7 +100,7 @@ export function WeaponInstanceSidebar({
             .sort((a, b) => b.refinementLevel - a.refinementLevel)
             .map((instance, index) => (
               <div
-                key={instance.weaponInstanceId}
+                key={instance.collectionWeaponId}
                 className="flex items-center gap-3 rounded-lg border border-border bg-card p-3"
               >
                 <div className="min-w-0 flex-1">
@@ -114,7 +114,7 @@ export function WeaponInstanceSidebar({
                     <button
                       key={level}
                       type="button"
-                      onClick={() => onRefinementChange(instance.weaponInstanceId, level)}
+                      onClick={() => onRefinementChange(instance.collectionWeaponId, level)}
                       className={cn(
                         'h-7 w-7 rounded text-xs font-bold tabular-nums transition-colors',
                         level === instance.refinementLevel
@@ -131,7 +131,7 @@ export function WeaponInstanceSidebar({
 
                 <button
                   type="button"
-                  onClick={() => onRemove(instance.weaponInstanceId)}
+                  onClick={() => onRemove(instance.collectionWeaponId)}
                   className="shrink-0 rounded-md p-1 text-destructive transition-opacity hover:bg-destructive hover:text-destructive-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
                   aria-label={`Remove instance ${index + 1}`}
                 >

@@ -141,7 +141,7 @@ async function validateMembers(userId: string, members: CollectionTeamMember[]):
   }
 
   // No duplicate weapon instance IDs
-  const weaponIds = members.flatMap((m) => (m.weaponInstanceId ? [m.weaponInstanceId] : []));
+  const weaponIds = members.flatMap((m) => (m.collectionWeaponId ? [m.collectionWeaponId] : []));
   if (new Set(weaponIds).size !== weaponIds.length) {
     throw new HTTPException(400, { message: 'Duplicate weapon instance IDs in team' });
   }
@@ -157,11 +157,11 @@ async function validateMembers(userId: string, members: CollectionTeamMember[]):
       }
 
       // Weapon instance must be in user's collection (if provided)
-      if (member.weaponInstanceId) {
-        const weapon = await Weapons.get(userId, member.weaponInstanceId as UUID);
+      if (member.collectionWeaponId) {
+        const weapon = await Weapons.get(userId, member.collectionWeaponId as UUID);
         if (!weapon) {
           throw new HTTPException(400, {
-            message: `Weapon instance not in collection: ${member.weaponInstanceId}`,
+            message: `Weapon instance not in collection: ${member.collectionWeaponId}`,
           });
         }
       }

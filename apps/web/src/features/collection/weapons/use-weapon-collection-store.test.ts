@@ -8,12 +8,12 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { useWeaponCollectionStore } from './use-weapon-collection-store';
 
 function makeWeapon(
-  weaponInstanceId: string,
+  collectionWeaponId: string,
   weaponId: string,
   refinementLevel = 1,
 ): CollectionWeapon {
   return {
-    weaponInstanceId: weaponInstanceId as CollectionWeaponId,
+    collectionWeaponId: collectionWeaponId as CollectionWeaponId,
     weaponId: weaponId as Weapon['id'],
     refinementLevel,
     createdAt: '2026-01-01T00:00:00.000Z' as ISOTimestamp,
