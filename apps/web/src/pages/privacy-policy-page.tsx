@@ -51,8 +51,8 @@ export function PrivacyPolicyPage(): JSX.Element {
 
         <h2 className="mt-8 text-xl font-semibold text-foreground">How we use your data</h2>
         <p className="mt-4 leading-relaxed">
-          We use your account information to sign you in and your collection data to save and sync
-          it across devices. That's the extent of it.
+          We use your account information to sign you in, and your collection data to save and sync
+          it across devices. We don't use it for anything else.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold text-foreground">Service providers</h2>
