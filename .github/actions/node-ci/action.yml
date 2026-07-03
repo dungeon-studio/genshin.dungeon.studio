@@ -43,7 +43,7 @@ runs:
       env:
         SEED_SOURCE: ${{ github.event.pull_request.head.sha || github.sha }}
       # SEED_SOURCE is a commit SHA (trusted, hex), not attacker-controlled;
-      # low-confidence finding tracked for recheck in the follow-up issue.
+      # low-confidence finding tracked for recheck in #910.
       run: echo "FAST_CHECK_SEED=$((16#${SEED_SOURCE:0:8}))" >> "$GITHUB_ENV" # zizmor: ignore[github-env]
 
     - name: Test

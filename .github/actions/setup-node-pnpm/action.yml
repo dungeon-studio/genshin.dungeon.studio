@@ -26,7 +26,7 @@ runs:
     - name: Get pnpm store directory
       shell: bash
       # STORE_PATH is pnpm's own store path (trusted), not attacker-controlled;
-      # low-confidence finding tracked for recheck in the follow-up issue.
+      # low-confidence finding tracked for recheck in #910.
       run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_ENV" # zizmor: ignore[github-env]
 
     - name: Setup pnpm cache
