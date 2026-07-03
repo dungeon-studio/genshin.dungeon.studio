@@ -3,13 +3,31 @@
 
 import { GAME_DATA_VERSION } from '@genshin/game-data';
 import type { JSX } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import { Container } from '@/components/container';
+import { useAuth } from '@/features/auth';
+import { buildBugReportUrl } from '@/lib/debug-info';
 
 const GITHUB_REPO = 'https://github.com/dungeon-studio/genshin.dungeon.studio';
 
 export function Footer(): JSX.Element {
+  const { user } = useAuth();
+  const location = useLocation();
+
+  const pageUrl = window.location.origin + location.pathname + location.search + location.hash;
+  const reportUrl = buildBugReportUrl(`${GITHUB_REPO}/issues/new`, pageUrl, {
+    appVersion: __APP_VERSION__,
+    buildSha: __BUILD_SHA__,
+    gameDataVersion: GAME_DATA_VERSION,
+    authenticated: user !== null,
+    userAgent: navigator.userAgent,
+    platform: navigator.platform,
+    screenWidth: window.screen.width,
+    screenHeight: window.screen.height,
+    pixelRatio: window.devicePixelRatio,
+  });
+
   return (
     <footer className="border-t border-border bg-muted py-8">
       <Container className="text-center text-sm text-muted-foreground">
@@ -17,7 +35,7 @@ export function Footer(): JSX.Element {
           <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2">
             <li>
               <a
-                href={`${GITHUB_REPO}/issues/new?template=bug-report.yml`}
+                href={reportUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline-offset-4 hover:underline"
