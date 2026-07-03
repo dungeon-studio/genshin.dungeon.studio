@@ -9,7 +9,7 @@ import type {
   CollectionWeaponId,
   TeamSlot,
 } from '@genshin/domain';
-import { initialTeams, isValidMemberIndex, nowTimestamp } from '@genshin/domain';
+import { defaultTeamName, initialTeams, isValidMemberIndex, nowTimestamp } from '@genshin/domain';
 import { create } from 'zustand';
 
 interface TeamStoreState {
@@ -157,10 +157,12 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
   },
 
   setTeamName: (slot, name) => {
+    const trimmed = name.trim();
+    const nextName = trimmed || defaultTeamName(slot);
     set((state) => ({
       teams: {
         ...state.teams,
-        [slot]: { ...state.teams[slot], name, updatedAt: nowTimestamp() },
+        [slot]: { ...state.teams[slot], name: nextName, updatedAt: nowTimestamp() },
       },
     }));
   },
