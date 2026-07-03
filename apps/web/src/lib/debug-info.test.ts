@@ -3,14 +3,13 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { formatDebugInfo } from './debug-info';
+import { buildBugReportUrl, formatDebugInfo } from './debug-info';
 import type { DebugInfo } from './debug-info';
 
 const info: DebugInfo = {
   appVersion: '0.1.0',
   buildSha: 'd4fbd16',
   gameDataVersion: '5.3',
-  route: '/teams',
   authenticated: false,
   userAgent: 'Mozilla/5.0 (X11; Linux x86_64)',
   platform: 'Linux x86_64',
@@ -37,9 +36,20 @@ describe('formatDebugInfo', () => {
     const text = formatDebugInfo(info);
 
     expect(text).toContain('Game data: 5.3');
-    expect(text).toContain('Route: /teams');
     expect(text).toContain('Screen: 1920×1080 @2x');
     expect(text).toContain('Platform: Linux x86_64');
     expect(text).toContain('User agent: Mozilla/5.0 (X11; Linux x86_64)');
+  });
+});
+
+describe('buildBugReportUrl', () => {
+  it('pre-fills the template, page url, and environment fields', () => {
+    const url = new URL(
+      buildBugReportUrl('https://github.com/o/r/issues/new', 'https://app.example/teams', info),
+    );
+
+    expect(url.searchParams.get('template')).toBe('bug-report.yml');
+    expect(url.searchParams.get('url')).toBe('https://app.example/teams');
+    expect(url.searchParams.get('environment')).toBe(formatDebugInfo(info));
   });
 });

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import type { User as FirebaseUser } from 'firebase/auth';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
@@ -40,19 +39,14 @@ describe('Footer', () => {
     }
   });
 
-  it('copies debug info to the clipboard reflecting route and auth state', async () => {
-    const writeText = vi.fn().mockResolvedValue(undefined);
-    vi.stubGlobal('navigator', { ...navigator, clipboard: { writeText } });
-
+  it('pre-fills the bug report link with page and environment details', () => {
     renderFooter({ uid: 'abc' } as FirebaseUser, '/weapons');
 
-    await userEvent.click(screen.getByRole('button', { name: 'Copy debug info' }));
+    const href = screen.getByRole('link', { name: 'Report an issue' }).getAttribute('href') ?? '';
+    const params = new URL(href).searchParams;
 
-    expect(writeText).toHaveBeenCalledOnce();
-    const copied = writeText.mock.calls[0][0] as string;
-    expect(copied).toContain('Route: /weapons');
-    expect(copied).toContain('Authenticated: yes');
-
-    vi.unstubAllGlobals();
+    expect(params.get('template')).toBe('bug-report.yml');
+    expect(params.get('url')).toContain('/weapons');
+    expect(params.get('environment')).toContain('Authenticated: yes');
   });
 });
