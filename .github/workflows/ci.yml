@@ -58,6 +58,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
 
       - uses: ./.github/actions/node-ci
         with:
@@ -85,11 +87,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
 
       - name: Fetch base branch
+        env:
+          BASE_REF: ${{ github.base_ref }}
         run: |
           git fetch --no-tags --depth=1 \
-            origin "${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}"
+            origin "$BASE_REF:refs/remotes/origin/$BASE_REF"
 
       - uses: ./.github/actions/setup-node-pnpm
 
