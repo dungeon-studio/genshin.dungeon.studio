@@ -125,6 +125,25 @@ describe('useTeamStore', () => {
 
       expect(useTeamStore.getState().teams[1].name).toBe('National Team');
     });
+
+    it('trims surrounding whitespace', () => {
+      useTeamStore.getState().setTeamName(1, '  National Team  ');
+
+      expect(useTeamStore.getState().teams[1].name).toBe('National Team');
+    });
+
+    it('falls back to the default name when cleared', () => {
+      useTeamStore.getState().setTeamName(2, 'Freeze');
+      useTeamStore.getState().setTeamName(2, '');
+
+      expect(useTeamStore.getState().teams[2].name).toBe('Team 2');
+    });
+
+    it('falls back to the default name for a whitespace-only name', () => {
+      useTeamStore.getState().setTeamName(3, '   ');
+
+      expect(useTeamStore.getState().teams[3].name).toBe('Team 3');
+    });
   });
 
   describe('setTeams', () => {

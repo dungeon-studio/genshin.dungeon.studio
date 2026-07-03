@@ -105,11 +105,16 @@ export function assertCollectionTeam(value: unknown): asserts value is Collectio
   }
 }
 
+/** The name a team slot shows before the user gives it a custom one. */
+export function defaultTeamName(slot: TeamSlot): string {
+  return `Team ${slot}`;
+}
+
 export function createEmptyTeam(slot: TeamSlot): CollectionTeam {
   const now = nowTimestamp();
   return {
     slot,
-    name: `Team ${slot}`,
+    name: defaultTeamName(slot),
     members: [null, null, null, null],
     createdAt: now,
     updatedAt: now,

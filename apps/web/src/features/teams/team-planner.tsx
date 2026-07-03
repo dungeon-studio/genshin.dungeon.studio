@@ -58,10 +58,7 @@ export function TeamPlanner({
   }
 
   function commitEdit() {
-    const trimmed = editValue.trim();
-    if (trimmed) {
-      onNameChange(trimmed);
-    }
+    onNameChange(editValue);
     setEditing(false);
   }
 

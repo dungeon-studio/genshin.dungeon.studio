@@ -16,6 +16,7 @@ export {
 export {
   assertCollectionTeam,
   createEmptyTeam,
+  defaultTeamName,
   initialTeams,
   isValidMemberIndex,
   isValidTeamSlot,
