@@ -17,6 +17,14 @@ on:
 permissions:
   contents: read
 
+# Only one deploy per ref at a time. Cloud Run and the `:develop` image tag
+# are single mutable targets, so concurrent runs race: an older run's health
+# verification sees a newer run's SHA and fails with sha_mismatch. Cancelling
+# superseded runs deploys only the latest commit.
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   web:
     if: github.ref == 'refs/heads/develop'
