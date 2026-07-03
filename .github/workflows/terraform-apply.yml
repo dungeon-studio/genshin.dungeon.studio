@@ -23,7 +23,7 @@ jobs:
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: core
-    secrets: inherit # pragma: allowlist secret
+    secrets: inherit
 
   dev:
     if: github.ref == 'refs/heads/develop'
@@ -31,7 +31,7 @@ jobs:
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: dev
-    secrets: inherit # pragma: allowlist secret
+    secrets: inherit
 
   staging:
     if: startsWith(github.ref, 'refs/heads/release/')
@@ -39,4 +39,4 @@ jobs:
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: staging
-    secrets: inherit # pragma: allowlist secret
+    secrets: inherit
