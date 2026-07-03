@@ -3,13 +3,11 @@
 
 import { z } from 'zod';
 
-// The per-record shape: one persisted collection entry. This is the unit the
-// compatibility gate snapshots — jsoncompat can't see into a `Record` value
-// (`additionalProperties`), and the collection blob keys every entry under one,
-// so the whole-store schema would leave these fields ungated. Kept as loose as
-// the Firestore-side V1CharacterSchema (apps/api): the snapshot gates structural
-// compatibility, while assertCollectionCharacter enforces the domain semantics
-// (known character, constellation range, ISO timestamps) at migrate time.
+// One persisted collection entry, exported as the unit the compatibility gate
+// snapshots (see schema-registry.ts for why the entry, not the whole store).
+// Kept as loose as the Firestore-side V1CharacterSchema (apps/api): the snapshot
+// gates structure only, while assertCollectionCharacter enforces the domain
+// semantics (known character, constellation range, ISO timestamps) at migrate time.
 export const V1CollectionCharacterSchema = z.object({
   characterId: z.string(),
   constellationLevel: z.number(),

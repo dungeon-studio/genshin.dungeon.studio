@@ -11,12 +11,10 @@ import { V1PersistedCollectionSchema } from './v1.js';
 // (apps/api/scripts/check-schema-compat.ts) then forces the change to only widen.
 export const CURRENT_VERSION = 1 as const;
 
-// Rehydration guard for the `genshin-collection` store. Runs only when the
-// persisted version is older than CURRENT_VERSION, so unversioned pre-alpha data
-// (treated as v0) is adopted here. Structurally invalid blobs are discarded
-// wholesale; individually malformed or unknown-character entries are dropped so
-// one bad record can't poison the collection. Signed-in users re-merge from the
-// server afterward, so a discard is never a real loss.
+// Rehydration guard for the `genshin-collection` store: an invalid blob is
+// discarded whole and a single malformed or unknown-character entry is dropped,
+// so one bad record can't poison the collection. Signed-in users re-merge from
+// the server afterward, so a discard is never a real loss.
 export function migratePersistedCollection(persisted: unknown): {
   characters: Record<string, CollectionCharacter>;
 } {
