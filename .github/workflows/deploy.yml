@@ -40,6 +40,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
 
       - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
         with:
@@ -100,6 +102,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
 
       - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
         with:
@@ -144,10 +148,13 @@ jobs:
           echo "image_uri=$IMAGE_URI" >> "$GITHUB_OUTPUT"
 
       - name: Log Tags & Image
+        env:
+          IMAGE_TAGS: ${{ steps.meta.outputs.tags }}
+          IMAGE_URI: ${{ steps.image.outputs.image_uri }}
         run: |
           echo "Published image tags:"
-          printf '%s\n' "${{ steps.meta.outputs.tags }}"
-          echo "Deploy image URI: ${{ steps.image.outputs.image_uri }}"
+          printf '%s\n' "$IMAGE_TAGS"
+          echo "Deploy image URI: $IMAGE_URI"
 
       # Service lifecycle is intentionally CI-managed for fast app rollouts.
       # Terraform in dev manages supporting infra (APIs, Artifact Registry,
@@ -172,8 +179,10 @@ jobs:
 
       - name: Verify Public Health
         continue-on-error: true
+        env:
+          SERVICE_URL: ${{ steps.deploy.outputs.url }}
         run: >-
-          curl -fsSL "${{ steps.deploy.outputs.url }}/health"
+          curl -fsSL "$SERVICE_URL/health"
           | jq -e '.status == "ok"'
 
       - uses: ./.github/actions/setup-node-pnpm
@@ -190,4 +199,5 @@ jobs:
       - name: Verify Authenticated Health
         env:
           HEALTH_BEARER_TOKEN: ${{ steps.verify-token.outputs.id_token }}
-        run: pnpm --filter @genshin/api exec tsx scripts/verify-deployment.ts "${{ steps.deploy.outputs.url }}"
+          SERVICE_URL: ${{ steps.deploy.outputs.url }}
+        run: pnpm --filter @genshin/api exec tsx scripts/verify-deployment.ts "$SERVICE_URL"

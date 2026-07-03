@@ -1,0 +1,80 @@
+// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+// SPDX-License-Identifier: MIT
+
+import { buildCollection, type CollectionDocument } from '@genshin/collection-json';
+import type {
+  CharacterId,
+  CollectionCharacter,
+  CollectionTeam,
+  CollectionWeapon,
+  ISOTimestamp,
+  TeamSlot,
+  UUID,
+} from '@genshin/domain';
+import {
+  createEmptyTeam,
+  serialiseCharacter,
+  serialiseTeam,
+  serialiseWeapon,
+} from '@genshin/domain';
+
+// Origin the API client resolves relative paths against (see vitest.config.ts).
+const API_BASE_URL = 'http://localhost:8080';
+
+const FIXED_TIMESTAMP = '2026-01-01T00:00:00.000Z' as ISOTimestamp;
+
+// Domain-object builders. IDs must exist in @genshin/game-data because the
+// deserialisers validate them against the static catalogue.
+export function makeCharacter(id: string, constellationLevel = 0): CollectionCharacter {
+  return {
+    characterId: id as CharacterId,
+    constellationLevel,
+    createdAt: FIXED_TIMESTAMP,
+    updatedAt: FIXED_TIMESTAMP,
+  };
+}
+
+export function makeWeapon(
+  instanceId: string,
+  weaponId: string,
+  refinementLevel = 1,
+): CollectionWeapon {
+  return {
+    weaponInstanceId: instanceId as UUID,
+    weaponId,
+    refinementLevel,
+    createdAt: FIXED_TIMESTAMP,
+    updatedAt: FIXED_TIMESTAMP,
+  };
+}
+
+export function makeTeam(slot: TeamSlot, overrides: Partial<CollectionTeam> = {}): CollectionTeam {
+  return {
+    ...createEmptyTeam(slot),
+    createdAt: FIXED_TIMESTAMP,
+    updatedAt: FIXED_TIMESTAMP,
+    ...overrides,
+  };
+}
+
+// Collection+JSON envelope builders producing the wire format the hooks parse.
+export function charactersDocument(characters: CollectionCharacter[]): CollectionDocument {
+  return buildCollection(
+    `${API_BASE_URL}/api/characters`,
+    characters.map((character) => serialiseCharacter(character, API_BASE_URL)),
+  );
+}
+
+export function weaponsDocument(weapons: CollectionWeapon[]): CollectionDocument {
+  return buildCollection(
+    `${API_BASE_URL}/api/weapons`,
+    weapons.map((weapon) => serialiseWeapon(weapon, API_BASE_URL)),
+  );
+}
+
+export function teamsDocument(teams: CollectionTeam[]): CollectionDocument {
+  return buildCollection(
+    `${API_BASE_URL}/api/teams`,
+    teams.map((team) => serialiseTeam(team, API_BASE_URL)),
+  );
+}

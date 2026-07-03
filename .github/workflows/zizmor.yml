@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 ---
-name: Link Check
+name: Zizmor
 
 on:
   pull_request:
@@ -18,14 +18,17 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/main' }}
 
 jobs:
-  # Internal cross-references must resolve on disk. Runs on every pull request
-  # (no path filter, so it always reports a status and is safe to require) and
-  # blocks merge on failure. --offline skips all network requests, so external
-  # rot — checked weekly in external-link-check.yml — never blocks a PR.
-  internal:
-    name: Internal Links
+  # Online supply-chain audits (impostor commits, known-vulnerable actions)
+  # need a token and network, so they can't run in pre-commit.ci. This job
+  # uploads SARIF to the Security tab and blocks on findings; the offline
+  # audits are gated separately via the zizmor pre-commit hook.
+  actions:
+    name: GitHub Actions
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write
 
     steps:
       - name: Checkout repository
@@ -33,8 +36,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Check internal links
-        uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2.8.0
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@192e21d79ab29983730a13d1382995c2307fbcaa # v0.5.7
         with:
-          args: --offline --no-progress "**/*.md"
-          fail: true
+          config: .github/zizmor.yml

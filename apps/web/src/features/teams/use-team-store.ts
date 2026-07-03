@@ -9,7 +9,7 @@ import type {
   CollectionWeaponId,
   TeamSlot,
 } from '@genshin/domain';
-import { initialTeams, isValidMemberIndex } from '@genshin/domain';
+import { initialTeams, isValidMemberIndex, nowTimestamp } from '@genshin/domain';
 import { create } from 'zustand';
 
 interface TeamStoreState {
@@ -66,6 +66,7 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
               ? { characterId, ...(existingWeaponId && { weaponInstanceId: existingWeaponId }) }
               : m,
           ) as CollectionTeamMembers,
+          updatedAt: nowTimestamp(),
         },
       },
     }));
@@ -82,6 +83,7 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
           members: state.teams[slot].members.map((m, i) =>
             i === memberIndex ? null : m,
           ) as CollectionTeamMembers,
+          updatedAt: nowTimestamp(),
         },
       },
     }));
@@ -99,6 +101,7 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
           members: state.teams[slot].members.map((m, i) =>
             i === memberIndex && m ? { ...m, weaponInstanceId: collectionWeaponId } : m,
           ) as CollectionTeamMembers,
+          updatedAt: nowTimestamp(),
         },
       },
     }));
@@ -116,6 +119,7 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
           members: state.teams[slot].members.map((m, i) =>
             i === memberIndex && m ? { ...m, weaponInstanceId: undefined } : m,
           ) as CollectionTeamMembers,
+          updatedAt: nowTimestamp(),
         },
       },
     }));
@@ -133,6 +137,7 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
           members: state.teams[slot].members.map((m, i) =>
             i === memberIndex && m ? { ...m, artifactPlan: plan } : m,
           ) as CollectionTeamMembers,
+          updatedAt: nowTimestamp(),
         },
       },
     }));
@@ -145,6 +150,7 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
         [slot]: {
           ...state.teams[slot],
           members: [null, null, null, null],
+          updatedAt: nowTimestamp(),
         },
       },
     }));
@@ -154,7 +160,7 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
     set((state) => ({
       teams: {
         ...state.teams,
-        [slot]: { ...state.teams[slot], name },
+        [slot]: { ...state.teams[slot], name, updatedAt: nowTimestamp() },
       },
     }));
   },

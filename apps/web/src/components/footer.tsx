@@ -3,7 +3,7 @@
 
 import { GAME_DATA_VERSION } from '@genshin/game-data';
 import type { JSX } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import { Container } from '@/components/container';
 import { useAuth } from '@/features/auth';
@@ -82,6 +82,16 @@ export function Footer(): JSX.Element {
               >
                 GitHub
               </a>
+            </li>
+            <li>
+              <Link to="/privacy" className="underline-offset-4 hover:underline">
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <Link to="/terms" className="underline-offset-4 hover:underline">
+                Terms of Service
+              </Link>
             </li>
           </ul>
         </nav>
