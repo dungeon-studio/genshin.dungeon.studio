@@ -83,7 +83,7 @@ The API is available at `http://localhost:8080`. See [apps/api/Dockerfile](apps/
 
 ### Quality checks overview
 
-Pre-commit enforces formatting, linting, documentation, secrets, and hygiene checks on every commit and on pull requests. If checks fail, fix the issues—see the Code quality section below for guidance.
+Pre-commit enforces formatting, linting, documentation, and hygiene checks on every commit and on pull requests. If checks fail, fix the issues—see the Code quality section below for guidance.
 
 ### Quality gate ownership
 
@@ -91,6 +91,7 @@ Pre-commit enforces formatting, linting, documentation, secrets, and hygiene che
 - [.github/workflows/pre-commit.yml](.github/workflows/pre-commit.yml) runs only hooks that can't run in pre-commit.ci.
 - [.github/workflows/ci.yml](.github/workflows/ci.yml) runs build and type check jobs for apps and packages.
 - [.github/workflows/link-check.yml](.github/workflows/link-check.yml) blocks pull requests on broken internal documentation links ([lychee](https://lychee.cli.rs), offline); [.github/workflows/external-link-check.yml](.github/workflows/external-link-check.yml) checks external URLs weekly and reports breakage via a GitHub issue.
+- [.github/workflows/secret-scan.yml](.github/workflows/secret-scan.yml) blocks pull requests that introduce verified secrets ([TruffleHog](https://github.com/trufflesecurity/trufflehog)).
 - Feature work adds tests and enforces them when it introduces testable behavior.
 
 **Commit types**. Use these prefixes in your commit messages:
@@ -121,7 +122,7 @@ Pre-commit hooks automatically enforce key checks, including:
 - **ESLint** - JavaScript/TypeScript linting with automatic fixes when possible
 - CSS linting with Tailwind directives
 - Documentation and config linting for Markdown, YAML, and prose
-- Safety and repository hygiene checks for secrets, merge conflict markers, large files, trailing whitespace, line endings, and YAML/JSON validation
+- Safety and repository hygiene checks for merge conflict markers, large files, trailing whitespace, line endings, and YAML/JSON validation
 - Exact dependency versions via [syncpack](https://jamiemason.github.io/syncpack/): `package.json` dependencies stay pinned with no `^` or `~` ranges. Run `pnpm exec syncpack fix` to pin offenders
 
 Pull requests must pass type checks in [ci.yml](.github/workflows/ci.yml). Run type checks locally before committing when your change affects TypeScript code:
