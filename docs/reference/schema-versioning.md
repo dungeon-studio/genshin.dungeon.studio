@@ -70,7 +70,7 @@ Version numbers appear on every exported type—there's no unversioned
 
 ---
 
-## Implementation: Browser storage (zustand persist)
+## Implementation: Local storage (zustand persist)
 
 The `apps/web` stores that use zustand's `persist` middleware version their
 snapshots the same way, without Verzod—`persist` owns version dispatch. Each
@@ -82,15 +82,16 @@ user re-merges from the server afterward, so a dropped local record is never a
 real loss.
 
 The committed snapshots live under `apps/web/schema-snapshots/{store}/v{n}.json`,
-keyed by the `persist` store name. Each snapshots the **per-record entry**, not
-the whole-store blob—jsoncompat can't see into a `Record` value
+keyed by the `persist` store name. Each captures the **per-record entry**, not
+the whole-store blob: jsoncompat can't see into a `Record` value
 (`additionalProperties`), so gating the wrapper would leave the entry fields
 unchecked. This matches the Firestore side, which snapshots one document rather
-than the collection. They regenerate from their Zod source through the same
-`schemas:export` drift hook, and the same base-branch widening check
-(`apps/api/scripts/check-schema-compat.ts`, run in CI) scans both the Firestore
-and the browser-storage snapshot roots—a released version's schema may only
-widen.
+than the collection.
+
+The snapshots regenerate from their Zod source through the `schemas:export` drift
+hook. The base-branch widening check (`apps/api/scripts/check-schema-compat.ts`,
+run in CI) scans the Firestore and local-storage snapshot roots alike: a released
+version's schema may only widen.
 
 ---
 
@@ -161,9 +162,6 @@ stamp. Lifecycle:
 
 - **Old-version read metrics.** No instrumentation counts traversals of `up()`
   paths, so retiring a version safely requires a manual audit of the medium.
-
-- **Breaking-change detection in CI.** Nothing blocks a PR that narrows a Zod
-  schema in a way that rejects previously valid payloads.
 
 ---
 
