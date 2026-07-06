@@ -6,6 +6,7 @@ import { CircleHelp } from 'lucide-react';
 import type { JSX } from 'react';
 
 import { ItemSummary } from '@/components/item-summary';
+import { ThemedIcon } from '@/components/themed-icon';
 import { cn } from '@/lib/utils';
 import { getWeaponTypeIconPath } from '@/lib/weapon-types';
 
@@ -30,24 +31,12 @@ export function WeaponSummary({
   const dimIcon = !weapon || dimmed;
 
   const icon = iconType ? (
-    <>
-      <img
-        src={getWeaponTypeIconPath(iconType, 'light')}
-        alt=""
-        aria-hidden="true"
-        loading="lazy"
-        decoding="async"
-        className={cn('h-10 w-10 shrink-0 dark:hidden', dimIcon && 'opacity-30')}
-      />
-      <img
-        src={getWeaponTypeIconPath(iconType, 'dark')}
-        alt=""
-        aria-hidden="true"
-        loading="lazy"
-        decoding="async"
-        className={cn('hidden h-10 w-10 shrink-0 dark:block', dimIcon && 'opacity-30')}
-      />
-    </>
+    <ThemedIcon
+      lightSrc={getWeaponTypeIconPath(iconType, 'light')}
+      darkSrc={getWeaponTypeIconPath(iconType, 'dark')}
+      alt=""
+      className={cn('h-10 w-10 shrink-0', dimIcon && 'opacity-30')}
+    />
   ) : (
     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground opacity-30">
       <CircleHelp className="h-5 w-5" aria-hidden="true" focusable={false} />

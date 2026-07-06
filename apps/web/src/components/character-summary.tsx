@@ -6,6 +6,7 @@ import { CircleHelp } from 'lucide-react';
 import type { JSX } from 'react';
 
 import { ItemSummary } from '@/components/item-summary';
+import { ThemedIcon } from '@/components/themed-icon';
 import { getElementIconPath } from '@/lib/elements';
 import { cn } from '@/lib/utils';
 
@@ -19,22 +20,12 @@ export function CharacterSummary({
   dimmed = false,
 }: CharacterSummaryProps): JSX.Element {
   const icon = character ? (
-    <>
-      <img
-        src={getElementIconPath(character.element, 'light')}
-        alt={character.element}
-        loading="lazy"
-        decoding="async"
-        className={cn('h-10 w-10 shrink-0 dark:hidden', dimmed && 'opacity-30')}
-      />
-      <img
-        src={getElementIconPath(character.element, 'dark')}
-        alt={character.element}
-        loading="lazy"
-        decoding="async"
-        className={cn('hidden h-10 w-10 shrink-0 dark:block', dimmed && 'opacity-30')}
-      />
-    </>
+    <ThemedIcon
+      lightSrc={getElementIconPath(character.element, 'light')}
+      darkSrc={getElementIconPath(character.element, 'dark')}
+      alt={character.element}
+      className={cn('h-10 w-10 shrink-0', dimmed && 'opacity-30')}
+    />
   ) : (
     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground opacity-30">
       <CircleHelp className="h-5 w-5" aria-hidden="true" focusable={false} />
