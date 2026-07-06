@@ -8,7 +8,7 @@ import { Trash2 } from 'lucide-react';
 import type { JSX } from 'react';
 import { useState } from 'react';
 
-import { CharacterSummary } from '@/components/character-summary';
+import { CharacterSummary } from '@/components/summaries/character-summary';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   ELEMENT_BORDER_COLORS,

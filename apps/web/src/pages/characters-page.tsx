@@ -7,7 +7,7 @@ import { Loader2 } from 'lucide-react';
 import type { JSX } from 'react';
 import { useMemo, useState } from 'react';
 
-import { Container } from '@/components/container';
+import { Container } from '@/components/chrome/container';
 import { CharacterCard } from '@/features/collection/characters/character-card';
 import { CharacterFilters } from '@/features/collection/characters/character-filters';
 import type { CharacterFilterState } from '@/features/collection/characters/filtering';

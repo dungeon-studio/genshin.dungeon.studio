@@ -9,7 +9,7 @@ import type { JSX } from 'react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { CharacterSummary } from '@/components/character-summary';
+import { CharacterSummary } from '@/components/summaries/character-summary';
 import { Button } from '@/components/ui/button';
 import { CharacterFilters } from '@/features/collection/characters/character-filters';
 import type { CharacterFilterState } from '@/features/collection/characters/filtering';
