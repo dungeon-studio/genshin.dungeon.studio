@@ -69,24 +69,34 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     storeSetWeapons(apiWeapons);
   }, [apiWeapons, storeSetWeapons]);
 
-  const addWeapon = useCallback(
-    (weaponId: Weapon['id']) => {
-      if (!isAuthenticated) return;
-
+  const runAdd = useCallback(
+    (weaponId: Weapon['id'], onSettled?: () => void) => {
       addWeaponApi(weaponId, {
         onSuccess: applyMutationResult,
         onError: () => {
           toast.error('Failed to add weapon.');
         },
+        onSettled,
       });
     },
-    [isAuthenticated, addWeaponApi, applyMutationResult],
+    [addWeaponApi, applyMutationResult],
   );
 
-  // Weapon instances are keyed by a server-generated id, so an add cannot be
-  // reflected in the store until the POST resolves. Tracking in-flight ensures
-  // per weapon id closes the window where rapid clicks on an unowned weapon
-  // would each auto-create an instance before the first one lands.
+  // Explicitly add another instance of a weapon (e.g. the sidebar's
+  // "add another"); each call creates a new instance.
+  const addWeapon = useCallback(
+    (weaponId: Weapon['id']) => {
+      if (!isAuthenticated) return;
+      runAdd(weaponId);
+    },
+    [isAuthenticated, runAdd],
+  );
+
+  // Guarantee at least one instance exists, idempotently. Weapon instances are
+  // keyed by a server-generated id, so an add cannot be reflected in the store
+  // until the POST resolves. Tracking in-flight ensures per weapon id closes the
+  // window where rapid clicks on an unowned weapon would each auto-create an
+  // instance before the first one lands.
   const pendingEnsures = useRef<Set<Weapon['id']>>(new Set());
 
   const ensureWeapon = useCallback(
@@ -99,17 +109,11 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
       if (alreadyOwned || pendingEnsures.current.has(weaponId)) return;
 
       pendingEnsures.current.add(weaponId);
-      addWeaponApi(weaponId, {
-        onSuccess: applyMutationResult,
-        onError: () => {
-          toast.error('Failed to add weapon.');
-        },
-        onSettled: () => {
-          pendingEnsures.current.delete(weaponId);
-        },
+      runAdd(weaponId, () => {
+        pendingEnsures.current.delete(weaponId);
       });
     },
-    [isAuthenticated, addWeaponApi, applyMutationResult],
+    [isAuthenticated, runAdd],
   );
 
   const removeWeapon = useCallback(
