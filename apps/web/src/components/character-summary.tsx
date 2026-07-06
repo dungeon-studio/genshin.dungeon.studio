@@ -5,6 +5,7 @@ import type { Character } from '@genshin/game-data';
 import { CircleHelp } from 'lucide-react';
 import type { JSX } from 'react';
 
+import { ItemSummary } from '@/components/item-summary';
 import { getElementIconPath } from '@/lib/elements';
 import { cn } from '@/lib/utils';
 
@@ -17,21 +18,7 @@ export function CharacterSummary({
   character,
   dimmed = false,
 }: CharacterSummaryProps): JSX.Element {
-  if (!character) {
-    return (
-      <>
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground opacity-30">
-          <CircleHelp className="h-5 w-5" aria-hidden="true" focusable={false} />
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-muted-foreground">No character</p>
-        </div>
-      </>
-    );
-  }
-
-  return (
+  const icon = character ? (
     <>
       <img
         src={getElementIconPath(character.element, 'light')}
@@ -47,17 +34,20 @@ export function CharacterSummary({
         decoding="async"
         className={cn('hidden h-10 w-10 shrink-0 dark:block', dimmed && 'opacity-30')}
       />
-
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-card-foreground">{character.name}</p>
-        <p className="truncate text-xs text-muted-foreground">
-          <span className="text-geo-dark" aria-hidden="true">
-            {character.rarity}★
-          </span>
-          <span className="sr-only">{character.rarity}-star</span>
-          {` · ${character.weaponType} · ${character.region}`}
-        </p>
-      </div>
     </>
+  ) : (
+    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground opacity-30">
+      <CircleHelp className="h-5 w-5" aria-hidden="true" focusable={false} />
+    </div>
+  );
+
+  return (
+    <ItemSummary
+      icon={icon}
+      name={character?.name}
+      rarity={character?.rarity}
+      metadata={character && `${character.weaponType} · ${character.region}`}
+      emptyLabel="No character"
+    />
   );
 }
