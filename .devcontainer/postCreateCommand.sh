@@ -23,9 +23,10 @@ corepack install
 # ---------------------------------------------------------------------------
 step "Installing Google Cloud SDK"
 
-curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg && \
+curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor --batch --yes -o /usr/share/keyrings/cloud.google.gpg && \
 echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list && \
-sudo apt-get update && sudo apt-get install -y google-cloud-sdk
+sudo DEBIAN_FRONTEND=noninteractive apt-get update && \
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y google-cloud-sdk
 
 # ---------------------------------------------------------------------------
 # 3. Project dependencies
