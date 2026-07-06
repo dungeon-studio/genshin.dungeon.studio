@@ -70,12 +70,15 @@ export const teamPutRequestV1 = {
             minLength: 1,
             description: 'Desired main stat for Circlet of Logos',
           },
-          sets: {
-            type: 'array',
-            items: { type: 'string', minLength: 1 },
-            minItems: 1,
-            maxItems: 2,
-            description: '1-2 artifact set IDs from game data',
+          primarySetId: {
+            type: 'string',
+            minLength: 1,
+            description: 'Primary artifact set ID: a 4-piece, or the first half of a 2+2 split',
+          },
+          secondarySetId: {
+            type: 'string',
+            minLength: 1,
+            description: 'Second 2-piece set ID for a 2+2 split',
           },
           priorityMinorAffixes: {
             type: 'array',

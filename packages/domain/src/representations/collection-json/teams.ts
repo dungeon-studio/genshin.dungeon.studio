@@ -78,10 +78,17 @@ function deserialiseArtifactPlan(value: unknown): ArtifactPlan {
       );
     }
   }
-  for (const field of ['sets', 'priorityMinorAffixes', 'secondaryMinorAffixes'] as const) {
+  for (const field of ['priorityMinorAffixes', 'secondaryMinorAffixes'] as const) {
     if (!Array.isArray(plan[field])) {
       throw new TypeError(
         `artifactPlan.${field} must be an array, got: ${JSON.stringify(plan[field])}`,
+      );
+    }
+  }
+  for (const field of ['primarySetId', 'secondarySetId'] as const) {
+    if (plan[field] !== undefined && typeof plan[field] !== 'string') {
+      throw new TypeError(
+        `artifactPlan.${field} must be a string, got: ${JSON.stringify(plan[field])}`,
       );
     }
   }

@@ -71,7 +71,7 @@ describe('team serialisation round-trip', () => {
             sands: 'ATK Percentage',
             goblet: 'Hydro DMG Bonus',
             circlet: 'CRIT Rate',
-            sets: ['aubade-of-morningstar-and-moon'],
+            primarySetId: 'aubade-of-morningstar-and-moon',
             priorityMinorAffixes: ['CRIT Rate', 'CRIT DMG'],
             secondaryMinorAffixes: ['ATK Percentage'],
           },

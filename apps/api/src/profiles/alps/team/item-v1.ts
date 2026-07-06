@@ -78,10 +78,17 @@ export const teamItemV1 = {
                   },
                 },
                 {
-                  id: 'sets',
+                  id: 'primarySetId',
                   type: 'semantic',
                   doc: {
-                    value: '1-2 artifact set IDs from game data',
+                    value: 'Primary artifact set ID: a 4-piece, or the first half of a 2+2 split',
+                  },
+                },
+                {
+                  id: 'secondarySetId',
+                  type: 'semantic',
+                  doc: {
+                    value: 'Second 2-piece set ID for a 2+2 split',
                   },
                 },
                 {

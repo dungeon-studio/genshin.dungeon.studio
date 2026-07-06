@@ -67,7 +67,11 @@ export function ArtifactPlanner({ plan, onChange }: ArtifactPlannerProps): JSX.E
           onChange={(value) => updatePlan({ circlet: value as CircletMainAffix | undefined })}
         />
 
-        <SetConfiguration sets={plan?.sets} onChange={(sets) => updatePlan({ sets })} />
+        <SetConfiguration
+          primarySetId={plan?.primarySetId}
+          secondarySetId={plan?.secondarySetId}
+          onChange={updatePlan}
+        />
 
         <PrioritySubstats
           label="Priority substats"
@@ -119,33 +123,30 @@ function MainAffixSelector({
 }
 
 function SetConfiguration({
-  sets,
+  primarySetId,
+  secondarySetId,
   onChange,
 }: {
-  sets: ArtifactPlan['sets'] | undefined;
-  onChange: (sets: ArtifactPlan['sets'] | undefined) => void;
+  primarySetId: ArtifactPlan['primarySetId'];
+  secondarySetId: ArtifactPlan['secondarySetId'];
+  onChange: (fields: Pick<ArtifactPlan, 'primarySetId' | 'secondarySetId'>) => void;
 }) {
-  const handleFirstChange = (setId: ArtifactSet['id']) => {
-    if (sets && sets.length === 2) {
-      onChange([setId, sets[1]]);
-    } else {
-      onChange([setId]);
-    }
+  const handlePrimaryChange = (setId: ArtifactSet['id']) => {
+    onChange({ primarySetId: setId, secondarySetId });
   };
 
-  const handleSecondChange = (setId: ArtifactSet['id']) => {
-    if (sets === undefined) return;
-    onChange([sets[0], setId]);
+  const handleSecondaryChange = (setId: ArtifactSet['id']) => {
+    onChange({ primarySetId, secondarySetId: setId });
   };
 
-  const handleClearSecond = () => {
-    if (sets) {
-      onChange([sets[0]]);
-    }
+  // Clearing the primary set drops the secondary too: a 2-piece split has no
+  // meaning without a primary half.
+  const handleClearPrimary = () => {
+    onChange({ primarySetId: undefined, secondarySetId: undefined });
   };
 
-  const handleClearFirst = () => {
-    onChange(undefined);
+  const handleClearSecondary = () => {
+    onChange({ primarySetId, secondarySetId: undefined });
   };
 
   return (
@@ -154,17 +155,17 @@ function SetConfiguration({
 
       <ArtifactSetSearch
         label="Search artifact set..."
-        value={sets?.[0]}
-        onChange={handleFirstChange}
-        onClear={sets?.[0] ? handleClearFirst : undefined}
+        value={primarySetId}
+        onChange={handlePrimaryChange}
+        onClear={primarySetId ? handleClearPrimary : undefined}
       />
 
-      {sets && sets.length >= 1 && (
+      {primarySetId && (
         <ArtifactSetSearch
           label="Optional second 2-piece set..."
-          value={sets?.[1]}
-          onChange={handleSecondChange}
-          onClear={sets?.[1] ? handleClearSecond : undefined}
+          value={secondarySetId}
+          onChange={handleSecondaryChange}
+          onClear={secondarySetId ? handleClearSecondary : undefined}
         />
       )}
     </div>

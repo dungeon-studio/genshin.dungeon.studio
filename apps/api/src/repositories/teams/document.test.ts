@@ -109,6 +109,44 @@ describe('fromDocument', () => {
     expect(team.members[0]?.artifactPlan?.priorityMinorAffixes).toEqual(['crit-rate']);
   });
 
+  it('migrates artifactPlan.sets → primarySetId/secondarySetId in v1 documents', () => {
+    const team = fromDocument(
+      1,
+      makeV1Document({
+        members: [
+          {
+            characterId: 'columbina',
+            artifactPlan: {
+              sets: ['crimson-witch-of-flames', 'aubade-of-morningstar-and-moon'],
+            },
+          },
+          null,
+          null,
+          null,
+        ],
+      }),
+    );
+    expect(team.members[0]?.artifactPlan?.primarySetId).toBe('crimson-witch-of-flames');
+    expect(team.members[0]?.artifactPlan?.secondarySetId).toBe('aubade-of-morningstar-and-moon');
+    expect(team.members[0]?.artifactPlan).not.toHaveProperty('sets');
+  });
+
+  it('migrates a single-set v1 plan to primarySetId only', () => {
+    const team = fromDocument(
+      1,
+      makeV1Document({
+        members: [
+          { characterId: 'columbina', artifactPlan: { sets: ['crimson-witch-of-flames'] } },
+          null,
+          null,
+          null,
+        ],
+      }),
+    );
+    expect(team.members[0]?.artifactPlan?.primarySetId).toBe('crimson-witch-of-flames');
+    expect(team.members[0]?.artifactPlan).not.toHaveProperty('secondarySetId');
+  });
+
   it('throws for too many members', () => {
     expect(() =>
       fromDocument(1, makeV1Document({ members: [null, null, null, null, null] })),

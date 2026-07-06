@@ -25,8 +25,10 @@ export interface ArtifactPlan {
   goblet?: GobletMainAffix;
   /** Desired main affix for Circlet of Logos */
   circlet?: CircletMainAffix;
-  /** 1–2 artifact set IDs from game-data */
-  sets?: [ArtifactSet['id']] | [ArtifactSet['id'], ArtifactSet['id']];
+  /** Primary artifact set: a 4-piece, or the first half of a 2+2 split */
+  primarySetId?: ArtifactSet['id'];
+  /** Second 2-piece set for a 2+2 split; only meaningful alongside primarySetId */
+  secondarySetId?: ArtifactSet['id'];
   /** 0–3 priority minor affixes to prioritize */
   priorityMinorAffixes?: ArtifactMinorAffix[];
   /** 0–3 secondary minor affixes (must be disjoint from priorityMinorAffixes) */
