@@ -7,7 +7,7 @@
 import type { JSX } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Container } from '@/components/container';
+import { Container } from '@/components/chrome/container';
 
 const EFFECTIVE_DATE = '3 July 2026';
 const GITHUB_REPO = 'https://github.com/dungeon-studio/genshin.dungeon.studio';

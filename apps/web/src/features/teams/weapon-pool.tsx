@@ -14,8 +14,8 @@ import type { JSX } from 'react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { WeaponSummary } from '@/components/summaries/weapon-summary';
 import { Button } from '@/components/ui/button';
-import { WeaponSummary } from '@/components/weapon-summary';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';

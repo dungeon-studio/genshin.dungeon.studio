@@ -10,11 +10,11 @@ import type {
 import { getCharacterById } from '@genshin/game-data';
 import type { JSX } from 'react';
 
-import { ArtifactPlanner } from '@/components/artifact-planner';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { elementBorderClass } from '@/lib/element-styles';
 import { cn } from '@/lib/utils';
 
+import { ArtifactPlanner } from './artifact-planner';
 import { TeamMemberSummary } from './team-member-summary';
 
 interface TeamMemberPlannerProps {

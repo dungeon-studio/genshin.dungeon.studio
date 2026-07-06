@@ -4,8 +4,8 @@
 import type { JSX } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Container } from '@/components/container';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { Container } from '@/components/chrome/container';
+import { ThemeToggle } from '@/components/chrome/theme-toggle';
 import { LoginButton, LogoutButton, useAuth } from '@/features/auth';
 
 export function Header(): JSX.Element {

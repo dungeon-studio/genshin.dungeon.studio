@@ -9,7 +9,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import { Container } from '@/components/container';
+import { Container } from '@/components/chrome/container';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';

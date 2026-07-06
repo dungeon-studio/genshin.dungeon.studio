@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { JSX } from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
-import { Layout } from './components/layout';
+import { Layout } from './components/chrome/layout';
 import { Toaster } from './components/ui/sonner';
 import { AuthProvider } from './features/auth';
 import { CharactersPage } from './pages/characters-page';
