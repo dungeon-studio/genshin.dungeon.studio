@@ -4,7 +4,7 @@
 import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
 import { isValidRefinementLevel } from '@genshin/domain';
 import type { Weapon } from '@genshin/game-data';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
 import { useAuth } from '@/features/auth/use-auth';
@@ -21,6 +21,7 @@ import { useWeaponCollectionStore } from './use-weapon-collection-store';
 export interface UseWeaponCollectionResult {
   weapons: Record<CollectionWeaponId, CollectionWeapon>;
   isAuthenticated: boolean;
+  ensureWeapon: (weaponId: Weapon['id']) => void;
   addWeapon: (weaponId: Weapon['id']) => void;
   removeWeapon: (collectionWeaponId: CollectionWeaponId) => void;
   setRefinementLevel: (collectionWeaponId: CollectionWeaponId, level: number) => void;
@@ -76,6 +77,35 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
         onSuccess: applyMutationResult,
         onError: () => {
           toast.error('Failed to add weapon.');
+        },
+      });
+    },
+    [isAuthenticated, addWeaponApi, applyMutationResult],
+  );
+
+  // Weapon instances are keyed by a server-generated id, so an add cannot be
+  // reflected in the store until the POST resolves. Tracking in-flight ensures
+  // per weapon id closes the window where rapid clicks on an unowned weapon
+  // would each auto-create an instance before the first one lands.
+  const pendingEnsures = useRef<Set<Weapon['id']>>(new Set());
+
+  const ensureWeapon = useCallback(
+    (weaponId: Weapon['id']) => {
+      if (!isAuthenticated) return;
+
+      const alreadyOwned = Object.values(useWeaponCollectionStore.getState().weapons).some(
+        (w) => w.weaponId === weaponId,
+      );
+      if (alreadyOwned || pendingEnsures.current.has(weaponId)) return;
+
+      pendingEnsures.current.add(weaponId);
+      addWeaponApi(weaponId, {
+        onSuccess: applyMutationResult,
+        onError: () => {
+          toast.error('Failed to add weapon.');
+        },
+        onSettled: () => {
+          pendingEnsures.current.delete(weaponId);
         },
       });
     },
@@ -146,6 +176,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   return {
     weapons,
     isAuthenticated,
+    ensureWeapon,
     addWeapon,
     removeWeapon,
     setRefinementLevel,

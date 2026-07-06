@@ -21,6 +21,7 @@ export function WeaponsPage(): JSX.Element {
   const {
     weapons,
     isAuthenticated,
+    ensureWeapon,
     addWeapon,
     removeWeapon,
     setRefinementLevel,
@@ -87,14 +88,10 @@ export function WeaponsPage(): JSX.Element {
         return;
       }
 
-      const hasInstances = (instanceCounts[weaponId] ?? 0) > 0;
-      if (!hasInstances) {
-        addWeapon(weaponId);
-      }
-
+      ensureWeapon(weaponId);
       setSelectedWeaponId(weaponId);
     },
-    [selectedWeaponId, isAuthenticated, instanceCounts, addWeapon],
+    [selectedWeaponId, isAuthenticated, ensureWeapon],
   );
 
   const handleAddWeapon = useCallback(

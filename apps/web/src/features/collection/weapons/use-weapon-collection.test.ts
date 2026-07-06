@@ -97,4 +97,53 @@ describe('useWeaponCollection', () => {
     await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(2));
     expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
   });
+
+  it('creates only one instance when ensureWeapon fires repeatedly before the add lands', async () => {
+    let posts = 0;
+    let serverWeapons = weaponsDocument([]);
+    server.use(
+      http.get('http://localhost:8080/api/weapons', () => HttpResponse.json(serverWeapons)),
+      http.post('http://localhost:8080/api/weapons', () => {
+        posts += 1;
+        serverWeapons = weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 1)]);
+        return HttpResponse.json(serverWeapons);
+      }),
+    );
+
+    const { result } = renderAuthed();
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => {
+      result.current.ensureWeapon(WEAPON_ID);
+      result.current.ensureWeapon(WEAPON_ID);
+      result.current.ensureWeapon(WEAPON_ID);
+    });
+
+    await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.weaponId).toBe(WEAPON_ID));
+    expect(posts).toBe(1);
+  });
+
+  it('does not add another instance when the weapon is already owned', async () => {
+    let posts = 0;
+    server.use(
+      http.get('http://localhost:8080/api/weapons', () =>
+        HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 1)])),
+      ),
+      http.post('http://localhost:8080/api/weapons', () => {
+        posts += 1;
+        return HttpResponse.json(
+          weaponsDocument([makeWeapon('weapon-instance-2' as CollectionWeaponId, WEAPON_ID, 1)]),
+        );
+      }),
+    );
+
+    const { result } = renderAuthed();
+    await waitFor(() => expect(result.current.weapons[INSTANCE_ID]).toBeDefined());
+
+    act(() => {
+      result.current.ensureWeapon(WEAPON_ID);
+    });
+
+    expect(posts).toBe(0);
+  });
 });
