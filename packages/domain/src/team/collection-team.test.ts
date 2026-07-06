@@ -3,6 +3,8 @@
 
 import { describe, expect, it } from 'vitest';
 
+import type { ISOTimestamp } from '../iso-timestamp.js';
+import { isISOTimestamp } from '../iso-timestamp.js';
 import type { CollectionTeamMembers, TeamSlot } from './collection-team.js';
 import {
   assertCollectionTeam,
@@ -12,8 +14,6 @@ import {
   MAX_TEAM_MEMBERS,
   TEAM_SLOTS,
 } from './collection-team.js';
-import type { ISOTimestamp } from './iso-timestamp.js';
-import { isISOTimestamp } from './iso-timestamp.js';
 
 const VALID_TIMESTAMP = '2024-01-15T12:00:00Z' as ISOTimestamp;
 

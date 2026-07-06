@@ -3,14 +3,14 @@
 
 import { describe, expect, it } from 'vitest';
 
+import type { ISOTimestamp } from '../iso-timestamp.js';
+import type { UUID } from '../uuid.js';
 import {
   assertCollectionWeapon,
   isValidRefinementLevel,
   MAX_REFINEMENT_LEVEL,
   MIN_REFINEMENT_LEVEL,
 } from './collection-weapon.js';
-import type { ISOTimestamp } from './iso-timestamp.js';
-import type { UUID } from './uuid.js';
 
 const VALID_TIMESTAMP = '2024-01-15T12:00:00Z' as ISOTimestamp;
 
