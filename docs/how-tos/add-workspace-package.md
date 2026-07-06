@@ -54,8 +54,8 @@ closest template.
   Add `test` only once tests exist, along with the `vitest` and
   `@vitest/coverage-v8` dev dependencies and a `vitest.config.ts`.
 
-- [ ] `tsconfig.json`: compiler options plus `include: ["src/**/*"]`. This is
-      the typechecking config, with no shared base to extend.
+- [ ] `tsconfig.json`: compiler options plus `include: ["src/**/*"]` (no shared
+      base to extend).
 - [ ] `tsconfig.build.json`: extends `./tsconfig.json` and adds
       `"exclude": ["src/**/*.test.ts"]`. The `build` script points here so test
       files stay out of `dist`.
@@ -75,8 +75,8 @@ closest template.
 - [ ] The `packages/*` glob in `pnpm-workspace.yaml` already covers a new
       `packages/<name>`. Only a new top-level directory needs a new glob.
 - [ ] In each consuming package, add `"@genshin/<name>": "workspace:*"` under
-      `dependencies`, not `devDependencies`. A runtime import belongs there, and
-      the Docker prune in step 4 keeps `dependencies` and drops everything else.
+      `dependencies`, not `devDependencies` (the Docker prune in step 4 drops
+      `devDependencies`).
 - [ ] Run `pnpm install` and commit the updated `pnpm-lock.yaml`.
 
 ## 3) Add it to continuous integration
@@ -91,10 +91,8 @@ closest template.
     flag: <name>
   ```
 
-  Every entry runs the same `node-ci` composite action, which runs
-  typechecking, tests with coverage, and the build. A package with no `test`
-  script fails that step, so add tests before adding the matrix entry (or the
-  entry once the tests land).
+  Every entry runs the `typecheck`, `test`, and `build` tasks. Add the entry
+  only once the package has a `test` script, or the `test` task fails.
 
 - [ ] In `codecov.yml`, add both a flag and a component:
 
