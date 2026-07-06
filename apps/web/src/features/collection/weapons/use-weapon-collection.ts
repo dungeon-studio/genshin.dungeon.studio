@@ -82,8 +82,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     [addWeaponApi, applyMutationResult],
   );
 
-  // Explicitly add another instance of a weapon (e.g. the sidebar's
-  // "add another"); each call creates a new instance.
+  // Additive: every call creates a new instance. Contrast ensureWeapon.
   const addWeapon = useCallback(
     (weaponId: Weapon['id']) => {
       if (!isAuthenticated) return;
@@ -92,11 +91,9 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     [isAuthenticated, runAdd],
   );
 
-  // Guarantee at least one instance exists, idempotently. Weapon instances are
-  // keyed by a server-generated id, so an add cannot be reflected in the store
-  // until the POST resolves. Tracking in-flight ensures per weapon id closes the
-  // window where rapid clicks on an unowned weapon would each auto-create an
-  // instance before the first one lands.
+  // Weapon instances carry a server-generated id, so an add can't reach the
+  // store until the POST resolves. Tracking in-flight adds per weapon id closes
+  // the window where rapid clicks would each auto-create an instance.
   const pendingEnsures = useRef<Set<Weapon['id']>>(new Set());
 
   const ensureWeapon = useCallback(
