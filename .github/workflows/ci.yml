@@ -105,6 +105,39 @@ jobs:
           SCHEMA_COMPAT_BASE: origin/${{ github.base_ref }}
         run: pnpm --filter @genshin/api schemas:check
 
+  # Smoke-tests the local dev stack: `pnpm dev` must bring up the web server,
+  # API server, and Firebase emulators. Guards against a regression (missing
+  # dependency, broken import, port conflict) silently breaking `pnpm dev`.
+  # Separate from the per-package matrix because it exercises the whole stack
+  # end-to-end rather than one workspace.
+  dev-smoke:
+    name: Dev Smoke Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      # The Firebase emulators run on the JVM.
+      - name: Set up Java
+        uses: actions/setup-java@1bcf9fb12cf4aa7d266a90ae39939e61372fe520 # v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      # `pnpm dev` resolves `@genshin/*` to each package's `dist/`, and the
+      # `dev` turbo task has no `^build`, so the libraries must be built first.
+      - name: Build workspace libraries
+        run: pnpm turbo run build --filter='./packages/*'
+
+      - name: Verify dev stack starts
+        run: bash scripts/verify-dev.sh
+
 # ---------------------------------------------------------------------------
 # Maintenance notes
 # - Add a new matrix entry under strategy.matrix.include when new apps or
