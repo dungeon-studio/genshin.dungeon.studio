@@ -12,7 +12,7 @@ import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 
 import type { AuthVariables } from '@/middleware/auth.js';
-import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
+import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { firestoreErrorToHttpException } from '@/repositories/firestore-error.js';
 import { alpsProfiles } from '@/routes/alps-profiles.js';
 import { characters } from '@/routes/characters.js';
@@ -27,7 +27,9 @@ const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.me
 
 export const PROBLEM_JSON = { 'Content-Type': 'application/problem+json' };
 
-export const app = new Hono<{ Variables: Partial<AuthVariables> & NegotiatedContentVariables }>();
+export const app = new Hono<{
+  Variables: Partial<AuthVariables> & NegotiatedResponseContentVariables;
+}>();
 
 // Request logging middleware
 app.use('*', logger());
