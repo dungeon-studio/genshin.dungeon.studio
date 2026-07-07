@@ -7,6 +7,7 @@ import { serialiseWeapon, weaponItemHref, weaponRepresentation } from '@genshin/
 import { getWeaponById } from '@genshin/game-data';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import type { FromSchema } from 'json-schema-to-ts';
 
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
@@ -32,14 +33,8 @@ weapons.use('*', auth);
 
 weapons.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: weaponItemV1 }]));
 
-interface CreateWeaponBody {
-  weaponId: string;
-  refinementLevel: number;
-}
-
-interface UpdateWeaponBody {
-  refinementLevel: number;
-}
+type CreateWeaponBody = FromSchema<typeof weaponPostRequestV1.schema>;
+type UpdateWeaponBody = FromSchema<typeof weaponPatchRequestV1.schema>;
 
 // GET /api/weapons — List all weapon instances, optionally filtered by weaponId
 weapons.get('/', async (c) => {
