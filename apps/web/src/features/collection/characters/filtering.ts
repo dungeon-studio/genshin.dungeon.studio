@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 import type { Character, Element, Rarity } from '@genshin/game-data';
-import { compareVersions } from '@genshin/game-data';
 
 export type OwnershipFilter = 'all' | 'owned' | 'unowned';
 export type SortField = 'release' | 'name';
@@ -48,7 +47,7 @@ export function filterCharacters(
     let cmp = 0;
     switch (filters.sortField) {
       case 'release':
-        cmp = compareVersions(a.version, b.version);
+        cmp = a.releaseDate.localeCompare(b.releaseDate);
         if (cmp === 0) {
           cmp = a.name.localeCompare(b.name) || a.id.localeCompare(b.id);
         }
