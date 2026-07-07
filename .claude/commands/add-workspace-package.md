@@ -19,6 +19,7 @@ copies).
 ## Requirements
 
 1. Don't skip the Dockerfile section when the package is a runtime dependency
-   of `apps/api`. A missed COPY fails the Docker build, not CI.
+   of `apps/api`. A missed COPY fails the Docker workflow build that runs on
+   every PR, with an opaque module-resolution error rather than a clear cause.
 2. Copy `packages/validation/` as the closest scaffolding template.
 3. Run the how-to's Verify section before opening a PR.

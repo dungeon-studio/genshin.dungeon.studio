@@ -6,9 +6,10 @@ SPDX-License-Identifier: MIT
 # Add a workspace package
 
 This guide covers the integration points touched when adding a new package
-under `packages/` (or a tool under `tools/`). Miss one and the failure usually
-surfaces far from the change—a CI matrix gap, a Docker build that can't
-resolve the new dependency, an uncovered flag in Codecov.
+under `packages/` (or a tool under `tools/`). Several fail unhelpfully when
+omitted. A forgotten CI matrix entry or Codecov flag leaves the package
+uncovered with CI still green. A missing Dockerfile COPY fails the `apps/api`
+image build on every PR.
 
 Work top to bottom. Each section ends at a committable state.
 
