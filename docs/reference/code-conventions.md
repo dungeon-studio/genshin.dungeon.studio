@@ -9,10 +9,6 @@ Conventions for how code in this repository is named, organized, and documented.
 
 ---
 
-## Source file headers
-
-All source files require SPDX headers per the [REUSE Specification](https://reuse.software/). Use `reuse addheader` or check [REUSE docs](https://reuse.software/tutorial/) for details. For files without comment syntax, see [Add SPDX headers](../how-tos/add-spdx-headers.md).
-
 ## Code comments
 
 For complex logic, decisions, or subtle patterns:

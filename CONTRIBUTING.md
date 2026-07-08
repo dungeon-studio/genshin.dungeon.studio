@@ -108,6 +108,7 @@ Pre-commit hooks automatically enforce key checks, including:
 - Documentation and config linting for Markdown, YAML, and prose
 - Safety and repository hygiene checks for merge conflict markers, large files, trailing whitespace, line endings, and YAML/JSON validation
 - Exact dependency versions via [syncpack](https://jamiemason.github.io/syncpack/): `package.json` dependencies stay pinned with no `^` or `~` ranges. Run `pnpm exec syncpack fix` to pin offenders
+- SPDX license headers via [REUSE](https://reuse.software/): every source file needs one—see [Add SPDX headers](docs/how-tos/add-spdx-headers.md)
 
 Pull requests must pass type checks in [ci.yml](.github/workflows/ci.yml). Run type checks locally before committing when your change affects TypeScript code:
 
@@ -115,7 +116,7 @@ Pull requests must pass type checks in [ci.yml](.github/workflows/ci.yml). Run t
 pnpm typecheck
 ```
 
-For code conventions—source file headers, comments, documentation strategy, naming, shared types, test utilities, and platform compatibility—see [Code conventions](docs/reference/code-conventions.md).
+For code conventions—comments, documentation strategy, naming, shared types, test utilities, and platform compatibility—see [Code conventions](docs/reference/code-conventions.md).
 
 ---
 
