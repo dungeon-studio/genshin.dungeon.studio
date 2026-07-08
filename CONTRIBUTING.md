@@ -178,7 +178,8 @@ For step-by-step instructions and technical details:
 
 - [Manual Setup Guide](docs/how-tos/manual-setup.md): Development environment setup without DevContainers
 - [Build the API Docker image](docs/how-tos/build-api-docker-image.md): Build and run the `apps/api` container locally
-- [Add Terraform Environment](docs/how-tos/add-terraform-environment.md): Infrastructure branch flow plus bootstrap, scaffold, lock file, and workflow updates for new environments
+- [Add Terraform Environment](docs/how-tos/add-terraform-environment.md): Bootstrap, scaffold, lock file, and workflow updates for new environments
+- [Infrastructure branch flow](docs/reference/infrastructure-branch-flow.md): How branches map to environments and Terraform actions
 - [Code conventions](docs/reference/code-conventions.md): Naming, shared types, test utilities, documentation strategy, and platform compatibility
 - [REST API conventions](docs/reference/rest-api-conventions.md): Route design, method semantics, status codes, error shape, and pagination
 

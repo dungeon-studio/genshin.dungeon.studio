@@ -7,25 +7,7 @@ SPDX-License-Identifier: MIT
 
 This guide explains how to add a new infrastructure environment such as `staging` to this repository.
 
----
-
-## Infrastructure branch flow
-
-Infrastructure automation follows this branch strategy:
-
-- `develop`: integration branch
-- `release/*`: release-train branches cut from `develop`
-- `main`: long-term release target branch, used when production flow is active
-
-Terraform workflow routing:
-
-- push to `develop`: applies `core` then `dev`
-- push to `release/*`: applies `core` then `staging`
-- pull requests to `develop`, `release/*`, and `main`: run Terraform plan checks
-
-When creating release branches, derive the name from the root `package.json` version using SemVer2 context and always include both the release date and short hash token, for example:
-
-- `release/0.1.0-20260221.d24af0f`
+For how branches map to environments and Terraform actions, see [Infrastructure branch flow](../reference/infrastructure-branch-flow.md).
 
 ---
 
@@ -93,7 +75,7 @@ Don't commit `.terraform/` directories.
 ## 5) Align GitHub workflows
 
 - In `.github/workflows/terraform-plan.yml`, copy one matrix entry and set `<environment>` + RO secret.
-- In `.github/workflows/terraform-apply.yml`, copy one job and set job id, `with.environment`, and RW secret.
+- In `.github/workflows/terraform-apply.yml`, copy one job and set job id, `with.environment`, and RW secret. Match the routing in [Infrastructure branch flow](../reference/infrastructure-branch-flow.md).
 - Keep `.github/workflows/terraform-apply-reusable.yml` unchanged.
 
 ---
