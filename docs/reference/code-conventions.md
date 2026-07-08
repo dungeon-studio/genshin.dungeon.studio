@@ -11,12 +11,18 @@ Conventions for how code in this repository is named, organized, and documented.
 
 ## Code comments
 
-For complex logic, decisions, or subtle patterns:
+Comments are the exception, not the rule. Don't restate what the code does—the reader can read it. Earn each comment by capturing what the code can't show: the _why_ behind it.
+
+Warranted cases:
 
 - Decisions and trade-offs—why you chose this approach
 - Workarounds—temporary fixes with issue references
 - Performance-sensitive code—explain the optimization
 - External dependencies—integration quirks or API specifics
+
+## Documentation strings
+
+Reach for a documentation string when a name alone can't convey a module or function's purpose or contract. State what it's for and when to use it over an alternative. Inline comments explain _why_ a line works. A documentation string explains _what_ an interface is for.
 
 ## Documentation strategy
 
