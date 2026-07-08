@@ -25,7 +25,7 @@ beforeAll(() => {
     throw googleError(Status.PERMISSION_DENIED);
   });
   app.get('/__test/http-exception', () => {
-    throw new HTTPException(429, { message: 'rate limited' });
+    throw new HTTPException(503, { message: 'service unavailable' });
   });
 });
 
@@ -48,9 +48,9 @@ describe('onError Retry-After header', () => {
     expect(res.headers.get('Retry-After')).toBeNull();
   });
 
-  it('omits Retry-After on a non-Firestore HTTP exception', async () => {
+  it('sets Retry-After on a retryable status regardless of source', async () => {
     const res = await app.request('/__test/http-exception');
-    expect(res.status).toBe(429);
-    expect(res.headers.get('Retry-After')).toBeNull();
+    expect(res.status).toBe(503);
+    expect(res.headers.get('Retry-After')).toBe('5');
   });
 });

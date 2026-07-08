@@ -11,12 +11,10 @@ import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 
+import { retryAfterSeconds } from '@/http/retry-after.js';
 import type { AuthVariables } from '@/middleware/auth.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
-import {
-  firestoreErrorToHttpException,
-  retryAfterSeconds,
-} from '@/repositories/firestore-error.js';
+import { firestoreErrorToHttpException } from '@/repositories/firestore-error.js';
 import { alpsProfiles } from '@/routes/alps-profiles.js';
 import { characters } from '@/routes/characters.js';
 import { jsonSchemaProfiles } from '@/routes/json-schema-profiles.js';
@@ -57,10 +55,8 @@ app.onError((err, c) => {
 
   if (resolved instanceof HTTPException) {
     const headers: Record<string, string> = { ...PROBLEM_JSON };
-    if (err instanceof GoogleError) {
-      const retryAfter = retryAfterSeconds(resolved.status);
-      if (retryAfter !== undefined) headers['Retry-After'] = String(retryAfter);
-    }
+    const retryAfter = retryAfterSeconds(resolved.status);
+    if (retryAfter !== undefined) headers['Retry-After'] = String(retryAfter);
     return c.json(
       {
         type: 'about:blank',
