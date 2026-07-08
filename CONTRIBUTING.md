@@ -65,25 +65,9 @@ pnpm dev
 > [Configure Firestore credentials](docs/how-tos/configure-firestore-credentials.md)
 > for setup instructions.
 
-### Building and running the Docker image
-
-To build the API Docker image locally:
-
-```bash
-docker build -f apps/api/Dockerfile -t genshin-api:local .
-```
-
-To run it:
-
-```bash
-docker run -p 8080:8080 genshin-api:local
-```
-
-The API is available at `http://localhost:8080`. See [apps/api/Dockerfile](apps/api/Dockerfile) for build details and [.github/workflows/](.github/workflows/) for CI/CD pipeline information.
-
 ### Quality checks overview
 
-Pre-commit enforces formatting, linting, documentation, and hygiene checks on every commit and on pull requests. If checks fail, fix the issues—see the Code quality section below for guidance.
+Pre-commit enforces formatting, linting, documentation, and hygiene checks on every commit and on pull requests. If checks fail, fix the issues—see [Code quality](#code-quality) for the tools involved.
 
 ### Quality gate ownership
 
@@ -131,42 +115,7 @@ Pull requests must pass type checks in [ci.yml](.github/workflows/ci.yml). Run t
 pnpm typecheck
 ```
 
-### Source file headers
-
-All source files require SPDX headers per the [REUSE Specification](https://reuse.software/). Use `reuse addheader` or check [REUSE docs](https://reuse.software/tutorial/) for details.
-
-### Code comments
-
-For complex logic, decisions, or subtle patterns:
-
-- Decisions and trade-offs—why you chose this approach
-- Workarounds—temporary fixes with issue references
-- Performance-sensitive code—explain the optimization
-- External dependencies—integration quirks or API specifics
-
-### Documentation strategy
-
-When documenting decisions or conventions, prefer the highest-priority location that fits:
-
-1. **Inline comments**: explain _why_ code works a certain way.
-2. **Documentation strings**: explain module or function purpose when the name isn't sufficient.
-3. **`docs/`**: task-specific how-tos, references, and explanations following the [Diátaxis](https://diataxis.fr/) framework.
-4. **`CONTRIBUTING.md`**: high-level human workflow guidance and project conventions.
-5. **`.github/copilot-instructions.md`**: AI-specific decision rules.
-
-Avoid duplicating the same guidance across multiple locations. Place it once at the most appropriate level and link to it from others.
-
-### Naming conventions
-
-Use descriptive, specific names for files and modules. Avoid generic names like "helpers." For example, name a shared test auth module `auth-requests.ts`, not `helpers.ts`.
-
-### Shared types
-
-Branded types in `packages/domain/` each get their own file (for example, `uuid.ts`, `iso-timestamp.ts`). Export both the type and any related validation functions from the same file.
-
-### Test utilities
-
-Shared API test utilities live in `apps/api/src/test/` with descriptive file names. The build excludes this directory via `tsconfig.build.json`.
+For code conventions—source file headers, comments, documentation strategy, naming, shared types, test utilities, and platform compatibility—see [Code conventions](docs/reference/code-conventions.md).
 
 ---
 
@@ -182,24 +131,6 @@ Shared API test utilities live in `apps/api/src/test/` with descriptive file nam
 ---
 
 ## Pull request workflow
-
-### Branch flow for infrastructure
-
-Infrastructure automation follows this branch strategy:
-
-- `develop`: integration branch
-- `release/*`: release-train branches cut from `develop`
-- `main`: long-term release target branch, used when production flow is active
-
-Current Terraform workflow routing:
-
-- push to `develop`: applies `core` then `dev`
-- push to `release/*`: applies `core` then `staging`
-- pull requests to `develop`, `release/*`, and `main`: run Terraform plan checks
-
-When creating release branches, derive the name from the root `package.json` version using SemVer2 context and always include both the release date and short hash token, for example:
-
-- `release/0.1.0-20260221.d24af0f`
 
 ### Branch naming
 
@@ -241,20 +172,14 @@ When your pull request changes something a user of the deployed app would notice
 
 ---
 
-## Platform compatibility
-
-This project runs on Windows, macOS, and Linux.
-
-- Use Node.js `path` module for paths, not hardcoded `/` or `\`
-- Use cross-platform approaches for file operations
-- Avoid OS-specific environment variables
-
-### Detailed guides
+## Detailed guides
 
 For step-by-step instructions and technical details:
 
 - [Manual Setup Guide](docs/how-tos/manual-setup.md): Development environment setup without DevContainers
-- [Add Terraform Environment](docs/how-tos/add-terraform-environment.md): Bootstrap, scaffold, lock file, and workflow updates for new environments
+- [Build the API Docker image](docs/how-tos/build-api-docker-image.md): Build and run the `apps/api` container locally
+- [Add Terraform Environment](docs/how-tos/add-terraform-environment.md): Infrastructure branch flow plus bootstrap, scaffold, lock file, and workflow updates for new environments
+- [Code conventions](docs/reference/code-conventions.md): Naming, shared types, test utilities, documentation strategy, and platform compatibility
 - [REST API conventions](docs/reference/rest-api-conventions.md): Route design, method semantics, status codes, error shape, and pagination
 
 ---
