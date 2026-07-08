@@ -7,11 +7,9 @@ import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { app } from './app.js';
 
-function googleError(code: Status, statusDetails?: unknown[]): GoogleError {
+function googleError(code: Status): GoogleError {
   const err = new GoogleError('firestore blew up');
   err.code = code;
-  if (statusDetails !== undefined)
-    err.statusDetails = statusDetails as GoogleError['statusDetails'];
   return err;
 }
 
@@ -21,7 +19,7 @@ beforeAll(() => {
     throw googleError(Status.RESOURCE_EXHAUSTED);
   });
   app.get('/__test/unavailable', () => {
-    throw googleError(Status.UNAVAILABLE, [{ retryDelay: { seconds: 12, nanos: 0 } }]);
+    throw googleError(Status.UNAVAILABLE);
   });
   app.get('/__test/permission-denied', () => {
     throw googleError(Status.PERMISSION_DENIED);
@@ -38,10 +36,10 @@ describe('onError Retry-After header', () => {
     expect(res.headers.get('Retry-After')).toBe('30');
   });
 
-  it('forwards the RetryInfo hint on a 503 from a Firestore error', async () => {
+  it('sets Retry-After on a 503 from a Firestore error', async () => {
     const res = await app.request('/__test/unavailable');
     expect(res.status).toBe(503);
-    expect(res.headers.get('Retry-After')).toBe('12');
+    expect(res.headers.get('Retry-After')).toBe('5');
   });
 
   it('omits Retry-After on a non-retryable Firestore error', async () => {

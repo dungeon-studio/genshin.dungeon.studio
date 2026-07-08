@@ -58,7 +58,7 @@ app.onError((err, c) => {
   if (resolved instanceof HTTPException) {
     const headers: Record<string, string> = { ...PROBLEM_JSON };
     if (err instanceof GoogleError) {
-      const retryAfter = retryAfterSeconds(err, resolved.status);
+      const retryAfter = retryAfterSeconds(resolved.status);
       if (retryAfter !== undefined) headers['Retry-After'] = String(retryAfter);
     }
     return c.json(

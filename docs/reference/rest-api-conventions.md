@@ -145,7 +145,7 @@ Transient upstream failures map to status codes clients can retry, each carrying
 | Firestore `RESOURCE_EXHAUSTED` | `429`  | Quota or rate limit exhausted; wait before retrying |
 | Firestore `UNAVAILABLE`        | `503`  | Service momentarily unavailable; retry shortly      |
 
-`Retry-After` is an integer count of seconds ([RFC9110], Section 10.2.3). Its value comes from a retry-delay hint forwarded from the upstream error when present. Firestore surfaces this hint as `google.rpc.RetryInfo` in the gRPC status details. When absent, a per-status default applies: a wider window for quota exhaustion than for a momentarily unavailable service. All other error statuses omit the header.
+`Retry-After` is an integer count of seconds ([RFC9110], Section 10.2.3). Each status above carries a fixed default: a wider window for quota exhaustion than for a momentarily unavailable service. All other error statuses omit the header.
 
 See [RFC9110], Section 10.2.3: <https://www.rfc-editor.org/rfc/rfc9110.html#name-retry-after>
 
