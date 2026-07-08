@@ -6,7 +6,7 @@
  *
  * This interface requires fields that RFC 9457 leaves optional. The shape
  * will be reassessed when content negotiation and representation parsing
- * are implemented (see #518, #520).
+ * are implemented (see #518).
  *
  * @see https://www.rfc-editor.org/rfc/rfc9457
  */
@@ -21,4 +21,6 @@ export interface ProblemDetail {
   detail: string;
   /** A URI reference identifying the specific occurrence. */
   instance?: string;
+  /** Extension members (RFC 9457 §3.2): additional problem-specific fields. */
+  [key: string]: unknown;
 }
