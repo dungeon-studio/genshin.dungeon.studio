@@ -13,7 +13,10 @@ import { logger } from 'hono/logger';
 
 import type { AuthVariables } from '@/middleware/auth.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
-import { firestoreErrorToHttpException } from '@/repositories/firestore-error.js';
+import {
+  firestoreErrorToHttpException,
+  retryAfterSeconds,
+} from '@/repositories/firestore-error.js';
 import { alpsProfiles } from '@/routes/alps-profiles.js';
 import { characters } from '@/routes/characters.js';
 import { jsonSchemaProfiles } from '@/routes/json-schema-profiles.js';
@@ -53,6 +56,11 @@ app.onError((err, c) => {
   const resolved = err instanceof GoogleError ? firestoreErrorToHttpException(err) : err;
 
   if (resolved instanceof HTTPException) {
+    const headers: Record<string, string> = { ...PROBLEM_JSON };
+    if (err instanceof GoogleError) {
+      const retryAfter = retryAfterSeconds(err, resolved.status);
+      if (retryAfter !== undefined) headers['Retry-After'] = String(retryAfter);
+    }
     return c.json(
       {
         type: 'about:blank',
@@ -60,7 +68,7 @@ app.onError((err, c) => {
         status: resolved.status,
         detail: resolved.message,
       } satisfies ProblemDetail,
-      { status: resolved.status, headers: PROBLEM_JSON },
+      { status: resolved.status, headers },
     );
   }
 

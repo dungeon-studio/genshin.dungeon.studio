@@ -136,6 +136,19 @@ Design choices:
 - **Versioning**: the `/health` endpoint carries the API version alongside operational metadata like `status` and `sha`, not the root response. The root handles resource discovery only.
 - **Route file**: the handler lives in `apps/api/src/routes/root.ts`. Mount it after all other routes so it can discover them.
 
+### 13. Retry-After on transient errors
+
+Transient upstream failures map to status codes clients can retry, each carrying a `Retry-After` header that tells clients how long to wait:
+
+| Upstream condition             | Status | Meaning                                             |
+| ------------------------------ | ------ | --------------------------------------------------- |
+| Firestore `RESOURCE_EXHAUSTED` | `429`  | Quota or rate limit exhausted; wait before retrying |
+| Firestore `UNAVAILABLE`        | `503`  | Service momentarily unavailable; retry shortly      |
+
+`Retry-After` is an integer count of seconds ([RFC9110], Section 10.2.3). Its value comes from a retry-delay hint forwarded from the upstream error when present. Firestore surfaces this hint as `google.rpc.RetryInfo` in the gRPC status details. When absent, a per-status default applies: a wider window for quota exhaustion than for a momentarily unavailable service. All other error statuses omit the header.
+
+See [RFC9110], Section 10.2.3: <https://www.rfc-editor.org/rfc/rfc9110.html#name-retry-after>
+
 ## Repository scope
 
 These principles guide route design, method semantics, status code usage, error shape, pagination, authentication header handling, and timestamp format for `apps/api`.
