@@ -28,6 +28,22 @@ runs:
   steps:
     - uses: ./.github/actions/setup-node-pnpm
 
+    # Persist Turborepo's local cache so unchanged workspace packages (most
+    # visibly the shared `^build` deps @genshin/domain and @genshin/game-data)
+    # skip redundant rebuilds across runs. Turbo content-addresses each task by
+    # hashed inputs, so a per-commit key with a prefix restore-key gives the
+    # "restore newest, always save fresh" pattern: the exact key only hits on a
+    # re-run of the same commit, otherwise restore-keys warms the cache from the
+    # leg's previous run. Scoped per matrix leg (flag) to avoid parallel jobs
+    # racing on one key.
+    - name: Cache Turborepo
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+      with:
+        path: .turbo
+        key: ${{ runner.os }}-turbo-${{ inputs.flag }}-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-turbo-${{ inputs.flag }}-
+
     - name: Typecheck
       shell: bash
       env:
