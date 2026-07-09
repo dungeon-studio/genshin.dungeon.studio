@@ -28,6 +28,19 @@ runs:
   steps:
     - uses: ./.github/actions/setup-node-pnpm
 
+    # Persist turbo's local cache so unchanged packages skip rebuilds across
+    # runs. GitHub cache entries are write-once per key, so a stable key would
+    # freeze after the first save; the per-commit key saves a fresh entry each
+    # run while the prefix restore-key restores the leg's most recent one.
+    # Per-leg scoping keeps parallel legs from racing a shared key.
+    - name: Cache Turborepo
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+      with:
+        path: .turbo
+        key: ${{ runner.os }}-turbo-${{ inputs.flag }}-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-turbo-${{ inputs.flag }}-
+
     - name: Typecheck
       shell: bash
       env:
