@@ -34,7 +34,7 @@ runs:
     # run while the prefix restore-key restores the leg's most recent one.
     # Per-leg scoping keeps parallel legs from racing a shared key.
     - name: Cache Turborepo
-      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: .turbo
         key: ${{ runner.os }}-turbo-${{ inputs.flag }}-${{ github.sha }}
@@ -66,7 +66,7 @@ runs:
       run: pnpm turbo run test --filter="$FILTER" -- --coverage
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
         token: ${{ inputs.codecov-token }}
         files: ${{ inputs.coverage-file }}
@@ -74,7 +74,7 @@ runs:
         fail_ci_if_error: false
 
     - name: Upload test results to Codecov
-      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
         token: ${{ inputs.codecov-token }}
         files: ${{ inputs.results-file }}
