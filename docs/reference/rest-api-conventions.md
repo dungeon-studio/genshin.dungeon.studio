@@ -158,7 +158,9 @@ These principles guide route design, method semantics, status code usage, error 
 <!-- vale Vale.Spelling = NO -->
 
 - [Masse2011] Mark Masse. _REST API Design Rulebook_. O'Reilly Media, 2011. ISBN 978-1-4493-1050-9. <https://www.amazon.co.uk/REST-Design-Rulebook-Mark-Masse/dp/1449310508>
+
 <!-- vale Vale.Spelling = YES -->
+
 - [RFC9110] Nottingham, M., et al. _RFC 9110: HTTP Semantics_. IETF, 2022. Status codes: Section 15. <https://www.rfc-editor.org/rfc/rfc9110>
 - [RFC6838] Freed, N., et al. _RFC 6838: Media Type Specifications and Registration Procedures_. IETF, 2013. <https://www.rfc-editor.org/rfc/rfc6838>
 - [RFC9457] Nottingham, M., Wilde, E., and Dalal, S. _RFC 9457: Problem Details for HTTP APIs_. IETF, 2023. <https://www.rfc-editor.org/rfc/rfc9457>
