@@ -23,6 +23,11 @@
   },
   "packageRules": [
     {
+      "description": "Exempt update types that carry no release timestamp from the minimum release-age bake, so their renovate/stability-days check can resolve under internalChecksFilter:strict",
+      "matchUpdateTypes": ["pin", "pinDigest", "digest", "lockFileMaintenance"],
+      "minimumReleaseAge": "0 days"
+    },
+    {
       "description": "Group all npm dependencies in a single PR",
       "matchManagers": ["npm"],
       "groupName": "npm dependencies",
