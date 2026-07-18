@@ -23,9 +23,9 @@
   },
   "devDependencies": {
     "@genshin/eslint-config": "workspace:*",
-    "@vitest/coverage-v8": "4.1.7",
-    "eslint": "10.4.0",
+    "@vitest/coverage-v8": "4.1.10",
+    "eslint": "10.7.0",
     "typescript": "6.0.3",
-    "vitest": "4.1.7"
+    "vitest": "4.1.10"
   }
 }
