@@ -42,6 +42,13 @@
       "addLabels": ["terraform", "infrastructure"]
     },
     {
+      "description": "Bump the Terraform CLI version in lockstep across the infrastructure required_version constraint and the CI workflow terraform_version pins",
+      "matchDepNames": ["hashicorp/terraform"],
+      "groupName": "terraform dependencies",
+      "groupSlug": "terraform",
+      "addLabels": ["terraform", "infrastructure"]
+    },
+    {
       "description": "Group all GitHub Actions updates in a single PR",
       "matchManagers": ["github-actions"],
       "groupName": "github actions",
@@ -93,6 +100,15 @@
       "matchStrings": ["REUSE_VERSION=\"\\$\\{REUSE_VERSION:-(?<currentValue>[^}]+)\\}\""],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "fsfe/reuse-tool",
+      "extractVersionTemplate": "^v(?<version>.+)$"
+    },
+    {
+      "customType": "regex",
+      "description": "Track terraform_version in the CI workflows against hashicorp/terraform releases",
+      "managerFilePatterns": ["/^\\.github/workflows/.+\\.ya?ml$/"],
+      "matchStrings": ["terraform_version: ['\"](?<currentValue>[^'\"]+)['\"]"],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "hashicorp/terraform",
       "extractVersionTemplate": "^v(?<version>.+)$"
     }
   ]
