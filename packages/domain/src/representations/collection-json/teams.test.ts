@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { Item } from '@genshin/collection-json';
 import { describe, expect, it } from 'vitest';
 
 import { deserialiseTeam, serialiseTeam } from './teams.js';
@@ -89,4 +90,51 @@ describe('team serialisation round-trip', () => {
     const result = deserialiseTeam(item);
     expect(result.members[0]?.artifactPlan).toEqual(team.members[0]?.artifactPlan);
   });
+
+  it('strips unknown properties off deserialised members', () => {
+    const item = itemWithRawMembers([
+      { characterId: 'columbina', weaponInstanceId: 'wep-001', injected: 'evil' },
+      null,
+      null,
+      null,
+    ]);
+    const result = deserialiseTeam(item);
+    expect(result.members[0]).toEqual({ characterId: 'columbina', weaponInstanceId: 'wep-001' });
+  });
+
+  it('strips unknown properties off deserialised artifact plans', () => {
+    const item = itemWithRawMembers([
+      {
+        characterId: 'columbina',
+        artifactPlan: {
+          sands: 'ATK Percentage',
+          goblet: 'Hydro DMG Bonus',
+          circlet: 'CRIT Rate',
+          sets: ['aubade-of-morningstar-and-moon'],
+          priorityMinorAffixes: [],
+          secondaryMinorAffixes: [],
+          injected: 'evil',
+        },
+      },
+      null,
+      null,
+      null,
+    ]);
+    const result = deserialiseTeam(item);
+    expect(result.members[0]?.artifactPlan).not.toHaveProperty('injected');
+  });
 });
+
+/**
+ * Builds a team Item whose serialised members carry raw, unsanitised JSON —
+ * the shape a hostile or buggy client could put on the wire.
+ */
+function itemWithRawMembers(members: unknown[]): Item {
+  const item = serialiseTeam(VALID_TEAM, BASE_URL);
+  return {
+    ...item,
+    data: item.data.map((d) =>
+      d.name === 'members' ? { ...d, value: JSON.stringify(members) } : d,
+    ),
+  };
+}
