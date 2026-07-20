@@ -21,7 +21,7 @@ import {
   type Template,
 } from '@genshin/collection-json';
 
-import type { ArtifactPlan } from '../../artifact/artifact-plan.js';
+import { asArtifactSets, type ArtifactPlan } from '../../artifact/artifact-plan.js';
 import type { CollectionTeamMember } from '../../team/collection-team-member.js';
 import type { CollectionTeam, CollectionTeamMembers } from '../../team/collection-team.js';
 import { assertCollectionTeam, MAX_TEAM_MEMBERS } from '../../team/collection-team.js';
@@ -78,13 +78,14 @@ function deserialiseArtifactPlan(value: unknown): ArtifactPlan {
       );
     }
   }
-  for (const field of ['sets', 'priorityMinorAffixes', 'secondaryMinorAffixes'] as const) {
+  for (const field of ['priorityMinorAffixes', 'secondaryMinorAffixes'] as const) {
     if (!Array.isArray(plan[field])) {
       throw new TypeError(
         `artifactPlan.${field} must be an array, got: ${JSON.stringify(plan[field])}`,
       );
     }
   }
+  plan.sets = asArtifactSets(plan.sets);
   return value as ArtifactPlan;
 }
 

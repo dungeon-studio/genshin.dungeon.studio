@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 export { issue, isValid, prefixPaths, type ValidationIssue } from '@genshin/validation';
-export { type ArtifactPlan } from './artifact/artifact-plan.js';
+export { type ArtifactPlan, asArtifactSets } from './artifact/artifact-plan.js';
 export { validateArtifactPlan } from './artifact/artifact-plan-validation.js';
 export type { AuthIdentity } from './profile/auth-identity.js';
 export {

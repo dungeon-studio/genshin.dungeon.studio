@@ -65,6 +65,33 @@ describe('team serialisation round-trip', () => {
     expect(result.members[0]?.weaponInstanceId).toBe('wep-001');
   });
 
+  it('rejects a member artifact plan with more than 2 sets', () => {
+    const badMembers = [
+      {
+        characterId: 'columbina',
+        artifactPlan: {
+          sands: 'ATK Percentage',
+          goblet: 'Hydro DMG Bonus',
+          circlet: 'CRIT Rate',
+          sets: ['aubade-of-morningstar-and-moon', 'golden-troupe', 'gilded-dreams'],
+          priorityMinorAffixes: [],
+          secondaryMinorAffixes: [],
+        },
+      },
+      null,
+      null,
+      null,
+    ];
+    const item = serialiseTeam(VALID_TEAM, BASE_URL);
+    const tampered = {
+      ...item,
+      data: item.data.map((d) =>
+        d.name === 'members' ? { ...d, value: JSON.stringify(badMembers) } : d,
+      ),
+    };
+    expect(() => deserialiseTeam(tampered)).toThrow(TypeError);
+  });
+
   it('preserves artifact plans on members through round-trip', () => {
     const team: CollectionTeam = {
       ...VALID_TEAM,

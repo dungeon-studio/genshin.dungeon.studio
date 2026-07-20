@@ -119,6 +119,40 @@ describe('fromDocument', () => {
     const team = fromDocument(1, makeV1Document({ description: 'My best team' }));
     expect(team.description).toBe('My best team');
   });
+
+  it('narrows an artifact plan with 2 sets to a tuple', () => {
+    const team = fromDocument(
+      1,
+      makeV1Document({
+        members: [
+          {
+            characterId: 'columbina',
+            artifactPlan: { sets: ['golden-troupe', 'marechaussee-hunter'] },
+          },
+          null,
+          null,
+          null,
+        ],
+      }),
+    );
+    expect(team.members[0]?.artifactPlan?.sets).toEqual(['golden-troupe', 'marechaussee-hunter']);
+  });
+
+  it('rejects an artifact plan with more than 2 sets', () => {
+    expect(() =>
+      fromDocument(
+        1,
+        makeV1Document({
+          members: [
+            { characterId: 'columbina', artifactPlan: { sets: ['a', 'b', 'c'] } },
+            null,
+            null,
+            null,
+          ],
+        }),
+      ),
+    ).toThrow(TypeError);
+  });
 });
 
 describe('toDocument', () => {

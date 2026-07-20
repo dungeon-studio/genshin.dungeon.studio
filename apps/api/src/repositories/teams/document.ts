@@ -2,13 +2,15 @@
 // SPDX-License-Identifier: MIT
 
 import type {
+  ArtifactPlan,
   CollectionTeam,
   CollectionTeamMember,
   CollectionTeamMembers,
   ISOTimestamp,
   TeamSlot,
+  UUID,
 } from '@genshin/domain';
-import { assertCollectionTeam } from '@genshin/domain';
+import { asArtifactSets, assertCollectionTeam } from '@genshin/domain';
 
 import {
   entity,
@@ -20,12 +22,22 @@ import {
 
 export { CURRENT_VERSION, type V1Team, type V0Team };
 
+function artifactPlanFromDocument(plan: NonNullable<V1Member['artifactPlan']>): ArtifactPlan {
+  const { sets, ...rest } = plan;
+  return {
+    ...rest,
+    ...(sets !== undefined ? { sets: asArtifactSets(sets) } : {}),
+  } as ArtifactPlan;
+}
+
 function memberFromDocument(m: V1Member): CollectionTeamMember {
   return {
     characterId: m.characterId,
-    ...(m.weaponInstanceId !== undefined ? { weaponInstanceId: m.weaponInstanceId } : {}),
-    ...(m.artifactPlan !== undefined ? { artifactPlan: m.artifactPlan } : {}),
-  } as CollectionTeamMember;
+    ...(m.weaponInstanceId !== undefined ? { weaponInstanceId: m.weaponInstanceId as UUID } : {}),
+    ...(m.artifactPlan !== undefined
+      ? { artifactPlan: artifactPlanFromDocument(m.artifactPlan) }
+      : {}),
+  };
 }
 
 function memberToDocument(m: CollectionTeamMember): V1Member {
