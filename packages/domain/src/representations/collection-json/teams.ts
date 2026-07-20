@@ -78,12 +78,29 @@ function deserialiseArtifactPlan(value: unknown): ArtifactPlan {
       );
     }
   }
+  const cardinalities = {
+    sets: { min: 1, max: 2 },
+    priorityMinorAffixes: { min: 0, max: 3 },
+    secondaryMinorAffixes: { min: 0, max: 3 },
+  } as const;
   for (const field of ['sets', 'priorityMinorAffixes', 'secondaryMinorAffixes'] as const) {
-    if (!Array.isArray(plan[field])) {
+    const arr = plan[field];
+    if (!Array.isArray(arr)) {
+      throw new TypeError(`artifactPlan.${field} must be an array, got: ${JSON.stringify(arr)}`);
+    }
+    const { min, max } = cardinalities[field];
+    if (arr.length < min || arr.length > max) {
       throw new TypeError(
-        `artifactPlan.${field} must be an array, got: ${JSON.stringify(plan[field])}`,
+        `artifactPlan.${field} must have between ${min} and ${max} elements, got: ${arr.length}`,
       );
     }
+    arr.forEach((element, index) => {
+      if (typeof element !== 'string') {
+        throw new TypeError(
+          `artifactPlan.${field}[${index}] must be a string, got: ${JSON.stringify(element)}`,
+        );
+      }
+    });
   }
   return value as ArtifactPlan;
 }
