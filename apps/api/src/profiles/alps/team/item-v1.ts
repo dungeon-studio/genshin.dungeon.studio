@@ -31,7 +31,7 @@ export const teamItemV1 = {
           type: 'semantic',
           doc: {
             value:
-              'Team members (exactly 4 character positions; null represents an empty position)',
+              'Team members, transported as a JSON-encoded string value in the Collection+JSON data element; clients parse it into an array of exactly 4 character positions (null represents an empty position). The nested descriptors below document the logical structure of each parsed member, not separate wire data elements.',
           },
           descriptor: [
             {
