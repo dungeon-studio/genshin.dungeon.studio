@@ -3,8 +3,8 @@
 
 import { MAX_CONSTELLATION_LEVEL, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import type { Character } from '@genshin/game-data';
-import { motion } from 'framer-motion';
 import { Trash2 } from 'lucide-react';
+import { motion } from 'motion/react';
 import type { JSX } from 'react';
 import { useState } from 'react';
 
