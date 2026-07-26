@@ -38,8 +38,11 @@ export default defineConfig({
     react(),
     {
       name: 'validate-env',
+      // Deployed builds get these injected by .github/workflows/deploy.yml.
+      // Failing here keeps placeholder defaults, which dev relies on, out of
+      // any bundle that ships.
       configResolved(config) {
-        if (config.command !== 'build' || process.env.VERIFY_ENV !== 'true') return;
+        if (config.command !== 'build') return;
 
         const missing = requiredEnvVars.filter((key) => !config.env[key]);
         if (missing.length > 0) {

@@ -7,10 +7,9 @@ import { auth } from '@/lib/firebase';
 
 export type { ProblemDetail };
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-if (!API_BASE_URL) {
-  throw new Error('Missing required environment variable: VITE_API_BASE_URL');
-}
+// Defaults to the local API server so `pnpm dev` works without any .env file;
+// see the same treatment of the Firebase config in @/lib/firebase.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 export class ApiError extends Error {
   readonly problem: ProblemDetail;

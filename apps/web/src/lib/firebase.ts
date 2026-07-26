@@ -4,36 +4,30 @@
 import { getApp, getApps, initializeApp } from 'firebase/app';
 import { connectAuthEmulator, getAuth } from 'firebase/auth';
 
-const requiredEnvVars = [
-  'VITE_FIREBASE_API_KEY',
-  'VITE_FIREBASE_AUTH_DOMAIN',
-  'VITE_FIREBASE_PROJECT_ID',
-  'VITE_FIREBASE_STORAGE_BUCKET',
-  'VITE_FIREBASE_MESSAGING_SENDER_ID',
-  'VITE_FIREBASE_APP_ID',
-] as const;
+const DEV_PROJECT_ID = 'demo-dungeon-studio-genshin-dev';
 
-for (const key of requiredEnvVars) {
-  if (!import.meta.env[key]) {
-    throw new Error(`Missing required environment variable: ${key}`);
-  }
-}
-
+// Fallbacks let `pnpm dev` run without any .env file; the Auth emulator
+// validates none of these. This mirrors the API supplying its own emulator
+// defaults in apps/api/src/lib/firebase/app.ts. A .env.local value still wins,
+// so pointing dev at real GCP stays possible. Deployed builds cannot reach the
+// fallbacks — vite.config.ts fails the build when a variable is missing.
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'demo-api-key',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || `${DEV_PROJECT_ID}.firebaseapp.com`,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || DEV_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || `${DEV_PROJECT_ID}.appspot.com`,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '000000000000',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:000000000000:web:0000000000000000000000',
 };
 
 // Safety: In dev mode, force the project ID to match the local Firebase
 // Emulators (started at the repository root with --project demo-dungeon-studio-genshin-dev).
+// This overrides rather than defaults, so a real project ID in .env.local still
+// cannot reach real Firestore from a dev server.
 // This mirrors the API's forced project ID in apps/api/src/lib/firebase/app.ts.
 // Dead-code-eliminated during production builds.
 if (import.meta.env.DEV) {
-  firebaseConfig.projectId = 'demo-dungeon-studio-genshin-dev';
+  firebaseConfig.projectId = DEV_PROJECT_ID;
 }
 
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
