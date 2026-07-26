@@ -7,8 +7,8 @@ import { auth } from '@/lib/firebase';
 
 export type { ProblemDetail };
 
-// Defaults to the local API server so `pnpm dev` works without any .env file;
-// see the same treatment of the Firebase config in @/lib/firebase.
+// `pnpm dev` needs no .env file; vite.config.ts fails deployed builds on a
+// missing variable.
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 export class ApiError extends Error {

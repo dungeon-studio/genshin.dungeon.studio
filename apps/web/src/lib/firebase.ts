@@ -6,11 +6,9 @@ import { connectAuthEmulator, getAuth } from 'firebase/auth';
 
 const DEV_PROJECT_ID = 'demo-dungeon-studio-genshin-dev';
 
-// Fallbacks let `pnpm dev` run without any .env file; the Auth emulator
-// validates none of these. This mirrors the API supplying its own emulator
-// defaults in apps/api/src/lib/firebase/app.ts. A .env.local value still wins,
-// so pointing dev at real GCP stays possible. Deployed builds cannot reach the
-// fallbacks — vite.config.ts fails the build when a variable is missing.
+// The Auth emulator validates none of these, so `pnpm dev` needs no .env file.
+// Deployed bundles never carry the fallbacks: vite.config.ts fails the build on
+// a missing variable.
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'demo-api-key',
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || `${DEV_PROJECT_ID}.firebaseapp.com`,
@@ -22,8 +20,7 @@ const firebaseConfig = {
 
 // Safety: In dev mode, force the project ID to match the local Firebase
 // Emulators (started at the repository root with --project demo-dungeon-studio-genshin-dev).
-// This overrides rather than defaults, so a real project ID in .env.local still
-// cannot reach real Firestore from a dev server.
+// A real project ID in .env.local cannot reach real Firestore from a dev server.
 // This mirrors the API's forced project ID in apps/api/src/lib/firebase/app.ts.
 // Dead-code-eliminated during production builds.
 if (import.meta.env.DEV) {

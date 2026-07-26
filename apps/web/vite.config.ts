@@ -38,9 +38,9 @@ export default defineConfig({
     react(),
     {
       name: 'validate-env',
-      // Deployed builds get these injected by .github/workflows/deploy.yml.
-      // Failing here keeps placeholder defaults, which dev relies on, out of
-      // any bundle that ships.
+      // .github/workflows/deploy.yml injects these for deployed builds. Failing
+      // here keeps the dev fallbacks in lib/firebase.ts and lib/api.ts out of
+      // any shipped bundle.
       configResolved(config) {
         if (config.command !== 'build') return;
 
