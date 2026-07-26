@@ -82,8 +82,20 @@ runs:
         report_type: test_results
         fail_ci_if_error: false
 
+    # apps/web fails the build when its Firebase config is missing, so that a
+    # deployed bundle can never fall back to the local-emulator placeholders in
+    # lib/firebase.ts. This build only proves the app compiles and its output is
+    # discarded, so any non-empty value satisfies it. Deployed bundles come from
+    # the separate build step in deploy.yml, which injects the real config.
     - name: Build
       shell: bash
       env:
         FILTER: ${{ inputs.filter }}
+        VITE_API_BASE_URL: https://api.invalid
+        VITE_FIREBASE_API_KEY: ci
+        VITE_FIREBASE_AUTH_DOMAIN: ci.invalid
+        VITE_FIREBASE_PROJECT_ID: ci
+        VITE_FIREBASE_STORAGE_BUCKET: ci.invalid
+        VITE_FIREBASE_MESSAGING_SENDER_ID: ci
+        VITE_FIREBASE_APP_ID: ci
       run: pnpm turbo run build --filter="$FILTER"
