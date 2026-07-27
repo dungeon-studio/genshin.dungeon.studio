@@ -14,6 +14,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
+  TERRAFORM_VERSION: '1.15.8'
+
 jobs:
   terraform-apply:
     runs-on: ubuntu-latest
@@ -37,7 +41,7 @@ jobs:
 
       - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
-          terraform_version: '1.15.8'
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
 
       # Each environment maps to an explicit secret to avoid dynamic secret
       # indexing, which fixes CodeQL actions/excessive-secrets-exposure.

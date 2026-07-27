@@ -1,19 +1,17 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:best-practices"],
-  "baseBranchPatterns": ["develop"],
+  "extends": [
+    "config:best-practices",
+    "security:openssf-scorecard",
+    "customManagers:githubActionsVersions"
+  ],
   "schedule": ["before 6pm on friday"],
   "timezone": "Europe/London",
   "labels": ["dependencies", "automated"],
   "reviewers": ["alunduil"],
-  "branchPrefix": "renovate/",
   "rangeStrategy": "pin",
   "minimumReleaseAge": "3 days",
-  "internalChecksFilter": "strict",
   "osvVulnerabilityAlerts": true,
-  "vulnerabilityAlerts": {
-    "minimumReleaseAge": "0 days"
-  },
   "pre-commit": {
     "enabled": true
   },
@@ -24,8 +22,17 @@
   "packageRules": [
     {
       "description": "Exempt update types that carry no release timestamp from the minimum release-age bake, so their renovate/stability-days check can resolve under internalChecksFilter:strict",
-      "matchUpdateTypes": ["pin", "pinDigest", "digest", "lockFileMaintenance"],
-      "minimumReleaseAge": "0 days"
+      "matchUpdateTypes": [
+        "pin",
+        "pinDigest",
+        "digest",
+        "lockFileMaintenance",
+        "lockfileUpdate",
+        "rollback",
+        "bump",
+        "replacement"
+      ],
+      "minimumReleaseAge": null
     },
     {
       "description": "Group all npm dependencies in a single PR",
@@ -42,7 +49,7 @@
       "addLabels": ["terraform", "infrastructure"]
     },
     {
-      "description": "Bump the Terraform CLI version in lockstep across the infrastructure required_version constraint and the CI workflow terraform_version pins",
+      "description": "Bump the Terraform CLI version in lockstep across the infrastructure required_version constraint and the CI workflow TERRAFORM_VERSION pins",
       "matchDepNames": ["hashicorp/terraform"],
       "groupName": "terraform dependencies",
       "groupSlug": "terraform",
@@ -100,15 +107,6 @@
       "matchStrings": ["REUSE_VERSION=\"\\$\\{REUSE_VERSION:-(?<currentValue>[^}]+)\\}\""],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "fsfe/reuse-tool",
-      "extractVersionTemplate": "^v(?<version>.+)$"
-    },
-    {
-      "customType": "regex",
-      "description": "Track terraform_version in the CI workflows against hashicorp/terraform releases",
-      "managerFilePatterns": ["/^\\.github/workflows/.+\\.ya?ml$/"],
-      "matchStrings": ["terraform_version: ['\"](?<currentValue>[^'\"]+)['\"]"],
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "hashicorp/terraform",
       "extractVersionTemplate": "^v(?<version>.+)$"
     }
   ]
