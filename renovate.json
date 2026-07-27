@@ -5,7 +5,6 @@
     "security:openssf-scorecard",
     "customManagers:githubActionsVersions"
   ],
-  "schedule": ["before 6pm on friday"],
   "timezone": "Europe/London",
   "labels": ["dependencies", "automated"],
   "reviewers": ["alunduil"],
@@ -14,10 +13,6 @@
   "osvVulnerabilityAlerts": true,
   "pre-commit": {
     "enabled": true
-  },
-  "lockFileMaintenance": {
-    "enabled": true,
-    "schedule": ["* 0-17 1-7 * 5"]
   },
   "packageRules": [
     {
