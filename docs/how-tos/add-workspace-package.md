@@ -46,11 +46,17 @@ closest template.
     },
     "devDependencies": {
       "@genshin/eslint-config": "workspace:*",
+      "@typescript/native": "npm:typescript@7.0.2",
       "eslint": "10.4.0",
-      "typescript": "6.0.3"
+      "typescript": "npm:@typescript/typescript6@6.0.2"
     }
   }
   ```
+
+  The `typecheck` and `build` scripts run `tsc` from `@typescript/native`. The
+  `typescript` name resolves to the TypeScript 6 compatibility package, because
+  `typescript-eslint` imports the compiler API through a `typescript` peer
+  dependency and rejects TypeScript 7.
 
   Add `test` only once tests exist, along with the `vitest` and
   `@vitest/coverage-v8` dev dependencies and a `vitest.config.ts`.
