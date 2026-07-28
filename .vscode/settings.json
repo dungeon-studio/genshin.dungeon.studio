@@ -34,8 +34,10 @@
   },
 
   // TypeScript
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
+  // No workspace tsdk: `typescript` resolves to the TypeScript 6 compatibility
+  // package, which re-exports the API without shipping a tsserver, and the
+  // TypeScript 7 package runs as a native binary. Neither can back the editor's
+  // language service, so it uses the bundled one.
   "typescript.preferences.importModuleSpecifier": "shortest",
   "typescript.updateImportsOnFileMove.enabled": "always",
 
