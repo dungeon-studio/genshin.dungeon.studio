@@ -53,11 +53,10 @@ closest template.
   }
   ```
 
-  Both TypeScript entries are aliases, and the names are load-bearing.
-  `@typescript/native` supplies the TypeScript 7 `tsc` that the `typecheck`
-  and `build` scripts run. The `typescript` name resolves to the TypeScript 6
-  compatibility package, because `typescript-eslint` imports the compiler API
-  through a `typescript` peer dependency and rejects the TypeScript 7 API.
+  The `typecheck` and `build` scripts run `tsc` from `@typescript/native`. The
+  `typescript` name resolves to the TypeScript 6 compatibility package, because
+  `typescript-eslint` imports the compiler API through a `typescript` peer
+  dependency and rejects TypeScript 7.
 
   Add `test` only once tests exist, along with the `vitest` and
   `@vitest/coverage-v8` dev dependencies and a `vitest.config.ts`.
