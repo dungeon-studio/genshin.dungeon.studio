@@ -38,7 +38,7 @@
   "devDependencies": {
     "@ls-lint/ls-lint": "2.3.1",
     "@types/node": "25.9.5",
-    "concurrently": "10.0.3",
+    "concurrently": "10.0.4",
     "eslint": "10.8.0",
     "firebase-tools": "15.24.0",
     "knip": "6.29.0",
