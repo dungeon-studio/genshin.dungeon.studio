@@ -48,7 +48,7 @@
     "syncpack": "15.3.2",
     "tsx": "4.23.1",
     "turbo": "2.10.6",
-    "typescript": "6.0.3"
+    "typescript": "npm:@typescript/typescript6@6.0.2"
   },
   "packageManager": "pnpm@11.17.0",
   "engines": {

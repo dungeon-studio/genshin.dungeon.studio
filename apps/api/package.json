@@ -31,6 +31,7 @@
     "@genshin/eslint-config": "workspace:*",
     "@types/negotiator": "0.6.4",
     "@types/node": "25.9.5",
+    "@typescript/native": "npm:typescript@7.0.2",
     "@vitest/coverage-v8": "4.1.10",
     "eslint": "10.8.0",
     "fast-check": "4.9.0",
@@ -39,7 +40,7 @@
     "jsoncompat": "0.4.1",
     "tsc-alias": "1.9.1",
     "tsx": "4.23.1",
-    "typescript": "6.0.3",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
     "vitest": "4.1.10"
   }
 }
