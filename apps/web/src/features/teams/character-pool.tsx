@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { CharacterId, CollectionCharacter, TeamSlot } from '@genshin/domain';
-import type { Character } from '@genshin/game-data';
+import type { Character, WeaponType } from '@genshin/game-data';
 import { CHARACTERS } from '@genshin/game-data';
 import { Lock, Users } from 'lucide-react';
 import type { JSX } from 'react';
@@ -26,6 +26,12 @@ interface CharacterPoolProps {
   characters: Record<CharacterId, CollectionCharacter>;
   slot: TeamSlot;
   memberIndex: number;
+  /**
+   * Restricts the pool to characters wielding this weapon type. Not exposed through
+   * the filter bar: a weapon picked before a character is a constraint on the choice,
+   * not a preference the user can toggle away.
+   */
+  weaponType?: WeaponType;
   onAssign: (characterId: string) => void;
 }
 
@@ -33,6 +39,7 @@ export function CharacterPool({
   characters,
   slot,
   memberIndex,
+  weaponType,
   onAssign,
 }: CharacterPoolProps): JSX.Element {
   const members = useTeamStore((s) => s.teams[slot].members);
@@ -55,15 +62,20 @@ export function CharacterPool({
   const ownedIds = useMemo(() => new Set(Object.keys(characters)), [characters]);
   const ownedCount = ownedIds.size;
 
+  const eligibleCharacters = useMemo(
+    () => (weaponType ? CHARACTERS.filter((c) => c.weaponType === weaponType) : CHARACTERS),
+    [weaponType],
+  );
+
   const { filteredCharacters, filteredOwnedCount } = useMemo(() => {
     if (ownedIds.size === 0)
       return { filteredCharacters: [] as Character[], filteredOwnedCount: 0 };
-    const filtered = filterCharacters(CHARACTERS, filters, ownedIds);
+    const filtered = filterCharacters(eligibleCharacters, filters, ownedIds);
     return {
       filteredCharacters: filtered,
       filteredOwnedCount: filtered.filter((c) => ownedIds.has(c.id)).length,
     };
-  }, [filters, ownedIds]);
+  }, [filters, ownedIds, eligibleCharacters]);
 
   if (ownedCount === 0) {
     return (
@@ -88,7 +100,7 @@ export function CharacterPool({
         filters={filters}
         onChange={handleFilterChange}
         filteredCount={filteredCharacters.length}
-        totalCount={CHARACTERS.length}
+        totalCount={eligibleCharacters.length}
         ownedCount={ownedCount}
         filteredOwnedCount={filteredOwnedCount}
         showOwnership={false}
@@ -120,7 +132,9 @@ export function CharacterPool({
 
         {filteredCharacters.length === 0 && (
           <p className="py-8 text-center text-muted-foreground">
-            No characters match your filters.
+            {weaponType
+              ? `No ${weaponType} users in your collection match your filters.`
+              : 'No characters match your filters.'}
           </p>
         )}
       </div>
