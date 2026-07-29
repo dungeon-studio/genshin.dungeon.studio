@@ -37,20 +37,20 @@
   },
   "devDependencies": {
     "@ls-lint/ls-lint": "2.3.1",
-    "@types/node": "25.9.1",
-    "eslint": "10.4.0",
-    "firebase-tools": "15.22.3",
-    "knip": "6.16.1",
-    "prettier": "3.8.3",
-    "stylelint": "17.12.0",
+    "@types/node": "25.9.5",
+    "eslint": "10.8.0",
+    "firebase-tools": "15.24.0",
+    "knip": "6.29.0",
+    "prettier": "3.9.6",
+    "stylelint": "17.14.1",
     "stylelint-config-standard": "40.0.0",
-    "syncpack": "15.3.1",
-    "tsx": "4.22.3",
-    "turbo": "2.9.14",
-    "typescript": "6.0.3"
+    "syncpack": "15.3.2",
+    "tsx": "4.23.1",
+    "turbo": "2.10.7",
+    "typescript": "npm:@typescript/typescript6@6.0.2"
   },
-  "packageManager": "pnpm@11.8.0",
+  "packageManager": "pnpm@11.17.0",
   "engines": {
-    "node": ">=20.0.0"
+    "node": "v26.5.0"
   }
 }

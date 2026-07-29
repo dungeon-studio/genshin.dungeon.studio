@@ -1,9 +1,9 @@
 /* SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> */
 /* SPDX-License-Identifier: MIT */
 
+import type { ISOTimestamp } from '../iso-timestamp.js';
+import { isISOTimestamp, nowTimestamp } from '../iso-timestamp.js';
 import type { CollectionTeamMember } from './collection-team-member.js';
-import type { ISOTimestamp } from './iso-timestamp.js';
-import { isISOTimestamp, nowTimestamp } from './iso-timestamp.js';
 
 export const MIN_TEAM_SLOT = 1;
 export const MAX_TEAM_SLOT = 4;
@@ -105,11 +105,16 @@ export function assertCollectionTeam(value: unknown): asserts value is Collectio
   }
 }
 
+/** The name a team slot shows before the user gives it a custom one. */
+export function defaultTeamName(slot: TeamSlot): string {
+  return `Team ${slot}`;
+}
+
 export function createEmptyTeam(slot: TeamSlot): CollectionTeam {
   const now = nowTimestamp();
   return {
     slot,
-    name: `Team ${slot}`,
+    name: defaultTeamName(slot),
     members: [null, null, null, null],
     createdAt: now,
     updatedAt: now,

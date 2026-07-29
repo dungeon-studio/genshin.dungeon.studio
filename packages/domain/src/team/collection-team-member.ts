@@ -3,8 +3,8 @@
 
 import type { Character } from '@genshin/game-data';
 
-import type { ArtifactPlan } from './artifact-plan.js';
-import type { UUID } from './uuid.js';
+import type { ArtifactPlan } from '../artifact/artifact-plan.js';
+import type { UUID } from '../uuid.js';
 
 /**
  * CollectionTeamMember represents a single character position in a team with

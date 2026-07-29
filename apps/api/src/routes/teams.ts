@@ -15,7 +15,7 @@ import { HTTPException } from 'hono/http-exception';
 
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
-import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
+import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
@@ -29,7 +29,7 @@ import * as Weapons from '@/repositories/weapons/index.js';
 
 export const teams = new Hono<{
   Variables: AuthVariables &
-    NegotiatedContentVariables &
+    NegotiatedResponseContentVariables &
     NegotiatedRequestSchemaVariables &
     ValidatedRequestBodyVariables;
 }>();

@@ -4,9 +4,9 @@
 import type { JSX } from 'react';
 import { Outlet } from 'react-router-dom';
 
-import { Footer } from '@/components/footer';
-import { Header } from '@/components/header';
-import { Nav } from '@/components/nav';
+import { Footer } from '@/components/chrome/footer';
+import { Header } from '@/components/chrome/header';
+import { Nav } from '@/components/chrome/nav';
 
 export function Layout(): JSX.Element {
   return (

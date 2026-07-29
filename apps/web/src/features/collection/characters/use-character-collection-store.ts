@@ -6,6 +6,8 @@ import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL, nowTimestamp } from
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+import { CURRENT_VERSION, migratePersistedCollection } from './schemas/index.js';
+
 // Additive merge: union of both sets, keep higher constellation level on conflicts.
 export function mergeCollections(
   local: Record<CharacterId, CollectionCharacter>,
@@ -102,6 +104,11 @@ export const useCollectionStore = create<CollectionState>()(
     }),
     {
       name: 'genshin-collection',
+      version: CURRENT_VERSION,
+      // Persist only the data; the actions are re-supplied by the initializer on
+      // rehydration, so the stored shape stays equal to the versioned schema.
+      partialize: (state) => ({ characters: state.characters }),
+      migrate: (persisted) => migratePersistedCollection(persisted),
     },
   ),
 );

@@ -15,6 +15,7 @@
       "outputs": ["dist/**", ".next/**", "build/**"]
     },
     "dev": {
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
@@ -32,11 +33,7 @@
     },
     "schemas:export": {
       "dependsOn": ["^build"],
-      "inputs": [
-        "src/repositories/*/schemas/**",
-        "scripts/export-schemas.ts",
-        "scripts/schema-registry.ts"
-      ],
+      "inputs": ["src/**/schemas/**", "scripts/export-schemas.ts", "scripts/schema-registry.ts"],
       "outputs": ["schema-snapshots/**"]
     },
     "clean": {
