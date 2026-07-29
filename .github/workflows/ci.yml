@@ -3,18 +3,23 @@
 ---
 name: CI
 
+# Every sensor that runs unconditionally on an integration event. Path-gated
+# checks have a narrower "when" and keep their own files; see
+# docs/reference/code-conventions.md for the naming rule.
+
 on:
   pull_request:
   push:
     branches:
       - develop
+      - main
 
 permissions:
   contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/develop' }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/main' }}
 
 jobs:
   test:
@@ -80,7 +85,7 @@ jobs:
   # matrix above. It diffs committed JSON snapshots, so it needs the install but
   # no workspace build.
   schema-compat:
-    name: Schema Compatibility
+    name: Check schema compatibility
     runs-on: ubuntu-latest
     timeout-minutes: 10
     if: github.event_name == 'pull_request'
@@ -104,6 +109,309 @@ jobs:
         env:
           SCHEMA_COMPAT_BASE: origin/${{ github.base_ref }}
         run: pnpm --filter @genshin/api schemas:check
+
+  # Runs only the hooks skipped by pre-commit.ci; see .pre-commit-config.yaml
+  # ci.skip for the complete list.
+  pre-commit:
+    name: Run local hooks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
+      TERRAFORM_VERSION: '1.15.8'
+      # renovate: datasource=github-releases depName=hadolint/hadolint
+      HADOLINT_VERSION: 'v2.14.0'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Run ESLint hook
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+        with:
+          extra_args: --all-files eslint
+
+      - name: Run Prettier hook
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+        with:
+          extra_args: --all-files prettier
+
+      - name: Run Stylelint hook
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+        with:
+          extra_args: --all-files stylelint
+
+      - name: Run Terraform fmt hook
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+        with:
+          extra_args: --all-files terraform_fmt
+
+      - name: Install Trivy
+        run: |
+          set -euo pipefail
+          TRIVY_INSTALL=https://raw.githubusercontent.com/aquasecurity/trivy
+          curl -fsSL "$TRIVY_INSTALL/main/contrib/install.sh" \
+            | sh -s -- -b /usr/local/bin
+
+      - name: Run Terraform Trivy hook
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+        env:
+          TRIVY_CONFIG: ${{ github.workspace }}/.trivy.yaml
+        with:
+          extra_args: --all-files terraform_trivy
+
+      - name: Run Renovate config validator hook
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+        with:
+          extra_args: --all-files renovate-config-validator
+
+      - name: Install hadolint
+        run: |
+          set -euo pipefail
+          sudo curl -fsSL \
+            "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64" \
+            -o /usr/local/bin/hadolint
+          sudo chmod +x /usr/local/bin/hadolint
+
+      - name: Run hadolint hook
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+        with:
+          extra_args: --all-files hadolint
+
+      - name: Run ls-lint hook
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+        with:
+          extra_args: --all-files ls-lint
+
+      - name: Run knip hook
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+        with:
+          extra_args: --all-files knip
+
+      - name: Run syncpack hook
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+        with:
+          extra_args: --all-files syncpack
+
+      - name: Run schema snapshots hook
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+        with:
+          extra_args: --all-files schema-snapshots
+
+  # Internal cross-references must resolve on disk. Ungated, so it always
+  # reports a status and is safe to require. --offline skips all network
+  # requests, so external rot — checked in weekly.yml — never blocks a PR.
+  internal-links:
+    name: Check internal links
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check internal links
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: --offline --no-progress "**/*.md"
+          fail: true
+
+  # Verified-mode secret scanning: TruffleHog confirms a detected credential is
+  # live before failing, so this gate is high-signal and needs no allowlist.
+  # It complements GitHub's free push protection (known-provider patterns,
+  # server-side) with broad, verified detection that GitHub only offers under
+  # the paid Secret Protection product. fetch-depth: 0 gives TruffleHog the full
+  # commit range so it scans only the diff, not a snapshot.
+  secrets:
+    name: Scan for verified secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Scan for verified secrets
+        uses: trufflesecurity/trufflehog@6f3c981e7b77f235fd2702dd74af25fc4b72bf11 # v3.96.0
+        with:
+          extra_args: --results=verified
+
+  # Online supply-chain audits (impostor commits, known-vulnerable actions)
+  # need a token and network, so they can't run in pre-commit.ci. This job
+  # uploads SARIF to the Security tab and blocks on findings; the offline
+  # audits are gated separately via the zizmor pre-commit hook.
+  workflows:
+    name: Audit workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@6fc4b006235f201fdab3722e17240ab420d580e5 # v0.6.1
+        with:
+          config: .github/zizmor.yml
+
+  trivy-terraform:
+    name: Scan Terraform config
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Scan Terraform
+        uses: aquasecurity/trivy-action@c07df6fec6fa692e6fd1200d50aaa1fdd66f03c8 # master
+        with:
+          scan-type: config
+          scan-ref: infrastructure/terraform
+          format: sarif
+          output: terraform-results.sarif
+          trivy-config: .trivy.yaml
+
+      - name: Upload Terraform SARIF
+        uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        if: always()
+        with:
+          sarif_file: terraform-results.sarif
+          category: trivy-terraform
+
+  trivy-dockerfile:
+    name: Scan Dockerfile
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Scan Dockerfile
+        uses: aquasecurity/trivy-action@c07df6fec6fa692e6fd1200d50aaa1fdd66f03c8 # master
+        with:
+          scan-type: config
+          scan-ref: apps/api
+          format: sarif
+          output: dockerfile-results.sarif
+          trivy-config: .trivy.yaml
+
+      - name: Upload Dockerfile SARIF
+        uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        if: always()
+        with:
+          sarif_file: dockerfile-results.sarif
+          category: trivy-dockerfile
+
+  trivy-container:
+    name: Scan container image
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+
+      - name: Build image
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: .
+          file: ./apps/api/Dockerfile
+          push: false
+          load: true
+          tags: api-trivy:scan
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Scan Container Image
+        uses: aquasecurity/trivy-action@c07df6fec6fa692e6fd1200d50aaa1fdd66f03c8 # master
+        with:
+          image-ref: api-trivy:scan
+          format: sarif
+          output: container-results.sarif
+          trivy-config: .trivy.yaml
+
+      - name: Upload Container SARIF
+        uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        if: always()
+        with:
+          sarif_file: container-results.sarif
+          category: trivy-container
+
+  container-smoke:
+    name: Build and smoke-test container
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+
+      - name: Build image
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: .
+          file: ./apps/api/Dockerfile
+          push: false
+          load: true
+          tags: api-smoke:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke-test container startup
+        run: bash apps/api/scripts/smoke-test-container.sh
+
+      - name: Dump container logs on failure
+        if: failure()
+        run: docker logs api-smoke 2>&1 || true
+
+      - name: Cleanup container
+        if: always()
+        run: docker rm -f api-smoke 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
 # Maintenance notes

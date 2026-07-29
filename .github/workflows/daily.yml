@@ -1,19 +1,12 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 ---
-name: Renovate Watchdog
-
-# A failed Renovate job on Mend's hosted runner stalls silently with no retry:
-# the repo went 29 days without updates before anyone noticed. This watchdog
-# fails (and thus emails repo admins) when Renovate's Dependency Dashboard has
-# not been refreshed within the staleness window, turning a silent stall into
-# a weekly alert.
+name: Daily
 
 on:
   schedule:
-    # Daily 09:00 UTC. A passing run is silent; only a stale dashboard fails
-    # (and emails admins), so daily costs nothing when healthy but bounds
-    # detection latency to roughly a day once the staleness window is crossed.
+    # Daily 09:00 UTC. A passing run is silent; only a failure emails repo
+    # admins, so a daily cadence costs nothing when everything is healthy.
     - cron: '0 9 * * *'
   workflow_dispatch:
 
@@ -26,6 +19,10 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # A failed Renovate job on Mend's hosted runner stalls silently with no
+  # retry: the repo went 29 days without updates before anyone noticed. The
+  # Dependency Dashboard issue is Renovate's heartbeat, so a stale one turns a
+  # silent stall into a daily alert.
   check-freshness:
     name: Check Renovate freshness
     runs-on: ubuntu-latest

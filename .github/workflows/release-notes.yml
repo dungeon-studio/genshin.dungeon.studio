@@ -1,0 +1,57 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+name: Release Notes
+
+# Both jobs maintain the running release draft, and the autolabeler produces
+# the labels the drafter categorises by — split across files they drift into
+# disagreement. Configuration for both lives in .github/release-drafter.yml.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Labels same-repo PRs only; fork PRs run with a read-only token. Switch the
+  # trigger to pull_request_target to label fork PRs (see the release-drafter
+  # README) once outside contributions arrive.
+  autolabel:
+    name: Label pull request
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: release-drafter/release-drafter/autolabeler@eada3c96a64734dd381cfbda23511034e328ddb0 # v7.6.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Notes are collected from PRs merged into develop (commitish in the config).
+  # At release time, publish the running draft and set its tag target to the
+  # main merge commit so the tag lands on main per git flow.
+  draft:
+    name: Update release draft
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: read
+
+    steps:
+      - uses: release-drafter/release-drafter@eada3c96a64734dd381cfbda23511034e328ddb0 # v7.6.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

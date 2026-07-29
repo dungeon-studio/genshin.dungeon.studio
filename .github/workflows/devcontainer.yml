@@ -2,11 +2,15 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-name: devcontainer
+name: Devcontainer
 
+# A cold devcontainer build is expensive (~5 minutes), so this one is
+# path-gated: "runs when the devcontainer changes" is a narrower when than
+# ci.yml's. The anchor keeps both triggers on one list — two copies would
+# drift silently.
 on:
   pull_request:
-    paths:
+    paths: &paths
       - '.devcontainer/**'
       - '.vscode/extensions.json'
       - 'scripts/install-reuse.sh'
@@ -18,13 +22,14 @@ on:
     branches:
       - develop
       - main
+    paths: *paths
 
 permissions:
   contents: read
 
 jobs:
   validate:
-    name: Validate
+    name: Validate devcontainer
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
