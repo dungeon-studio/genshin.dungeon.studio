@@ -35,9 +35,11 @@ function weaponOfType(weaponType: WeaponType): Weapon {
 }
 
 const CLAYMORE = weaponOfType('Claymore');
+const BOW_WEAPON = weaponOfType('Bow');
 const CLAYMORE_USER = characterWielding('Claymore');
 const BOW_USER = characterWielding('Bow');
 const CLAYMORE_INSTANCE = 'claymore-instance' as CollectionWeaponId;
+const BOW_INSTANCE = 'bow-instance' as CollectionWeaponId;
 
 const TIMESTAMP = '2026-01-01T00:00:00.000Z' as ISOTimestamp;
 
@@ -68,6 +70,13 @@ function renderTeamsPage() {
       [CLAYMORE_INSTANCE]: {
         weaponInstanceId: CLAYMORE_INSTANCE,
         weaponId: CLAYMORE.id,
+        refinementLevel: 1,
+        createdAt: TIMESTAMP,
+        updatedAt: TIMESTAMP,
+      },
+      [BOW_INSTANCE]: {
+        weaponInstanceId: BOW_INSTANCE,
+        weaponId: BOW_WEAPON.id,
         refinementLevel: 1,
         createdAt: TIMESTAMP,
         updatedAt: TIMESTAMP,
@@ -124,5 +133,46 @@ describe('TeamsPage weapon-first flow', () => {
     expect(
       await screen.findByRole('button', { name: `Add ${BOW_USER.name} to team` }),
     ).toBeInTheDocument();
+  }, 30_000);
+
+  it('offers weapons of any type, filterable, on a member with no character', async () => {
+    const user = userEvent.setup({ delay: null });
+    renderTeamsPage();
+
+    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+    await user.click(await screen.findByRole('button', { name: 'Weapons' }));
+
+    // Both owned weapons are on offer: no character means no weapon type to enforce.
+    expect(
+      await screen.findByRole('button', { name: `Assign ${CLAYMORE.name} to character` }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: `Assign ${BOW_WEAPON.name} to character` }),
+    ).toBeInTheDocument();
+
+    // The type chips are hidden in the character-first flow, where the type is fixed.
+    expect(screen.getByRole('button', { name: 'Filter by Claymore' })).toBeInTheDocument();
+  }, 30_000);
+
+  it('restores the whole character pool when the pending weapon is cleared', async () => {
+    const user = userEvent.setup({ delay: null });
+    renderTeamsPage();
+
+    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+    await user.click(await screen.findByRole('button', { name: 'Weapons' }));
+    await user.click(
+      await screen.findByRole('button', { name: `Assign ${CLAYMORE.name} to character` }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Characters' }));
+
+    expect(await screen.findByText(new RegExp(`Showing Claymore users for`))).toBeInTheDocument();
+    expect(screen.getByText(CLAYMORE.name)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Clear weapon' }));
+
+    expect(
+      await screen.findByRole('button', { name: `Add ${BOW_USER.name} to team` }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Showing Claymore users for/)).not.toBeInTheDocument();
   }, 30_000);
 });
