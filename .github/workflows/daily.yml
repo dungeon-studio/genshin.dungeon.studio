@@ -5,9 +5,11 @@ name: Daily
 
 on:
   schedule:
-    # Daily 09:00 UTC. A passing run is silent; only a failure emails repo
-    # admins, so a daily cadence costs nothing when everything is healthy.
+    # Daily at 09:00 Europe/London; the timezone field handles BST/GMT. A
+    # passing run is silent; only a failure emails repo admins, so a daily
+    # cadence costs nothing when everything is healthy.
     - cron: '0 9 * * *'
+      timezone: Europe/London
   workflow_dispatch:
 
 permissions:

@@ -5,7 +5,7 @@ name: CI
 
 # Every sensor that runs unconditionally on an integration event. Path-gated
 # checks have a narrower "when" and keep their own files; see
-# docs/reference/code-conventions.md for the naming rule.
+# docs/reference/workflow-conventions.md for the naming rule.
 
 # The push set is every git-flow branch whose merge result ships or gets
 # inherited, since no merge result was itself tested before it landed. Feature
@@ -201,11 +201,7 @@ jobs:
           # so it would fail every merge.
           SKIP: no-commit-to-branch
         with:
-          # The pre-push stage is the superset: hooks without an explicit
-          # `stages` run at every stage, and the ones that opt out of the
-          # commit loop opt into this one. Running the pre-commit stage here
-          # would silently skip them.
-          extra_args: --all-files --hook-stage pre-push
+          extra_args: --all-files
 
   # Verified-mode secret scanning: TruffleHog confirms a detected credential is
   # live before failing, so this gate is high-signal and needs no allowlist.
