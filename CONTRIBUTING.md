@@ -71,8 +71,7 @@ Pre-commit enforces formatting, linting, documentation, and hygiene checks on ev
 
 ### Quality gate ownership
 
-- pre-commit.ci is the authoritative runner for hooks that it can run in its environment.
-- [.github/workflows/ci.yml](.github/workflows/ci.yml) runs everything else that gates a pull request: the per-package test matrix, the hooks pre-commit.ci can't run, and the security and internal-link scans. Each is its own job, so a failure names the check.
+- [.github/workflows/ci.yml](.github/workflows/ci.yml) runs everything that gates a pull request: the per-package test matrix, every pre-commit hook, and the security and internal-link scans. Each is its own job, so a failure names the check. A hook added to `.pre-commit-config.yaml` is enforced there without any workflow edit.
 - [.github/workflows/weekly.yml](.github/workflows/weekly.yml) checks external URLs and reports breakage via a GitHub issue rather than blocking, since transient outages make per-PR external checks flaky.
 - Feature work adds tests and enforces them when it introduces testable behavior.
 

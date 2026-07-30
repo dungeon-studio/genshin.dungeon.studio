@@ -17,33 +17,6 @@ exclude: |
     pnpm-lock\.yaml         # Package lockfile
   )
 
-ci:
-  # NOTE: This 'skip' list ONLY affects pre-commit.ci (hosted CI service).
-  # pre-commit.ci is authoritative for hooks it can run in its environment.
-  #
-  # GitHub Actions runs hooks in a dedicated ci.yml job to avoid duplicating
-  # hook execution across systems:
-  # 1. ci.yml pre-commit job (hooks that cannot run in pre-commit.ci)
-  # 2. ci.yml test matrix (typecheck + build)
-  # Skip hooks here that are handled by ci.yml or other workflows.
-  # Keep this list in sync with workflow ownership documented in CONTRIBUTING.md.
-  skip:
-    - eslint
-    - prettier
-    - stylelint
-    - typescript-check
-    - knip
-    - terraform_fmt
-    - terraform_trivy
-    - renovate-config-validator
-    - hadolint
-    - ls-lint
-    - syncpack
-    - schema-snapshots
-    # lychee is a binary not installable in pre-commit.ci; its CI coverage
-    # lives in ci.yml's internal-links job, not its pre-commit job.
-    - lychee
-
 repos:
   # Basic file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -113,8 +86,8 @@ repos:
       - id: reuse
         always_run: true
 
-  # GitHub Actions static analysis. Offline gate here (local + pre-commit.ci);
-  # online supply-chain audits run in ci.yml's workflows job with a token.
+  # GitHub Actions static analysis. Offline gate here; online supply-chain
+  # audits need a token and run in ci.yml's workflows job.
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
     rev: v1.28.0
     hooks:
@@ -163,7 +136,7 @@ repos:
 
       # knip analyzes the whole workspace graph, so it can't be file-scoped;
       # it runs on every commit (always_run) like ls-lint. Fast enough (~1s)
-      # to gate commits. CI runs it via the same hook in ci.yml.
+      # to gate commits.
       - id: knip
         name: knip (unused files, dependencies, exports)
         entry: pnpm exec knip

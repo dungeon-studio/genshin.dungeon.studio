@@ -117,10 +117,10 @@ jobs:
           SCHEMA_COMPAT_BASE: origin/${{ github.base_ref }}
         run: pnpm --filter @genshin/api schemas:check
 
-  # Runs only the hooks skipped by pre-commit.ci; see .pre-commit-config.yaml
-  # ci.skip for the complete list.
+  # Runs every hook. This is the only runner, so a hook added to
+  # .pre-commit-config.yaml is enforced here without touching this file.
   pre-commit:
-    name: Run local hooks
+    name: Run hooks
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -143,44 +143,12 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Run ESLint hook
-        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
-        with:
-          extra_args: --all-files eslint
-
-      - name: Run Prettier hook
-        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
-        with:
-          extra_args: --all-files prettier
-
-      - name: Run Stylelint hook
-        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
-        with:
-          extra_args: --all-files stylelint
-
-      - name: Run Terraform fmt hook
-        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
-        with:
-          extra_args: --all-files terraform_fmt
-
       - name: Install Trivy
         run: |
           set -euo pipefail
           TRIVY_INSTALL=https://raw.githubusercontent.com/aquasecurity/trivy
           curl -fsSL "$TRIVY_INSTALL/main/contrib/install.sh" \
             | sh -s -- -b /usr/local/bin
-
-      - name: Run Terraform Trivy hook
-        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
-        env:
-          TRIVY_CONFIG: ${{ github.workspace }}/.trivy.yaml
-        with:
-          extra_args: --all-files terraform_trivy
-
-      - name: Run Renovate config validator hook
-        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
-        with:
-          extra_args: --all-files renovate-config-validator
 
       - name: Install hadolint
         run: |
@@ -190,30 +158,17 @@ jobs:
             -o /usr/local/bin/hadolint
           sudo chmod +x /usr/local/bin/hadolint
 
-      - name: Run hadolint hook
+      - name: Run hooks
         uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+        env:
+          TRIVY_CONFIG: ${{ github.workspace }}/.trivy.yaml
+          # no-commit-to-branch guards local commits against develop and main,
+          # and a push-event checkout is attached to the very branch it guards,
+          # so it would fail every merge. lychee needs a binary this job does
+          # not install; the internal-links job runs it through the action.
+          SKIP: no-commit-to-branch,lychee
         with:
-          extra_args: --all-files hadolint
-
-      - name: Run ls-lint hook
-        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
-        with:
-          extra_args: --all-files ls-lint
-
-      - name: Run knip hook
-        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
-        with:
-          extra_args: --all-files knip
-
-      - name: Run syncpack hook
-        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
-        with:
-          extra_args: --all-files syncpack
-
-      - name: Run schema snapshots hook
-        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
-        with:
-          extra_args: --all-files schema-snapshots
+          extra_args: --all-files
 
   # Internal cross-references must resolve on disk. Ungated, so it always
   # reports a status and is safe to require. --offline skips all network
@@ -259,9 +214,9 @@ jobs:
           extra_args: --results=verified
 
   # Online supply-chain audits (impostor commits, known-vulnerable actions)
-  # need a token and network, so they can't run in pre-commit.ci. This job
-  # uploads SARIF to the Security tab and blocks on findings; the offline
-  # audits are gated separately via the zizmor pre-commit hook.
+  # need a token and network. This job uploads SARIF to the Security tab and
+  # blocks on findings; the offline audits are gated by the zizmor pre-commit
+  # hook, which the pre-commit job above runs.
   workflows:
     name: Audit workflows
     runs-on: ubuntu-latest
