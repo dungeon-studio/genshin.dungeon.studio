@@ -176,7 +176,7 @@
 - Keep Terraform version aligned across:
   - `.github/workflows/terraform-plan.yml`
   - `.github/workflows/terraform-apply.yml`
-  - `.github/workflows/pre-commit.yml`, when Terraform is in use
+  - `.github/workflows/ci.yml` pre-commit job, when Terraform is in use
 - Current Terraform version baseline: `1.9.0`.
 
 ## Docker rules
