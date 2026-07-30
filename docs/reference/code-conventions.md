@@ -48,20 +48,6 @@ Branded types in `packages/domain/` each get their own file (for example, `uuid.
 
 Shared API test utilities live in `apps/api/src/test/` with descriptive file names. The build excludes this directory via `tsconfig.build.json`.
 
-## Workflow files
-
-A workflow file is named for _when_ it runs. Its jobs are named for _what_ they check, because the filename no longer carries that.
-
-- `ci.yml` holds every sensor that runs on an integration event: a pull request, or a push to `develop` or `main`.
-- `daily.yml` and `weekly.yml` hold the scheduled checks, one file per cadence.
-- A path-gated check keeps its own file, since "runs when these paths change" is a narrower when. Gate only when the setup is expensive, and share one `paths:` list across triggers with a YAML anchor (`paths: &paths`, then `paths: *paths`).
-
-Workflows that mutate state outside the checkout—deploy, Terraform apply, release notes—are named for what they change: `deploy.yml`, `terraform-apply.yml`, `release-notes.yml`.
-
-A new check lands as a job in the file matching its when. A new file needs a different when: a new trigger, a new cadence, or a path gate. Reusable (`workflow_call`) workflows sit outside the rule, since a caller decides when they run.
-
-The rule and its rationale come from [architecture decision record 0004 in alunduil-chezmoi](https://github.com/alunduil/alunduil-chezmoi/blob/main/docs/adr/0004-consolidate-ci-workflow.md).
-
 ---
 
 ## Platform compatibility

@@ -69,11 +69,13 @@ pnpm dev
 
 Pre-commit enforces formatting, linting, documentation, and hygiene checks on every commit and on pull requests. If checks fail, fix the issues—see [Code quality](#code-quality) for the tools involved.
 
-### Quality gate ownership
+### What your pull request has to pass
 
-- [.github/workflows/ci.yml](.github/workflows/ci.yml) runs everything that gates a pull request: the workspace build and tests, every pre-commit hook, and the security scans. Each is its own job, so a failure names the check. A hook added to `.pre-commit-config.yaml` is enforced there without any workflow edit.
-- [.github/workflows/weekly.yml](.github/workflows/weekly.yml) checks external URLs and reports breakage via a GitHub issue rather than blocking, since transient outages make per-PR external checks flaky.
-- Feature work adds tests and enforces them when it introduces testable behavior.
+- Every pre-commit hook. Run `pre-commit install` once, and the same hooks run on each commit that CI runs over the whole tree—so a clean commit is a clean build. `pre-commit run --all-files` reproduces CI exactly.
+- The workspace build and tests: `pnpm turbo run typecheck test build`.
+- Feature work adds tests when it introduces testable behavior.
+
+Broken external URLs are the one exception: a weekly run files them as a GitHub issue rather than blocking a pull request, since transient outages would make that check flaky. For which workflow runs what, see [workflow conventions](docs/reference/workflow-conventions.md).
 
 **Commit types**. Use these prefixes in your commit messages:
 
@@ -179,6 +181,7 @@ For step-by-step instructions and technical details:
 - [Add Terraform Environment](docs/how-tos/add-terraform-environment.md): Bootstrap, scaffold, lock file, and workflow updates for new environments
 - [Infrastructure branch flow](docs/reference/infrastructure-branch-flow.md): How branches map to environments and Terraform actions
 - [Code conventions](docs/reference/code-conventions.md): Naming, shared types, test utilities, documentation strategy, and platform compatibility
+- [Workflow conventions](docs/reference/workflow-conventions.md): How workflows and jobs are named, which branches get push runs, and how tool versions are pinned
 - [REST API conventions](docs/reference/rest-api-conventions.md): Route design, method semantics, status codes, error shape, and pagination
 
 ---
