@@ -150,6 +150,8 @@ jobs:
       HADOLINT_VERSION: 'v2.14.0'
       # renovate: datasource=github-releases depName=lycheeverse/lychee extractVersion=^lychee-v(?<version>.+)$
       LYCHEE_VERSION: '0.24.2'
+      # renovate: datasource=github-releases depName=aquasecurity/trivy extractVersion=^v(?<version>.+)$
+      TRIVY_VERSION: '0.72.0'
 
     steps:
       - name: Checkout repository
@@ -167,9 +169,10 @@ jobs:
       - name: Install Trivy
         run: |
           set -euo pipefail
-          TRIVY_INSTALL=https://raw.githubusercontent.com/aquasecurity/trivy
-          curl -fsSL "$TRIVY_INSTALL/main/contrib/install.sh" \
-            | sh -s -- -b /usr/local/bin
+          TRIVY_URL=https://github.com/aquasecurity/trivy/releases/download
+          curl -fsSL \
+            "${TRIVY_URL}/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" \
+            | sudo tar -xz -C /usr/local/bin trivy
 
       - name: Install hadolint
         run: |
