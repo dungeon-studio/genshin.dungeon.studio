@@ -2,11 +2,13 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-name: devcontainer
+name: Devcontainer
 
+# A cold devcontainer build is expensive, hence the path gate. The anchor keeps
+# both triggers on one list, which two copies would let drift.
 on:
   pull_request:
-    paths:
+    paths: &paths
       - '.devcontainer/**'
       - '.vscode/extensions.json'
       - 'scripts/install-reuse.sh'
@@ -18,13 +20,16 @@ on:
     branches:
       - develop
       - main
+      - 'release/**'
+      - 'hotfix/**'
+    paths: *paths
 
 permissions:
   contents: read
 
 jobs:
   validate:
-    name: Validate
+    name: Validate workspace
     runs-on: ubuntu-latest
     timeout-minutes: 30
 

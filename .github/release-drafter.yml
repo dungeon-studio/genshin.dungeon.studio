@@ -5,7 +5,7 @@ name-template: 'v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
 
 # Collect notes from PRs merged into develop. The tag is retargeted to main at
-# publish time (git flow); see .github/workflows/release-drafter.yml.
+# publish time (git flow); see .github/workflows/release-notes.yml.
 commitish: refs/heads/develop
 
 categories:
