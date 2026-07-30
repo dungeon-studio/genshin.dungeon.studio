@@ -98,63 +98,10 @@ jobs:
       - name: Verify Build Artifacts
         run: bash apps/web/scripts/verify-build-output.sh
 
-      # One upload per flag; see .github/actions/codecov-upload for why they
-      # cannot be combined. Always run, so a failing package still reports the
-      # coverage of the ones that passed.
-      - name: Upload web coverage
-        if: always()
+      - name: Upload coverage to Codecov
+        if: ${{ !cancelled() }}
         uses: ./.github/actions/codecov-upload
         with:
-          path-prefix: apps/web
-          flag: web
-          codecov-token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload api coverage
-        if: always()
-        uses: ./.github/actions/codecov-upload
-        with:
-          path-prefix: apps/api
-          flag: api
-          codecov-token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload game-data coverage
-        if: always()
-        uses: ./.github/actions/codecov-upload
-        with:
-          path-prefix: packages/game-data
-          flag: game-data
-          codecov-token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload domain coverage
-        if: always()
-        uses: ./.github/actions/codecov-upload
-        with:
-          path-prefix: packages/domain
-          flag: domain
-          codecov-token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload collection-json coverage
-        if: always()
-        uses: ./.github/actions/codecov-upload
-        with:
-          path-prefix: packages/collection-json
-          flag: collection-json
-          codecov-token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload validation coverage
-        if: always()
-        uses: ./.github/actions/codecov-upload
-        with:
-          path-prefix: packages/validation
-          flag: validation
-          codecov-token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload game-data-codegen coverage
-        if: always()
-        uses: ./.github/actions/codecov-upload
-        with:
-          path-prefix: tools/game-data-codegen
-          flag: game-data-codegen
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
   # Proves the PR's persisted-data schemas stay backward-compatible with the ones

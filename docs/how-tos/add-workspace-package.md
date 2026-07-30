@@ -92,19 +92,11 @@ closest template.
       `test`, and `build` across the whole workspace, so turbo picks up the new
       package from `pnpm-workspace.yaml`. No change to the job is required.
 
-- [ ] Add a coverage upload step to that job so the package reports under its
-      own Codecov flag, and declare the flag in `codecov.yml` under
-      `flag_management.individual_flags`:
-
-  ```yaml
-  - name: Upload <name> coverage
-    if: always()
-    uses: ./.github/actions/codecov-upload
-    with:
-      path-prefix: packages/<name>
-      flag: <name>
-      codecov-token: ${{ secrets.CODECOV_TOKEN }}
-  ```
+- [ ] Add an upload pair to `.github/actions/codecov-upload/action.yml` so the
+      package reports under its own flag, and declare that flag in
+      `codecov.yml` under `flag_management.individual_flags`. Copy an existing
+      pair and change the paths and flag; one upload per flag is required, and
+      the action explains why.
 
   Every entry runs the `typecheck`, `test`, and `build` tasks. Add the entry
   only once the package has a `test` script, or the `test` task fails.

@@ -3,21 +3,22 @@
 # SPDX-License-Identifier: MIT
 
 name: Codecov upload
-description: Upload one package's coverage and test results under its own flag
+description: Upload every package's coverage and test results under its own flag
 
-# One invocation per flag, deliberately. Codecov applies a report's entire
-# coverage to every flag it is tagged with, so a single upload carrying all
-# seven flags reports each package's coverage as the whole workspace's. The
-# `paths` under flag_management in codecov.yml filter what the UI displays;
-# they do not segment an upload.
+# One upload per flag, deliberately. Codecov applies a report's entire coverage
+# to every flag it is tagged with, so a single upload carrying all seven flags
+# would report each package's coverage as the whole workspace's. The `paths`
+# under flag_management in codecov.yml filter what the UI displays; they do not
+# segment an upload. Hence the repetition, kept here rather than in ci.yml so
+# the workflow reads as one step.
+#
+# Every step runs unless the job was cancelled, so a package whose tests failed
+# still reports the coverage of the packages that passed.
+#
+# Adding a package means adding a pair here and a flag in codecov.yml; see
+# docs/how-tos/add-workspace-package.md.
 
 inputs:
-  path-prefix:
-    description: 'Package directory, e.g. apps/api'
-    required: true
-  flag:
-    description: 'Codecov flag name, matching codecov.yml flag_management'
-    required: true
   codecov-token:
     description: 'Codecov upload token'
     required: true
@@ -26,19 +27,135 @@ runs:
   using: composite
 
   steps:
-    - name: Upload coverage to Codecov
+    - name: Upload web
+      if: ${{ !cancelled() }}
       uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
         token: ${{ inputs.codecov-token }}
-        files: ${{ inputs.path-prefix }}/coverage/lcov.info
-        flags: ${{ inputs.flag }}
+        files: apps/web/coverage/lcov.info
+        flags: web
         fail_ci_if_error: false
 
-    - name: Upload test results to Codecov
+    - name: Upload web test results
+      if: ${{ !cancelled() }}
       uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
         token: ${{ inputs.codecov-token }}
-        files: ${{ inputs.path-prefix }}/test-results/junit.xml
-        flags: ${{ inputs.flag }}
+        files: apps/web/test-results/junit.xml
+        flags: web
+        report_type: test_results
+        fail_ci_if_error: false
+
+    - name: Upload api
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: apps/api/coverage/lcov.info
+        flags: api
+        fail_ci_if_error: false
+
+    - name: Upload api test results
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: apps/api/test-results/junit.xml
+        flags: api
+        report_type: test_results
+        fail_ci_if_error: false
+
+    - name: Upload game-data
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: packages/game-data/coverage/lcov.info
+        flags: game-data
+        fail_ci_if_error: false
+
+    - name: Upload game-data test results
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: packages/game-data/test-results/junit.xml
+        flags: game-data
+        report_type: test_results
+        fail_ci_if_error: false
+
+    - name: Upload domain
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: packages/domain/coverage/lcov.info
+        flags: domain
+        fail_ci_if_error: false
+
+    - name: Upload domain test results
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: packages/domain/test-results/junit.xml
+        flags: domain
+        report_type: test_results
+        fail_ci_if_error: false
+
+    - name: Upload collection-json
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: packages/collection-json/coverage/lcov.info
+        flags: collection-json
+        fail_ci_if_error: false
+
+    - name: Upload collection-json test results
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: packages/collection-json/test-results/junit.xml
+        flags: collection-json
+        report_type: test_results
+        fail_ci_if_error: false
+
+    - name: Upload validation
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: packages/validation/coverage/lcov.info
+        flags: validation
+        fail_ci_if_error: false
+
+    - name: Upload validation test results
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: packages/validation/test-results/junit.xml
+        flags: validation
+        report_type: test_results
+        fail_ci_if_error: false
+
+    - name: Upload game-data-codegen
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: tools/game-data-codegen/coverage/lcov.info
+        flags: game-data-codegen
+        fail_ci_if_error: false
+
+    - name: Upload game-data-codegen test results
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: tools/game-data-codegen/test-results/junit.xml
+        flags: game-data-codegen
         report_type: test_results
         fail_ci_if_error: false
