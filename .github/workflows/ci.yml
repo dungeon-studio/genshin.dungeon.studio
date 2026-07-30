@@ -179,7 +179,11 @@ jobs:
           # so it would fail every merge.
           SKIP: no-commit-to-branch
         with:
-          extra_args: --all-files
+          # The pre-push stage is the superset: hooks without an explicit
+          # `stages` run at every stage, and the ones that opt out of the
+          # commit loop opt into this one. Running the pre-commit stage here
+          # would silently skip them.
+          extra_args: --all-files --hook-stage pre-push
 
   # Verified-mode secret scanning: TruffleHog confirms a detected credential is
   # live before failing, so this gate is high-signal and needs no allowlist.

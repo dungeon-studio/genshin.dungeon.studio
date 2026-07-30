@@ -17,6 +17,11 @@ exclude: |
     pnpm-lock\.yaml         # Package lockfile
   )
 
+# Hooks default to every stage, so anything without an explicit `stages` runs
+# at both. Installing both types is what lets a hook opt out of the commit
+# loop without opting out of everything.
+default_install_hook_types: [pre-commit, pre-push]
+
 repos:
   # Basic file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -134,9 +139,9 @@ repos:
         pass_filenames: false
         stages: [manual]
 
-      # knip analyzes the whole workspace graph, so it can't be file-scoped;
-      # it runs on every commit (always_run) like ls-lint. Fast enough (~1s)
-      # to gate commits.
+      # knip analyzes the whole workspace graph, so it can't be file-scoped
+      # and runs on every commit (always_run). ~2s, which is a tolerable
+      # commit-loop cost; revisit if the workspace grows enough to change that.
       - id: knip
         name: knip (unused files, dependencies, exports)
         entry: pnpm exec knip
@@ -161,12 +166,17 @@ repos:
         language: system
         types: [markdown]
 
+      # ls-lint's ignore list filters its findings but does not prune its walk,
+      # so it spends ~10s traversing node_modules to validate ~560 tracked
+      # files. Too slow for the commit loop; pre-push still catches a bad name
+      # before it leaves the machine, and CI runs the pre-push stage too.
       - id: ls-lint
         name: file naming conventions
         entry: pnpm exec ls-lint
         language: system
         pass_filenames: false
         always_run: true
+        stages: [pre-push]
 
       - id: syncpack
         name: exact dependency versions
