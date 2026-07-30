@@ -7,19 +7,26 @@ name: CI
 # checks have a narrower "when" and keep their own files; see
 # docs/reference/code-conventions.md for the naming rule.
 
+# The push set is every git-flow branch whose merge result ships or gets
+# inherited, since no merge result was itself tested before it landed. Feature
+# branches are absent deliberately: the pull_request trigger gates those.
 on:
   pull_request:
   push:
     branches:
       - develop
       - main
+      - 'release/**'
+      - 'hotfix/**'
 
 permissions:
   contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/main' }}
+  # Cancel superseded pull request runs; never cancel a push to a long-lived
+  # branch, so every commit on it keeps a result of its own.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test:

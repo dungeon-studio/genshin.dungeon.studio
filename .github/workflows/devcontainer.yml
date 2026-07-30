@@ -22,6 +22,8 @@ on:
     branches:
       - develop
       - main
+      - 'release/**'
+      - 'hotfix/**'
     paths: *paths
 
 permissions:
