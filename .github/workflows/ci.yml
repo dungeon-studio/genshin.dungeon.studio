@@ -131,11 +131,14 @@ jobs:
           java-version: '21'
 
       # Browser builds are keyed by Playwright version, so the cache only misses
-      # when the dependency itself moves.
+      # when the dependency itself moves. Read straight from the manifest, which
+      # syncpack keeps pinned to an exact version: `pnpm exec` writes warnings to
+      # the same stream as the version it reports, and those would land in
+      # GITHUB_OUTPUT too.
       - name: Resolve Playwright version
         id: playwright
         run: |
-          version="$(pnpm --filter @genshin/web exec playwright --version | awk '{print $2}')"
+          version="$(node -p "require('./apps/web/package.json').devDependencies['@playwright/test']")"
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Cache Playwright browsers
