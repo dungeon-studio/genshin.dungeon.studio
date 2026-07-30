@@ -18,6 +18,7 @@ permissions:
 
 jobs:
   core:
+    name: Core
     if: github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/release/')
     permissions:
       contents: read
@@ -28,6 +29,7 @@ jobs:
     secrets: inherit
 
   dev:
+    name: Dev
     if: github.ref == 'refs/heads/develop'
     needs: core
     permissions:
@@ -39,6 +41,7 @@ jobs:
     secrets: inherit
 
   staging:
+    name: Staging
     if: startsWith(github.ref, 'refs/heads/release/')
     needs: core
     permissions:

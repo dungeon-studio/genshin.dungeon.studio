@@ -9,8 +9,8 @@ SPDX-License-Identifier: MIT
 
 <!-- vale Microsoft.Headings = YES -->
 
-CI runs Trivy automatically on pull requests via the `trivy.yml`
-workflow and the `terraform_trivy` pre-commit hook. Use this guide to
+CI runs Trivy automatically on pull requests via the `trivy-*` jobs in
+`ci.yml` and the `terraform_trivy` pre-commit hook. Use this guide to
 reproduce a finding locally or scan changes before pushing.
 
 ## Prerequisites
