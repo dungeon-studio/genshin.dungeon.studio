@@ -54,8 +54,8 @@ run_verification() {
   verify "hadolint"             hadolint --version
   verify "lychee"               lychee --version
   verify "firebase"             firebase --version
-  verify "playwright-cli"       npx --yes playwright --version
-  verify "playwright-browsers"  npx --yes playwright install --list
+  verify "playwright-cli"       pnpm --filter @genshin/web exec playwright --version
+  verify "playwright-browsers"  pnpm --filter @genshin/web exec playwright install --list
   eval "${_xtrace}"
 }
 
@@ -77,7 +77,7 @@ run_version_summary() {
   print_version "hadolint"   hadolint --version
   print_version "lychee"     lychee --version
   print_version "firebase"   firebase --version
-  print_version "playwright" npx --yes playwright --version
+  print_version "playwright" pnpm --filter @genshin/web exec playwright --version
   eval "${_xtrace}"
 }
 
