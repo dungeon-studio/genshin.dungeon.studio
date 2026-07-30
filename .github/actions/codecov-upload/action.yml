@@ -27,7 +27,7 @@ runs:
   using: composite
 
   steps:
-    - name: Upload web
+    - name: Upload web coverage
       if: ${{ !cancelled() }}
       uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
@@ -46,7 +46,7 @@ runs:
         report_type: test_results
         fail_ci_if_error: false
 
-    - name: Upload api
+    - name: Upload api coverage
       if: ${{ !cancelled() }}
       uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
@@ -65,7 +65,7 @@ runs:
         report_type: test_results
         fail_ci_if_error: false
 
-    - name: Upload game-data
+    - name: Upload game-data coverage
       if: ${{ !cancelled() }}
       uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
@@ -84,7 +84,7 @@ runs:
         report_type: test_results
         fail_ci_if_error: false
 
-    - name: Upload domain
+    - name: Upload domain coverage
       if: ${{ !cancelled() }}
       uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
@@ -103,7 +103,7 @@ runs:
         report_type: test_results
         fail_ci_if_error: false
 
-    - name: Upload collection-json
+    - name: Upload collection-json coverage
       if: ${{ !cancelled() }}
       uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
@@ -122,7 +122,7 @@ runs:
         report_type: test_results
         fail_ci_if_error: false
 
-    - name: Upload validation
+    - name: Upload validation coverage
       if: ${{ !cancelled() }}
       uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
@@ -141,7 +141,7 @@ runs:
         report_type: test_results
         fail_ci_if_error: false
 
-    - name: Upload game-data-codegen
+    - name: Upload game-data-codegen coverage
       if: ${{ !cancelled() }}
       uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
