@@ -98,7 +98,7 @@ jobs:
       - name: Verify Build Artifacts
         run: bash apps/web/scripts/verify-build-output.sh
 
-      - name: Upload coverage to Codecov
+      - name: Upload coverage and test results to Codecov
         if: ${{ !cancelled() }}
         uses: ./.github/actions/codecov-upload
         with:
