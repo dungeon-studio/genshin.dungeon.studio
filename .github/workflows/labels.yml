@@ -3,9 +3,8 @@
 ---
 name: Labels
 
-# The labels this applies are what release-notes.yml groups the draft by, and
-# both read their rules from .github/release-drafter.yml. They stay separate
-# workflows because they run on different triggers.
+# release-notes.yml groups the draft by the labels this applies; both read
+# their rules from .github/release-drafter.yml.
 
 on:
   pull_request:

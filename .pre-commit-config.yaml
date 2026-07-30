@@ -134,9 +134,8 @@ repos:
         pass_filenames: false
         stages: [manual]
 
-      # knip analyzes the whole workspace graph, so it can't be file-scoped
-      # and runs on every commit (always_run). ~2s, which is a tolerable
-      # commit-loop cost; revisit if the workspace grows enough to change that.
+      # knip analyzes the whole workspace graph, so it can't be file-scoped and
+      # runs on every commit.
       - id: knip
         name: knip (unused files, dependencies, exports)
         entry: pnpm exec knip
@@ -162,9 +161,8 @@ repos:
         types: [markdown]
 
       # ls-lint's ignore list filters its findings but does not prune its walk,
-      # so it spends ~10s traversing node_modules to validate ~560 tracked
-      # files. Tolerable on every commit; worth revisiting upstream rather than
-      # moving the hook.
+      # so it traverses node_modules to validate the tracked files and takes
+      # seconds rather than milliseconds.
       - id: ls-lint
         name: file naming conventions
         entry: pnpm exec ls-lint

@@ -4,10 +4,8 @@
 
 name: Devcontainer
 
-# A cold devcontainer build is expensive (~5 minutes), so this one is
-# path-gated: "runs when the devcontainer changes" is a narrower when than
-# ci.yml's. The anchor keeps both triggers on one list — two copies would
-# drift silently.
+# A cold devcontainer build is expensive, hence the path gate. The anchor keeps
+# both triggers on one list, which two copies would let drift.
 on:
   pull_request:
     paths: &paths

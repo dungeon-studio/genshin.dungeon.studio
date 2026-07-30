@@ -5,9 +5,8 @@ name: Daily
 
 on:
   schedule:
-    # Daily at 09:00 Europe/London; the timezone field handles BST/GMT. A
-    # passing run is silent; only a failure emails repo admins, so a daily
-    # cadence costs nothing when everything is healthy.
+    # A passing run is silent and only a failure emails repo admins, so a daily
+    # cadence costs nothing while everything is healthy.
     - cron: '0 9 * * *'
       timezone: Europe/London
   workflow_dispatch:
@@ -21,10 +20,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # A failed Renovate job on Mend's hosted runner stalls silently with no
-  # retry: the repo went 29 days without updates before anyone noticed. The
-  # Dependency Dashboard issue is Renovate's heartbeat, so a stale one turns a
-  # silent stall into a daily alert.
+  # A failed Renovate job on Mend's hosted runner stalls silently and is never
+  # retried. The Dependency Dashboard issue is Renovate's heartbeat, so a stale
+  # one is the only available signal.
   renovate-liveness:
     name: Check Renovate liveness
     runs-on: ubuntu-latest

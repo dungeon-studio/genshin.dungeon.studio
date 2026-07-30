@@ -5,18 +5,14 @@
 name: Codecov upload
 description: Upload every package's coverage and test results under its own flag
 
-# One upload per flag, deliberately. Codecov applies a report's entire coverage
-# to every flag it is tagged with, so a single upload carrying all seven flags
-# would report each package's coverage as the whole workspace's. The `paths`
-# under flag_management in codecov.yml filter what the UI displays; they do not
-# segment an upload. Hence the repetition, kept here rather than in ci.yml so
-# the workflow reads as one step.
+# One upload per flag. Codecov applies a report's entire coverage to every flag
+# it is tagged with, so a single upload carrying all seven would report each
+# package's coverage as the whole workspace's. The `paths` under
+# flag_management in codecov.yml filter what the UI displays; they do not
+# segment an upload.
 #
-# Every step runs unless the job was cancelled, so a package whose tests failed
-# still reports the coverage of the packages that passed.
-#
-# Adding a package means adding a pair here and a flag in codecov.yml; see
-# docs/how-tos/add-workspace-package.md.
+# A failing package must not suppress the coverage of the ones that passed,
+# hence the condition on every step.
 
 inputs:
   codecov-token:

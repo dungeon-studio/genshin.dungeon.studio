@@ -3,13 +3,8 @@
 ---
 name: CI
 
-# Every sensor that runs unconditionally on an integration event. Path-gated
-# checks have a narrower "when" and keep their own files; see
-# docs/reference/workflow-conventions.md for the naming rule.
-
-# The push set is every git-flow branch whose merge result ships or gets
-# inherited, since no merge result was itself tested before it landed. Feature
-# branches are absent deliberately: the pull_request trigger gates those.
+# Every sensor that runs unconditionally on an integration event.
+# See docs/reference/workflow-conventions.md.
 on:
   pull_request:
   push:
@@ -29,12 +24,8 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  # turbo owns the task graph: every task declares `dependsOn: ["^build"]` with
-  # its inputs and outputs, so turbo orders the workspace, parallelises what is
-  # independent, and builds each package exactly once. A per-package job matrix
-  # was a second scheduler layered on top of that one, re-deriving every
-  # dependency closure on its own runner and partitioning the turbo cache per
-  # leg so no leg could ever reuse another's output.
+  # Unfiltered, so turbo orders the workspace from turbo.json and builds each
+  # package once. Splitting this per package costs that.
   workspace:
     name: Build and test workspace
     runs-on: ubuntu-latest
@@ -71,8 +62,8 @@ jobs:
         # low-confidence finding tracked for recheck in #910.
         run: echo "FAST_CHECK_SEED=$((16#${SEED_SOURCE:0:8}))" >> "$GITHUB_ENV" # zizmor: ignore[github-env]
 
-      # --continue keeps every package's result in one run, which is what the
-      # matrix's fail-fast: false bought.
+      # --continue reports every package rather than stopping at the first
+      # failure.
       - name: Typecheck
         run: pnpm turbo run typecheck --continue
 
@@ -136,8 +127,8 @@ jobs:
           SCHEMA_COMPAT_BASE: origin/${{ github.base_ref }}
         run: pnpm --filter @genshin/api schemas:check
 
-  # Runs every hook. This is the only runner, so a hook added to
-  # .pre-commit-config.yaml is enforced here without touching this file.
+  # The only runner, so a hook added to .pre-commit-config.yaml is enforced
+  # without touching this file.
   pre-commit:
     name: Run pre-commit hooks
     runs-on: ubuntu-latest
@@ -309,11 +300,9 @@ jobs:
           sarif_file: dockerfile-results.sarif
           category: trivy-dockerfile
 
-  # One build feeds both the scan and the smoke test. As two jobs they built
-  # the same image twice and raced each other writing the same type=gha cache
-  # scope. The scan runs first because it never fails the job (trivy-action
-  # defaults to exit-code 0, reporting through SARIF), so a smoke failure can
-  # still not cost us the scan results.
+  # One build feeds both the scan and the smoke test. The scan goes first
+  # because trivy-action defaults to exit-code 0 and reports through SARIF, so
+  # a smoke-test failure cannot cost us its results.
   container:
     name: Scan and smoke-test container
     runs-on: ubuntu-latest
@@ -369,11 +358,3 @@ jobs:
       - name: Cleanup container
         if: always()
         run: docker rm -f api-smoke 2>/dev/null || true
-
-# ---------------------------------------------------------------------------
-# Maintenance notes
-# - A new workspace package needs no change here to be typechecked, tested, or
-#   built; turbo discovers it. It does need a coverage upload step and a
-#   matching flag in codecov.yml. See docs/how-tos/add-workspace-package.md.
-# - Keep caching strategy aligned with package manager changes.
-# ---------------------------------------------------------------------------
