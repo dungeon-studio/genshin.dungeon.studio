@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "schemas:export": "tsx scripts/export-schemas.ts",
     "test": "vitest run",
-    "typecheck": "tsc -b --noEmit && tsc --project tsconfig.scripts.json --noEmit"
+    "test:e2e": "firebase --config ../../firebase.json emulators:exec --only auth,firestore --project demo-dungeon-studio-genshin-dev 'playwright test'",
+    "typecheck": "tsc -b --noEmit && tsc --project tsconfig.scripts.json --noEmit && tsc --project tsconfig.e2e.json --noEmit"
   },
   "dependencies": {
     "@genshin/collection-json": "workspace:*",
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@genshin/eslint-config": "workspace:*",
+    "@playwright/test": "1.62.0",
     "@tailwindcss/postcss": "4.3.3",
     "@testing-library/jest-dom": "7.0.0",
     "@testing-library/react": "16.3.2",

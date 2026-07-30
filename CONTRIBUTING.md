@@ -129,6 +129,20 @@ For code conventions—comments, documentation strategy, naming, shared types, t
 - **Use `satisfies` for fixture annotations**: it validates the fixture shape at the declaration site without changing the inferred type, avoiding index-signature assignability errors.
 - **One schema assertion per route test, then field-level spot checks**: validate the response against the published JSON Schema with AJV first, then assert one specific value; don't re-test the schema field by field.
 
+### End-to-end tests
+
+Playwright drives a browser through the assembled stack—Firebase emulators, the API, and the web app:
+
+```bash
+pnpm turbo run test:e2e
+```
+
+The command owns the whole stack: it starts the emulators, the API, and the Vite dev server, and stops them again on the way out. That means it can't share ports with a `pnpm dev` session, in this checkout or any other worktree—stop that session first or the emulators fail to bind.
+
+The suite runs against the dev server rather than a production preview because `vite build` strips the emulator wiring in [`src/lib/firebase.ts`](apps/web/src/lib/firebase.ts), leaving a built bundle with no way to sign in.
+
+Artifacts (traces, failure screenshots, the HTML report) are written to `/tmp/genshin-e2e`, never into the workspace.
+
 ---
 
 ## Pull request workflow
