@@ -23,8 +23,8 @@ jobs:
   # retry: the repo went 29 days without updates before anyone noticed. The
   # Dependency Dashboard issue is Renovate's heartbeat, so a stale one turns a
   # silent stall into a daily alert.
-  check-freshness:
-    name: Check Renovate freshness
+  renovate-liveness:
+    name: Check Renovate liveness
     runs-on: ubuntu-latest
     timeout-minutes: 5
 

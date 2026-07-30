@@ -30,7 +30,7 @@ concurrency:
 
 jobs:
   test:
-    name: ${{ matrix.display }}
+    name: Build and test ${{ matrix.display }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -120,7 +120,7 @@ jobs:
   # Runs every hook. This is the only runner, so a hook added to
   # .pre-commit-config.yaml is enforced here without touching this file.
   pre-commit:
-    name: Run hooks
+    name: Run pre-commit hooks
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -212,7 +212,7 @@ jobs:
   # need a token and network. This job uploads SARIF to the Security tab and
   # blocks on findings; the offline audits are gated by the zizmor pre-commit
   # hook, which the pre-commit job above runs.
-  workflows:
+  workflow-audit:
     name: Audit workflows
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -232,7 +232,7 @@ jobs:
           config: .github/zizmor.yml
 
   trivy-terraform:
-    name: Scan Terraform config
+    name: Scan Terraform
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

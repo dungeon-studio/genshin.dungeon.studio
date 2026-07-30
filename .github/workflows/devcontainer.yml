@@ -31,7 +31,7 @@ permissions:
 
 jobs:
   validate:
-    name: Validate devcontainer
+    name: Validate workspace
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
