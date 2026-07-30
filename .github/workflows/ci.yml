@@ -129,6 +129,8 @@ jobs:
       TERRAFORM_VERSION: '1.15.8'
       # renovate: datasource=github-releases depName=hadolint/hadolint
       HADOLINT_VERSION: 'v2.14.0'
+      # renovate: datasource=github-releases depName=lycheeverse/lychee extractVersion=^lychee-v(?<version>.+)$
+      LYCHEE_VERSION: '0.24.2'
 
     steps:
       - name: Checkout repository
@@ -158,37 +160,26 @@ jobs:
             -o /usr/local/bin/hadolint
           sudo chmod +x /usr/local/bin/hadolint
 
+      # musl, so the binary is static and carries no glibc floor.
+      - name: Install lychee
+        run: |
+          set -euo pipefail
+          LYCHEE_URL=https://github.com/lycheeverse/lychee/releases/download
+          LYCHEE_DIR=lychee-x86_64-unknown-linux-musl
+          curl -fsSL \
+            "${LYCHEE_URL}/lychee-v${LYCHEE_VERSION}/${LYCHEE_DIR}.tar.gz" \
+            | sudo tar -xz -C /usr/local/bin --strip-components=1 "${LYCHEE_DIR}/lychee"
+
       - name: Run hooks
         uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
         env:
           TRIVY_CONFIG: ${{ github.workspace }}/.trivy.yaml
           # no-commit-to-branch guards local commits against develop and main,
           # and a push-event checkout is attached to the very branch it guards,
-          # so it would fail every merge. lychee needs a binary this job does
-          # not install; the internal-links job runs it through the action.
-          SKIP: no-commit-to-branch,lychee
+          # so it would fail every merge.
+          SKIP: no-commit-to-branch
         with:
           extra_args: --all-files
-
-  # Internal cross-references must resolve on disk. Ungated, so it always
-  # reports a status and is safe to require. --offline skips all network
-  # requests, so external rot — checked in weekly.yml — never blocks a PR.
-  internal-links:
-    name: Check internal links
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Check internal links
-        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
-        with:
-          args: --offline --no-progress "**/*.md"
-          fail: true
 
   # Verified-mode secret scanning: TruffleHog confirms a detected credential is
   # live before failing, so this gate is high-signal and needs no allowlist.
@@ -296,8 +287,13 @@ jobs:
           sarif_file: dockerfile-results.sarif
           category: trivy-dockerfile
 
-  trivy-container:
-    name: Scan container image
+  # One build feeds both the scan and the smoke test. As two jobs they built
+  # the same image twice and raced each other writing the same type=gha cache
+  # scope. The scan runs first because it never fails the job (trivy-action
+  # defaults to exit-code 0, reporting through SARIF), so a smoke failure can
+  # still not cost us the scan results.
+  container:
+    name: Scan and smoke-test container
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -320,14 +316,14 @@ jobs:
           file: ./apps/api/Dockerfile
           push: false
           load: true
-          tags: api-trivy:scan
+          tags: api:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Scan Container Image
         uses: aquasecurity/trivy-action@c07df6fec6fa692e6fd1200d50aaa1fdd66f03c8 # master
         with:
-          image-ref: api-trivy:scan
+          image-ref: api:ci
           format: sarif
           output: container-results.sarif
           trivy-config: .trivy.yaml
@@ -339,32 +335,9 @@ jobs:
           sarif_file: container-results.sarif
           category: trivy-container
 
-  container-smoke:
-    name: Build and smoke-test container
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
-
-      - name: Build image
-        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
-        with:
-          context: .
-          file: ./apps/api/Dockerfile
-          push: false
-          load: true
-          tags: api-smoke:test
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
       - name: Smoke-test container startup
+        env:
+          IMAGE_TAG: api:ci
         run: bash apps/api/scripts/smoke-test-container.sh
 
       - name: Dump container logs on failure

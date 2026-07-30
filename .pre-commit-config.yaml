@@ -150,6 +150,11 @@ repos:
         language: system
         types: [dockerfile]
 
+      # Offline resolves on-disk paths and makes no network request, so it
+      # gates every commit and every pull request. The weekly external sweep
+      # stays an action for its issue reporting. Upstream's auto-installing
+      # hook is unusable here: cargo-binstall fetches a glibc build that needs
+      # GLIBC_2.38, newer than some contributor machines.
       - id: lychee
         name: lychee (internal links)
         entry: lychee --offline --no-progress
