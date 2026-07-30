@@ -8,6 +8,16 @@ rules:
     # next bump. Comment hygiene, not a security signal, so opt out repo-wide.
     disable: true
 
+  cache-poisoning:
+    # The audit fires because ci.yml has push triggers it associates with
+    # publishing. ci.yml publishes nothing: it builds to prove the workspace
+    # compiles and discards the output, and deploy.yml owns every artifact that
+    # leaves the repository. GitHub also scopes cache writes to the writing
+    # branch, so a pull request cannot write into the scope a later develop or
+    # main run restores from.
+    ignore:
+      - ci.yml
+
   secrets-inherit:
     # terraform-apply.yml uses secret inheritance into its reusable workflow
     # because the GCP_RW_* credentials are environment-scoped (core/dev/staging).

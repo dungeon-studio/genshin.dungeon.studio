@@ -1,0 +1,44 @@
+---
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+name: Codecov upload
+description: Upload one package's coverage and test results under its own flag
+
+# One invocation per flag, deliberately. Codecov applies a report's entire
+# coverage to every flag it is tagged with, so a single upload carrying all
+# seven flags reports each package's coverage as the whole workspace's. The
+# `paths` under flag_management in codecov.yml filter what the UI displays;
+# they do not segment an upload.
+
+inputs:
+  path-prefix:
+    description: 'Package directory, e.g. apps/api'
+    required: true
+  flag:
+    description: 'Codecov flag name, matching codecov.yml flag_management'
+    required: true
+  codecov-token:
+    description: 'Codecov upload token'
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: ${{ inputs.path-prefix }}/coverage/lcov.info
+        flags: ${{ inputs.flag }}
+        fail_ci_if_error: false
+
+    - name: Upload test results to Codecov
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: ${{ inputs.path-prefix }}/test-results/junit.xml
+        flags: ${{ inputs.flag }}
+        report_type: test_results
+        fail_ci_if_error: false

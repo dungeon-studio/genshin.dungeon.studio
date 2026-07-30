@@ -29,43 +29,16 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  test:
-    name: Build and test ${{ matrix.display }}
+  # turbo owns the task graph: every task declares `dependsOn: ["^build"]` with
+  # its inputs and outputs, so turbo orders the workspace, parallelises what is
+  # independent, and builds each package exactly once. A per-package job matrix
+  # was a second scheduler layered on top of that one, re-deriving every
+  # dependency closure on its own runner and partitioning the turbo cache per
+  # leg so no leg could ever reuse another's output.
+  workspace:
+    name: Build and test workspace
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - display: Web
-            filter: '@genshin/web'
-            path-prefix: apps/web
-            flag: web
-          - display: API
-            filter: '@genshin/api'
-            path-prefix: apps/api
-            flag: api
-          - display: Game Data
-            filter: '@genshin/game-data'
-            path-prefix: packages/game-data
-            flag: game-data
-          - display: Domain
-            filter: '@genshin/domain'
-            path-prefix: packages/domain
-            flag: domain
-          - display: Collection JSON
-            filter: '@genshin/collection-json'
-            path-prefix: packages/collection-json
-            flag: collection-json
-          - display: Validation
-            filter: '@genshin/validation'
-            path-prefix: packages/validation
-            flag: validation
-          - display: Game Data Codegen
-            filter: '@genshin/game-data-codegen'
-            path-prefix: tools/game-data-codegen
-            flag: game-data-codegen
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
@@ -73,17 +46,116 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/node-ci
+      - uses: ./.github/actions/setup-node-pnpm
+
+      # Persist turbo's local cache so unchanged packages skip rebuilds across
+      # runs. GitHub cache entries are write-once per key, so a stable key would
+      # freeze after the first save; the per-commit key saves a fresh entry each
+      # run while the prefix restore-key restores the most recent one.
+      - name: Cache Turborepo
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          filter: ${{ matrix.filter }}
-          coverage-file: ${{ matrix.path-prefix }}/coverage/lcov.info
-          results-file: ${{ matrix.path-prefix }}/test-results/junit.xml
-          flag: ${{ matrix.flag }}
-          codecov-token: ${{ secrets.CODECOV_TOKEN }}
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      # Seed property-based tests from the commit under test: a re-run of the same
+      # commit replays identical inputs (so a failure reproduces), while a new
+      # commit or PR draws fresh inputs (so the generators keep exploring). The
+      # first 8 hex digits of the SHA become a 32-bit integer seed.
+      - name: Derive fast-check seed
+        env:
+          SEED_SOURCE: ${{ github.event.pull_request.head.sha || github.sha }}
+        # SEED_SOURCE is a commit SHA (trusted, hex), not attacker-controlled;
+        # low-confidence finding tracked for recheck in #910.
+        run: echo "FAST_CHECK_SEED=$((16#${SEED_SOURCE:0:8}))" >> "$GITHUB_ENV" # zizmor: ignore[github-env]
+
+      # --continue keeps every package's result in one run, which is what the
+      # matrix's fail-fast: false bought.
+      - name: Typecheck
+        run: pnpm turbo run typecheck --continue
+
+      - name: Test
+        run: pnpm turbo run test --continue -- --coverage
+
+      # apps/web fails the build when its Firebase config is missing, so that a
+      # deployed bundle can never fall back to the local-emulator placeholders in
+      # lib/firebase.ts. This build only proves the app compiles and its output is
+      # discarded, so any non-empty value satisfies it. Deployed bundles come from
+      # the separate build step in deploy.yml, which injects the real config.
+      - name: Build
+        env:
+          VITE_API_BASE_URL: https://api.invalid
+          VITE_FIREBASE_API_KEY: ci
+          VITE_FIREBASE_AUTH_DOMAIN: ci.invalid
+          VITE_FIREBASE_PROJECT_ID: ci
+          VITE_FIREBASE_STORAGE_BUCKET: ci.invalid
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ci
+          VITE_FIREBASE_APP_ID: ci
+        run: pnpm turbo run build --continue
 
       - name: Verify Build Artifacts
-        if: matrix.flag == 'web'
         run: bash apps/web/scripts/verify-build-output.sh
+
+      # One upload per flag; see .github/actions/codecov-upload for why they
+      # cannot be combined. Always run, so a failing package still reports the
+      # coverage of the ones that passed.
+      - name: Upload web coverage
+        if: always()
+        uses: ./.github/actions/codecov-upload
+        with:
+          path-prefix: apps/web
+          flag: web
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload api coverage
+        if: always()
+        uses: ./.github/actions/codecov-upload
+        with:
+          path-prefix: apps/api
+          flag: api
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload game-data coverage
+        if: always()
+        uses: ./.github/actions/codecov-upload
+        with:
+          path-prefix: packages/game-data
+          flag: game-data
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload domain coverage
+        if: always()
+        uses: ./.github/actions/codecov-upload
+        with:
+          path-prefix: packages/domain
+          flag: domain
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload collection-json coverage
+        if: always()
+        uses: ./.github/actions/codecov-upload
+        with:
+          path-prefix: packages/collection-json
+          flag: collection-json
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload validation coverage
+        if: always()
+        uses: ./.github/actions/codecov-upload
+        with:
+          path-prefix: packages/validation
+          flag: validation
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload game-data-codegen coverage
+        if: always()
+        uses: ./.github/actions/codecov-upload
+        with:
+          path-prefix: tools/game-data-codegen
+          flag: game-data-codegen
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
   # Proves the PR's persisted-data schemas stay backward-compatible with the ones
   # on its base branch — Firestore documents (apps/api) and localStorage snapshots
@@ -354,7 +426,8 @@ jobs:
 
 # ---------------------------------------------------------------------------
 # Maintenance notes
-# - Add a new matrix entry under strategy.matrix.include when new apps or
-#   packages are added.
+# - A new workspace package needs no change here to be typechecked, tested, or
+#   built; turbo discovers it. It does need a coverage upload step and a
+#   matching flag in codecov.yml. See docs/how-tos/add-workspace-package.md.
 # - Keep caching strategy aligned with package manager changes.
 # ---------------------------------------------------------------------------

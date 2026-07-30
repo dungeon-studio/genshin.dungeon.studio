@@ -88,14 +88,22 @@ closest template.
 
 ## 3) Add it to continuous integration
 
-- [ ] Add a matrix entry under `strategy.matrix.include` in
-      `.github/workflows/ci.yml`:
+- [ ] The `workspace` job in `.github/workflows/ci.yml` runs `typecheck`,
+      `test`, and `build` across the whole workspace, so turbo picks up the new
+      package from `pnpm-workspace.yaml`. No change to the job is required.
+
+- [ ] Add a coverage upload step to that job so the package reports under its
+      own Codecov flag, and declare the flag in `codecov.yml` under
+      `flag_management.individual_flags`:
 
   ```yaml
-  - display: <Display Name>
-    filter: '@genshin/<name>'
-    path-prefix: packages/<name>
-    flag: <name>
+  - name: Upload <name> coverage
+    if: always()
+    uses: ./.github/actions/codecov-upload
+    with:
+      path-prefix: packages/<name>
+      flag: <name>
+      codecov-token: ${{ secrets.CODECOV_TOKEN }}
   ```
 
   Every entry runs the `typecheck`, `test`, and `build` tasks. Add the entry
