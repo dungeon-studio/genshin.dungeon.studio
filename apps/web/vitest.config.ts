@@ -19,8 +19,8 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    // Scoped to src so the Playwright specs under e2e/, which vitest's default
-    // pattern would also match, stay with their own runner.
+    // Scoped to src: the default pattern also matches the Playwright specs
+    // under e2e/, which belong to their own runner.
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     setupFiles: ['./src/test/setup.ts'],
     reporters: ['default', 'junit'],

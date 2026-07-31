@@ -155,17 +155,17 @@ jobs:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
-      # Browser builds are keyed by Playwright version, so the cache only misses
-      # when the dependency itself moves. Read straight from the manifest, which
-      # syncpack keeps pinned to an exact version: `pnpm exec` writes warnings to
-      # the same stream as the version it reports, and those would land in
-      # GITHUB_OUTPUT too.
+      # From the manifest, which syncpack keeps pinned exact: `pnpm exec` writes
+      # warnings to the same stream as the version it reports, and both would
+      # land in GITHUB_OUTPUT.
       - name: Resolve Playwright version
         id: playwright
         run: |
           version="$(node -p "require('./apps/web/package.json').devDependencies['@playwright/test']")"
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
+      # Keyed by Playwright version, so the cache misses only when the
+      # dependency moves.
       - name: Cache Playwright browsers
         id: playwright-cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -185,9 +185,9 @@ jobs:
       - name: Run end-to-end tests
         run: pnpm turbo run test:e2e --filter=@genshin/web
 
-      # Under its own flag rather than `web`, so a flaky browser test is not
-      # attributed to the vitest suite. Uploaded even when the run fails, since
-      # a failure is exactly what test analytics needs to see.
+      # Its own flag, so a flaky browser test is not attributed to the vitest
+      # suite behind `web`. A failing run is the one test analytics needs, hence
+      # the condition.
       - name: Upload end-to-end test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0

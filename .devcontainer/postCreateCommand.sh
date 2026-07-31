@@ -76,9 +76,8 @@ sudo chmod +x /usr/local/bin/lychee
 # ---------------------------------------------------------------------------
 step "Installing Playwright Chromium and Chrome"
 
-# Driven through the workspace rather than `npx --yes` so the browsers match the
-# @playwright/test version apps/web pins, which is what the end-to-end suite and
-# the CI job both run.
+# Through the workspace, so the browsers match the @playwright/test version
+# apps/web pins — the one the end-to-end suite and the CI job run.
 pnpm --filter @genshin/web exec playwright install --with-deps chromium chrome
 
 # ---------------------------------------------------------------------------

@@ -14,9 +14,10 @@ const ROUTES = [
 ] as const;
 
 /**
- * Collect the failures a route can produce without changing what renders: an
- * uncaught exception, or anything the app logs at error level. Without this a
- * "the heading is there" assertion passes on a page whose data layer threw.
+ * Collect the failures a route produces without changing what it renders.
+ *
+ * Without them, a "the heading is there" assertion passes on a page whose data
+ * layer threw.
  */
 function watchForFailures(page: Page): string[] {
   const failures: string[] = [];

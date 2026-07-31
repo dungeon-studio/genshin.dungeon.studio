@@ -14,8 +14,6 @@ import {
 
 const { weapon } = equippablePair();
 
-// The level the refinement test drives to. The control it clicks and the state
-// it then asserts both read from this, so moving it moves both together.
 const REFINEMENT_LEVEL = 3;
 const refinementLabel = `Set refinement level ${REFINEMENT_LEVEL}`;
 

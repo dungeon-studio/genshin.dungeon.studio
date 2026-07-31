@@ -16,10 +16,9 @@ const { character, weapon } = equippablePair();
 const TEAM_SLOT = 1;
 const TEAM_NAME = 'Vaporise';
 
-// The team editor draws its pools from the character and weapon collections, and
-// a weapon instance only exists once the server has minted its id, so the whole
-// flow is exercised signed in. Anonymous team building is not covered while the
-// anonymous collection path is still open between #552 and #563.
+// A weapon instance exists only once the server mints its id, so the whole flow
+// runs signed in. Anonymous team building stays uncovered while the anonymous
+// collection path is open between #552 and #563.
 
 test('a team takes a name, a character, and a weapon that survive a reload', async ({
   signedInPage: page,

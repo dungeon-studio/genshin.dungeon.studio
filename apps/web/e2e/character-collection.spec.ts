@@ -17,11 +17,9 @@ const STARTING_CONSTELLATION = 0;
 const RAISED_CONSTELLATION = 4;
 
 // Nothing here asserts that an anonymous collection outlives a navigation or a
-// reload. It does not today — the store is cleared whenever the hook mounts
-// without a user — and whether it should is still open between #552 (keep
-// zustand + localStorage as the anonymous path) and #563 (drop anonymous
-// persistence and gate characters on auth, as weapons already are). Pinning
-// either answer here would put this suite on one side of that decision.
+// reload. It does not today — the store clears whenever the hook mounts without
+// a user — and whether it should is open between #552 and #563, which propose
+// opposite answers. Asserting either would put this suite on one side of it.
 
 test('a character can be collected and released anonymously', async ({ page }) => {
   await page.goto('/characters');

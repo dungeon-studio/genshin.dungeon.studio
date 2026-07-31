@@ -46,9 +46,8 @@ export default [
     },
   },
   {
-    // No React runs in the end-to-end suite; it drives the served app through a
-    // browser. `use` there is the callback Playwright hands a fixture to publish
-    // its value, which rules-of-hooks reads as React's `use`.
+    // The end-to-end suite drives a browser, not React. Playwright names a
+    // fixture's publish callback `use`, which rules-of-hooks reads as React's.
     files: ['e2e/**/*.ts'],
     rules: {
       'react-hooks/rules-of-hooks': 'off',
