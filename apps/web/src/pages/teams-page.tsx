@@ -15,21 +15,11 @@ import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-co
 import { CharacterPool } from '@/features/teams/character-pool';
 import { TeamPlanner } from '@/features/teams/team-planner';
 import { TeamStrip } from '@/features/teams/team-strip';
+import { usePendingWeapon } from '@/features/teams/use-pending-weapon';
 import { useTeams } from '@/features/teams/use-teams';
 import { WeaponPool } from '@/features/teams/weapon-pool';
 
 type SheetTab = 'characters' | 'weapons';
-
-/**
- * A weapon chosen for a member that has no character yet. The domain model has no
- * home for it — a team member is keyed by its character — so it is held here until a
- * character assignment commits the pair, and dropped if the user leaves without one.
- */
-interface PendingWeapon {
-  slot: TeamSlot;
-  memberIndex: number;
-  collectionWeaponId: CollectionWeaponId;
-}
 
 export function TeamsPage(): JSX.Element {
   const { characters, getCharacter } = useCollection();
@@ -45,7 +35,12 @@ export function TeamsPage(): JSX.Element {
   const [activeTab, setActiveTab] = useState<SheetTab>('characters');
   const [selectedSlot, setSelectedSlot] = useState<TeamSlot | null>(null);
   const [selectedMemberIndex, setSelectedMemberIndex] = useState<number | null>(null);
-  const [pendingWeapon, setPendingWeapon] = useState<PendingWeapon | null>(null);
+
+  const {
+    collectionWeaponId: pendingWeaponId,
+    select: selectPendingWeapon,
+    clear: clearPendingWeapon,
+  } = usePendingWeapon(selectedSlot, selectedMemberIndex);
 
   const {
     teams,
@@ -59,78 +54,73 @@ export function TeamsPage(): JSX.Element {
 
   const selectedTeam = selectedSlot !== null ? teams[selectedSlot] : null;
 
+  // The member being edited, once both halves of its address are known. Carrying the
+  // pair as one value keeps every handler to a single guard.
+  const editing = useMemo(
+    () =>
+      selectedSlot !== null && selectedMemberIndex !== null
+        ? { slot: selectedSlot, memberIndex: selectedMemberIndex }
+        : null,
+    [selectedSlot, selectedMemberIndex],
+  );
+
   const selectedMember =
-    selectedTeam && selectedMemberIndex !== null
-      ? selectedTeam.members[selectedMemberIndex]
-      : undefined;
+    editing && selectedTeam ? selectedTeam.members[editing.memberIndex] : undefined;
 
-  // Only honour a pending weapon while its own member is the one being edited.
-  const activePendingWeaponId =
-    pendingWeapon &&
-    pendingWeapon.slot === selectedSlot &&
-    pendingWeapon.memberIndex === selectedMemberIndex
-      ? pendingWeapon.collectionWeaponId
-      : undefined;
-
-  const pendingWeaponData = useMemo(() => {
-    if (!activePendingWeaponId) return undefined;
-    const collectionWeapon = weapons[activePendingWeaponId];
+  const pendingWeapon = useMemo(() => {
+    if (!pendingWeaponId) return undefined;
+    const collectionWeapon = weapons[pendingWeaponId];
     return collectionWeapon ? getWeaponById(collectionWeapon.weaponId) : undefined;
-  }, [activePendingWeaponId, weapons]);
+  }, [pendingWeaponId, weapons]);
 
   // Constrains the weapon pool once a character is assigned. Undefined on an empty
   // member, where the whole owned pool is offered instead.
-  const selectedMemberWeaponType = useMemo(() => {
+  const assignedCharacterWeaponType = useMemo(() => {
     if (!selectedMember) return undefined;
     return getCharacterById(selectedMember.characterId)?.weaponType;
   }, [selectedMember]);
 
   const handleToggleCharacter = useCallback(
     (characterId: string) => {
-      if (selectedSlot === null || selectedMemberIndex === null) return;
+      if (!editing) return;
 
-      const currentMember = selectedTeam?.members[selectedMemberIndex];
-      if (currentMember?.characterId === characterId) {
-        removeCharacter(selectedSlot, selectedMemberIndex);
-      } else {
-        assignCharacter(selectedSlot, selectedMemberIndex, characterId, activePendingWeaponId);
-        setPendingWeapon(null);
+      if (selectedMember?.characterId === characterId) {
+        removeCharacter(editing.slot, editing.memberIndex);
+        return;
       }
+      assignCharacter(editing.slot, editing.memberIndex, characterId, pendingWeaponId);
+      clearPendingWeapon();
     },
     [
-      selectedSlot,
-      selectedMemberIndex,
-      selectedTeam?.members,
+      editing,
+      selectedMember?.characterId,
       assignCharacter,
       removeCharacter,
-      activePendingWeaponId,
+      pendingWeaponId,
+      clearPendingWeapon,
     ],
   );
 
+  // Until a character is assigned the choice has nowhere to persist, so it waits in
+  // the pending slot instead of going to the store.
   const handleWeaponSelect = useCallback(
     (collectionWeaponId: CollectionWeaponId) => {
-      if (selectedSlot === null || selectedMemberIndex === null) return;
-      if (selectedMember) {
-        assignWeapon(selectedSlot, selectedMemberIndex, collectionWeaponId);
+      if (editing && selectedMember) {
+        assignWeapon(editing.slot, editing.memberIndex, collectionWeaponId);
         return;
       }
-      setPendingWeapon({
-        slot: selectedSlot,
-        memberIndex: selectedMemberIndex,
-        collectionWeaponId,
-      });
+      selectPendingWeapon(collectionWeaponId);
     },
-    [selectedSlot, selectedMemberIndex, selectedMember, assignWeapon],
+    [editing, selectedMember, assignWeapon, selectPendingWeapon],
   );
 
   const handleWeaponClear = useCallback(() => {
-    if (selectedSlot === null || selectedMemberIndex === null) return;
-    if (selectedMember) {
-      removeWeapon(selectedSlot, selectedMemberIndex);
+    if (editing && selectedMember) {
+      removeWeapon(editing.slot, editing.memberIndex);
       return;
     }
-    setPendingWeapon(null);
-  }, [selectedSlot, selectedMemberIndex, selectedMember, removeWeapon]);
+    clearPendingWeapon();
+  }, [editing, selectedMember, removeWeapon, clearPendingWeapon]);
 
   return (
     <Container className="py-12">
@@ -167,7 +157,7 @@ export function TeamsPage(): JSX.Element {
             setSelectedSlot(null);
             setSelectedMemberIndex(null);
             setActiveTab('characters');
-            setPendingWeapon(null);
+            clearPendingWeapon();
           }
         }}
       >
@@ -215,21 +205,24 @@ export function TeamsPage(): JSX.Element {
               </nav>
 
               <div className="mt-3 flex min-h-0 flex-1 flex-col gap-3">
-                {activeTab === 'characters' && selectedMemberIndex !== null && (
+                {editing === null ? (
+                  <p className="text-sm text-muted-foreground">
+                    Select a team member to choose a{' '}
+                    {activeTab === 'characters' ? 'character' : 'weapon'}.
+                  </p>
+                ) : activeTab === 'characters' ? (
                   <>
-                    {pendingWeaponData && (
+                    {pendingWeapon && (
                       <div className="flex items-center gap-3 rounded-md bg-muted px-3 py-2 text-sm">
                         <p className="text-muted-foreground">
-                          Showing {pendingWeaponData.type} users for{' '}
-                          <span className="font-medium text-foreground">
-                            {pendingWeaponData.name}
-                          </span>
+                          Showing {pendingWeapon.type} users for{' '}
+                          <span className="font-medium text-foreground">{pendingWeapon.name}</span>
                         </p>
                         <Button
                           variant="outline"
                           size="sm"
                           className="ml-auto"
-                          onClick={() => setPendingWeapon(null)}
+                          onClick={clearPendingWeapon}
                         >
                           Clear weapon
                         </Button>
@@ -237,36 +230,23 @@ export function TeamsPage(): JSX.Element {
                     )}
                     <CharacterPool
                       characters={characters}
-                      slot={selectedSlot}
-                      memberIndex={selectedMemberIndex}
-                      weaponType={pendingWeaponData?.type}
+                      slot={editing.slot}
+                      memberIndex={editing.memberIndex}
+                      weaponType={pendingWeapon?.type}
                       onAssign={handleToggleCharacter}
                     />
                   </>
-                )}
-                {activeTab === 'characters' && selectedMemberIndex === null && (
-                  <p className="text-sm text-muted-foreground">
-                    Select a team member to choose a character.
-                  </p>
-                )}
-                {activeTab === 'weapons' && selectedMemberIndex !== null && (
+                ) : (
                   <WeaponPool
-                    key={selectedMemberWeaponType ?? 'any'}
+                    key={assignedCharacterWeaponType ?? 'any'}
                     collectionWeapons={collectionWeapons}
-                    weaponType={selectedMemberWeaponType}
-                    selectedCollectionWeaponId={
-                      selectedMember?.weaponInstanceId ?? activePendingWeaponId
-                    }
-                    slot={selectedSlot}
-                    memberIndex={selectedMemberIndex}
+                    weaponType={assignedCharacterWeaponType}
+                    selectedCollectionWeaponId={selectedMember?.weaponInstanceId ?? pendingWeaponId}
+                    slot={editing.slot}
+                    memberIndex={editing.memberIndex}
                     onSelect={handleWeaponSelect}
                     onClear={handleWeaponClear}
                   />
-                )}
-                {activeTab === 'weapons' && selectedMemberIndex === null && (
-                  <p className="text-sm text-muted-foreground">
-                    Select a team member to choose a weapon.
-                  </p>
                 )}
               </div>
             </>
