@@ -7,7 +7,7 @@ import type { JSX } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
+import { cn, toggleInSet } from '@/lib/utils';
 
 type OwnershipFilter = 'all' | 'owned' | 'unowned';
 type SortDirection = 'asc' | 'desc';
@@ -54,6 +54,12 @@ interface FilterBarProps<F extends BaseFilterState, T extends string> {
 
 const RARITY_VALUES: Rarity[] = [5, 4];
 
+/** Release/name sort fields shared by every collection filter. */
+export const SORT_FIELDS = [
+  { value: 'release', label: 'Release' },
+  { value: 'name', label: 'Name' },
+] as const;
+
 export function FilterBar<F extends BaseFilterState, T extends string>({
   filters,
   onChange,
@@ -71,13 +77,7 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
   const sortLabel = sortFields.find((f) => f.value === filters.sortField)?.label ?? '';
 
   function toggleRarity(rarity: Rarity) {
-    const next = new Set(filters.rarities);
-    if (next.has(rarity)) {
-      next.delete(rarity);
-    } else {
-      next.add(rarity);
-    }
-    onChange({ ...filters, rarities: next });
+    onChange({ ...filters, rarities: toggleInSet(filters.rarities, rarity) });
   }
 
   function cycleSortField() {

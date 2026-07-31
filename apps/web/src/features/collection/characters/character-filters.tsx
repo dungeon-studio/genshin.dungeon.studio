@@ -5,9 +5,10 @@ import type { Element } from '@genshin/game-data';
 import { ELEMENTS } from '@genshin/game-data';
 import type { JSX } from 'react';
 
-import { FilterBar } from '@/components/filter-bar';
+import { FilterBar, SORT_FIELDS } from '@/components/filter-bar';
 import { ELEMENT_BG_COLORS } from '@/lib/element-styles';
 import { getElementIconPath } from '@/lib/elements';
+import { toggleInSet } from '@/lib/utils';
 
 import type { CharacterFilterState } from './filtering';
 
@@ -23,11 +24,6 @@ interface CharacterFiltersProps {
 
 const ELEMENT_VALUES = Object.values(ELEMENTS);
 
-const SORT_FIELDS = [
-  { value: 'release', label: 'Release' },
-  { value: 'name', label: 'Name' },
-] as const;
-
 export function CharacterFilters({
   filters,
   onChange,
@@ -35,13 +31,7 @@ export function CharacterFilters({
   ...counts
 }: CharacterFiltersProps): JSX.Element {
   function toggleElement(element: Element) {
-    const next = new Set(filters.elements);
-    if (next.has(element)) {
-      next.delete(element);
-    } else {
-      next.add(element);
-    }
-    onChange({ ...filters, elements: next });
+    onChange({ ...filters, elements: toggleInSet(filters.elements, element) });
   }
 
   return (

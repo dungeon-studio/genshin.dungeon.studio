@@ -5,7 +5,8 @@ import type { WeaponType } from '@genshin/game-data';
 import { WEAPON_TYPES } from '@genshin/game-data';
 import type { JSX } from 'react';
 
-import { FilterBar } from '@/components/filter-bar';
+import { FilterBar, SORT_FIELDS } from '@/components/filter-bar';
+import { toggleInSet } from '@/lib/utils';
 import { getWeaponTypeIconPath } from '@/lib/weapon-types';
 
 import type { WeaponFilterState } from './filtering';
@@ -23,11 +24,6 @@ interface WeaponFiltersProps {
 
 const WEAPON_TYPE_VALUES = Object.values(WEAPON_TYPES);
 
-const SORT_FIELDS = [
-  { value: 'release', label: 'Release' },
-  { value: 'name', label: 'Name' },
-] as const;
-
 export function WeaponFilters({
   filters,
   onChange,
@@ -36,13 +32,7 @@ export function WeaponFilters({
   ...counts
 }: WeaponFiltersProps): JSX.Element {
   function toggleWeaponType(type: WeaponType) {
-    const next = new Set(filters.weaponTypes);
-    if (next.has(type)) {
-      next.delete(type);
-    } else {
-      next.add(type);
-    }
-    onChange({ ...filters, weaponTypes: next });
+    onChange({ ...filters, weaponTypes: toggleInSet(filters.weaponTypes, type) });
   }
 
   return (
