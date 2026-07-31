@@ -17,6 +17,7 @@ import { useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 
 import { TeamMemberPlanner } from './team-member-planner';
+import { TeamResonance } from './team-resonance';
 
 interface TeamPlannerProps {
   slot: TeamSlot;
@@ -95,6 +96,8 @@ export function TeamPlanner({
             </button>
           )}
         </h2>
+
+        <TeamResonance members={members} />
 
         {onEdit && (
           <button

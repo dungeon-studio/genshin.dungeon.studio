@@ -14,6 +14,7 @@ import { useCollection } from '@/features/collection/characters/use-character-co
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
 import { CharacterPool } from '@/features/teams/character-pool';
 import { TeamPlanner } from '@/features/teams/team-planner';
+import { TeamResonance } from '@/features/teams/team-resonance';
 import { TeamStrip } from '@/features/teams/team-strip';
 import { usePendingWeapon } from '@/features/teams/use-pending-weapon';
 import { useTeams } from '@/features/teams/use-teams';
@@ -166,6 +167,8 @@ export function TeamsPage(): JSX.Element {
           {selectedSlot !== null && selectedTeam && (
             <>
               <SheetHeader className="pt-6">
+                <TeamResonance members={selectedTeam.members} />
+
                 <TeamStrip
                   members={selectedTeam.members}
                   selectedMemberIndex={selectedMemberIndex}

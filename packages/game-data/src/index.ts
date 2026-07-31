@@ -18,6 +18,16 @@ export {
   type ReactionType,
 } from './elements.js';
 
+// Resonances
+export {
+  ELEMENTAL_RESONANCES,
+  getActiveResonances,
+  RESONANCE_TRIGGERS,
+  type ElementalResonance,
+  type ResonanceCondition,
+  type ResonanceTrigger,
+} from './resonances.js';
+
 // Rarities
 export type { Rarity } from './rarities.js';
 
