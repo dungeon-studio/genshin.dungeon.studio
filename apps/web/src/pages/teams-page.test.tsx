@@ -4,7 +4,7 @@
 import type { CollectionWeaponId, ISOTimestamp } from '@genshin/domain';
 import type { Character, Weapon, WeaponType } from '@genshin/game-data';
 import { CHARACTERS, WEAPONS } from '@genshin/game-data';
-import { act, configure, render, screen } from '@testing-library/react';
+import { act, configure, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -259,6 +259,32 @@ describe('TeamsPage weapon-first flow', () => {
       await screen.findByRole('button', { name: `Add ${BOW_USER.name} to team` }),
     ).toBeInTheDocument();
     expect(screen.queryByText(/users for/)).not.toBeInTheDocument();
+  }, 30_000);
+
+  // An empty member has no character, so the pool cannot tell that a weapon equipped
+  // elsewhere belongs to the character about to be chosen. Reaching that pairing means
+  // going character-first, where the weapon carries over on its own.
+  it('withholds a weapon another team already equips', async () => {
+    const user = userEvent.setup({ delay: null });
+    renderTeamsPage();
+
+    act(() => {
+      useTeamStore.getState().assignCharacter(1, 0, CLAYMORE_USER.id);
+      useTeamStore.getState().assignWeapon(1, 0, CLAYMORE_INSTANCE);
+    });
+
+    const teamTwo = screen.getByRole('region', { name: 'Team 2' });
+    await user.click(within(teamTwo).getAllByRole('button', { name: /No character/ })[0]);
+    await user.click(await screen.findByRole('button', { name: 'Weapons' }));
+
+    expect(
+      await screen.findByRole('button', {
+        name: `${CLAYMORE.name} is equipped by another character`,
+      }),
+    ).toBeDisabled();
+    expect(
+      screen.queryByRole('button', { name: `Assign ${CLAYMORE.name} to character` }),
+    ).not.toBeInTheDocument();
   }, 30_000);
 
   it('forgets a pending weapon once the editor is closed', async () => {
