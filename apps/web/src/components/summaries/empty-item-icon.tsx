@@ -18,7 +18,6 @@ interface EmptyItemIconProps {
   shape: keyof typeof SHAPE_CLASSES;
 }
 
-/** Placeholder filling the icon slot when no item occupies the summary. */
 export function EmptyItemIcon({ shape }: EmptyItemIconProps): JSX.Element {
   return (
     <div

@@ -8,16 +8,13 @@ import { cn } from '@/lib/utils';
 interface ThemedIconProps {
   lightSrc: string;
   darkSrc: string;
-  /** Description for assistive tech; an empty string marks the icon decorative. */
+  /** An empty string marks the icon decorative, mirrored to `aria-hidden`. */
   alt: string;
-  /** Classes shared by both variants (sizing, opacity, ...). */
+  /** Applied to both variants. */
   className?: string;
 }
 
-/**
- * Renders light and dark image variants, swapped by the active theme via
- * Tailwind's `dark:` variant so the browser paints only the matching one.
- */
+/** Swaps variants with Tailwind's `dark:` so the browser paints only the active theme's image. */
 export function ThemedIcon({ lightSrc, darkSrc, alt, className }: ThemedIconProps): JSX.Element {
   const decorative = alt === '';
 
