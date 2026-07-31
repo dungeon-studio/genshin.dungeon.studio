@@ -14,6 +14,7 @@ const AMBER = {
   rarity: 4 as const,
   region: 'Mondstadt',
   version: '1.0',
+  releaseDate: '2020-09-28',
 };
 
 describe('CharacterSummary', () => {

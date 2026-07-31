@@ -5,7 +5,7 @@ import type { Env, Hono as HonoApp } from 'hono';
 import { Hono } from 'hono';
 import { findTargetHandler, isMiddleware } from 'hono/utils/handler';
 
-import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
+import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { rootGetResponseV1 } from '@/profiles/json-schema/root/get-response-v1.js';
 
@@ -44,9 +44,9 @@ function discoverLinks<E extends Env>(app: HonoApp<E>): Record<string, { href: s
 
 export function root<E extends Env>(
   app: HonoApp<E>,
-): Hono<{ Variables: NegotiatedContentVariables }> {
+): Hono<{ Variables: NegotiatedResponseContentVariables }> {
   const links = discoverLinks(app);
-  const router = new Hono<{ Variables: NegotiatedContentVariables }>();
+  const router = new Hono<{ Variables: NegotiatedResponseContentVariables }>();
 
   router.get(
     '/',

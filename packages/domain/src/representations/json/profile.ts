@@ -9,11 +9,11 @@
  * type and bidirectional converters shared by API and web.
  */
 
-import type { AuthIdentity } from '../../auth-identity.js';
 import type { ISOTimestamp } from '../../iso-timestamp.js';
-import type { UserProfile } from '../../user-profile.js';
+import type { AuthIdentity } from '../../profile/auth-identity.js';
+import type { UserProfile } from '../../profile/user-profile.js';
 
-export type { AuthIdentity } from '../../auth-identity.js';
+export type { AuthIdentity } from '../../profile/auth-identity.js';
 
 /**
  * Wire format for the composite profile response.

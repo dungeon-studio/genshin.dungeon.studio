@@ -5,7 +5,7 @@ import { GAME_DATA_VERSION } from '@genshin/game-data';
 import type { JSX } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-import { Container } from '@/components/container';
+import { Container } from '@/components/chrome/container';
 import { useAuth } from '@/features/auth';
 import { buildBugReportUrl } from '@/lib/debug-info';
 

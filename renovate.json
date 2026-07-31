@@ -1,27 +1,34 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:best-practices"],
-  "baseBranchPatterns": ["develop"],
-  "schedule": ["before 6pm on friday"],
+  "extends": [
+    "config:best-practices",
+    "security:openssf-scorecard",
+    "customManagers:githubActionsVersions"
+  ],
   "timezone": "Europe/London",
   "labels": ["dependencies", "automated"],
   "reviewers": ["alunduil"],
-  "branchPrefix": "renovate/",
   "rangeStrategy": "pin",
   "minimumReleaseAge": "3 days",
-  "internalChecksFilter": "strict",
   "osvVulnerabilityAlerts": true,
-  "vulnerabilityAlerts": {
-    "minimumReleaseAge": "0 days"
-  },
   "pre-commit": {
     "enabled": true
   },
-  "lockFileMaintenance": {
-    "enabled": true,
-    "schedule": ["* 0-17 1-7 * 5"]
-  },
   "packageRules": [
+    {
+      "description": "Exempt update types that carry no release timestamp from the minimum release-age bake, so their renovate/stability-days check can resolve under internalChecksFilter:strict",
+      "matchUpdateTypes": [
+        "pin",
+        "pinDigest",
+        "digest",
+        "lockFileMaintenance",
+        "lockfileUpdate",
+        "rollback",
+        "bump",
+        "replacement"
+      ],
+      "minimumReleaseAge": null
+    },
     {
       "description": "Group all npm dependencies in a single PR",
       "matchManagers": ["npm"],
@@ -32,6 +39,13 @@
     {
       "description": "Group all Terraform dependencies in a single PR",
       "matchManagers": ["terraform"],
+      "groupName": "terraform dependencies",
+      "groupSlug": "terraform",
+      "addLabels": ["terraform", "infrastructure"]
+    },
+    {
+      "description": "Bump the Terraform CLI version in lockstep across the infrastructure required_version constraint and the CI workflow TERRAFORM_VERSION pins",
+      "matchDepNames": ["hashicorp/terraform"],
       "groupName": "terraform dependencies",
       "groupSlug": "terraform",
       "addLabels": ["terraform", "infrastructure"]
