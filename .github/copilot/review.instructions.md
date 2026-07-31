@@ -113,8 +113,8 @@ violations as review comments with a brief explanation and a suggested fix.
 
 - Terraform version must stay aligned across
   `.github/workflows/terraform-plan.yml`,
-  `.github/workflows/terraform-apply.yml`, and
-  `.github/workflows/pre-commit.yml`. Current baseline: `1.9.0`.
+  `.github/workflows/terraform-apply.yml`, and the
+  `.github/workflows/ci.yml` pre-commit job. Current baseline: `1.9.0`.
 - GCP projects follow the naming convention
   `dungeon-studio-genshin-{env}`. `shared` and `core` are
   production-grade infrastructure.

@@ -62,6 +62,17 @@ describe('useTeamStore', () => {
       const team2 = useTeamStore.getState().teams[2];
       expect(team2.members[0]?.weaponInstanceId).toBe(weaponId);
     });
+
+    it('prefers an explicit weapon over the one auto-populated from another team', () => {
+      const autoWeaponId = 'weapon-instance-1' as CollectionWeaponId;
+      const chosenWeaponId = 'weapon-instance-2' as CollectionWeaponId;
+      useTeamStore.getState().assignCharacter(1, 0, 'amber');
+      useTeamStore.getState().assignWeapon(1, 0, autoWeaponId);
+
+      useTeamStore.getState().assignCharacter(2, 0, 'amber', chosenWeaponId);
+
+      expect(useTeamStore.getState().teams[2].members[0]?.weaponInstanceId).toBe(chosenWeaponId);
+    });
   });
 
   describe('removeCharacter', () => {

@@ -5,8 +5,8 @@ import type { CollectionCharacter, CollectionTeamMember, CollectionWeapon } from
 import { getCharacterById, getWeaponById } from '@genshin/game-data';
 import type { JSX } from 'react';
 
-import { CharacterSummary } from '@/components/character-summary';
-import { WeaponSummary } from '@/components/weapon-summary';
+import { CharacterSummary } from '@/components/summaries/character-summary';
+import { WeaponSummary } from '@/components/summaries/weapon-summary';
 
 interface TeamMemberSummaryProps {
   member: CollectionTeamMember | null;

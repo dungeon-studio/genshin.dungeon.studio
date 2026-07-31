@@ -14,8 +14,8 @@ import type { JSX } from 'react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { WeaponSummary } from '@/components/summaries/weapon-summary';
 import { Button } from '@/components/ui/button';
-import { WeaponSummary } from '@/components/weapon-summary';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
@@ -37,13 +37,18 @@ function buildEquippedWeapons(
   return map;
 }
 
-function poolFilterState(weaponType: WeaponType): WeaponFilterState {
-  return { ...initialFilterState(), ownership: 'owned', weaponTypes: new Set([weaponType]) };
+function poolFilterState(weaponType: WeaponType | undefined): WeaponFilterState {
+  return {
+    ...initialFilterState(),
+    ownership: 'owned',
+    weaponTypes: weaponType ? new Set([weaponType]) : new Set(),
+  };
 }
 
 interface WeaponPoolProps {
   collectionWeapons: CollectionWeapon[];
-  weaponType: WeaponType;
+  /** Undefined on a member with no character, where the whole owned pool is offered. */
+  weaponType?: WeaponType;
   selectedCollectionWeaponId?: CollectionWeaponId;
   slot: TeamSlot;
   memberIndex: number;
@@ -80,6 +85,7 @@ export function WeaponPool({
   const ownedCount = ownedWeaponIds.size;
 
   const hasWeaponsOfType = useMemo(() => {
+    if (!weaponType) return true;
     for (const id of ownedWeaponIds) {
       const weapon = getWeaponById(id);
       if (weapon?.type === weaponType) return true;
@@ -124,7 +130,7 @@ export function WeaponPool({
     );
   }
 
-  if (!hasWeaponsOfType) {
+  if (weaponType && !hasWeaponsOfType) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-4 py-12">
         <Swords className="h-10 w-10 text-muted-foreground" aria-hidden="true" focusable={false} />
@@ -151,7 +157,7 @@ export function WeaponPool({
         ownedCount={ownedCount}
         filteredOwnedCount={filteredOwnedCount}
         showOwnership={false}
-        showWeaponTypes={false}
+        showWeaponTypes={weaponType === undefined}
       />
 
       <div className="min-h-0 flex-1 overflow-y-auto">

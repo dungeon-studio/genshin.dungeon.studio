@@ -6,10 +6,11 @@ import { characterItemHref, characterRepresentation, serialiseCharacter } from '
 import { getCharacterById } from '@genshin/game-data';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import type { FromSchema } from 'json-schema-to-ts';
 
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
-import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
+import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
@@ -21,7 +22,7 @@ import * as Characters from '@/repositories/characters/index.js';
 
 export const characters = new Hono<{
   Variables: AuthVariables &
-    NegotiatedContentVariables &
+    NegotiatedResponseContentVariables &
     NegotiatedRequestSchemaVariables &
     ValidatedRequestBodyVariables;
 }>();
@@ -30,9 +31,7 @@ characters.use('*', auth);
 
 characters.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: characterItemV1 }]));
 
-interface SaveCharacterBody {
-  constellationLevel: number;
-}
+type SaveCharacterBody = FromSchema<typeof characterPutRequestV1.schema>;
 
 // GET /api/characters — List user's character collection
 characters.get('/', async (c) => {

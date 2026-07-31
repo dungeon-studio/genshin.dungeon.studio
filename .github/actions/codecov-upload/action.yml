@@ -1,0 +1,157 @@
+---
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+name: Codecov upload
+description: Upload every package's coverage and test results under its own flag
+
+# One upload per flag. Codecov applies a report's entire coverage to every flag
+# it is tagged with, so a single upload carrying all seven would report each
+# package's coverage as the whole workspace's. The `paths` under
+# flag_management in codecov.yml filter what the UI displays; they do not
+# segment an upload.
+#
+# A failing package must not suppress the coverage of the ones that passed,
+# hence the condition on every step.
+
+inputs:
+  codecov-token:
+    description: 'Codecov upload token'
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    - name: Upload web coverage
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: apps/web/coverage/lcov.info
+        flags: web
+        fail_ci_if_error: false
+
+    - name: Upload web test results
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: apps/web/test-results/junit.xml
+        flags: web
+        report_type: test_results
+        fail_ci_if_error: false
+
+    - name: Upload api coverage
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: apps/api/coverage/lcov.info
+        flags: api
+        fail_ci_if_error: false
+
+    - name: Upload api test results
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: apps/api/test-results/junit.xml
+        flags: api
+        report_type: test_results
+        fail_ci_if_error: false
+
+    - name: Upload game-data coverage
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: packages/game-data/coverage/lcov.info
+        flags: game-data
+        fail_ci_if_error: false
+
+    - name: Upload game-data test results
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: packages/game-data/test-results/junit.xml
+        flags: game-data
+        report_type: test_results
+        fail_ci_if_error: false
+
+    - name: Upload domain coverage
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: packages/domain/coverage/lcov.info
+        flags: domain
+        fail_ci_if_error: false
+
+    - name: Upload domain test results
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: packages/domain/test-results/junit.xml
+        flags: domain
+        report_type: test_results
+        fail_ci_if_error: false
+
+    - name: Upload collection-json coverage
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: packages/collection-json/coverage/lcov.info
+        flags: collection-json
+        fail_ci_if_error: false
+
+    - name: Upload collection-json test results
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: packages/collection-json/test-results/junit.xml
+        flags: collection-json
+        report_type: test_results
+        fail_ci_if_error: false
+
+    - name: Upload validation coverage
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: packages/validation/coverage/lcov.info
+        flags: validation
+        fail_ci_if_error: false
+
+    - name: Upload validation test results
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: packages/validation/test-results/junit.xml
+        flags: validation
+        report_type: test_results
+        fail_ci_if_error: false
+
+    - name: Upload game-data-codegen coverage
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: tools/game-data-codegen/coverage/lcov.info
+        flags: game-data-codegen
+        fail_ci_if_error: false
+
+    - name: Upload game-data-codegen test results
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: tools/game-data-codegen/test-results/junit.xml
+        flags: game-data-codegen
+        report_type: test_results
+        fail_ci_if_error: false

@@ -4,7 +4,10 @@
 import { Hono } from 'hono';
 import { describe, expect, it } from 'vitest';
 
-import type { NegotiatedContentVariables, SupportedRepresentation } from './negotiate-content.js';
+import type {
+  NegotiatedResponseContentVariables,
+  SupportedRepresentation,
+} from './negotiate-content.js';
 import { negotiateContent, toMediaTypeString } from './negotiate-content.js';
 
 const ORIGIN = 'http://localhost';
@@ -42,7 +45,7 @@ describe('negotiateContent middleware', () => {
   ];
 
   function createApp() {
-    const app = new Hono<{ Variables: NegotiatedContentVariables }>();
+    const app = new Hono<{ Variables: NegotiatedResponseContentVariables }>();
     app.use('*', negotiateContent(supported));
     app.get('/', (c) => c.body(null, 200, { 'Content-Type': c.get('negotiatedMediaType') }));
     return app;

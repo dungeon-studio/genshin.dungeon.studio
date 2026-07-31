@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { deserialiseCharacter, serialiseCharacter } from './characters.js';
-import type { CollectionCharacter } from '../../collection-character.js';
+import type { CollectionCharacter } from '../../character/collection-character.js';
 import type { ISOTimestamp } from '../../iso-timestamp.js';
 
 const BASE_URL = 'http://localhost:8080';

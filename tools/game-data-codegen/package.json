@@ -17,14 +17,15 @@
   "dependencies": {
     "@genshin/game-data": "workspace:*",
     "commander": "15.0.0",
-    "genshin-db": "5.2.11"
+    "genshin-db": "5.2.12"
   },
   "devDependencies": {
     "@genshin/eslint-config": "workspace:*",
-    "@types/node": "25.9.1",
-    "@vitest/coverage-v8": "4.1.7",
-    "eslint": "10.4.0",
-    "typescript": "6.0.3",
-    "vitest": "4.1.7"
+    "@types/node": "25.9.5",
+    "@typescript/native": "npm:typescript@7.0.2",
+    "@vitest/coverage-v8": "4.1.10",
+    "eslint": "10.8.0",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
+    "vitest": "4.1.10"
   }
 }
