@@ -5,10 +5,11 @@ import type { Weapon, WeaponType } from '@genshin/game-data';
 import { CircleHelp } from 'lucide-react';
 import type { JSX } from 'react';
 
-import { ItemSummary } from '@/components/item-summary';
-import { ThemedIcon } from '@/components/themed-icon';
+import { ThemedIcon } from '@/components/ui/themed-icon';
 import { cn } from '@/lib/utils';
 import { getWeaponTypeIconPath } from '@/lib/weapon-types';
+
+import { ItemSummary } from './item-summary';
 
 interface WeaponSummaryProps {
   /** Static weapon definition (name, rarity, type), not a collection instance. */

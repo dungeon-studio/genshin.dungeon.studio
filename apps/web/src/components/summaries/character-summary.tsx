@@ -5,10 +5,11 @@ import type { Character } from '@genshin/game-data';
 import { CircleHelp } from 'lucide-react';
 import type { JSX } from 'react';
 
-import { ItemSummary } from '@/components/item-summary';
-import { ThemedIcon } from '@/components/themed-icon';
+import { ThemedIcon } from '@/components/ui/themed-icon';
 import { getElementIconPath } from '@/lib/elements';
 import { cn } from '@/lib/utils';
+
+import { ItemSummary } from './item-summary';
 
 interface CharacterSummaryProps {
   character?: Character;
