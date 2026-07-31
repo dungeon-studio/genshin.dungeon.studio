@@ -5,7 +5,7 @@ import { ARTIFACT_MINOR_AFFIXES, type ArtifactMinorAffix } from '@genshin/game-d
 import { GripVertical, Minus } from 'lucide-react';
 import type { JSX } from 'react';
 
-export function PrioritySubstats({
+export function SubstatList({
   label,
   selected,
   excluded,
