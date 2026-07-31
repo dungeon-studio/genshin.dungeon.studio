@@ -19,14 +19,14 @@ export function PrioritySubstats({
   onChange: (affixes: ArtifactMinorAffix[]) => void;
 }): JSX.Element {
   const availableAffixes = ARTIFACT_MINOR_AFFIXES.filter(
-    (a) => !excluded.includes(a) && !selected.includes(a),
+    (affix) => !excluded.includes(affix) && !selected.includes(affix),
   );
 
   const moveUp = (index: number) => {
     if (index === 0) return;
     const next = [...selected];
     [next[index - 1], next[index]] = [next[index], next[index - 1]];
-    onChange(next as ArtifactMinorAffix[]);
+    onChange(next);
   };
 
   const remove = (index: number) => {

@@ -7,9 +7,6 @@ import {
   CIRCLET_MAIN_AFFIXES,
   GOBLET_MAIN_AFFIXES,
   SANDS_MAIN_AFFIXES,
-  type CircletMainAffix,
-  type GobletMainAffix,
-  type SandsMainAffix,
 } from '@genshin/game-data';
 import { Shield } from 'lucide-react';
 import type { JSX } from 'react';
@@ -17,6 +14,9 @@ import type { JSX } from 'react';
 import { MainAffixSelector } from './main-affix-selector';
 import { PrioritySubstats } from './priority-substats';
 import { SetConfiguration } from './set-configuration';
+
+/** Maximum affixes selectable in each prioritization list; see ArtifactPlan's "0–3" contract. */
+const MAX_PRIORITIZED_SUBSTATS = 3;
 
 interface ArtifactPlannerProps {
   plan?: ArtifactPlan;
@@ -40,19 +40,19 @@ export function ArtifactPlanner({ plan, onChange }: ArtifactPlannerProps): JSX.E
           label={ARTIFACT_PIECES.SANDS}
           options={SANDS_MAIN_AFFIXES}
           value={plan?.sands}
-          onChange={(value) => updatePlan({ sands: value as SandsMainAffix | undefined })}
+          onChange={(value) => updatePlan({ sands: value })}
         />
         <MainAffixSelector
           label={ARTIFACT_PIECES.GOBLET}
           options={GOBLET_MAIN_AFFIXES}
           value={plan?.goblet}
-          onChange={(value) => updatePlan({ goblet: value as GobletMainAffix | undefined })}
+          onChange={(value) => updatePlan({ goblet: value })}
         />
         <MainAffixSelector
           label={ARTIFACT_PIECES.CIRCLET}
           options={CIRCLET_MAIN_AFFIXES}
           value={plan?.circlet}
-          onChange={(value) => updatePlan({ circlet: value as CircletMainAffix | undefined })}
+          onChange={(value) => updatePlan({ circlet: value })}
         />
 
         <SetConfiguration sets={plan?.sets} onChange={(sets) => updatePlan({ sets })} />
@@ -61,14 +61,14 @@ export function ArtifactPlanner({ plan, onChange }: ArtifactPlannerProps): JSX.E
           label="Priority substats"
           selected={plan?.priorityMinorAffixes ?? []}
           excluded={plan?.secondaryMinorAffixes ?? []}
-          max={3}
+          max={MAX_PRIORITIZED_SUBSTATS}
           onChange={(affixes) => updatePlan({ priorityMinorAffixes: affixes })}
         />
         <PrioritySubstats
           label="Secondary substats"
           selected={plan?.secondaryMinorAffixes ?? []}
           excluded={plan?.priorityMinorAffixes ?? []}
-          max={3}
+          max={MAX_PRIORITIZED_SUBSTATS}
           onChange={(affixes) => updatePlan({ secondaryMinorAffixes: affixes })}
         />
       </div>

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { ARTIFACT_SETS } from '@genshin/game-data';
+import { ARTIFACT_SETS, type ArtifactSet } from '@genshin/game-data';
 import { Check, ChevronsUpDown, Minus } from 'lucide-react';
 import type { JSX } from 'react';
 import { useState } from 'react';
@@ -24,13 +24,13 @@ export function ArtifactSetSearch({
   onClear,
 }: {
   label: string;
-  value: string | undefined;
-  onChange: (id: string) => void;
+  value: ArtifactSet['id'] | undefined;
+  onChange: (id: ArtifactSet['id']) => void;
   onClear?: () => void;
 }): JSX.Element {
   const [open, setOpen] = useState(false);
 
-  const selectedSet = value ? ARTIFACT_SETS.find((s) => s.id === value) : undefined;
+  const selectedSet = value ? ARTIFACT_SETS.find((set) => set.id === value) : undefined;
 
   return (
     <div className="flex gap-1">
