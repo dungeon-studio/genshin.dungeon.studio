@@ -12,11 +12,7 @@ import { cn, toggleInSet } from '@/lib/utils';
 type OwnershipFilter = 'all' | 'owned' | 'unowned';
 type SortDirection = 'asc' | 'desc';
 
-/**
- * Fields every collection filter shares. Concrete states (character, weapon)
- * add their own category set (`elements`, `weaponTypes`) on top; that divergent
- * field is driven separately through {@link FilterCategoryConfig}.
- */
+/** Fields shared by every collection filter; each concrete state adds its own category set, driven separately via {@link FilterCategoryConfig}. */
 export interface BaseFilterState {
   search: string;
   rarities: Set<Rarity>;
@@ -30,10 +26,10 @@ export interface FilterCategoryConfig<T extends string> {
   values: readonly T[];
   selected: Set<T>;
   onToggle: (value: T) => void;
-  /** Classes applied when a value is active, e.g. per-element background. */
+  /** Active-state classes for a value, e.g. per-element background color. */
   activeClassName: (value: T) => string;
   iconPath: (value: T, variant: 'light' | 'dark') => string;
-  /** Hide the category row entirely (default shown). */
+  /** Render the category row (default true). */
   show?: boolean;
 }
 
@@ -54,7 +50,7 @@ interface FilterBarProps<F extends BaseFilterState, T extends string> {
 
 const RARITY_VALUES: Rarity[] = [5, 4];
 
-/** Release/name sort fields shared by every collection filter. */
+/** Default sort fields shared by both collection filters. */
 export const SORT_FIELDS = [
   { value: 'release', label: 'Release' },
   { value: 'name', label: 'Name' },
@@ -95,9 +91,7 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
 
   return (
     <div className="space-y-1.5">
-      {/* Row 1: Filters */}
       <div className="flex flex-wrap items-center gap-1.5">
-        {/* Ownership filters */}
         {showOwnership &&
           (['all', 'owned', 'unowned'] as const).map((value) => (
             <button
@@ -122,7 +116,6 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
           </span>
         )}
 
-        {/* Rarity filters */}
         {RARITY_VALUES.map((rarity) => (
           <button
             key={rarity}
@@ -147,7 +140,6 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
           </span>
         )}
 
-        {/* Category filters (elements, weapon types, …) */}
         {showCategory &&
           category.values.map((value) => (
             <button
@@ -180,7 +172,6 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
           ))}
       </div>
 
-      {/* Row 2: Search + status + sort */}
       <div className="flex items-center gap-1.5">
         <div className="relative w-1/2 lg:w-1/3">
           <Search
