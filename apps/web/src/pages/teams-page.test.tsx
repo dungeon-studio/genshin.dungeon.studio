@@ -204,6 +204,23 @@ describe('TeamsPage weapon-first flow', () => {
       });
     }, 30_000);
 
+    it('empties the slot when the assigned character is picked again', async () => {
+      const user = userEvent.setup({ delay: null });
+      renderTeamsPage();
+
+      await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+      await user.click(
+        await screen.findByRole('button', { name: `Add ${CLAYMORE_USER.name} to team` }),
+      );
+
+      // Now assigned, so the same card offers removal.
+      await user.click(
+        await screen.findByRole('button', { name: `Remove ${CLAYMORE_USER.name} from team` }),
+      );
+
+      expect(useTeamStore.getState().teams[1].members[0]).toBeNull();
+    }, 30_000);
+
     it('unequips the weapon when the equipped one is picked again', async () => {
       const user = userEvent.setup({ delay: null });
       renderTeamsPage();
