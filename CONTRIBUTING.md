@@ -130,7 +130,7 @@ For code conventions—comments, documentation strategy, naming, shared types, t
 
 ### End-to-end tests
 
-Playwright drives a browser through the assembled stack—Firebase emulators, the API, and the web app:
+`tools/e2e` drives a browser through the assembled stack—Firebase emulators, the API, and the web app. It sits outside `apps/web` because it exercises both apps, and because two test runners in one package means two configs fighting over the same file patterns:
 
 ```bash
 pnpm turbo run test:e2e

@@ -161,7 +161,7 @@ jobs:
       - name: Resolve Playwright version
         id: playwright
         run: |
-          version="$(node -p "require('./apps/web/package.json').devDependencies['@playwright/test']")"
+          version="$(node -p "require('./tools/e2e/package.json').devDependencies['@playwright/test']")"
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       # Keyed by Playwright version, so the cache misses only when the
@@ -175,15 +175,15 @@ jobs:
 
       - name: Install Playwright Chromium
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm --filter @genshin/web exec playwright install --with-deps chromium
+        run: pnpm --filter @genshin/e2e exec playwright install --with-deps chromium
 
       # The cached browser still needs its shared libraries on a fresh runner.
       - name: Install Chromium system dependencies
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: pnpm --filter @genshin/web exec playwright install-deps chromium
+        run: pnpm --filter @genshin/e2e exec playwright install-deps chromium
 
       - name: Run end-to-end tests
-        run: pnpm turbo run test:e2e --filter=@genshin/web
+        run: pnpm turbo run test:e2e --filter=@genshin/e2e
 
       # Its own flag, so a flaky browser test is not attributed to the vitest
       # suite behind `web`. A failing run is the one test analytics needs, hence
@@ -193,7 +193,7 @@ jobs:
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: apps/web/test-results/e2e-junit.xml
+          files: tools/e2e/test-results/e2e-junit.xml
           flags: e2e
           report_type: test_results
           fail_ci_if_error: false

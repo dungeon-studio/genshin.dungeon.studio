@@ -26,7 +26,7 @@ const junitReporter: ReporterDescription = [
 ];
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './specs',
   outputDir: path.join(artifactRoot, 'test-results'),
 
   // Signed-in specs take a fresh emulator account each, so their Firestore
@@ -71,7 +71,7 @@ export default defineConfig({
     },
     {
       command: 'pnpm exec vite',
-      cwd: import.meta.dirname,
+      cwd: path.join(repoRoot, 'apps/web'),
       url: WEB_URL,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,

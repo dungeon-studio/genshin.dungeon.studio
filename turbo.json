@@ -28,14 +28,14 @@
       "env": ["FAST_CHECK_SEED"]
     },
     "test:e2e": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "@genshin/api#build"],
       "cache": false
     },
     "typecheck": {
       "dependsOn": ["^build"],
       "inputs": [
         "src/**/*.{ts,tsx}",
-        "e2e/**/*.ts",
+        "specs/**/*.ts",
         "package.json",
         "vite.config.*",
         "playwright.config.*",

@@ -45,12 +45,4 @@ export default [
       'react/function-component-definition': 'off',
     },
   },
-  {
-    // The end-to-end suite drives a browser, not React. Playwright names a
-    // fixture's publish callback `use`, which rules-of-hooks reads as React's.
-    files: ['e2e/**/*.ts'],
-    rules: {
-      'react-hooks/rules-of-hooks': 'off',
-    },
-  },
 ];
