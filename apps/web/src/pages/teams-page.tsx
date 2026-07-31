@@ -54,8 +54,7 @@ export function TeamsPage(): JSX.Element {
 
   const selectedTeam = selectedSlot !== null ? teams[selectedSlot] : null;
 
-  // The member being edited, once both halves of its address are known. Carrying the
-  // pair as one value keeps every handler to a single guard.
+  // The member being edited, once both halves of its address are known.
   const editing = useMemo(
     () =>
       selectedSlot !== null && selectedMemberIndex !== null
@@ -73,8 +72,7 @@ export function TeamsPage(): JSX.Element {
     return collectionWeapon ? getWeaponById(collectionWeapon.weaponId) : undefined;
   }, [pendingWeaponId, weapons]);
 
-  // Constrains the weapon pool once a character is assigned. Undefined on an empty
-  // member, where the whole owned pool is offered instead.
+  // Undefined on an empty member, where the whole owned pool is offered instead.
   const assignedCharacterWeaponType = useMemo(() => {
     if (!selectedMember) return undefined;
     return getCharacterById(selectedMember.characterId)?.weaponType;
@@ -101,8 +99,8 @@ export function TeamsPage(): JSX.Element {
     ],
   );
 
-  // Until a character is assigned the choice has nowhere to persist, so it waits in
-  // the pending slot instead of going to the store.
+  // Without a character the choice has nowhere to persist, so it waits in the pending
+  // slot instead of reaching the store.
   const handleWeaponSelect = useCallback(
     (collectionWeaponId: CollectionWeaponId) => {
       if (editing && selectedMember) {

@@ -20,8 +20,6 @@ describe('usePendingWeapon', () => {
     expect(result.current.collectionWeaponId).toBeUndefined();
   });
 
-  // The selection belongs to the member it was made on. Editing a sibling must not
-  // inherit it, and coming back must not have lost it.
   it('surfaces the selection only for the member it was made on', () => {
     const { result, rerender } = renderHook(
       ({ slot, memberIndex }: { slot: TeamSlot; memberIndex: number }) =>

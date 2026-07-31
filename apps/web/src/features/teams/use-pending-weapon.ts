@@ -11,7 +11,6 @@ interface PendingWeapon {
 }
 
 export interface UsePendingWeaponResult {
-  /** The weapon awaiting a character for the member given to the hook, if any. */
   collectionWeaponId: CollectionWeaponId | undefined;
   select: (collectionWeaponId: CollectionWeaponId) => void;
   clear: () => void;
@@ -21,11 +20,10 @@ export interface UsePendingWeaponResult {
  * Holds a weapon chosen for a member that has no character yet.
  *
  * A team member is keyed by its character, so the domain model has nowhere to put a
- * weapon picked first. It waits here until a character assignment commits the pair,
- * and is dropped if the user leaves without one.
+ * weapon picked first; it waits here until a character assignment commits the pair.
  *
- * The selection belongs to the member it was made on: editing a different member
- * hides it rather than moving it, so returning to the original member restores it.
+ * The selection belongs to the member it was made on. Editing a different member
+ * hides it rather than moving it, so returning to the first member restores it.
  */
 export function usePendingWeapon(
   slot: TeamSlot | null,

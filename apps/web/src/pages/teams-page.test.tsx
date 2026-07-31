@@ -16,9 +16,9 @@ import { createWrapper } from '@/test/render';
 
 import { TeamsPage } from './teams-page';
 
-// Each pool renders a card per character and per weapon in the game data, which is
-// slow enough in jsdom to outrun the default one-second budget when the rest of the
-// suite is competing for workers.
+// These mount the whole page and drive it through many interactions, which runs
+// several times slower when the rest of the suite is competing for workers than it
+// does alone — past the default one-second budget for async queries.
 configure({ asyncUtilTimeout: 10_000 });
 
 // The page draws from real game data, so fixtures have to be real entries.
@@ -98,7 +98,6 @@ describe('TeamsPage weapon-first flow', () => {
     const user = userEvent.setup({ delay: null });
     renderTeamsPage();
 
-    // Every unfilled member card matches; the first is team 1's leading slot.
     await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
     await user.click(await screen.findByRole('button', { name: 'Weapons' }));
     await user.click(
@@ -127,7 +126,6 @@ describe('TeamsPage weapon-first flow', () => {
     const user = userEvent.setup({ delay: null });
     renderTeamsPage();
 
-    // Every unfilled member card matches; the first is team 1's leading slot.
     await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
 
     expect(
@@ -142,7 +140,6 @@ describe('TeamsPage weapon-first flow', () => {
     await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
     await user.click(await screen.findByRole('button', { name: 'Weapons' }));
 
-    // Both owned weapons are on offer: no character means no weapon type to enforce.
     expect(
       await screen.findByRole('button', { name: `Assign ${CLAYMORE.name} to character` }),
     ).toBeInTheDocument();
@@ -176,8 +173,6 @@ describe('TeamsPage weapon-first flow', () => {
     expect(screen.queryByText(/Showing Claymore users for/)).not.toBeInTheDocument();
   }, 30_000);
 
-  // The issue requires the pre-existing direction to keep working, and routing it
-  // through the pending-weapon branches is exactly what could break it.
   describe('character-first flow', () => {
     it('constrains the weapon pool to the assigned character and equips from it', async () => {
       const user = userEvent.setup({ delay: null });
@@ -260,7 +255,6 @@ describe('TeamsPage weapon-first flow', () => {
 
     await user.click(screen.getByRole('button', { name: 'Characters' }));
 
-    // No pending weapon left, so nothing constrains the pool.
     expect(
       await screen.findByRole('button', { name: `Add ${BOW_USER.name} to team` }),
     ).toBeInTheDocument();
@@ -280,7 +274,7 @@ describe('TeamsPage weapon-first flow', () => {
     await user.click(screen.getByRole('button', { name: 'Close' }));
     await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
 
-    // Reopened on the same member: the weapon did not survive the trip.
+    // Reopened on the same member, so a surviving weapon would still be constraining.
     expect(
       await screen.findByRole('button', { name: `Add ${BOW_USER.name} to team` }),
     ).toBeInTheDocument();

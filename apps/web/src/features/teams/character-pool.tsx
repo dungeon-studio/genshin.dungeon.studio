@@ -27,9 +27,9 @@ interface CharacterPoolProps {
   slot: TeamSlot;
   memberIndex: number;
   /**
-   * Restricts the pool to characters wielding this weapon type. Not exposed through
-   * the filter bar: a weapon picked before a character is a constraint on the choice,
-   * not a preference the user can toggle away.
+   * Restricts the pool to characters wielding this type. Deliberately not a filter-bar
+   * facet: it constrains which character is valid, so the user must not be able to
+   * clear it and pick one that cannot equip the weapon.
    */
   weaponType?: WeaponType;
   onAssign: (characterId: string) => void;

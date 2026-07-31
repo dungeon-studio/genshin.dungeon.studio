@@ -47,7 +47,7 @@ function poolFilterState(weaponType: WeaponType | undefined): WeaponFilterState 
 
 interface WeaponPoolProps {
   collectionWeapons: CollectionWeapon[];
-  /** Constrains the pool to one type. Undefined on a member with no character yet. */
+  /** Undefined on a member with no character, where the whole owned pool is offered. */
   weaponType?: WeaponType;
   selectedCollectionWeaponId?: CollectionWeaponId;
   slot: TeamSlot;
