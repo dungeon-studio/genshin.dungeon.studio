@@ -72,11 +72,13 @@ curl -fsSL \
 sudo chmod +x /usr/local/bin/lychee
 
 # ---------------------------------------------------------------------------
-# 8. Playwright browsers (for Playwright MCP server)
+# 8. Playwright browsers (for the end-to-end suite and the Playwright MCP server)
 # ---------------------------------------------------------------------------
 step "Installing Playwright Chromium and Chrome"
 
-npx --yes playwright install --with-deps chromium chrome
+# Through the workspace, so the browsers match the @playwright/test version
+# tools/e2e pins — the one the suite and the CI job run.
+pnpm --filter @genshin/e2e exec playwright install --with-deps chromium chrome
 
 # ---------------------------------------------------------------------------
 # Verify and report

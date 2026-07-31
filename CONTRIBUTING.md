@@ -73,6 +73,7 @@ Pre-commit enforces formatting, linting, documentation, and hygiene checks on ev
 
 - Every pre-commit hook. Run `pre-commit install` once, and the same hooks run on each commit that CI runs over the whole tree—so a clean commit is a clean build. `pre-commit run --all-files` reproduces CI exactly.
 - The workspace build and tests: `pnpm turbo run typecheck test build`.
+- The end-to-end suite in `tools/e2e`: `pnpm turbo run test:e2e`. It starts the Firebase emulators, the API, and the dev server itself, so stop any `pnpm dev` first—in this checkout or any other worktree—or the emulators fail to bind.
 - Feature work adds tests when it introduces testable behavior.
 
 Broken external URLs are the one exception: a weekly run files them as a GitHub issue rather than blocking a pull request, since transient outages would make that check flaky. For which workflow runs what, see [workflow conventions](docs/reference/workflow-conventions.md).
