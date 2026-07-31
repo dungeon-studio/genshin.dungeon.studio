@@ -73,6 +73,7 @@ Pre-commit enforces formatting, linting, documentation, and hygiene checks on ev
 
 - Every pre-commit hook. Run `pre-commit install` once, and the same hooks run on each commit that CI runs over the whole tree—so a clean commit is a clean build. `pre-commit run --all-files` reproduces CI exactly.
 - The workspace build and tests: `pnpm turbo run typecheck test build`.
+- The end-to-end suite in `tools/e2e`: `pnpm turbo run test:e2e`. It starts the Firebase emulators, the API, and the dev server itself, so stop any `pnpm dev` first—in this checkout or any other worktree—or the emulators fail to bind.
 - Feature work adds tests when it introduces testable behavior.
 
 Broken external URLs are the one exception: a weekly run files them as a GitHub issue rather than blocking a pull request, since transient outages would make that check flaky. For which workflow runs what, see [workflow conventions](docs/reference/workflow-conventions.md).
@@ -127,20 +128,6 @@ For code conventions—comments, documentation strategy, naming, shared types, t
 - **Assert only the necessary properties**: keep each assertion as close to the property under test as possible; redundant assertions obscure what the test proves.
 - **Use `satisfies` for fixture annotations**: it validates the fixture shape at the declaration site without changing the inferred type, avoiding index-signature assignability errors.
 - **One schema assertion per route test, then field-level spot checks**: validate the response against the published JSON Schema with AJV first, then assert one specific value; don't re-test the schema field by field.
-
-### End-to-end tests
-
-`tools/e2e` drives a browser through the assembled stack—Firebase emulators, the API, and the web app. It sits outside `apps/web` because it exercises both apps, and because two test runners in one package means two configs fighting over the same file patterns:
-
-```bash
-pnpm turbo run test:e2e
-```
-
-The command owns the whole stack: it starts the emulators, the API, and the Vite dev server, and stops them again on the way out. That means it can't share ports with a `pnpm dev` session, in this checkout or any other worktree—stop that session first or the emulators fail to bind.
-
-The suite drives the dev server rather than a production preview, because `vite build` strips the emulator wiring in [`src/lib/firebase.ts`](apps/web/src/lib/firebase.ts) and leaves a built bundle with no way to sign in.
-
-The run writes traces, failure screenshots, and the HTML report to `/tmp/genshin-e2e`, never into the workspace.
 
 ---
 
