@@ -15,7 +15,7 @@ import { MainAffixSelector } from './main-affix-selector';
 import { PrioritySubstats } from './priority-substats';
 import { SetConfiguration } from './set-configuration';
 
-/** Maximum affixes selectable in each prioritization list; see ArtifactPlan's "0–3" contract. */
+/** ArtifactPlan documents each affix list as holding 0–3 entries. */
 const MAX_PRIORITIZED_SUBSTATS = 3;
 
 interface ArtifactPlannerProps {
