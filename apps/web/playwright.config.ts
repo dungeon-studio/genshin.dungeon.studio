@@ -3,6 +3,7 @@
 
 import path from 'node:path';
 
+import type { ReporterDescription } from '@playwright/test';
 import { defineConfig, devices } from '@playwright/test';
 
 const repoRoot = path.resolve(import.meta.dirname, '../..');
@@ -18,6 +19,11 @@ const artifactRoot = '/tmp/genshin-e2e';
 // also lands on the API's default CORS origin and the app's default API URL.
 const WEB_URL = 'http://localhost:5173';
 const API_URL = 'http://localhost:8080';
+
+const junitReporter: ReporterDescription = [
+  'junit',
+  { outputFile: path.join(import.meta.dirname, 'test-results/e2e-junit.xml') },
+];
 
 export default defineConfig({
   testDir: './e2e',
@@ -40,13 +46,10 @@ export default defineConfig({
   reporter: process.env.CI
     ? [
         ['github'],
-        ['junit', { outputFile: path.join(import.meta.dirname, 'test-results/e2e-junit.xml') }],
+        junitReporter,
         ['html', { outputFolder: path.join(artifactRoot, 'report'), open: 'never' }],
       ]
-    : [
-        ['list'],
-        ['junit', { outputFile: path.join(import.meta.dirname, 'test-results/e2e-junit.xml') }],
-      ],
+    : [['list'], junitReporter],
 
   use: {
     baseURL: WEB_URL,

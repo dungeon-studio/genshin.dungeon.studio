@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import type { ConsoleMessage, Page } from '@playwright/test';
-import { expect, test } from '@playwright/test';
+
+import { expect, test } from './fixtures';
 
 const ROUTES = [
   { path: '/', heading: 'Teams' },

@@ -1,11 +1,20 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { expect, test } from '@playwright/test';
-
-import { collectCharacter, equippablePair, signIn } from './fixtures';
+import {
+  addCharacterLabel,
+  collectCharacter,
+  constellationLabel,
+  equippablePair,
+  expect,
+  removeCharacterLabel,
+  test,
+} from './fixtures';
 
 const { character } = equippablePair();
+
+const STARTING_CONSTELLATION = 0;
+const RAISED_CONSTELLATION = 4;
 
 // Nothing here asserts that an anonymous collection outlives a navigation or a
 // reload. It does not today — the store is cleared whenever the hook mounts
@@ -17,45 +26,39 @@ const { character } = equippablePair();
 test('a character can be collected and released anonymously', async ({ page }) => {
   await page.goto('/characters');
 
-  await page.getByRole('button', { name: `Add ${character.name} to collection` }).click();
+  await page.getByRole('button', { name: addCharacterLabel(character) }).click();
 
-  const owned = page.getByRole('button', { name: `Remove ${character.name} from collection` });
+  const owned = page.getByRole('button', { name: removeCharacterLabel(character) });
   await expect(owned).toBeVisible();
 
   await owned.click();
 
-  await expect(
-    page.getByRole('button', { name: `Add ${character.name} to collection` }),
-  ).toBeVisible();
+  await expect(page.getByRole('button', { name: addCharacterLabel(character) })).toBeVisible();
 });
 
 test('a collected character takes a constellation level', async ({ page }) => {
   await page.goto('/characters');
 
-  await page.getByRole('button', { name: `Add ${character.name} to collection` }).click();
+  await page.getByRole('button', { name: addCharacterLabel(character) }).click();
   await page
-    .getByRole('button', { name: `Constellation level 0 for ${character.name}, click to edit` })
+    .getByRole('button', { name: constellationLabel(character, STARTING_CONSTELLATION) })
     .click();
-  await page.getByRole('button', { name: 'Set constellation level 4' }).click();
+  await page
+    .getByRole('button', { name: `Set constellation level ${RAISED_CONSTELLATION}` })
+    .click();
 
   await expect(
-    page.getByRole('button', {
-      name: `Constellation level 4 for ${character.name}, click to edit`,
-    }),
+    page.getByRole('button', { name: constellationLabel(character, RAISED_CONSTELLATION) }),
   ).toBeVisible();
 });
 
-test('a signed-in collection round-trips through the API', async ({ page }) => {
-  await page.goto('/characters');
-  await signIn(page);
-
+test('a signed-in collection round-trips through the API', async ({ signedInPage: page }) => {
   await collectCharacter(page, character);
 
-  // A reload drops every in-memory store, so what comes back has been served by
-  // the API out of Firestore.
+  // A reload clears the persisted collection while auth is still resolving, so
+  // what comes back has been served by the API rather than read from
+  // localStorage.
   await page.reload();
 
-  await expect(
-    page.getByRole('button', { name: `Remove ${character.name} from collection` }),
-  ).toBeVisible();
+  await expect(page.getByRole('button', { name: removeCharacterLabel(character) })).toBeVisible();
 });

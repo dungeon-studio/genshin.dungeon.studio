@@ -3,8 +3,8 @@
 
 import type { Character, Weapon } from '@genshin/game-data';
 import { CHARACTERS, WEAPONS } from '@genshin/game-data';
-import type { Page, Response } from '@playwright/test';
-import { expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { test as base, expect } from '@playwright/test';
 
 /**
  * A character and a weapon the character can actually equip.
@@ -23,24 +23,64 @@ export function equippablePair(): { character: Character; weapon: Weapon } {
   throw new Error('Game data has no character with a weapon of a matching type.');
 }
 
+// The accessible names the app renders. Kept beside each other so a label
+// changing in a component is one edit here rather than a search across specs.
+
+export function weaponCardLabel(weapon: Weapon, instances: number): string {
+  return `${weapon.name}, ${instances} owned`;
+}
+
+export function addCharacterLabel(character: Character): string {
+  return `Add ${character.name} to collection`;
+}
+
+export function removeCharacterLabel(character: Character): string {
+  return `Remove ${character.name} from collection`;
+}
+
+export function constellationLabel(character: Character, level: number): string {
+  return `Constellation level ${level} for ${character.name}, click to edit`;
+}
+
 /**
- * A promise for the API write a signed-in mutation triggers.
+ * The API paths the collection mutations hit, matched as substrings of the
+ * request URL.
+ *
+ * A weapon item path extends the collection path, so the two never separate on
+ * the path alone — the HTTP method passed alongside is what tells a collection
+ * POST from an item PATCH.
+ */
+export const apiPath = {
+  character: (character: Character) => `/api/characters/${encodeURIComponent(character.id)}`,
+  weapons: '/api/weapons',
+  team: (slot: number) => `/api/teams/${slot}`,
+} as const;
+
+/**
+ * Run an action and wait for the API write it triggers.
  *
  * Every collection mutation writes to the local store first and calls the API
  * behind it, so the UI reaches its asserted state before the server has the
- * change. Anything that later reloads the page has to await the write itself
- * or it races the request it depends on.
+ * change. Anything that later reloads the page has to await that write, and the
+ * listener has to be watching before the request goes out — so the action is
+ * passed in here rather than left to callers to sequence correctly.
  */
-export function apiWrite(page: Page, method: string, pathFragment: string): Promise<Response> {
-  return page.waitForResponse(
+export async function withApiWrite(
+  page: Page,
+  method: string,
+  pathFragment: string,
+  action: () => Promise<void>,
+): Promise<void> {
+  const settled = page.waitForResponse(
     (response) =>
       response.request().method() === method &&
       response.url().includes(pathFragment) &&
       response.ok(),
   );
-}
 
-let accountSequence = 0;
+  await action();
+  await settled;
+}
 
 /**
  * Sign in through the Firebase Auth emulator's Google provider screen.
@@ -50,8 +90,11 @@ let accountSequence = 0;
  * serves at /emulator/auth/handler; its controls are addressed by id because
  * they carry no accessible names.
  */
-export async function signIn(page: Page): Promise<void> {
-  accountSequence += 1;
+async function signIn(page: Page): Promise<void> {
+  // Identifies the attempt, not the test: retrying against the same account
+  // would inherit the Firestore documents the failed attempt left behind.
+  const { testId, retry } = base.info();
+  const account = `${testId}-${retry}`;
 
   const popupPromise = page.waitForEvent('popup');
   await page.getByRole('button', { name: 'Sign in' }).click();
@@ -65,8 +108,8 @@ export async function signIn(page: Page): Promise<void> {
 
   const email = popup.locator('#email-input');
   await expect(email).toBeVisible();
-  await email.fill(`e2e.${accountSequence}.${process.pid}@example.com`);
-  await popup.locator('#display-name-input').fill(`E2E Traveler ${accountSequence}`);
+  await email.fill(`e2e.${account}@example.com`);
+  await popup.locator('#display-name-input').fill(`E2E Traveler ${account}`);
   await popup.locator('#sign-in').click();
 
   // The header switching over is the signal that the credential reached the
@@ -78,13 +121,11 @@ export async function signIn(page: Page): Promise<void> {
 export async function collectCharacter(page: Page, character: Character): Promise<void> {
   await page.goto('/characters');
 
-  const written = apiWrite(page, 'PUT', `/api/characters/${encodeURIComponent(character.id)}`);
-  await page.getByRole('button', { name: `Add ${character.name} to collection` }).click();
-  await written;
+  await withApiWrite(page, 'PUT', apiPath.character(character), () =>
+    page.getByRole('button', { name: addCharacterLabel(character) }).click(),
+  );
 
-  await expect(
-    page.getByRole('button', { name: `Remove ${character.name} from collection` }),
-  ).toBeVisible();
+  await expect(page.getByRole('button', { name: removeCharacterLabel(character) })).toBeVisible();
 }
 
 /**
@@ -96,9 +137,9 @@ export async function collectCharacter(page: Page, character: Character): Promis
 export async function collectWeapon(page: Page, weapon: Weapon): Promise<void> {
   await page.goto('/weapons');
 
-  const written = apiWrite(page, 'POST', '/api/weapons');
-  await page.getByRole('button', { name: `${weapon.name}, 0 owned` }).click();
-  await written;
+  await withApiWrite(page, 'POST', apiPath.weapons, () =>
+    page.getByRole('button', { name: weaponCardLabel(weapon, 0) }).click(),
+  );
 
   // Selecting the card opens the instance sheet, and that sheet is modal: it
   // hides the grid behind it from the accessibility tree, so the card's own
@@ -113,3 +154,17 @@ export async function closeWeaponSheet(page: Page, weapon: Weapon): Promise<void
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog', { name: weapon.name })).toBeHidden();
 }
+
+/**
+ * `signedInPage` is a page already signed in to a fresh emulator account, so a
+ * spec that needs one declares it instead of opening with the same two lines.
+ */
+export const test = base.extend<{ signedInPage: Page }>({
+  signedInPage: async ({ page }, use) => {
+    await page.goto('/');
+    await signIn(page);
+    await use(page);
+  },
+});
+
+export { expect };
