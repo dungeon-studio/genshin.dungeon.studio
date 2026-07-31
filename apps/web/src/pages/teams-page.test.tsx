@@ -175,4 +175,98 @@ describe('TeamsPage weapon-first flow', () => {
     ).toBeInTheDocument();
     expect(screen.queryByText(/Showing Claymore users for/)).not.toBeInTheDocument();
   }, 30_000);
+
+  // The issue requires the pre-existing direction to keep working, and routing it
+  // through the pending-weapon branches is exactly what could break it.
+  describe('character-first flow', () => {
+    it('constrains the weapon pool to the assigned character and equips from it', async () => {
+      const user = userEvent.setup({ delay: null });
+      renderTeamsPage();
+
+      await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+      await user.click(
+        await screen.findByRole('button', { name: `Add ${CLAYMORE_USER.name} to team` }),
+      );
+      await user.click(screen.getByRole('button', { name: 'Weapons' }));
+
+      const claymore = await screen.findByRole('button', {
+        name: `Assign ${CLAYMORE.name} to character`,
+      });
+      expect(
+        screen.queryByRole('button', { name: `Assign ${BOW_WEAPON.name} to character` }),
+      ).not.toBeInTheDocument();
+
+      await user.click(claymore);
+
+      expect(useTeamStore.getState().teams[1].members[0]).toEqual({
+        characterId: CLAYMORE_USER.id,
+        weaponInstanceId: CLAYMORE_INSTANCE,
+      });
+    }, 30_000);
+
+    it('unequips the weapon when the equipped one is picked again', async () => {
+      const user = userEvent.setup({ delay: null });
+      renderTeamsPage();
+
+      await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+      await user.click(
+        await screen.findByRole('button', { name: `Add ${CLAYMORE_USER.name} to team` }),
+      );
+      await user.click(screen.getByRole('button', { name: 'Weapons' }));
+      await user.click(
+        await screen.findByRole('button', { name: `Assign ${CLAYMORE.name} to character` }),
+      );
+
+      // Now selected, so the same card offers removal.
+      await user.click(
+        await screen.findByRole('button', { name: `Remove ${CLAYMORE.name} from character` }),
+      );
+
+      expect(useTeamStore.getState().teams[1].members[0]).toEqual({
+        characterId: CLAYMORE_USER.id,
+      });
+    }, 30_000);
+  });
+
+  it('drops a pending weapon when the same card is picked again', async () => {
+    const user = userEvent.setup({ delay: null });
+    renderTeamsPage();
+
+    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+    await user.click(await screen.findByRole('button', { name: 'Weapons' }));
+    await user.click(
+      await screen.findByRole('button', { name: `Assign ${CLAYMORE.name} to character` }),
+    );
+    await user.click(
+      await screen.findByRole('button', { name: `Remove ${CLAYMORE.name} from character` }),
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Characters' }));
+
+    // No pending weapon left, so nothing constrains the pool.
+    expect(
+      await screen.findByRole('button', { name: `Add ${BOW_USER.name} to team` }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/users for/)).not.toBeInTheDocument();
+  }, 30_000);
+
+  it('forgets a pending weapon once the editor is closed', async () => {
+    const user = userEvent.setup({ delay: null });
+    renderTeamsPage();
+
+    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+    await user.click(await screen.findByRole('button', { name: 'Weapons' }));
+    await user.click(
+      await screen.findByRole('button', { name: `Assign ${CLAYMORE.name} to character` }),
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+
+    // Reopened on the same member: the weapon did not survive the trip.
+    expect(
+      await screen.findByRole('button', { name: `Add ${BOW_USER.name} to team` }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/users for/)).not.toBeInTheDocument();
+  }, 30_000);
 });
