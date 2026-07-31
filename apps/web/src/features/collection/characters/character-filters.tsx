@@ -5,11 +5,12 @@ import type { Element } from '@genshin/game-data';
 import { ELEMENTS } from '@genshin/game-data';
 import type { JSX } from 'react';
 
-import { FilterBar, SORT_FIELDS } from '@/components/filter-bar';
+import { FilterBar } from '@/components/filter-bar';
 import { ELEMENT_BG_COLORS } from '@/lib/element-styles';
 import { getElementIconPath } from '@/lib/elements';
 import { toggleInSet } from '@/lib/utils';
 
+import { SORT_FIELDS } from '../sort-fields';
 import type { CharacterFilterState } from './filtering';
 
 interface CharacterFiltersProps {

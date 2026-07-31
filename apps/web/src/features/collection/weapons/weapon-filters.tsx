@@ -5,10 +5,11 @@ import type { WeaponType } from '@genshin/game-data';
 import { WEAPON_TYPES } from '@genshin/game-data';
 import type { JSX } from 'react';
 
-import { FilterBar, SORT_FIELDS } from '@/components/filter-bar';
+import { FilterBar } from '@/components/filter-bar';
 import { toggleInSet } from '@/lib/utils';
 import { getWeaponTypeIconPath } from '@/lib/weapon-types';
 
+import { SORT_FIELDS } from '../sort-fields';
 import type { WeaponFilterState } from './filtering';
 
 interface WeaponFiltersProps {

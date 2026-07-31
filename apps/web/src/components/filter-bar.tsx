@@ -50,12 +50,6 @@ interface FilterBarProps<F extends BaseFilterState, T extends string> {
 
 const RARITY_VALUES: Rarity[] = [5, 4];
 
-/** Default sort fields shared by both collection filters. */
-export const SORT_FIELDS = [
-  { value: 'release', label: 'Release' },
-  { value: 'name', label: 'Name' },
-] as const;
-
 export function FilterBar<F extends BaseFilterState, T extends string>({
   filters,
   onChange,
