@@ -54,7 +54,7 @@
     "globals": "17.8.0",
     "jsdom": "30.0.0",
     "msw": "2.15.0",
-    "postcss": "8.5.23",
+    "postcss": "8.5.24",
     "prettier-plugin-tailwindcss": "0.8.1",
     "stylelint": "17.14.1",
     "stylelint-config-standard": "40.0.0",
