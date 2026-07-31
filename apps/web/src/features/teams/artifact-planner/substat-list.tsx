@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { ARTIFACT_MINOR_AFFIXES, type ArtifactMinorAffix } from '@genshin/game-data';
-import { GripVertical, Minus } from 'lucide-react';
+import { Minus } from 'lucide-react';
 import type { JSX } from 'react';
 
 export function SubstatList({
@@ -22,51 +22,32 @@ export function SubstatList({
     (affix) => !excluded.includes(affix) && !selected.includes(affix),
   );
 
-  const moveUp = (index: number) => {
-    if (index === 0) return;
-    const next = [...selected];
-    [next[index - 1], next[index]] = [next[index], next[index - 1]];
-    onChange(next);
-  };
+  // The game lists substats in a fixed order regardless of how they were
+  // acquired, so present and store the selection in that canonical order.
+  const orderedSelected = ARTIFACT_MINOR_AFFIXES.filter((affix) => selected.includes(affix));
 
-  const remove = (index: number) => {
-    onChange(selected.filter((_, i) => i !== index));
+  const remove = (affix: ArtifactMinorAffix) => {
+    onChange(selected.filter((selectedAffix) => selectedAffix !== affix));
   };
 
   const add = (affix: ArtifactMinorAffix) => {
     if (selected.length >= max) return;
-    onChange([...selected, affix]);
+    const next = [...selected, affix];
+    onChange(ARTIFACT_MINOR_AFFIXES.filter((candidate) => next.includes(candidate)));
   };
 
   return (
     <div className="space-y-1.5">
       <span className="text-xs font-medium text-card-foreground">{label}</span>
 
-      {selected.length > 0 && (
+      {orderedSelected.length > 0 && (
         <ul className="space-y-1" aria-label={label}>
-          {selected.map((affix, index) => (
+          {orderedSelected.map((affix) => (
             <li key={affix} className="flex items-center gap-1 rounded-md bg-muted/50 px-2 py-1">
-              <span className="flex flex-col" aria-label={`Reorder ${affix}`}>
-                <button
-                  type="button"
-                  onClick={() => moveUp(index)}
-                  disabled={index === 0}
-                  className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                  aria-label={`Move ${affix} up`}
-                >
-                  <GripVertical
-                    className="h-3 w-3 rotate-90"
-                    aria-hidden="true"
-                    focusable={false}
-                  />
-                </button>
-              </span>
-              <span className="flex-1 text-xs text-card-foreground">
-                {index + 1}. {affix}
-              </span>
+              <span className="flex-1 text-xs text-card-foreground">{affix}</span>
               <button
                 type="button"
-                onClick={() => remove(index)}
+                onClick={() => remove(affix)}
                 className="text-muted-foreground hover:text-destructive"
                 aria-label={`Remove ${affix}`}
               >
