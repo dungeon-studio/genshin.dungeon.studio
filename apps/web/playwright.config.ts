@@ -33,9 +33,20 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
 
+  // JUnit goes into the workspace rather than under artifactRoot, matching where
+  // vitest writes its own: it is the report Codecov ingests for test analytics,
+  // not a debugging artifact, and `test-results/` is already gitignored. Written
+  // on every run, because a failing run is the one test analytics cares about.
   reporter: process.env.CI
-    ? [['github'], ['html', { outputFolder: path.join(artifactRoot, 'report'), open: 'never' }]]
-    : [['list']],
+    ? [
+        ['github'],
+        ['junit', { outputFile: path.join(import.meta.dirname, 'test-results/e2e-junit.xml') }],
+        ['html', { outputFolder: path.join(artifactRoot, 'report'), open: 'never' }],
+      ]
+    : [
+        ['list'],
+        ['junit', { outputFile: path.join(import.meta.dirname, 'test-results/e2e-junit.xml') }],
+      ],
 
   use: {
     baseURL: WEB_URL,

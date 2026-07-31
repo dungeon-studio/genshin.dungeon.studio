@@ -29,6 +29,12 @@ flag_management:
   default_rules:
     carryforward: true
   individual_flags:
+    # Test results only. The Playwright suite reports flaky-test signal, not
+    # coverage — measuring the served bundle would mark whole files covered that
+    # a smoke test never asserts on. No paths for the same reason, and
+    # carryforward is off so an absent report is never republished as coverage.
+    - name: e2e
+      carryforward: false
     - name: api
       paths:
         - apps/api/src/**

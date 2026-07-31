@@ -185,6 +185,19 @@ jobs:
       - name: Run end-to-end tests
         run: pnpm turbo run test:e2e --filter=@genshin/web
 
+      # Under its own flag rather than `web`, so a flaky browser test is not
+      # attributed to the vitest suite. Uploaded even when the run fails, since
+      # a failure is exactly what test analytics needs to see.
+      - name: Upload end-to-end test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: apps/web/test-results/e2e-junit.xml
+          flags: e2e
+          report_type: test_results
+          fail_ci_if_error: false
+
       - name: Upload Playwright report
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
