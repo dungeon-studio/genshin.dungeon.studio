@@ -7,7 +7,8 @@ import type { JSX } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { cn, toggleInSet } from '@/lib/utils';
+import { toggleInSet } from '@/lib/set';
+import { cn } from '@/lib/utils';
 
 type OwnershipFilter = 'all' | 'owned' | 'unowned';
 type SortDirection = 'asc' | 'desc';

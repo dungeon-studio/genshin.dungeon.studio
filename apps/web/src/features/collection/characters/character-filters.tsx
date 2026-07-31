@@ -8,7 +8,7 @@ import type { JSX } from 'react';
 import { FilterBar } from '@/components/filter-bar';
 import { ELEMENT_BG_COLORS } from '@/lib/element-styles';
 import { getElementIconPath } from '@/lib/elements';
-import { toggleInSet } from '@/lib/utils';
+import { toggleInSet } from '@/lib/set';
 
 import { SORT_FIELDS } from '../sort-fields';
 import type { CharacterFilterState } from './filtering';

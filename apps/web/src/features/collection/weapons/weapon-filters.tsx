@@ -6,7 +6,7 @@ import { WEAPON_TYPES } from '@genshin/game-data';
 import type { JSX } from 'react';
 
 import { FilterBar } from '@/components/filter-bar';
-import { toggleInSet } from '@/lib/utils';
+import { toggleInSet } from '@/lib/set';
 import { getWeaponTypeIconPath } from '@/lib/weapon-types';
 
 import { SORT_FIELDS } from '../sort-fields';

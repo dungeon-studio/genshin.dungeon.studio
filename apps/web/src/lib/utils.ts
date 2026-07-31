@@ -7,14 +7,3 @@ import { twMerge } from 'tailwind-merge';
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
 }
-
-/** Return a new Set with `value` toggled; does not mutate the input. */
-export function toggleInSet<T>(set: ReadonlySet<T>, value: T): Set<T> {
-  const next = new Set(set);
-  if (next.has(value)) {
-    next.delete(value);
-  } else {
-    next.add(value);
-  }
-  return next;
-}
