@@ -7,7 +7,7 @@ import type { JSX } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { toggleInSet } from '@/lib/set';
+import { toggleInSet } from '@/lib/toggle-in-set';
 import { cn } from '@/lib/utils';
 
 type OwnershipFilter = 'all' | 'owned' | 'unowned';
