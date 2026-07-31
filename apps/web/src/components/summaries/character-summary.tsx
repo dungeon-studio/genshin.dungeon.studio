@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import type { Character } from '@genshin/game-data';
-import { CircleHelp } from 'lucide-react';
 import type { JSX } from 'react';
 
 import { ThemedIcon } from '@/components/ui/themed-icon';
 import { getElementIconPath } from '@/lib/elements';
 import { cn } from '@/lib/utils';
 
-import { ItemSummary } from './item-summary';
+import { EmptyItemIcon } from './empty-item-icon';
+import { ICON_SLOT, ItemSummary } from './item-summary';
 
 interface CharacterSummaryProps {
   character?: Character;
@@ -25,20 +25,22 @@ export function CharacterSummary({
       lightSrc={getElementIconPath(character.element, 'light')}
       darkSrc={getElementIconPath(character.element, 'dark')}
       alt={character.element}
-      className={cn('h-10 w-10 shrink-0', dimmed && 'opacity-30')}
+      className={cn(ICON_SLOT, dimmed && 'opacity-30')}
     />
   ) : (
-    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground opacity-30">
-      <CircleHelp className="h-5 w-5" aria-hidden="true" focusable={false} />
-    </div>
+    <EmptyItemIcon shape="circle" />
   );
 
   return (
     <ItemSummary
       icon={icon}
-      name={character?.name}
-      rarity={character?.rarity}
-      metadata={character && `${character.weaponType} · ${character.region}`}
+      item={
+        character && {
+          name: character.name,
+          rarity: character.rarity,
+          metadata: `${character.weaponType} · ${character.region}`,
+        }
+      }
       emptyLabel="No character"
     />
   );

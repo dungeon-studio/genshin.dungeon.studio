@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import type { Weapon, WeaponType } from '@genshin/game-data';
-import { CircleHelp } from 'lucide-react';
 import type { JSX } from 'react';
 
 import { ThemedIcon } from '@/components/ui/themed-icon';
 import { cn } from '@/lib/utils';
 import { getWeaponTypeIconPath } from '@/lib/weapon-types';
 
-import { ItemSummary } from './item-summary';
+import { EmptyItemIcon } from './empty-item-icon';
+import { ICON_SLOT, ItemSummary } from './item-summary';
 
 interface WeaponSummaryProps {
   /** Static weapon definition (name, rarity, type), not a collection instance. */
@@ -36,20 +36,16 @@ export function WeaponSummary({
       lightSrc={getWeaponTypeIconPath(iconType, 'light')}
       darkSrc={getWeaponTypeIconPath(iconType, 'dark')}
       alt=""
-      className={cn('h-10 w-10 shrink-0', dimIcon && 'opacity-30')}
+      className={cn(ICON_SLOT, dimIcon && 'opacity-30')}
     />
   ) : (
-    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground opacity-30">
-      <CircleHelp className="h-5 w-5" aria-hidden="true" focusable={false} />
-    </div>
+    <EmptyItemIcon shape="square" />
   );
 
   return (
     <ItemSummary
       icon={icon}
-      name={weapon?.name}
-      rarity={weapon?.rarity}
-      metadata={weapon?.type}
+      item={weapon && { name: weapon.name, rarity: weapon.rarity, metadata: weapon.type }}
       emptyLabel="No weapon"
     />
   );
