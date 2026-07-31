@@ -14,7 +14,12 @@ import { useTeamStore } from './use-team-store';
 
 export interface UseTeamsResult {
   teams: Record<TeamSlot, CollectionTeam>;
-  assignCharacter: (slot: TeamSlot, memberIndex: number, characterId: string) => void;
+  assignCharacter: (
+    slot: TeamSlot,
+    memberIndex: number,
+    characterId: string,
+    collectionWeaponId?: CollectionWeaponId,
+  ) => void;
   removeCharacter: (slot: TeamSlot, memberIndex: number) => void;
   assignWeapon: (
     slot: TeamSlot,
@@ -125,9 +130,14 @@ export function useTeams(): UseTeamsResult {
   );
 
   const assignCharacter = useCallback(
-    (slot: TeamSlot, memberIndex: number, characterId: string) => {
+    (
+      slot: TeamSlot,
+      memberIndex: number,
+      characterId: string,
+      collectionWeaponId?: CollectionWeaponId,
+    ) => {
       const previousTeam = { ...useTeamStore.getState().teams[slot] };
-      storeAssignCharacter(slot, memberIndex, characterId);
+      storeAssignCharacter(slot, memberIndex, characterId, collectionWeaponId);
       if (isAuthenticated) {
         saveAfterMutation(slot, previousTeam);
       }
