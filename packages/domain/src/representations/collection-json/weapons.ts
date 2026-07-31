@@ -16,12 +16,12 @@ import {
   type Template,
 } from '@genshin/collection-json';
 
-import type { CollectionWeapon } from '../../collection-weapon.js';
+import type { CollectionWeapon } from '../../weapon/collection-weapon.js';
 import {
   assertCollectionWeapon,
   MAX_REFINEMENT_LEVEL,
   MIN_REFINEMENT_LEVEL,
-} from '../../collection-weapon.js';
+} from '../../weapon/collection-weapon.js';
 
 const WEAPON_TEMPLATE: Template = {
   data: [

@@ -30,71 +30,149 @@ function renderAuthed() {
   });
 }
 
+const SECOND_INSTANCE_ID = 'weapon-instance-2' as CollectionWeaponId;
+
 describe('useWeaponCollection', () => {
-  it('adds the server-confirmed weapon to the store', async () => {
-    let serverWeapons = weaponsDocument([]);
-    server.use(
-      http.get('http://localhost:8080/api/weapons', () => HttpResponse.json(serverWeapons)),
-      http.post('http://localhost:8080/api/weapons', () => {
-        serverWeapons = weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 1)]);
-        return HttpResponse.json(serverWeapons);
-      }),
-    );
+  describe('addWeapon', () => {
+    it('adds the server-confirmed weapon to the store', async () => {
+      let serverWeapons = weaponsDocument([]);
+      server.use(
+        http.get('http://localhost:8080/api/weapons', () => HttpResponse.json(serverWeapons)),
+        http.post('http://localhost:8080/api/weapons', () => {
+          serverWeapons = weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 1)]);
+          return HttpResponse.json(serverWeapons);
+        }),
+      );
 
-    const { result } = renderAuthed();
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
+      const { result } = renderAuthed();
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    act(() => {
-      result.current.addWeapon(WEAPON_ID);
+      act(() => {
+        result.current.addWeapon(WEAPON_ID);
+      });
+
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.weaponId).toBe(WEAPON_ID));
     });
 
-    await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.weaponId).toBe(WEAPON_ID));
+    it('creates another instance even when the weapon is already owned', async () => {
+      server.use(
+        http.get('http://localhost:8080/api/weapons', () =>
+          HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 1)])),
+        ),
+        http.post('http://localhost:8080/api/weapons', () =>
+          HttpResponse.json(weaponsDocument([makeWeapon(SECOND_INSTANCE_ID, WEAPON_ID, 1)])),
+        ),
+      );
+
+      const { result } = renderAuthed();
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]).toBeDefined());
+
+      act(() => {
+        result.current.addWeapon(WEAPON_ID);
+      });
+
+      await waitFor(() => expect(result.current.weapons[SECOND_INSTANCE_ID]).toBeDefined());
+      expect(result.current.weapons[INSTANCE_ID]).toBeDefined();
+    });
   });
 
-  it('restores a removed weapon when the delete fails', async () => {
-    server.use(
-      http.get('http://localhost:8080/api/weapons', () =>
-        HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 2)])),
-      ),
-      http.delete(
-        'http://localhost:8080/api/weapons/weapon-instance-1',
-        () => new HttpResponse(null, { status: 500 }),
-      ),
-    );
+  describe('ensureWeapon', () => {
+    it('creates only one instance when it fires repeatedly before the add lands', async () => {
+      let posts = 0;
+      let serverWeapons = weaponsDocument([]);
+      server.use(
+        http.get('http://localhost:8080/api/weapons', () => HttpResponse.json(serverWeapons)),
+        http.post('http://localhost:8080/api/weapons', () => {
+          posts += 1;
+          serverWeapons = weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 1)]);
+          return HttpResponse.json(serverWeapons);
+        }),
+      );
 
-    const { result } = renderAuthed();
-    await waitFor(() => expect(result.current.weapons[INSTANCE_ID]).toBeDefined());
+      const { result } = renderAuthed();
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    act(() => {
-      result.current.removeWeapon(INSTANCE_ID);
+      act(() => {
+        result.current.ensureWeapon(WEAPON_ID);
+        result.current.ensureWeapon(WEAPON_ID);
+        result.current.ensureWeapon(WEAPON_ID);
+      });
+
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.weaponId).toBe(WEAPON_ID));
+      expect(posts).toBe(1);
     });
 
-    // Optimistically gone, then restored once the delete errors.
-    expect(result.current.weapons[INSTANCE_ID]).toBeUndefined();
-    await waitFor(() => expect(result.current.weapons[INSTANCE_ID]).toBeDefined());
-    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+    it('does not add another instance when the weapon is already owned', async () => {
+      let posts = 0;
+      server.use(
+        http.get('http://localhost:8080/api/weapons', () =>
+          HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 1)])),
+        ),
+        http.post('http://localhost:8080/api/weapons', () => {
+          posts += 1;
+          return HttpResponse.json(weaponsDocument([makeWeapon(SECOND_INSTANCE_ID, WEAPON_ID, 1)]));
+        }),
+      );
+
+      const { result } = renderAuthed();
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]).toBeDefined());
+
+      act(() => {
+        result.current.ensureWeapon(WEAPON_ID);
+      });
+
+      expect(posts).toBe(0);
+    });
   });
 
-  it('reverts a refinement change when the update fails', async () => {
-    server.use(
-      http.get('http://localhost:8080/api/weapons', () =>
-        HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 2)])),
-      ),
-      http.patch(
-        'http://localhost:8080/api/weapons/weapon-instance-1',
-        () => new HttpResponse(null, { status: 500 }),
-      ),
-    );
+  describe('removeWeapon', () => {
+    it('restores a removed weapon when the delete fails', async () => {
+      server.use(
+        http.get('http://localhost:8080/api/weapons', () =>
+          HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 2)])),
+        ),
+        http.delete(
+          'http://localhost:8080/api/weapons/weapon-instance-1',
+          () => new HttpResponse(null, { status: 500 }),
+        ),
+      );
 
-    const { result } = renderAuthed();
-    await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(2));
+      const { result } = renderAuthed();
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]).toBeDefined());
 
-    act(() => {
-      result.current.setRefinementLevel(INSTANCE_ID, 5);
+      act(() => {
+        result.current.removeWeapon(INSTANCE_ID);
+      });
+
+      // Optimistically gone, then restored once the delete errors.
+      expect(result.current.weapons[INSTANCE_ID]).toBeUndefined();
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]).toBeDefined());
+      expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
     });
+  });
 
-    expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(5);
-    await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(2));
-    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+  describe('setRefinementLevel', () => {
+    it('reverts a refinement change when the update fails', async () => {
+      server.use(
+        http.get('http://localhost:8080/api/weapons', () =>
+          HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 2)])),
+        ),
+        http.patch(
+          'http://localhost:8080/api/weapons/weapon-instance-1',
+          () => new HttpResponse(null, { status: 500 }),
+        ),
+      );
+
+      const { result } = renderAuthed();
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(2));
+
+      act(() => {
+        result.current.setRefinementLevel(INSTANCE_ID, 5);
+      });
+
+      expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(5);
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(2));
+      expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+    });
   });
 });

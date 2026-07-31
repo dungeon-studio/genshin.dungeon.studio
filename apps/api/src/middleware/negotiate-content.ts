@@ -25,7 +25,7 @@ export interface SupportedRepresentation {
   profile?: ProfileLink;
 }
 
-export type NegotiatedContentVariables = {
+export type NegotiatedResponseContentVariables = {
   negotiatedMediaType: string;
 };
 

@@ -27,6 +27,7 @@ From the wiki, collect:
 - Character name
 - Element, type, rarity, and region
 - Release version, for example, "1.0," "3.1," "5.2"
+- Release date, as an ISO 8601 date (`YYYY-MM-DD`) --- the day the character's debut banner opened
 
 ### 2. Update `packages/game-data/src/characters.ts`
 
@@ -41,6 +42,7 @@ interface Character {
   rarity: Rarity; // 4 or 5
   region: string; // Character's home region
   version: string; // Release version (for example, "1.0", "3.1", "5.2")
+  releaseDate: string; // ISO 8601 debut date (for example, "2022-11-02")
 }
 ```
 
@@ -55,6 +57,7 @@ interface Character {
   rarity: 5,
   region: 'Sumeru',
   version: '3.2',
+  releaseDate: '2022-11-02',
 }
 ```
 

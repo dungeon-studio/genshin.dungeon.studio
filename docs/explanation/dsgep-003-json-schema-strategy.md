@@ -312,6 +312,7 @@ app.get('/schemas/:module/:name.json', async (c) => {
 
 - [`rest-api-conventions.md`](../reference/rest-api-conventions.md): Principle 4, predictable representation shapes
 - [JSON Schema 2020-12](https://json-schema.org/draft/2020-12): Schema vocabulary
+
 <!-- vale alex.Condescending = NO -->
 
 - [RFC 5829: Link Relation Types for Simple Version Navigation](https://www.rfc-editor.org/rfc/rfc5829): `successor-version` relation type for major version transitions

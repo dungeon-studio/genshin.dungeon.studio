@@ -4,7 +4,7 @@
 import type { JSX } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Container } from '@/components/container';
+import { Container } from '@/components/chrome/container';
 
 export function NotFoundPage(): JSX.Element {
   return (

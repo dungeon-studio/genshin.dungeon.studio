@@ -15,6 +15,7 @@ const CHARACTERS: Character[] = [
     rarity: 4,
     region: 'Mondstadt',
     version: '1.0',
+    releaseDate: '2020-09-28',
   },
   {
     id: 'ganyu',
@@ -24,6 +25,7 @@ const CHARACTERS: Character[] = [
     rarity: 5,
     region: 'Liyue',
     version: '1.2',
+    releaseDate: '2021-01-12',
   },
   {
     id: 'xiangling',
@@ -33,6 +35,7 @@ const CHARACTERS: Character[] = [
     rarity: 4,
     region: 'Liyue',
     version: '1.0',
+    releaseDate: '2020-09-28',
   },
   {
     id: 'zhongli',
@@ -42,6 +45,7 @@ const CHARACTERS: Character[] = [
     rarity: 5,
     region: 'Liyue',
     version: '1.1',
+    releaseDate: '2020-12-01',
   },
 ];
 
@@ -142,5 +146,39 @@ describe('filterCharacters', () => {
 
     // Version 1.0 characters should come first
     expect(result[0].version).toBe('1.0');
+  });
+
+  it('orders same-version characters by their release date', () => {
+    const sameVersion: Character[] = [
+      {
+        id: 'wriothesley',
+        name: 'Wriothesley',
+        element: 'Cryo',
+        weaponType: 'Catalyst',
+        rarity: 5,
+        region: 'Fontaine',
+        version: '4.1',
+        releaseDate: '2023-10-17',
+      },
+      {
+        id: 'neuvillette',
+        name: 'Neuvillette',
+        element: 'Hydro',
+        weaponType: 'Catalyst',
+        rarity: 5,
+        region: 'Fontaine',
+        version: '4.1',
+        releaseDate: '2023-09-27',
+      },
+    ];
+    const filters = {
+      ...initialFilterState(),
+      sortField: 'release' as const,
+      sortDirection: 'asc' as const,
+    };
+
+    const result = filterCharacters(sameVersion, filters, new Set<string>());
+
+    expect(result.map((c) => c.id)).toEqual(['neuvillette', 'wriothesley']);
   });
 });

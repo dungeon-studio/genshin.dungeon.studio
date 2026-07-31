@@ -29,7 +29,7 @@
 ## Dependency management in the monorepo
 
 - Pin exact versions without `^` or `~` prefixes; Renovate handles updates weekly.
-- Root `package.json` is the source of truth for shared tooling: turbo, concurrently, TypeScript, ESLint, Prettier, and Stylelint.
+- Root `package.json` is the source of truth for shared tooling: turbo, TypeScript, ESLint, Prettier, and Stylelint.
 - Workspace `package.json` holds app-specific dependencies. Declare every direct import explicitly, even when the same package exists at the root.
 - When a shared tool appears in both root and workspace `package.json`, keep the versions identical.
 - `pnpm-workspace.yaml` declares workspace package globs and engine constraints only; don't use it for version overrides.
@@ -176,7 +176,7 @@
 - Keep Terraform version aligned across:
   - `.github/workflows/terraform-plan.yml`
   - `.github/workflows/terraform-apply.yml`
-  - `.github/workflows/pre-commit.yml`, when Terraform is in use
+  - `.github/workflows/ci.yml` pre-commit job, when Terraform is in use
 - Current Terraform version baseline: `1.9.0`.
 
 ## Docker rules
