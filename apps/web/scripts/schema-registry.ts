@@ -13,22 +13,24 @@ interface StoreSchemas {
   readonly versions: Readonly<Record<number, z.ZodType>>;
   /** The version written onto every new document. */
   readonly currentVersion: number;
-  /** Directory under `src/features/collection` holding the Zod source. */
-  readonly source: string;
 }
 
 /**
  * Every web-side shape whose evolution is gated: data a released build wrote
  * that a later build still has to read.
  *
- * `genshin-collection` is the localStorage blob zustand `persist` writes, keyed
- * by its store name. Its schema is the per-record entry, not the whole-store
+ * Keys name the snapshot directory, and should match the feature directory the
+ * Zod source lives in — `genshin-collection` is the one exception, named for the
+ * zustand `persist` store it belongs to before that convention settled.
+ *
+ * `genshin-collection` is the localStorage blob `persist` writes. Its schema is
+ * the per-record entry, not the whole-store
  * blob: the collection keys entries under a `Record`, and jsoncompat can't see
  * into a `Record` value, so snapshotting the wrapper would leave the entry
  * fields ungated. This mirrors the api side, which snapshots one Firestore
  * document rather than the collection.
  *
- * `collection-transfer` is the exported collection file, under a stronger
+ * `transfer` is the exported collection file, under a stronger
  * constraint still: a file exported today has to import into a build shipped
  * years later. The whole envelope is snapshotted because it nests its entries in
  * arrays, which jsoncompat does see into.
@@ -37,12 +39,10 @@ export const SCHEMA_REGISTRY: Record<string, StoreSchemas> = {
   'genshin-collection': {
     versions: { 1: V1CollectionCharacterSchema },
     currentVersion: collectionCurrent,
-    source: 'characters',
   },
-  'collection-transfer': {
+  transfer: {
     versions: { 1: V1TransferEnvelopeSchema },
     currentVersion: transferCurrent,
-    source: 'transfer',
   },
 };
 

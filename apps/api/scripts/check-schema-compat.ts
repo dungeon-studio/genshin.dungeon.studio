@@ -24,21 +24,19 @@ import { check_compat, initSync } from 'jsoncompat';
 const require = createRequire(import.meta.url);
 initSync({ module: readFileSync(require.resolve('jsoncompat/jsoncompat_wasm_bg.wasm')) });
 
-// Web snapshot directories are named for the writer, not for the directory
-// holding the Zod source. Mirrors the `source` field in
-// apps/web/scripts/schema-registry.ts, duplicated rather than imported to keep
-// this check a plain JSON diff needing no workspace build; it only affects the
-// path quoted in a violation.
-const WEB_SOURCE_DIRS: Record<string, string> = {
+// A web snapshot directory normally has the same name as the feature directory
+// its Zod source sits in. `genshin-collection` is the lone exception: it is named
+// for the zustand `persist` store, and renaming the directory to match would read
+// as a deleted snapshot to the check below.
+const WEB_SOURCE_DIR_EXCEPTIONS: Record<string, string> = {
   'genshin-collection': 'characters',
-  'collection-transfer': 'transfer',
 };
 
-// Each committed snapshot root, paired with a resolver from (repository, version)
-// back to the Zod source file named in violation messages.
+// Each committed snapshot root, paired with a resolver from a snapshot directory
+// and version back to the Zod source file named in violation messages.
 const SNAPSHOT_ROOTS: ReadonlyArray<{
   prefix: string;
-  sourceFor: (repository: string, version: string) => string;
+  sourceFor: (snapshotDir: string, version: string) => string;
 }> = [
   {
     prefix: 'apps/api/schema-snapshots',
@@ -47,8 +45,8 @@ const SNAPSHOT_ROOTS: ReadonlyArray<{
   },
   {
     prefix: 'apps/web/schema-snapshots',
-    sourceFor: (repository, version) =>
-      `apps/web/src/features/collection/${WEB_SOURCE_DIRS[repository] ?? repository}/schemas/${version}.ts`,
+    sourceFor: (feature, version) =>
+      `apps/web/src/features/collection/${WEB_SOURCE_DIR_EXCEPTIONS[feature] ?? feature}/schemas/${version}.ts`,
   },
 ];
 
@@ -108,18 +106,18 @@ for (const { prefix, sourceFor } of SNAPSHOT_ROOTS) {
     const base = showAt(baseRef, path);
     if (base === null) continue; // race-proofing; ls-tree already filtered to base.
 
-    const [repository, version] = path
+    const [snapshotDir, version] = path
       .slice(`${prefix}/`.length)
       .replace(/\.json$/, '')
       .split('/');
-    const source = sourceFor(repository, version);
+    const source = sourceFor(snapshotDir, version);
 
     let head: string;
     try {
       head = readFileSync(join(repoRoot, path), 'utf8');
     } catch {
       violations.push(
-        `${repository} ${version} shipped on the base branch but its snapshot is gone. Restore the version at ${source} and re-export; removing it orphans data still stored under it.`,
+        `${snapshotDir} ${version} shipped on the base branch but its snapshot is gone. Restore the version at ${source} and re-export; removing it orphans data still stored under it.`,
       );
       continue;
     }
@@ -128,7 +126,7 @@ for (const { prefix, sourceFor } of SNAPSHOT_ROOTS) {
     // the old one did (L(old) ⊆ L(new)) — i.e. the change only widens.
     if (!check_compat(base, head, 'deserializer')) {
       violations.push(
-        `${source} narrows the schema: it no longer accepts data already stored under ${repository} ${version}. Widen it back, or add a new version with a migration instead of editing ${version} in place.`,
+        `${source} narrows the schema: it no longer accepts data already stored under ${snapshotDir} ${version}. Widen it back, or add a new version with a migration instead of editing ${version} in place.`,
       );
     }
   }
