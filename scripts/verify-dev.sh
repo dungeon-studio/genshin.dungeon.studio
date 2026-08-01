@@ -4,10 +4,8 @@
 
 # Smoke-test the local dev stack: start `pnpm dev` and confirm the web server,
 # API server, and Firebase emulators all come up. Complements the production
-# checks in apps/{web,api}/scripts/verify-deployment.*. `pnpm dev` runs the
-# Firebase emulators (which need Java on PATH) wrapping `turbo run dev`, whose
-# `^build` dependency builds the `@genshin/*` libraries to their `dist/` output
-# before the dev servers resolve them.
+# checks in apps/{web,api}/scripts/verify-deployment.*. Needs Java on PATH: the
+# Firebase emulators run on the JVM.
 
 set -euo pipefail
 
@@ -37,11 +35,10 @@ dump_log() {
   cat "$LOG" >&2
 }
 
-# True when a probe result means the service is up and meets expectations. A
-# non-empty, non-000 status code means something answered; curl reports an empty
-# code (or 000) while the connection is still refused. When non-empty,
-# expect_code and expect_body additionally demand a specific status and a body
-# substring.
+# True when a probe means the service is up and meets expectations. curl reports
+# an empty code (or 000) while the connection is refused, so a real status code
+# means something answered; expect_code and expect_body, when set, additionally
+# demand a specific status and a body substring.
 response_matches() {
   local code="$1" body="$2" expect_code="$3" expect_body="$4"
 
@@ -50,9 +47,7 @@ response_matches() {
   [ -z "$expect_body" ] || printf '%s' "$body" | grep -qF "$expect_body" || return 1
 }
 
-# Poll a URL until it responds as expected, or the timeout elapses. With no
-# expected code any HTTP response counts (the service is listening); pass a code
-# and/or a body substring to demand more.
+# Poll a URL until response_matches accepts the reply, or the timeout elapses.
 wait_for() {
   local name="$1" url="$2" expect_code="${3:-}" expect_body="${4:-}"
   local deadline=$((SECONDS + TIMEOUT))
@@ -80,13 +75,11 @@ wait_for() {
   done
 }
 
-# Web: Vite serves the app root with a 200.
 wait_for 'web dev server' 'http://localhost:5173' 200
-
-# API: /health reports readiness.
 wait_for 'API dev server' 'http://localhost:8080/health' 200 '"status":"ok"'
 
-# Emulators: the root path answers once the emulator is listening.
+# The emulators expose no readiness route, so a bare liveness check is all we
+# assert.
 wait_for 'auth emulator' 'http://localhost:9099'
 wait_for 'firestore emulator' 'http://localhost:8181'
 

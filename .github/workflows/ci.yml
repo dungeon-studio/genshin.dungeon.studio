@@ -127,12 +127,10 @@ jobs:
           SCHEMA_COMPAT_BASE: origin/${{ github.base_ref }}
         run: pnpm --filter @genshin/api schemas:check
 
-  # Smoke-tests the root `pnpm dev` script — the single command a contributor
-  # runs to bring up the whole stack (web server, API server, Firebase
-  # emulators). The e2e job below exercises the same services, but through
-  # playwright.config.ts, which re-implements the orchestration; only this job
-  # drives the root script and the turbo `dev` graph, catching a regression that
-  # breaks `pnpm dev` without breaking the browser tests.
+  # Smoke-tests the root `pnpm dev` script — the one command a contributor runs
+  # to bring up the whole stack (web, API, Firebase emulators). The e2e job below
+  # hits the same services but through playwright.config.ts's own orchestration;
+  # only this job exercises the root script and the turbo `dev` graph.
   dev-smoke:
     name: Smoke-test dev stack
     runs-on: ubuntu-latest
