@@ -37,23 +37,35 @@ dump_log() {
   cat "$LOG" >&2
 }
 
-# Poll a URL until it responds, or the timeout elapses. With no expected code
-# any HTTP response counts (the service is listening); pass a code and/or a body
-# substring to demand more. curl exits non-zero and yields an empty code when
-# the connection is refused, so the service is still starting.
+# True when a probe result means the service is up and meets expectations. A
+# non-empty, non-000 status code means something answered; curl reports an empty
+# code (or 000) while the connection is still refused. When non-empty,
+# expect_code and expect_body additionally demand a specific status and a body
+# substring.
+response_matches() {
+  local code="$1" body="$2" expect_code="$3" expect_body="$4"
+
+  [ -n "$code" ] && [ "$code" != "000" ] || return 1
+  [ -z "$expect_code" ] || [ "$code" = "$expect_code" ] || return 1
+  [ -z "$expect_body" ] || printf '%s' "$body" | grep -qF "$expect_body" || return 1
+}
+
+# Poll a URL until it responds as expected, or the timeout elapses. With no
+# expected code any HTTP response counts (the service is listening); pass a code
+# and/or a body substring to demand more.
 wait_for() {
   local name="$1" url="$2" expect_code="${3:-}" expect_body="${4:-}"
   local deadline=$((SECONDS + TIMEOUT))
-  local body code
+  local response body code
 
   while true; do
-    body=$(curl -sS -o - -w '\n%{http_code}' "$url" 2>/dev/null) || body=''
-    code=${body##*$'\n'}
-    body=${body%$'\n'*}
+    # curl writes the body, then a newline and the status code; split them back
+    # apart. On a refused connection curl fails and both stay empty.
+    response=$(curl -sS -o - -w '\n%{http_code}' "$url" 2>/dev/null) || response=''
+    code=${response##*$'\n'}
+    body=${response%$'\n'*}
 
-    if [ -n "$code" ] && [ "$code" != "000" ] &&
-      { [ -z "$expect_code" ] || [ "$code" = "$expect_code" ]; } &&
-      { [ -z "$expect_body" ] || printf '%s' "$body" | grep -qF "$expect_body"; }; then
+    if response_matches "$code" "$body" "$expect_code" "$expect_body"; then
       echo "ok: $name ($url)"
       return 0
     fi
