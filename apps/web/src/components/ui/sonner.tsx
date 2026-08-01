@@ -14,12 +14,9 @@ export function Toaster(props: ToasterProps): JSX.Element {
   return (
     <Sonner
       className="toaster group"
-      // Sonner keys its own palettes off this prop, not the `dark` class, and
-      // defaults to light. Rich colors would stay light-themed without it.
+      // Sonner keys its palettes off this prop, not the `dark` class, and defaults to light.
       theme={isDark ? 'dark' : 'light'}
-      // Cards fill the content area, so some overlap is unavoidable; the
-      // bottom edge is the only one clear of both the sticky filter bar and
-      // the right-hand instance sheet.
+      // The only edge clear of both the sticky filter bar and the right-hand instance sheet.
       position="bottom-center"
       richColors
       toastOptions={{

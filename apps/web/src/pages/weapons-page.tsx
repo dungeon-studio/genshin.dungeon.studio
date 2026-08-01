@@ -18,7 +18,7 @@ import { WeaponCard } from '@/features/collection/weapons/weapon-card';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
 import { WeaponInstanceSidebar } from '@/features/collection/weapons/weapon-instance-sidebar';
 
-/** Longer than the 4s default: the toast asks the user to act, not just to read. */
+/** The toast asks the user to act, not just to read. */
 const AUTH_TOAST_DURATION_MS = 10_000;
 
 function promptSignIn() {

@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ThemeProvider } from './theme-provider';
 import { ThemeToggle } from './theme-toggle';
 
-// jsdom has no media query engine, so the OS preference has to be supplied.
+// jsdom implements no matchMedia at all, so the OS preference has to be stubbed.
 function stubPrefersDark(prefersDark: boolean) {
   vi.stubGlobal('matchMedia', (query: string) => ({
     matches: prefersDark,

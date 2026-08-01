@@ -11,8 +11,6 @@ import { useTheme } from './use-theme';
 
 const CYCLE: Theme[] = ['system', 'light', 'dark'];
 
-// Keyed by Theme so the compiler catches a theme added to the union without a
-// button face to go with it.
 const FACES: Record<Theme, { icon: typeof Sun; label: string }> = {
   light: { icon: Sun, label: 'Light mode' },
   dark: { icon: Moon, label: 'Dark mode' },

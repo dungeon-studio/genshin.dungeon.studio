@@ -8,7 +8,7 @@ export type Theme = 'light' | 'dark' | 'system';
 export interface ThemeContextValue {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  /** `theme` resolved against the OS preference, for consumers that can't read the `dark` class. */
+  /** `theme` resolved against the OS preference. */
   isDark: boolean;
 }
 
