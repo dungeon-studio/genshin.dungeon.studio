@@ -33,7 +33,15 @@ runs:
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ env.STORE_PATH }}
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        # Hash the single root lockfile by its literal path, not `**/…`. This is
+        # a pnpm workspace with exactly one pnpm-lock.yaml, so the digest is
+        # identical, but a literal path skips the full-tree walk that `**` forces.
+        # That walk runs again in the cache action's post-save step, and jobs
+        # that start the dev stack (`pnpm dev`: vite, tsx, Firebase emulators)
+        # leave transient entries the walk can't stat, so hashFiles aborts with
+        # "Fail to hash files under directory" and fails the job after its real
+        # work already passed.
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
 
