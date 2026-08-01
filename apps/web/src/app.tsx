@@ -6,6 +6,7 @@ import type { JSX } from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 import { Layout } from './components/chrome/layout';
+import { ThemeProvider } from './components/chrome/theme-provider';
 import { Toaster } from './components/ui/sonner';
 import { AuthProvider } from './features/auth';
 import { CharactersPage } from './pages/characters-page';
@@ -20,21 +21,23 @@ const queryClient = new QueryClient();
 export function App(): JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Router>
-          <Routes>
-            <Route element={<Layout />}>
-              <Route path="/" element={<TeamsPage />} />
-              <Route path="/characters" element={<CharactersPage />} />
-              <Route path="/weapons" element={<WeaponsPage />} />
-              <Route path="/privacy" element={<PrivacyPolicyPage />} />
-              <Route path="/terms" element={<TermsOfServicePage />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Route>
-          </Routes>
-        </Router>
-      </AuthProvider>
-      <Toaster />
+      <ThemeProvider>
+        <AuthProvider>
+          <Router>
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="/" element={<TeamsPage />} />
+                <Route path="/characters" element={<CharactersPage />} />
+                <Route path="/weapons" element={<WeaponsPage />} />
+                <Route path="/privacy" element={<PrivacyPolicyPage />} />
+                <Route path="/terms" element={<TermsOfServicePage />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Route>
+            </Routes>
+          </Router>
+        </AuthProvider>
+        <Toaster />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
