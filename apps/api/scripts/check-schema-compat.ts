@@ -25,7 +25,8 @@ const require = createRequire(import.meta.url);
 initSync({ module: readFileSync(require.resolve('jsoncompat/jsoncompat_wasm_bg.wasm')) });
 
 // Each committed snapshot root, paired with a resolver from (repository, version)
-// back to the Zod source file named in violation messages.
+// to the file to edit, named in violation messages. Messages interpolate the
+// repository and version themselves, so a resolver returns a bare path.
 const SNAPSHOT_ROOTS: ReadonlyArray<{
   prefix: string;
   sourceFor: (repository: string, version: string) => string;
@@ -36,11 +37,10 @@ const SNAPSHOT_ROOTS: ReadonlyArray<{
       `apps/api/src/repositories/${repository}/schemas/${version}.ts`,
   },
   {
-    // A web snapshot is named for its `persist` store, which doesn't imply a
-    // source path, so point at the registry that maps the store to its schemas.
+    // A web snapshot is named for its `persist` store, which implies no source
+    // path, so point at the registry mapping stores to their schemas.
     prefix: 'apps/web/schema-snapshots',
-    sourceFor: (repository, version) =>
-      `apps/web/scripts/schema-registry.ts (store "${repository}", ${version})`,
+    sourceFor: () => 'apps/web/scripts/schema-registry.ts',
   },
 ];
 
