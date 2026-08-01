@@ -3,10 +3,14 @@
 
 import { expect, test } from '@playwright/test';
 
+import { LOCAL_API_ORIGIN } from './origins';
+
 // The API the bundle under test was built to call — VITE_API_BASE_URL at build
-// time, FRONTEND_ORIGIN's counterpart at run time. Defaults to the local API so
-// the same assertion holds against the development stack.
-const apiBaseURL = process.env.SMOKE_API_BASE_URL ?? 'http://localhost:8080';
+// time, FRONTEND_ORIGIN's counterpart at run time.
+const apiOrigin = process.env.SMOKE_API_BASE_URL ?? LOCAL_API_ORIGIN;
+
+/** What the page got back, or why it never got that far. */
+type Reachability = { status: number } | { blocked: string };
 
 /**
  * The request is issued by the page, not by the runner, and that is the whole
@@ -18,16 +22,17 @@ const apiBaseURL = process.env.SMOKE_API_BASE_URL ?? 'http://localhost:8080';
 test('the page origin can reach the API', { tag: '@smoke' }, async ({ page }) => {
   await page.goto('/');
 
-  // A rejected cross-origin fetch surfaces as an opaque TypeError, which would
-  // reach the report as an unhandled evaluate failure rather than as a result.
-  const outcome = await page.evaluate(async (url) => {
+  // A refused cross-origin request rejects with an opaque TypeError. Returning
+  // it as a result rather than letting it escape keeps the reason in the report
+  // instead of an unhandled evaluate failure.
+  const reachability = await page.evaluate(async (origin): Promise<Reachability> => {
     try {
-      const response = await fetch(`${url}/health`);
-      return String(response.status);
+      const response = await fetch(`${origin}/health`);
+      return { status: response.status };
     } catch (error) {
-      return `blocked: ${String(error)}`;
+      return { blocked: String(error) };
     }
-  }, apiBaseURL);
+  }, apiOrigin);
 
-  expect(outcome).toBe('200');
+  expect(reachability).toEqual({ status: 200 });
 });

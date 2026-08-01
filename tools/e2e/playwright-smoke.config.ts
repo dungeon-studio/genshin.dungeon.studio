@@ -5,18 +5,13 @@ import path from 'node:path';
 
 import { defineConfig, devices } from '@playwright/test';
 
-// Required rather than defaulted: a workflow that forgot to set it would
-// otherwise smoke-test localhost, find nothing listening, and the failure would
-// read as a broken deployment.
-const baseURL = process.env.SMOKE_BASE_URL;
-if (!baseURL) {
-  throw new Error('SMOKE_BASE_URL must be set to the origin of the deployment to smoke-test.');
-}
-
 const artifactRoot = '/tmp/genshin-smoke';
 
 export default defineConfig({
   testDir: './specs',
+
+  // Required, not defaulted; see the setup for why it is enforced there.
+  globalSetup: './specs/require-smoke-target.ts',
 
   // The specs that hold against a real deployment: anonymous, read-only, and
   // free of the Firebase Auth emulator the rest of the suite signs in through.
@@ -39,7 +34,7 @@ export default defineConfig({
   outputDir: path.join(artifactRoot, 'test-results'),
 
   use: {
-    baseURL,
+    baseURL: process.env.SMOKE_BASE_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
