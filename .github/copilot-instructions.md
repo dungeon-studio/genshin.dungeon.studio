@@ -16,7 +16,7 @@
 - API: Hono + Node.js, Firestore, Firebase Auth.
 - Testing: Vitest (API integration tests).
 - Not yet implemented: Claude MCP, React Testing Library, Bun.
-- `shadcn/ui` setup: New York style, neutral base color, CSS variables, and ESM Tailwind plugin imports.
+- `shadcn/ui` setup: New York style, CSS variables, and ESM Tailwind plugin imports. `components.json` names the `neutral` base color, but `apps/web/src/index.css` carries a brand-derived palette.
 
 ## Repository map
 
