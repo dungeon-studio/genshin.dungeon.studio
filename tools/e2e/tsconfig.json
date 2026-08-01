@@ -18,5 +18,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["specs/**/*.ts", "playwright.config.ts"]
+  "include": ["specs/**/*.ts", "playwright.config.ts", "playwright-smoke.config.ts"]
 }

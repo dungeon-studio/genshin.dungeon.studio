@@ -2,8 +2,15 @@
 // SPDX-License-Identifier: MIT
 
 import type { ConsoleMessage, Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
-import { expect, test } from './fixtures';
+// `@smoke` marks a spec as safe and meaningful against a deployment: anonymous,
+// read-only, and reaching for nothing the Firebase emulators provide. The
+// post-deploy run in deploy.yml selects on it. Nothing here signs in, so these
+// take the plain `test` rather than the suite's emulator-backed fixtures — which
+// also keeps the post-deploy run from having to build a workspace package to
+// assert on routes that render no game data.
+const SMOKE = { tag: '@smoke' } as const;
 
 const ROUTES = [
   { path: '/', heading: 'Teams' },
@@ -31,7 +38,7 @@ function watchForFailures(page: Page): string[] {
 }
 
 for (const route of ROUTES) {
-  test(`${route.path} renders`, async ({ page }) => {
+  test(`${route.path} renders`, SMOKE, async ({ page }) => {
     const failures = watchForFailures(page);
 
     await page.goto(route.path);
@@ -41,7 +48,7 @@ for (const route of ROUTES) {
   });
 }
 
-test('an unknown route renders the not-found page', async ({ page }) => {
+test('an unknown route renders the not-found page', SMOKE, async ({ page }) => {
   const failures = watchForFailures(page);
 
   await page.goto('/no-such-page');
@@ -50,7 +57,7 @@ test('an unknown route renders the not-found page', async ({ page }) => {
   expect(failures).toEqual([]);
 });
 
-test('the main navigation moves between routes', async ({ page }) => {
+test('the main navigation moves between routes', SMOKE, async ({ page }) => {
   await page.goto('/');
 
   const nav = page.getByRole('navigation', { name: 'Main navigation' });

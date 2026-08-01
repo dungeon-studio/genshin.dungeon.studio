@@ -38,7 +38,7 @@
         "specs/**/*.ts",
         "package.json",
         "vite.config.*",
-        "playwright.config.*",
+        "playwright*.config.*",
         "tsconfig*.json"
       ]
     },

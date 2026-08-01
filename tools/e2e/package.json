@@ -7,6 +7,7 @@
   "scripts": {
     "lint": "eslint .",
     "test:e2e": "firebase --config ../../firebase.json emulators:exec --only auth,firestore --project demo-dungeon-studio-genshin-dev 'playwright test'",
+    "test:smoke": "playwright test --config playwright-smoke.config.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

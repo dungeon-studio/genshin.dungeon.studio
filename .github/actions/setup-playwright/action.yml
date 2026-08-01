@@ -1,0 +1,42 @@
+---
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+name: Set up Playwright
+description: Install Chromium for @genshin/e2e, restoring it from cache when the pinned version has not moved
+
+runs:
+  using: composite
+
+  steps:
+    # From the manifest, which syncpack keeps pinned exact: `pnpm exec` writes
+    # warnings to the same stream as the version it reports, and both would land
+    # in GITHUB_OUTPUT. Playwright is a `dependency` of @genshin/e2e — for a
+    # package whose only purpose is running tests, the framework is not
+    # development tooling.
+    - name: Resolve Playwright version
+      id: playwright
+      shell: bash
+      run: |
+        version="$(node -p "require('./tools/e2e/package.json').dependencies['@playwright/test']")"
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+
+    # Keyed by Playwright version, so the cache misses only when the dependency
+    # moves.
+    - name: Cache Playwright browsers
+      id: cache
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.cache/ms-playwright
+        key: ${{ runner.os }}-playwright-${{ steps.playwright.outputs.version }}
+
+    - name: Install Playwright Chromium
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: pnpm --filter @genshin/e2e exec playwright install --with-deps chromium
+
+    # The cached browser still needs its shared libraries on a fresh runner.
+    - name: Install Chromium system dependencies
+      if: steps.cache.outputs.cache-hit == 'true'
+      shell: bash
+      run: pnpm --filter @genshin/e2e exec playwright install-deps chromium
