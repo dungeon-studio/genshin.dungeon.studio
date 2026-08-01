@@ -7,17 +7,17 @@ import { describe, expect, it } from 'vitest';
 const AA_TEXT = 4.5;
 const AA_NON_TEXT = 3;
 
-/** Surfaces that arbitrary content sits on top of. */
+/** Every surface content sits on. */
 const SURFACES = ['background', 'card', 'popover', 'muted', 'secondary', 'accent'];
 
-/** Tokens Tailwind exposes as a text colour over any of those surfaces. */
+/** Text colors that can land on any of those surfaces. */
 const TEXT_TOKENS = ['foreground', 'muted-foreground'];
 
-/** Roles whose own colour reads as text or as a border rather than as a fill. */
+/** Roles whose own color reads as text or a border, not only as a fill. */
 const SIGNALS = ['primary', 'destructive', 'success', 'warning'];
 
-/** Plain surfaces a signal colour or a focus ring lands on. */
-const PLAIN_SURFACES = ['background', 'card', 'popover'];
+/** The untinted backdrops a signal color or focus ring appears against. */
+const NEUTRAL_SURFACES = ['background', 'card', 'popover'];
 
 type Hsl = readonly [hue: number, saturation: number, lightness: number];
 
@@ -32,9 +32,9 @@ interface Pairing {
 const css = __THEME_CSS__;
 
 /**
- * Custom properties declared under a selector, keyed without the `--` prefix.
- * A selector can appear more than once — `:root` also carries the base
- * typography rule — so every matching block contributes.
+ * Custom properties under a selector, keyed without the `--` prefix. A selector
+ * can appear more than once — `:root` also carries the typography rule — so
+ * every matching block contributes.
  */
 function themeTokens(selector: string): Map<string, string> {
   const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -54,7 +54,7 @@ function themeTokens(selector: string): Map<string, string> {
   return tokens;
 }
 
-/** Parses the space-separated `H S% L%` triple Tailwind wraps in `hsl(var(--token))`. */
+/** The bare `H S% L%` triple Tailwind wraps in `hsl(var(--token))`. */
 function parseHsl(value: string): Hsl {
   const parts = value.split(/\s+/).map((part) => Number.parseFloat(part));
   if (parts.length !== 3 || !parts.every((part) => Number.isFinite(part))) {
@@ -102,8 +102,8 @@ function contrast(tokens: Map<string, string>, foreground: string, background: s
 }
 
 /**
- * Every contrast requirement the palette owes, keyed by pair so that overlapping
- * rules collapse to the strictest minimum rather than to duplicate cases.
+ * Every contrast requirement the palette owes. Keyed by pair, so overlapping
+ * rules collapse to the strictest minimum instead of duplicating cases.
  */
 function requiredPairings(tokenNames: string[]): Pairing[] {
   // `--x-foreground` exists to sit on `--x`; bare `--foreground` sits on `--background`.
@@ -121,10 +121,10 @@ function requiredPairings(tokenNames: string[]): Pairing[] {
   );
 
   const signals = SIGNALS.flatMap((foreground) =>
-    PLAIN_SURFACES.map((background) => ({ foreground, background, minimum: AA_TEXT })),
+    NEUTRAL_SURFACES.map((background) => ({ foreground, background, minimum: AA_TEXT })),
   );
 
-  const rings = PLAIN_SURFACES.map((background) => ({
+  const rings = NEUTRAL_SURFACES.map((background) => ({
     foreground: 'ring',
     background,
     minimum: AA_NON_TEXT,

@@ -22,11 +22,10 @@ body {
   min-height: 100vh;
 }
 
-/* Palette derived from the app icon (see public/icon-source.md): a dark
-   teal-green shield field with a copper border and constellation. Teal-green
-   carries the primary role and tints every neutral; copper stays an accent so
-   the two brand tones never compete for the same job. Every text-on-background
-   pair here is asserted against WCAG AA in theme-contrast.test.ts. */
+/* Palette derived from the app icon; see public/icon-source.md. Teal-green
+   takes the primary role and tints the neutrals, copper stays an accent, so the
+   two brand tones never compete for the same job. theme-contrast.test.ts holds
+   every pair here to WCAG AA. */
 @layer base {
   :root {
     --background: 180 20% 99%;

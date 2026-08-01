@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url';
 
 import { defineConfig } from 'vitest/config';
 
-// Vitest stubs `.css` imports to an empty string, `?raw` included, so the theme
-// contrast test gets the stylesheet text injected instead.
+// Vitest stubs `.css` imports to an empty string, `?raw` included, so the
+// contrast test takes the stylesheet as injected text.
 const themeCss = readFileSync(fileURLToPath(new URL('./src/index.css', import.meta.url)), 'utf8');
 
 export default defineConfig({
