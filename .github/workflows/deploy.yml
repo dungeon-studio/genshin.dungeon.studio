@@ -205,17 +205,14 @@ jobs:
           SERVICE_URL: ${{ steps.deploy.outputs.url }}
         run: pnpm --filter @genshin/api exec tsx scripts/verify-deployment.ts "$SERVICE_URL"
 
-  # Executes the published app in a browser, which nothing before it does:
-  # verify-deployment.sh compares a static version.json that reports correctly on
-  # a site that never boots, and the PR-time e2e suite drives a dev server wired
-  # to emulators rather than a production bundle carrying real Firebase config.
-  # The gap between those two is where #553 lived.
+  # Executes the published app in a browser, which nothing else does:
+  # verify-deployment.sh compares a static version.json that reports correctly
+  # on a site that never boots, and the PR-time e2e suite drives a dev server
+  # wired to emulators rather than a production bundle.
   #
-  # Its own job, and gated on both deploys, because the result is meant to travel
-  # with the version: a promotion to the next environment reads this conclusion
-  # to decide whether this SHA earned the move, so it has to name the smoke
-  # rather than a build or a Firebase outage. The reader lands with the release
-  # flow (#837); this only emits the signal.
+  # Its own job, gated on both deploys, because the conclusion is read per-SHA
+  # when promoting a version onward: it has to name the smoke rather than a
+  # build or a Firebase outage.
   smoke:
     if: github.ref == 'refs/heads/develop'
     name: Smoke
@@ -236,8 +233,8 @@ jobs:
 
       - uses: ./.github/actions/setup-playwright
 
-      # Not through turbo: the smoke specs reach for no workspace package, so
-      # there is no build to order ahead of them.
+      # Not through turbo: these specs reach for no workspace package, so there
+      # is no build to order ahead of them.
       - name: Run smoke tests
         run: pnpm --filter @genshin/e2e test:smoke
 

@@ -3,12 +3,7 @@
 
 import { expect, test } from './page-failures';
 
-// `@smoke` marks a spec as safe and meaningful against a deployment: anonymous,
-// read-only, and reaching for nothing the Firebase emulators provide. The
-// post-deploy run in deploy.yml selects on it. Nothing here signs in, so these
-// stay off the suite's emulator-backed fixtures — which also keeps the
-// post-deploy run from building a workspace package to assert on routes that
-// render no game data.
+// Selected by the post-deploy run; see playwright-smoke.config.ts.
 const SMOKE = { tag: '@smoke' } as const;
 
 const ROUTES = [

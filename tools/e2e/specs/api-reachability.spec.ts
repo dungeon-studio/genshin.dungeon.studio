@@ -13,18 +13,17 @@ const apiOrigin = process.env.SMOKE_API_BASE_URL ?? LOCAL_API_ORIGIN;
 type Reachability = { status: number } | { blocked: string };
 
 /**
- * The request is issued by the page, not by the runner, and that is the whole
- * point: it is the only check that exercises the CORS pairing between the web
- * origin and the API. `curl` against /health carries no `Origin` header, so it
- * answers the same whatever FRONTEND_ORIGIN the API was deployed with — the two
- * can be mismatched and every existing check still passes.
+ * Issued by the page rather than the runner, which is the point: it exercises
+ * the CORS pairing between the web origin and the API. `curl` against /health
+ * carries no `Origin` header, so it answers the same whatever FRONTEND_ORIGIN
+ * the API was deployed with — the two can be mismatched with every other check
+ * still passing.
  */
 test('the page origin can reach the API', { tag: '@smoke' }, async ({ page }) => {
   await page.goto('/');
 
-  // A refused cross-origin request rejects with an opaque TypeError. Returning
-  // it as a result rather than letting it escape keeps the reason in the report
-  // instead of an unhandled evaluate failure.
+  // A refused cross-origin request rejects with an opaque TypeError; returning
+  // it keeps the reason in the report instead of an unhandled evaluate failure.
   const reachability = await page.evaluate(async (origin): Promise<Reachability> => {
     try {
       const response = await fetch(`${origin}/health`);

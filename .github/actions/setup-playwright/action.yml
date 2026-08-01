@@ -9,11 +9,9 @@ runs:
   using: composite
 
   steps:
-    # From the manifest, which syncpack keeps pinned exact: `pnpm exec` writes
-    # warnings to the same stream as the version it reports, and both would land
-    # in GITHUB_OUTPUT. Playwright is a `dependency` of @genshin/e2e — for a
-    # package whose only purpose is running tests, the framework is not
-    # development tooling.
+    # `pnpm exec` writes warnings to the same stream as the version it reports,
+    # and both would land in GITHUB_OUTPUT. syncpack pins the manifest exact, so
+    # reading it directly is equivalent.
     - name: Resolve Playwright version
       id: playwright
       shell: bash
@@ -21,8 +19,6 @@ runs:
         version="$(node -p "require('./tools/e2e/package.json').dependencies['@playwright/test']")"
         echo "version=$version" >> "$GITHUB_OUTPUT"
 
-    # Keyed by Playwright version, so the cache misses only when the dependency
-    # moves.
     - name: Cache Playwright browsers
       id: cache
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0

@@ -10,27 +10,25 @@ const artifactRoot = '/tmp/genshin-smoke';
 export default defineConfig({
   testDir: './specs',
 
-  // Required, not defaulted; see the setup for why it is enforced there.
   globalSetup: './specs/require-smoke-target.ts',
 
-  // The specs that hold against a real deployment: anonymous, read-only, and
-  // free of the Firebase Auth emulator the rest of the suite signs in through.
+  // `@smoke` marks the anonymous, read-only specs — the ones that hold against a
+  // real deployment rather than the Firebase emulators the rest of the suite
+  // signs in through.
   grep: /@smoke/,
 
-  // Read-only against a deployment nothing else in the run mutates, so no spec
-  // can observe another's state.
+  // Every spec is read-only against a deployment nothing else mutates.
   fullyParallel: true,
 
   forbidOnly: Boolean(process.env.CI),
 
-  // A public origin behind a CDN. A failure has to survive a retry before it is
-  // worth withholding a version from the next environment over.
+  // A public origin behind a CDN: a failure has to survive a retry to count.
   retries: process.env.CI ? 2 : 0,
 
+  // No JUnit: this run reports on a deployment, not on the suite's own health,
+  // so there is nothing for Codecov's test analytics to trend.
   reporter: process.env.CI ? [['github'], ['list']] : [['list']],
 
-  // No JUnit: this run reports on one deployment, not on the test suite's own
-  // health, so there is nothing for Codecov's test analytics to trend.
   outputDir: path.join(artifactRoot, 'test-results'),
 
   use: {
@@ -41,6 +39,6 @@ export default defineConfig({
 
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 
-  // No `webServer`, deliberately: the point is to exercise what was published,
-  // and a local server started here would answer in its place.
+  // No `webServer`: a local server started here would answer in place of the
+  // deployment under test.
 });

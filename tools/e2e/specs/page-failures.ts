@@ -9,12 +9,11 @@ import { test as base, expect } from '@playwright/test';
  * `console.error`.
  *
  * Without it, a "the heading is there" assertion passes on a page whose data
- * layer threw. The check is automatic rather than something each test opts into:
- * a collect-now-assert-later helper leaves every test to remember the assertion,
- * and the spec that clicks through the navigation had already forgotten it.
+ * layer threw. Automatic rather than opt-in, so no test reaches the end without
+ * the check.
  *
- * Listeners attach before the test body runs, so nothing a navigation emits is
- * missed, and the assertion runs in teardown against whatever accumulated.
+ * Listeners attach before the test body, so nothing a navigation emits is
+ * missed; the assertion runs in teardown against whatever accumulated.
  */
 export const test = base.extend<{ pageFailures: string[] }>({
   pageFailures: [

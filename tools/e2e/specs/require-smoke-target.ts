@@ -8,10 +8,8 @@
  * localhost, find nothing listening, and report the miswiring as a broken
  * deployment.
  *
- * The check belongs to starting a run rather than to loading the config: a
- * config that throws on import cannot be read by anything static, and knip
- * (which resolves it through the test:smoke script) has to load it to follow
- * what it imports.
+ * Enforced here rather than in the config: a config that throws while loading
+ * cannot be read by static tooling.
  */
 export default function requireSmokeTarget(): void {
   if (!process.env.SMOKE_BASE_URL) {
