@@ -90,21 +90,6 @@ describe('useCollectionStore', () => {
     });
   });
 
-  describe('replaceCharacters', () => {
-    it('replaces the entire collection', () => {
-      useCollectionStore.getState().addCharacter('amber' as CharacterId);
-      useCollectionStore
-        .getState()
-        .replaceCharacters({ xiangling: makeCharacter('xiangling') } as Record<
-          CharacterId,
-          CollectionCharacter
-        >);
-
-      expect(useCollectionStore.getState().characters['amber']).toBeUndefined();
-      expect(useCollectionStore.getState().characters['xiangling']).toBeDefined();
-    });
-  });
-
   describe('clearCharacters', () => {
     it('empties the collection', () => {
       useCollectionStore.getState().addCharacter('amber' as CharacterId);

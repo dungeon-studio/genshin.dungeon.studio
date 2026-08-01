@@ -2,14 +2,15 @@
 // SPDX-License-Identifier: MIT
 
 import type { CharacterId, CollectionCharacter } from '@genshin/domain';
-import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import { isValidConstellationLevel } from '@genshin/domain';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
 import { useAuth } from '@/features/auth/use-auth';
 
-import type { MutationResult } from './use-character-collection-api';
 import {
+  collectionKey,
   useAddCharacterMutation,
   useCharacterCollectionQuery,
   useRemoveCharacterMutation,
@@ -28,21 +29,28 @@ export interface UseCollectionResult {
   error: Error | null;
 }
 
+// Stable identity so an unresolved query doesn't hand consumers a fresh object
+// on every render.
+const NO_CHARACTERS: Record<CharacterId, CollectionCharacter> = {};
+
+// Collection state is split along the authentication boundary: anonymous users
+// read and write the persisted zustand store with no API involvement, while
+// authenticated users read and write the TanStack Query cache, which handles
+// optimistic updates and rollback natively. Signing in merges the local
+// collection up once and then empties the store, so the two never overlap.
 export function useCollection(): UseCollectionResult {
   const { user, loading: authLoading } = useAuth();
   const isAuthenticated = user !== null;
+  const queryClient = useQueryClient();
 
-  // Zustand store — always the read layer
-  const characters = useCollectionStore((s) => s.characters);
+  const localCharacters = useCollectionStore((s) => s.characters);
   const storeAddCharacter = useCollectionStore((s) => s.addCharacter);
   const storeRemoveCharacter = useCollectionStore((s) => s.removeCharacter);
   const storeSetConstellationLevel = useCollectionStore((s) => s.setConstellationLevel);
-  const replaceCharacters = useCollectionStore((s) => s.replaceCharacters);
   const clearCharacters = useCollectionStore((s) => s.clearCharacters);
 
-  // TanStack Query — background sync when authenticated
   const {
-    data: apiCharacters,
+    data: serverCharacters,
     error: queryError,
     isLoading: queryLoading,
   } = useCharacterCollectionQuery(user?.uid);
@@ -51,164 +59,140 @@ export function useCollection(): UseCollectionResult {
   const { mutate: removeCharacterApi } = useRemoveCharacterMutation(user?.uid);
   const { mutate: setConstellationLevelApi } = useSetConstellationLevelMutation(user?.uid);
 
-  // Patch zustand with confirmed server data
-  const applyMutationResult = useCallback(
-    ({ characterId, entry }: MutationResult) => {
-      storeSetConstellationLevel(characterId, entry.constellationLevel);
-    },
-    [storeSetConstellationLevel],
+  const characters = isAuthenticated ? (serverCharacters ?? NO_CHARACTERS) : localCharacters;
+
+  // Mutation guards read the cache directly rather than the render snapshot, so
+  // a burst of clicks in one tick sees the optimistic writes its predecessors
+  // already made.
+  const currentCharacters = useCallback(
+    () =>
+      queryClient.getQueryData<Record<CharacterId, CollectionCharacter>>(
+        collectionKey(user?.uid ?? ''),
+      ) ?? NO_CHARACTERS,
+    [queryClient, user?.uid],
   );
 
-  // Merge anonymous localStorage data with server data on first query resolution
-  // per user session. Subsequent resolutions (refetches) merge additively to
-  // avoid overwriting optimistic state while merge mutations are in flight.
+  // The uid of the session that has already been merged, so a refetch or
+  // re-render doesn't push the same local entries a second time.
   const mergedForUser = useRef<string | null>(null);
+  // The uid last observed as signed in, so a sign-out is distinguished from the
+  // signed-out-on-mount state that precedes auth resolving.
+  const signedInUser = useRef<string | null>(null);
 
-  // Reset merge tracking and clear persisted collection on logout so
-  // re-login triggers a fresh merge and a different account cannot
-  // inherit the previous user's local data.
+  // Drop any local data on sign-out so the next account to sign in on this
+  // browser cannot merge the previous account's collection into its own.
   useEffect(() => {
-    if (!user) {
-      mergedForUser.current = null;
+    if (authLoading || user) return;
+    if (signedInUser.current === null) return;
+
+    signedInUser.current = null;
+    mergedForUser.current = null;
+    clearCharacters();
+  }, [user, authLoading, clearCharacters]);
+
+  // One-time additive merge of the anonymous collection into the server
+  // collection, then the local copy is dropped. A failed push keeps the local
+  // copy so the next sign-in for this account retries it.
+  useEffect(() => {
+    if (!user || !serverCharacters) return;
+
+    signedInUser.current = user.uid;
+    if (mergedForUser.current === user.uid) return;
+    mergedForUser.current = user.uid;
+
+    const local = useCollectionStore.getState().characters;
+    const merged = mergeCollections(local, serverCharacters);
+
+    const diffs: Array<{ characterId: CharacterId; level: number }> = [];
+    for (const id of Object.keys(merged)) {
+      const entry = merged[id];
+      const serverEntry = serverCharacters[id];
+      if (
+        isValidConstellationLevel(entry.constellationLevel) &&
+        (!serverEntry || entry.constellationLevel > serverEntry.constellationLevel)
+      ) {
+        diffs.push({ characterId: id, level: entry.constellationLevel });
+      }
+    }
+
+    if (diffs.length === 0) {
       clearCharacters();
+      return;
     }
-  }, [user, clearCharacters]);
 
-  useEffect(() => {
-    if (!apiCharacters) return;
-
-    if (user && mergedForUser.current !== user.uid) {
-      const localData = useCollectionStore.getState().characters;
-      const merged = mergeCollections(localData, apiCharacters);
-      replaceCharacters(merged);
-
-      // Push entries that differ from the server
-      const diffs: Array<{ characterId: CharacterId; level: number }> = [];
-      for (const id of Object.keys(merged)) {
-        const entry = merged[id];
-        const serverEntry = apiCharacters[id];
-        if (
-          isValidConstellationLevel(entry.constellationLevel) &&
-          (!serverEntry || entry.constellationLevel > serverEntry.constellationLevel)
-        ) {
-          diffs.push({ characterId: id, level: entry.constellationLevel });
-        }
-      }
-
-      for (const diff of diffs) {
-        setConstellationLevelApi(diff, {
-          onSuccess: applyMutationResult,
-          onError: () => {
-            toast.error('Failed to sync a merged character to the server.');
-          },
-        });
-      }
-
-      if (diffs.length > 0) {
-        toast.success(`Merged ${diffs.length} character(s) from your local collection.`);
-      }
-
-      mergedForUser.current = user.uid;
-    } else {
-      // Keep refetches additive so in-flight merge mutations aren't overwritten.
-      const currentCharacters = useCollectionStore.getState().characters;
-      const merged = mergeCollections(currentCharacters, apiCharacters);
-      replaceCharacters(merged);
+    let outstanding = diffs.length;
+    let failed = false;
+    for (const diff of diffs) {
+      setConstellationLevelApi(diff, {
+        onError: () => {
+          failed = true;
+          toast.error('Failed to sync a merged character to the server.');
+        },
+        onSettled: () => {
+          outstanding -= 1;
+          if (outstanding === 0 && !failed) clearCharacters();
+        },
+      });
     }
-  }, [apiCharacters, user, replaceCharacters, setConstellationLevelApi, applyMutationResult]);
 
-  // Mutation error strategy: optimistic rollback + toast notification.
-  // Each mutation writes to zustand first for instant UI feedback, then fires
-  // the API call. On failure the onError callback rolls back the zustand change
-  // only if the store still reflects this mutation's optimistic value (guards
-  // against races from rapid user interactions). Errors are surfaced via toast
-  // side-effects — no retry is attempted.
+    toast.success(`Merged ${diffs.length} character(s) from your local collection.`);
+  }, [user, serverCharacters, clearCharacters, setConstellationLevelApi]);
 
   const addCharacter = useCallback(
     (id: CharacterId) => {
-      const alreadyOwned = id in useCollectionStore.getState().characters;
-      if (alreadyOwned) return;
-
-      storeAddCharacter(id);
       if (isAuthenticated) {
+        if (id in currentCharacters()) return;
         addCharacterApi(id, {
-          onSuccess: applyMutationResult,
           onError: () => {
-            const current = useCollectionStore.getState().characters[id];
-            if (current && current.constellationLevel === MIN_CONSTELLATION_LEVEL) {
-              storeRemoveCharacter(id);
-              toast.error('Failed to add character. Change has been reverted.');
-            } else {
-              toast.error('Failed to add character.');
-            }
+            toast.error('Failed to add character. Change has been reverted.');
           },
         });
+        return;
       }
+
+      storeAddCharacter(id);
     },
-    [
-      isAuthenticated,
-      addCharacterApi,
-      storeAddCharacter,
-      storeRemoveCharacter,
-      applyMutationResult,
-    ],
+    [isAuthenticated, currentCharacters, addCharacterApi, storeAddCharacter],
   );
 
   const removeCharacter = useCallback(
     (id: CharacterId) => {
-      const current = useCollectionStore.getState().characters[id];
-      if (!current) return;
-
-      storeRemoveCharacter(id);
       if (isAuthenticated) {
+        if (!(id in currentCharacters())) return;
         removeCharacterApi(id, {
           onError: () => {
-            const stillAbsent = !(id in useCollectionStore.getState().characters);
-            if (stillAbsent) {
-              storeAddCharacter(id);
-              storeSetConstellationLevel(id, current.constellationLevel);
-              toast.error('Failed to remove character. Change has been reverted.');
-            } else {
-              toast.error('Failed to remove character.');
-            }
+            toast.error('Failed to remove character. Change has been reverted.');
           },
         });
+        return;
       }
+
+      storeRemoveCharacter(id);
     },
-    [
-      isAuthenticated,
-      removeCharacterApi,
-      storeRemoveCharacter,
-      storeAddCharacter,
-      storeSetConstellationLevel,
-    ],
+    [isAuthenticated, currentCharacters, removeCharacterApi, storeRemoveCharacter],
   );
 
   const setConstellationLevel = useCallback(
     (id: CharacterId, level: number) => {
-      const previousLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
-      if (previousLevel === undefined || previousLevel === level) return;
+      if (!isValidConstellationLevel(level)) return;
 
-      storeSetConstellationLevel(id, level);
       if (isAuthenticated) {
+        const current = currentCharacters()[id];
+        if (!current || current.constellationLevel === level) return;
         setConstellationLevelApi(
           { characterId: id, level },
           {
-            onSuccess: applyMutationResult,
             onError: () => {
-              const currentLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
-              if (previousLevel !== undefined && currentLevel === level) {
-                storeSetConstellationLevel(id, previousLevel);
-                toast.error('Failed to update constellation level. Change has been reverted.');
-              } else {
-                toast.error('Failed to update constellation level.');
-              }
+              toast.error('Failed to update constellation level. Change has been reverted.');
             },
           },
         );
+        return;
       }
+
+      storeSetConstellationLevel(id, level);
     },
-    [isAuthenticated, setConstellationLevelApi, storeSetConstellationLevel, applyMutationResult],
+    [isAuthenticated, currentCharacters, setConstellationLevelApi, storeSetConstellationLevel],
   );
 
   const isOwned = useCallback((id: CharacterId) => id in characters, [characters]);

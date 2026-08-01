@@ -38,7 +38,6 @@ interface CollectionState {
   setConstellationLevel: (characterId: CharacterId, level: number) => void;
   isOwned: (characterId: CharacterId) => boolean;
   getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
-  replaceCharacters: (characters: Record<CharacterId, CollectionCharacter>) => void;
   clearCharacters: () => void;
 }
 
@@ -92,10 +91,6 @@ export const useCollectionStore = create<CollectionState>()(
 
       getCharacter: (characterId) => {
         return get().characters[characterId];
-      },
-
-      replaceCharacters: (characters) => {
-        set({ characters });
       },
 
       clearCharacters: () => {

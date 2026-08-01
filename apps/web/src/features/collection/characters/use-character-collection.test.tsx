@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CharacterId } from '@genshin/domain';
+import type { CharacterId, CollectionCharacter } from '@genshin/domain';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { User } from 'firebase/auth';
@@ -23,77 +23,121 @@ import { useCollectionStore } from './use-character-collection-store';
 const SKIRK = 'skirk' as CharacterId;
 const ESCOFFIER = 'escoffier' as CharacterId;
 
+// A collection that mutations actually change, so a refetch reflects what the
+// preceding PUT or DELETE did. The authenticated read layer is the server, so
+// stateless handlers would report every write as immediately lost.
+function fakeServerCollection(initial: CollectionCharacter[] = []) {
+  const characters = new Map(initial.map((character) => [character.characterId, character]));
+  const requests = { get: 0, put: 0, delete: 0 };
+
+  server.use(
+    http.get('http://localhost:8080/api/characters', () => {
+      requests.get += 1;
+      return HttpResponse.json(charactersDocument([...characters.values()]));
+    }),
+    http.put('http://localhost:8080/api/characters/:characterId', async ({ params, request }) => {
+      requests.put += 1;
+      const { constellationLevel } = (await request.json()) as { constellationLevel: number };
+      const entry = makeCharacter(params.characterId as string, constellationLevel);
+      characters.set(entry.characterId, entry);
+      return HttpResponse.json(charactersDocument([entry]));
+    }),
+    http.delete('http://localhost:8080/api/characters/:characterId', ({ params }) => {
+      requests.delete += 1;
+      characters.delete(params.characterId as CharacterId);
+      return new HttpResponse(null, { status: 204 });
+    }),
+  );
+
+  return { characters, requests };
+}
+
 beforeEach(() => {
   useCollectionStore.getState().clearCharacters();
   vi.clearAllMocks();
 });
 
+describe('useCollection anonymous', () => {
+  it('writes to the local store without touching the API', async () => {
+    const api = fakeServerCollection();
+
+    const { result } = renderHook(() => useCollection(), { wrapper: createWrapper() });
+
+    act(() => {
+      result.current.addCharacter(SKIRK);
+    });
+    act(() => {
+      result.current.setConstellationLevel(SKIRK, 2);
+    });
+
+    expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(2);
+    expect(useCollectionStore.getState().characters[SKIRK]?.constellationLevel).toBe(2);
+    expect(api.requests).toEqual({ get: 0, put: 0, delete: 0 });
+  });
+
+  it('keeps the persisted collection when auth resolves to signed-out', async () => {
+    useCollectionStore.getState().addCharacter(SKIRK);
+
+    let loading = true;
+    function Wrapper({ children }: { children: ReactNode }) {
+      return (
+        <QueryClientProvider client={createTestQueryClient()}>
+          <AuthContext.Provider value={{ user: null, loading }}>{children}</AuthContext.Provider>
+        </QueryClientProvider>
+      );
+    }
+
+    const { result, rerender } = renderHook(() => useCollection(), { wrapper: Wrapper });
+
+    act(() => {
+      loading = false;
+      rerender();
+    });
+
+    expect(result.current.getCharacter(SKIRK)).toBeDefined();
+  });
+});
+
 describe('useCollection merge-on-first-login', () => {
-  it('merges the local collection into the store and syncs new entries to the server', async () => {
+  it('pushes the local collection to the server, then empties the local store', async () => {
     // Anonymous local collection built before signing in.
     useCollectionStore.getState().addCharacter(SKIRK);
     useCollectionStore.getState().setConstellationLevel(SKIRK, 3);
 
-    const putBodies: unknown[] = [];
-    server.use(
-      http.get('http://localhost:8080/api/characters', () =>
-        HttpResponse.json(charactersDocument([])),
-      ),
-      http.put('http://localhost:8080/api/characters/skirk', async ({ request }) => {
-        putBodies.push(await request.json());
-        return HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 3)]));
-      }),
-    );
+    const api = fakeServerCollection();
 
     const { result } = renderHook(() => useCollection(), {
       wrapper: createWrapper({ user: fakeUser('user-1') }),
     });
 
     await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
-    // The locally-owned character absent from the server is pushed up.
-    await waitFor(() => expect(putBodies).toContainEqual({ constellationLevel: 3 }));
+    expect(api.characters.get(SKIRK)?.constellationLevel).toBe(3);
+    await waitFor(() => expect(useCollectionStore.getState().characters).toEqual({}));
   });
 
   it('does not re-push local entries when the same user refetches', async () => {
     useCollectionStore.getState().addCharacter(SKIRK);
     useCollectionStore.getState().setConstellationLevel(SKIRK, 3);
 
-    let getCount = 0;
-    let putCount = 0;
-    server.use(
-      http.get('http://localhost:8080/api/characters', () => {
-        getCount += 1;
-        return HttpResponse.json(charactersDocument([]));
-      }),
-      http.put('http://localhost:8080/api/characters/skirk', () => {
-        putCount += 1;
-        return HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 3)]));
-      }),
-    );
+    const api = fakeServerCollection();
 
     renderHook(() => useCollection(), {
       wrapper: createWrapper({ user: fakeUser('user-1') }),
     });
 
-    // First merge pushes the diff, whose success invalidates and refetches.
-    await waitFor(() => expect(putCount).toBe(1));
-    await waitFor(() => expect(getCount).toBeGreaterThanOrEqual(2));
+    // The merge push settles and invalidates, which refetches.
+    await waitFor(() => expect(api.requests.put).toBe(1));
+    await waitFor(() => expect(api.requests.get).toBeGreaterThanOrEqual(2));
 
-    // The refetch runs the additive branch, not another merge push.
-    expect(putCount).toBe(1);
+    // The refetch is a plain read, not another merge.
+    expect(api.requests.put).toBe(1);
   });
 
-  it('clears the collection on logout so a different user merges fresh', async () => {
+  it('drops local data on sign-out so a different account merges fresh', async () => {
     useCollectionStore.getState().addCharacter(SKIRK);
     useCollectionStore.getState().setConstellationLevel(SKIRK, 3);
 
-    let serverCharacters = charactersDocument([]);
-    server.use(
-      http.get('http://localhost:8080/api/characters', () => HttpResponse.json(serverCharacters)),
-      http.put('http://localhost:8080/api/characters/skirk', () =>
-        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 3)])),
-      ),
-    );
+    const api = fakeServerCollection();
 
     const queryClient = createTestQueryClient();
     let authUser: User | null = fakeUser('user-1');
@@ -110,15 +154,17 @@ describe('useCollection merge-on-first-login', () => {
     const { result, rerender } = renderHook(() => useCollection(), { wrapper: Wrapper });
 
     await waitFor(() => expect(result.current.getCharacter(SKIRK)).toBeDefined());
+    await waitFor(() => expect(useCollectionStore.getState().characters).toEqual({}));
 
-    // A second account signs in.
-    serverCharacters = charactersDocument([makeCharacter(ESCOFFIER, 2)]);
     act(() => {
       authUser = null;
       rerender();
     });
-    await waitFor(() => expect(result.current.getCharacter(SKIRK)).toBeUndefined());
+    expect(result.current.getCharacter(SKIRK)).toBeUndefined();
 
+    // A second account signs in against its own server collection.
+    api.characters.clear();
+    api.characters.set(ESCOFFIER, makeCharacter(ESCOFFIER, 2));
     act(() => {
       authUser = fakeUser('user-2');
       rerender();
@@ -126,19 +172,23 @@ describe('useCollection merge-on-first-login', () => {
 
     await waitFor(() => expect(result.current.getCharacter(ESCOFFIER)?.constellationLevel).toBe(2));
     expect(result.current.getCharacter(SKIRK)).toBeUndefined();
+    expect(api.characters.has(SKIRK)).toBe(false);
   });
 });
 
-describe('useCollection mutations', () => {
-  it('restores a removed character when the delete fails', async () => {
+describe('useCollection authenticated mutations', () => {
+  it('removes optimistically and restores the entry when the delete fails', async () => {
+    fakeServerCollection([makeCharacter(SKIRK, 3)]);
+
+    let releaseDelete!: () => void;
+    const deleteInFlight = new Promise<void>((resolve) => {
+      releaseDelete = resolve;
+    });
     server.use(
-      http.get('http://localhost:8080/api/characters', () =>
-        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 3)])),
-      ),
-      http.delete(
-        'http://localhost:8080/api/characters/skirk',
-        () => new HttpResponse(null, { status: 500 }),
-      ),
+      http.delete('http://localhost:8080/api/characters/skirk', async () => {
+        await deleteInFlight;
+        return new HttpResponse(null, { status: 500 });
+      }),
     );
 
     const { result } = renderHook(() => useCollection(), {
@@ -150,10 +200,44 @@ describe('useCollection mutations', () => {
     act(() => {
       result.current.removeCharacter(SKIRK);
     });
+    await waitFor(() => expect(result.current.getCharacter(SKIRK)).toBeUndefined());
 
-    // Optimistically gone, then restored at its prior level once the delete errors.
-    expect(result.current.getCharacter(SKIRK)).toBeUndefined();
+    act(() => {
+      releaseDelete();
+    });
     await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
     expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+  });
+
+  it('raises the constellation level optimistically before the server confirms', async () => {
+    fakeServerCollection([makeCharacter(SKIRK, 1)]);
+
+    let releasePut!: () => void;
+    const putInFlight = new Promise<void>((resolve) => {
+      releasePut = resolve;
+    });
+    server.use(
+      http.put('http://localhost:8080/api/characters/skirk', async () => {
+        await putInFlight;
+        return HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 4)]));
+      }),
+    );
+
+    const { result } = renderHook(() => useCollection(), {
+      wrapper: createWrapper({ user: fakeUser('user-1') }),
+    });
+
+    await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(1));
+
+    act(() => {
+      result.current.setConstellationLevel(SKIRK, 4);
+    });
+
+    await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(4));
+    expect(useCollectionStore.getState().characters[SKIRK]).toBeUndefined();
+
+    act(() => {
+      releasePut();
+    });
   });
 });
