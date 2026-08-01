@@ -5,29 +5,6 @@ import type { CharacterId, CollectionCharacter } from '@genshin/domain';
 import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL, nowTimestamp } from '@genshin/domain';
 import { create } from 'zustand';
 
-// Additive merge: union of both sets, keep higher constellation level on conflicts.
-export function mergeCollections(
-  local: Record<CharacterId, CollectionCharacter>,
-  server: Record<CharacterId, CollectionCharacter>,
-): Record<CharacterId, CollectionCharacter> {
-  const merged: Record<CharacterId, CollectionCharacter> = { ...server };
-
-  for (const [id, localEntry] of Object.entries(local)) {
-    const serverEntry = merged[id];
-    if (!serverEntry) {
-      merged[id] = localEntry;
-    } else if (localEntry.constellationLevel > serverEntry.constellationLevel) {
-      merged[id] = {
-        ...serverEntry,
-        constellationLevel: localEntry.constellationLevel,
-        updatedAt: nowTimestamp(),
-      };
-    }
-  }
-
-  return merged;
-}
-
 interface CollectionState {
   characters: Record<CharacterId, CollectionCharacter>;
   addCharacter: (characterId: CharacterId) => void;

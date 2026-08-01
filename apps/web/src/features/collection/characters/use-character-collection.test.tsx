@@ -23,84 +23,16 @@ import { useCollectionStore } from './use-character-collection-store';
 const SKIRK = 'skirk' as CharacterId;
 const ESCOFFIER = 'escoffier' as CharacterId;
 
-// A `genshin-collection` blob as the retired anonymous store left it behind.
-function seedLegacyCollection(characterId: CharacterId, constellationLevel: number): void {
-  localStorage.setItem(
-    'genshin-collection',
-    JSON.stringify({
-      state: { characters: { [characterId]: makeCharacter(characterId, constellationLevel) } },
-      version: 1,
-    }),
-  );
-}
-
 beforeEach(() => {
   useCollectionStore.getState().clearCharacters();
-  localStorage.clear();
   vi.clearAllMocks();
 });
 
-describe('useCollection drain-on-first-login', () => {
-  it('drains the retired anonymous collection and syncs new entries to the server', async () => {
-    seedLegacyCollection(SKIRK, 3);
-
-    const putBodies: unknown[] = [];
-    server.use(
-      http.get('http://localhost:8080/api/characters', () =>
-        HttpResponse.json(charactersDocument([])),
-      ),
-      http.put('http://localhost:8080/api/characters/skirk', async ({ request }) => {
-        putBodies.push(await request.json());
-        return HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 3)]));
-      }),
-    );
-
-    const { result } = renderHook(() => useCollection(), {
-      wrapper: createWrapper({ user: fakeUser('user-1') }),
-    });
-
-    await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
-    // The locally-owned character absent from the server is pushed up.
-    await waitFor(() => expect(putBodies).toContainEqual({ constellationLevel: 3 }));
-  });
-
-  it('does not re-push drained entries when the same user refetches', async () => {
-    seedLegacyCollection(SKIRK, 3);
-
-    let getCount = 0;
-    let putCount = 0;
-    server.use(
-      http.get('http://localhost:8080/api/characters', () => {
-        getCount += 1;
-        return HttpResponse.json(charactersDocument([]));
-      }),
-      http.put('http://localhost:8080/api/characters/skirk', () => {
-        putCount += 1;
-        return HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 3)]));
-      }),
-    );
-
-    renderHook(() => useCollection(), {
-      wrapper: createWrapper({ user: fakeUser('user-1') }),
-    });
-
-    // First merge pushes the diff, whose success invalidates and refetches.
-    await waitFor(() => expect(putCount).toBe(1));
-    await waitFor(() => expect(getCount).toBeGreaterThanOrEqual(2));
-
-    // The refetch runs the additive branch, not another merge push.
-    expect(putCount).toBe(1);
-  });
-
+describe('useCollection account isolation', () => {
   it('clears the collection on logout so a different user starts fresh', async () => {
-    seedLegacyCollection(SKIRK, 3);
-
-    let serverCharacters = charactersDocument([]);
+    let serverCharacters = charactersDocument([makeCharacter(SKIRK, 3)]);
     server.use(
       http.get('http://localhost:8080/api/characters', () => HttpResponse.json(serverCharacters)),
-      http.put('http://localhost:8080/api/characters/skirk', () =>
-        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 3)])),
-      ),
     );
 
     const queryClient = createTestQueryClient();

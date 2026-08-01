@@ -2,13 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 import type { CharacterId, CollectionCharacter } from '@genshin/domain';
-import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
-import { useCallback, useEffect, useRef } from 'react';
+import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import { useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 
 import { useAuth } from '@/features/auth/use-auth';
 
-import { drainPersistedCollection } from './drain-persisted-collection';
 import type { MutationResult } from './use-character-collection-api';
 import {
   useAddCharacterMutation,
@@ -16,7 +15,7 @@ import {
   useRemoveCharacterMutation,
   useSetConstellationLevelMutation,
 } from './use-character-collection-api';
-import { mergeCollections, useCollectionStore } from './use-character-collection-store';
+import { useCollectionStore } from './use-character-collection-store';
 
 export interface UseCollectionResult {
   characters: Record<CharacterId, CollectionCharacter>;
@@ -61,63 +60,18 @@ export function useCollection(): UseCollectionResult {
     [storeSetConstellationLevel],
   );
 
-  // Drain the retired anonymous localStorage store into the server on first
-  // query resolution per user session. Subsequent resolutions (refetches) merge
-  // additively to avoid overwriting optimistic state while drain mutations are
-  // in flight.
-  const mergedForUser = useRef<string | null>(null);
-
-  // Reset merge tracking and drop the in-memory collection on logout so a
-  // different account cannot read the previous user's data.
+  // Drop the in-memory collection on logout so a different account cannot read
+  // the previous user's data.
   useEffect(() => {
-    if (!user) {
-      mergedForUser.current = null;
-      clearCharacters();
-    }
+    if (!user) clearCharacters();
   }, [user, clearCharacters]);
 
+  // The server is the only source of characters, so a resolved query replaces
+  // the store outright rather than merging into it.
   useEffect(() => {
     if (!apiCharacters) return;
-
-    if (user && mergedForUser.current !== user.uid) {
-      const localData = drainPersistedCollection();
-      const merged = mergeCollections(localData, apiCharacters);
-      replaceCharacters(merged);
-
-      // Push entries that differ from the server
-      const diffs: Array<{ characterId: CharacterId; level: number }> = [];
-      for (const id of Object.keys(merged)) {
-        const entry = merged[id];
-        const serverEntry = apiCharacters[id];
-        if (
-          isValidConstellationLevel(entry.constellationLevel) &&
-          (!serverEntry || entry.constellationLevel > serverEntry.constellationLevel)
-        ) {
-          diffs.push({ characterId: id, level: entry.constellationLevel });
-        }
-      }
-
-      for (const diff of diffs) {
-        setConstellationLevelApi(diff, {
-          onSuccess: applyMutationResult,
-          onError: () => {
-            toast.error('Failed to sync a merged character to the server.');
-          },
-        });
-      }
-
-      if (diffs.length > 0) {
-        toast.success(`Merged ${diffs.length} character(s) from your local collection.`);
-      }
-
-      mergedForUser.current = user.uid;
-    } else {
-      // Keep refetches additive so in-flight merge mutations aren't overwritten.
-      const currentCharacters = useCollectionStore.getState().characters;
-      const merged = mergeCollections(currentCharacters, apiCharacters);
-      replaceCharacters(merged);
-    }
-  }, [apiCharacters, user, replaceCharacters, setConstellationLevelApi, applyMutationResult]);
+    replaceCharacters(apiCharacters);
+  }, [apiCharacters, replaceCharacters]);
 
   // Mutation error strategy: optimistic rollback + toast notification.
   // Each mutation writes to zustand first for instant UI feedback, then fires

@@ -36,11 +36,27 @@ const SNAPSHOT_ROOTS: ReadonlyArray<{
       `apps/api/src/repositories/${repository}/schemas/${version}.ts`,
   },
   {
+    // A web snapshot is named for its `persist` store, which doesn't imply a
+    // source path, so point at the registry that maps the store to its schemas.
     prefix: 'apps/web/schema-snapshots',
-    sourceFor: (_repository, version) =>
-      `apps/web/src/features/collection/characters/schemas/${version}.ts`,
+    sourceFor: (repository, version) =>
+      `apps/web/scripts/schema-registry.ts (store "${repository}", ${version})`,
   },
 ];
+
+/**
+ * Snapshots whose store was deliberately retired, exempted from the
+ * missing-snapshot violation below.
+ *
+ * A retirement is a decision that nothing needs to read the data any more —
+ * distinct from a snapshot vanishing by accident, which is what that violation
+ * is for. Entries stop mattering once the deletion reaches the base branch,
+ * since the loop only visits paths the base still has, so this list is expected
+ * to be emptied rather than to accumulate.
+ */
+const RETIRED_SNAPSHOTS: ReadonlySet<string> = new Set([
+  'apps/web/schema-snapshots/genshin-collection/v1.json',
+]);
 
 const repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
 
@@ -103,6 +119,8 @@ for (const { prefix, sourceFor } of SNAPSHOT_ROOTS) {
       .replace(/\.json$/, '')
       .split('/');
     const source = sourceFor(repository, version);
+
+    if (RETIRED_SNAPSHOTS.has(path)) continue;
 
     let head: string;
     try {
