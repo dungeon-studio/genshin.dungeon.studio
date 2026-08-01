@@ -22,6 +22,7 @@ vi.mock('@/repositories/weapons/index.js', () => ({
   list: vi.fn(),
   get: vi.fn(),
   create: vi.fn(),
+  save: vi.fn(),
   update: vi.fn(),
   remove: vi.fn(),
 }));
@@ -395,6 +396,163 @@ describe('Weapon routes', () => {
       expect(res.status).toBe(404);
       const body = (await res.json()) as { detail: string };
       expect(body.detail).toBe('Weapon instance not found');
+    });
+  });
+
+  describe('PUT /api/weapons/:weaponInstanceId', () => {
+    const CHOSEN_ID = '3f2504e0-4f89-41d3-9a0c-0305e82c3301';
+    const SAVED_WEAPON: CollectionWeapon = {
+      ...FAKE_WEAPON,
+      weaponInstanceId: CHOSEN_ID as UUID,
+    };
+
+    beforeEach(() => {
+      // The repository doubles are module-level vi.fn()s, so call history
+      // survives restoreAllMocks; these assertions count calls.
+      vi.mocked(Weapons.save).mockClear();
+      vi.mocked(getWeaponById).mockReturnValue({
+        id: 'mistsplitter-reforged',
+        name: 'Mistsplitter Reforged',
+      } as ReturnType<typeof getWeaponById>);
+    });
+
+    describe('when the instance does not yet exist', () => {
+      let res: Response;
+      let body: CollectionDocument;
+
+      beforeEach(async () => {
+        vi.mocked(Weapons.save).mockResolvedValue({ weapon: SAVED_WEAPON, created: true });
+        res = await app.request(
+          authedRequest('PUT', `/api/weapons/${CHOSEN_ID}`, {
+            weaponId: 'mistsplitter-reforged',
+            refinementLevel: 1,
+          }),
+        );
+        body = (await res.json()) as CollectionDocument;
+      });
+
+      it('returns 201', () => {
+        expect(res.status).toBe(201);
+      });
+
+      it('returns collection+json content type', () => {
+        expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
+      });
+
+      it('stores the instance under the caller-supplied identifier', () => {
+        expect(Weapons.save).toHaveBeenCalledWith(
+          FAKE_TOKEN.uid,
+          CHOSEN_ID,
+          'mistsplitter-reforged',
+          1,
+        );
+      });
+
+      it('echoes the caller-supplied identifier back', () => {
+        expect(body.collection.items[0].data).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ name: 'weaponInstanceId', value: CHOSEN_ID }),
+          ]),
+        );
+      });
+    });
+
+    it('returns 200 when replacing an existing instance', async () => {
+      vi.mocked(Weapons.save).mockResolvedValue({ weapon: SAVED_WEAPON, created: false });
+
+      const res = await app.request(
+        authedRequest('PUT', `/api/weapons/${CHOSEN_ID}`, {
+          weaponId: 'mistsplitter-reforged',
+          refinementLevel: 1,
+        }),
+      );
+
+      expect(res.status).toBe(200);
+    });
+
+    it('is idempotent — replaying the same body creates no second instance', async () => {
+      vi.mocked(Weapons.save)
+        .mockResolvedValueOnce({ weapon: SAVED_WEAPON, created: true })
+        .mockResolvedValueOnce({ weapon: SAVED_WEAPON, created: false });
+
+      const send = () =>
+        app.request(
+          authedRequest('PUT', `/api/weapons/${CHOSEN_ID}`, {
+            weaponId: 'mistsplitter-reforged',
+            refinementLevel: 1,
+          }),
+        );
+
+      const first = await send();
+      const second = await send();
+
+      expect(first.status).toBe(201);
+      expect(second.status).toBe(200);
+      expect(vi.mocked(Weapons.save).mock.calls.map((call) => call[1])).toEqual([
+        CHOSEN_ID,
+        CHOSEN_ID,
+      ]);
+    });
+
+    it('returns 400 when the identifier is not a UUID', async () => {
+      const res = await app.request(
+        authedRequest('PUT', '/api/weapons/not-a-uuid', {
+          weaponId: 'mistsplitter-reforged',
+          refinementLevel: 1,
+        }),
+      );
+
+      expect(res.status).toBe(400);
+      const body = (await res.json()) as { detail: string };
+      expect(body.detail).toBe('Weapon instance identifier must be a UUID: not-a-uuid');
+    });
+
+    it('does not write when the identifier is rejected', async () => {
+      await app.request(
+        authedRequest('PUT', '/api/weapons/not-a-uuid', {
+          weaponId: 'mistsplitter-reforged',
+          refinementLevel: 1,
+        }),
+      );
+
+      expect(Weapons.save).not.toHaveBeenCalled();
+    });
+
+    it('returns 400 for unknown weapon ID', async () => {
+      vi.mocked(getWeaponById).mockReturnValue(undefined);
+
+      const res = await app.request(
+        authedRequest('PUT', `/api/weapons/${CHOSEN_ID}`, {
+          weaponId: 'not-a-weapon',
+          refinementLevel: 1,
+        }),
+      );
+
+      expect(res.status).toBe(400);
+      const body = (await res.json()) as { detail: string };
+      expect(body.detail).toBe('Unknown weapon: not-a-weapon');
+    });
+
+    it('returns 422 when the body omits weaponId', async () => {
+      const res = await app.request(
+        authedRequest('PUT', `/api/weapons/${CHOSEN_ID}`, {
+          refinementLevel: 1,
+        }),
+      );
+
+      expect(res.status).toBe(422);
+    });
+
+    it('returns 422 when the body carries extra properties', async () => {
+      const res = await app.request(
+        authedRequest('PUT', `/api/weapons/${CHOSEN_ID}`, {
+          weaponId: 'mistsplitter-reforged',
+          refinementLevel: 1,
+          createdAt: '2020-01-01T00:00:00.000Z',
+        }),
+      );
+
+      expect(res.status).toBe(422);
     });
   });
 

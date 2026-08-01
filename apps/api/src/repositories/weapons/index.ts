@@ -61,6 +61,43 @@ export async function create(
   return weapon;
 }
 
+export interface SaveResult {
+  weapon: CollectionWeapon;
+  created: boolean;
+}
+
+/**
+ * Create or replace the instance at `weaponInstanceId`.
+ *
+ * Unlike `create`, the caller names the instance, which is what lets an import
+ * restore weapons under the identifiers its teams already reference. `createdAt`
+ * survives a replacement so the collection keeps its original acquisition order.
+ */
+export async function save(
+  userId: string,
+  weaponInstanceId: UUID,
+  weaponId: string,
+  refinementLevel: number,
+): Promise<SaveResult> {
+  const docRef = collectionRef(userId).doc(weaponInstanceId);
+  const existing = await docRef.get();
+  const now = new Date().toISOString() as ISOTimestamp;
+
+  const existingData = existing.exists ? existing.data() : undefined;
+
+  const weapon: CollectionWeapon = {
+    weaponInstanceId,
+    weaponId,
+    refinementLevel,
+    createdAt: existingData ? fromDocument(weaponInstanceId, existingData).createdAt : now,
+    updatedAt: now,
+  };
+
+  await docRef.set(toDocument(weapon));
+
+  return { weapon, created: !existing.exists };
+}
+
 export async function update(
   userId: string,
   weaponInstanceId: UUID,
