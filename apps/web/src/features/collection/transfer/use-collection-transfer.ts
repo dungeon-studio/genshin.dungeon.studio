@@ -64,12 +64,19 @@ export interface UseCollectionTransferResult {
   exportCollection: () => void;
   readPlan: (file: File) => Promise<ReadPlanResult>;
   applyImport: (plan: ImportPlan) => Promise<void>;
+  /**
+   * Import needs an account. Signed out, the login merge keeps whichever
+   * constellation level is higher, which would silently undo any import that
+   * lowered one; weapons and teams have no local persistence to import into at
+   * all. Export stays available either way — reading a collection is harmless.
+   */
+  canImport: boolean;
   isImporting: boolean;
 }
 
 export function useCollectionTransfer(): UseCollectionTransferResult {
   const { user } = useAuth();
-  const isAuthenticated = user !== null;
+  const canImport = user !== null;
 
   const replaceCharacters = useCollectionStore((s) => s.replaceCharacters);
   const storeAddWeapon = useWeaponCollectionStore((s) => s.addWeapon);
@@ -105,13 +112,13 @@ export function useCollectionTransfer(): UseCollectionTransferResult {
   const importWeapons = useCallback(
     async (entries: PlannedWeapon[]) => {
       for (const entry of entries) {
-        if (isAuthenticated) await saveWeaponApi(entry);
+        await saveWeaponApi(entry);
 
         const existing = useWeaponCollectionStore.getState().weapons[entry.weaponInstanceId];
         storeAddWeapon({ ...entry, ...restamp(existing, nowTimestamp()) });
       }
     },
-    [isAuthenticated, saveWeaponApi, storeAddWeapon],
+    [saveWeaponApi, storeAddWeapon],
   );
 
   const importCharacters = useCallback(
@@ -125,7 +132,6 @@ export function useCollectionTransfer(): UseCollectionTransferResult {
       }
       replaceCharacters(next);
 
-      if (!isAuthenticated) return;
       for (const entry of entries) {
         await saveCharacterApi({
           characterId: entry.characterId,
@@ -133,7 +139,7 @@ export function useCollectionTransfer(): UseCollectionTransferResult {
         });
       }
     },
-    [isAuthenticated, saveCharacterApi, replaceCharacters],
+    [saveCharacterApi, replaceCharacters],
   );
 
   const importTeams = useCallback(
@@ -155,10 +161,10 @@ export function useCollectionTransfer(): UseCollectionTransferResult {
           ...restamp(snapshot.teams[entry.slot], nowTimestamp()),
         });
 
-        if (isAuthenticated) await saveTeamApi(payload);
+        await saveTeamApi(payload);
       }
     },
-    [isAuthenticated, saveTeamApi, storeSetTeam],
+    [saveTeamApi, storeSetTeam],
   );
 
   const applyImport = useCallback(
@@ -181,5 +187,5 @@ export function useCollectionTransfer(): UseCollectionTransferResult {
     [importWeapons, importCharacters, importTeams],
   );
 
-  return { exportCollection, readPlan, applyImport, isImporting };
+  return { exportCollection, readPlan, applyImport, canImport, isImporting };
 }
