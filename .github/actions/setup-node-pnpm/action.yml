@@ -33,7 +33,13 @@ runs:
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ env.STORE_PATH }}
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        # Root-anchored (not `**/`): there is a single lockfile at the repo
+        # root, so the hash is identical, but the jobs that run `pnpm dev`
+        # (dev-smoke, e2e) leave the workspace tree churning as the emulator
+        # stack tears down. A `**/` walk at post-job cache time races those
+        # deletions and fails with "Fail to hash files under directory";
+        # hashing one known file sidesteps the walk entirely.
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
 
