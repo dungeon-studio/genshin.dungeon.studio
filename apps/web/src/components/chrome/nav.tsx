@@ -25,8 +25,8 @@ export function Nav(): JSX.Element {
               className={({ isActive }) =>
                 `inline-block border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
                   isActive
-                    ? 'border-blue-500 text-foreground'
-                    : 'border-transparent text-muted-foreground hover:border-blue-500 hover:text-foreground'
+                    ? 'border-primary text-foreground'
+                    : 'border-transparent text-muted-foreground hover:border-primary hover:text-foreground'
                 }`
               }
             >
