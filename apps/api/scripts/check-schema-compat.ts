@@ -24,14 +24,6 @@ import { check_compat, initSync } from 'jsoncompat';
 const require = createRequire(import.meta.url);
 initSync({ module: readFileSync(require.resolve('jsoncompat/jsoncompat_wasm_bg.wasm')) });
 
-// A web snapshot directory normally has the same name as the feature directory
-// its Zod source sits in. `genshin-collection` is the lone exception: it is named
-// for the zustand `persist` store, and renaming the directory to match would read
-// as a deleted snapshot to the check below.
-const WEB_SOURCE_DIR_EXCEPTIONS: Record<string, string> = {
-  'genshin-collection': 'characters',
-};
-
 // Each committed snapshot root, paired with a resolver from a snapshot directory
 // and version back to the Zod source file named in violation messages.
 const SNAPSHOT_ROOTS: ReadonlyArray<{
@@ -45,8 +37,14 @@ const SNAPSHOT_ROOTS: ReadonlyArray<{
   },
   {
     prefix: 'apps/web/schema-snapshots',
-    sourceFor: (feature, version) =>
-      `apps/web/src/features/collection/${WEB_SOURCE_DIR_EXCEPTIONS[feature] ?? feature}/schemas/${version}.ts`,
+    sourceFor: (snapshotDir, version) => {
+      // Snapshot directories are named for the feature directory their Zod
+      // source sits in, so the two agree everywhere but `genshin-collection`.
+      // That one is named for the zustand `persist` store it belongs to, and
+      // renaming it now would read as a deleted snapshot to the check below.
+      const feature = snapshotDir === 'genshin-collection' ? 'characters' : snapshotDir;
+      return `apps/web/src/features/collection/${feature}/schemas/${version}.ts`;
+    },
   },
 ];
 
