@@ -10,12 +10,16 @@ import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import { Container } from '@/components/chrome/container';
+import { signInWithGoogle } from '@/features/auth';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
 import { WeaponCard } from '@/features/collection/weapons/weapon-card';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
 import { WeaponInstanceSidebar } from '@/features/collection/weapons/weapon-instance-sidebar';
+
+/** Longer than the 4s default: the toast asks the user to act, not just to read. */
+const AUTH_TOAST_DURATION_MS = 10_000;
 
 export function WeaponsPage(): JSX.Element {
   const {
@@ -84,7 +88,10 @@ export function WeaponsPage(): JSX.Element {
       }
 
       if (!isAuthenticated) {
-        toast.info('Sign in to manage your weapon collection.');
+        toast.info('Sign in to manage your weapon collection.', {
+          action: { label: 'Sign in', onClick: () => void signInWithGoogle() },
+          duration: AUTH_TOAST_DURATION_MS,
+        });
         return;
       }
 
