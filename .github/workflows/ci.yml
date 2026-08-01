@@ -127,6 +127,37 @@ jobs:
           SCHEMA_COMPAT_BASE: origin/${{ github.base_ref }}
         run: pnpm --filter @genshin/api schemas:check
 
+  # Smoke-tests the root `pnpm dev` script — the one command a contributor runs
+  # to bring up the whole stack (web, API, Firebase emulators). The e2e job below
+  # hits the same services but through playwright.config.ts's own orchestration;
+  # only this job exercises the root script and the turbo `dev` graph.
+  dev-smoke:
+    name: Smoke-test dev stack
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      # renovate: datasource=java-version depName=java
+      JAVA_VERSION: '21'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      # The Firestore emulator is a Java process.
+      - name: Set up Java
+        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Verify dev stack starts
+        run: bash scripts/verify-dev.sh
+
   # Drives a real browser through the assembled stack — Firebase emulators, the
   # API, and the Vite dev server. Separate from the workspace job because it is
   # the only check needing a JDK and a browser, and turbo cannot schedule either.
