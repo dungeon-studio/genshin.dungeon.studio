@@ -31,8 +31,7 @@ export function mergeCollections(
   return merged;
 }
 
-// The entries a merge would advance on the server: owned locally but missing
-// there, or owned locally at a higher constellation level.
+// Local entries the server is missing or behind on.
 export function mergeDiffs(
   local: Record<CharacterId, CollectionCharacter>,
   server: Record<CharacterId, CollectionCharacter>,

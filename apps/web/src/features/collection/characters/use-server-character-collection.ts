@@ -17,13 +17,12 @@ import {
   useSetConstellationLevelMutation,
 } from './use-character-collection-api';
 
-// Stable identity so an unresolved query doesn't hand consumers a fresh object
-// on every render.
+// Stable identity so an unresolved query doesn't hand consumers a new object
+// each render.
 const NO_CHARACTERS: Record<CharacterId, CollectionCharacter> = {};
 
-// The signed-in half of the collection: the query cache answers reads, and the
-// mutations own the optimistic write and its rollback. Inert while `user` is
-// null, since both the query and the mutations key off the uid.
+// The signed-in half of UseCollectionResult. Inert while `user` is null: the
+// query and every mutation key off the uid.
 export function useServerCollection(user: User | null): UseCollectionResult {
   const queryClient = useQueryClient();
 
@@ -34,8 +33,8 @@ export function useServerCollection(user: User | null): UseCollectionResult {
 
   const characters = data ?? NO_CHARACTERS;
 
-  // Guards read the cache rather than the render snapshot, so a burst of clicks
-  // in one tick sees the optimistic writes its predecessors already made.
+  // Guards read the cache, not the render snapshot, so a burst of clicks in one
+  // tick sees its predecessors' optimistic writes.
   const currentCharacters = useCallback(
     () =>
       queryClient.getQueryData<Record<CharacterId, CollectionCharacter>>(

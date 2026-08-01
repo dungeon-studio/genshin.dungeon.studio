@@ -20,12 +20,9 @@ export interface UseCollectionResult {
   error: Error | null;
 }
 
-// Collection state is split along the authentication boundary. Anonymous users
-// get the persisted zustand store; authenticated users get the TanStack Query
-// cache, which handles optimistic updates and rollback natively. Signing in
-// merges the local collection up once and then empties the store, so the two
-// halves never both hold data. Both are hooks, so both run every render and
-// only the result is chosen between.
+// The two halves never both hold data: signing in merges the local collection
+// up and empties the store. Both are hooks, so both run every render and only
+// the result is chosen.
 export function useCollection(): UseCollectionResult {
   const { user, loading: authLoading } = useAuth();
 

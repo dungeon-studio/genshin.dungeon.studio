@@ -23,9 +23,8 @@ import { useCollectionStore } from './use-character-collection-store';
 const SKIRK = 'skirk' as CharacterId;
 const ESCOFFIER = 'escoffier' as CharacterId;
 
-// A collection that mutations actually change, so a refetch reflects what the
-// preceding PUT or DELETE did. The authenticated read layer is the server, so
-// stateless handlers would report every write as immediately lost.
+// A collection that mutations actually change, so a refetch reflects the
+// preceding PUT or DELETE.
 function fakeServerCollection(initial: CollectionCharacter[] = []) {
   const characters = new Map(initial.map((character) => [character.characterId, character]));
   const requests = { get: 0, put: 0, delete: 0 };
@@ -100,7 +99,6 @@ describe('useCollection anonymous', () => {
 
 describe('useCollection merge-on-first-login', () => {
   it('pushes the local collection to the server, then empties the local store', async () => {
-    // Anonymous local collection built before signing in.
     useCollectionStore.getState().addCharacter(SKIRK);
     useCollectionStore.getState().setConstellationLevel(SKIRK, 3);
 
@@ -125,7 +123,7 @@ describe('useCollection merge-on-first-login', () => {
       wrapper: createWrapper({ user: fakeUser('user-1') }),
     });
 
-    // The merge push settles and invalidates, which refetches.
+    // The merge push settles, invalidates, and refetches.
     await waitFor(() => expect(api.requests.put).toBe(1));
     await waitFor(() => expect(api.requests.get).toBeGreaterThanOrEqual(2));
 

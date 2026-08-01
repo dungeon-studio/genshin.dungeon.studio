@@ -16,8 +16,7 @@ export interface MutationResult {
   entry: CollectionCharacter;
 }
 
-// Snapshot of the collection cache taken before an optimistic write, restored
-// verbatim if the mutation fails.
+// The cache snapshot TanStack Query threads from onMutate to onError.
 interface RollbackContext {
   previous: CharacterRecord | undefined;
 }
@@ -52,8 +51,7 @@ function parseSingleCharacterResponse(response: unknown): MutationResult {
   };
 }
 
-// Ownership and constellation level are the same PUT; adding is the minimum
-// level.
+// The API has no separate add: ownership is a PUT of a constellation level.
 async function putCharacter(characterId: CharacterId, level: number): Promise<MutationResult> {
   const response = await apiPut(`/api/characters/${encodeURIComponent(characterId)}`, {
     constellationLevel: level,
@@ -83,10 +81,8 @@ function withoutCharacter(current: CharacterRecord, characterId: CharacterId): C
   return next;
 }
 
-// Every collection mutation shares one lifecycle: write the expected result to
-// the cache, restore the pre-write snapshot if the request fails, and refetch
-// once it settles so the server has the last word. Callers supply only the
-// request and the cache edit.
+// Callers supply only the request and the cache edit. Invalidation is on
+// settled rather than success so a rolled-back failure refetches too.
 function useCollectionMutation<TVariables, TResult>(
   userId: string | undefined,
   mutationFn: (variables: TVariables) => Promise<TResult>,
@@ -98,8 +94,7 @@ function useCollectionMutation<TVariables, TResult>(
   return useMutation({
     mutationFn,
     onMutate: async (variables) => {
-      // Cancel in-flight refetches so a resolving GET can't land on top of the
-      // optimistic write.
+      // A resolving GET would otherwise land on top of the optimistic write.
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData<CharacterRecord>(queryKey);
       queryClient.setQueryData<CharacterRecord>(queryKey, optimistic(previous ?? {}, variables));

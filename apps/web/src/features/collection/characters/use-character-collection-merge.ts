@@ -11,19 +11,17 @@ import {
 } from './use-character-collection-api';
 import { mergeDiffs, useCollectionStore } from './use-character-collection-store';
 
-// Carries the anonymous collection across the authentication boundary: on the
-// first resolved query of a session the local entries the server doesn't have
-// are pushed up, and the local copy is dropped once they land. A failed push
-// keeps that copy so the next sign-in for the account retries it.
+// Carries the anonymous collection across the authentication boundary. A failed
+// push keeps the local copy, so the next sign-in for the account retries it.
 export function useMergeOnSignIn(user: User | null, authLoading: boolean): void {
   const clearCharacters = useCollectionStore((s) => s.clearCharacters);
   const { data: serverCharacters } = useCharacterCollectionQuery(user?.uid);
   const { mutate: setConstellationLevel } = useSetConstellationLevelMutation(user?.uid);
 
-  // The uid already merged, so a refetch or re-render doesn't push twice.
+  // The uid already merged, so a refetch doesn't push twice.
   const mergedForUser = useRef<string | null>(null);
-  // The uid last seen signed in, so a sign-out is distinguished from the
-  // signed-out state that precedes auth resolving.
+  // The uid last seen signed in. Firebase reports no user while it restores a
+  // session, so that state alone doesn't mean a sign-out.
   const signedInUser = useRef<string | null>(null);
 
   // Drop local data on sign-out so the next account to sign in on this browser

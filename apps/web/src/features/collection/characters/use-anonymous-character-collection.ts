@@ -7,8 +7,8 @@ import { useCallback } from 'react';
 import type { UseCollectionResult } from './use-character-collection';
 import { useCollectionStore } from './use-character-collection-store';
 
-// The signed-out half of the collection: the persisted store answers reads and
-// takes writes directly, with no request to roll back and nothing to load.
+// The signed-out half of UseCollectionResult. Nothing to load and no request to
+// fail, so isLoading and error are constant.
 export function useAnonymousCollection(): UseCollectionResult {
   const characters = useCollectionStore((s) => s.characters);
   const addCharacter = useCollectionStore((s) => s.addCharacter);
