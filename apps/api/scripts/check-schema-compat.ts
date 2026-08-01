@@ -111,6 +111,8 @@ const violations: string[] = [];
 // beyond the base carry no compatibility constraint.
 for (const { prefix, sourceFor } of SNAPSHOT_ROOTS) {
   for (const path of snapshotPathsAt(baseRef, prefix)) {
+    if (RETIRED_SNAPSHOTS.has(path)) continue;
+
     const base = showAt(baseRef, path);
     if (base === null) continue; // race-proofing; ls-tree already filtered to base.
 
@@ -119,8 +121,6 @@ for (const { prefix, sourceFor } of SNAPSHOT_ROOTS) {
       .replace(/\.json$/, '')
       .split('/');
     const source = sourceFor(repository, version);
-
-    if (RETIRED_SNAPSHOTS.has(path)) continue;
 
     let head: string;
     try {

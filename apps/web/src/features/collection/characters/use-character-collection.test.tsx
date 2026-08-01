@@ -111,4 +111,57 @@ describe('useCollection mutations', () => {
     await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
     expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
   });
+
+  it('drops an added character when the write fails', async () => {
+    server.use(
+      http.get('http://localhost:8080/api/characters', () =>
+        HttpResponse.json(charactersDocument([])),
+      ),
+      http.put(
+        'http://localhost:8080/api/characters/skirk',
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    const { result } = renderHook(() => useCollection(), {
+      wrapper: createWrapper({ user: fakeUser('user-1') }),
+    });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => {
+      result.current.addCharacter(SKIRK);
+    });
+
+    // Optimistically owned, then withdrawn once the write errors.
+    expect(result.current.getCharacter(SKIRK)).toBeDefined();
+    await waitFor(() => expect(result.current.getCharacter(SKIRK)).toBeUndefined());
+    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+  });
+
+  it('restores the prior constellation level when the update fails', async () => {
+    server.use(
+      http.get('http://localhost:8080/api/characters', () =>
+        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 3)])),
+      ),
+      http.put(
+        'http://localhost:8080/api/characters/skirk',
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    const { result } = renderHook(() => useCollection(), {
+      wrapper: createWrapper({ user: fakeUser('user-1') }),
+    });
+
+    await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
+
+    act(() => {
+      result.current.setConstellationLevel(SKIRK, 5);
+    });
+
+    expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(5);
+    await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
+    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+  });
 });

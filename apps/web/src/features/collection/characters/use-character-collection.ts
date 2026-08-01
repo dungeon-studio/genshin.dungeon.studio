@@ -73,32 +73,50 @@ export function useCollection(): UseCollectionResult {
     replaceCharacters(apiCharacters);
   }, [apiCharacters, replaceCharacters]);
 
-  // Mutation error strategy: optimistic rollback + toast notification.
-  // Each mutation writes to zustand first for instant UI feedback, then fires
-  // the API call. On failure the onError callback rolls back the zustand change
-  // only if the store still reflects this mutation's optimistic value (guards
-  // against races from rapid user interactions). Errors are surfaced via toast
-  // side-effects — no retry is attempted.
+  // The live entry, not the render-time `characters` snapshot: mutation
+  // callbacks run after the request settles and must see the current value.
+  const currentCharacter = useCallback(
+    (id: CharacterId) => useCollectionStore.getState().characters[id],
+    [],
+  );
+
+  /**
+   * Reports a failed mutation, undoing its optimistic write first if that write
+   * is still what the store holds.
+   *
+   * Rapid interactions can supersede an in-flight mutation, and reverting to a
+   * value the user has already moved on from is worse than leaving the next
+   * refetch to settle it. No retry is attempted either way.
+   */
+  const reportFailure = useCallback(
+    (action: string, isStillOptimistic: () => boolean, revert: () => void) => {
+      if (isStillOptimistic()) {
+        revert();
+        toast.error(`Failed to ${action}. Change has been reverted.`);
+      } else {
+        toast.error(`Failed to ${action}.`);
+      }
+    },
+    [],
+  );
+
+  // Each mutation writes to zustand first for instant feedback, then fires the
+  // API call and reconciles on the response.
 
   const addCharacter = useCallback(
     (id: CharacterId) => {
       if (!isAuthenticated) return;
-
-      const alreadyOwned = id in useCollectionStore.getState().characters;
-      if (alreadyOwned) return;
+      if (currentCharacter(id)) return;
 
       storeAddCharacter(id);
       addCharacterApi(id, {
         onSuccess: applyMutationResult,
-        onError: () => {
-          const current = useCollectionStore.getState().characters[id];
-          if (current && current.constellationLevel === MIN_CONSTELLATION_LEVEL) {
-            storeRemoveCharacter(id);
-            toast.error('Failed to add character. Change has been reverted.');
-          } else {
-            toast.error('Failed to add character.');
-          }
-        },
+        onError: () =>
+          reportFailure(
+            'add character',
+            () => currentCharacter(id)?.constellationLevel === MIN_CONSTELLATION_LEVEL,
+            () => storeRemoveCharacter(id),
+          ),
       });
     },
     [
@@ -107,6 +125,8 @@ export function useCollection(): UseCollectionResult {
       storeAddCharacter,
       storeRemoveCharacter,
       applyMutationResult,
+      currentCharacter,
+      reportFailure,
     ],
   );
 
@@ -114,21 +134,20 @@ export function useCollection(): UseCollectionResult {
     (id: CharacterId) => {
       if (!isAuthenticated) return;
 
-      const current = useCollectionStore.getState().characters[id];
-      if (!current) return;
+      const previous = currentCharacter(id);
+      if (!previous) return;
 
       storeRemoveCharacter(id);
       removeCharacterApi(id, {
-        onError: () => {
-          const stillAbsent = !(id in useCollectionStore.getState().characters);
-          if (stillAbsent) {
-            storeAddCharacter(id);
-            storeSetConstellationLevel(id, current.constellationLevel);
-            toast.error('Failed to remove character. Change has been reverted.');
-          } else {
-            toast.error('Failed to remove character.');
-          }
-        },
+        onError: () =>
+          reportFailure(
+            'remove character',
+            () => currentCharacter(id) === undefined,
+            () => {
+              storeAddCharacter(id);
+              storeSetConstellationLevel(id, previous.constellationLevel);
+            },
+          ),
       });
     },
     [
@@ -137,6 +156,8 @@ export function useCollection(): UseCollectionResult {
       storeRemoveCharacter,
       storeAddCharacter,
       storeSetConstellationLevel,
+      currentCharacter,
+      reportFailure,
     ],
   );
 
@@ -144,7 +165,7 @@ export function useCollection(): UseCollectionResult {
     (id: CharacterId, level: number) => {
       if (!isAuthenticated) return;
 
-      const previousLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
+      const previousLevel = currentCharacter(id)?.constellationLevel;
       if (previousLevel === undefined || previousLevel === level) return;
 
       storeSetConstellationLevel(id, level);
@@ -152,19 +173,23 @@ export function useCollection(): UseCollectionResult {
         { characterId: id, level },
         {
           onSuccess: applyMutationResult,
-          onError: () => {
-            const currentLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
-            if (currentLevel === level) {
-              storeSetConstellationLevel(id, previousLevel);
-              toast.error('Failed to update constellation level. Change has been reverted.');
-            } else {
-              toast.error('Failed to update constellation level.');
-            }
-          },
+          onError: () =>
+            reportFailure(
+              'update constellation level',
+              () => currentCharacter(id)?.constellationLevel === level,
+              () => storeSetConstellationLevel(id, previousLevel),
+            ),
         },
       );
     },
-    [isAuthenticated, setConstellationLevelApi, storeSetConstellationLevel, applyMutationResult],
+    [
+      isAuthenticated,
+      setConstellationLevelApi,
+      storeSetConstellationLevel,
+      applyMutationResult,
+      currentCharacter,
+      reportFailure,
+    ],
   );
 
   const isOwned = useCallback((id: CharacterId) => id in characters, [characters]);

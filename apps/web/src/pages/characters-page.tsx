@@ -29,7 +29,6 @@ export function CharactersPage(): JSX.Element {
 
   const [filters, setFilters] = useState<CharacterFilterState>(initialFilterState);
 
-  const ownedCount = Object.keys(characters).length;
   const ownedIds = useMemo(() => new Set(Object.keys(characters)), [characters]);
 
   const { filteredCharacters, filteredOwnedCount } = useMemo(() => {
@@ -53,10 +52,6 @@ export function CharactersPage(): JSX.Element {
     },
     [isAuthenticated, addCharacter],
   );
-
-  function handleConstellationChange(characterId: Character['id'], level: number) {
-    setConstellationLevel(characterId, level);
-  }
 
   if (isLoading) {
     return (
@@ -90,7 +85,7 @@ export function CharactersPage(): JSX.Element {
             onChange={setFilters}
             filteredCount={filteredCharacters.length}
             totalCount={CHARACTERS.length}
-            ownedCount={ownedCount}
+            ownedCount={ownedIds.size}
             filteredOwnedCount={filteredOwnedCount}
           />
         </Container>
@@ -110,7 +105,7 @@ export function CharactersPage(): JSX.Element {
                   constellationLevel={entry?.constellationLevel}
                   onAdd={handleAddCharacter}
                   onRemove={removeCharacter}
-                  onConstellationChange={handleConstellationChange}
+                  onConstellationChange={setConstellationLevel}
                 />
               </div>
             );
