@@ -15,7 +15,12 @@ import { create } from 'zustand';
 interface TeamStoreState {
   teams: Record<TeamSlot, CollectionTeam>;
 
-  assignCharacter: (slot: TeamSlot, memberIndex: number, characterId: string) => void;
+  assignCharacter: (
+    slot: TeamSlot,
+    memberIndex: number,
+    characterId: string,
+    collectionWeaponId?: CollectionWeaponId,
+  ) => void;
   removeCharacter: (slot: TeamSlot, memberIndex: number) => void;
   assignWeapon: (
     slot: TeamSlot,
@@ -37,7 +42,7 @@ interface TeamStoreState {
 export const useTeamStore = create<TeamStoreState>()((set, get) => ({
   teams: initialTeams(),
 
-  assignCharacter: (slot, memberIndex, characterId) => {
+  assignCharacter: (slot, memberIndex, characterId, collectionWeaponId) => {
     if (!isValidMemberIndex(memberIndex)) return;
     const team = get().teams[slot];
     if (team.members.some((m) => m?.characterId === characterId)) return;
@@ -56,15 +61,15 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => ({
       if (existingWeaponId) break;
     }
 
+    const weaponInstanceId = collectionWeaponId ?? existingWeaponId;
+
     set((state) => ({
       teams: {
         ...state.teams,
         [slot]: {
           ...state.teams[slot],
           members: state.teams[slot].members.map((m, i) =>
-            i === memberIndex
-              ? { characterId, ...(existingWeaponId && { weaponInstanceId: existingWeaponId }) }
-              : m,
+            i === memberIndex ? { characterId, ...(weaponInstanceId && { weaponInstanceId }) } : m,
           ) as CollectionTeamMembers,
           updatedAt: nowTimestamp(),
         },

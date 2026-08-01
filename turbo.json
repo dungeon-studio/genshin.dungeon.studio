@@ -15,6 +15,7 @@
       "outputs": ["dist/**", ".next/**", "build/**"]
     },
     "dev": {
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
@@ -26,9 +27,20 @@
       "inputs": ["src/**", "package.json", "vite.config.*", "vitest.config.*", "tsconfig*.json"],
       "env": ["FAST_CHECK_SEED"]
     },
+    "test:e2e": {
+      "dependsOn": ["^build", "@genshin/api#build"],
+      "cache": false
+    },
     "typecheck": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**/*.{ts,tsx}", "package.json", "vite.config.*", "tsconfig*.json"]
+      "inputs": [
+        "src/**/*.{ts,tsx}",
+        "specs/**/*.ts",
+        "package.json",
+        "vite.config.*",
+        "playwright.config.*",
+        "tsconfig*.json"
+      ]
     },
     "schemas:export": {
       "dependsOn": ["^build"],

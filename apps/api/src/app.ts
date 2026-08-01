@@ -11,8 +11,9 @@ import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 
+import { retryAfterSeconds } from '@/http/retry-after.js';
 import type { AuthVariables } from '@/middleware/auth.js';
-import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
+import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { firestoreErrorToHttpException } from '@/repositories/firestore-error.js';
 import { alpsProfiles } from '@/routes/alps-profiles.js';
 import { characters } from '@/routes/characters.js';
@@ -27,7 +28,9 @@ const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.me
 
 export const PROBLEM_JSON = { 'Content-Type': 'application/problem+json' };
 
-export const app = new Hono<{ Variables: Partial<AuthVariables> & NegotiatedContentVariables }>();
+export const app = new Hono<{
+  Variables: Partial<AuthVariables> & NegotiatedResponseContentVariables;
+}>();
 
 // Request logging middleware
 app.use('*', logger());
@@ -51,6 +54,9 @@ app.onError((err, c) => {
   const resolved = err instanceof GoogleError ? firestoreErrorToHttpException(err) : err;
 
   if (resolved instanceof HTTPException) {
+    const headers: Record<string, string> = { ...PROBLEM_JSON };
+    const retryAfter = retryAfterSeconds(resolved.status);
+    if (retryAfter !== undefined) headers['Retry-After'] = String(retryAfter);
     return c.json(
       {
         type: 'about:blank',
@@ -58,7 +64,7 @@ app.onError((err, c) => {
         status: resolved.status,
         detail: resolved.message,
       } satisfies ProblemDetail,
-      { status: resolved.status, headers: PROBLEM_JSON },
+      { status: resolved.status, headers },
     );
   }
 

@@ -65,34 +65,18 @@ pnpm dev
 > [Configure Firestore credentials](docs/how-tos/configure-firestore-credentials.md)
 > for setup instructions.
 
-### Building and running the Docker image
-
-To build the API Docker image locally:
-
-```bash
-docker build -f apps/api/Dockerfile -t genshin-api:local .
-```
-
-To run it:
-
-```bash
-docker run -p 8080:8080 genshin-api:local
-```
-
-The API is available at `http://localhost:8080`. See [apps/api/Dockerfile](apps/api/Dockerfile) for build details and [.github/workflows/](.github/workflows/) for CI/CD pipeline information.
-
 ### Quality checks overview
 
-Pre-commit enforces formatting, linting, documentation, and hygiene checks on every commit and on pull requests. If checks fail, fix the issues—see the Code quality section below for guidance.
+Pre-commit enforces formatting, linting, documentation, and hygiene checks on every commit and on pull requests. If checks fail, fix the issues—see [Code quality](#code-quality) for the tools involved.
 
-### Quality gate ownership
+### What your pull request has to pass
 
-- pre-commit.ci is the authoritative runner for hooks that it can run in its environment.
-- [.github/workflows/pre-commit.yml](.github/workflows/pre-commit.yml) runs only hooks that can't run in pre-commit.ci.
-- [.github/workflows/ci.yml](.github/workflows/ci.yml) runs build and type check jobs for apps and packages.
-- [.github/workflows/link-check.yml](.github/workflows/link-check.yml) blocks pull requests on broken internal documentation links ([lychee](https://lychee.cli.rs), offline); [.github/workflows/external-link-check.yml](.github/workflows/external-link-check.yml) checks external URLs weekly and reports breakage via a GitHub issue.
-- [.github/workflows/secret-scan.yml](.github/workflows/secret-scan.yml) blocks pull requests that introduce verified secrets ([TruffleHog](https://github.com/trufflesecurity/trufflehog)).
-- Feature work adds tests and enforces them when it introduces testable behavior.
+- Every pre-commit hook. Run `pre-commit install` once, and the same hooks run on each commit that CI runs over the whole tree—so a clean commit is a clean build. `pre-commit run --all-files` reproduces CI exactly.
+- The workspace build and tests: `pnpm turbo run typecheck test build`.
+- The end-to-end suite in `tools/e2e`: `pnpm turbo run test:e2e`. It starts the Firebase emulators, the API, and the dev server itself, so stop any `pnpm dev` first—in this checkout or any other worktree—or the emulators fail to bind.
+- Feature work adds tests when it introduces testable behavior.
+
+Broken external URLs are the one exception: a weekly run files them as a GitHub issue rather than blocking a pull request, since transient outages would make that check flaky. For which workflow runs what, see [workflow conventions](docs/reference/workflow-conventions.md).
 
 **Commit types**. Use these prefixes in your commit messages:
 
@@ -124,6 +108,7 @@ Pre-commit hooks automatically enforce key checks, including:
 - Documentation and config linting for Markdown, YAML, and prose
 - Safety and repository hygiene checks for merge conflict markers, large files, trailing whitespace, line endings, and YAML/JSON validation
 - Exact dependency versions via [syncpack](https://jamiemason.github.io/syncpack/): `package.json` dependencies stay pinned with no `^` or `~` ranges. Run `pnpm exec syncpack fix` to pin offenders
+- SPDX license headers via [REUSE](https://reuse.software/): every source file needs one—see [Add SPDX headers](docs/how-tos/add-spdx-headers.md)
 
 Pull requests must pass type checks in [ci.yml](.github/workflows/ci.yml). Run type checks locally before committing when your change affects TypeScript code:
 
@@ -131,42 +116,7 @@ Pull requests must pass type checks in [ci.yml](.github/workflows/ci.yml). Run t
 pnpm typecheck
 ```
 
-### Source file headers
-
-All source files require SPDX headers per the [REUSE Specification](https://reuse.software/). Use `reuse addheader` or check [REUSE docs](https://reuse.software/tutorial/) for details.
-
-### Code comments
-
-For complex logic, decisions, or subtle patterns:
-
-- Decisions and trade-offs—why you chose this approach
-- Workarounds—temporary fixes with issue references
-- Performance-sensitive code—explain the optimization
-- External dependencies—integration quirks or API specifics
-
-### Documentation strategy
-
-When documenting decisions or conventions, prefer the highest-priority location that fits:
-
-1. **Inline comments**: explain _why_ code works a certain way.
-2. **Documentation strings**: explain module or function purpose when the name isn't sufficient.
-3. **`docs/`**: task-specific how-tos, references, and explanations following the [Diátaxis](https://diataxis.fr/) framework.
-4. **`CONTRIBUTING.md`**: high-level human workflow guidance and project conventions.
-5. **`.github/copilot-instructions.md`**: AI-specific decision rules.
-
-Avoid duplicating the same guidance across multiple locations. Place it once at the most appropriate level and link to it from others.
-
-### Naming conventions
-
-Use descriptive, specific names for files and modules. Avoid generic names like "helpers." For example, name a shared test auth module `auth-requests.ts`, not `helpers.ts`.
-
-### Shared types
-
-Branded types in `packages/domain/` each get their own file (for example, `uuid.ts`, `iso-timestamp.ts`). Export both the type and any related validation functions from the same file.
-
-### Test utilities
-
-Shared API test utilities live in `apps/api/src/test/` with descriptive file names. The build excludes this directory via `tsconfig.build.json`.
+For code conventions—comments, documentation strategy, naming, shared types, test utilities, and platform compatibility—see [Code conventions](docs/reference/code-conventions.md).
 
 ---
 
@@ -182,24 +132,6 @@ Shared API test utilities live in `apps/api/src/test/` with descriptive file nam
 ---
 
 ## Pull request workflow
-
-### Branch flow for infrastructure
-
-Infrastructure automation follows this branch strategy:
-
-- `develop`: integration branch
-- `release/*`: release-train branches cut from `develop`
-- `main`: long-term release target branch, used when production flow is active
-
-Current Terraform workflow routing:
-
-- push to `develop`: applies `core` then `dev`
-- push to `release/*`: applies `core` then `staging`
-- pull requests to `develop`, `release/*`, and `main`: run Terraform plan checks
-
-When creating release branches, derive the name from the root `package.json` version using SemVer2 context and always include both the release date and short hash token, for example:
-
-- `release/0.1.0-20260221.d24af0f`
 
 ### Branch naming
 
@@ -241,20 +173,16 @@ When your pull request changes something a user of the deployed app would notice
 
 ---
 
-## Platform compatibility
-
-This project runs on Windows, macOS, and Linux.
-
-- Use Node.js `path` module for paths, not hardcoded `/` or `\`
-- Use cross-platform approaches for file operations
-- Avoid OS-specific environment variables
-
-### Detailed guides
+## Detailed guides
 
 For step-by-step instructions and technical details:
 
 - [Manual Setup Guide](docs/how-tos/manual-setup.md): Development environment setup without DevContainers
+- [Build the API Docker image](docs/how-tos/build-api-docker-image.md): Build and run the `apps/api` container locally
 - [Add Terraform Environment](docs/how-tos/add-terraform-environment.md): Bootstrap, scaffold, lock file, and workflow updates for new environments
+- [Infrastructure branch flow](docs/reference/infrastructure-branch-flow.md): How branches map to environments and Terraform actions
+- [Code conventions](docs/reference/code-conventions.md): Naming, shared types, test utilities, documentation strategy, and platform compatibility
+- [Workflow conventions](docs/reference/workflow-conventions.md): How workflows and jobs are named, which branches get push runs, and how tool versions are pinned
 - [REST API conventions](docs/reference/rest-api-conventions.md): Route design, method semantics, status codes, error shape, and pagination
 
 ---

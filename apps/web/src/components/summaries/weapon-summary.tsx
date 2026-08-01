@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import type { Weapon, WeaponType } from '@genshin/game-data';
-import { CircleHelp } from 'lucide-react';
 import type { JSX } from 'react';
 
+import { ThemedIcon } from '@/components/ui/themed-icon';
 import { cn } from '@/lib/utils';
 import { getWeaponTypeIconPath } from '@/lib/weapon-types';
+
+import { EmptyItemIcon } from './empty-item-icon';
+import { ICON_SLOT, ItemSummary } from './item-summary';
 
 interface WeaponSummaryProps {
   /** Static weapon definition (name, rarity, type), not a collection instance. */
@@ -26,64 +29,24 @@ export function WeaponSummary({
   dimmed = false,
 }: WeaponSummaryProps): JSX.Element {
   const iconType = weapon?.type ?? weaponType;
+  const dimIcon = !weapon || dimmed;
 
-  if (!iconType) {
-    return (
-      <>
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground opacity-30">
-          <CircleHelp className="h-5 w-5" aria-hidden="true" focusable={false} />
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-muted-foreground">No weapon</p>
-        </div>
-      </>
-    );
-  }
+  const icon = iconType ? (
+    <ThemedIcon
+      lightSrc={getWeaponTypeIconPath(iconType, 'light')}
+      darkSrc={getWeaponTypeIconPath(iconType, 'dark')}
+      alt=""
+      className={cn(ICON_SLOT, dimIcon && 'opacity-30')}
+    />
+  ) : (
+    <EmptyItemIcon shape="square" />
+  );
 
   return (
-    <>
-      <img
-        src={getWeaponTypeIconPath(iconType, 'light')}
-        alt=""
-        aria-hidden="true"
-        loading="lazy"
-        decoding="async"
-        className={cn(
-          'h-10 w-10 shrink-0 dark:hidden',
-          !weapon && 'opacity-30',
-          dimmed && 'opacity-30',
-        )}
-      />
-      <img
-        src={getWeaponTypeIconPath(iconType, 'dark')}
-        alt=""
-        aria-hidden="true"
-        loading="lazy"
-        decoding="async"
-        className={cn(
-          'hidden h-10 w-10 shrink-0 dark:block',
-          !weapon && 'opacity-30',
-          dimmed && 'opacity-30',
-        )}
-      />
-
-      <div className="min-w-0 flex-1">
-        {weapon ? (
-          <>
-            <p className="truncate text-sm font-semibold text-card-foreground">{weapon.name}</p>
-            <p className="truncate text-xs text-muted-foreground">
-              <span className="text-geo-dark" aria-hidden="true">
-                {weapon.rarity}★
-              </span>
-              <span className="sr-only">{weapon.rarity}-star</span>
-              {` · ${weapon.type}`}
-            </p>
-          </>
-        ) : (
-          <p className="truncate text-sm font-semibold text-muted-foreground">No weapon</p>
-        )}
-      </div>
-    </>
+    <ItemSummary
+      icon={icon}
+      item={weapon && { name: weapon.name, rarity: weapon.rarity, metadata: weapon.type }}
+      emptyLabel="No weapon"
+    />
   );
 }

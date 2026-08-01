@@ -17,33 +17,6 @@ exclude: |
     pnpm-lock\.yaml         # Package lockfile
   )
 
-ci:
-  # NOTE: This 'skip' list ONLY affects pre-commit.ci (hosted CI service).
-  # pre-commit.ci is authoritative for hooks it can run in its environment.
-  #
-  # GitHub Actions runs hooks via a dedicated local-hooks workflow to avoid
-  # duplicating hook execution across systems:
-  # 1. pre-commit.yml (hooks that cannot run in pre-commit.ci)
-  # 2. ci.yml (typecheck + build)
-  # Skip hooks here that are handled by pre-commit.yml or other workflows.
-  # Keep this list in sync with workflow ownership documented in CONTRIBUTING.md.
-  skip:
-    - eslint
-    - prettier
-    - stylelint
-    - typescript-check
-    - knip
-    - terraform_fmt
-    - terraform_trivy
-    - renovate-config-validator
-    - hadolint
-    - ls-lint
-    - syncpack
-    - schema-snapshots
-    # lychee is a binary not installable in pre-commit.ci; its CI coverage
-    # lives in link-check.yml, not pre-commit.yml.
-    - lychee
-
 repos:
   # Basic file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -76,7 +49,7 @@ repos:
 
   # Markdown linting
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.22.1
+    rev: v0.23.2
     hooks:
       - id: markdownlint-cli2
         args: [--fix]
@@ -90,7 +63,7 @@ repos:
 
   # Vale - Prose linting
   - repo: https://github.com/errata-ai/vale
-    rev: v3.14.2
+    rev: v3.15.2
     hooks:
       - id: vale
         args: [--config=.vale.ini]
@@ -98,7 +71,7 @@ repos:
 
   # Terraform - Infrastructure as Code
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.105.0
+    rev: v1.108.1
     hooks:
       - id: terraform_fmt
         args: [--args=-recursive]
@@ -113,17 +86,17 @@ repos:
       - id: reuse
         always_run: true
 
-  # GitHub Actions static analysis. Offline gate here (local + pre-commit.ci);
-  # online supply-chain audits run in .github/workflows/zizmor.yml with a token.
+  # GitHub Actions static analysis. Offline gate here; online supply-chain
+  # audits need a token and run in ci.yml's workflows job.
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.26.1
+    rev: v1.28.0
     hooks:
       - id: zizmor
         args: [--no-progress, --offline]
 
   # Renovate config validation
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 43.150.0
+    rev: 43.287.0
     hooks:
       - id: renovate-config-validator
         args: [--strict, --no-global]
@@ -161,9 +134,8 @@ repos:
         pass_filenames: false
         stages: [manual]
 
-      # knip analyzes the whole workspace graph, so it can't be file-scoped;
-      # it runs on every commit (always_run) like ls-lint. Fast enough (~1s)
-      # to gate commits. CI runs it via the same hook in pre-commit.yml.
+      # knip analyzes the whole workspace graph, so it can't be file-scoped and
+      # runs on every commit.
       - id: knip
         name: knip (unused files, dependencies, exports)
         entry: pnpm exec knip
@@ -177,12 +149,20 @@ repos:
         language: system
         types: [dockerfile]
 
+      # Offline resolves on-disk paths and makes no network request, so it
+      # gates every commit and every pull request. The weekly external sweep
+      # stays an action for its issue reporting. Upstream's auto-installing
+      # hook is unusable here: cargo-binstall fetches a glibc build that needs
+      # GLIBC_2.38, newer than some contributor machines.
       - id: lychee
         name: lychee (internal links)
         entry: lychee --offline --no-progress
         language: system
         types: [markdown]
 
+      # ls-lint's ignore list filters its findings but does not prune its walk,
+      # so it traverses node_modules to validate the tracked files and takes
+      # seconds rather than milliseconds.
       - id: ls-lint
         name: file naming conventions
         entry: pnpm exec ls-lint

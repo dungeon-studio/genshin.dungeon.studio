@@ -1,0 +1,23 @@
+{
+  "name": "@genshin/e2e",
+  "version": "0.0.0",
+  "description": "End-to-end suite driving the web app against the API and the Firebase emulators",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "eslint .",
+    "test:e2e": "firebase --config ../../firebase.json emulators:exec --only auth,firestore --project demo-dungeon-studio-genshin-dev 'playwright test'",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@genshin/game-data": "workspace:*",
+    "@playwright/test": "1.62.0"
+  },
+  "devDependencies": {
+    "@genshin/eslint-config": "workspace:*",
+    "@types/node": "25.9.5",
+    "@typescript/native": "npm:typescript@7.0.2",
+    "eslint": "10.8.0",
+    "typescript": "npm:@typescript/typescript6@6.0.2"
+  }
+}

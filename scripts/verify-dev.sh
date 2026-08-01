@@ -4,10 +4,10 @@
 
 # Smoke-test the local dev stack: start `pnpm dev` and confirm the web server,
 # API server, and Firebase emulators all come up. Complements the production
-# checks in apps/{web,api}/scripts/verify-deployment.*. Requires the workspace
-# library packages to be built first (the `dev` turbo task has no `^build`, and
-# `@genshin/*` resolve to their `dist/` output) and Java on PATH for the
-# emulators.
+# checks in apps/{web,api}/scripts/verify-deployment.*. `pnpm dev` runs the
+# Firebase emulators (which need Java on PATH) wrapping `turbo run dev`, whose
+# `^build` dependency builds the `@genshin/*` libraries to their `dist/` output
+# before the dev servers resolve them.
 
 set -euo pipefail
 
@@ -19,8 +19,8 @@ TIMEOUT="${TIMEOUT_SECONDS:-30}"
 LOG=$(mktemp)
 
 # Job control puts the backgrounded stack in its own process group (PGID equal
-# to its PID), so cleanup can signal every child (concurrently, firebase, vite,
-# tsx) in one shot rather than just the `pnpm` parent.
+# to its PID), so cleanup can signal every child (firebase, the turbo `dev`
+# tasks, vite, tsx) in one shot rather than just the `pnpm` parent.
 set -m
 pnpm dev >"$LOG" 2>&1 &
 DEV_PGID=$!

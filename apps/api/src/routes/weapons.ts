@@ -7,10 +7,11 @@ import { serialiseWeapon, weaponItemHref, weaponRepresentation } from '@genshin/
 import { getWeaponById } from '@genshin/game-data';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import type { FromSchema } from 'json-schema-to-ts';
 
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
-import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
+import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
@@ -23,7 +24,7 @@ import * as Weapons from '@/repositories/weapons/index.js';
 
 export const weapons = new Hono<{
   Variables: AuthVariables &
-    NegotiatedContentVariables &
+    NegotiatedResponseContentVariables &
     NegotiatedRequestSchemaVariables &
     ValidatedRequestBodyVariables;
 }>();
@@ -32,14 +33,8 @@ weapons.use('*', auth);
 
 weapons.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: weaponItemV1 }]));
 
-interface CreateWeaponBody {
-  weaponId: string;
-  refinementLevel: number;
-}
-
-interface UpdateWeaponBody {
-  refinementLevel: number;
-}
+type CreateWeaponBody = FromSchema<typeof weaponPostRequestV1.schema>;
+type UpdateWeaponBody = FromSchema<typeof weaponPatchRequestV1.schema>;
 
 // GET /api/weapons — List all weapon instances, optionally filtered by weaponId
 weapons.get('/', async (c) => {

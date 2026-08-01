@@ -31,7 +31,7 @@ export const teamItemV1 = {
           type: 'semantic',
           doc: {
             value:
-              'Team members (exactly 4 character positions; null represents an empty position)',
+              'Team members: a JSON string holding an array of exactly 4 positions (null represents an empty position). Clients parse it to recover the array; the nested descriptors below describe each member.',
           },
           descriptor: [
             {

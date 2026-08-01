@@ -29,6 +29,11 @@ flag_management:
   default_rules:
     carryforward: true
   individual_flags:
+    # Carries the end-to-end suite's test results. It reports no coverage, so
+    # there are no paths, and carryforward stays off to keep an absent report
+    # from being republished as coverage.
+    - name: e2e
+      carryforward: false
     - name: api
       paths:
         - apps/api/src/**
