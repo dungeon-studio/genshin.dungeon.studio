@@ -21,6 +21,13 @@ import { WeaponInstanceSidebar } from '@/features/collection/weapons/weapon-inst
 /** Longer than the 4s default: the toast asks the user to act, not just to read. */
 const AUTH_TOAST_DURATION_MS = 10_000;
 
+function promptSignIn() {
+  toast.info('Sign in to manage your weapon collection.', {
+    action: { label: 'Sign in', onClick: () => void signInWithGoogle() },
+    duration: AUTH_TOAST_DURATION_MS,
+  });
+}
+
 export function WeaponsPage(): JSX.Element {
   const {
     weapons,
@@ -88,10 +95,7 @@ export function WeaponsPage(): JSX.Element {
       }
 
       if (!isAuthenticated) {
-        toast.info('Sign in to manage your weapon collection.', {
-          action: { label: 'Sign in', onClick: () => void signInWithGoogle() },
-          duration: AUTH_TOAST_DURATION_MS,
-        });
+        promptSignIn();
         return;
       }
 

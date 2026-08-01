@@ -10,24 +10,26 @@ import type { Theme } from './theme-context';
 import { useTheme } from './use-theme';
 
 const CYCLE: Theme[] = ['system', 'light', 'dark'];
-const ICONS: Record<Theme, typeof Sun> = { light: Sun, dark: Moon, system: Monitor };
-const LABELS: Record<Theme, string> = {
-  light: 'Light mode',
-  dark: 'Dark mode',
-  system: 'System theme',
+
+// Keyed by Theme so the compiler catches a theme added to the union without a
+// button face to go with it.
+const FACES: Record<Theme, { icon: typeof Sun; label: string }> = {
+  light: { icon: Sun, label: 'Light mode' },
+  dark: { icon: Moon, label: 'Dark mode' },
+  system: { icon: Monitor, label: 'System theme' },
 };
 
 export function ThemeToggle(): JSX.Element {
   const { theme, setTheme } = useTheme();
 
-  const Icon = ICONS[theme];
+  const { icon: Icon, label } = FACES[theme];
 
   function cycle() {
     setTheme(CYCLE[(CYCLE.indexOf(theme) + 1) % CYCLE.length]);
   }
 
   return (
-    <Button variant="ghost" size="icon" onClick={cycle} aria-label={LABELS[theme]}>
+    <Button variant="ghost" size="icon" onClick={cycle} aria-label={label}>
       <Icon className="h-4 w-4" />
     </Button>
   );

@@ -8,10 +8,11 @@ import type { Theme } from './theme-context';
 import { ThemeContext } from './theme-context';
 
 const DARK_QUERY = '(prefers-color-scheme: dark)';
+const STORAGE_KEY = 'theme';
 
-function getStoredTheme(): Theme {
+function readStoredTheme(): Theme {
   try {
-    const stored = localStorage.getItem('theme');
+    const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === 'light' || stored === 'dark') return stored;
   } catch {
     // Storage access blocked (privacy mode / sandboxed iframe)
@@ -19,8 +20,20 @@ function getStoredTheme(): Theme {
   return 'system';
 }
 
+function writeStoredTheme(theme: Theme): void {
+  try {
+    if (theme === 'system') {
+      localStorage.removeItem(STORAGE_KEY);
+    } else {
+      localStorage.setItem(STORAGE_KEY, theme);
+    }
+  } catch {
+    // Storage access blocked (privacy mode / sandboxed iframe)
+  }
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }): JSX.Element {
-  const [theme, setTheme] = useState<Theme>(getStoredTheme);
+  const [theme, setTheme] = useState<Theme>(readStoredTheme);
   const [systemPrefersDark, setSystemPrefersDark] = useState<boolean>(
     () => window.matchMedia(DARK_QUERY).matches,
   );
@@ -39,15 +52,7 @@ export function ThemeProvider({ children }: { children: ReactNode }): JSX.Elemen
   }, [isDark]);
 
   useEffect(() => {
-    try {
-      if (theme === 'system') {
-        localStorage.removeItem('theme');
-      } else {
-        localStorage.setItem('theme', theme);
-      }
-    } catch {
-      // Ignore storage errors (e.g. access blocked in privacy mode)
-    }
+    writeStoredTheme(theme);
   }, [theme]);
 
   return <ThemeContext value={{ theme, setTheme, isDark }}>{children}</ThemeContext>;
