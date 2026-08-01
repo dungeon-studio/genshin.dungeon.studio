@@ -63,7 +63,7 @@ repos:
 
   # Vale - Prose linting
   - repo: https://github.com/errata-ai/vale
-    rev: v3.15.2
+    rev: v3.16.0
     hooks:
       - id: vale
         args: [--config=.vale.ini]
@@ -96,7 +96,7 @@ repos:
 
   # Renovate config validation
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 44.0.0
+    rev: 44.0.1
     hooks:
       - id: renovate-config-validator
         args: [--strict, --no-global]
