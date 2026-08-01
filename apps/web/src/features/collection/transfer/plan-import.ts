@@ -23,12 +23,11 @@ export interface SkippedEntry {
 }
 
 /**
- * Entries that survived planning, carrying the types the write paths take.
+ * Entries that survived planning, in the types the write paths take.
  *
- * The envelope types are deliberately loose — a file is untrusted input. Planning
- * is where each entry is proven to be a known character, a real UUID, a valid
- * slot, so these narrower types are what that proof buys: the caller writes them
- * without casting.
+ * Envelope types stay loose because a file is untrusted. Planning is where an
+ * entry is proven to be a known character, a real UUID, a valid slot, so these
+ * carry that proof forward and callers write them without casting.
  */
 export interface PlannedCharacter {
   characterId: CharacterId;
@@ -140,8 +139,6 @@ function planWeapons(
     const skip = (reason: string) =>
       skipped.push({ kind: 'weapon', label: entry.weaponId, reason });
 
-    // Checked first: the identifier names a Firestore document, so nothing else
-    // about the entry matters until it is one this app could have minted.
     if (!isUUID(entry.weaponInstanceId)) {
       skip('its identifier is not a UUID');
       continue;
@@ -196,11 +193,11 @@ function planTeams(
 }
 
 /**
- * Team members whose weapon is neither in the envelope nor already owned.
+ * Every member of `team`, with unresolvable weapon references dropped.
  *
  * Import writes weapons before teams, so a reference that survives this check
  * resolves by the time the team is written. One that does not would leave the
- * member pointing at nothing, so the reference is dropped and the member kept.
+ * member pointing at nothing, so the reference goes and the member stays.
  */
 export function resolveTeamMembers(
   team: PlannedTeam,

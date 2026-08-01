@@ -64,8 +64,8 @@ export function CollectionTransferCard(): JSX.Element {
         <CardTitle>Import and export</CardTitle>
         <CardDescription>
           Download your characters, weapons, and teams as a file, or restore them from one.
-          Importing matches entries by identity, so the same file can be imported more than once
-          without duplicating anything.
+          Importing updates what you already have instead of adding copies, so the same file is safe
+          to import twice.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-wrap gap-3">

@@ -10,7 +10,6 @@ import { V1TransferEnvelopeSchema } from './v1.js';
 // widen, so files written by older builds keep importing.
 export const CURRENT_VERSION = 1 as const;
 
-/** Envelope versions this build knows how to read. */
 const SUPPORTED_VERSIONS: readonly number[] = [1];
 
 export type ParseEnvelopeResult =

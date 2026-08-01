@@ -24,11 +24,11 @@ import { check_compat, initSync } from 'jsoncompat';
 const require = createRequire(import.meta.url);
 initSync({ module: readFileSync(require.resolve('jsoncompat/jsoncompat_wasm_bg.wasm')) });
 
-// Web snapshot directories are named for the writer — a zustand `persist` store
-// name, or the transfer envelope — which doesn't match the directory holding the
-// Zod source. Mirrors the `source` field in apps/web/scripts/schema-registry.ts,
-// duplicated rather than imported to keep this check a plain JSON diff that needs
-// no workspace build. It only affects the file path quoted in a violation.
+// Web snapshot directories are named for the writer, not for the directory
+// holding the Zod source. Mirrors the `source` field in
+// apps/web/scripts/schema-registry.ts, duplicated rather than imported to keep
+// this check a plain JSON diff needing no workspace build; it only affects the
+// path quoted in a violation.
 const WEB_SOURCE_DIRS: Record<string, string> = {
   'genshin-collection': 'characters',
   'collection-transfer': 'transfer',
@@ -47,9 +47,6 @@ const SNAPSHOT_ROOTS: ReadonlyArray<{
   },
   {
     prefix: 'apps/web/schema-snapshots',
-    // The snapshot directory is named for the writer (a `persist` store name, or
-    // the transfer envelope), which doesn't match the source directory; the web
-    // registry carries the mapping.
     sourceFor: (repository, version) =>
       `apps/web/src/features/collection/${WEB_SOURCE_DIRS[repository] ?? repository}/schemas/${version}.ts`,
   },

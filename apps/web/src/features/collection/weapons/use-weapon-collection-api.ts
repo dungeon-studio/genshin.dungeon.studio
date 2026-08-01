@@ -84,9 +84,8 @@ export interface SaveWeaponPayload {
 /**
  * Write a weapon at an instance id the caller already holds.
  *
- * Import needs this rather than `useAddWeaponMutation`: teams reference weapons
- * by instance id, so restoring under a server-minted id would break those
- * references and duplicate the weapon on every re-import.
+ * Teams reference weapons by instance id, so a caller restoring one it has
+ * references to cannot let the server mint a fresh id.
  */
 export function useSaveWeaponMutation(
   userId: string | undefined,

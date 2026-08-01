@@ -13,9 +13,8 @@ import type {
 /**
  * Everything a transfer reads or writes, in the shape the zustand stores hold it.
  *
- * Taking a plain snapshot rather than the hooks keeps the export and import
- * logic free of React, and means both signed-in and signed-out callers hand over
- * the same structure — the stores are the read layer either way.
+ * A plain snapshot rather than the hooks keeps export and import free of React,
+ * and lets signed-in and signed-out callers hand over the same structure.
  */
 export interface CollectionSnapshot {
   characters: Record<CharacterId, CollectionCharacter>;

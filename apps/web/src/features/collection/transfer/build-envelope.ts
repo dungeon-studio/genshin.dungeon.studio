@@ -41,7 +41,6 @@ export function buildTransferEnvelope(
   };
 }
 
-/** The envelope as the bytes written to disk. */
 export function serialiseEnvelope(envelope: V1TransferEnvelope): string {
   return `${JSON.stringify(envelope, null, 2)}\n`;
 }

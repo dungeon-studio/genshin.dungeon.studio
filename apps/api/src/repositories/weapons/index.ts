@@ -76,9 +76,9 @@ export interface SaveResult {
 /**
  * Create or replace the instance at `weaponInstanceId`.
  *
- * Unlike `create`, the caller names the instance, which is what lets an import
- * restore weapons under the identifiers its teams already reference. `createdAt`
- * survives a replacement so the collection keeps its original acquisition order.
+ * Unlike `create`, the caller names the instance, so a restore can put a weapon
+ * back under the identifier its teams already reference. `createdAt` survives a
+ * replacement, keeping the collection's original acquisition order.
  */
 export async function save(
   userId: string,

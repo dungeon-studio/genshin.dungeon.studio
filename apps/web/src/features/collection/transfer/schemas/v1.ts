@@ -4,20 +4,15 @@
 import { MAX_TEAM_MEMBERS } from '@genshin/domain';
 import { z } from 'zod';
 
-// The shape of an exported collection file. Unlike the persisted store schemas,
-// this one describes a document that leaves the app entirely and can come back
-// arbitrarily long afterwards, so it is snapshotted and gated the same way: a
-// released version may only ever widen.
-//
 // Timestamps are deliberately absent. `createdAt` and `updatedAt` are
-// server-managed (see the profile field ownership table in
+// server-managed (see the field ownership table in
 // docs/reference/rest-api-conventions.md) and no write endpoint accepts them, so
-// carrying them would promise a fidelity the import cannot deliver. The envelope
+// carrying them would promise a fidelity import cannot deliver. The envelope
 // holds exactly the fields an import can restore.
 //
 // Field validation stays loose here for the same reason the store schemas do:
-// this gates structure, while the domain assertions applied during import
-// enforce semantics (known character, constellation range, refinement range).
+// this gates structure, while the domain checks applied during import enforce
+// semantics (known character, constellation range, refinement range).
 
 export const V1TransferCharacterSchema = z.object({
   characterId: z.string(),

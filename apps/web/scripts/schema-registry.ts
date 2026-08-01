@@ -28,11 +28,10 @@ interface StoreSchemas {
  * fields ungated. This mirrors the api side, which snapshots one Firestore
  * document rather than the collection.
  *
- * `collection-transfer` is the exported collection file. It leaves the app
- * entirely, so the constraint is if anything stronger — a file exported today
- * has to import into a build shipped years later. The whole envelope is
- * snapshotted here because it nests its entries in arrays, which jsoncompat does
- * see into.
+ * `collection-transfer` is the exported collection file, under a stronger
+ * constraint still: a file exported today has to import into a build shipped
+ * years later. The whole envelope is snapshotted because it nests its entries in
+ * arrays, which jsoncompat does see into.
  */
 export const SCHEMA_REGISTRY: Record<string, StoreSchemas> = {
   'genshin-collection': {

@@ -38,7 +38,6 @@ type CreateWeaponBody = FromSchema<typeof weaponPostRequestV1.schema>;
 type SaveWeaponBody = FromSchema<typeof weaponPutRequestV1.schema>;
 type UpdateWeaponBody = FromSchema<typeof weaponPatchRequestV1.schema>;
 
-/** Every single-instance response body; only the href and status differ. */
 function weaponBody(weapon: CollectionWeapon, baseUrl: string, href: string): string {
   return JSON.stringify(
     serialiseCollection(weaponRepresentation, href, [serialiseWeapon(weapon, baseUrl)]),

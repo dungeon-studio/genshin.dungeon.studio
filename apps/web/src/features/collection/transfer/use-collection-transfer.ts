@@ -29,7 +29,7 @@ import { parseTransferEnvelope } from './schemas/index';
 
 const EXPORT_MEDIA_TYPE = 'application/json';
 
-/** Read the three stores as one value. They are the read layer signed in or out. */
+/** The stores are the read layer signed in or out, so both paths read here. */
 function readSnapshot(): CollectionSnapshot {
   return {
     characters: useCollectionStore.getState().characters,
@@ -38,12 +38,12 @@ function readSnapshot(): CollectionSnapshot {
   };
 }
 
-/** Create and update are written the same way; only the bucketing differed. */
+/** The split matters to the preview, not to the writing. */
 function allOf<T>(entries: PlannedEntries<T>): T[] {
   return [...entries.create, ...entries.update];
 }
 
-/** Keep an entry's original creation time, and stamp this write as the update. */
+/** An import must not reset acquisition order, so only `updatedAt` moves. */
 function restamp(
   existing: { createdAt: ISOTimestamp } | undefined,
   now: ISOTimestamp,
@@ -118,7 +118,6 @@ export function useCollectionTransfer(): UseCollectionTransferResult {
     async (entries: PlannedCharacter[]) => {
       if (entries.length === 0) return;
 
-      // One store write for the whole set; the API takes them one at a time.
       const now = nowTimestamp();
       const next = { ...useCollectionStore.getState().characters };
       for (const entry of entries) {
@@ -139,8 +138,8 @@ export function useCollectionTransfer(): UseCollectionTransferResult {
 
   const importTeams = useCallback(
     async (entries: PlannedTeam[], importedWeaponIds: ReadonlySet<string>) => {
-      // Re-read: the weapons this import just wrote are what the members resolve
-      // against, and they landed after the plan was drawn up.
+      // Re-read rather than reuse the plan's snapshot: members resolve against
+      // the weapons this import just wrote.
       const snapshot = readSnapshot();
 
       for (const entry of entries) {
@@ -166,8 +165,8 @@ export function useCollectionTransfer(): UseCollectionTransferResult {
     async (plan: ImportPlan) => {
       setIsImporting(true);
       try {
-        // Weapons first: team members reference them by instance id, so the
-        // references a team carries have to resolve by the time it is written.
+        // Weapons first: team members reference them by instance id, and those
+        // references have to resolve by the time a team is written.
         const weapons = allOf(plan.weapons);
         await importWeapons(weapons);
         await importCharacters(allOf(plan.characters));
