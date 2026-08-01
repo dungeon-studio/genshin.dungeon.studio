@@ -11,6 +11,7 @@ export function Nav(): JSX.Element {
     { to: '/', label: 'Teams' },
     { to: '/characters', label: 'Characters' },
     { to: '/weapons', label: 'Weapons' },
+    { to: '/settings', label: 'Settings' },
   ];
 
   return (

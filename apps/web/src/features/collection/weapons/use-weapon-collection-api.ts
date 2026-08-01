@@ -7,7 +7,7 @@ import { deserialiseWeapon, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { apiDelete, apiGet, apiPatch, apiPost } from '@/lib/api';
+import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from '@/lib/api';
 
 type WeaponRecord = Record<CollectionWeaponId, CollectionWeapon>;
 
@@ -65,6 +65,42 @@ export function useAddWeaponMutation(
       const response = await apiPost('/api/weapons', {
         weaponId,
         refinementLevel: MIN_REFINEMENT_LEVEL,
+      });
+      return parseSingleWeaponResponse(response);
+    },
+    onSuccess: () => {
+      if (userId !== undefined)
+        queryClient.invalidateQueries({ queryKey: weaponCollectionKey(userId) });
+    },
+  });
+}
+
+export interface SaveWeaponPayload {
+  weaponInstanceId: CollectionWeaponId;
+  weaponId: string;
+  refinementLevel: number;
+}
+
+/**
+ * Write a weapon at an instance id the caller already holds.
+ *
+ * Teams reference weapons by instance id, so a caller restoring one it has
+ * references to cannot let the server mint a fresh id.
+ */
+export function useSaveWeaponMutation(
+  userId: string | undefined,
+): UseMutationResult<WeaponMutationResult, Error, SaveWeaponPayload> {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      weaponInstanceId,
+      weaponId,
+      refinementLevel,
+    }: SaveWeaponPayload): Promise<WeaponMutationResult> => {
+      const response = await apiPut(`/api/weapons/${encodeURIComponent(weaponInstanceId)}`, {
+        weaponId,
+        refinementLevel,
       });
       return parseSingleWeaponResponse(response);
     },

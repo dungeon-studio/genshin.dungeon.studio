@@ -1,0 +1,124 @@
+// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+// SPDX-License-Identifier: MIT
+
+import type { ChangeEvent, JSX } from 'react';
+import { useRef, useState } from 'react';
+import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { promptSignIn } from '@/features/auth';
+
+import { ImportSummary } from './import-summary';
+import type { ImportPlan } from './plan-import';
+import { plannedCount } from './plan-import';
+import { useCollectionTransfer } from './use-collection-transfer';
+
+export function CollectionTransferCard(): JSX.Element {
+  const { exportCollection, readPlan, applyImport, canImport, isImporting } =
+    useCollectionTransfer();
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [plan, setPlan] = useState<ImportPlan | null>(null);
+
+  async function handleFile(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    // Clear the input so picking the same file twice still fires a change event.
+    event.target.value = '';
+    if (!file) return;
+
+    const result = await readPlan(file);
+    if (!result.ok) {
+      toast.error(result.message);
+      return;
+    }
+
+    if (plannedCount(result.plan) === 0 && result.plan.skipped.length === 0) {
+      toast.info('That export is empty — there is nothing to import.');
+      return;
+    }
+
+    setPlan(result.plan);
+  }
+
+  function handleImportClick() {
+    if (!canImport) {
+      promptSignIn('import a collection');
+      return;
+    }
+    fileInput.current?.click();
+  }
+
+  async function confirmImport() {
+    if (!plan) return;
+
+    try {
+      await applyImport(plan);
+      toast.success('Collection imported.');
+      setPlan(null);
+    } catch {
+      toast.error('Import failed partway through. Some entries may have been applied.');
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Import and export</CardTitle>
+        <CardDescription>
+          Download your characters, weapons, and teams as a file, or restore them from one.
+          Importing updates what you already have instead of adding copies, so the same file is safe
+          to import twice.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-wrap gap-3">
+        <Button onClick={exportCollection}>Export collection</Button>
+        <Button variant="outline" onClick={handleImportClick} disabled={isImporting}>
+          Import collection
+        </Button>
+        <input
+          ref={fileInput}
+          type="file"
+          accept="application/json,.json"
+          className="hidden"
+          onChange={(event) => void handleFile(event)}
+          data-testid="import-file-input"
+        />
+      </CardContent>
+
+      <Dialog
+        open={plan !== null}
+        onOpenChange={(open) => {
+          if (!open && !isImporting) setPlan(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Import this collection?</DialogTitle>
+            <DialogDescription>
+              Nothing has changed yet. Here is what importing this file would do.
+            </DialogDescription>
+          </DialogHeader>
+
+          {plan ? <ImportSummary plan={plan} /> : null}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPlan(null)} disabled={isImporting}>
+              Cancel
+            </Button>
+            <Button onClick={() => void confirmImport()} disabled={isImporting}>
+              {isImporting ? 'Importing…' : 'Import'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Card>
+  );
+}

@@ -40,25 +40,66 @@ export async function get(
   return fromDocument(weaponInstanceId, data);
 }
 
+function nowTimestamp(): ISOTimestamp {
+  return new Date().toISOString() as ISOTimestamp;
+}
+
+async function write(userId: string, weapon: CollectionWeapon): Promise<void> {
+  await collectionRef(userId).doc(weapon.weaponInstanceId).set(toDocument(weapon));
+}
+
 export async function create(
   userId: string,
   weaponId: string,
   refinementLevel: number,
 ): Promise<CollectionWeapon> {
-  const weaponInstanceId = randomUUID() as UUID;
-  const now = new Date().toISOString() as ISOTimestamp;
+  const now = nowTimestamp();
 
   const weapon: CollectionWeapon = {
-    weaponInstanceId,
+    weaponInstanceId: randomUUID() as UUID,
     weaponId,
     refinementLevel,
     createdAt: now,
     updatedAt: now,
   };
 
-  await collectionRef(userId).doc(weaponInstanceId).set(toDocument(weapon));
+  await write(userId, weapon);
 
   return weapon;
+}
+
+export interface SaveResult {
+  weapon: CollectionWeapon;
+  created: boolean;
+}
+
+/**
+ * Create or replace the instance at `weaponInstanceId`.
+ *
+ * Unlike `create`, the caller names the instance, so a restore can put a weapon
+ * back under the identifier its teams already reference. `createdAt` survives a
+ * replacement, keeping the collection's original acquisition order.
+ */
+export async function save(
+  userId: string,
+  weaponInstanceId: UUID,
+  weaponId: string,
+  refinementLevel: number,
+): Promise<SaveResult> {
+  const existing = await get(userId, weaponInstanceId);
+  const now = nowTimestamp();
+
+  const weapon: CollectionWeapon = {
+    weaponInstanceId,
+    weaponId,
+    refinementLevel,
+    createdAt: existing?.createdAt ?? now,
+    updatedAt: now,
+  };
+
+  await write(userId, weapon);
+
+  return { weapon, created: existing === null };
 }
 
 export async function update(
@@ -66,30 +107,15 @@ export async function update(
   weaponInstanceId: UUID,
   refinementLevel: number,
 ): Promise<CollectionWeapon | null> {
-  const docRef = collectionRef(userId).doc(weaponInstanceId);
-  const existing = await docRef.get();
+  const existing = await get(userId, weaponInstanceId);
 
-  if (!existing.exists) {
+  if (existing === null) {
     return null;
   }
 
-  const existingData = existing.data();
-  if (existingData === undefined) {
-    return null;
-  }
+  const weapon: CollectionWeapon = { ...existing, refinementLevel, updatedAt: nowTimestamp() };
 
-  const existingWeapon = fromDocument(weaponInstanceId, existingData);
-  const now = new Date().toISOString() as ISOTimestamp;
-
-  const weapon: CollectionWeapon = {
-    weaponInstanceId,
-    weaponId: existingWeapon.weaponId,
-    refinementLevel,
-    createdAt: existingWeapon.createdAt,
-    updatedAt: now,
-  };
-
-  await docRef.set(toDocument(weapon));
+  await write(userId, weapon);
 
   return weapon;
 }

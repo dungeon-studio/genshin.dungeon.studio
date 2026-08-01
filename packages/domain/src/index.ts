@@ -67,4 +67,4 @@ export {
 
 export { validateTeam, validateTeams, type TeamValidationContext } from './team/team-validation.js';
 export { assertUserProfile, type ProfileUpdate, type UserProfile } from './profile/user-profile.js';
-export type { UUID } from './uuid.js';
+export { isUUID, type UUID } from './uuid.js';
