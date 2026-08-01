@@ -15,15 +15,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { signInWithGoogle } from '@/features/auth';
+import { promptSignIn } from '@/features/auth';
 
 import { ImportSummary } from './import-summary';
 import type { ImportPlan } from './plan-import';
 import { plannedCount } from './plan-import';
 import { useCollectionTransfer } from './use-collection-transfer';
-
-/** The toast asks the user to act, not just to read. */
-const AUTH_TOAST_DURATION_MS = 10_000;
 
 export function CollectionTransferCard(): JSX.Element {
   const { exportCollection, readPlan, applyImport, canImport, isImporting } =
@@ -51,6 +48,14 @@ export function CollectionTransferCard(): JSX.Element {
     setPlan(result.plan);
   }
 
+  function handleImportClick() {
+    if (!canImport) {
+      promptSignIn('import a collection');
+      return;
+    }
+    fileInput.current?.click();
+  }
+
   async function confirmImport() {
     if (!plan) return;
 
@@ -75,20 +80,7 @@ export function CollectionTransferCard(): JSX.Element {
       </CardHeader>
       <CardContent className="flex flex-wrap gap-3">
         <Button onClick={exportCollection}>Export collection</Button>
-        <Button
-          variant="outline"
-          onClick={() => {
-            if (!canImport) {
-              toast.info('Sign in to import a collection.', {
-                action: { label: 'Sign in', onClick: () => void signInWithGoogle() },
-                duration: AUTH_TOAST_DURATION_MS,
-              });
-              return;
-            }
-            fileInput.current?.click();
-          }}
-          disabled={isImporting}
-        >
+        <Button variant="outline" onClick={handleImportClick} disabled={isImporting}>
           Import collection
         </Button>
         <input

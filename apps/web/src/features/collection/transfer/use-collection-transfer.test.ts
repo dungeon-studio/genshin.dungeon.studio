@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionWeapon, CollectionWeaponId, ISOTimestamp, TeamSlot } from '@genshin/domain';
+import type { CollectionWeaponId, ISOTimestamp, TeamSlot } from '@genshin/domain';
 import { initialTeams } from '@genshin/domain';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { HttpResponse, http } from 'msw';
@@ -15,6 +15,7 @@ import { server } from '@/test/msw/server';
 import { createWrapper, fakeUser } from '@/test/render';
 
 import type { ImportPlan } from './plan-import';
+import type { UseCollectionTransferResult } from './use-collection-transfer';
 import { useCollectionTransfer } from './use-collection-transfer';
 
 const API = 'http://localhost:8080';
@@ -35,14 +36,14 @@ function resetStores() {
 }
 
 function ownWeapon(instanceId: string, weaponId: string, refinementLevel: number) {
-  useWeaponCollectionStore.getState().addWeapon({
-    ...makeWeapon(instanceId, weaponId, refinementLevel),
-  } satisfies CollectionWeapon);
+  useWeaponCollectionStore.getState().addWeapon(makeWeapon(instanceId, weaponId, refinementLevel));
 }
 
-/** Import requires an account, so every apply test runs against a stub API. */
-function renderSignedIn() {
-  const seenWeaponIds: string[] = [];
+/** Instance ids the API was asked to write, in order. */
+let weaponWrites: string[] = [];
+
+function stubCollectionWrites() {
+  weaponWrites = [];
 
   server.use(
     http.put(`${API}/api/characters/:characterId`, ({ params }) =>
@@ -50,17 +51,17 @@ function renderSignedIn() {
     ),
     http.put(`${API}/api/weapons/:weaponInstanceId`, ({ params }) => {
       const id = params.weaponInstanceId as string;
-      seenWeaponIds.push(id);
+      weaponWrites.push(id);
       return HttpResponse.json(weaponsDocument([makeWeapon(id, 'mistsplitter-reforged', 1)]));
     }),
     http.put(`${API}/api/teams/:slot`, () => HttpResponse.json({})),
   );
+}
 
-  const { result } = renderHook(() => useCollectionTransfer(), {
+function renderSignedIn() {
+  return renderHook(() => useCollectionTransfer(), {
     wrapper: createWrapper({ user: fakeUser('user-1') }),
   });
-
-  return { result, seenWeaponIds };
 }
 
 function renderSignedOut() {
@@ -68,7 +69,7 @@ function renderSignedOut() {
 }
 
 async function applyFile(
-  result: { current: ReturnType<typeof useCollectionTransfer> },
+  result: { current: UseCollectionTransferResult },
   envelope: unknown,
 ): Promise<ImportPlan> {
   const parsed = await result.current.readPlan(exportFile(envelope));
@@ -82,7 +83,10 @@ async function applyFile(
 }
 
 describe('useCollectionTransfer', () => {
-  beforeEach(resetStores);
+  beforeEach(() => {
+    resetStores();
+    stubCollectionWrites();
+  });
   afterEach(resetStores);
 
   describe('round trip', () => {
@@ -123,12 +127,12 @@ describe('useCollectionTransfer', () => {
     });
 
     it('writes weapons to the identifier-preserving endpoint', async () => {
-      const { result, seenWeaponIds } = renderSignedIn();
+      const { result } = renderSignedIn();
 
       await applyFile(result, envelope);
 
       await waitFor(() => {
-        expect(seenWeaponIds).toEqual([WEAPON_ID]);
+        expect(weaponWrites).toEqual([WEAPON_ID]);
       });
     });
 
