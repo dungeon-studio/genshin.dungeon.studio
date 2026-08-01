@@ -7,7 +7,7 @@ import { LOCAL_API_ORIGIN } from './origins';
 
 // The API the bundle under test was built to call — VITE_API_BASE_URL at build
 // time, FRONTEND_ORIGIN's counterpart at run time.
-const apiOrigin = process.env.SMOKE_API_BASE_URL ?? LOCAL_API_ORIGIN;
+const apiOrigin = process.env.DEPLOYED_API_BASE_URL ?? LOCAL_API_ORIGIN;
 
 /** What the page got back, or why it never got that far. */
 type Reachability = { status: number } | { blocked: string };
@@ -19,7 +19,7 @@ type Reachability = { status: number } | { blocked: string };
  * the API was deployed with — the two can be mismatched with every other check
  * still passing.
  */
-test('the page origin can reach the API', { tag: '@smoke' }, async ({ page }) => {
+test('the page origin can reach the API', { tag: '@deployed' }, async ({ page }) => {
   await page.goto('/');
 
   // A refused cross-origin request rejects with an opaque TypeError; returning

@@ -5,17 +5,18 @@ import path from 'node:path';
 
 import { defineConfig, devices } from '@playwright/test';
 
-const artifactRoot = '/tmp/genshin-smoke';
+const artifactRoot = '/tmp/genshin-deployed';
 
 export default defineConfig({
   testDir: './specs',
 
-  globalSetup: './specs/require-smoke-target.ts',
+  globalSetup: './specs/require-deployment.ts',
 
-  // `@smoke` marks the anonymous, read-only specs — the ones that hold against a
-  // real deployment rather than the Firebase emulators the rest of the suite
-  // signs in through.
-  grep: /@smoke/,
+  // `@deployed` marks the specs that can reach a served deployment at all:
+  // anonymous and read-only, needing none of the Firebase emulators the rest of
+  // the suite signs in through. Bounded by what a deployment can offer, not
+  // narrowed to keep the run cheap.
+  grep: /@deployed/,
 
   // Every spec is read-only against a deployment nothing else mutates.
   fullyParallel: true,
@@ -32,7 +33,7 @@ export default defineConfig({
   outputDir: path.join(artifactRoot, 'test-results'),
 
   use: {
-    baseURL: process.env.SMOKE_BASE_URL,
+    baseURL: process.env.DEPLOYED_BASE_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },

@@ -211,18 +211,18 @@ jobs:
   # wired to emulators rather than a production bundle.
   #
   # Its own job, gated on both deploys, because the conclusion is read per-SHA
-  # when promoting a version onward: it has to name the smoke rather than a
+  # when promoting a version onward: it has to name the tests rather than a
   # build or a Firebase outage.
-  smoke:
+  e2e:
     if: github.ref == 'refs/heads/develop'
-    name: Smoke
+    name: Run end-to-end tests against the deployment
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: [web, api]
 
     env:
-      SMOKE_BASE_URL: https://develop.genshin.dungeon.studio
-      SMOKE_API_BASE_URL: https://api.develop.genshin.dungeon.studio
+      DEPLOYED_BASE_URL: https://develop.genshin.dungeon.studio
+      DEPLOYED_API_BASE_URL: https://api.develop.genshin.dungeon.studio
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -235,13 +235,13 @@ jobs:
 
       # Not through turbo: these specs reach for no workspace package, so there
       # is no build to order ahead of them.
-      - name: Run smoke tests
-        run: pnpm --filter @genshin/e2e test:smoke
+      - name: Run end-to-end tests
+        run: pnpm --filter @genshin/e2e test:deployed
 
       - name: Upload Playwright report
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: smoke-report
-          path: /tmp/genshin-smoke
+          name: playwright-report
+          path: /tmp/genshin-deployed
           retention-days: 7
