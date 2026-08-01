@@ -23,16 +23,26 @@ import { useCollectionStore } from './use-character-collection-store';
 const SKIRK = 'skirk' as CharacterId;
 const ESCOFFIER = 'escoffier' as CharacterId;
 
+// A `genshin-collection` blob as the retired anonymous store left it behind.
+function seedLegacyCollection(characterId: CharacterId, constellationLevel: number): void {
+  localStorage.setItem(
+    'genshin-collection',
+    JSON.stringify({
+      state: { characters: { [characterId]: makeCharacter(characterId, constellationLevel) } },
+      version: 1,
+    }),
+  );
+}
+
 beforeEach(() => {
   useCollectionStore.getState().clearCharacters();
+  localStorage.clear();
   vi.clearAllMocks();
 });
 
-describe('useCollection merge-on-first-login', () => {
-  it('merges the local collection into the store and syncs new entries to the server', async () => {
-    // Anonymous local collection built before signing in.
-    useCollectionStore.getState().addCharacter(SKIRK);
-    useCollectionStore.getState().setConstellationLevel(SKIRK, 3);
+describe('useCollection drain-on-first-login', () => {
+  it('drains the retired anonymous collection and syncs new entries to the server', async () => {
+    seedLegacyCollection(SKIRK, 3);
 
     const putBodies: unknown[] = [];
     server.use(
@@ -54,9 +64,8 @@ describe('useCollection merge-on-first-login', () => {
     await waitFor(() => expect(putBodies).toContainEqual({ constellationLevel: 3 }));
   });
 
-  it('does not re-push local entries when the same user refetches', async () => {
-    useCollectionStore.getState().addCharacter(SKIRK);
-    useCollectionStore.getState().setConstellationLevel(SKIRK, 3);
+  it('does not re-push drained entries when the same user refetches', async () => {
+    seedLegacyCollection(SKIRK, 3);
 
     let getCount = 0;
     let putCount = 0;
@@ -83,9 +92,8 @@ describe('useCollection merge-on-first-login', () => {
     expect(putCount).toBe(1);
   });
 
-  it('clears the collection on logout so a different user merges fresh', async () => {
-    useCollectionStore.getState().addCharacter(SKIRK);
-    useCollectionStore.getState().setConstellationLevel(SKIRK, 3);
+  it('clears the collection on logout so a different user starts fresh', async () => {
+    seedLegacyCollection(SKIRK, 3);
 
     let serverCharacters = charactersDocument([]);
     server.use(
@@ -125,6 +133,21 @@ describe('useCollection merge-on-first-login', () => {
     });
 
     await waitFor(() => expect(result.current.getCharacter(ESCOFFIER)?.constellationLevel).toBe(2));
+    expect(result.current.getCharacter(SKIRK)).toBeUndefined();
+  });
+});
+
+describe('useCollection when signed out', () => {
+  it('refuses to add a character', () => {
+    const { result } = renderHook(() => useCollection(), {
+      wrapper: createWrapper({ user: null }),
+    });
+
+    act(() => {
+      result.current.addCharacter(SKIRK);
+    });
+
+    expect(result.current.isAuthenticated).toBe(false);
     expect(result.current.getCharacter(SKIRK)).toBeUndefined();
   });
 });

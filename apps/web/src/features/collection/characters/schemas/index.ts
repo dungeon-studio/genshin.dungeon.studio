@@ -6,15 +6,16 @@ import { assertCollectionCharacter } from '@genshin/domain';
 
 import { V1PersistedCollectionSchema } from './v1.js';
 
-// The version zustand `persist` stamps onto every write. Bump this and add a
-// `schemas/v{n}.ts` whenever the persisted shape changes; the compatibility gate
-// (apps/api/scripts/check-schema-compat.ts) then forces the change to only widen.
+// The last version the retired `genshin-collection` store wrote. Nothing
+// persists under it any more, but the compatibility gate
+// (apps/api/scripts/check-schema-compat.ts) still holds the snapshot, because
+// browsers left over from the anonymous era hold data this version must read.
 export const CURRENT_VERSION = 1 as const;
 
-// Rehydration guard for the `genshin-collection` store: an invalid blob is
+// Drain guard for the retired `genshin-collection` store: an invalid blob is
 // discarded whole and a single malformed or unknown-character entry is dropped,
-// so one bad record can't poison the collection. Signed-in users re-merge from
-// the server afterward, so a discard is never a real loss.
+// so one bad record can't poison the collection. The server is the system of
+// record, so a discard costs at most the entries never synced from it.
 export function migratePersistedCollection(persisted: unknown): {
   characters: Record<string, CollectionCharacter>;
 } {
