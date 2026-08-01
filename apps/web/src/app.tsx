@@ -12,6 +12,7 @@ import { AuthProvider } from './features/auth';
 import { CharactersPage } from './pages/characters-page';
 import { NotFoundPage } from './pages/not-found-page';
 import { PrivacyPolicyPage } from './pages/privacy-policy-page';
+import { SettingsPage } from './pages/settings-page';
 import { TeamsPage } from './pages/teams-page';
 import { TermsOfServicePage } from './pages/terms-of-service-page';
 import { WeaponsPage } from './pages/weapons-page';
@@ -29,6 +30,7 @@ export function App(): JSX.Element {
                 <Route path="/" element={<TeamsPage />} />
                 <Route path="/characters" element={<CharactersPage />} />
                 <Route path="/weapons" element={<WeaponsPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/privacy" element={<PrivacyPolicyPage />} />
                 <Route path="/terms" element={<TermsOfServicePage />} />
                 <Route path="*" element={<NotFoundPage />} />
