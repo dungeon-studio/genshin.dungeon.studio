@@ -22,26 +22,55 @@ export interface SkippedEntry {
   reason: string;
 }
 
+/**
+ * Entries that survived planning, carrying the types the write paths take.
+ *
+ * The envelope types are deliberately loose — a file is untrusted input. Planning
+ * is where each entry is proven to be a known character, a real UUID, a valid
+ * slot, so these narrower types are what that proof buys: the caller writes them
+ * without casting.
+ */
+export interface PlannedCharacter {
+  characterId: CharacterId;
+  constellationLevel: number;
+}
+
+export interface PlannedWeapon {
+  weaponInstanceId: CollectionWeaponId;
+  weaponId: string;
+  refinementLevel: number;
+}
+
+export type TransferMembers = V1TransferTeam['members'];
+
+export interface PlannedTeam {
+  slot: TeamSlot;
+  name: string;
+  members: TransferMembers;
+  description?: string;
+}
+
 export interface PlannedEntries<T> {
   create: T[];
   update: T[];
 }
 
 export interface ImportPlan {
-  characters: PlannedEntries<V1TransferCharacter>;
-  weapons: PlannedEntries<V1TransferWeapon>;
-  teams: PlannedEntries<V1TransferTeam>;
+  characters: PlannedEntries<PlannedCharacter>;
+  weapons: PlannedEntries<PlannedWeapon>;
+  teams: PlannedEntries<PlannedTeam>;
+  skipped: SkippedEntry[];
+}
+
+interface PlannedKind<T> {
+  entries: PlannedEntries<T>;
   skipped: SkippedEntry[];
 }
 
 export function plannedCount(plan: ImportPlan): number {
-  return (
-    plan.characters.create.length +
-    plan.characters.update.length +
-    plan.weapons.create.length +
-    plan.weapons.update.length +
-    plan.teams.create.length +
-    plan.teams.update.length
+  return [plan.characters, plan.weapons, plan.teams].reduce(
+    (total, { create, update }) => total + create.length + update.length,
+    0,
   );
 }
 
@@ -52,9 +81,6 @@ export function plannedCount(plan: ImportPlan): number {
  * so a single unknown character or out-of-range level costs that one entry
  * instead of the whole file — the same tradeoff `migratePersistedCollection`
  * makes when rehydrating a persisted store.
- *
- * A team is "new" when the slot it claims is currently empty. Slots always
- * exist, so there is no such thing as an absent team to create.
  */
 export function planImport(
   envelope: {
@@ -64,87 +90,109 @@ export function planImport(
   },
   current: CollectionSnapshot,
 ): ImportPlan {
+  const characters = planCharacters(envelope.characters, current);
+  const weapons = planWeapons(envelope.weapons, current);
+  const teams = planTeams(envelope.teams, current);
+
+  return {
+    characters: characters.entries,
+    weapons: weapons.entries,
+    teams: teams.entries,
+    skipped: [...characters.skipped, ...weapons.skipped, ...teams.skipped],
+  };
+}
+
+function planCharacters(
+  entries: V1TransferCharacter[],
+  current: CollectionSnapshot,
+): PlannedKind<PlannedCharacter> {
+  const planned: PlannedEntries<PlannedCharacter> = { create: [], update: [] };
   const skipped: SkippedEntry[] = [];
 
-  const characters: PlannedEntries<V1TransferCharacter> = { create: [], update: [] };
-  for (const entry of envelope.characters) {
+  for (const entry of entries) {
+    const skip = (reason: string) =>
+      skipped.push({ kind: 'character', label: entry.characterId, reason });
+
     if (!getCharacterById(entry.characterId)) {
-      skipped.push({
-        kind: 'character',
-        label: entry.characterId,
-        reason: 'not a character this version of the app knows',
-      });
+      skip('not a character this version of the app knows');
       continue;
     }
     if (!isValidConstellationLevel(entry.constellationLevel)) {
-      skipped.push({
-        kind: 'character',
-        label: entry.characterId,
-        reason: `constellation level ${String(entry.constellationLevel)} is out of range`,
-      });
+      skip(`constellation level ${String(entry.constellationLevel)} is out of range`);
       continue;
     }
 
-    const bucket = entry.characterId in current.characters ? characters.update : characters.create;
-    bucket.push(entry);
+    const owned = entry.characterId in current.characters;
+    (owned ? planned.update : planned.create).push(entry);
   }
 
-  const weapons: PlannedEntries<V1TransferWeapon> = { create: [], update: [] };
-  for (const entry of envelope.weapons) {
+  return { entries: planned, skipped };
+}
+
+function planWeapons(
+  entries: V1TransferWeapon[],
+  current: CollectionSnapshot,
+): PlannedKind<PlannedWeapon> {
+  const planned: PlannedEntries<PlannedWeapon> = { create: [], update: [] };
+  const skipped: SkippedEntry[] = [];
+
+  for (const entry of entries) {
+    const skip = (reason: string) =>
+      skipped.push({ kind: 'weapon', label: entry.weaponId, reason });
+
+    // Checked first: the identifier names a Firestore document, so nothing else
+    // about the entry matters until it is one this app could have minted.
     if (!isUUID(entry.weaponInstanceId)) {
-      skipped.push({
-        kind: 'weapon',
-        label: entry.weaponId,
-        reason: 'its identifier is not a UUID',
-      });
+      skip('its identifier is not a UUID');
       continue;
     }
     if (!getWeaponById(entry.weaponId)) {
-      skipped.push({
-        kind: 'weapon',
-        label: entry.weaponId,
-        reason: 'not a weapon this version of the app knows',
-      });
+      skip('not a weapon this version of the app knows');
       continue;
     }
     if (!isValidRefinementLevel(entry.refinementLevel)) {
-      skipped.push({
-        kind: 'weapon',
-        label: entry.weaponId,
-        reason: `refinement level ${String(entry.refinementLevel)} is out of range`,
-      });
+      skip(`refinement level ${String(entry.refinementLevel)} is out of range`);
       continue;
     }
 
-    const bucket = entry.weaponInstanceId in current.weapons ? weapons.update : weapons.create;
-    bucket.push(entry);
+    const { weaponInstanceId } = entry;
+    const owned = weaponInstanceId in current.weapons;
+    (owned ? planned.update : planned.create).push({ ...entry, weaponInstanceId });
   }
 
-  const teams: PlannedEntries<V1TransferTeam> = { create: [], update: [] };
-  for (const entry of envelope.teams) {
+  return { entries: planned, skipped };
+}
+
+/**
+ * A team is "new" when the slot it claims is currently empty. Slots always
+ * exist, so there is no such thing as an absent team to create.
+ */
+function planTeams(
+  entries: V1TransferTeam[],
+  current: CollectionSnapshot,
+): PlannedKind<PlannedTeam> {
+  const planned: PlannedEntries<PlannedTeam> = { create: [], update: [] };
+  const skipped: SkippedEntry[] = [];
+
+  for (const entry of entries) {
+    const skip = (reason: string) => skipped.push({ kind: 'team', label: entry.name, reason });
+
     if (!isValidTeamSlot(entry.slot)) {
-      skipped.push({
-        kind: 'team',
-        label: entry.name,
-        reason: `slot ${String(entry.slot)} is not a team slot`,
-      });
+      skip(`slot ${String(entry.slot)} is not a team slot`);
       continue;
     }
     if (entry.members.length > MAX_TEAM_MEMBERS) {
-      skipped.push({
-        kind: 'team',
-        label: entry.name,
-        reason: `it holds ${String(entry.members.length)} members`,
-      });
+      skip(`it holds ${String(entry.members.length)} members`);
       continue;
     }
 
-    const existing = current.teams[entry.slot];
-    const bucket = existing && !isEmptyTeam(existing) ? teams.update : teams.create;
-    bucket.push(entry);
+    const { slot } = entry;
+    const existing = current.teams[slot];
+    const occupied = existing !== undefined && !isEmptyTeam(existing);
+    (occupied ? planned.update : planned.create).push({ ...entry, slot });
   }
 
-  return { characters, weapons, teams, skipped };
+  return { entries: planned, skipped };
 }
 
 /**
@@ -155,10 +203,10 @@ export function planImport(
  * member pointing at nothing, so the reference is dropped and the member kept.
  */
 export function resolveTeamMembers(
-  team: V1TransferTeam,
+  team: PlannedTeam,
   importedWeaponIds: ReadonlySet<string>,
   current: CollectionSnapshot,
-): V1TransferTeam['members'] {
+): TransferMembers {
   return team.members.map((member) => {
     if (member === null) return null;
     if (member.weaponInstanceId === undefined) return member;
@@ -171,8 +219,3 @@ export function resolveTeamMembers(
     return withoutWeapon;
   });
 }
-
-/** Narrow the planner's loose ids to the branded types the write paths take. */
-export const asCharacterId = (id: string): CharacterId => id as CharacterId;
-export const asWeaponInstanceId = (id: string): CollectionWeaponId => id as CollectionWeaponId;
-export const asTeamSlot = (slot: number): TeamSlot => slot as TeamSlot;

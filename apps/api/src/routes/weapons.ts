@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
-import type { UUID } from '@genshin/domain';
+import type { CollectionWeapon, UUID } from '@genshin/domain';
 import { isUUID, serialiseWeapon, weaponItemHref, weaponRepresentation } from '@genshin/domain';
 import { getWeaponById } from '@genshin/game-data';
 import { Hono } from 'hono';
@@ -37,6 +37,13 @@ weapons.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: weapon
 type CreateWeaponBody = FromSchema<typeof weaponPostRequestV1.schema>;
 type SaveWeaponBody = FromSchema<typeof weaponPutRequestV1.schema>;
 type UpdateWeaponBody = FromSchema<typeof weaponPatchRequestV1.schema>;
+
+/** Every single-instance response body; only the href and status differ. */
+function weaponBody(weapon: CollectionWeapon, baseUrl: string, href: string): string {
+  return JSON.stringify(
+    serialiseCollection(weaponRepresentation, href, [serialiseWeapon(weapon, baseUrl)]),
+  );
+}
 
 // GET /api/weapons — List all weapon instances, optionally filtered by weaponId
 weapons.get('/', async (c) => {
@@ -101,20 +108,13 @@ weapons.post(
     const weapon = await Weapons.create(userId, weaponId, refinementLevel);
     const baseUrl = new URL(c.req.url).origin;
 
-    return c.body(
-      JSON.stringify(
-        serialiseCollection(weaponRepresentation, `${baseUrl}/api/weapons`, [
-          serialiseWeapon(weapon, baseUrl),
-        ]),
-      ),
-      {
-        status: 201,
-        headers: {
-          'Content-Type': c.get('negotiatedMediaType'),
-          Location: weaponItemHref(baseUrl, weapon),
-        },
+    return c.body(weaponBody(weapon, baseUrl, `${baseUrl}/api/weapons`), {
+      status: 201,
+      headers: {
+        'Content-Type': c.get('negotiatedMediaType'),
+        Location: weaponItemHref(baseUrl, weapon),
       },
-    );
+    });
   },
 );
 
@@ -131,16 +131,9 @@ weapons.get('/:weaponInstanceId', async (c) => {
 
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(
-    JSON.stringify(
-      serialiseCollection(weaponRepresentation, weaponItemHref(baseUrl, weapon), [
-        serialiseWeapon(weapon, baseUrl),
-      ]),
-    ),
-    {
-      headers: { 'Content-Type': c.get('negotiatedMediaType') },
-    },
-  );
+  return c.body(weaponBody(weapon, baseUrl, weaponItemHref(baseUrl, weapon)), {
+    headers: { 'Content-Type': c.get('negotiatedMediaType') },
+  });
 });
 
 // PUT /api/weapons/:weaponInstanceId — Save weapon instance at a caller-chosen id
@@ -175,17 +168,10 @@ weapons.put(
     );
     const baseUrl = new URL(c.req.url).origin;
 
-    return c.body(
-      JSON.stringify(
-        serialiseCollection(weaponRepresentation, weaponItemHref(baseUrl, weapon), [
-          serialiseWeapon(weapon, baseUrl),
-        ]),
-      ),
-      {
-        status: created ? 201 : 200,
-        headers: { 'Content-Type': c.get('negotiatedMediaType') },
-      },
-    );
+    return c.body(weaponBody(weapon, baseUrl, weaponItemHref(baseUrl, weapon)), {
+      status: created ? 201 : 200,
+      headers: { 'Content-Type': c.get('negotiatedMediaType') },
+    });
   },
 );
 
@@ -208,16 +194,9 @@ weapons.patch(
 
     const baseUrl = new URL(c.req.url).origin;
 
-    return c.body(
-      JSON.stringify(
-        serialiseCollection(weaponRepresentation, weaponItemHref(baseUrl, weapon), [
-          serialiseWeapon(weapon, baseUrl),
-        ]),
-      ),
-      {
-        headers: { 'Content-Type': c.get('negotiatedMediaType') },
-      },
-    );
+    return c.body(weaponBody(weapon, baseUrl, weaponItemHref(baseUrl, weapon)), {
+      headers: { 'Content-Type': c.get('negotiatedMediaType') },
+    });
   },
 );
 

@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionTeamMembers, CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
-import { nowTimestamp } from '@genshin/domain';
+import type { CollectionTeamMembers, ISOTimestamp } from '@genshin/domain';
+import { MAX_TEAM_MEMBERS, nowTimestamp } from '@genshin/domain';
 import { useCallback, useState } from 'react';
 
 import { useAuth } from '@/features/auth/use-auth';
@@ -12,19 +12,22 @@ import { useSaveWeaponMutation } from '@/features/collection/weapons/use-weapon-
 import { useWeaponCollectionStore } from '@/features/collection/weapons/use-weapon-collection-store';
 import { useSaveTeamMutation } from '@/features/teams/use-team-api';
 import { useTeamStore } from '@/features/teams/use-team-store';
+import { downloadFile } from '@/lib/download-file';
 
 import { buildTransferEnvelope, exportFilename, serialiseEnvelope } from './build-envelope';
 import type { CollectionSnapshot } from './collection-snapshot';
-import type { ImportPlan } from './plan-import';
-import {
-  asCharacterId,
-  asTeamSlot,
-  asWeaponInstanceId,
-  planImport,
-  resolveTeamMembers,
+import type {
+  ImportPlan,
+  PlannedCharacter,
+  PlannedEntries,
+  PlannedTeam,
+  PlannedWeapon,
+  TransferMembers,
 } from './plan-import';
-import type { ParseEnvelopeResult } from './schemas/index';
+import { planImport, resolveTeamMembers } from './plan-import';
 import { parseTransferEnvelope } from './schemas/index';
+
+const EXPORT_MEDIA_TYPE = 'application/json';
 
 /** Read the three stores as one value. They are the read layer signed in or out. */
 function readSnapshot(): CollectionSnapshot {
@@ -33,6 +36,26 @@ function readSnapshot(): CollectionSnapshot {
     weapons: useWeaponCollectionStore.getState().weapons,
     teams: useTeamStore.getState().teams,
   };
+}
+
+/** Create and update are written the same way; only the bucketing differed. */
+function allOf<T>(entries: PlannedEntries<T>): T[] {
+  return [...entries.create, ...entries.update];
+}
+
+/** Keep an entry's original creation time, and stamp this write as the update. */
+function restamp(
+  existing: { createdAt: ISOTimestamp } | undefined,
+  now: ISOTimestamp,
+): { createdAt: ISOTimestamp; updatedAt: ISOTimestamp } {
+  return { createdAt: existing?.createdAt ?? now, updatedAt: now };
+}
+
+/** Teams are a fixed 4-tuple; an envelope may carry fewer positions than that. */
+function padMembers(members: TransferMembers): CollectionTeamMembers {
+  const padded: TransferMembers = [...members];
+  while (padded.length < MAX_TEAM_MEMBERS) padded.push(null);
+  return padded.slice(0, MAX_TEAM_MEMBERS) as CollectionTeamMembers;
 }
 
 export type ReadPlanResult = { ok: true; plan: ImportPlan } | { ok: false; message: string };
@@ -62,15 +85,7 @@ export function useCollectionTransfer(): UseCollectionTransferResult {
     const exportedAt = new Date().toISOString();
     const envelope = buildTransferEnvelope(readSnapshot(), exportedAt);
 
-    const blob = new Blob([serialiseEnvelope(envelope)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = exportFilename(exportedAt);
-    anchor.click();
-
-    URL.revokeObjectURL(url);
+    downloadFile(exportFilename(exportedAt), serialiseEnvelope(envelope), EXPORT_MEDIA_TYPE);
   }, []);
 
   const readPlan = useCallback(async (file: File): Promise<ReadPlanResult> => {
@@ -81,11 +96,71 @@ export function useCollectionTransfer(): UseCollectionTransferResult {
       return { ok: false, message: 'This file is not valid JSON.' };
     }
 
-    const parsed: ParseEnvelopeResult = parseTransferEnvelope(raw);
+    const parsed = parseTransferEnvelope(raw);
     if (!parsed.ok) return { ok: false, message: parsed.message };
 
     return { ok: true, plan: planImport(parsed.envelope, readSnapshot()) };
   }, []);
+
+  const importWeapons = useCallback(
+    async (entries: PlannedWeapon[]) => {
+      for (const entry of entries) {
+        if (isAuthenticated) await saveWeaponApi(entry);
+
+        const existing = useWeaponCollectionStore.getState().weapons[entry.weaponInstanceId];
+        storeAddWeapon({ ...entry, ...restamp(existing, nowTimestamp()) });
+      }
+    },
+    [isAuthenticated, saveWeaponApi, storeAddWeapon],
+  );
+
+  const importCharacters = useCallback(
+    async (entries: PlannedCharacter[]) => {
+      if (entries.length === 0) return;
+
+      // One store write for the whole set; the API takes them one at a time.
+      const now = nowTimestamp();
+      const next = { ...useCollectionStore.getState().characters };
+      for (const entry of entries) {
+        next[entry.characterId] = { ...entry, ...restamp(next[entry.characterId], now) };
+      }
+      replaceCharacters(next);
+
+      if (!isAuthenticated) return;
+      for (const entry of entries) {
+        await saveCharacterApi({
+          characterId: entry.characterId,
+          level: entry.constellationLevel,
+        });
+      }
+    },
+    [isAuthenticated, saveCharacterApi, replaceCharacters],
+  );
+
+  const importTeams = useCallback(
+    async (entries: PlannedTeam[], importedWeaponIds: ReadonlySet<string>) => {
+      // Re-read: the weapons this import just wrote are what the members resolve
+      // against, and they landed after the plan was drawn up.
+      const snapshot = readSnapshot();
+
+      for (const entry of entries) {
+        const payload = {
+          slot: entry.slot,
+          name: entry.name,
+          members: padMembers(resolveTeamMembers(entry, importedWeaponIds, snapshot)),
+          ...(entry.description !== undefined ? { description: entry.description } : {}),
+        };
+
+        storeSetTeam(entry.slot, {
+          ...payload,
+          ...restamp(snapshot.teams[entry.slot], nowTimestamp()),
+        });
+
+        if (isAuthenticated) await saveTeamApi(payload);
+      }
+    },
+    [isAuthenticated, saveTeamApi, storeSetTeam],
+  );
 
   const applyImport = useCallback(
     async (plan: ImportPlan) => {
@@ -93,110 +168,19 @@ export function useCollectionTransfer(): UseCollectionTransferResult {
       try {
         // Weapons first: team members reference them by instance id, so the
         // references a team carries have to resolve by the time it is written.
-        const weapons = [...plan.weapons.create, ...plan.weapons.update];
-        for (const entry of weapons) {
-          const weaponInstanceId = asWeaponInstanceId(entry.weaponInstanceId);
-          if (isAuthenticated) {
-            await saveWeaponApi({
-              weaponInstanceId,
-              weaponId: entry.weaponId,
-              refinementLevel: entry.refinementLevel,
-            });
-          }
-          storeAddWeapon(localWeapon(weaponInstanceId, entry.weaponId, entry.refinementLevel));
-        }
-
-        // Characters go through the store in one write. The API mutation is a
-        // PUT upsert, so an existing character is replaced rather than duplicated.
-        const characters = [...plan.characters.create, ...plan.characters.update];
-        if (characters.length > 0) {
-          const now = nowTimestamp();
-          const next = { ...useCollectionStore.getState().characters };
-          for (const entry of characters) {
-            const characterId = asCharacterId(entry.characterId);
-            next[characterId] = {
-              characterId,
-              constellationLevel: entry.constellationLevel,
-              createdAt: next[characterId]?.createdAt ?? now,
-              updatedAt: now,
-            };
-          }
-          replaceCharacters(next);
-
-          if (isAuthenticated) {
-            for (const entry of characters) {
-              await saveCharacterApi({
-                characterId: asCharacterId(entry.characterId),
-                level: entry.constellationLevel,
-              });
-            }
-          }
-        }
-
-        const importedWeaponIds = new Set(weapons.map((w) => w.weaponInstanceId));
-        const snapshot = readSnapshot();
-
-        for (const entry of [...plan.teams.create, ...plan.teams.update]) {
-          const slot = asTeamSlot(entry.slot);
-          const members = padMembers(resolveTeamMembers(entry, importedWeaponIds, snapshot));
-          const existing = snapshot.teams[slot];
-
-          storeSetTeam(slot, {
-            slot,
-            name: entry.name,
-            members,
-            ...(entry.description !== undefined ? { description: entry.description } : {}),
-            createdAt: existing?.createdAt ?? nowTimestamp(),
-            updatedAt: nowTimestamp(),
-          });
-
-          if (isAuthenticated) {
-            await saveTeamApi({
-              slot,
-              name: entry.name,
-              members,
-              ...(entry.description !== undefined ? { description: entry.description } : {}),
-            });
-          }
-        }
+        const weapons = allOf(plan.weapons);
+        await importWeapons(weapons);
+        await importCharacters(allOf(plan.characters));
+        await importTeams(
+          allOf(plan.teams),
+          new Set(weapons.map((weapon) => weapon.weaponInstanceId)),
+        );
       } finally {
         setIsImporting(false);
       }
     },
-    [
-      isAuthenticated,
-      saveCharacterApi,
-      saveWeaponApi,
-      saveTeamApi,
-      replaceCharacters,
-      storeAddWeapon,
-      storeSetTeam,
-    ],
+    [importWeapons, importCharacters, importTeams],
   );
 
   return { exportCollection, readPlan, applyImport, isImporting };
-}
-
-function localWeapon(
-  weaponInstanceId: CollectionWeaponId,
-  weaponId: string,
-  refinementLevel: number,
-): CollectionWeapon {
-  const existing = useWeaponCollectionStore.getState().weapons[weaponInstanceId];
-  const now = nowTimestamp();
-
-  return {
-    weaponInstanceId,
-    weaponId,
-    refinementLevel,
-    createdAt: existing?.createdAt ?? now,
-    updatedAt: now,
-  };
-}
-
-/** Teams are a fixed 4-tuple; an envelope may carry fewer positions than that. */
-function padMembers(members: ReturnType<typeof resolveTeamMembers>): CollectionTeamMembers {
-  const padded = [...members];
-  while (padded.length < 4) padded.push(null);
-  return padded.slice(0, 4) as CollectionTeamMembers;
 }

@@ -14,8 +14,8 @@ import { describe, expect, it } from 'vitest';
 import { makeCharacter, makeTeam, makeWeapon } from '@/test/fixtures';
 
 import type { CollectionSnapshot } from './collection-snapshot';
+import type { PlannedTeam } from './plan-import';
 import { planImport, plannedCount, resolveTeamMembers } from './plan-import';
-import type { V1TransferTeam } from './schemas/v1';
 
 const WEAPON_ID = '3f2504e0-4f89-41d3-9a0c-0305e82c3301';
 const OTHER_WEAPON_ID = '9c858901-8a57-4791-81fe-4c455b099bc9';
@@ -182,7 +182,7 @@ describe('planImport', () => {
 });
 
 describe('resolveTeamMembers', () => {
-  const team: V1TransferTeam = {
+  const team: PlannedTeam = {
     slot: 1,
     name: 'Team 1',
     members: [{ characterId: 'amber', weaponInstanceId: WEAPON_ID }, null, null, null],
