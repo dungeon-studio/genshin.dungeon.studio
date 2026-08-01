@@ -19,9 +19,7 @@ interface StoreSchemas {
  * entry fields ungated. This mirrors the api side, which snapshots one Firestore
  * document rather than the collection.
  *
- * Empty because the web app currently persists nothing: `genshin-collection`
- * was the sole entry and went away with anonymous collection management. Add a
- * store here as soon as it gains `persist`, before it can ship a shape.
+ * Register a store as soon as it gains `persist`, before it can ship a shape.
  */
 export const SCHEMA_REGISTRY: Record<string, StoreSchemas> = {};
 

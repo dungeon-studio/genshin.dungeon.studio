@@ -16,9 +16,8 @@ interface CollectionState {
   clearCharacters: () => void;
 }
 
-// In-memory only. Collection management is authenticated-only, so the server is
-// the system of record and a signed-out session has nothing to hold; the
-// retired anonymous localStorage store is drained by drain-persisted-collection.
+// Deliberately not persisted: the server is the system of record, and a
+// signed-out session has no collection to hold.
 export const useCollectionStore = create<CollectionState>()((set, get) => ({
   characters: {},
 

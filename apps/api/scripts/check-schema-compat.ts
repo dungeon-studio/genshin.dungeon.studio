@@ -45,14 +45,11 @@ const SNAPSHOT_ROOTS: ReadonlyArray<{
 ];
 
 /**
- * Snapshots whose store was deliberately retired, exempted from the
- * missing-snapshot violation below.
+ * Stores retired on purpose, exempt from the missing-snapshot violation, which
+ * otherwise reads every disappearance as an accident.
  *
- * A retirement is a decision that nothing needs to read the data any more —
- * distinct from a snapshot vanishing by accident, which is what that violation
- * is for. Entries stop mattering once the deletion reaches the base branch,
- * since the loop only visits paths the base still has, so this list is expected
- * to be emptied rather than to accumulate.
+ * Entries are transient: the loop below only visits paths the base branch still
+ * has, so an entry is spent once its deletion merges. Prune, don't accumulate.
  */
 const RETIRED_SNAPSHOTS: ReadonlySet<string> = new Set([
   'apps/web/schema-snapshots/genshin-collection/v1.json',

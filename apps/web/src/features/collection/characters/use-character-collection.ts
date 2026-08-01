@@ -52,7 +52,6 @@ export function useCollection(): UseCollectionResult {
   const { mutate: removeCharacterApi } = useRemoveCharacterMutation(user?.uid);
   const { mutate: setConstellationLevelApi } = useSetConstellationLevelMutation(user?.uid);
 
-  // Patch zustand with confirmed server data
   const applyMutationResult = useCallback(
     ({ characterId, entry }: MutationResult) => {
       storeSetConstellationLevel(characterId, entry.constellationLevel);
@@ -60,33 +59,28 @@ export function useCollection(): UseCollectionResult {
     [storeSetConstellationLevel],
   );
 
-  // Drop the in-memory collection on logout so a different account cannot read
-  // the previous user's data.
+  // Account isolation: the next user to sign in must not inherit this one.
   useEffect(() => {
     if (!user) clearCharacters();
   }, [user, clearCharacters]);
 
-  // The server is the only source of characters, so a resolved query replaces
-  // the store outright rather than merging into it.
   useEffect(() => {
     if (!apiCharacters) return;
     replaceCharacters(apiCharacters);
   }, [apiCharacters, replaceCharacters]);
 
-  // The live entry, not the render-time `characters` snapshot: mutation
-  // callbacks run after the request settles and must see the current value.
+  // Reads through to the store rather than the render-time `characters`, which
+  // mutation callbacks close over stale.
   const currentCharacter = useCallback(
     (id: CharacterId) => useCollectionStore.getState().characters[id],
     [],
   );
 
   /**
-   * Reports a failed mutation, undoing its optimistic write first if that write
-   * is still what the store holds.
-   *
-   * Rapid interactions can supersede an in-flight mutation, and reverting to a
-   * value the user has already moved on from is worse than leaving the next
-   * refetch to settle it. No retry is attempted either way.
+   * Rapid interactions can supersede an in-flight mutation, so a failure only
+   * reverts a write the store still holds: restoring a value the user has
+   * already moved past is worse than leaving the next refetch to settle it.
+   * No retry either way.
    */
   const reportFailure = useCallback(
     (action: string, isStillOptimistic: () => boolean, revert: () => void) => {
@@ -99,9 +93,6 @@ export function useCollection(): UseCollectionResult {
     },
     [],
   );
-
-  // Each mutation writes to zustand first for instant feedback, then fires the
-  // API call and reconciles on the response.
 
   const addCharacter = useCallback(
     (id: CharacterId) => {

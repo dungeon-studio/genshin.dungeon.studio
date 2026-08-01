@@ -45,7 +45,6 @@ export function WeaponsPage(): JSX.Element {
 
   const effectiveSelectedWeaponId = isAuthenticated ? selectedWeaponId : null;
 
-  // Collect weapon IDs that have at least one instance
   const ownedWeaponIds = useMemo(() => {
     const ids = new Set<string>();
     for (const instance of Object.values(weapons)) {
@@ -54,7 +53,6 @@ export function WeaponsPage(): JSX.Element {
     return ids;
   }, [weapons]);
 
-  // Count instances per weaponId for badges
   const instanceCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const instance of Object.values(weapons)) {
