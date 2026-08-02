@@ -155,7 +155,27 @@ jobs:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
+      # Keyed by firebase-tools, which pins the emulator artifacts it downloads,
+      # so the cache misses only when that dependency moves. Uncached, every run
+      # pulls ~130 MB of Firestore emulator before the stack can start.
+      - name: Resolve firebase-tools version
+        id: firebase-tools
+        run: |
+          version="$(node -p "require('./package.json').devDependencies['firebase-tools']")"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Firebase emulators
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/firebase/emulators
+          key: ${{ runner.os }}-firebase-emulators-${{ steps.firebase-tools.outputs.version }}
+
+      # The stack starts behind `firebase emulators:exec`, so the first
+      # readiness check absorbs emulator startup — and the download above on a
+      # cache miss. Matches the per-server budget in playwright.config.ts.
       - name: Verify dev stack starts
+        env:
+          TIMEOUT_SECONDS: '120'
         run: bash scripts/verify-dev.sh
 
   # Drives a real browser through the assembled stack — Firebase emulators, the
@@ -185,6 +205,19 @@ jobs:
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
+
+      # Same emulator downloads as the dev-smoke job; see the comment there.
+      - name: Resolve firebase-tools version
+        id: firebase-tools
+        run: |
+          version="$(node -p "require('./package.json').devDependencies['firebase-tools']")"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Firebase emulators
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/firebase/emulators
+          key: ${{ runner.os }}-firebase-emulators-${{ steps.firebase-tools.outputs.version }}
 
       # From the manifest, which syncpack keeps pinned exact: `pnpm exec` writes
       # warnings to the same stream as the version it reports, and both would
