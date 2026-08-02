@@ -167,6 +167,19 @@ describe('FilterBar', () => {
     expect(screen.queryByRole('button', { name: /Filters/ })).not.toBeInTheDocument();
   });
 
+  it('collapses only the chips, leaving search and sort reachable', () => {
+    renderBar({ collapsible: true });
+    const region = document.getElementById(
+      screen.getByRole('button', { name: 'Filters' }).getAttribute('aria-controls') ?? '',
+    );
+
+    expect(region).toContainElement(screen.getByRole('button', { name: 'Filter by A' }));
+    expect(region).not.toContainElement(
+      screen.getByRole('searchbox', { name: 'Search items by name' }),
+    );
+    expect(region).not.toContainElement(screen.getByRole('button', { name: 'Sort descending' }));
+  });
+
   it('starts collapsed and expands when the toggle is pressed', async () => {
     const user = userEvent.setup({ delay: null });
     renderBar({ collapsible: true });
