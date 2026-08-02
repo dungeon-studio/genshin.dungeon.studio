@@ -189,17 +189,21 @@ jobs:
           curl -fsSL "$SERVICE_URL/health"
           | jq -e '.status == "ok"'
 
-      # A request without an Origin header gets the same answer whatever
-      # FRONTEND_ORIGIN the service was deployed with, so the header is the
-      # whole check: the browser blocks on the response lacking a matching
-      # access-control-allow-origin, and nothing else here would notice.
+      # Whether the middleware honours its configuration is a unit test in
+      # app.test.ts. What only a deployed service can answer is whether it got
+      # the configuration: FRONTEND_ORIGIN falling out of the deploy is silent,
+      # because app.ts defaults to localhost, leaving a service that passes
+      # every health check while refusing every real browser.
       - name: Verify CORS Origin
         env:
           SERVICE_URL: ${{ steps.deploy.outputs.url }}
         run: |
-          curl -fsS -o /dev/null -D - -H "Origin: $FRONTEND_ORIGIN" "$SERVICE_URL/health" \
-            | tr -d '\r' \
-            | grep -Fqix "access-control-allow-origin: $FRONTEND_ORIGIN"
+          allowed=$(curl -fsS -o /dev/null -H "Origin: $FRONTEND_ORIGIN" \
+            -w '%header{access-control-allow-origin}' "$SERVICE_URL/health")
+          test "$allowed" = "$FRONTEND_ORIGIN" || {
+            echo "expected $FRONTEND_ORIGIN, got '${allowed:-<none>}'" >&2
+            exit 1
+          }
 
       - uses: ./.github/actions/setup-node-pnpm
 

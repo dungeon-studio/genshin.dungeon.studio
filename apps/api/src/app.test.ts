@@ -29,6 +29,31 @@ beforeAll(() => {
   });
 });
 
+// The web app is a different origin from the API in every deployed
+// environment, so the browser reaching it at all depends on this header. A
+// request without an `Origin` answers the same however the middleware is
+// configured, which is why the header is the whole test.
+describe('CORS', () => {
+  const origin = 'http://localhost:5173';
+
+  it('allows the configured frontend origin', async () => {
+    const res = await app.request('/health', { headers: { Origin: origin } });
+    expect(res.headers.get('access-control-allow-origin')).toBe(origin);
+  });
+
+  it('withholds the header from any other origin', async () => {
+    const res = await app.request('/health', {
+      headers: { Origin: 'https://not-the-frontend.example' },
+    });
+    expect(res.headers.get('access-control-allow-origin')).toBeNull();
+  });
+
+  it('allows credentials, so the browser sends the ID token', async () => {
+    const res = await app.request('/health', { headers: { Origin: origin } });
+    expect(res.headers.get('access-control-allow-credentials')).toBe('true');
+  });
+});
+
 describe('onError Retry-After header', () => {
   it('sets Retry-After on a 429 from a Firestore error', async () => {
     const res = await app.request('/__test/resource-exhausted');
