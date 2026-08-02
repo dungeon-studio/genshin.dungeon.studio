@@ -31,28 +31,6 @@ export function mergeCollections(
   return merged;
 }
 
-// Local entries the server is missing or behind on.
-export function mergeDiffs(
-  local: Record<CharacterId, CollectionCharacter>,
-  server: Record<CharacterId, CollectionCharacter>,
-): Array<{ characterId: CharacterId; level: number }> {
-  const merged = mergeCollections(local, server);
-  const diffs: Array<{ characterId: CharacterId; level: number }> = [];
-
-  for (const characterId of Object.keys(merged)) {
-    const { constellationLevel } = merged[characterId];
-    const serverEntry = server[characterId];
-    if (
-      isValidConstellationLevel(constellationLevel) &&
-      (!serverEntry || constellationLevel > serverEntry.constellationLevel)
-    ) {
-      diffs.push({ characterId, level: constellationLevel });
-    }
-  }
-
-  return diffs;
-}
-
 interface CollectionState {
   characters: Record<CharacterId, CollectionCharacter>;
   addCharacter: (characterId: CharacterId) => void;
@@ -60,6 +38,7 @@ interface CollectionState {
   setConstellationLevel: (characterId: CharacterId, level: number) => void;
   isOwned: (characterId: CharacterId) => boolean;
   getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
+  replaceCharacters: (characters: Record<CharacterId, CollectionCharacter>) => void;
   clearCharacters: () => void;
 }
 
@@ -113,6 +92,10 @@ export const useCollectionStore = create<CollectionState>()(
 
       getCharacter: (characterId) => {
         return get().characters[characterId];
+      },
+
+      replaceCharacters: (characters) => {
+        set({ characters });
       },
 
       clearCharacters: () => {

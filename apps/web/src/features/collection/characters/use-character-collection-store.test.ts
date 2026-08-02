@@ -4,7 +4,7 @@
 import type { CharacterId, CollectionCharacter, ISOTimestamp } from '@genshin/domain';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { mergeCollections, mergeDiffs, useCollectionStore } from './use-character-collection-store';
+import { mergeCollections, useCollectionStore } from './use-character-collection-store';
 
 function makeCharacter(id: string, constellationLevel = 0): CollectionCharacter {
   return {
@@ -90,6 +90,21 @@ describe('useCollectionStore', () => {
     });
   });
 
+  describe('replaceCharacters', () => {
+    it('replaces the entire collection', () => {
+      useCollectionStore.getState().addCharacter('amber' as CharacterId);
+      useCollectionStore
+        .getState()
+        .replaceCharacters({ xiangling: makeCharacter('xiangling') } as Record<
+          CharacterId,
+          CollectionCharacter
+        >);
+
+      expect(useCollectionStore.getState().characters['amber']).toBeUndefined();
+      expect(useCollectionStore.getState().characters['xiangling']).toBeDefined();
+    });
+  });
+
   describe('clearCharacters', () => {
     it('empties the collection', () => {
       useCollectionStore.getState().addCharacter('amber' as CharacterId);
@@ -139,32 +154,5 @@ describe('mergeCollections', () => {
     const merged = mergeCollections({}, server);
 
     expect(merged).toEqual(server);
-  });
-});
-
-describe('mergeDiffs', () => {
-  it('pushes local characters the server is missing or behind on', () => {
-    const local = {
-      amber: makeCharacter('amber', 3),
-      xiangling: makeCharacter('xiangling', 1),
-    } as Record<CharacterId, CollectionCharacter>;
-    const server = { amber: makeCharacter('amber', 1) } as Record<CharacterId, CollectionCharacter>;
-
-    expect(mergeDiffs(local, server)).toEqual(
-      expect.arrayContaining([
-        { characterId: 'amber', level: 3 },
-        { characterId: 'xiangling', level: 1 },
-      ]),
-    );
-  });
-
-  it('pushes nothing when the server is level with or ahead of local', () => {
-    const local = { amber: makeCharacter('amber', 1) } as Record<CharacterId, CollectionCharacter>;
-    const server = {
-      amber: makeCharacter('amber', 5),
-      xiangling: makeCharacter('xiangling', 2),
-    } as Record<CharacterId, CollectionCharacter>;
-
-    expect(mergeDiffs(local, server)).toEqual([]);
   });
 });

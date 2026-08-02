@@ -51,11 +51,21 @@ function renderTeamsPage() {
     { wrapper: createWrapper() },
   );
 
-  // Seeded after mount: the weapon hook clears its store on finding no signed-in user.
+  // Seeded after mount: the hooks clear their stores on finding no signed-in user.
   act(() => {
-    for (const character of [CLAYMORE_USER, BOW_USER]) {
-      useCollectionStore.getState().addCharacter(character.id);
-    }
+    useCollectionStore.getState().replaceCharacters(
+      Object.fromEntries(
+        [CLAYMORE_USER, BOW_USER].map((c) => [
+          c.id,
+          {
+            characterId: c.id,
+            constellationLevel: 0,
+            createdAt: TIMESTAMP,
+            updatedAt: TIMESTAMP,
+          },
+        ]),
+      ),
+    );
     useWeaponCollectionStore.getState().setWeapons({
       [CLAYMORE_INSTANCE]: {
         weaponInstanceId: CLAYMORE_INSTANCE,
