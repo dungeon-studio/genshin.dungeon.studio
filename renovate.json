@@ -86,8 +86,7 @@
       "addLabels": ["pre-commit"]
     },
     {
-      "description": "Group the Node.js version across .nvmrc, the devcontainer feature, and the API runtime Dockerfile into a single PR, keeping dev, CI, and production on one version.",
-      "matchManagers": ["nvm", "devcontainer", "dockerfile"],
+      "description": "Group every Node.js pin into a single PR, whichever manager reports it: .nvmrc, the devcontainer feature, the API runtime Dockerfile, and the package.json engines field.",
       "matchDepNames": ["node"],
       "groupName": "node",
       "groupSlug": "node",
