@@ -7,7 +7,7 @@
   "scripts": {
     "lint": "eslint .",
     "test:e2e": "firebase --config ../../firebase.json emulators:exec --only auth,firestore --project demo-dungeon-studio-genshin-dev 'playwright test'",
-    "test:deployed": "playwright test --config playwright-deployed.config.ts",
+    "test:deployed": ": \"${E2E_BASE_URL:?must name the origin of the deployment under test}\" && playwright test --grep @deployed --fully-parallel --workers 4 --retries 2",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

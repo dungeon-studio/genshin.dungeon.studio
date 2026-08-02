@@ -20,6 +20,13 @@ const artifactRoot = '/tmp/genshin-e2e';
 const WEB_URL = 'http://localhost:5173';
 const API_URL = 'http://localhost:8080';
 
+// The deployment to run against. Unset means the suite brings its own stack up
+// and points at that; set means something else is already serving. Everything
+// else that separates the two runs — which specs, how parallel, how many
+// retries — is a flag on the command, because only these two answers decide
+// what the suite is talking to.
+const target = process.env.E2E_BASE_URL;
+
 const junitReporter: ReporterDescription = [
   'junit',
   { outputFile: path.join(import.meta.dirname, 'test-results/e2e-junit.xml') },
@@ -50,31 +57,36 @@ export default defineConfig({
     : [['list'], junitReporter],
 
   use: {
-    baseURL: WEB_URL,
+    baseURL: target ?? WEB_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
 
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 
+  // Nothing to start when the target is already serving; a server started here
+  // would answer in its place.
+  //
   // The emulators belong to `firebase emulators:exec`, which wraps the whole run
   // from the test:e2e script. Starting them here would leave the Firestore
   // emulator's detached Java child holding port 8181 past teardown, against the
   // next run. Both servers below start before it and connect lazily.
-  webServer: [
-    {
-      command: 'pnpm --filter @genshin/api dev',
-      cwd: repoRoot,
-      url: API_URL,
-      reuseExistingServer: !process.env.CI,
-      timeout: 120_000,
-    },
-    {
-      command: 'pnpm exec vite',
-      cwd: path.join(repoRoot, 'apps/web'),
-      url: WEB_URL,
-      reuseExistingServer: !process.env.CI,
-      timeout: 120_000,
-    },
-  ],
+  webServer: target
+    ? undefined
+    : [
+        {
+          command: 'pnpm --filter @genshin/api dev',
+          cwd: repoRoot,
+          url: API_URL,
+          reuseExistingServer: !process.env.CI,
+          timeout: 120_000,
+        },
+        {
+          command: 'pnpm exec vite',
+          cwd: path.join(repoRoot, 'apps/web'),
+          url: WEB_URL,
+          reuseExistingServer: !process.env.CI,
+          timeout: 120_000,
+        },
+      ],
 });
