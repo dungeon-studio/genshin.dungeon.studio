@@ -16,11 +16,6 @@ export interface MutationResult {
   entry: CollectionCharacter;
 }
 
-// The cache snapshot TanStack Query threads from onMutate to onError.
-interface RollbackContext {
-  previous: CharacterRecord | undefined;
-}
-
 export function collectionKey(userId: string): readonly [string, string] {
   return ['characters', userId] as const;
 }
@@ -87,7 +82,7 @@ function useCollectionMutation<TVariables, TResult>(
   userId: string | undefined,
   mutationFn: (variables: TVariables) => Promise<TResult>,
   optimistic: (current: CharacterRecord, variables: TVariables) => CharacterRecord,
-): UseMutationResult<TResult, Error, TVariables, RollbackContext> {
+): UseMutationResult<TResult, Error, TVariables, CharacterRecord | undefined> {
   const queryClient = useQueryClient();
   const queryKey = collectionKey(userId ?? '');
 
@@ -98,10 +93,13 @@ function useCollectionMutation<TVariables, TResult>(
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData<CharacterRecord>(queryKey);
       queryClient.setQueryData<CharacterRecord>(queryKey, optimistic(previous ?? {}, variables));
-      return { previous };
+      return previous;
     },
-    onError: (_error, _variables, context) => {
-      if (context) queryClient.setQueryData<CharacterRecord>(queryKey, context.previous);
+    // TanStack hands back whatever onMutate returned. An undefined snapshot
+    // leaves the cache alone, so an optimistic write over an unloaded
+    // collection is corrected by the invalidation below rather than here.
+    onError: (_error, _variables, previous) => {
+      queryClient.setQueryData<CharacterRecord>(queryKey, previous);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
@@ -124,7 +122,7 @@ export function useCharacterCollectionQuery(
 
 export function useAddCharacterMutation(
   userId: string | undefined,
-): UseMutationResult<MutationResult, Error, CharacterId, RollbackContext> {
+): UseMutationResult<MutationResult, Error, CharacterId, CharacterRecord | undefined> {
   return useCollectionMutation(
     userId,
     (characterId: CharacterId) => putCharacter(characterId, MIN_CONSTELLATION_LEVEL),
@@ -134,7 +132,7 @@ export function useAddCharacterMutation(
 
 export function useRemoveCharacterMutation(
   userId: string | undefined,
-): UseMutationResult<void, Error, CharacterId, RollbackContext> {
+): UseMutationResult<void, Error, CharacterId, CharacterRecord | undefined> {
   return useCollectionMutation(
     userId,
     async (characterId: CharacterId) => {
@@ -150,7 +148,7 @@ export function useSetConstellationLevelMutation(
   MutationResult,
   Error,
   { characterId: CharacterId; level: number },
-  RollbackContext
+  CharacterRecord | undefined
 > {
   return useCollectionMutation(
     userId,
