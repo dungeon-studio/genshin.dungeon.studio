@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@genshin/game-data": "workspace:*",
-    "@playwright/test": "1.62.0"
+    "@playwright/test": "1.62.1"
   },
   "devDependencies": {
     "@genshin/eslint-config": "workspace:*",
