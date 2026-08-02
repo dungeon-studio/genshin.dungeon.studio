@@ -35,7 +35,15 @@ export interface FilterCategoryConfig<T extends string> {
   show?: boolean;
 }
 
-interface FilterBarProps<F extends BaseFilterState, T extends string> {
+/** How much of the collection survived the filters, and how much of that the user owns. */
+interface FilterCounts {
+  filteredCount: number;
+  totalCount: number;
+  ownedCount: number;
+  filteredOwnedCount: number;
+}
+
+interface FilterBarProps<F extends BaseFilterState, T extends string> extends FilterCounts {
   filters: F;
   onChange: (filters: F) => void;
   category: FilterCategoryConfig<T>;
@@ -43,10 +51,6 @@ interface FilterBarProps<F extends BaseFilterState, T extends string> {
   /** Plural noun for the status line, e.g. "characters". */
   noun: string;
   searchLabel: string;
-  filteredCount: number;
-  totalCount: number;
-  ownedCount: number;
-  filteredOwnedCount: number;
   showOwnership?: boolean;
   /** Hide the controls behind a toggle below the `sm` breakpoint, leaving the grid the viewport. */
   collapsible?: boolean;
@@ -61,37 +65,21 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
   sortFields,
   noun,
   searchLabel,
-  filteredCount,
-  totalCount,
-  ownedCount,
-  filteredOwnedCount,
   showOwnership = true,
   collapsible = false,
+  ...counts
 }: FilterBarProps<F, T>): JSX.Element {
   const showCategory = category.show ?? true;
   const sortLabel = sortFields.find((f) => f.value === filters.sortField)?.label ?? '';
   const controlsId = useId();
   const [expanded, setExpanded] = useState(false);
 
+  // Sorting reorders rather than narrows, so it never counts as an active filter.
   const activeFilterCount =
     (filters.search ? 1 : 0) +
     filters.rarities.size +
     (showCategory ? category.selected.size : 0) +
     (showOwnership && filters.ownership !== 'all' ? 1 : 0);
-
-  const status = !showOwnership ? (
-    <>
-      {filteredCount} {noun}
-    </>
-  ) : filteredCount === totalCount ? (
-    <>
-      {ownedCount} / {totalCount} owned
-    </>
-  ) : (
-    <>
-      {filteredOwnedCount} / {filteredCount} owned
-    </>
-  );
 
   function toggleRarity(rarity: Rarity) {
     onChange({ ...filters, rarities: toggleInSet(filters.rarities, rarity) });
@@ -114,30 +102,16 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
     <div className="space-y-1.5">
       {collapsible && (
         <div className="flex items-center gap-1.5 sm:hidden">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setExpanded(!expanded)}
-            aria-expanded={expanded}
-            aria-controls={controlsId}
-            aria-label={activeFilterCount > 0 ? `Filters, ${activeFilterCount} active` : 'Filters'}
-          >
-            <SlidersHorizontal
-              className="mr-1.5 h-3.5 w-3.5"
-              aria-hidden="true"
-              focusable={false}
-            />
-            Filters
-            {activeFilterCount > 0 && (
-              <span className="ml-1.5 rounded-full bg-foreground px-1.5 text-xs font-medium text-background">
-                {activeFilterCount}
-              </span>
-            )}
-          </Button>
+          <FilterToggle
+            expanded={expanded}
+            onToggle={() => setExpanded((wasExpanded) => !wasExpanded)}
+            activeCount={activeFilterCount}
+            controlsId={controlsId}
+          />
 
           <div className="flex-1" />
 
-          <p className="text-sm text-muted-foreground">{status}</p>
+          <FilterSummary noun={noun} showOwnership={showOwnership} {...counts} />
         </div>
       )}
 
@@ -245,9 +219,12 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
 
           <div className="flex-1" />
 
-          <p className={cn('text-sm text-muted-foreground', collapsible && 'max-sm:hidden')}>
-            {status}
-          </p>
+          <FilterSummary
+            noun={noun}
+            showOwnership={showOwnership}
+            {...counts}
+            className={collapsible ? 'max-sm:hidden' : undefined}
+          />
 
           <div className="flex shrink-0 items-center">
             <Button variant="outline" size="sm" onClick={cycleSortField} className="rounded-r-none">
@@ -270,5 +247,80 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
         </div>
       </div>
     </div>
+  );
+}
+
+interface FilterToggleProps {
+  expanded: boolean;
+  onToggle: () => void;
+  activeCount: number;
+  /** Element the button discloses, for `aria-controls`. */
+  controlsId: string;
+}
+
+function FilterToggle({
+  expanded,
+  onToggle,
+  activeCount,
+  controlsId,
+}: FilterToggleProps): JSX.Element {
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={onToggle}
+      aria-expanded={expanded}
+      aria-controls={controlsId}
+      // The badge reads as part of the word without one, e.g. "Filters3".
+      aria-label={activeCount > 0 ? `Filters, ${activeCount} active` : 'Filters'}
+    >
+      <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" focusable={false} />
+      Filters
+      {activeCount > 0 && (
+        <span className="ml-1.5 rounded-full bg-foreground px-1.5 text-xs font-medium text-background">
+          {activeCount}
+        </span>
+      )}
+    </Button>
+  );
+}
+
+interface FilterSummaryProps extends FilterCounts {
+  noun: string;
+  showOwnership: boolean;
+  className?: string;
+}
+
+function FilterSummary({
+  noun,
+  showOwnership,
+  filteredCount,
+  totalCount,
+  ownedCount,
+  filteredOwnedCount,
+  className,
+}: FilterSummaryProps): JSX.Element {
+  const text = cn('text-sm text-muted-foreground', className);
+
+  if (!showOwnership) {
+    return (
+      <p className={text}>
+        {filteredCount} {noun}
+      </p>
+    );
+  }
+
+  if (filteredCount === totalCount) {
+    return (
+      <p className={text}>
+        {ownedCount} / {totalCount} owned
+      </p>
+    );
+  }
+
+  return (
+    <p className={text}>
+      {filteredOwnedCount} / {filteredCount} owned
+    </p>
   );
 }
