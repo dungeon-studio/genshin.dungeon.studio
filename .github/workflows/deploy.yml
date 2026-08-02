@@ -189,6 +189,18 @@ jobs:
           curl -fsSL "$SERVICE_URL/health"
           | jq -e '.status == "ok"'
 
+      # A request without an Origin header gets the same answer whatever
+      # FRONTEND_ORIGIN the service was deployed with, so the header is the
+      # whole check: the browser blocks on the response lacking a matching
+      # access-control-allow-origin, and nothing else here would notice.
+      - name: Verify CORS Origin
+        env:
+          SERVICE_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          curl -fsS -o /dev/null -D - -H "Origin: $FRONTEND_ORIGIN" "$SERVICE_URL/health" \
+            | tr -d '\r' \
+            | grep -Fqix "access-control-allow-origin: $FRONTEND_ORIGIN"
+
       - uses: ./.github/actions/setup-node-pnpm
 
       - name: Generate Verify Token

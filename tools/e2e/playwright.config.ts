@@ -6,13 +6,19 @@ import path from 'node:path';
 import type { ReporterDescription } from '@playwright/test';
 import { defineConfig, devices } from '@playwright/test';
 
-import { LOCAL_API_ORIGIN, LOCAL_WEB_ORIGIN } from './specs/origins';
-
 const repoRoot = path.resolve(import.meta.dirname, '../..');
 
 // Artifacts land outside the workspace so no gitignore entry has to keep pace
 // with them; see .github/copilot-instructions.md.
 const artifactRoot = '/tmp/genshin-e2e';
+
+// Ports match apps/api/src/main.ts and vite.config.ts. The host has to be
+// `localhost`, not 127.0.0.1: Firebase's popup sign-in returns the credential
+// to the origin that opened it, and the emulator serves its handler from
+// localhost. These are also the API's default CORS origin and the app's default
+// API base URL, so neither server needs configuring below.
+const WEB_URL = 'http://localhost:5173';
+const API_URL = 'http://localhost:8080';
 
 const junitReporter: ReporterDescription = [
   'junit',
@@ -44,7 +50,7 @@ export default defineConfig({
     : [['list'], junitReporter],
 
   use: {
-    baseURL: LOCAL_WEB_ORIGIN,
+    baseURL: WEB_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
@@ -59,14 +65,14 @@ export default defineConfig({
     {
       command: 'pnpm --filter @genshin/api dev',
       cwd: repoRoot,
-      url: LOCAL_API_ORIGIN,
+      url: API_URL,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
     },
     {
       command: 'pnpm exec vite',
       cwd: path.join(repoRoot, 'apps/web'),
-      url: LOCAL_WEB_ORIGIN,
+      url: WEB_URL,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
     },
