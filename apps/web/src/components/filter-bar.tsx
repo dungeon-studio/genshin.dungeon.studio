@@ -35,7 +35,6 @@ export interface FilterCategoryConfig<T extends string> {
   show?: boolean;
 }
 
-/** How much of the collection survived the filters, and how much of that the user owns. */
 interface FilterCounts {
   filteredCount: number;
   totalCount: number;
@@ -48,11 +47,11 @@ interface FilterBarProps<F extends BaseFilterState, T extends string> extends Fi
   onChange: (filters: F) => void;
   category: FilterCategoryConfig<T>;
   sortFields: readonly { value: F['sortField']; label: string }[];
-  /** Plural noun for the status line, e.g. "characters". */
+  /** Plural noun for the summary, e.g. "characters". */
   noun: string;
   searchLabel: string;
   showOwnership?: boolean;
-  /** Hide the controls behind a toggle below the `sm` breakpoint, leaving the grid the viewport. */
+  /** Hide the controls behind a toggle below the `sm` breakpoint. */
   collapsible?: boolean;
 }
 
@@ -74,7 +73,7 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
   const controlsId = useId();
   const [expanded, setExpanded] = useState(false);
 
-  // Sorting reorders rather than narrows, so it never counts as an active filter.
+  // Sorting reorders rather than narrows, so it never counts.
   const activeFilterCount =
     (filters.search ? 1 : 0) +
     filters.rarities.size +
@@ -254,7 +253,6 @@ interface FilterToggleProps {
   expanded: boolean;
   onToggle: () => void;
   activeCount: number;
-  /** Element the button discloses, for `aria-controls`. */
   controlsId: string;
 }
 
@@ -271,7 +269,7 @@ function FilterToggle({
       onClick={onToggle}
       aria-expanded={expanded}
       aria-controls={controlsId}
-      // The badge reads as part of the word without one, e.g. "Filters3".
+      // Without an explicit label the badge joins the text: "Filters3".
       aria-label={activeCount > 0 ? `Filters, ${activeCount} active` : 'Filters'}
     >
       <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" focusable={false} />

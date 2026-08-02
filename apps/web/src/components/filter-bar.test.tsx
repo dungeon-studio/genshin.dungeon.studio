@@ -188,7 +188,7 @@ describe('FilterBar', () => {
     expect(screen.getByRole('button', { name: 'Filters, 5 active' })).toBeInTheDocument();
   });
 
-  it('leaves the toggle unbadged when sorting alone is not a filter', () => {
+  it('leaves the toggle unbadged when only the sort field is set', () => {
     renderBar({ collapsible: true, filters: baseFilters({ sortField: 'name' }) });
 
     expect(screen.getByRole('button', { name: 'Filters' })).toBeInTheDocument();
