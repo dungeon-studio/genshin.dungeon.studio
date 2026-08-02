@@ -21,7 +21,7 @@
     "ajv": "8.20.0",
     "content-type": "2.0.0",
     "firebase-admin": "14.2.0",
-    "google-gax": "5.0.8",
+    "google-gax": "6.0.0",
     "hono": "4.12.32",
     "negotiator": "1.0.0",
     "verzod": "0.5.1",
