@@ -56,8 +56,7 @@ COPY --from=builder /app/packages/validation ./packages/validation
 
 EXPOSE 8080
 
-# The base image's node user, numeric so a host checking for non-root does not
-# have to resolve the name.
+# The base image's node user; hosts verifying non-root cannot resolve the name
 USER 1000:1000
 
 CMD ["node", "apps/api/dist/main.js"]
