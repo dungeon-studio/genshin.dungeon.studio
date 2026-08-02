@@ -146,6 +146,7 @@ export function WeaponsPage(): JSX.Element {
             totalCount={WEAPONS.length}
             ownedCount={ownedWeaponIds.size}
             filteredOwnedCount={filteredOwnedCount}
+            collapsible
           />
         </Container>
       </div>

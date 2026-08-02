@@ -25,6 +25,7 @@ function renderBar(
     filters?: BaseFilterState;
     category?: Partial<FilterCategoryConfig<string>>;
     showOwnership?: boolean;
+    collapsible?: boolean;
     filteredCount?: number;
     totalCount?: number;
     ownedCount?: number;
@@ -55,6 +56,7 @@ function renderBar(
       ownedCount={props.ownedCount ?? 2}
       filteredOwnedCount={props.filteredOwnedCount ?? 2}
       showOwnership={props.showOwnership}
+      collapsible={props.collapsible}
     />,
   );
 
@@ -157,5 +159,49 @@ describe('FilterBar', () => {
     renderBar({ filteredCount: 3, totalCount: 5, filteredOwnedCount: 1 });
 
     expect(screen.getByText(/1 \/ 3 owned/)).toBeInTheDocument();
+  });
+
+  it('offers no collapse toggle unless asked for one', () => {
+    renderBar();
+
+    expect(screen.queryByRole('button', { name: /Filters/ })).not.toBeInTheDocument();
+  });
+
+  it('starts collapsed and expands when the toggle is pressed', async () => {
+    const user = userEvent.setup({ delay: null });
+    renderBar({ collapsible: true });
+    const toggle = screen.getByRole('button', { name: /Filters/ });
+
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await user.click(toggle);
+
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('counts every kind of narrowing filter on the toggle', () => {
+    renderBar({
+      collapsible: true,
+      filters: baseFilters({ search: 'amber', rarities: new Set([5, 4]), ownership: 'owned' }),
+      category: { selected: new Set(['A']) },
+    });
+
+    expect(screen.getByRole('button', { name: 'Filters, 5 active' })).toBeInTheDocument();
+  });
+
+  it('leaves the toggle unbadged when sorting alone is not a filter', () => {
+    renderBar({ collapsible: true, filters: baseFilters({ sortField: 'name' }) });
+
+    expect(screen.getByRole('button', { name: 'Filters' })).toBeInTheDocument();
+  });
+
+  it('ignores filters whose rows are hidden when counting', () => {
+    renderBar({
+      collapsible: true,
+      showOwnership: false,
+      filters: baseFilters({ ownership: 'owned' }),
+      category: { show: false, selected: new Set(['A']) },
+    });
+
+    expect(screen.getByRole('button', { name: 'Filters' })).toBeInTheDocument();
   });
 });

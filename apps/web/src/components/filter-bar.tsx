@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import type { Rarity } from '@genshin/game-data';
-import { ArrowDownWideNarrow, ArrowUpNarrowWide, Search } from 'lucide-react';
+import { ArrowDownWideNarrow, ArrowUpNarrowWide, Search, SlidersHorizontal } from 'lucide-react';
 import type { JSX } from 'react';
+import { useId, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,6 +48,8 @@ interface FilterBarProps<F extends BaseFilterState, T extends string> {
   ownedCount: number;
   filteredOwnedCount: number;
   showOwnership?: boolean;
+  /** Hide the controls behind a toggle below the `sm` breakpoint, leaving the grid the viewport. */
+  collapsible?: boolean;
 }
 
 const RARITY_VALUES: Rarity[] = [5, 4];
@@ -63,9 +66,32 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
   ownedCount,
   filteredOwnedCount,
   showOwnership = true,
+  collapsible = false,
 }: FilterBarProps<F, T>): JSX.Element {
   const showCategory = category.show ?? true;
   const sortLabel = sortFields.find((f) => f.value === filters.sortField)?.label ?? '';
+  const controlsId = useId();
+  const [expanded, setExpanded] = useState(false);
+
+  const activeFilterCount =
+    (filters.search ? 1 : 0) +
+    filters.rarities.size +
+    (showCategory ? category.selected.size : 0) +
+    (showOwnership && filters.ownership !== 'all' ? 1 : 0);
+
+  const status = !showOwnership ? (
+    <>
+      {filteredCount} {noun}
+    </>
+  ) : filteredCount === totalCount ? (
+    <>
+      {ownedCount} / {totalCount} owned
+    </>
+  ) : (
+    <>
+      {filteredOwnedCount} / {filteredCount} owned
+    </>
+  );
 
   function toggleRarity(rarity: Rarity) {
     onChange({ ...filters, rarities: toggleInSet(filters.rarities, rarity) });
@@ -86,139 +112,161 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
 
   return (
     <div className="space-y-1.5">
-      <div className="flex flex-wrap items-center gap-1.5">
-        {showOwnership &&
-          (['all', 'owned', 'unowned'] as const).map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => onChange({ ...filters, ownership: value })}
-              className={cn(
-                'rounded-full px-2.5 py-1 text-xs font-medium capitalize transition-colors',
-                filters.ownership === value
-                  ? 'bg-foreground text-background'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80',
-              )}
-              aria-pressed={filters.ownership === value}
-            >
-              {value}
-            </button>
-          ))}
-
-        {showOwnership && (
-          <span className="self-center text-border" aria-hidden="true">
-            |
-          </span>
-        )}
-
-        {RARITY_VALUES.map((rarity) => (
-          <button
-            key={rarity}
-            type="button"
-            onClick={() => toggleRarity(rarity)}
-            className={cn(
-              'rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
-              filters.rarities.has(rarity)
-                ? 'bg-geo-dark text-white'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80',
-            )}
-            aria-pressed={filters.rarities.has(rarity)}
-            aria-label={`Filter by ${rarity}-star`}
-          >
-            {rarity}★
-          </button>
-        ))}
-
-        {showCategory && (
-          <span className="self-center text-border" aria-hidden="true">
-            |
-          </span>
-        )}
-
-        {showCategory &&
-          category.values.map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => category.onToggle(value)}
-              className={cn(
-                'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
-                category.selected.has(value)
-                  ? category.activeClassName(value)
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80',
-              )}
-              aria-pressed={category.selected.has(value)}
-              aria-label={`Filter by ${value}`}
-            >
-              <img
-                src={category.iconPath(value, 'light')}
-                alt=""
-                className="h-3.5 w-3.5 dark:hidden"
-                aria-hidden="true"
-              />
-              <img
-                src={category.iconPath(value, 'dark')}
-                alt=""
-                className="hidden h-3.5 w-3.5 dark:block"
-                aria-hidden="true"
-              />
-              {value}
-            </button>
-          ))}
-      </div>
-
-      <div className="flex items-center gap-1.5">
-        <div className="relative w-1/2 lg:w-1/3">
-          <Search
-            className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-            aria-hidden="true"
-            focusable={false}
-          />
-          <Input
-            type="search"
-            placeholder="Search…"
-            value={filters.search}
-            onChange={(e) => onChange({ ...filters, search: e.target.value })}
-            className="h-8 pl-9 text-xs [&::-webkit-search-cancel-button]:grayscale"
-            aria-label={searchLabel}
-          />
-        </div>
-
-        <div className="flex-1" />
-
-        <p className="text-sm text-muted-foreground">
-          {!showOwnership ? (
-            <>
-              {filteredCount} {noun}
-            </>
-          ) : filteredCount === totalCount ? (
-            <>
-              {ownedCount} / {totalCount} owned
-            </>
-          ) : (
-            <>
-              {filteredOwnedCount} / {filteredCount} owned
-            </>
-          )}
-        </p>
-
-        <div className="flex shrink-0 items-center">
-          <Button variant="outline" size="sm" onClick={cycleSortField} className="rounded-r-none">
-            {sortLabel}
-          </Button>
+      {collapsible && (
+        <div className="flex items-center gap-1.5 sm:hidden">
           <Button
             variant="outline"
             size="sm"
-            onClick={toggleSortDirection}
-            aria-label={`Sort ${filters.sortDirection === 'asc' ? 'ascending' : 'descending'}`}
-            className="-ml-px rounded-l-none px-1.5"
+            onClick={() => setExpanded(!expanded)}
+            aria-expanded={expanded}
+            aria-controls={controlsId}
+            aria-label={activeFilterCount > 0 ? `Filters, ${activeFilterCount} active` : 'Filters'}
           >
-            {filters.sortDirection === 'asc' ? (
-              <ArrowUpNarrowWide className="h-3.5 w-3.5" aria-hidden="true" focusable={false} />
-            ) : (
-              <ArrowDownWideNarrow className="h-3.5 w-3.5" aria-hidden="true" focusable={false} />
+            <SlidersHorizontal
+              className="mr-1.5 h-3.5 w-3.5"
+              aria-hidden="true"
+              focusable={false}
+            />
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="ml-1.5 rounded-full bg-foreground px-1.5 text-xs font-medium text-background">
+                {activeFilterCount}
+              </span>
             )}
           </Button>
+
+          <div className="flex-1" />
+
+          <p className="text-sm text-muted-foreground">{status}</p>
+        </div>
+      )}
+
+      <div
+        id={controlsId}
+        className={cn('space-y-1.5', collapsible && !expanded && 'hidden sm:block')}
+      >
+        <div className="flex flex-wrap items-center gap-1.5">
+          {showOwnership &&
+            (['all', 'owned', 'unowned'] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => onChange({ ...filters, ownership: value })}
+                className={cn(
+                  'rounded-full px-2.5 py-1 text-xs font-medium capitalize transition-colors',
+                  filters.ownership === value
+                    ? 'bg-foreground text-background'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80',
+                )}
+                aria-pressed={filters.ownership === value}
+              >
+                {value}
+              </button>
+            ))}
+
+          {showOwnership && (
+            <span className="self-center text-border" aria-hidden="true">
+              |
+            </span>
+          )}
+
+          {RARITY_VALUES.map((rarity) => (
+            <button
+              key={rarity}
+              type="button"
+              onClick={() => toggleRarity(rarity)}
+              className={cn(
+                'rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
+                filters.rarities.has(rarity)
+                  ? 'bg-geo-dark text-white'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80',
+              )}
+              aria-pressed={filters.rarities.has(rarity)}
+              aria-label={`Filter by ${rarity}-star`}
+            >
+              {rarity}★
+            </button>
+          ))}
+
+          {showCategory && (
+            <span className="self-center text-border" aria-hidden="true">
+              |
+            </span>
+          )}
+
+          {showCategory &&
+            category.values.map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => category.onToggle(value)}
+                className={cn(
+                  'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
+                  category.selected.has(value)
+                    ? category.activeClassName(value)
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80',
+                )}
+                aria-pressed={category.selected.has(value)}
+                aria-label={`Filter by ${value}`}
+              >
+                <img
+                  src={category.iconPath(value, 'light')}
+                  alt=""
+                  className="h-3.5 w-3.5 dark:hidden"
+                  aria-hidden="true"
+                />
+                <img
+                  src={category.iconPath(value, 'dark')}
+                  alt=""
+                  className="hidden h-3.5 w-3.5 dark:block"
+                  aria-hidden="true"
+                />
+                {value}
+              </button>
+            ))}
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          <div className="relative w-1/2 lg:w-1/3">
+            <Search
+              className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden="true"
+              focusable={false}
+            />
+            <Input
+              type="search"
+              placeholder="Search…"
+              value={filters.search}
+              onChange={(e) => onChange({ ...filters, search: e.target.value })}
+              className="h-8 pl-9 text-xs [&::-webkit-search-cancel-button]:grayscale"
+              aria-label={searchLabel}
+            />
+          </div>
+
+          <div className="flex-1" />
+
+          <p className={cn('text-sm text-muted-foreground', collapsible && 'max-sm:hidden')}>
+            {status}
+          </p>
+
+          <div className="flex shrink-0 items-center">
+            <Button variant="outline" size="sm" onClick={cycleSortField} className="rounded-r-none">
+              {sortLabel}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleSortDirection}
+              aria-label={`Sort ${filters.sortDirection === 'asc' ? 'ascending' : 'descending'}`}
+              className="-ml-px rounded-l-none px-1.5"
+            >
+              {filters.sortDirection === 'asc' ? (
+                <ArrowUpNarrowWide className="h-3.5 w-3.5" aria-hidden="true" focusable={false} />
+              ) : (
+                <ArrowDownWideNarrow className="h-3.5 w-3.5" aria-hidden="true" focusable={false} />
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
