@@ -57,7 +57,7 @@ interface FilterBarProps<F extends BaseFilterState, T extends string> extends Fi
   noun: string;
   searchLabel: string;
   showOwnership?: boolean;
-  /** Hide the controls behind a toggle below the `sm` breakpoint. */
+  /** Hide the filter chips behind a toggle below the `sm` breakpoint. */
   collapsible?: boolean;
 }
 
@@ -325,7 +325,6 @@ function FilterToggle({
           {activeCount}
         </span>
       )}
-      {/* Turning marks the state change, so neither direction has to be read as a fixed meaning. */}
       <ChevronDown
         className={cn('h-3.5 w-3.5 transition-transform', expanded && 'rotate-180')}
         aria-hidden="true"
