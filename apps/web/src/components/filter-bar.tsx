@@ -123,25 +123,28 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
           />
         </div>
 
-        <FilterSummary noun={noun} showOwnership={showOwnership} {...counts} />
+        {/* Held together so the slack falls before the pair, not between them. */}
+        <div className="ml-auto flex shrink-0 items-center gap-1.5">
+          <FilterSummary noun={noun} showOwnership={showOwnership} {...counts} />
 
-        <div className="ml-auto flex shrink-0 items-center">
-          <Button variant="outline" size="sm" onClick={cycleSortField} className="rounded-r-none">
-            {sortLabel}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleSortDirection}
-            aria-label={`Sort ${filters.sortDirection === 'asc' ? 'ascending' : 'descending'}`}
-            className="-ml-px rounded-l-none px-1.5"
-          >
-            {filters.sortDirection === 'asc' ? (
-              <ArrowUpNarrowWide className="h-3.5 w-3.5" aria-hidden="true" focusable={false} />
-            ) : (
-              <ArrowDownWideNarrow className="h-3.5 w-3.5" aria-hidden="true" focusable={false} />
-            )}
-          </Button>
+          <div className="flex items-center">
+            <Button variant="outline" size="sm" onClick={cycleSortField} className="rounded-r-none">
+              {sortLabel}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleSortDirection}
+              aria-label={`Sort ${filters.sortDirection === 'asc' ? 'ascending' : 'descending'}`}
+              className="-ml-px rounded-l-none px-1.5"
+            >
+              {filters.sortDirection === 'asc' ? (
+                <ArrowUpNarrowWide className="h-3.5 w-3.5" aria-hidden="true" focusable={false} />
+              ) : (
+                <ArrowDownWideNarrow className="h-3.5 w-3.5" aria-hidden="true" focusable={false} />
+              )}
+            </Button>
+          </div>
         </div>
       </div>
 
