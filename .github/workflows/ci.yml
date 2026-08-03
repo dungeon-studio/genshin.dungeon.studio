@@ -148,14 +148,16 @@ jobs:
 
       - uses: ./.github/actions/setup-node-pnpm
 
-      # The Firestore emulator is a Java process.
-      - name: Set up Java
-        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+      - uses: ./.github/actions/setup-firebase-emulators
         with:
-          distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
+      # The stack starts behind `firebase emulators:exec`, so the first
+      # readiness check absorbs emulator startup — and the emulator download on
+      # a cache miss. Matches the per-server budget in playwright.config.ts.
       - name: Verify dev stack starts
+        env:
+          TIMEOUT_SECONDS: '120'
         run: bash scripts/verify-dev.sh
 
   # Drives a real browser through the assembled stack — Firebase emulators, the
@@ -178,12 +180,8 @@ jobs:
 
       - uses: ./.github/actions/setup-node-pnpm
 
-      # The Firestore emulator is a Java process. Pinning it here keeps the job
-      # off whatever JDK happens to be baked into the runner image.
-      - name: Set up Java
-        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+      - uses: ./.github/actions/setup-firebase-emulators
         with:
-          distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
       # From the manifest, which syncpack keeps pinned exact: `pnpm exec` writes

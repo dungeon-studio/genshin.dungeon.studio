@@ -1,0 +1,43 @@
+---
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+name: Setup Firebase emulators
+description: Install the JDK the emulators run on and restore their downloaded artifacts
+
+inputs:
+  java-version:
+    description: JDK version for the emulators. Renovate tracks it in the caller's env block.
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    # The Firestore emulator is a Java process. Pinning it here keeps the jobs
+    # off whatever JDK happens to be baked into the runner image.
+    - name: Set up Java
+      uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+      with:
+        distribution: temurin
+        java-version: ${{ inputs.java-version }}
+
+    # From the manifest, which syncpack keeps pinned exact: `pnpm exec` writes
+    # warnings to the same stream as the version it reports, and both would land
+    # in GITHUB_OUTPUT.
+    - name: Resolve firebase-tools version
+      id: firebase-tools
+      shell: bash
+      run: |
+        version="$(node -p "require('./package.json').devDependencies['firebase-tools']")"
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+
+    # Keyed by firebase-tools, which pins the emulator artifacts it downloads,
+    # so the cache misses only when that dependency moves. Uncached, every run
+    # pulls ~130 MB of Firestore emulator before the stack can start, inside
+    # whatever readiness budget the caller allows.
+    - name: Cache Firebase emulators
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.cache/firebase/emulators
+        key: ${{ runner.os }}-firebase-emulators-${{ steps.firebase-tools.outputs.version }}
