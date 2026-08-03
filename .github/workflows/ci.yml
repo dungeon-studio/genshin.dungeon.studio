@@ -246,7 +246,7 @@ jobs:
       # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
       TERRAFORM_VERSION: '1.15.8'
       # renovate: datasource=github-releases depName=hadolint/hadolint
-      HADOLINT_VERSION: 'v2.15.0'
+      HADOLINT_VERSION: 'v2.15.1'
       # renovate: datasource=github-releases depName=lycheeverse/lychee extractVersion=^lychee-v(?<version>.+)$
       LYCHEE_VERSION: '0.24.2'
       # renovate: datasource=github-releases depName=aquasecurity/trivy extractVersion=^v(?<version>.+)$
