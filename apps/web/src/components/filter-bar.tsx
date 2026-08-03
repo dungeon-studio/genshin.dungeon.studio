@@ -75,7 +75,6 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
   ...counts
 }: FilterBarProps<F, T>): JSX.Element {
   const showCategory = category.show ?? true;
-  const sortLabel = sortFields.find((f) => f.value === filters.sortField)?.label ?? '';
   const controlsId = useId();
   const [expanded, setExpanded] = useState(false);
 
@@ -86,65 +85,20 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
     (showCategory ? category.selected.size : 0) +
     (showOwnership && filters.ownership !== 'all' ? 1 : 0);
 
-  function toggleRarity(rarity: Rarity) {
-    onChange({ ...filters, rarities: toggleInSet(filters.rarities, rarity) });
-  }
-
-  function cycleSortField() {
-    const currentIndex = sortFields.findIndex((f) => f.value === filters.sortField);
-    const nextField = sortFields[(currentIndex + 1) % sortFields.length].value;
-    onChange({ ...filters, sortField: nextField });
-  }
-
-  function toggleSortDirection() {
-    onChange({
-      ...filters,
-      sortDirection: filters.sortDirection === 'asc' ? 'desc' : 'asc',
-    });
-  }
-
   return (
     <div className="space-y-1.5">
       {/* Wraps rather than squeezing the search box below its placeholder on ~320px screens. */}
       <div className="flex flex-wrap items-center gap-1.5">
-        <div className="relative min-w-28 flex-1 md:max-w-md">
-          <Search
-            className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-            aria-hidden="true"
-            focusable={false}
-          />
-          <Input
-            type="search"
-            placeholder="Search…"
-            value={filters.search}
-            onChange={(e) => onChange({ ...filters, search: e.target.value })}
-            className="h-8 pl-9 text-xs [&::-webkit-search-cancel-button]:grayscale"
-            aria-label={searchLabel}
-          />
-        </div>
+        <SearchField
+          value={filters.search}
+          onChange={(search) => onChange({ ...filters, search })}
+          label={searchLabel}
+        />
 
         {/* Held together so the slack falls before the pair, not between them. */}
         <div className="ml-auto flex shrink-0 items-center gap-1.5">
           <FilterSummary noun={noun} showOwnership={showOwnership} {...counts} />
-
-          <div className="flex items-center">
-            <Button variant="outline" size="sm" onClick={cycleSortField} className="rounded-r-none">
-              {sortLabel}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={toggleSortDirection}
-              aria-label={`Sort ${filters.sortDirection === 'asc' ? 'ascending' : 'descending'}`}
-              className="-ml-px rounded-l-none px-1.5"
-            >
-              {filters.sortDirection === 'asc' ? (
-                <ArrowUpNarrowWide className="h-3.5 w-3.5" aria-hidden="true" focusable={false} />
-              ) : (
-                <ArrowDownWideNarrow className="h-3.5 w-3.5" aria-hidden="true" focusable={false} />
-              )}
-            </Button>
-          </div>
+          <SortControl filters={filters} onChange={onChange} sortFields={sortFields} />
         </div>
       </div>
 
@@ -159,93 +113,185 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
         </div>
       )}
 
-      <div
-        id={controlsId}
-        className={cn(
-          'flex flex-wrap items-center gap-1.5',
-          collapsible && !expanded && 'hidden sm:flex',
-        )}
+      <div id={controlsId} className={cn(collapsible && !expanded && 'hidden sm:block')}>
+        <FilterChips
+          filters={filters}
+          onChange={onChange}
+          category={category}
+          showOwnership={showOwnership}
+        />
+      </div>
+    </div>
+  );
+}
+
+interface SearchFieldProps {
+  value: string;
+  onChange: (value: string) => void;
+  label: string;
+}
+
+function SearchField({ value, onChange, label }: SearchFieldProps): JSX.Element {
+  return (
+    <div className="relative min-w-28 flex-1 md:max-w-md">
+      <Search
+        className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+        aria-hidden="true"
+        focusable={false}
+      />
+      <Input
+        type="search"
+        placeholder="Search…"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-8 pl-9 text-xs [&::-webkit-search-cancel-button]:grayscale"
+        aria-label={label}
+      />
+    </div>
+  );
+}
+
+interface SortControlProps<F extends BaseFilterState> {
+  filters: F;
+  onChange: (filters: F) => void;
+  sortFields: readonly { value: F['sortField']; label: string }[];
+}
+
+function SortControl<F extends BaseFilterState>({
+  filters,
+  onChange,
+  sortFields,
+}: SortControlProps<F>): JSX.Element {
+  const label = sortFields.find((f) => f.value === filters.sortField)?.label ?? '';
+  const ascending = filters.sortDirection === 'asc';
+
+  function cycleField() {
+    const currentIndex = sortFields.findIndex((f) => f.value === filters.sortField);
+    onChange({ ...filters, sortField: sortFields[(currentIndex + 1) % sortFields.length].value });
+  }
+
+  function toggleDirection() {
+    onChange({ ...filters, sortDirection: ascending ? 'desc' : 'asc' });
+  }
+
+  return (
+    <div className="flex items-center">
+      <Button variant="outline" size="sm" onClick={cycleField} className="rounded-r-none">
+        {label}
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={toggleDirection}
+        aria-label={`Sort ${ascending ? 'ascending' : 'descending'}`}
+        className="-ml-px rounded-l-none px-1.5"
       >
-        {showOwnership &&
-          (['all', 'owned', 'unowned'] as const).map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => onChange({ ...filters, ownership: value })}
-              className={cn(
-                'rounded-full px-2.5 py-1 text-xs font-medium capitalize transition-colors',
-                filters.ownership === value
-                  ? 'bg-foreground text-background'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80',
-              )}
-              aria-pressed={filters.ownership === value}
-            >
-              {value}
-            </button>
-          ))}
-
-        {showOwnership && (
-          <span className="self-center text-border" aria-hidden="true">
-            |
-          </span>
+        {ascending ? (
+          <ArrowUpNarrowWide className="h-3.5 w-3.5" aria-hidden="true" focusable={false} />
+        ) : (
+          <ArrowDownWideNarrow className="h-3.5 w-3.5" aria-hidden="true" focusable={false} />
         )}
+      </Button>
+    </div>
+  );
+}
 
-        {RARITY_VALUES.map((rarity) => (
+const CHIP = 'rounded-full px-2.5 py-1 text-xs font-medium transition-colors';
+const CHIP_IDLE = 'bg-muted text-muted-foreground hover:bg-muted/80';
+
+interface FilterChipsProps<F extends BaseFilterState, T extends string> {
+  filters: F;
+  onChange: (filters: F) => void;
+  category: FilterCategoryConfig<T>;
+  showOwnership: boolean;
+}
+
+function FilterChips<F extends BaseFilterState, T extends string>({
+  filters,
+  onChange,
+  category,
+  showOwnership,
+}: FilterChipsProps<F, T>): JSX.Element {
+  const showCategory = category.show ?? true;
+
+  function toggleRarity(rarity: Rarity) {
+    onChange({ ...filters, rarities: toggleInSet(filters.rarities, rarity) });
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      {showOwnership &&
+        (['all', 'owned', 'unowned'] as const).map((value) => (
           <button
-            key={rarity}
+            key={value}
             type="button"
-            onClick={() => toggleRarity(rarity)}
+            onClick={() => onChange({ ...filters, ownership: value })}
             className={cn(
-              'rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
-              filters.rarities.has(rarity)
-                ? 'bg-geo-dark text-white'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80',
+              CHIP,
+              'capitalize',
+              filters.ownership === value ? 'bg-foreground text-background' : CHIP_IDLE,
             )}
-            aria-pressed={filters.rarities.has(rarity)}
-            aria-label={`Filter by ${rarity}-star`}
+            aria-pressed={filters.ownership === value}
           >
-            {rarity}★
+            {value}
           </button>
         ))}
 
-        {showCategory && (
-          <span className="self-center text-border" aria-hidden="true">
-            |
-          </span>
-        )}
+      {showOwnership && <ChipDivider />}
 
-        {showCategory &&
-          category.values.map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => category.onToggle(value)}
-              className={cn(
-                'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
-                category.selected.has(value)
-                  ? category.activeClassName(value)
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80',
-              )}
-              aria-pressed={category.selected.has(value)}
-              aria-label={`Filter by ${value}`}
-            >
-              <img
-                src={category.iconPath(value, 'light')}
-                alt=""
-                className="h-3.5 w-3.5 dark:hidden"
-                aria-hidden="true"
-              />
-              <img
-                src={category.iconPath(value, 'dark')}
-                alt=""
-                className="hidden h-3.5 w-3.5 dark:block"
-                aria-hidden="true"
-              />
-              {value}
-            </button>
-          ))}
-      </div>
+      {RARITY_VALUES.map((rarity) => (
+        <button
+          key={rarity}
+          type="button"
+          onClick={() => toggleRarity(rarity)}
+          className={cn(CHIP, filters.rarities.has(rarity) ? 'bg-geo-dark text-white' : CHIP_IDLE)}
+          aria-pressed={filters.rarities.has(rarity)}
+          aria-label={`Filter by ${rarity}-star`}
+        >
+          {rarity}★
+        </button>
+      ))}
+
+      {showCategory && <ChipDivider />}
+
+      {showCategory &&
+        category.values.map((value) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => category.onToggle(value)}
+            className={cn(
+              CHIP,
+              'inline-flex items-center gap-1.5',
+              category.selected.has(value) ? category.activeClassName(value) : CHIP_IDLE,
+            )}
+            aria-pressed={category.selected.has(value)}
+            aria-label={`Filter by ${value}`}
+          >
+            <img
+              src={category.iconPath(value, 'light')}
+              alt=""
+              className="h-3.5 w-3.5 dark:hidden"
+              aria-hidden="true"
+            />
+            <img
+              src={category.iconPath(value, 'dark')}
+              alt=""
+              className="hidden h-3.5 w-3.5 dark:block"
+              aria-hidden="true"
+            />
+            {value}
+          </button>
+        ))}
     </div>
+  );
+}
+
+function ChipDivider(): JSX.Element {
+  return (
+    <span className="self-center text-border" aria-hidden="true">
+      |
+    </span>
   );
 }
 
@@ -294,35 +340,19 @@ interface FilterSummaryProps extends FilterCounts {
   showOwnership: boolean;
 }
 
-function FilterSummary({
+function FilterSummary(props: FilterSummaryProps): JSX.Element {
+  return <p className="shrink-0 text-sm text-muted-foreground">{summaryText(props)}</p>;
+}
+
+function summaryText({
   noun,
   showOwnership,
   filteredCount,
   totalCount,
   ownedCount,
   filteredOwnedCount,
-}: FilterSummaryProps): JSX.Element {
-  const text = 'shrink-0 text-sm text-muted-foreground';
-
-  if (!showOwnership) {
-    return (
-      <p className={text}>
-        {filteredCount} {noun}
-      </p>
-    );
-  }
-
-  if (filteredCount === totalCount) {
-    return (
-      <p className={text}>
-        {ownedCount} / {totalCount} owned
-      </p>
-    );
-  }
-
-  return (
-    <p className={text}>
-      {filteredOwnedCount} / {filteredCount} owned
-    </p>
-  );
+}: FilterSummaryProps): string {
+  if (!showOwnership) return `${filteredCount} ${noun}`;
+  if (filteredCount === totalCount) return `${ownedCount} / ${totalCount} owned`;
+  return `${filteredOwnedCount} / ${filteredCount} owned`;
 }
