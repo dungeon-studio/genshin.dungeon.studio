@@ -363,7 +363,7 @@ jobs:
           persist-credentials: false
 
       - name: Scan Terraform
-        uses: aquasecurity/trivy-action@c07df6fec6fa692e6fd1200d50aaa1fdd66f03c8 # master
+        uses: aquasecurity/trivy-action@2736533278103862a861f4a35ebac3e97854d956 # master
         with:
           scan-type: config
           scan-ref: infrastructure/terraform
@@ -393,7 +393,7 @@ jobs:
           persist-credentials: false
 
       - name: Scan Dockerfile
-        uses: aquasecurity/trivy-action@c07df6fec6fa692e6fd1200d50aaa1fdd66f03c8 # master
+        uses: aquasecurity/trivy-action@2736533278103862a861f4a35ebac3e97854d956 # master
         with:
           scan-type: config
           scan-ref: apps/api
@@ -440,7 +440,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Scan Container Image
-        uses: aquasecurity/trivy-action@c07df6fec6fa692e6fd1200d50aaa1fdd66f03c8 # master
+        uses: aquasecurity/trivy-action@2736533278103862a861f4a35ebac3e97854d956 # master
         with:
           image-ref: api:ci
           format: sarif
