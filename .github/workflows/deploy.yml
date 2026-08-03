@@ -228,11 +228,11 @@ jobs:
   # wired to emulators rather than a production bundle.
   #
   # Its own job, gated on both deploys, because the conclusion is read per-SHA
-  # when promoting a version onward: it has to name the tests rather than a
-  # build or a Firebase outage.
-  e2e:
+  # when promoting a version onward: a failure here has to mean the environment
+  # rather than a build or a Firebase outage.
+  verify:
     if: github.ref == 'refs/heads/develop'
-    name: Run end-to-end tests against the deployment
+    name: Verify the deployed environment
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: [web, api]
