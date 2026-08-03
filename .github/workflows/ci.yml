@@ -148,31 +148,13 @@ jobs:
 
       - uses: ./.github/actions/setup-node-pnpm
 
-      # The Firestore emulator is a Java process.
-      - name: Set up Java
-        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+      - uses: ./.github/actions/setup-firebase-emulators
         with:
-          distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
-      # Keyed by firebase-tools, which pins the emulator artifacts it downloads,
-      # so the cache misses only when that dependency moves. Uncached, every run
-      # pulls ~130 MB of Firestore emulator before the stack can start.
-      - name: Resolve firebase-tools version
-        id: firebase-tools
-        run: |
-          version="$(node -p "require('./package.json').devDependencies['firebase-tools']")"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-
-      - name: Cache Firebase emulators
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/firebase/emulators
-          key: ${{ runner.os }}-firebase-emulators-${{ steps.firebase-tools.outputs.version }}
-
       # The stack starts behind `firebase emulators:exec`, so the first
-      # readiness check absorbs emulator startup — and the download above on a
-      # cache miss. Matches the per-server budget in playwright.config.ts.
+      # readiness check absorbs emulator startup — and the emulator download on
+      # a cache miss. Matches the per-server budget in playwright.config.ts.
       - name: Verify dev stack starts
         env:
           TIMEOUT_SECONDS: '120'
@@ -198,26 +180,9 @@ jobs:
 
       - uses: ./.github/actions/setup-node-pnpm
 
-      # The Firestore emulator is a Java process. Pinning it here keeps the job
-      # off whatever JDK happens to be baked into the runner image.
-      - name: Set up Java
-        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+      - uses: ./.github/actions/setup-firebase-emulators
         with:
-          distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
-
-      # Same emulator downloads as the dev-smoke job; see the comment there.
-      - name: Resolve firebase-tools version
-        id: firebase-tools
-        run: |
-          version="$(node -p "require('./package.json').devDependencies['firebase-tools']")"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-
-      - name: Cache Firebase emulators
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/firebase/emulators
-          key: ${{ runner.os }}-firebase-emulators-${{ steps.firebase-tools.outputs.version }}
 
       # From the manifest, which syncpack keeps pinned exact: `pnpm exec` writes
       # warnings to the same stream as the version it reports, and both would
