@@ -1,9 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { ConsoleMessage, Page } from '@playwright/test';
+import { expect, test } from './page-failures';
 
-import { expect, test } from './fixtures';
+// Selected by the post-deploy run; see playwright-deployed.config.ts.
+const DEPLOYED = { tag: '@deployed' } as const;
 
 const ROUTES = [
   { path: '/', heading: 'Teams' },
@@ -13,44 +14,21 @@ const ROUTES = [
   { path: '/terms', heading: 'Terms of Service' },
 ] as const;
 
-/**
- * Collect the failures a route produces without changing what it renders.
- *
- * Without them, a "the heading is there" assertion passes on a page whose data
- * layer threw.
- */
-function watchForFailures(page: Page): string[] {
-  const failures: string[] = [];
-
-  page.on('pageerror', (error) => failures.push(`uncaught: ${error.message}`));
-  page.on('console', (message: ConsoleMessage) => {
-    if (message.type() === 'error') failures.push(`console.error: ${message.text()}`);
-  });
-
-  return failures;
-}
-
 for (const route of ROUTES) {
-  test(`${route.path} renders`, async ({ page }) => {
-    const failures = watchForFailures(page);
-
+  test(`${route.path} renders`, DEPLOYED, async ({ page }) => {
     await page.goto(route.path);
 
     await expect(page.getByRole('heading', { level: 1, name: route.heading })).toBeAttached();
-    expect(failures).toEqual([]);
   });
 }
 
-test('an unknown route renders the not-found page', async ({ page }) => {
-  const failures = watchForFailures(page);
-
+test('an unknown route renders the not-found page', DEPLOYED, async ({ page }) => {
   await page.goto('/no-such-page');
 
   await expect(page.getByText('Page Not Found')).toBeVisible();
-  expect(failures).toEqual([]);
 });
 
-test('the main navigation moves between routes', async ({ page }) => {
+test('the main navigation moves between routes', DEPLOYED, async ({ page }) => {
   await page.goto('/');
 
   const nav = page.getByRole('navigation', { name: 'Main navigation' });

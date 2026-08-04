@@ -13,6 +13,7 @@ on:
       - 'apps/api/**'
       - '.github/workflows/deploy.yml'
       - '.github/actions/setup-node-pnpm/**'
+      - '.github/actions/setup-playwright/**'
 
 permissions:
   contents: read
@@ -188,6 +189,22 @@ jobs:
           curl -fsSL "$SERVICE_URL/health"
           | jq -e '.status == "ok"'
 
+      # Whether the middleware honours its configuration is a unit test in
+      # app.test.ts. What only a deployed service can answer is whether it got
+      # the configuration: FRONTEND_ORIGIN falling out of the deploy is silent,
+      # because app.ts defaults to localhost, leaving a service that passes
+      # every health check while refusing every real browser.
+      - name: Verify CORS Origin
+        env:
+          SERVICE_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          allowed=$(curl -fsS -o /dev/null -H "Origin: $FRONTEND_ORIGIN" \
+            -w '%header{access-control-allow-origin}' "$SERVICE_URL/health")
+          test "$allowed" = "$FRONTEND_ORIGIN" || {
+            echo "expected $FRONTEND_ORIGIN, got '${allowed:-<none>}'" >&2
+            exit 1
+          }
+
       - uses: ./.github/actions/setup-node-pnpm
 
       - name: Generate Verify Token
@@ -204,3 +221,43 @@ jobs:
           HEALTH_BEARER_TOKEN: ${{ steps.verify-token.outputs.id_token }}
           SERVICE_URL: ${{ steps.deploy.outputs.url }}
         run: pnpm --filter @genshin/api exec tsx scripts/verify-deployment.ts "$SERVICE_URL"
+
+  # Executes the published app in a browser, which nothing else does:
+  # verify-deployment.sh compares a static version.json that reports correctly
+  # on a site that never boots, and the PR-time e2e suite drives a dev server
+  # wired to emulators rather than a production bundle.
+  #
+  # Its own job, gated on both deploys, because the conclusion is read per-SHA
+  # when promoting a version onward: a failure here has to mean the environment
+  # rather than a build or a Firebase outage.
+  verify:
+    if: github.ref == 'refs/heads/develop'
+    name: Verify the deployed environment
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [web, api]
+
+    env:
+      E2E_BASE_URL: https://develop.genshin.dungeon.studio
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - uses: ./.github/actions/setup-playwright
+
+      # Not through turbo: these specs reach for no workspace package, so there
+      # is no build to order ahead of them.
+      - name: Run end-to-end tests
+        run: pnpm --filter @genshin/e2e test:deployed
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-report
+          path: /tmp/genshin-e2e
+          retention-days: 7
