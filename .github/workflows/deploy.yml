@@ -249,10 +249,11 @@ jobs:
 
       - uses: ./.github/actions/setup-playwright
 
-      # Not through turbo: these specs reach for no workspace package, so there
-      # is no build to order ahead of them.
+      # Through turbo so `^build` compiles the workspace packages the specs
+      # import: fixtures.ts pulls @genshin/game-data, which Playwright loads
+      # while collecting tests regardless of the @deployed grep.
       - name: Run end-to-end tests
-        run: pnpm --filter @genshin/e2e test:deployed
+        run: pnpm turbo run test:deployed --filter=@genshin/e2e
 
       - name: Upload Playwright report
         if: failure()
