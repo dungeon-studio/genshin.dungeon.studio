@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
+# renovate: datasource=npm depName=corepack
 ARG COREPACK_VERSION=0.34.6
 
 # Build stage

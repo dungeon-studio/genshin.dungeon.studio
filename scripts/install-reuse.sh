@@ -10,6 +10,7 @@
 
 set -euo pipefail
 
+# renovate: datasource=github-releases depName=fsfe/reuse-tool extractVersion=^v(?<version>.+)$
 REUSE_VERSION="${REUSE_VERSION:-6.2.0}"
 
 if command -v reuse > /dev/null 2>&1; then
