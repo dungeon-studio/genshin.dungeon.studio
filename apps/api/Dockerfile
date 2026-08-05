@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 # renovate: datasource=npm depName=corepack
-ARG COREPACK_VERSION=0.34.6
+ARG COREPACK_VERSION=0.35.0
 
 # Build stage
 FROM node:24.18.1-slim@sha256:235600a8101ab264e117b1768e925532262668dc9b581ef1dd7d96ced463b8e7 AS builder
