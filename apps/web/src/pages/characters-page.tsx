@@ -76,6 +76,7 @@ export function CharactersPage(): JSX.Element {
             totalCount={CHARACTERS.length}
             ownedCount={ownedCount}
             filteredOwnedCount={filteredOwnedCount}
+            collapsible
           />
         </Container>
       </div>

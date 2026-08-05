@@ -21,6 +21,7 @@ interface CharacterFiltersProps {
   ownedCount: number;
   filteredOwnedCount: number;
   showOwnership?: boolean;
+  collapsible?: boolean;
 }
 
 const ELEMENT_VALUES = Object.values(ELEMENTS);
@@ -29,6 +30,7 @@ export function CharacterFilters({
   filters,
   onChange,
   showOwnership = true,
+  collapsible = false,
   ...counts
 }: CharacterFiltersProps): JSX.Element {
   function toggleElement(element: Element) {
@@ -43,6 +45,7 @@ export function CharacterFilters({
       noun="characters"
       searchLabel="Search characters by name"
       showOwnership={showOwnership}
+      collapsible={collapsible}
       category={{
         values: ELEMENT_VALUES,
         selected: filters.elements,

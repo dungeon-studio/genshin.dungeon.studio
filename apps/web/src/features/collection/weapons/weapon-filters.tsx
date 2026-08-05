@@ -21,6 +21,7 @@ interface WeaponFiltersProps {
   filteredOwnedCount: number;
   showOwnership?: boolean;
   showWeaponTypes?: boolean;
+  collapsible?: boolean;
 }
 
 const WEAPON_TYPE_VALUES = Object.values(WEAPON_TYPES);
@@ -30,6 +31,7 @@ export function WeaponFilters({
   onChange,
   showOwnership = true,
   showWeaponTypes = true,
+  collapsible = false,
   ...counts
 }: WeaponFiltersProps): JSX.Element {
   function toggleWeaponType(type: WeaponType) {
@@ -44,6 +46,7 @@ export function WeaponFilters({
       noun="weapons"
       searchLabel="Search weapons by name"
       showOwnership={showOwnership}
+      collapsible={collapsible}
       category={{
         values: WEAPON_TYPE_VALUES,
         selected: filters.weaponTypes,
