@@ -33,7 +33,8 @@
     },
     "test:deployed": {
       "dependsOn": ["^build"],
-      "cache": false
+      "cache": false,
+      "env": ["E2E_BASE_URL"]
     },
     "typecheck": {
       "dependsOn": ["^build"],
