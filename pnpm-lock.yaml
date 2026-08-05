@@ -112,8 +112,8 @@ importers:
         specifier: 3.1.1
         version: 3.1.1
       jsoncompat:
-        specifier: 0.4.1
-        version: 0.4.1
+        specifier: 0.4.2
+        version: 0.4.2
       tsc-alias:
         specifier: 1.9.1
         version: 1.9.1
@@ -4596,8 +4596,8 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  jsoncompat@0.4.1:
-    resolution: {integrity: sha512-GWloAH4QvUgoVCJIutxf8D0vd3S6AO8uODRCGp34t5b+9yXOxk/JcHMzFg03I0ZBu2BvfQKqz4u2euer9tLEog==}
+  jsoncompat@0.4.2:
+    resolution: {integrity: sha512-KRDUj49J5MGfRubCL4+B9MN4iTB/5dyDqcrYCLcXETI8wMvIgVLF/hDxZA+3pwBF8Mqttv3GVMNAn0M6qzqdUA==}
 
   jsonfile@6.2.1:
     resolution: {integrity: sha512-zwOTdL3rFQ/lRdBnntKVOX6k5cKJwEc1HdilT71BWEu7J41gXIB2MRp+vxduPSwZJPWBxEzv4yH1wYLJGUHX4Q==}
@@ -11203,7 +11203,7 @@ snapshots:
 
   json5@2.2.3: {}
 
-  jsoncompat@0.4.1: {}
+  jsoncompat@0.4.2: {}
 
   jsonfile@6.2.1:
     dependencies:
