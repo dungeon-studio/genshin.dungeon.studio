@@ -55,7 +55,7 @@ step "Installing reuse-tool"
 step "Installing hadolint"
 
 # renovate: datasource=github-releases depName=hadolint/hadolint
-HADOLINT_VERSION="v2.12.0"
+HADOLINT_VERSION="v2.15.1"
 sudo curl -fsSL \
   "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64" \
   -o /usr/local/bin/hadolint
