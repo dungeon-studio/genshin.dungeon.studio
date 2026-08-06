@@ -4,32 +4,6 @@
 import type { CharacterId, CollectionCharacter } from '@genshin/domain';
 import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL, nowTimestamp } from '@genshin/domain';
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-
-import { CURRENT_VERSION, migratePersistedCollection } from './schemas/index.js';
-
-// Additive merge: union of both sets, keep higher constellation level on conflicts.
-export function mergeCollections(
-  local: Record<CharacterId, CollectionCharacter>,
-  server: Record<CharacterId, CollectionCharacter>,
-): Record<CharacterId, CollectionCharacter> {
-  const merged: Record<CharacterId, CollectionCharacter> = { ...server };
-
-  for (const [id, localEntry] of Object.entries(local)) {
-    const serverEntry = merged[id];
-    if (!serverEntry) {
-      merged[id] = localEntry;
-    } else if (localEntry.constellationLevel > serverEntry.constellationLevel) {
-      merged[id] = {
-        ...serverEntry,
-        constellationLevel: localEntry.constellationLevel,
-        updatedAt: nowTimestamp(),
-      };
-    }
-  }
-
-  return merged;
-}
 
 interface CollectionState {
   characters: Record<CharacterId, CollectionCharacter>;
@@ -42,73 +16,63 @@ interface CollectionState {
   clearCharacters: () => void;
 }
 
-export const useCollectionStore = create<CollectionState>()(
-  persist(
-    (set, get) => ({
-      characters: {},
+// Deliberately not persisted: the server is the system of record, and a
+// signed-out session has no collection to hold.
+export const useCollectionStore = create<CollectionState>()((set, get) => ({
+  characters: {},
 
-      addCharacter: (characterId) => {
-        if (get().characters[characterId]) return;
+  addCharacter: (characterId) => {
+    if (get().characters[characterId]) return;
 
-        const now = nowTimestamp();
-        set((state) => ({
-          characters: {
-            ...state.characters,
-            [characterId]: {
-              characterId,
-              constellationLevel: MIN_CONSTELLATION_LEVEL,
-              createdAt: now,
-              updatedAt: now,
-            },
-          },
-        }));
+    const now = nowTimestamp();
+    set((state) => ({
+      characters: {
+        ...state.characters,
+        [characterId]: {
+          characterId,
+          constellationLevel: MIN_CONSTELLATION_LEVEL,
+          createdAt: now,
+          updatedAt: now,
+        },
       },
+    }));
+  },
 
-      removeCharacter: (characterId) => {
-        set((state) => {
-          const characters = { ...state.characters };
-          delete characters[characterId];
-          return { characters };
-        });
+  removeCharacter: (characterId) => {
+    set((state) => {
+      const characters = { ...state.characters };
+      delete characters[characterId];
+      return { characters };
+    });
+  },
+
+  setConstellationLevel: (characterId, level) => {
+    if (!isValidConstellationLevel(level)) return;
+
+    const entry = get().characters[characterId];
+    if (!entry) return;
+
+    set((state) => ({
+      characters: {
+        ...state.characters,
+        [characterId]: { ...entry, constellationLevel: level, updatedAt: nowTimestamp() },
       },
+    }));
+  },
 
-      setConstellationLevel: (characterId, level) => {
-        if (!isValidConstellationLevel(level)) return;
+  isOwned: (characterId) => {
+    return characterId in get().characters;
+  },
 
-        const entry = get().characters[characterId];
-        if (!entry) return;
+  getCharacter: (characterId) => {
+    return get().characters[characterId];
+  },
 
-        set((state) => ({
-          characters: {
-            ...state.characters,
-            [characterId]: { ...entry, constellationLevel: level, updatedAt: nowTimestamp() },
-          },
-        }));
-      },
+  replaceCharacters: (characters) => {
+    set({ characters });
+  },
 
-      isOwned: (characterId) => {
-        return characterId in get().characters;
-      },
-
-      getCharacter: (characterId) => {
-        return get().characters[characterId];
-      },
-
-      replaceCharacters: (characters) => {
-        set({ characters });
-      },
-
-      clearCharacters: () => {
-        set({ characters: {} });
-      },
-    }),
-    {
-      name: 'genshin-collection',
-      version: CURRENT_VERSION,
-      // Persist only the data; the actions are re-supplied by the initializer on
-      // rehydration, so the stored shape stays equal to the versioned schema.
-      partialize: (state) => ({ characters: state.characters }),
-      migrate: (persisted) => migratePersistedCollection(persisted),
-    },
-  ),
-);
+  clearCharacters: () => {
+    set({ characters: {} });
+  },
+}));

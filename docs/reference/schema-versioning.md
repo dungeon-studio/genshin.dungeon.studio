@@ -72,14 +72,17 @@ Version numbers appear on every exported type—there's no unversioned
 
 ## Implementation: Local storage (zustand persist)
 
-The `apps/web` stores that use zustand's `persist` middleware version their
-snapshots the same way, without Verzod—`persist` owns version dispatch. Each
-store keeps a Zod schema per version under
-`src/features/.../schemas/v{n}.ts`, stamps every write through `persist`'s
-`version`, and validates the old snapshot in `migrate` when the store reloads.
-`migrate` drops records that no longer satisfy the domain model; a signed-in
-user re-merges from the server afterward, so a dropped local record is never a
-real loss.
+No `apps/web` store persists today; the plumbing below stands ready for the
+next one, and `SCHEMA_REGISTRY` is empty until then.
+
+A persisted store versions its snapshots without Verzod—`persist` owns version
+dispatch. Each store keeps a Zod schema per version under
+`src/features/.../schemas/v{n}.ts` and stamps every write through `persist`'s
+`version`.
+
+Put validation somewhere that always runs, not in `migrate`: zustand calls
+`migrate` only when the stored version differs from the configured one, so a
+blob written by the current version reaches the store unchecked.
 
 The committed snapshots live under `apps/web/schema-snapshots/{store}/v{n}.json`,
 keyed by the `persist` store name. Each captures the **per-record entry**, not
@@ -92,6 +95,12 @@ The snapshots regenerate from their Zod source through the `schemas:export` drif
 hook. The base-branch widening check (`apps/api/scripts/check-schema-compat.ts`,
 run in CI) scans the Firestore and local-storage snapshot roots alike: a released
 version's schema may only widen.
+
+Deleting a store trips that check, which reads a vanished snapshot as an
+accident. To retire one on purpose, list its snapshot path in
+`RETIRED_SNAPSHOTS` in the same change. The entry is spent once the deletion
+reaches the base branch—the check only visits paths the base still has—so prune
+it rather than letting the list grow.
 
 ---
 

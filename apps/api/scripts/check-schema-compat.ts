@@ -25,7 +25,8 @@ const require = createRequire(import.meta.url);
 initSync({ module: readFileSync(require.resolve('jsoncompat/jsoncompat_wasm_bg.wasm')) });
 
 // Each committed snapshot root, paired with a resolver from (repository, version)
-// back to the Zod source file named in violation messages.
+// to the file to edit, named in violation messages. Messages interpolate the
+// repository and version themselves, so a resolver returns a bare path.
 const SNAPSHOT_ROOTS: ReadonlyArray<{
   prefix: string;
   sourceFor: (repository: string, version: string) => string;
@@ -36,11 +37,23 @@ const SNAPSHOT_ROOTS: ReadonlyArray<{
       `apps/api/src/repositories/${repository}/schemas/${version}.ts`,
   },
   {
+    // A web snapshot is named for its `persist` store, which implies no source
+    // path, so point at the registry mapping stores to their schemas.
     prefix: 'apps/web/schema-snapshots',
-    sourceFor: (_repository, version) =>
-      `apps/web/src/features/collection/characters/schemas/${version}.ts`,
+    sourceFor: () => 'apps/web/scripts/schema-registry.ts',
   },
 ];
+
+/**
+ * Stores retired on purpose, exempt from the missing-snapshot violation, which
+ * otherwise reads every disappearance as an accident.
+ *
+ * Entries are transient: the loop below only visits paths the base branch still
+ * has, so an entry is spent once its deletion merges. Prune, don't accumulate.
+ */
+const RETIRED_SNAPSHOTS: ReadonlySet<string> = new Set([
+  'apps/web/schema-snapshots/genshin-collection/v1.json',
+]);
 
 const repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
 
@@ -95,6 +108,8 @@ const violations: string[] = [];
 // beyond the base carry no compatibility constraint.
 for (const { prefix, sourceFor } of SNAPSHOT_ROOTS) {
   for (const path of snapshotPathsAt(baseRef, prefix)) {
+    if (RETIRED_SNAPSHOTS.has(path)) continue;
+
     const base = showAt(baseRef, path);
     if (base === null) continue; // race-proofing; ls-tree already filtered to base.
 

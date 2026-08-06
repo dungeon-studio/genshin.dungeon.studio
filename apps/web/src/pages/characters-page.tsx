@@ -5,9 +5,10 @@ import type { Character } from '@genshin/game-data';
 import { CHARACTERS } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
 import type { JSX } from 'react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { Container } from '@/components/chrome/container';
+import { promptSignIn } from '@/features/auth';
 import { CharacterCard } from '@/features/collection/characters/character-card';
 import { CharacterFilters } from '@/features/collection/characters/character-filters';
 import type { CharacterFilterState } from '@/features/collection/characters/filtering';
@@ -17,6 +18,7 @@ import { useCollection } from '@/features/collection/characters/use-character-co
 export function CharactersPage(): JSX.Element {
   const {
     characters,
+    isAuthenticated,
     addCharacter,
     removeCharacter,
     setConstellationLevel,
@@ -27,7 +29,6 @@ export function CharactersPage(): JSX.Element {
 
   const [filters, setFilters] = useState<CharacterFilterState>(initialFilterState);
 
-  const ownedCount = Object.keys(characters).length;
   const ownedIds = useMemo(() => new Set(Object.keys(characters)), [characters]);
 
   const { filteredCharacters, filteredOwnedCount } = useMemo(() => {
@@ -38,9 +39,19 @@ export function CharactersPage(): JSX.Element {
     };
   }, [filters, ownedIds]);
 
-  function handleConstellationChange(characterId: Character['id'], level: number) {
-    setConstellationLevel(characterId, level);
-  }
+  // Signed out the collection is empty, so adding is the only action a card
+  // offers, and the only one that has to explain itself.
+  const handleAddCharacter = useCallback(
+    (characterId: Character['id']) => {
+      if (!isAuthenticated) {
+        promptSignIn('character collection');
+        return;
+      }
+
+      addCharacter(characterId);
+    },
+    [isAuthenticated, addCharacter],
+  );
 
   if (isLoading) {
     return (
@@ -66,7 +77,7 @@ export function CharactersPage(): JSX.Element {
         <Container className="py-4">
           {error && (
             <p className="mb-3 rounded-md bg-destructive/10 px-4 py-3 text-center text-sm text-destructive">
-              Failed to sync collection. Local data is still available.
+              Failed to sync character collection.
             </p>
           )}
           <CharacterFilters
@@ -74,7 +85,7 @@ export function CharactersPage(): JSX.Element {
             onChange={setFilters}
             filteredCount={filteredCharacters.length}
             totalCount={CHARACTERS.length}
-            ownedCount={ownedCount}
+            ownedCount={ownedIds.size}
             filteredOwnedCount={filteredOwnedCount}
             collapsible
           />
@@ -93,9 +104,9 @@ export function CharactersPage(): JSX.Element {
                   character={character}
                   owned={owned}
                   constellationLevel={entry?.constellationLevel}
-                  onAdd={addCharacter}
+                  onAdd={handleAddCharacter}
                   onRemove={removeCharacter}
-                  onConstellationChange={handleConstellationChange}
+                  onConstellationChange={setConstellationLevel}
                 />
               </div>
             );
