@@ -225,7 +225,7 @@ jobs:
       # renovate: datasource=github-releases depName=lycheeverse/lychee extractVersion=^lychee-v(?<version>.+)$
       LYCHEE_VERSION: '0.24.2'
       # renovate: datasource=github-releases depName=aquasecurity/trivy extractVersion=^v(?<version>.+)$
-      TRIVY_VERSION: '0.72.0'
+      TRIVY_VERSION: '0.73.0'
 
     steps:
       - name: Checkout repository
