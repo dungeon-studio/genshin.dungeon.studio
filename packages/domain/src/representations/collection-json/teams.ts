@@ -66,42 +66,49 @@ export function teamItemDocument(team: CollectionTeam, baseUrl: string): Collect
   });
 }
 
+function assertString(plan: Record<string, unknown>, field: string): void {
+  if (typeof plan[field] !== 'string') {
+    throw new TypeError(
+      `artifactPlan.${field} must be a string, got: ${JSON.stringify(plan[field])}`,
+    );
+  }
+}
+
+function assertStringArray(
+  plan: Record<string, unknown>,
+  field: string,
+  min: number,
+  max: number,
+): void {
+  const arr = plan[field];
+  if (!Array.isArray(arr)) {
+    throw new TypeError(`artifactPlan.${field} must be an array, got: ${JSON.stringify(arr)}`);
+  }
+  if (arr.length < min || arr.length > max) {
+    throw new TypeError(
+      `artifactPlan.${field} must have between ${min} and ${max} elements, got: ${arr.length}`,
+    );
+  }
+  arr.forEach((element, index) => {
+    if (typeof element !== 'string') {
+      throw new TypeError(
+        `artifactPlan.${field}[${index}] must be a string, got: ${JSON.stringify(element)}`,
+      );
+    }
+  });
+}
+
 function deserialiseArtifactPlan(value: unknown): ArtifactPlan {
   if (value === null || typeof value !== 'object') {
     throw new TypeError(`artifactPlan must be a non-null object, got: ${JSON.stringify(value)}`);
   }
   const plan = value as Record<string, unknown>;
-  for (const field of ['sands', 'goblet', 'circlet'] as const) {
-    if (typeof plan[field] !== 'string') {
-      throw new TypeError(
-        `artifactPlan.${field} must be a string, got: ${JSON.stringify(plan[field])}`,
-      );
-    }
-  }
-  const cardinalities = {
-    sets: { min: 1, max: 2 },
-    priorityMinorAffixes: { min: 0, max: 3 },
-    secondaryMinorAffixes: { min: 0, max: 3 },
-  } as const;
-  for (const field of ['sets', 'priorityMinorAffixes', 'secondaryMinorAffixes'] as const) {
-    const arr = plan[field];
-    if (!Array.isArray(arr)) {
-      throw new TypeError(`artifactPlan.${field} must be an array, got: ${JSON.stringify(arr)}`);
-    }
-    const { min, max } = cardinalities[field];
-    if (arr.length < min || arr.length > max) {
-      throw new TypeError(
-        `artifactPlan.${field} must have between ${min} and ${max} elements, got: ${arr.length}`,
-      );
-    }
-    arr.forEach((element, index) => {
-      if (typeof element !== 'string') {
-        throw new TypeError(
-          `artifactPlan.${field}[${index}] must be a string, got: ${JSON.stringify(element)}`,
-        );
-      }
-    });
-  }
+  assertString(plan, 'sands');
+  assertString(plan, 'goblet');
+  assertString(plan, 'circlet');
+  assertStringArray(plan, 'sets', 1, 2);
+  assertStringArray(plan, 'priorityMinorAffixes', 0, 3);
+  assertStringArray(plan, 'secondaryMinorAffixes', 0, 3);
   return value as ArtifactPlan;
 }
 
