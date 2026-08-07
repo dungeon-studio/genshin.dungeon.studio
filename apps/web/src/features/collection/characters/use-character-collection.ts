@@ -1,14 +1,17 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CharacterId, CollectionCharacter } from '@genshin/domain';
-import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import type { CharacterId, CollectionCharacter, ConstellationLevel } from '@genshin/domain';
+import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
 import { useAuth } from '@/features/auth/use-auth';
 
-import type { MutationResult } from './use-character-collection-api';
+import type {
+  MutationResult,
+  SetConstellationLevelVariables,
+} from './use-character-collection-api';
 import {
   useAddCharacterMutation,
   useCharacterCollectionQuery,
@@ -18,37 +21,29 @@ import {
 import type { CharacterCollection } from './use-character-collection-store';
 import { mergeCollections, useCollectionStore } from './use-character-collection-store';
 
-export interface UseCollectionResult {
-  characters: CharacterCollection;
-  addCharacter: (characterId: CharacterId) => void;
-  removeCharacter: (characterId: CharacterId) => void;
-  setConstellationLevel: (characterId: CharacterId, level: number) => void;
-  isOwned: (characterId: CharacterId) => boolean;
-  getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
-  isLoading: boolean;
-  error: Error | null;
-}
-
-interface ConstellationSync {
-  characterId: CharacterId;
-  level: number;
-}
-
 /** Merged entries the server has not caught up with yet. */
-function pendingConstellationSyncs(
+function entriesAheadOfServer(
   merged: CharacterCollection,
   server: CharacterCollection,
-): ConstellationSync[] {
+): SetConstellationLevelVariables[] {
   return Object.values(merged)
     .filter((entry) => entry !== undefined)
     .filter((entry) => {
       const serverEntry = server[entry.characterId];
-      return (
-        isValidConstellationLevel(entry.constellationLevel) &&
-        (!serverEntry || entry.constellationLevel > serverEntry.constellationLevel)
-      );
+      return !serverEntry || entry.constellationLevel > serverEntry.constellationLevel;
     })
     .map((entry) => ({ characterId: entry.characterId, level: entry.constellationLevel }));
+}
+
+export interface UseCollectionResult {
+  characters: CharacterCollection;
+  addCharacter: (characterId: CharacterId) => void;
+  removeCharacter: (characterId: CharacterId) => void;
+  setConstellationLevel: (characterId: CharacterId, level: ConstellationLevel) => void;
+  isOwned: (characterId: CharacterId) => boolean;
+  getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
+  isLoading: boolean;
+  error: Error | null;
 }
 
 export function useCollection(): UseCollectionResult {
@@ -105,7 +100,7 @@ export function useCollection(): UseCollectionResult {
       const merged = mergeCollections(localData, apiCharacters);
       replaceCharacters(merged);
 
-      const diffs = pendingConstellationSyncs(merged, apiCharacters);
+      const diffs = entriesAheadOfServer(merged, apiCharacters);
 
       for (const diff of diffs) {
         setConstellationLevelApi(diff, {
@@ -197,7 +192,7 @@ export function useCollection(): UseCollectionResult {
   );
 
   const setConstellationLevel = useCallback(
-    (id: CharacterId, level: number) => {
+    (id: CharacterId, level: ConstellationLevel) => {
       const previousLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
       if (previousLevel === undefined || previousLevel === level) return;
 

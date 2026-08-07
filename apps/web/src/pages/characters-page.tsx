@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { ConstellationLevel } from '@genshin/domain';
 import type { Character } from '@genshin/game-data';
 import { CHARACTERS } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
@@ -38,7 +39,7 @@ export function CharactersPage(): JSX.Element {
     };
   }, [filters, ownedIds]);
 
-  function handleConstellationChange(characterId: Character['id'], level: number) {
+  function handleConstellationChange(characterId: Character['id'], level: ConstellationLevel) {
     setConstellationLevel(characterId, level);
   }
 

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
+import type { ConstellationLevel } from '@genshin/domain';
 import { characterItemHref, characterRepresentation, serialiseCharacter } from '@genshin/domain';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -31,7 +32,11 @@ characters.use('*', auth);
 
 characters.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: characterItemV1 }]));
 
-type SaveCharacterBody = FromSchema<typeof characterPutRequestV1.schema>;
+// FromSchema widens the schema's integer bounds to `number`; request validation
+// has already enforced them, so the intersection puts the range back.
+type SaveCharacterBody = FromSchema<typeof characterPutRequestV1.schema> & {
+  constellationLevel: ConstellationLevel;
+};
 
 // GET /api/characters — List user's character collection
 characters.get('/', async (c) => {

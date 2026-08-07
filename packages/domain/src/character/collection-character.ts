@@ -10,16 +10,24 @@ import { isISOTimestamp } from '../iso-timestamp.js';
 export const MIN_CONSTELLATION_LEVEL = 0;
 export const MAX_CONSTELLATION_LEVEL = 6;
 
+/** Activation level of a character's constellation, one level per duplicate copy obtained. */
+export type ConstellationLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+export const CONSTELLATION_LEVELS: readonly ConstellationLevel[] = Array.from(
+  { length: MAX_CONSTELLATION_LEVEL - MIN_CONSTELLATION_LEVEL + 1 },
+  (_, i) => (MIN_CONSTELLATION_LEVEL + i) as ConstellationLevel,
+);
+
 export interface CollectionCharacter {
   characterId: Character['id'];
-  constellationLevel: number;
+  constellationLevel: ConstellationLevel;
   createdAt: ISOTimestamp;
   updatedAt: ISOTimestamp;
 }
 
 export type CharacterId = CollectionCharacter['characterId'];
 
-export function isValidConstellationLevel(value: unknown): value is number {
+export function isValidConstellationLevel(value: unknown): value is ConstellationLevel {
   return (
     typeof value === 'number' &&
     Number.isInteger(value) &&

@@ -1,22 +1,15 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CharacterId, CollectionCharacter, ISOTimestamp } from '@genshin/domain';
+import type { CharacterId } from '@genshin/domain';
 import { beforeEach, describe, expect, it } from 'vitest';
+
+import { makeCharacter } from '@/test/fixtures';
 
 import { mergeCollections, useCollectionStore } from './use-character-collection-store';
 
 /** A real character the tests never add, for the "not in the collection" paths. */
 const UNOWNED: CharacterId = 'zhongli';
-
-function makeCharacter(id: CharacterId, constellationLevel = 0): CollectionCharacter {
-  return {
-    characterId: id,
-    constellationLevel,
-    createdAt: '2026-01-01T00:00:00.000Z' as ISOTimestamp,
-    updatedAt: '2026-01-01T00:00:00.000Z' as ISOTimestamp,
-  };
-}
 
 describe('useCollectionStore', () => {
   beforeEach(() => {
@@ -66,16 +59,6 @@ describe('useCollectionStore', () => {
 
       expect(useCollectionStore.getState().characters).toMatchObject({
         amber: { constellationLevel: 3 },
-      });
-    });
-
-    it('ignores invalid constellation levels', () => {
-      useCollectionStore.getState().addCharacter('amber');
-      useCollectionStore.getState().setConstellationLevel('amber', -1);
-      useCollectionStore.getState().setConstellationLevel('amber', 7);
-
-      expect(useCollectionStore.getState().characters).toMatchObject({
-        amber: { constellationLevel: 0 },
       });
     });
 

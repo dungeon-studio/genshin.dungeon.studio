@@ -7,6 +7,7 @@ import type {
   CollectionCharacter,
   CollectionTeam,
   CollectionWeapon,
+  ConstellationLevel,
   ISOTimestamp,
   TeamSlot,
   UUID,
@@ -25,7 +26,10 @@ const API_BASE_URL = 'http://localhost:8080';
 const FIXED_TIMESTAMP = '2026-01-01T00:00:00.000Z' as ISOTimestamp;
 
 // Domain-object builders.
-export function makeCharacter(id: CharacterId, constellationLevel = 0): CollectionCharacter {
+export function makeCharacter(
+  id: CharacterId,
+  constellationLevel: ConstellationLevel = 0,
+): CollectionCharacter {
   return {
     characterId: id,
     constellationLevel,
