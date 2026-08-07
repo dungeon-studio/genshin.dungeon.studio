@@ -7,6 +7,7 @@ import type {
   CollectionCharacter,
   CollectionTeam,
   CollectionWeapon,
+  ConstellationLevel,
   ISOTimestamp,
   TeamSlot,
   UUID,
@@ -25,7 +26,10 @@ const FIXED_TIMESTAMP = '2026-01-01T00:00:00.000Z' as ISOTimestamp;
 
 // Domain-object builders. IDs must exist in @genshin/game-data because the
 // deserialisers validate them against the static catalogue.
-export function makeCharacter(id: string, constellationLevel = 0): CollectionCharacter {
+export function makeCharacter(
+  id: string,
+  constellationLevel: ConstellationLevel = 0,
+): CollectionCharacter {
   return {
     characterId: id as CharacterId,
     constellationLevel,

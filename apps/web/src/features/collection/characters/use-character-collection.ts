@@ -1,14 +1,17 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CharacterId, CollectionCharacter } from '@genshin/domain';
-import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import type { CharacterId, CollectionCharacter, ConstellationLevel } from '@genshin/domain';
+import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
 import { useAuth } from '@/features/auth/use-auth';
 
-import type { MutationResult } from './use-character-collection-api';
+import type {
+  MutationResult,
+  SetConstellationLevelVariables,
+} from './use-character-collection-api';
 import {
   useAddCharacterMutation,
   useCharacterCollectionQuery,
@@ -17,11 +20,23 @@ import {
 } from './use-character-collection-api';
 import { mergeCollections, useCollectionStore } from './use-character-collection-store';
 
+function entriesAheadOfServer(
+  merged: Record<CharacterId, CollectionCharacter>,
+  server: Record<CharacterId, CollectionCharacter>,
+): SetConstellationLevelVariables[] {
+  return Object.entries(merged)
+    .filter(([id, entry]) => {
+      const serverEntry = server[id];
+      return !serverEntry || entry.constellationLevel > serverEntry.constellationLevel;
+    })
+    .map(([id, entry]) => ({ characterId: id, level: entry.constellationLevel }));
+}
+
 export interface UseCollectionResult {
   characters: Record<CharacterId, CollectionCharacter>;
   addCharacter: (characterId: CharacterId) => void;
   removeCharacter: (characterId: CharacterId) => void;
-  setConstellationLevel: (characterId: CharacterId, level: number) => void;
+  setConstellationLevel: (characterId: CharacterId, level: ConstellationLevel) => void;
   isOwned: (characterId: CharacterId) => boolean;
   getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
   isLoading: boolean;
@@ -82,18 +97,7 @@ export function useCollection(): UseCollectionResult {
       const merged = mergeCollections(localData, apiCharacters);
       replaceCharacters(merged);
 
-      // Push entries that differ from the server
-      const diffs: Array<{ characterId: CharacterId; level: number }> = [];
-      for (const id of Object.keys(merged)) {
-        const entry = merged[id];
-        const serverEntry = apiCharacters[id];
-        if (
-          isValidConstellationLevel(entry.constellationLevel) &&
-          (!serverEntry || entry.constellationLevel > serverEntry.constellationLevel)
-        ) {
-          diffs.push({ characterId: id, level: entry.constellationLevel });
-        }
-      }
+      const diffs = entriesAheadOfServer(merged, apiCharacters);
 
       for (const diff of diffs) {
         setConstellationLevelApi(diff, {
@@ -185,7 +189,7 @@ export function useCollection(): UseCollectionResult {
   );
 
   const setConstellationLevel = useCallback(
-    (id: CharacterId, level: number) => {
+    (id: CharacterId, level: ConstellationLevel) => {
       const previousLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
       if (previousLevel === undefined || previousLevel === level) return;
 

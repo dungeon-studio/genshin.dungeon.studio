@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { MAX_CONSTELLATION_LEVEL, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import { CONSTELLATION_LEVELS } from '@genshin/domain';
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 
@@ -19,10 +19,7 @@ const TIMESTAMP = '2024-01-15T12:00:00.000Z';
 
 const arbCharacter = fc.record({
   characterId: arbCharacterId,
-  constellationLevel: fc.integer({
-    min: MIN_CONSTELLATION_LEVEL,
-    max: MAX_CONSTELLATION_LEVEL,
-  }),
+  constellationLevel: fc.constantFrom(...CONSTELLATION_LEVELS),
   createdAt: arbTimestamp,
   updatedAt: arbTimestamp,
 });

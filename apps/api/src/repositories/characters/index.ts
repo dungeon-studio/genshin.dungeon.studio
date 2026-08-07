@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionCharacter, ISOTimestamp } from '@genshin/domain';
+import type { CollectionCharacter, ConstellationLevel, ISOTimestamp } from '@genshin/domain';
 
 import { db } from '@/lib/firebase/firestore.js';
 
@@ -43,7 +43,7 @@ export interface SaveResult {
 export async function save(
   userId: string,
   characterId: string,
-  constellationLevel: number,
+  constellationLevel: ConstellationLevel,
 ): Promise<SaveResult> {
   const docRef = collectionRef(userId).doc(characterId);
   const existing = await docRef.get();

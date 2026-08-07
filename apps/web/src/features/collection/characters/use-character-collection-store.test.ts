@@ -1,19 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CharacterId, CollectionCharacter, ISOTimestamp } from '@genshin/domain';
+import type { CharacterId, CollectionCharacter } from '@genshin/domain';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { mergeCollections, useCollectionStore } from './use-character-collection-store';
+import { makeCharacter } from '@/test/fixtures';
 
-function makeCharacter(id: string, constellationLevel = 0): CollectionCharacter {
-  return {
-    characterId: id as CharacterId,
-    constellationLevel,
-    createdAt: '2026-01-01T00:00:00.000Z' as ISOTimestamp,
-    updatedAt: '2026-01-01T00:00:00.000Z' as ISOTimestamp,
-  };
-}
+import { mergeCollections, useCollectionStore } from './use-character-collection-store';
 
 describe('useCollectionStore', () => {
   beforeEach(() => {
@@ -61,14 +54,6 @@ describe('useCollectionStore', () => {
       useCollectionStore.getState().setConstellationLevel('amber' as CharacterId, 3);
 
       expect(useCollectionStore.getState().characters['amber'].constellationLevel).toBe(3);
-    });
-
-    it('ignores invalid constellation levels', () => {
-      useCollectionStore.getState().addCharacter('amber' as CharacterId);
-      useCollectionStore.getState().setConstellationLevel('amber' as CharacterId, -1);
-      useCollectionStore.getState().setConstellationLevel('amber' as CharacterId, 7);
-
-      expect(useCollectionStore.getState().characters['amber'].constellationLevel).toBe(0);
     });
 
     it('ignores updates for characters not in the collection', () => {

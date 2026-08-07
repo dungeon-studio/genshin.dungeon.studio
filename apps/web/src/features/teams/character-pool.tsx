@@ -1,7 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CharacterId, CollectionCharacter, TeamSlot } from '@genshin/domain';
+import type {
+  CharacterId,
+  CollectionCharacter,
+  ConstellationLevel,
+  TeamSlot,
+} from '@genshin/domain';
+import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import type { Character, WeaponType } from '@genshin/game-data';
 import { CHARACTERS } from '@genshin/game-data';
 import { Lock, Users } from 'lucide-react';
@@ -120,7 +126,7 @@ export function CharacterPool({
               <PoolCharacterCard
                 key={character.id}
                 character={character}
-                constellationLevel={entry?.constellationLevel ?? 0}
+                constellationLevel={entry?.constellationLevel ?? MIN_CONSTELLATION_LEVEL}
                 assignedToCurrentMember={assignedToCurrentMember}
                 assignedToOtherMember={assignedToOtherMember}
                 disabled={!clickable}
@@ -144,7 +150,7 @@ export function CharacterPool({
 
 interface PoolCharacterCardProps {
   character: Character;
-  constellationLevel: number;
+  constellationLevel: ConstellationLevel;
   assignedToCurrentMember: boolean;
   assignedToOtherMember: boolean;
   disabled: boolean;
