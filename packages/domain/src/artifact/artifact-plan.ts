@@ -9,6 +9,8 @@ import type {
   SandsMainAffix,
 } from '@genshin/game-data';
 
+import { assertOptionalString, assertOptionalStringArray } from '../assertions.js';
+
 /**
  * Artifact plan configuration for a team member.
  *
@@ -31,4 +33,40 @@ export interface ArtifactPlan {
   priorityMinorAffixes?: ArtifactMinorAffix[];
   /** 0–3 secondary minor affixes (must be disjoint from priorityMinorAffixes) */
   secondaryMinorAffixes?: ArtifactMinorAffix[];
+}
+
+const MIN_SETS = 1;
+const MAX_SETS = 2;
+const MIN_MINOR_AFFIXES = 0;
+const MAX_MINOR_AFFIXES = 3;
+
+/**
+ * Structural check only. Affix names and set IDs are validated against
+ * game-data by `validateArtifactPlan`, which collects every problem instead of
+ * throwing on the first.
+ */
+export function assertArtifactPlan(
+  value: unknown,
+  path = 'artifactPlan',
+): asserts value is ArtifactPlan {
+  if (typeof value !== 'object' || value === null) {
+    throw new TypeError(`${path} must be a non-null object, got: ${JSON.stringify(value)}`);
+  }
+  const plan = value as Record<string, unknown>;
+  assertOptionalString(plan.sands, `${path}.sands`);
+  assertOptionalString(plan.goblet, `${path}.goblet`);
+  assertOptionalString(plan.circlet, `${path}.circlet`);
+  assertOptionalStringArray(plan.sets, `${path}.sets`, MIN_SETS, MAX_SETS);
+  assertOptionalStringArray(
+    plan.priorityMinorAffixes,
+    `${path}.priorityMinorAffixes`,
+    MIN_MINOR_AFFIXES,
+    MAX_MINOR_AFFIXES,
+  );
+  assertOptionalStringArray(
+    plan.secondaryMinorAffixes,
+    `${path}.secondaryMinorAffixes`,
+    MIN_MINOR_AFFIXES,
+    MAX_MINOR_AFFIXES,
+  );
 }

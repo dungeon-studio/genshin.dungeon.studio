@@ -6,20 +6,26 @@ import { getWeaponById } from '@genshin/game-data';
 
 import type { ISOTimestamp } from '../iso-timestamp.js';
 import { isISOTimestamp } from '../iso-timestamp.js';
-import type { UUID } from '../uuid.js';
 
 export const MIN_REFINEMENT_LEVEL = 1;
 export const MAX_REFINEMENT_LEVEL = 5;
 
+/**
+ * Identifier for one weapon instance in a user's collection.
+ *
+ * The API mints these with `randomUUID`, but the served profiles constrain the
+ * field to a non-empty string rather than a UUID format, so nothing may rely on
+ * the shape. Equality is the only operation performed on it.
+ */
+export type CollectionWeaponId = string;
+
 export interface CollectionWeapon {
-  weaponInstanceId: UUID;
+  weaponInstanceId: CollectionWeaponId;
   weaponId: Weapon['id'];
   refinementLevel: number;
   createdAt: ISOTimestamp;
   updatedAt: ISOTimestamp;
 }
-
-export type CollectionWeaponId = CollectionWeapon['weaponInstanceId'];
 
 export function isValidRefinementLevel(value: unknown): value is number {
   return (
