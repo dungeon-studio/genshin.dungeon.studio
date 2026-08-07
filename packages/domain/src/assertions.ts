@@ -4,8 +4,9 @@
 /**
  * Field-level assertion primitives shared by the `assertCollection*` guards.
  *
- * Each takes the value and the dotted path it sits at, so a guard on a nested
- * structure reports the position that failed rather than the outermost type.
+ * Passing the path in is what lets a guard over a nested structure report the
+ * position that failed, such as `CollectionTeam.members[0].artifactPlan.sets`,
+ * rather than the outermost type.
  */
 
 export function assertString(value: unknown, path: string): asserts value is string {

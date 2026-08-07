@@ -41,14 +41,9 @@ const MIN_MINOR_AFFIXES = 0;
 const MAX_MINOR_AFFIXES = 3;
 
 /**
- * Assert that `value` has the shape of an {@link ArtifactPlan}.
- *
- * Checks structure only — affix names and set IDs are checked against
- * game-data by {@link validateArtifactPlan}, which reports every problem at
- * once instead of throwing on the first.
- *
- * @param path - Prefix for error messages, so a nested plan reports its
- *   position (e.g. `CollectionTeam.members[0].artifactPlan`).
+ * Structural check only. Affix names and set IDs are validated against
+ * game-data by `validateArtifactPlan`, which collects every problem instead of
+ * throwing on the first.
  */
 export function assertArtifactPlan(
   value: unknown,

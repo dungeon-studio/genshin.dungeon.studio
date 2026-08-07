@@ -21,12 +21,6 @@ export interface CollectionTeamMember {
   artifactPlan?: ArtifactPlan;
 }
 
-/**
- * Assert that `value` has the shape of a {@link CollectionTeamMember}.
- *
- * @param path - Prefix for error messages, so a member reports its position
- *   within the team (e.g. `CollectionTeam.members[0]`).
- */
 export function assertCollectionTeamMember(
   value: unknown,
   path = 'CollectionTeamMember',

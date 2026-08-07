@@ -41,7 +41,6 @@ const VALID_PLAN = {
   secondaryMinorAffixes: ['ATK Percentage'],
 };
 
-/** A valid team carrying `member` at `index`, the rest of the slots empty. */
 function teamWithMember(member: unknown, index = 0): Record<string, unknown> {
   const members = [null, null, null, null];
   members[index] = member as null;
