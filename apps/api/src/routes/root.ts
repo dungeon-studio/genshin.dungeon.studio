@@ -3,8 +3,8 @@
 
 import type { Env, Hono as HonoApp } from 'hono';
 import { Hono } from 'hono';
-import { findTargetHandler, isMiddleware } from 'hono/utils/handler';
 
+import { isRouteHandler } from '@/lib/hono/route-table.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { rootGetResponseV1 } from '@/profiles/json-schema/root/get-response-v1.js';
@@ -24,7 +24,7 @@ function discoverLinks<E extends Env>(app: HonoApp<E>): Record<string, { href: s
 
   for (const route of app.routes) {
     if (route.method !== 'GET') continue;
-    if (isMiddleware(findTargetHandler(route.handler))) continue;
+    if (!isRouteHandler(route.handler)) continue;
 
     const path = route.path;
 

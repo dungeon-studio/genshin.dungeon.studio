@@ -2,28 +2,15 @@
 // SPDX-License-Identifier: MIT
 
 import type { Env, Hono, MiddlewareHandler } from 'hono';
-import { METHOD_NAME_ALL } from 'hono/router';
-import { findTargetHandler, isMiddleware } from 'hono/utils/handler';
+
+import { routedMethods } from '@/lib/hono/route-table.js';
 
 /**
- * Whether the app has a route handler — not just middleware — for this method
- * and path.
- */
-function handles<E extends Env>(app: Hono<E>, method: string, path: string): boolean {
-  const [matches] = app.router.match(method, path);
-  return matches.some(([[handler]]) => !isMiddleware(findTargetHandler(handler)));
-}
-
-/**
- * The methods the app answers at `path`, or an empty array when nothing is
- * routed there.
+ * The methods to advertise at `path`, or an empty array when nothing is routed
+ * there.
  */
 function allowedMethods<E extends Env>(app: Hono<E>, path: string): string[] {
-  const registered = new Set(
-    app.routes.map((route) => route.method).filter((method) => method !== METHOD_NAME_ALL),
-  );
-
-  const methods = [...registered].filter((method) => handles(app, method, path));
+  const methods = routedMethods(app, path);
   if (methods.length === 0) return [];
 
   // Hono answers HEAD by dispatching the GET route, so it is never registered.
