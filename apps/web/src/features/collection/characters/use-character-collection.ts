@@ -20,7 +20,6 @@ import {
 } from './use-character-collection-api';
 import { mergeCollections, useCollectionStore } from './use-character-collection-store';
 
-// Entries the merge left ahead of the server, in the shape the mutation takes.
 function entriesAheadOfServer(
   merged: Record<CharacterId, CollectionCharacter>,
   server: Record<CharacterId, CollectionCharacter>,

@@ -32,9 +32,8 @@ characters.use('*', auth);
 
 characters.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: characterItemV1 }]));
 
-// FromSchema widens `integer` with `minimum`/`maximum` to `number`, so the
-// intersection restores the range the validated body is already guaranteed to
-// satisfy.
+// FromSchema widens the schema's integer bounds to `number`; request validation
+// has already enforced them, so the intersection puts the range back.
 type SaveCharacterBody = FromSchema<typeof characterPutRequestV1.schema> & {
   constellationLevel: ConstellationLevel;
 };
