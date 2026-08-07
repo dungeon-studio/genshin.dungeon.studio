@@ -3,7 +3,7 @@
 
 import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
 import { isValidRefinementLevel } from '@genshin/domain';
-import type { Weapon } from '@genshin/game-data';
+import type { Weapon, WeaponId } from '@genshin/game-data';
 import { create } from 'zustand';
 
 interface WeaponCollectionState {
@@ -14,6 +14,11 @@ interface WeaponCollectionState {
   setRefinementLevel: (collectionWeaponId: CollectionWeaponId, level: number) => void;
   getWeaponsByWeaponId: (weaponId: Weapon['id']) => CollectionWeapon[];
   clearWeapons: () => void;
+}
+
+/** The distinct catalogue weapons a set of owned instances covers. */
+export function weaponIdsOf(instances: Iterable<CollectionWeapon>): ReadonlySet<WeaponId> {
+  return new Set(Array.from(instances, (instance) => instance.weaponId));
 }
 
 export const useWeaponCollectionStore = create<WeaponCollectionState>()((set, get) => ({

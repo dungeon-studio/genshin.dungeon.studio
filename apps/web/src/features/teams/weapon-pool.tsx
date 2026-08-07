@@ -18,6 +18,7 @@ import { WeaponSummary } from '@/components/summaries/weapon-summary';
 import { Button } from '@/components/ui/button';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
+import { weaponIdsOf } from '@/features/collection/weapons/use-weapon-collection-store';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
 import { useTeamStore } from '@/features/teams/use-team-store';
 import { RARITY_BORDER_COLORS, RARITY_SELECTED_RINGS } from '@/lib/rarity-styles';
@@ -74,13 +75,7 @@ export function WeaponPool({
     setFilters({ ...next, ownership: 'owned' });
   }
 
-  const ownedWeaponIds = useMemo(() => {
-    const ids = new Set<string>();
-    for (const cw of collectionWeapons) {
-      ids.add(cw.weaponId);
-    }
-    return ids;
-  }, [collectionWeapons]);
+  const ownedWeaponIds = useMemo(() => weaponIdsOf(collectionWeapons), [collectionWeapons]);
 
   const ownedCount = ownedWeaponIds.size;
 

@@ -11,6 +11,15 @@ import { CURRENT_VERSION, migratePersistedCollection } from './schemas/index.js'
 /** Owned characters keyed by ID. Sparse: a player owns a subset of the roster. */
 export type CharacterCollection = Partial<Record<CharacterId, CollectionCharacter>>;
 
+/** The collection's records, without the empty slots its key type admits. */
+export function ownedCharacters(collection: CharacterCollection): CollectionCharacter[] {
+  return Object.values(collection).filter((entry) => entry !== undefined);
+}
+
+export function ownedCharacterIds(collection: CharacterCollection): ReadonlySet<CharacterId> {
+  return new Set(ownedCharacters(collection).map((entry) => entry.characterId));
+}
+
 /** The server record is the base, so its `createdAt` survives a level bump. */
 function preferHigherConstellation(
   local: CollectionCharacter,
@@ -29,9 +38,7 @@ export function mergeCollections(
 ): CharacterCollection {
   const merged: CharacterCollection = { ...server };
 
-  for (const localEntry of Object.values(local)) {
-    if (!localEntry) continue;
-
+  for (const localEntry of ownedCharacters(local)) {
     const id = localEntry.characterId;
     merged[id] = preferHigherConstellation(localEntry, merged[id]);
   }

@@ -14,6 +14,7 @@ import { CharacterFilters } from '@/features/collection/characters/character-fil
 import type { CharacterFilterState } from '@/features/collection/characters/filtering';
 import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
+import { ownedCharacterIds } from '@/features/collection/characters/use-character-collection-store';
 
 export function CharactersPage(): JSX.Element {
   const {
@@ -28,8 +29,8 @@ export function CharactersPage(): JSX.Element {
 
   const [filters, setFilters] = useState<CharacterFilterState>(initialFilterState);
 
-  const ownedCount = Object.keys(characters).length;
-  const ownedIds = useMemo(() => new Set(Object.keys(characters)), [characters]);
+  const ownedIds = useMemo(() => ownedCharacterIds(characters), [characters]);
+  const ownedCount = ownedIds.size;
 
   const { filteredCharacters, filteredOwnedCount } = useMemo(() => {
     const filtered = filterCharacters(CHARACTERS, filters, ownedIds);

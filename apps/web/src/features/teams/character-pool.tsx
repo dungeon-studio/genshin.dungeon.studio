@@ -16,6 +16,7 @@ import { CharacterFilters } from '@/features/collection/characters/character-fil
 import type { CharacterFilterState } from '@/features/collection/characters/filtering';
 import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
 import type { CharacterCollection } from '@/features/collection/characters/use-character-collection-store';
+import { ownedCharacterIds } from '@/features/collection/characters/use-character-collection-store';
 import { useTeamStore } from '@/features/teams/use-team-store';
 import { ELEMENT_BORDER_COLORS, ELEMENT_SELECTED_RINGS } from '@/lib/element-styles';
 import { cn } from '@/lib/utils';
@@ -61,7 +62,7 @@ export function CharacterPool({
     setFilters({ ...next, ownership: 'owned' });
   }
 
-  const ownedIds = useMemo(() => new Set(Object.keys(characters)), [characters]);
+  const ownedIds = useMemo(() => ownedCharacterIds(characters), [characters]);
   const ownedCount = ownedIds.size;
 
   const eligibleCharacters = useMemo(

@@ -19,15 +19,18 @@ import {
   useSetConstellationLevelMutation,
 } from './use-character-collection-api';
 import type { CharacterCollection } from './use-character-collection-store';
-import { mergeCollections, useCollectionStore } from './use-character-collection-store';
+import {
+  mergeCollections,
+  ownedCharacters,
+  useCollectionStore,
+} from './use-character-collection-store';
 
 /** Merged entries the server has not caught up with yet. */
 function entriesAheadOfServer(
   merged: CharacterCollection,
   server: CharacterCollection,
 ): SetConstellationLevelVariables[] {
-  return Object.values(merged)
-    .filter((entry) => entry !== undefined)
+  return ownedCharacters(merged)
     .filter((entry) => {
       const serverEntry = server[entry.characterId];
       return !serverEntry || entry.constellationLevel > serverEntry.constellationLevel;
