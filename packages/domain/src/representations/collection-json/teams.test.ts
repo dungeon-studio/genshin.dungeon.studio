@@ -116,6 +116,21 @@ describe('deserialiseTeam artifact plan validation', () => {
     };
   }
 
+  it('rejects an artifact plan that is not an object', () => {
+    const item = itemWithArtifactPlan('not-an-object');
+    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan must be a non-null object/);
+  });
+
+  it('rejects a non-string main affix field', () => {
+    const item = itemWithArtifactPlan({ ...VALID_PLAN, sands: 42 });
+    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sands must be a string/);
+  });
+
+  it('rejects a set field that is not an array', () => {
+    const item = itemWithArtifactPlan({ ...VALID_PLAN, sets: 'aubade-of-morningstar-and-moon' });
+    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sets must be an array/);
+  });
+
   it('rejects a non-string element in sets', () => {
     const item = itemWithArtifactPlan({ ...VALID_PLAN, sets: [42] });
     expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sets\[0\] must be a string/);
