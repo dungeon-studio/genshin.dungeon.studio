@@ -66,57 +66,58 @@ export function teamItemDocument(team: CollectionTeam, baseUrl: string): Collect
   });
 }
 
-function deserialiseArtifactPlan(value: unknown): ArtifactPlan {
+function asObject(value: unknown, label: string): Record<string, unknown> {
   if (value === null || typeof value !== 'object') {
-    throw new TypeError(`artifactPlan must be a non-null object, got: ${JSON.stringify(value)}`);
+    throw new TypeError(`${label} must be a non-null object, got: ${JSON.stringify(value)}`);
   }
-  const plan = value as Record<string, unknown>;
-  for (const field of ['sands', 'goblet', 'circlet'] as const) {
-    if (typeof plan[field] !== 'string') {
-      throw new TypeError(
-        `artifactPlan.${field} must be a string, got: ${JSON.stringify(plan[field])}`,
-      );
-    }
+  return value as Record<string, unknown>;
+}
+
+function asString(value: unknown, label: string): string {
+  if (typeof value !== 'string') {
+    throw new TypeError(`${label} must be a string, got: ${JSON.stringify(value)}`);
   }
-  for (const field of ['sets', 'priorityMinorAffixes', 'secondaryMinorAffixes'] as const) {
-    if (!Array.isArray(plan[field])) {
-      throw new TypeError(
-        `artifactPlan.${field} must be an array, got: ${JSON.stringify(plan[field])}`,
-      );
-    }
+  return value;
+}
+
+function asArray(value: unknown, label: string): unknown[] {
+  if (!Array.isArray(value)) {
+    throw new TypeError(`${label} must be an array, got: ${JSON.stringify(value)}`);
   }
+  return value;
+}
+
+function deserialiseArtifactPlan(value: unknown): ArtifactPlan {
+  const plan = asObject(value, 'artifactPlan');
   return {
-    sands: plan.sands as ArtifactPlan['sands'],
-    goblet: plan.goblet as ArtifactPlan['goblet'],
-    circlet: plan.circlet as ArtifactPlan['circlet'],
-    sets: plan.sets as ArtifactPlan['sets'],
-    priorityMinorAffixes: plan.priorityMinorAffixes as ArtifactPlan['priorityMinorAffixes'],
-    secondaryMinorAffixes: plan.secondaryMinorAffixes as ArtifactPlan['secondaryMinorAffixes'],
+    sands: asString(plan.sands, 'artifactPlan.sands') as ArtifactPlan['sands'],
+    goblet: asString(plan.goblet, 'artifactPlan.goblet') as ArtifactPlan['goblet'],
+    circlet: asString(plan.circlet, 'artifactPlan.circlet') as ArtifactPlan['circlet'],
+    sets: asArray(plan.sets, 'artifactPlan.sets') as ArtifactPlan['sets'],
+    priorityMinorAffixes: asArray(
+      plan.priorityMinorAffixes,
+      'artifactPlan.priorityMinorAffixes',
+    ) as ArtifactPlan['priorityMinorAffixes'],
+    secondaryMinorAffixes: asArray(
+      plan.secondaryMinorAffixes,
+      'artifactPlan.secondaryMinorAffixes',
+    ) as ArtifactPlan['secondaryMinorAffixes'],
   };
 }
 
 function deserialiseCollectionTeamMember(value: unknown, index: number): CollectionTeamMember {
-  if (value === null || typeof value !== 'object') {
-    throw new TypeError(
-      `members[${index}] must be a non-null object, got: ${JSON.stringify(value)}`,
-    );
-  }
-  const raw = value as Record<string, unknown>;
-  if (typeof raw.characterId !== 'string') {
-    throw new TypeError(
-      `members[${index}].characterId must be a string, got: ${JSON.stringify(raw.characterId)}`,
-    );
-  }
-  if (raw.weaponInstanceId !== undefined && typeof raw.weaponInstanceId !== 'string') {
-    throw new TypeError(
-      `members[${index}].weaponInstanceId must be a string, got: ${JSON.stringify(raw.weaponInstanceId)}`,
-    );
-  }
+  const raw = asObject(value, `members[${index}]`);
   const member: CollectionTeamMember = {
-    characterId: raw.characterId as CollectionTeamMember['characterId'],
+    characterId: asString(
+      raw.characterId,
+      `members[${index}].characterId`,
+    ) as CollectionTeamMember['characterId'],
   };
   if (raw.weaponInstanceId !== undefined) {
-    member.weaponInstanceId = raw.weaponInstanceId as CollectionTeamMember['weaponInstanceId'];
+    member.weaponInstanceId = asString(
+      raw.weaponInstanceId,
+      `members[${index}].weaponInstanceId`,
+    ) as CollectionTeamMember['weaponInstanceId'];
   }
   if (raw.artifactPlan !== undefined) {
     member.artifactPlan = deserialiseArtifactPlan(raw.artifactPlan);
