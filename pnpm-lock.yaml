@@ -57,8 +57,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/game-data
       '@hono/node-server':
-        specifier: 2.0.12
-        version: 2.0.12(hono@4.13.0)
+        specifier: 2.1.0
+        version: 2.1.0(hono@4.13.0)
       ajv:
         specifier: 8.20.0
         version: 8.20.0
@@ -1171,8 +1171,8 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  '@hono/node-server@2.0.12':
-    resolution: {integrity: sha512-eWpQYr67tqJLeaSUl0Q+TquuYfUdTibpOJlUMV2FfUP7+KqCC5TufnwnlXL6mobZBJbGAYRd7ZvEBDCbLInjhg==}
+  '@hono/node-server@2.1.0':
+    resolution: {integrity: sha512-XovyyCCnBzW+zKu+z/zq8hwNs4KOR5rEMAOxo2f40Q5xoOI37IMm6MIg2COOUtUApo0i6850MTBKH2u4QLGIqg==}
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4
@@ -7553,7 +7553,7 @@ snapshots:
       protobufjs: 7.6.5
       yargs: 17.7.3
 
-  '@hono/node-server@2.0.12(hono@4.13.0)':
+  '@hono/node-server@2.1.0(hono@4.13.0)':
     dependencies:
       hono: 4.13.0
 
@@ -7773,7 +7773,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.30.0(supports-color@10.2.2)(zod@4.4.3)':
     dependencies:
-      '@hono/node-server': 2.0.12(hono@4.13.0)
+      '@hono/node-server': 2.1.0(hono@4.13.0)
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
       content-type: 1.0.5
