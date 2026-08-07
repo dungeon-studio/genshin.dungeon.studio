@@ -34,7 +34,7 @@ interface ConstellationSync {
   level: number;
 }
 
-/** Merged entries the server has not caught up with yet, in mutation order. */
+/** Merged entries the server has not caught up with yet. */
 function pendingConstellationSyncs(
   merged: CharacterCollection,
   server: CharacterCollection,
@@ -105,7 +105,6 @@ export function useCollection(): UseCollectionResult {
       const merged = mergeCollections(localData, apiCharacters);
       replaceCharacters(merged);
 
-      // Push entries that differ from the server
       const diffs = pendingConstellationSyncs(merged, apiCharacters);
 
       for (const diff of diffs) {

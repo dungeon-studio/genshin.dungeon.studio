@@ -34,9 +34,6 @@ export const WEAPON_STAT_TYPES = {
 
 export type WeaponStatType = (typeof WEAPON_STAT_TYPES)[keyof typeof WEAPON_STAT_TYPES];
 
-/**
- * Every weapon's ID, as a union of the IDs in {@link WEAPONS}.
- */
 export type WeaponId = (typeof WEAPON_DATA)[number]['id'];
 
 /**

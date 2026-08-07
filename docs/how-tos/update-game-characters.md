@@ -31,13 +31,12 @@ From the wiki, collect:
 
 ### 2. Update `packages/game-data/src/characters.ts`
 
-Add the character to the `CHARACTER_DATA` array. Every entry has to satisfy the
-`Character` interface, and the new entry's `id` joins the `CharacterId` union
-that every other package type-checks character IDs against:
+Add the character to the `CHARACTER_DATA` array. Its `id` joins the `CharacterId`
+union that other packages type-check against:
 
 ```typescript
 interface Character {
-  id: CharacterId; // kebab-case unique identifier, derived from CHARACTER_DATA
+  id: CharacterId; // kebab-case unique identifier
   name: string; // Display name
   element: Element; // Use ELEMENTS constants
   weaponType: WeaponType; // Use WEAPON_TYPES constants

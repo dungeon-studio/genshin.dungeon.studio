@@ -4,9 +4,9 @@
 /**
  * Indexes catalogue records for the `getXById` helpers.
  *
- * Keyed by plain `string` rather than the record's own ID type: those helpers
- * are the runtime gate that turns unvalidated input into a catalogue record, so
- * they have to accept IDs the catalogue does not list.
+ * The key type stays `string`: those helpers are the runtime gate that turns
+ * unvalidated input into a catalogue record, so they must accept IDs the
+ * catalogue does not list.
  */
 export function indexById<T extends { readonly id: string }>(
   records: readonly T[],

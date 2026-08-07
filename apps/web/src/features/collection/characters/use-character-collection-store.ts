@@ -8,13 +8,10 @@ import { persist } from 'zustand/middleware';
 
 import { CURRENT_VERSION, migratePersistedCollection } from './schemas/index.js';
 
-/** Owned characters keyed by ID; sparse, since a player owns a subset of the roster. */
+/** Owned characters keyed by ID. Sparse: a player owns a subset of the roster. */
 export type CharacterCollection = Partial<Record<CharacterId, CollectionCharacter>>;
 
-/**
- * Resolves one character held on both sides in favour of the higher
- * constellation level, keeping the server's timestamps as the base.
- */
+/** The server record is the base, so its `createdAt` survives a level bump. */
 function preferHigherConstellation(
   local: CollectionCharacter,
   server: CollectionCharacter | undefined,
@@ -25,7 +22,7 @@ function preferHigherConstellation(
   return { ...server, constellationLevel: local.constellationLevel, updatedAt: nowTimestamp() };
 }
 
-// Additive merge: union of both sets, keep higher constellation level on conflicts.
+// Additive merge: union of both sets.
 export function mergeCollections(
   local: CharacterCollection,
   server: CharacterCollection,

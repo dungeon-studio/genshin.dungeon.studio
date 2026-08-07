@@ -5,13 +5,7 @@ import type { CharacterId, WeaponId } from '@genshin/game-data';
 import { getCharacterById, getWeaponById } from '@genshin/game-data';
 import { HTTPException } from 'hono/http-exception';
 
-/**
- * Narrows a request-supplied character ID to one the catalogue lists.
- *
- * Returns the catalogue's own ID rather than a boolean so callers end up
- * holding a `CharacterId`; that is what lets the write paths take the narrowed
- * type instead of a bare `string`.
- */
+/** Narrows a request-supplied character ID to one the catalogue lists, or throws HTTP 400. */
 export function requireCharacterId(characterId: string): CharacterId {
   const character = getCharacterById(characterId);
   if (!character) {

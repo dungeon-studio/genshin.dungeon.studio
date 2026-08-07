@@ -1274,9 +1274,6 @@ const CHARACTER_DATA = [
   },
 ] as const;
 
-/**
- * Every playable character's ID, as a union of the IDs in {@link CHARACTERS}.
- */
 export type CharacterId = (typeof CHARACTER_DATA)[number]['id'];
 
 export const CHARACTERS: readonly Character[] = CHARACTER_DATA;
