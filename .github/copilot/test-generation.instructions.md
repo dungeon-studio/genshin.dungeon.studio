@@ -5,13 +5,11 @@
 
 ## Framework
 
-**Vitest** is the test runner and **React Testing Library** the component
-harness. Both are installed in `apps/api` and `apps/web`; generate tests
-targeting this stack.
+**Vitest** is the test runner for `apps/api` and `apps/web`, with **React
+Testing Library** for web component tests. Generate tests targeting this stack.
 
-End-to-end tests are **Playwright** specs and live in `tools/e2e`, not
-alongside the code they exercise. These instructions cover unit and component
-tests.
+**Playwright** end-to-end specs live in `tools/e2e` rather than beside the code
+they exercise, and fall outside these instructions.
 
 ## File placement
 

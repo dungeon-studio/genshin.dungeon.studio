@@ -24,10 +24,8 @@ const AMBER = {
 const CONSTELLATION_LEVEL_COUNT = 7;
 
 /**
- * Renders the owned, interactive card.
- *
- * `onRemove` is what selects that branch — an owned card with no callbacks at
- * all renders the read-only variant instead, controls and all omitted.
+ * `onRemove` is what selects the owned, interactive branch. An owned card with
+ * no callbacks renders the read-only variant instead.
  */
 function renderOwnedCard(props: Partial<ComponentProps<typeof CharacterCard>> = {}) {
   return render(<CharacterCard character={AMBER} owned onRemove={vi.fn()} {...props} />);
