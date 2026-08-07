@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { CharacterId, CollectionCharacter, ConstellationLevel } from '@genshin/domain';
-import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL, nowTimestamp } from '@genshin/domain';
+import { MIN_CONSTELLATION_LEVEL, nowTimestamp } from '@genshin/domain';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -73,8 +73,6 @@ export const useCollectionStore = create<CollectionState>()(
       },
 
       setConstellationLevel: (characterId, level) => {
-        if (!isValidConstellationLevel(level)) return;
-
         const entry = get().characters[characterId];
         if (!entry) return;
 

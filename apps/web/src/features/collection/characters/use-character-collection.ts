@@ -8,7 +8,10 @@ import { toast } from 'sonner';
 
 import { useAuth } from '@/features/auth/use-auth';
 
-import type { MutationResult } from './use-character-collection-api';
+import type {
+  MutationResult,
+  SetConstellationLevelVariables,
+} from './use-character-collection-api';
 import {
   useAddCharacterMutation,
   useCharacterCollectionQuery,
@@ -16,6 +19,19 @@ import {
   useSetConstellationLevelMutation,
 } from './use-character-collection-api';
 import { mergeCollections, useCollectionStore } from './use-character-collection-store';
+
+// Entries the merge left ahead of the server, in the shape the mutation takes.
+function entriesAheadOfServer(
+  merged: Record<CharacterId, CollectionCharacter>,
+  server: Record<CharacterId, CollectionCharacter>,
+): SetConstellationLevelVariables[] {
+  return Object.entries(merged)
+    .filter(([id, entry]) => {
+      const serverEntry = server[id];
+      return !serverEntry || entry.constellationLevel > serverEntry.constellationLevel;
+    })
+    .map(([id, entry]) => ({ characterId: id, level: entry.constellationLevel }));
+}
 
 export interface UseCollectionResult {
   characters: Record<CharacterId, CollectionCharacter>;
@@ -82,15 +98,7 @@ export function useCollection(): UseCollectionResult {
       const merged = mergeCollections(localData, apiCharacters);
       replaceCharacters(merged);
 
-      // Push entries that differ from the server
-      const diffs: Array<{ characterId: CharacterId; level: ConstellationLevel }> = [];
-      for (const id of Object.keys(merged)) {
-        const entry = merged[id];
-        const serverEntry = apiCharacters[id];
-        if (!serverEntry || entry.constellationLevel > serverEntry.constellationLevel) {
-          diffs.push({ characterId: id, level: entry.constellationLevel });
-        }
-      }
+      const diffs = entriesAheadOfServer(merged, apiCharacters);
 
       for (const diff of diffs) {
         setConstellationLevelApi(diff, {

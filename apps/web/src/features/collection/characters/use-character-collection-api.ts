@@ -92,23 +92,21 @@ export function useRemoveCharacterMutation(
   });
 }
 
+export interface SetConstellationLevelVariables {
+  characterId: CharacterId;
+  level: ConstellationLevel;
+}
+
 export function useSetConstellationLevelMutation(
   userId: string | undefined,
-): UseMutationResult<
-  MutationResult,
-  Error,
-  { characterId: CharacterId; level: ConstellationLevel }
-> {
+): UseMutationResult<MutationResult, Error, SetConstellationLevelVariables> {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({
       characterId,
       level,
-    }: {
-      characterId: CharacterId;
-      level: ConstellationLevel;
-    }): Promise<MutationResult> => {
+    }: SetConstellationLevelVariables): Promise<MutationResult> => {
       const response = await apiPut(`/api/characters/${encodeURIComponent(characterId)}`, {
         constellationLevel: level,
       });
