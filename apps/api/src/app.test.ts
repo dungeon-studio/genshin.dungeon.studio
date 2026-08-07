@@ -54,6 +54,58 @@ describe('CORS', () => {
   });
 });
 
+// Clients discover what a resource supports through OPTIONS, because the root
+// document (#443) lists hrefs without method hints. Every request here is
+// unauthenticated on purpose: a browser preflight carries no credentials, so
+// the answer has to come before the auth middleware would reject it.
+describe('Allow header', () => {
+  function allowed(res: Response): string[] {
+    return (res.headers.get('allow') ?? '').split(',').map((method) => method.trim());
+  }
+
+  it('advertises the methods of a read-only collection', async () => {
+    const res = await app.request('/api/characters', { method: 'OPTIONS' });
+    expect(allowed(res)).toEqual(['GET', 'HEAD', 'OPTIONS']);
+  });
+
+  it('advertises the methods of a writable collection', async () => {
+    const res = await app.request('/api/weapons', { method: 'OPTIONS' });
+    expect(allowed(res)).toEqual(['GET', 'HEAD', 'OPTIONS', 'POST']);
+  });
+
+  it('advertises the methods of a parameterized item resource', async () => {
+    const res = await app.request('/api/weapons/8c1a9c4e-1c2e-4a3f-9d5b-6f7a8b9c0d1e', {
+      method: 'OPTIONS',
+    });
+    expect(allowed(res)).toEqual(['DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH']);
+  });
+
+  it('advertises the methods of the user profile', async () => {
+    const res = await app.request('/api/profile', { method: 'OPTIONS' });
+    expect(allowed(res)).toEqual(['GET', 'HEAD', 'OPTIONS', 'PATCH']);
+  });
+
+  it('withholds the header where nothing is routed', async () => {
+    const res = await app.request('/api/not-a-resource', { method: 'OPTIONS' });
+    expect(res.headers.get('allow')).toBeNull();
+  });
+
+  it('accompanies the CORS preflight response', async () => {
+    const res = await app.request('/api/weapons', {
+      method: 'OPTIONS',
+      headers: {
+        Origin: 'http://localhost:5173',
+        'Access-Control-Request-Method': 'POST',
+      },
+    });
+
+    expect(res.status).toBe(204);
+    expect(res.headers.get('access-control-allow-origin')).toBe('http://localhost:5173');
+    expect(res.headers.get('access-control-allow-methods')).toContain('POST');
+    expect(allowed(res)).toContain('POST');
+  });
+});
+
 describe('onError Retry-After header', () => {
   it('sets Retry-After on a 429 from a Firestore error', async () => {
     const res = await app.request('/__test/resource-exhausted');
