@@ -36,7 +36,7 @@ export const app = new Hono<{
 // Request logging middleware
 app.use('*', logger());
 
-// Allow header on OPTIONS — must precede CORS, which short-circuits OPTIONS
+// Must precede CORS, which short-circuits OPTIONS before this could run
 app.use('*', allow(app));
 
 // CORS middleware - allow frontend origin

@@ -54,10 +54,9 @@ describe('CORS', () => {
   });
 });
 
-// Clients discover what a resource supports through OPTIONS, because the root
-// document (#443) lists hrefs without method hints. Every request here is
-// unauthenticated on purpose: a browser preflight carries no credentials, so
-// the answer has to come before the auth middleware would reject it.
+// The root document advertises resources without method hints, so OPTIONS is
+// how a client learns what one supports. These requests carry no credentials
+// because a browser preflight carries none either.
 describe('Allow header', () => {
   function allowed(res: Response): string[] {
     return (res.headers.get('allow') ?? '').split(',').map((method) => method.trim());

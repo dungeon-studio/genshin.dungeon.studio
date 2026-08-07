@@ -9,8 +9,7 @@ import { findTargetHandler, isMiddleware } from 'hono/utils/handler';
 /**
  * Whether a registered handler serves a route rather than wrapping one.
  *
- * Hono keeps middleware and route handlers in one table and tells them apart by
- * arity alone, so anything reading the table has to make the same distinction.
+ * Hono keeps both in one table, distinguished only by arity.
  */
 export function isRouteHandler(handler: H): boolean {
   return !isMiddleware(findTargetHandler(handler));

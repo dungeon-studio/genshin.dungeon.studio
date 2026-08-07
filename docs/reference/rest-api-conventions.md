@@ -151,7 +151,7 @@ See [RFC9110], Section 10.2.3: <https://www.rfc-editor.org/rfc/rfc9110.html#name
 
 ### 14. Method discovery via OPTIONS
 
-The root response (Section 12) advertises each resource as an `href` without method hints, so clients learn what a resource supports by sending `OPTIONS` to it. Every routed path answers with an `Allow` header listing its methods:
+As Section 12 describes, the root response advertises each resource as an `href` with no method hints, so a client learns what a resource supports by sending it `OPTIONS`. Every routed path answers with an `Allow` header:
 
 ```http
 OPTIONS /api/weapons
@@ -159,10 +159,10 @@ OPTIONS /api/weapons
 Allow: GET, HEAD, OPTIONS, POST
 ```
 
-- **Derivation**: the app's routing table produces the list, the same source resource discovery uses, so the advertised methods can't drift from the registered routes. Paths with no route omit the header.
-- **HEAD**: listed wherever `GET` is. Hono answers `HEAD` by dispatching the `GET` route, so `HEAD` never appears as a registered route of its own.
+- **Derivation**: the routing table produces the list, the same source resource discovery reads, so the advertised methods can't drift from the registered routes. Paths with no route omit the header.
+- **HEAD**: listed wherever `GET` is. Hono answers `HEAD` by dispatching the `GET` route, so it never appears as a route of its own.
 - **Authentication**: `OPTIONS` answers before the auth middleware, because a browser preflight carries no credentials.
-- **CORS**: the CORS middleware answers `OPTIONS` with a 204 that carries both headers. `Access-Control-Allow-Methods` states what the browser may send cross-origin; `Allow` states what the resource itself supports.
+- **CORS**: the preflight 204 carries both headers. `Access-Control-Allow-Methods` states what the browser may send cross-origin. `Allow` states what the resource supports.
 
 See [RFC9110], Section 9.3.7: <https://www.rfc-editor.org/rfc/rfc9110.html#name-options> and Section 10.2.1: <https://www.rfc-editor.org/rfc/rfc9110.html#name-allow>
 

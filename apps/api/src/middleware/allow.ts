@@ -5,10 +5,7 @@ import type { Env, Hono, MiddlewareHandler } from 'hono';
 
 import { routedMethods } from '@/lib/hono/route-table.js';
 
-/**
- * The methods to advertise at `path`, or an empty array when nothing is routed
- * there.
- */
+/** The methods to advertise at `path`, empty when nothing is routed there. */
 function allowedMethods<E extends Env>(app: Hono<E>, path: string): string[] {
   const methods = routedMethods(app, path);
   if (methods.length === 0) return [];
@@ -23,12 +20,12 @@ function allowedMethods<E extends Env>(app: Hono<E>, path: string): string[] {
 /**
  * `Allow` header middleware — RFC 9110 §10.2.1.
  *
- * Answers `OPTIONS` with the methods the requested resource supports, derived
- * from the app's own routing table so it cannot drift from the routes.
+ * Answers `OPTIONS` with the methods the requested resource supports, taken
+ * from the routing table rather than a list to maintain.
  *
- * Must be registered before the CORS middleware: that middleware short-circuits
- * every `OPTIONS` request into a 204 built from the headers prepared so far, so
- * a header set after it never reaches the response.
+ * Register before the CORS middleware, which short-circuits `OPTIONS` into a
+ * 204 built from the headers prepared so far. A header set after it never
+ * reaches the response.
  */
 export function allow<E extends Env>(app: Hono<E>): MiddlewareHandler {
   return async (c, next) => {
