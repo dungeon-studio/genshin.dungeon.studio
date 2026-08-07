@@ -23,6 +23,88 @@ const CONSTELLATION_LEVELS = Array.from(
   (_, i) => MIN_CONSTELLATION_LEVEL + i,
 );
 
+interface ConstellationPopoverProps {
+  character: Character;
+  constellationLevel: number;
+  onConstellationChange: (characterId: Character['id'], level: number) => void;
+}
+
+function ConstellationPopover({
+  character,
+  constellationLevel,
+  onConstellationChange,
+}: ConstellationPopoverProps): JSX.Element {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          onClick={(e) => e.stopPropagation()}
+          className="relative z-10 shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-bold tabular-nums text-muted-foreground hover:bg-muted/80"
+          aria-label={`Constellation level ${constellationLevel} for ${character.name}, click to edit`}
+        >
+          C{constellationLevel}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-auto p-2"
+        side="top"
+        align="end"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <p className="mb-1.5 text-center text-xs font-medium text-muted-foreground">
+          Constellation
+        </p>
+        <div className="flex gap-1">
+          {CONSTELLATION_LEVELS.map((level) => (
+            <button
+              key={level}
+              type="button"
+              onClick={() => {
+                onConstellationChange(character.id, level);
+                setOpen(false);
+              }}
+              className={cn(
+                'h-7 w-7 rounded text-xs font-bold tabular-nums transition-colors',
+                level === constellationLevel
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80',
+              )}
+              aria-label={`Set constellation level ${level}`}
+              aria-pressed={level === constellationLevel}
+            >
+              {level}
+            </button>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+interface RemoveButtonProps {
+  character: Character;
+  onRemove: (characterId: Character['id']) => void;
+}
+
+function RemoveButton({ character, onRemove }: RemoveButtonProps): JSX.Element {
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        onRemove(character.id);
+      }}
+      className="relative z-10 shrink-0 rounded-md p-1 text-destructive opacity-0 transition-opacity group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
+      aria-label={`Remove ${character.name} from collection`}
+    >
+      <Trash2 className="h-4 w-4" />
+    </button>
+  );
+}
+
 interface CharacterCardProps {
   character: Character;
   owned?: boolean;
@@ -42,8 +124,6 @@ export function CharacterCard({
   onRemove,
   onConstellationChange,
 }: CharacterCardProps): JSX.Element {
-  const [popoverOpen, setPopoverOpen] = useState(false);
-
   const borderColors = owned ? ELEMENT_BORDER_COLORS : ELEMENT_BORDER_COLORS_DIM;
 
   const sharedClassName = cn(
@@ -51,90 +131,36 @@ export function CharacterCard({
     borderColors[character.element],
   );
 
+  const selectedRingClassName = cn(
+    'ring-2 ring-offset-2 ring-offset-background',
+    ELEMENT_SELECTED_RINGS[character.element],
+  );
+
+  const readOnly = !onAdd && !onRemove;
+
   const content = (
     <>
       <CharacterSummary character={character} dimmed={!owned} />
 
       {owned && onConstellationChange && (
-        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-          <PopoverTrigger asChild>
-            <button
-              type="button"
-              onClick={(e) => e.stopPropagation()}
-              className="relative z-10 shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-bold tabular-nums text-muted-foreground hover:bg-muted/80"
-              aria-label={`Constellation level ${constellationLevel} for ${character.name}, click to edit`}
-            >
-              C{constellationLevel}
-            </button>
-          </PopoverTrigger>
-          <PopoverContent
-            className="w-auto p-2"
-            side="top"
-            align="end"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <p className="mb-1.5 text-center text-xs font-medium text-muted-foreground">
-              Constellation
-            </p>
-            <div className="flex gap-1">
-              {CONSTELLATION_LEVELS.map((level) => (
-                <button
-                  key={level}
-                  type="button"
-                  onClick={() => {
-                    onConstellationChange(character.id, level);
-                    setPopoverOpen(false);
-                  }}
-                  className={cn(
-                    'h-7 w-7 rounded text-xs font-bold tabular-nums transition-colors',
-                    level === constellationLevel
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground hover:bg-muted/80',
-                  )}
-                  aria-label={`Set constellation level ${level}`}
-                  aria-pressed={level === constellationLevel}
-                >
-                  {level}
-                </button>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
+        <ConstellationPopover
+          character={character}
+          constellationLevel={constellationLevel}
+          onConstellationChange={onConstellationChange}
+        />
       )}
 
-      {owned && onRemove && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemove(character.id);
-          }}
-          className="relative z-10 shrink-0 rounded-md p-1 text-destructive opacity-0 transition-opacity group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
-          aria-label={`Remove ${character.name} from collection`}
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
-      )}
+      {owned && onRemove && <RemoveButton character={character} onRemove={onRemove} />}
     </>
   );
 
-  if (!onAdd && !onRemove) {
+  if (readOnly) {
     return <div className={sharedClassName}>{content}</div>;
   }
 
   if (owned) {
     return (
-      <div
-        className={cn(
-          sharedClassName,
-          'group',
-          selected &&
-            cn(
-              'ring-2 ring-offset-2 ring-offset-background',
-              ELEMENT_SELECTED_RINGS[character.element],
-            ),
-        )}
-      >
+      <div className={cn(sharedClassName, 'group', selected && selectedRingClassName)}>
         {content}
       </div>
     );
@@ -150,11 +176,7 @@ export function CharacterCard({
         sharedClassName,
         'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
         selected
-          ? cn(
-              'ring-2 ring-offset-2 ring-offset-background',
-              ELEMENT_SELECTED_RINGS[character.element],
-              ELEMENT_FOCUS_RINGS[character.element],
-            )
+          ? cn(selectedRingClassName, ELEMENT_FOCUS_RINGS[character.element])
           : 'focus-visible:ring-ring',
       )}
       aria-label={`Add ${character.name} to collection`}
