@@ -1,10 +1,11 @@
 /* SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> */
 /* SPDX-License-Identifier: MIT */
 
-import { assertArtifactPlan } from '../artifact/artifact-plan.js';
+import { assertOptionalString, assertString } from '../assertions.js';
 import type { ISOTimestamp } from '../iso-timestamp.js';
 import { isISOTimestamp, nowTimestamp } from '../iso-timestamp.js';
 import type { CollectionTeamMember } from './collection-team-member.js';
+import { assertCollectionTeamMember } from './collection-team-member.js';
 
 export const MIN_TEAM_SLOT = 1;
 export const MAX_TEAM_SLOT = 4;
@@ -73,9 +74,7 @@ export function assertCollectionTeam(value: unknown): asserts value is Collectio
       `CollectionTeam.slot must be an integer between ${MIN_TEAM_SLOT} and ${MAX_TEAM_SLOT}, got: ${JSON.stringify(data.slot)}`,
     );
   }
-  if (typeof data.name !== 'string') {
-    throw new TypeError(`CollectionTeam.name must be a string, got: ${JSON.stringify(data.name)}`);
-  }
+  assertString(data.name, 'CollectionTeam.name');
   if (!Array.isArray(data.members)) {
     throw new TypeError(
       `CollectionTeam.members must be an array, got: ${JSON.stringify(data.members)}`,
@@ -88,26 +87,9 @@ export function assertCollectionTeam(value: unknown): asserts value is Collectio
   }
   for (const [i, member] of (data.members as unknown[]).entries()) {
     if (member === null) continue;
-    const entry = member as Record<string, unknown>;
-    if (typeof member !== 'object' || typeof entry.characterId !== 'string') {
-      throw new TypeError(
-        `CollectionTeam.members entries must have a string characterId, got: ${JSON.stringify(member)}`,
-      );
-    }
-    if (entry.weaponInstanceId !== undefined && typeof entry.weaponInstanceId !== 'string') {
-      throw new TypeError(
-        `CollectionTeam.members[${i}].weaponInstanceId must be a string, got: ${JSON.stringify(entry.weaponInstanceId)}`,
-      );
-    }
-    if (entry.artifactPlan !== undefined) {
-      assertArtifactPlan(entry.artifactPlan, `CollectionTeam.members[${i}].artifactPlan`);
-    }
+    assertCollectionTeamMember(member, `CollectionTeam.members[${i}]`);
   }
-  if (data.description !== undefined && typeof data.description !== 'string') {
-    throw new TypeError(
-      `CollectionTeam.description must be a string, got: ${JSON.stringify(data.description)}`,
-    );
-  }
+  assertOptionalString(data.description, 'CollectionTeam.description');
   if (!isISOTimestamp(data.createdAt)) {
     throw new TypeError(
       `CollectionTeam.createdAt must be an ISO 8601 timestamp, got: ${JSON.stringify(data.createdAt)}`,

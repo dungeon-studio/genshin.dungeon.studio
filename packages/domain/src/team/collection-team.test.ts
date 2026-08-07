@@ -24,9 +24,6 @@ const VALID_MEMBERS: CollectionTeamMembers = [
   null,
 ];
 
-/** Padding for a single-member `members` tuple. */
-const NULLS = [null, null, null] as const;
-
 const VALID_TEAM = {
   slot: 1 as TeamSlot,
   name: 'Team 1',
@@ -34,6 +31,22 @@ const VALID_TEAM = {
   createdAt: VALID_TIMESTAMP,
   updatedAt: VALID_TIMESTAMP,
 };
+
+const VALID_PLAN = {
+  sands: 'ATK Percentage',
+  goblet: 'Hydro DMG Bonus',
+  circlet: 'CRIT Rate',
+  sets: ['aubade-of-morningstar-and-moon'],
+  priorityMinorAffixes: ['CRIT Rate', 'CRIT DMG'],
+  secondaryMinorAffixes: ['ATK Percentage'],
+};
+
+/** A valid team carrying `member` at `index`, the rest of the slots empty. */
+function teamWithMember(member: unknown, index = 0): Record<string, unknown> {
+  const members = [null, null, null, null];
+  members[index] = member as null;
+  return { ...VALID_TEAM, members };
+}
 
 describe('TEAM_SLOTS', () => {
   it('contains all slots from MIN to MAX', () => {
@@ -151,49 +164,29 @@ describe('assertCollectionTeam', () => {
   });
 
   it('throws for member without characterId', () => {
-    expect(() =>
-      assertCollectionTeam({
-        ...VALID_TEAM,
-        members: [{ notCharacterId: 'x' }, null, null, null],
-      }),
-    ).toThrow(/characterId/);
+    expect(() => assertCollectionTeam(teamWithMember({ notCharacterId: 'x' }))).toThrow(
+      /members\[0\]\.characterId must be a string/,
+    );
   });
 
   it('accepts a member with a weapon instance and a full artifact plan', () => {
     expect(() =>
       assertCollectionTeam({
-        ...VALID_TEAM,
+        ...teamWithMember({
+          characterId: 'columbina',
+          weaponInstanceId: '3f2a1c6e-9d4b-4a7f-8e21-0b5c6d7e8f90',
+          artifactPlan: VALID_PLAN,
+        }),
         description: 'Hydro core',
-        members: [
-          {
-            characterId: 'columbina',
-            weaponInstanceId: '3f2a1c6e-9d4b-4a7f-8e21-0b5c6d7e8f90',
-            artifactPlan: {
-              sands: 'ATK Percentage',
-              goblet: 'Hydro DMG Bonus',
-              circlet: 'CRIT Rate',
-              sets: ['aubade-of-morningstar-and-moon'],
-              priorityMinorAffixes: ['CRIT Rate', 'CRIT DMG'],
-              secondaryMinorAffixes: ['ATK Percentage'],
-            },
-          },
-          null,
-          null,
-          null,
-        ],
       }),
     ).not.toThrow();
   });
 
   it('accepts a member with a partially filled artifact plan', () => {
     expect(() =>
-      assertCollectionTeam({
-        ...VALID_TEAM,
-        members: [
-          { characterId: 'columbina', artifactPlan: { sands: 'ATK Percentage' } },
-          ...NULLS,
-        ],
-      }),
+      assertCollectionTeam(
+        teamWithMember({ characterId: 'columbina', artifactPlan: { sands: 'ATK Percentage' } }),
+      ),
     ).not.toThrow();
   });
 
@@ -201,44 +194,39 @@ describe('assertCollectionTeam', () => {
     expect(() => assertCollectionTeam({ ...VALID_TEAM, description: 123 })).toThrow(/description/);
   });
 
+  it('throws for a non-object member', () => {
+    expect(() => assertCollectionTeam(teamWithMember('not-an-object'))).toThrow(
+      /members\[0\] must be a non-null object/,
+    );
+  });
+
   it('throws for non-string weaponInstanceId', () => {
     expect(() =>
-      assertCollectionTeam({
-        ...VALID_TEAM,
-        members: [{ characterId: 'columbina', weaponInstanceId: 42 }, ...NULLS],
-      }),
+      assertCollectionTeam(teamWithMember({ characterId: 'columbina', weaponInstanceId: 42 })),
     ).toThrow(/members\[0\]\.weaponInstanceId/);
   });
 
   it('throws for a non-object artifact plan', () => {
     expect(() =>
-      assertCollectionTeam({
-        ...VALID_TEAM,
-        members: [{ characterId: 'columbina', artifactPlan: 'not-an-object' }, ...NULLS],
-      }),
+      assertCollectionTeam(
+        teamWithMember({ characterId: 'columbina', artifactPlan: 'not-an-object' }),
+      ),
     ).toThrow(/members\[0\]\.artifactPlan must be a non-null object/);
   });
 
   it('throws for a non-string main affix in an artifact plan', () => {
     expect(() =>
-      assertCollectionTeam({
-        ...VALID_TEAM,
-        members: [{ characterId: 'columbina', artifactPlan: { sands: 42 } }, ...NULLS],
-      }),
+      assertCollectionTeam(
+        teamWithMember({ characterId: 'columbina', artifactPlan: { sands: 42 } }),
+      ),
     ).toThrow(/members\[0\]\.artifactPlan\.sands must be a string/);
   });
 
   it('throws for a malformed artifact plan on a later member', () => {
     expect(() =>
-      assertCollectionTeam({
-        ...VALID_TEAM,
-        members: [
-          null,
-          null,
-          { characterId: 'durin', artifactPlan: { sets: 'not-an-array' } },
-          null,
-        ],
-      }),
+      assertCollectionTeam(
+        teamWithMember({ characterId: 'durin', artifactPlan: { sets: 'not-an-array' } }, 2),
+      ),
     ).toThrow(/members\[2\]\.artifactPlan\.sets must be an array/);
   });
 

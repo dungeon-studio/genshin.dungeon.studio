@@ -9,6 +9,8 @@ import type {
   SandsMainAffix,
 } from '@genshin/game-data';
 
+import { assertOptionalString, assertOptionalStringArray } from '../assertions.js';
+
 /**
  * Artifact plan configuration for a team member.
  *
@@ -33,37 +35,10 @@ export interface ArtifactPlan {
   secondaryMinorAffixes?: ArtifactMinorAffix[];
 }
 
-function assertOptionalString(plan: Record<string, unknown>, path: string, field: string): void {
-  if (plan[field] !== undefined && typeof plan[field] !== 'string') {
-    throw new TypeError(`${path}.${field} must be a string, got: ${JSON.stringify(plan[field])}`);
-  }
-}
-
-function assertOptionalStringArray(
-  plan: Record<string, unknown>,
-  path: string,
-  field: string,
-  min: number,
-  max: number,
-): void {
-  const arr = plan[field];
-  if (arr === undefined) return;
-  if (!Array.isArray(arr)) {
-    throw new TypeError(`${path}.${field} must be an array, got: ${JSON.stringify(arr)}`);
-  }
-  if (arr.length < min || arr.length > max) {
-    throw new TypeError(
-      `${path}.${field} must have between ${min} and ${max} elements, got: ${arr.length}`,
-    );
-  }
-  arr.forEach((element, index) => {
-    if (typeof element !== 'string') {
-      throw new TypeError(
-        `${path}.${field}[${index}] must be a string, got: ${JSON.stringify(element)}`,
-      );
-    }
-  });
-}
+const MIN_SETS = 1;
+const MAX_SETS = 2;
+const MIN_MINOR_AFFIXES = 0;
+const MAX_MINOR_AFFIXES = 3;
 
 /**
  * Assert that `value` has the shape of an {@link ArtifactPlan}.
@@ -83,10 +58,20 @@ export function assertArtifactPlan(
     throw new TypeError(`${path} must be a non-null object, got: ${JSON.stringify(value)}`);
   }
   const plan = value as Record<string, unknown>;
-  assertOptionalString(plan, path, 'sands');
-  assertOptionalString(plan, path, 'goblet');
-  assertOptionalString(plan, path, 'circlet');
-  assertOptionalStringArray(plan, path, 'sets', 1, 2);
-  assertOptionalStringArray(plan, path, 'priorityMinorAffixes', 0, 3);
-  assertOptionalStringArray(plan, path, 'secondaryMinorAffixes', 0, 3);
+  assertOptionalString(plan.sands, `${path}.sands`);
+  assertOptionalString(plan.goblet, `${path}.goblet`);
+  assertOptionalString(plan.circlet, `${path}.circlet`);
+  assertOptionalStringArray(plan.sets, `${path}.sets`, MIN_SETS, MAX_SETS);
+  assertOptionalStringArray(
+    plan.priorityMinorAffixes,
+    `${path}.priorityMinorAffixes`,
+    MIN_MINOR_AFFIXES,
+    MAX_MINOR_AFFIXES,
+  );
+  assertOptionalStringArray(
+    plan.secondaryMinorAffixes,
+    `${path}.secondaryMinorAffixes`,
+    MIN_MINOR_AFFIXES,
+    MAX_MINOR_AFFIXES,
+  );
 }
