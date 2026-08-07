@@ -123,6 +123,36 @@ describe('team serialisation round-trip', () => {
     const result = deserialiseTeam(item);
     expect(result.members[0]?.artifactPlan).not.toHaveProperty('injected');
   });
+
+  it('rejects a member that is not an object', () => {
+    const item = itemWithRawMembers(['not-an-object', null, null, null]);
+    expect(() => deserialiseTeam(item)).toThrow(/members\[0\] must be a non-null object/);
+  });
+
+  it('rejects a member with a non-string characterId', () => {
+    const item = itemWithRawMembers([{ characterId: 42 }, null, null, null]);
+    expect(() => deserialiseTeam(item)).toThrow(/members\[0\]\.characterId must be a string/);
+  });
+
+  it('rejects an artifact plan whose sets is not an array', () => {
+    const item = itemWithRawMembers([
+      {
+        characterId: 'columbina',
+        artifactPlan: {
+          sands: 'ATK Percentage',
+          goblet: 'Hydro DMG Bonus',
+          circlet: 'CRIT Rate',
+          sets: 'not-an-array',
+          priorityMinorAffixes: [],
+          secondaryMinorAffixes: [],
+        },
+      },
+      null,
+      null,
+      null,
+    ]);
+    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sets must be an array/);
+  });
 });
 
 /**
