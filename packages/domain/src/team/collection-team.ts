@@ -1,6 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> */
 /* SPDX-License-Identifier: MIT */
 
+import { assertArtifactPlan } from '../artifact/artifact-plan.js';
 import type { ISOTimestamp } from '../iso-timestamp.js';
 import { isISOTimestamp, nowTimestamp } from '../iso-timestamp.js';
 import type { CollectionTeamMember } from './collection-team-member.js';
@@ -85,13 +86,27 @@ export function assertCollectionTeam(value: unknown): asserts value is Collectio
       `CollectionTeam.members must have exactly ${MAX_TEAM_MEMBERS} entries, got: ${data.members.length}`,
     );
   }
-  for (const member of data.members) {
+  for (const [i, member] of (data.members as unknown[]).entries()) {
     if (member === null) continue;
-    if (typeof member !== 'object' || typeof member.characterId !== 'string') {
+    const entry = member as Record<string, unknown>;
+    if (typeof member !== 'object' || typeof entry.characterId !== 'string') {
       throw new TypeError(
         `CollectionTeam.members entries must have a string characterId, got: ${JSON.stringify(member)}`,
       );
     }
+    if (entry.weaponInstanceId !== undefined && typeof entry.weaponInstanceId !== 'string') {
+      throw new TypeError(
+        `CollectionTeam.members[${i}].weaponInstanceId must be a string, got: ${JSON.stringify(entry.weaponInstanceId)}`,
+      );
+    }
+    if (entry.artifactPlan !== undefined) {
+      assertArtifactPlan(entry.artifactPlan, `CollectionTeam.members[${i}].artifactPlan`);
+    }
+  }
+  if (data.description !== undefined && typeof data.description !== 'string') {
+    throw new TypeError(
+      `CollectionTeam.description must be a string, got: ${JSON.stringify(data.description)}`,
+    );
   }
   if (!isISOTimestamp(data.createdAt)) {
     throw new TypeError(
