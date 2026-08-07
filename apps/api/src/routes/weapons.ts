@@ -92,11 +92,12 @@ weapons.post(
     const userId = c.get('user').uid;
     const { weaponId, refinementLevel } = c.get('validatedBody') as CreateWeaponBody;
 
-    if (!getWeaponById(weaponId)) {
+    const knownWeapon = getWeaponById(weaponId);
+    if (!knownWeapon) {
       throw new HTTPException(400, { message: `Unknown weapon: ${weaponId}` });
     }
 
-    const weapon = await Weapons.create(userId, weaponId, refinementLevel);
+    const weapon = await Weapons.create(userId, knownWeapon.id, refinementLevel);
     const baseUrl = new URL(c.req.url).origin;
 
     return c.body(

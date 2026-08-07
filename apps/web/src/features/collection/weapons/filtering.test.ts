@@ -7,7 +7,14 @@ import { describe, expect, it } from 'vitest';
 import { filterWeapons, initialFilterState } from './filtering';
 
 const WEAPONS: Weapon[] = [
-  { id: 'dull-blade', name: 'Dull Blade', type: 'Sword', rarity: 1, baseATK: 23, version: '1.0' },
+  {
+    id: 'favonius-sword',
+    name: 'Favonius Sword',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 41,
+    version: '1.0',
+  },
   { id: 'amos-bow', name: "Amos' Bow", type: 'Bow', rarity: 5, baseATK: 46, version: '1.0' },
   {
     id: 'staff-of-homa',

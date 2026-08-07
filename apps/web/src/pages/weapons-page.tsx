@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { WeaponType } from '@genshin/game-data';
+import type { WeaponId, WeaponType } from '@genshin/game-data';
 import { WEAPONS, WEAPON_TYPES } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
 import type { JSX } from 'react';
@@ -52,7 +52,7 @@ export function WeaponsPage(): JSX.Element {
     }
     return state;
   });
-  const [selectedWeaponId, setSelectedWeaponId] = useState<string | null>(null);
+  const [selectedWeaponId, setSelectedWeaponId] = useState<WeaponId | null>(null);
 
   const effectiveSelectedWeaponId = isAuthenticated ? selectedWeaponId : null;
 
@@ -88,7 +88,7 @@ export function WeaponsPage(): JSX.Element {
   );
 
   const handleWeaponClick = useCallback(
-    (weaponId: string) => {
+    (weaponId: WeaponId) => {
       if (selectedWeaponId === weaponId) {
         setSelectedWeaponId(null);
         return;
@@ -106,7 +106,7 @@ export function WeaponsPage(): JSX.Element {
   );
 
   const handleAddWeapon = useCallback(
-    (weaponId: string) => {
+    (weaponId: WeaponId) => {
       addWeapon(weaponId);
     },
     [addWeapon],

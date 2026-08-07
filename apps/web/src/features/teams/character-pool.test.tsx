@@ -1,11 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CharacterId, CollectionCharacter, ISOTimestamp } from '@genshin/domain';
+import type { ISOTimestamp } from '@genshin/domain';
 import type { Character, WeaponType } from '@genshin/game-data';
 import { CHARACTERS } from '@genshin/game-data';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import type { CharacterCollection } from '@/features/collection/characters/use-character-collection-store';
 
 import { CharacterPool } from './character-pool';
 import { useTeamStore } from './use-team-store';
@@ -20,7 +22,7 @@ function characterWielding(weaponType: WeaponType): Character {
 const BOW_USER = characterWielding('Bow');
 const CLAYMORE_USER = characterWielding('Claymore');
 
-function owned(...characters: Character[]): Record<CharacterId, CollectionCharacter> {
+function owned(...characters: Character[]): CharacterCollection {
   return Object.fromEntries(
     characters.map((c) => [
       c.id,

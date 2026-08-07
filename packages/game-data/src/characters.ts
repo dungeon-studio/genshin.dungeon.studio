@@ -9,7 +9,7 @@ import type { WeaponType } from './weapons.js';
  * Character definition
  */
 export interface Character {
-  id: string;
+  id: CharacterId;
   name: string;
   element: Element;
   weaponType: WeaponType;
@@ -31,7 +31,7 @@ export interface Character {
  *
  * To add more characters, follow the guide in docs/how-tos/update-game-characters.md
  */
-export const CHARACTERS: Character[] = [
+const CHARACTER_DATA = [
   // 5-star characters (sorted by version descending)
 
   // Luna IV
@@ -1271,9 +1271,18 @@ export const CHARACTERS: Character[] = [
     version: '1.0',
     releaseDate: '2020-09-28',
   },
-];
+] as const;
 
-const CHARACTERS_BY_ID = new Map(CHARACTERS.map((c) => [c.id, c]));
+/**
+ * Every playable character's ID, as a union of the IDs in {@link CHARACTERS}.
+ */
+export type CharacterId = (typeof CHARACTER_DATA)[number]['id'];
+
+export const CHARACTERS: readonly Character[] = CHARACTER_DATA;
+
+// Keyed by plain `string`: `getCharacterById` is the runtime gate that turns
+// unvalidated input into a `Character`, so it must accept unknown IDs.
+const CHARACTERS_BY_ID = new Map<string, Character>(CHARACTERS.map((c) => [c.id, c]));
 
 /**
  * Helper to find character by ID

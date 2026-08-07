@@ -87,12 +87,17 @@ characters.put(
     const userId = c.get('user').uid;
     const { characterId } = c.req.param();
 
-    if (!getCharacterById(characterId)) {
+    const knownCharacter = getCharacterById(characterId);
+    if (!knownCharacter) {
       throw new HTTPException(400, { message: `Unknown character: ${characterId}` });
     }
 
     const { constellationLevel } = c.get('validatedBody') as SaveCharacterBody;
-    const { character, created } = await Characters.save(userId, characterId, constellationLevel);
+    const { character, created } = await Characters.save(
+      userId,
+      knownCharacter.id,
+      constellationLevel,
+    );
     const baseUrl = new URL(c.req.url).origin;
 
     return c.body(

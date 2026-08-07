@@ -15,10 +15,11 @@ import {
   useRemoveCharacterMutation,
   useSetConstellationLevelMutation,
 } from './use-character-collection-api';
+import type { CharacterCollection } from './use-character-collection-store';
 import { mergeCollections, useCollectionStore } from './use-character-collection-store';
 
 export interface UseCollectionResult {
-  characters: Record<CharacterId, CollectionCharacter>;
+  characters: CharacterCollection;
   addCharacter: (characterId: CharacterId) => void;
   removeCharacter: (characterId: CharacterId) => void;
   setConstellationLevel: (characterId: CharacterId, level: number) => void;
@@ -84,14 +85,15 @@ export function useCollection(): UseCollectionResult {
 
       // Push entries that differ from the server
       const diffs: Array<{ characterId: CharacterId; level: number }> = [];
-      for (const id of Object.keys(merged)) {
-        const entry = merged[id];
-        const serverEntry = apiCharacters[id];
+      for (const entry of Object.values(merged)) {
+        if (!entry) continue;
+
+        const serverEntry = apiCharacters[entry.characterId];
         if (
           isValidConstellationLevel(entry.constellationLevel) &&
           (!serverEntry || entry.constellationLevel > serverEntry.constellationLevel)
         ) {
-          diffs.push({ characterId: id, level: entry.constellationLevel });
+          diffs.push({ characterId: entry.characterId, level: entry.constellationLevel });
         }
       }
 

@@ -17,17 +17,18 @@ import {
   serialiseTeam,
   serialiseWeapon,
 } from '@genshin/domain';
+import type { WeaponId } from '@genshin/game-data';
 
 // Origin the API client resolves relative paths against (see vitest.config.ts).
 const API_BASE_URL = 'http://localhost:8080';
 
 const FIXED_TIMESTAMP = '2026-01-01T00:00:00.000Z' as ISOTimestamp;
 
-// Domain-object builders. IDs must exist in @genshin/game-data because the
-// deserialisers validate them against the static catalogue.
-export function makeCharacter(id: string, constellationLevel = 0): CollectionCharacter {
+// Domain-object builders. The ID unions keep these in step with the static
+// catalogue, which the deserialisers also validate against at runtime.
+export function makeCharacter(id: CharacterId, constellationLevel = 0): CollectionCharacter {
   return {
-    characterId: id as CharacterId,
+    characterId: id,
     constellationLevel,
     createdAt: FIXED_TIMESTAMP,
     updatedAt: FIXED_TIMESTAMP,
@@ -36,7 +37,7 @@ export function makeCharacter(id: string, constellationLevel = 0): CollectionCha
 
 export function makeWeapon(
   instanceId: string,
-  weaponId: string,
+  weaponId: WeaponId,
   refinementLevel = 1,
 ): CollectionWeapon {
   return {

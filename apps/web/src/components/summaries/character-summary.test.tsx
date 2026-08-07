@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { Character } from '@genshin/game-data';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
@@ -9,13 +10,13 @@ import { CharacterSummary } from './character-summary';
 const AMBER = {
   id: 'amber',
   name: 'Amber',
-  element: 'Pyro' as const,
-  weaponType: 'Bow' as const,
-  rarity: 4 as const,
+  element: 'Pyro',
+  weaponType: 'Bow',
+  rarity: 4,
   region: 'Mondstadt',
   version: '1.0',
   releaseDate: '2020-09-28',
-};
+} satisfies Character;
 
 describe('CharacterSummary', () => {
   it('renders placeholder when no character is provided', () => {

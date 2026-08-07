@@ -3,7 +3,7 @@
 
 import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
 import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
-import type { Weapon } from '@genshin/game-data';
+import type { Weapon, WeaponId } from '@genshin/game-data';
 import { getWeaponById } from '@genshin/game-data';
 import { Plus, Trash2 } from 'lucide-react';
 import type { JSX } from 'react';
@@ -24,10 +24,10 @@ const REFINEMENT_LEVELS = Array.from(
 );
 
 interface WeaponInstanceSidebarProps {
-  weaponId: string | null;
+  weaponId: WeaponId | null;
   instances: CollectionWeapon[];
   onClose: () => void;
-  onAdd: (weaponId: string) => void;
+  onAdd: (weaponId: WeaponId) => void;
   onRemove: (collectionWeaponId: CollectionWeaponId) => void;
   onRefinementChange: (collectionWeaponId: CollectionWeaponId, level: number) => void;
 }

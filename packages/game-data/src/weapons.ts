@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { Rarity } from './rarities.js';
-import { WEAPONS } from './weapons.generated.js';
+import { WEAPON_DATA } from './weapons.generated.js';
 
 /**
  * Weapon types
@@ -34,10 +34,15 @@ export const WEAPON_STAT_TYPES = {
 export type WeaponStatType = (typeof WEAPON_STAT_TYPES)[keyof typeof WEAPON_STAT_TYPES];
 
 /**
+ * Every weapon's ID, as a union of the IDs in {@link WEAPONS}.
+ */
+export type WeaponId = (typeof WEAPON_DATA)[number]['id'];
+
+/**
  * Weapon definition
  */
 export interface Weapon {
-  id: string;
+  id: WeaponId;
   name: string;
   type: WeaponType;
   rarity: Rarity;
@@ -51,9 +56,11 @@ export interface Weapon {
   passiveDescription?: string;
 }
 
-export { WEAPONS };
+export const WEAPONS: readonly Weapon[] = WEAPON_DATA;
 
-const WEAPONS_BY_ID = new Map(WEAPONS.map((w) => [w.id, w]));
+// Keyed by plain `string`: `getWeaponById` is the runtime gate that turns
+// unvalidated input into a `Weapon`, so it must accept unknown IDs.
+const WEAPONS_BY_ID = new Map<string, Weapon>(WEAPONS.map((w) => [w.id, w]));
 
 /**
  * Helper to find weapon by ID

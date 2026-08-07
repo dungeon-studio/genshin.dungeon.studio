@@ -8,14 +8,20 @@ import { persist } from 'zustand/middleware';
 
 import { CURRENT_VERSION, migratePersistedCollection } from './schemas/index.js';
 
+/** Owned characters keyed by ID; sparse, since a player owns a subset of the roster. */
+export type CharacterCollection = Partial<Record<CharacterId, CollectionCharacter>>;
+
 // Additive merge: union of both sets, keep higher constellation level on conflicts.
 export function mergeCollections(
-  local: Record<CharacterId, CollectionCharacter>,
-  server: Record<CharacterId, CollectionCharacter>,
-): Record<CharacterId, CollectionCharacter> {
-  const merged: Record<CharacterId, CollectionCharacter> = { ...server };
+  local: CharacterCollection,
+  server: CharacterCollection,
+): CharacterCollection {
+  const merged: CharacterCollection = { ...server };
 
-  for (const [id, localEntry] of Object.entries(local)) {
+  for (const localEntry of Object.values(local)) {
+    if (!localEntry) continue;
+
+    const id = localEntry.characterId;
     const serverEntry = merged[id];
     if (!serverEntry) {
       merged[id] = localEntry;
@@ -32,13 +38,13 @@ export function mergeCollections(
 }
 
 interface CollectionState {
-  characters: Record<CharacterId, CollectionCharacter>;
+  characters: CharacterCollection;
   addCharacter: (characterId: CharacterId) => void;
   removeCharacter: (characterId: CharacterId) => void;
   setConstellationLevel: (characterId: CharacterId, level: number) => void;
   isOwned: (characterId: CharacterId) => boolean;
   getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
-  replaceCharacters: (characters: Record<CharacterId, CollectionCharacter>) => void;
+  replaceCharacters: (characters: CharacterCollection) => void;
   clearCharacters: () => void;
 }
 
