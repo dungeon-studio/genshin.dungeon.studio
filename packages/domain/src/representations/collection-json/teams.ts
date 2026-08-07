@@ -109,7 +109,14 @@ function deserialiseArtifactPlan(value: unknown): ArtifactPlan {
   assertStringArray(plan, 'sets', 1, 2);
   assertStringArray(plan, 'priorityMinorAffixes', 0, 3);
   assertStringArray(plan, 'secondaryMinorAffixes', 0, 3);
-  return value as ArtifactPlan;
+  return {
+    sands: plan.sands as ArtifactPlan['sands'],
+    goblet: plan.goblet as ArtifactPlan['goblet'],
+    circlet: plan.circlet as ArtifactPlan['circlet'],
+    sets: plan.sets as ArtifactPlan['sets'],
+    priorityMinorAffixes: plan.priorityMinorAffixes as ArtifactPlan['priorityMinorAffixes'],
+    secondaryMinorAffixes: plan.secondaryMinorAffixes as ArtifactPlan['secondaryMinorAffixes'],
+  };
 }
 
 function deserialiseCollectionTeamMember(value: unknown, index: number): CollectionTeamMember {
@@ -129,10 +136,16 @@ function deserialiseCollectionTeamMember(value: unknown, index: number): Collect
       `members[${index}].weaponInstanceId must be a string, got: ${JSON.stringify(raw.weaponInstanceId)}`,
     );
   }
-  if (raw.artifactPlan !== undefined) {
-    deserialiseArtifactPlan(raw.artifactPlan);
+  const member: CollectionTeamMember = {
+    characterId: raw.characterId as CollectionTeamMember['characterId'],
+  };
+  if (raw.weaponInstanceId !== undefined) {
+    member.weaponInstanceId = raw.weaponInstanceId as CollectionTeamMember['weaponInstanceId'];
   }
-  return value as CollectionTeamMember;
+  if (raw.artifactPlan !== undefined) {
+    member.artifactPlan = deserialiseArtifactPlan(raw.artifactPlan);
+  }
+  return member;
 }
 
 export function deserialiseTeam(item: Item): CollectionTeam {

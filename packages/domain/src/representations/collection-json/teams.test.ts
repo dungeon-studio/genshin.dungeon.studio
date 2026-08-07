@@ -163,3 +163,62 @@ describe('deserialiseTeam artifact plan validation', () => {
     );
   });
 });
+
+describe('deserialiseTeam member sanitisation', () => {
+  /**
+   * Builds a team Item with raw member JSON that serialiseTeam's typed input
+   * can't produce, exercising deserialisation of untrusted wire data.
+   */
+  function itemWithRawMembers(members: unknown[]): Item {
+    const item = serialiseTeam(VALID_TEAM, BASE_URL);
+    return {
+      ...item,
+      data: item.data.map((d) =>
+        d.name === 'members' ? { ...d, value: JSON.stringify(members) } : d,
+      ),
+    };
+  }
+
+  it('strips unknown properties off deserialised members', () => {
+    const item = itemWithRawMembers([
+      { characterId: 'columbina', weaponInstanceId: 'wep-001', injected: 'evil' },
+      null,
+      null,
+      null,
+    ]);
+    const result = deserialiseTeam(item);
+    expect(result.members[0]).toEqual({ characterId: 'columbina', weaponInstanceId: 'wep-001' });
+  });
+
+  it('strips unknown properties off deserialised artifact plans', () => {
+    const item = itemWithRawMembers([
+      {
+        characterId: 'columbina',
+        artifactPlan: {
+          sands: 'ATK Percentage',
+          goblet: 'Hydro DMG Bonus',
+          circlet: 'CRIT Rate',
+          sets: ['aubade-of-morningstar-and-moon'],
+          priorityMinorAffixes: [],
+          secondaryMinorAffixes: [],
+          injected: 'evil',
+        },
+      },
+      null,
+      null,
+      null,
+    ]);
+    const result = deserialiseTeam(item);
+    expect(result.members[0]?.artifactPlan).not.toHaveProperty('injected');
+  });
+
+  it('rejects a member that is not an object', () => {
+    const item = itemWithRawMembers(['not-an-object', null, null, null]);
+    expect(() => deserialiseTeam(item)).toThrow(/members\[0\] must be a non-null object/);
+  });
+
+  it('rejects a member with a non-string characterId', () => {
+    const item = itemWithRawMembers([{ characterId: 42 }, null, null, null]);
+    expect(() => deserialiseTeam(item)).toThrow(/members\[0\]\.characterId must be a string/);
+  });
+});
