@@ -6,7 +6,7 @@ import type { Character } from '@genshin/game-data';
 import type { ArtifactPlan } from '../artifact/artifact-plan.js';
 import { assertArtifactPlan } from '../artifact/artifact-plan.js';
 import { assertOptionalString, assertString } from '../assertions.js';
-import type { UUID } from '../uuid.js';
+import type { CollectionWeaponId } from '../weapon/collection-weapon.js';
 
 /**
  * CollectionTeamMember represents a single character position in a team with
@@ -17,7 +17,7 @@ import type { UUID } from '../uuid.js';
  */
 export interface CollectionTeamMember {
   characterId: Character['id'];
-  weaponInstanceId?: UUID;
+  weaponInstanceId?: CollectionWeaponId;
   artifactPlan?: ArtifactPlan;
 }
 

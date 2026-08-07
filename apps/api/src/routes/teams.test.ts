@@ -70,7 +70,7 @@ function mockCharacterOwned() {
 
 function mockWeaponOwned() {
   vi.mocked(Weapons.get).mockResolvedValue({
-    weaponInstanceId: 'uuid-1' as UUID,
+    weaponInstanceId: 'uuid-1',
     weaponId: 'staff-of-homa',
     refinementLevel: 1,
     createdAt: '2026-01-01T00:00:00.000Z',
