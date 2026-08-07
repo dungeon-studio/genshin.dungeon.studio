@@ -126,8 +126,8 @@ describe('team serialisation round-trip', () => {
 });
 
 /**
- * Builds a team Item whose serialised members carry raw, unsanitised JSON —
- * the shape a hostile or buggy client could put on the wire.
+ * Builds a team Item with raw member JSON that serialiseTeam's typed input
+ * can't produce, exercising deserialisation of untrusted wire data.
  */
 function itemWithRawMembers(members: unknown[]): Item {
   const item = serialiseTeam(VALID_TEAM, BASE_URL);
