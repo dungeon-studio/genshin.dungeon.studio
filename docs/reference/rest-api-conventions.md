@@ -17,7 +17,7 @@ Model endpoints as plural resource nouns on stable, hierarchical paths. No actio
 
 ### 2. Method semantics
 
-Use each method by its intent in Hypertext Transfer Protocol (HTTP): `GET` retrieves, `POST` creates, `PUT` replaces in full, `PATCH` updates in part, `DELETE` removes.
+Use each method by its HTTP intent: `GET` retrieves, `POST` creates, `PUT` replaces in full, `PATCH` updates in part, `DELETE` removes.
 
 ### 3. Consistent status code semantics
 
@@ -99,7 +99,7 @@ See [RFC9110], Section 15.5.21: <https://www.rfc-editor.org/rfc/rfc9110.html#nam
 
 ### 12. Resource discovery
 
-The API root (`GET /`) is a HATEOAS entry point advertising available resources as a `links` object, served as `application/json` with a `profile` parameter like every other endpoint:
+The API root (`GET /`) is a hypermedia entry point (HATEOAS) advertising available resources as a `links` object, served as `application/json` with a `profile` parameter like every other endpoint:
 
 ```json
 {
@@ -113,21 +113,19 @@ The API root (`GET /`) is a HATEOAS entry point advertising available resources 
 }
 ```
 
-- **Link shape**: plain `href` strings keyed by the last path segment, which avoids a separate hypermedia media type for a single endpoint.
-- **Population**: the app's route table at startup, so new resource endpoints appear without manual maintenance.
-- **Visibility**: every resource, authenticated or not, because URLs aren't secret and each resource enforces its own authorization.
-- **Version**: carried by `/health` alongside operational metadata such as `status` and `sha`, not by the root, which handles discovery only.
+- **Link shape**: plain `href` strings keyed by the last path segment.
+- **Population**: derived at startup, so new resource endpoints appear without manual maintenance.
+- **Visibility**: every resource, authenticated or not; each enforces its own authorization.
+- **Version**: carried by `/health` alongside operational metadata such as `status` and `sha`.
 
 ### 13. Retry-After on 429 and 503 responses
 
-Error responses with a status that has retry semantics carry a `Retry-After` header telling clients how long to wait, independent of what produced the status:
+These statuses carry a `Retry-After` header, an integer count of seconds, keyed on the response status alone and independent of what produced it. Every other error status omits the header.
 
 | Status | Meaning                                             |
 | ------ | --------------------------------------------------- |
 | `429`  | Quota or rate limit exhausted; wait before retrying |
 | `503`  | Service momentarily unavailable; retry shortly      |
-
-`Retry-After` is an integer count of seconds, and each status carries a fixed default: a wider window for quota exhaustion than for momentary unavailability. The header is keyed on the response status alone, so the same value applies whether the status came from a Firestore transient error or a route. All other error statuses omit the header.
 
 See [RFC9110], Section 10.2.3: <https://www.rfc-editor.org/rfc/rfc9110.html#name-retry-after>
 
