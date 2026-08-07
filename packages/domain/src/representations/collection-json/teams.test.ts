@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { Item } from '@genshin/collection-json';
 import { describe, expect, it } from 'vitest';
 
 import { deserialiseTeam, serialiseTeam } from './teams.js';
@@ -88,5 +89,77 @@ describe('team serialisation round-trip', () => {
     const item = serialiseTeam(team, BASE_URL);
     const result = deserialiseTeam(item);
     expect(result.members[0]?.artifactPlan).toEqual(team.members[0]?.artifactPlan);
+  });
+});
+
+describe('deserialiseTeam artifact plan validation', () => {
+  const VALID_PLAN = {
+    sands: 'ATK Percentage',
+    goblet: 'Hydro DMG Bonus',
+    circlet: 'CRIT Rate',
+    sets: ['aubade-of-morningstar-and-moon'],
+    priorityMinorAffixes: ['CRIT Rate'],
+    secondaryMinorAffixes: ['ATK Percentage'],
+  };
+
+  function itemWithArtifactPlan(artifactPlan: unknown): Item {
+    const members = [{ characterId: 'columbina', artifactPlan }, null, null, null];
+    return {
+      href: `${BASE_URL}/api/teams/1`,
+      data: [
+        { name: 'slot', value: 1 },
+        { name: 'name', value: 'Team 1' },
+        { name: 'members', value: JSON.stringify(members) },
+        { name: 'createdAt', value: VALID_TIMESTAMP },
+        { name: 'updatedAt', value: VALID_TIMESTAMP },
+      ],
+    };
+  }
+
+  it('rejects an artifact plan that is not an object', () => {
+    const item = itemWithArtifactPlan('not-an-object');
+    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan must be a non-null object/);
+  });
+
+  it('rejects a non-string main affix field', () => {
+    const item = itemWithArtifactPlan({ ...VALID_PLAN, sands: 42 });
+    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sands must be a string/);
+  });
+
+  it('rejects a set field that is not an array', () => {
+    const item = itemWithArtifactPlan({ ...VALID_PLAN, sets: 'aubade-of-morningstar-and-moon' });
+    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sets must be an array/);
+  });
+
+  it('rejects a non-string element in sets', () => {
+    const item = itemWithArtifactPlan({ ...VALID_PLAN, sets: [42] });
+    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sets\[0\] must be a string/);
+  });
+
+  it('rejects a non-string element in a minor affix array', () => {
+    const item = itemWithArtifactPlan({ ...VALID_PLAN, priorityMinorAffixes: [null] });
+    expect(() => deserialiseTeam(item)).toThrow(
+      /artifactPlan\.priorityMinorAffixes\[0\] must be a string/,
+    );
+  });
+
+  it('rejects sets with fewer than 1 element', () => {
+    const item = itemWithArtifactPlan({ ...VALID_PLAN, sets: [] });
+    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sets must have between 1 and 2/);
+  });
+
+  it('rejects sets with more than 2 elements', () => {
+    const item = itemWithArtifactPlan({ ...VALID_PLAN, sets: ['a', 'b', 'c'] });
+    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sets must have between 1 and 2/);
+  });
+
+  it('rejects a minor affix array with more than 3 elements', () => {
+    const item = itemWithArtifactPlan({
+      ...VALID_PLAN,
+      secondaryMinorAffixes: ['a', 'b', 'c', 'd'],
+    });
+    expect(() => deserialiseTeam(item)).toThrow(
+      /artifactPlan\.secondaryMinorAffixes must have between 0 and 3/,
+    );
   });
 });
