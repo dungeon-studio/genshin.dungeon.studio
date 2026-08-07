@@ -7,11 +7,13 @@ export { validateArtifactPlan } from './artifact/artifact-plan-validation.js';
 export type { AuthIdentity } from './profile/auth-identity.js';
 export {
   assertCollectionCharacter,
+  CONSTELLATION_LEVELS,
   isValidConstellationLevel,
   MAX_CONSTELLATION_LEVEL,
   MIN_CONSTELLATION_LEVEL,
   type CharacterId,
   type CollectionCharacter,
+  type ConstellationLevel,
 } from './character/collection-character.js';
 export {
   assertCollectionTeam,

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
+import type { ConstellationLevel } from '@genshin/domain';
 import { characterItemHref, characterRepresentation, serialiseCharacter } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
 import { Hono } from 'hono';
@@ -31,7 +32,12 @@ characters.use('*', auth);
 
 characters.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: characterItemV1 }]));
 
-type SaveCharacterBody = FromSchema<typeof characterPutRequestV1.schema>;
+// FromSchema widens `integer` with `minimum`/`maximum` to `number`, so the
+// intersection restores the range the validated body is already guaranteed to
+// satisfy.
+type SaveCharacterBody = FromSchema<typeof characterPutRequestV1.schema> & {
+  constellationLevel: ConstellationLevel;
+};
 
 // GET /api/characters — List user's character collection
 characters.get('/', async (c) => {

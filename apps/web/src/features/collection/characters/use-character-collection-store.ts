@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CharacterId, CollectionCharacter } from '@genshin/domain';
+import type { CharacterId, CollectionCharacter, ConstellationLevel } from '@genshin/domain';
 import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL, nowTimestamp } from '@genshin/domain';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -35,7 +35,7 @@ interface CollectionState {
   characters: Record<CharacterId, CollectionCharacter>;
   addCharacter: (characterId: CharacterId) => void;
   removeCharacter: (characterId: CharacterId) => void;
-  setConstellationLevel: (characterId: CharacterId, level: number) => void;
+  setConstellationLevel: (characterId: CharacterId, level: ConstellationLevel) => void;
   isOwned: (characterId: CharacterId) => boolean;
   getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
   replaceCharacters: (characters: Record<CharacterId, CollectionCharacter>) => void;

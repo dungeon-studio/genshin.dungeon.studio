@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CharacterId, CollectionCharacter } from '@genshin/domain';
-import { isValidConstellationLevel, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import type { CharacterId, CollectionCharacter, ConstellationLevel } from '@genshin/domain';
+import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
@@ -21,7 +21,7 @@ export interface UseCollectionResult {
   characters: Record<CharacterId, CollectionCharacter>;
   addCharacter: (characterId: CharacterId) => void;
   removeCharacter: (characterId: CharacterId) => void;
-  setConstellationLevel: (characterId: CharacterId, level: number) => void;
+  setConstellationLevel: (characterId: CharacterId, level: ConstellationLevel) => void;
   isOwned: (characterId: CharacterId) => boolean;
   getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
   isLoading: boolean;
@@ -83,14 +83,11 @@ export function useCollection(): UseCollectionResult {
       replaceCharacters(merged);
 
       // Push entries that differ from the server
-      const diffs: Array<{ characterId: CharacterId; level: number }> = [];
+      const diffs: Array<{ characterId: CharacterId; level: ConstellationLevel }> = [];
       for (const id of Object.keys(merged)) {
         const entry = merged[id];
         const serverEntry = apiCharacters[id];
-        if (
-          isValidConstellationLevel(entry.constellationLevel) &&
-          (!serverEntry || entry.constellationLevel > serverEntry.constellationLevel)
-        ) {
+        if (!serverEntry || entry.constellationLevel > serverEntry.constellationLevel) {
           diffs.push({ characterId: id, level: entry.constellationLevel });
         }
       }
@@ -185,7 +182,7 @@ export function useCollection(): UseCollectionResult {
   );
 
   const setConstellationLevel = useCallback(
-    (id: CharacterId, level: number) => {
+    (id: CharacterId, level: ConstellationLevel) => {
       const previousLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
       if (previousLevel === undefined || previousLevel === level) return;
 

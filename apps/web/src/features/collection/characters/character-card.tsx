@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { MAX_CONSTELLATION_LEVEL, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import type { ConstellationLevel } from '@genshin/domain';
+import { CONSTELLATION_LEVELS, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import type { Character } from '@genshin/game-data';
 import { Trash2 } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -18,15 +19,10 @@ import {
 } from '@/lib/element-styles';
 import { cn } from '@/lib/utils';
 
-const CONSTELLATION_LEVELS = Array.from(
-  { length: MAX_CONSTELLATION_LEVEL - MIN_CONSTELLATION_LEVEL + 1 },
-  (_, i) => MIN_CONSTELLATION_LEVEL + i,
-);
-
 interface ConstellationPopoverProps {
   character: Character;
-  constellationLevel: number;
-  onConstellationChange: (characterId: Character['id'], level: number) => void;
+  constellationLevel: ConstellationLevel;
+  onConstellationChange: (characterId: Character['id'], level: ConstellationLevel) => void;
 }
 
 function ConstellationPopover({
@@ -108,11 +104,11 @@ function RemoveButton({ character, onRemove }: RemoveButtonProps): JSX.Element {
 interface CharacterCardProps {
   character: Character;
   owned?: boolean;
-  constellationLevel?: number;
+  constellationLevel?: ConstellationLevel;
   selected?: boolean;
   onAdd?: (characterId: Character['id']) => void;
   onRemove?: (characterId: Character['id']) => void;
-  onConstellationChange?: (characterId: Character['id'], level: number) => void;
+  onConstellationChange?: (characterId: Character['id'], level: ConstellationLevel) => void;
 }
 
 export function CharacterCard({

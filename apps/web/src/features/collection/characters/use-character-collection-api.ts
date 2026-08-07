@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { assertCollectionDocument } from '@genshin/collection-json';
-import type { CharacterId, CollectionCharacter } from '@genshin/domain';
+import type { CharacterId, CollectionCharacter, ConstellationLevel } from '@genshin/domain';
 import { deserialiseCharacter, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -94,7 +94,11 @@ export function useRemoveCharacterMutation(
 
 export function useSetConstellationLevelMutation(
   userId: string | undefined,
-): UseMutationResult<MutationResult, Error, { characterId: CharacterId; level: number }> {
+): UseMutationResult<
+  MutationResult,
+  Error,
+  { characterId: CharacterId; level: ConstellationLevel }
+> {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -103,7 +107,7 @@ export function useSetConstellationLevelMutation(
       level,
     }: {
       characterId: CharacterId;
-      level: number;
+      level: ConstellationLevel;
     }): Promise<MutationResult> => {
       const response = await apiPut(`/api/characters/${encodeURIComponent(characterId)}`, {
         constellationLevel: level,

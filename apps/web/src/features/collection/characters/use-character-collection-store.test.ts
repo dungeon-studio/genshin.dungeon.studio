@@ -1,12 +1,20 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CharacterId, CollectionCharacter, ISOTimestamp } from '@genshin/domain';
+import type {
+  CharacterId,
+  CollectionCharacter,
+  ConstellationLevel,
+  ISOTimestamp,
+} from '@genshin/domain';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { mergeCollections, useCollectionStore } from './use-character-collection-store';
 
-function makeCharacter(id: string, constellationLevel = 0): CollectionCharacter {
+function makeCharacter(
+  id: string,
+  constellationLevel: ConstellationLevel = 0,
+): CollectionCharacter {
   return {
     characterId: id as CharacterId,
     constellationLevel,
@@ -63,10 +71,12 @@ describe('useCollectionStore', () => {
       expect(useCollectionStore.getState().characters['amber'].constellationLevel).toBe(3);
     });
 
+    // ConstellationLevel keeps these out of reach for typed callers; the casts
+    // exercise the runtime guard that still backs untyped and persisted input.
     it('ignores invalid constellation levels', () => {
       useCollectionStore.getState().addCharacter('amber' as CharacterId);
-      useCollectionStore.getState().setConstellationLevel('amber' as CharacterId, -1);
-      useCollectionStore.getState().setConstellationLevel('amber' as CharacterId, 7);
+      useCollectionStore.getState().setConstellationLevel('amber' as CharacterId, -1 as never);
+      useCollectionStore.getState().setConstellationLevel('amber' as CharacterId, 7 as never);
 
       expect(useCollectionStore.getState().characters['amber'].constellationLevel).toBe(0);
     });
