@@ -11,6 +11,20 @@ import { CURRENT_VERSION, migratePersistedCollection } from './schemas/index.js'
 /** Owned characters keyed by ID; sparse, since a player owns a subset of the roster. */
 export type CharacterCollection = Partial<Record<CharacterId, CollectionCharacter>>;
 
+/**
+ * Resolves one character held on both sides in favour of the higher
+ * constellation level, keeping the server's timestamps as the base.
+ */
+function preferHigherConstellation(
+  local: CollectionCharacter,
+  server: CollectionCharacter | undefined,
+): CollectionCharacter {
+  if (!server) return local;
+  if (local.constellationLevel <= server.constellationLevel) return server;
+
+  return { ...server, constellationLevel: local.constellationLevel, updatedAt: nowTimestamp() };
+}
+
 // Additive merge: union of both sets, keep higher constellation level on conflicts.
 export function mergeCollections(
   local: CharacterCollection,
@@ -22,16 +36,7 @@ export function mergeCollections(
     if (!localEntry) continue;
 
     const id = localEntry.characterId;
-    const serverEntry = merged[id];
-    if (!serverEntry) {
-      merged[id] = localEntry;
-    } else if (localEntry.constellationLevel > serverEntry.constellationLevel) {
-      merged[id] = {
-        ...serverEntry,
-        constellationLevel: localEntry.constellationLevel,
-        updatedAt: nowTimestamp(),
-      };
-    }
+    merged[id] = preferHigherConstellation(localEntry, merged[id]);
   }
 
   return merged;

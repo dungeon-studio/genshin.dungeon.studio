@@ -4,11 +4,11 @@
 import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
 import type { UUID } from '@genshin/domain';
 import { serialiseWeapon, weaponItemHref, weaponRepresentation } from '@genshin/domain';
-import { getWeaponById } from '@genshin/game-data';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import type { FromSchema } from 'json-schema-to-ts';
 
+import { requireWeaponId } from '@/lib/catalogue.js';
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
@@ -47,11 +47,7 @@ weapons.get('/', async (c) => {
       throw new HTTPException(400, { message: 'weaponId query parameter must not be empty' });
     }
 
-    if (!getWeaponById(weaponId)) {
-      throw new HTTPException(400, { message: `Unknown weapon: ${weaponId}` });
-    }
-
-    const instances = await Weapons.list(userId, weaponId);
+    const instances = await Weapons.list(userId, requireWeaponId(weaponId));
 
     return c.body(
       JSON.stringify(
@@ -92,12 +88,7 @@ weapons.post(
     const userId = c.get('user').uid;
     const { weaponId, refinementLevel } = c.get('validatedBody') as CreateWeaponBody;
 
-    const knownWeapon = getWeaponById(weaponId);
-    if (!knownWeapon) {
-      throw new HTTPException(400, { message: `Unknown weapon: ${weaponId}` });
-    }
-
-    const weapon = await Weapons.create(userId, knownWeapon.id, refinementLevel);
+    const weapon = await Weapons.create(userId, requireWeaponId(weaponId), refinementLevel);
     const baseUrl = new URL(c.req.url).origin;
 
     return c.body(

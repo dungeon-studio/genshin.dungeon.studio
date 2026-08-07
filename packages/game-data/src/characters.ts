@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { Element } from './elements.js';
+import { indexById } from './lookup.js';
 import type { Rarity } from './rarities.js';
 import type { WeaponType } from './weapons.js';
 
@@ -1280,9 +1281,7 @@ export type CharacterId = (typeof CHARACTER_DATA)[number]['id'];
 
 export const CHARACTERS: readonly Character[] = CHARACTER_DATA;
 
-// Keyed by plain `string`: `getCharacterById` is the runtime gate that turns
-// unvalidated input into a `Character`, so it must accept unknown IDs.
-const CHARACTERS_BY_ID = new Map<string, Character>(CHARACTERS.map((c) => [c.id, c]));
+const CHARACTERS_BY_ID = indexById(CHARACTERS);
 
 /**
  * Helper to find character by ID

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { indexById } from './lookup.js';
 import type { Rarity } from './rarities.js';
 import { WEAPON_DATA } from './weapons.generated.js';
 
@@ -58,9 +59,7 @@ export interface Weapon {
 
 export const WEAPONS: readonly Weapon[] = WEAPON_DATA;
 
-// Keyed by plain `string`: `getWeaponById` is the runtime gate that turns
-// unvalidated input into a `Weapon`, so it must accept unknown IDs.
-const WEAPONS_BY_ID = new Map<string, Weapon>(WEAPONS.map((w) => [w.id, w]));
+const WEAPONS_BY_ID = indexById(WEAPONS);
 
 /**
  * Helper to find weapon by ID

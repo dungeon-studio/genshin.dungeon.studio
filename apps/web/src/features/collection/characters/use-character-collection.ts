@@ -29,6 +29,28 @@ export interface UseCollectionResult {
   error: Error | null;
 }
 
+interface ConstellationSync {
+  characterId: CharacterId;
+  level: number;
+}
+
+/** Merged entries the server has not caught up with yet, in mutation order. */
+function pendingConstellationSyncs(
+  merged: CharacterCollection,
+  server: CharacterCollection,
+): ConstellationSync[] {
+  return Object.values(merged)
+    .filter((entry) => entry !== undefined)
+    .filter((entry) => {
+      const serverEntry = server[entry.characterId];
+      return (
+        isValidConstellationLevel(entry.constellationLevel) &&
+        (!serverEntry || entry.constellationLevel > serverEntry.constellationLevel)
+      );
+    })
+    .map((entry) => ({ characterId: entry.characterId, level: entry.constellationLevel }));
+}
+
 export function useCollection(): UseCollectionResult {
   const { user, loading: authLoading } = useAuth();
   const isAuthenticated = user !== null;
@@ -84,18 +106,7 @@ export function useCollection(): UseCollectionResult {
       replaceCharacters(merged);
 
       // Push entries that differ from the server
-      const diffs: Array<{ characterId: CharacterId; level: number }> = [];
-      for (const entry of Object.values(merged)) {
-        if (!entry) continue;
-
-        const serverEntry = apiCharacters[entry.characterId];
-        if (
-          isValidConstellationLevel(entry.constellationLevel) &&
-          (!serverEntry || entry.constellationLevel > serverEntry.constellationLevel)
-        ) {
-          diffs.push({ characterId: entry.characterId, level: entry.constellationLevel });
-        }
-      }
+      const diffs = pendingConstellationSyncs(merged, apiCharacters);
 
       for (const diff of diffs) {
         setConstellationLevelApi(diff, {

@@ -6,6 +6,9 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { mergeCollections, useCollectionStore } from './use-character-collection-store';
 
+/** A real character the tests never add, for the "not in the collection" paths. */
+const UNOWNED: CharacterId = 'zhongli';
+
 function makeCharacter(id: CharacterId, constellationLevel = 0): CollectionCharacter {
   return {
     characterId: id,
@@ -49,8 +52,8 @@ describe('useCollectionStore', () => {
       expect(useCollectionStore.getState().characters['amber']).toBeUndefined();
     });
 
-    it('is a no-op for nonexistent characters', () => {
-      useCollectionStore.getState().removeCharacter('zhongli');
+    it('is a no-op for characters not in the collection', () => {
+      useCollectionStore.getState().removeCharacter(UNOWNED);
 
       expect(Object.keys(useCollectionStore.getState().characters)).toHaveLength(0);
     });
@@ -77,9 +80,9 @@ describe('useCollectionStore', () => {
     });
 
     it('ignores updates for characters not in the collection', () => {
-      useCollectionStore.getState().setConstellationLevel('zhongli', 3);
+      useCollectionStore.getState().setConstellationLevel(UNOWNED, 3);
 
-      expect(useCollectionStore.getState().characters['zhongli']).toBeUndefined();
+      expect(useCollectionStore.getState().characters[UNOWNED]).toBeUndefined();
     });
   });
 
