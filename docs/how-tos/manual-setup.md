@@ -60,17 +60,15 @@ cd genshin.dungeon.studio
 # NOTE: The script assumes Debian/Ubuntu for the Google Cloud SDK install step.
 # On macOS or Fedora, install gcloud separately and run the remaining steps manually.
 .devcontainer/postCreateCommand.sh
-
-# Configure the web app for local emulators
-cp apps/web/.env.example apps/web/.env.local
 ```
 
 The script prints a verification summary at the end. If any tools fail
 verification, fix them and re-run the script.
 
-Edit `apps/web/.env.local` and fill in the Firebase client config. For local
-emulator development, any non-empty placeholder values work because the emulator
-doesn't validate them. See `apps/web/.env.example` for the full list.
+The web app needs no environment file for local development. It falls back to
+emulator-compatible defaults, which the emulators don't validate. To point it at
+real Firebase instead, copy `apps/web/.env.example` to `apps/web/.env.local` and
+fill in the values.
 
 ```bash
 # Start development servers

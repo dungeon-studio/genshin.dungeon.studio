@@ -16,7 +16,7 @@
 - API: Hono + Node.js, Firestore, Firebase Auth.
 - Testing: Vitest (API integration tests).
 - Not yet implemented: Claude MCP, React Testing Library, Bun.
-- `shadcn/ui` setup: New York style, neutral base color, CSS variables, and ESM Tailwind plugin imports.
+- `shadcn/ui` setup: New York style, CSS variables, and ESM Tailwind plugin imports. `components.json` names the `neutral` base color, but `apps/web/src/index.css` carries a brand-derived palette.
 
 ## Repository map
 
@@ -29,7 +29,7 @@
 ## Dependency management in the monorepo
 
 - Pin exact versions without `^` or `~` prefixes; Renovate handles updates weekly.
-- Root `package.json` is the source of truth for shared tooling: turbo, concurrently, TypeScript, ESLint, Prettier, and Stylelint.
+- Root `package.json` is the source of truth for shared tooling: turbo, TypeScript, ESLint, Prettier, and Stylelint.
 - Workspace `package.json` holds app-specific dependencies. Declare every direct import explicitly, even when the same package exists at the root.
 - When a shared tool appears in both root and workspace `package.json`, keep the versions identical.
 - `pnpm-workspace.yaml` declares workspace package globs and engine constraints only; don't use it for version overrides.
@@ -42,7 +42,7 @@
 - Workspace packages consumed by other packages must expose `types` and `default` in `exports` and include `main`.
 - Use ISO 8601 strings for timestamps such as `createdAt` and `updatedAt`, not `Date` objects.
 - Maintain game-data accuracy when working with `packages/game-data`.
-- Test alongside code when possible; the API has Vitest coverage, but web and UI testing is planned and not yet implemented.
+- Test alongside code when possible; Vitest covers both apps, and Playwright end-to-end specs live in `tools/e2e`.
 - Each branded type in `packages/domain/` gets its own file (for example, `uuid.ts`, `isoTimestamp.ts`).
 - Shared API test utilities go in `apps/api/src/test/` with descriptive names (not generic names like "helpers"). This directory is excluded from production builds via `tsconfig.build.json`.
 - Use descriptive, specific file names. Avoid generic names like "helpers."
@@ -176,7 +176,7 @@
 - Keep Terraform version aligned across:
   - `.github/workflows/terraform-plan.yml`
   - `.github/workflows/terraform-apply.yml`
-  - `.github/workflows/pre-commit.yml`, when Terraform is in use
+  - `.github/workflows/ci.yml` pre-commit job, when Terraform is in use
 - Current Terraform version baseline: `1.9.0`.
 
 ## Docker rules

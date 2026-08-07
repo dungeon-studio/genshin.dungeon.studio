@@ -20,14 +20,14 @@ describe('Nav', () => {
     renderNav('/');
 
     const teamsLink = screen.getByRole('link', { name: 'Teams' });
-    expect(teamsLink.className).toContain('border-blue-500');
+    expect(teamsLink.className).toContain('border-primary');
   });
 
   it('marks the Characters link as active on /characters', () => {
     renderNav('/characters');
 
     const charactersLink = screen.getByRole('link', { name: 'Characters' });
-    expect(charactersLink.className).toContain('border-blue-500');
+    expect(charactersLink.className).toContain('border-primary');
 
     const teamsLink = screen.getByRole('link', { name: 'Teams' });
     expect(teamsLink.className).toContain('border-transparent');
@@ -37,6 +37,6 @@ describe('Nav', () => {
     renderNav('/weapons');
 
     const weaponsLink = screen.getByRole('link', { name: 'Weapons' });
-    expect(weaponsLink.className).toContain('border-blue-500');
+    expect(weaponsLink.className).toContain('border-primary');
   });
 });

@@ -15,6 +15,7 @@ ls:
   # declared explicitly or files would be silently skipped).
   .test.ts: kebab-case
   .test.tsx: kebab-case
+  .spec.ts: kebab-case
   .config.ts: kebab-case
   .config.js: kebab-case
   .generated.ts: kebab-case

@@ -14,13 +14,17 @@ on:
 permissions:
   contents: read
 
+env:
+  # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
+  TERRAFORM_VERSION: '1.15.8'
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   terraform-plan:
-    name: ${{ matrix.environment }}
+    name: ${{ matrix.display }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -32,18 +36,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # display only sets the check name; environment is the directory
+          # under infrastructure/terraform/environments and stays lowercase.
           - environment: core
+            display: Core
           - environment: dev
+            display: Dev
           - environment: staging
+            display: Staging
 
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
-          terraform_version: '1.15.8'
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
 
       # Authenticate to GCP using Workload Identity.
       # Each environment maps to an explicit secret reference so this step

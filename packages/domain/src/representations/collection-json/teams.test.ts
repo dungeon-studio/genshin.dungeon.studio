@@ -90,6 +90,94 @@ describe('team serialisation round-trip', () => {
     const result = deserialiseTeam(item);
     expect(result.members[0]?.artifactPlan).toEqual(team.members[0]?.artifactPlan);
   });
+});
+
+describe('deserialiseTeam artifact plan validation', () => {
+  const VALID_PLAN = {
+    sands: 'ATK Percentage',
+    goblet: 'Hydro DMG Bonus',
+    circlet: 'CRIT Rate',
+    sets: ['aubade-of-morningstar-and-moon'],
+    priorityMinorAffixes: ['CRIT Rate'],
+    secondaryMinorAffixes: ['ATK Percentage'],
+  };
+
+  function itemWithArtifactPlan(artifactPlan: unknown): Item {
+    const members = [{ characterId: 'columbina', artifactPlan }, null, null, null];
+    return {
+      href: `${BASE_URL}/api/teams/1`,
+      data: [
+        { name: 'slot', value: 1 },
+        { name: 'name', value: 'Team 1' },
+        { name: 'members', value: JSON.stringify(members) },
+        { name: 'createdAt', value: VALID_TIMESTAMP },
+        { name: 'updatedAt', value: VALID_TIMESTAMP },
+      ],
+    };
+  }
+
+  it('rejects an artifact plan that is not an object', () => {
+    const item = itemWithArtifactPlan('not-an-object');
+    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan must be a non-null object/);
+  });
+
+  it('rejects a non-string main affix field', () => {
+    const item = itemWithArtifactPlan({ ...VALID_PLAN, sands: 42 });
+    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sands must be a string/);
+  });
+
+  it('rejects a set field that is not an array', () => {
+    const item = itemWithArtifactPlan({ ...VALID_PLAN, sets: 'aubade-of-morningstar-and-moon' });
+    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sets must be an array/);
+  });
+
+  it('rejects a non-string element in sets', () => {
+    const item = itemWithArtifactPlan({ ...VALID_PLAN, sets: [42] });
+    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sets\[0\] must be a string/);
+  });
+
+  it('rejects a non-string element in a minor affix array', () => {
+    const item = itemWithArtifactPlan({ ...VALID_PLAN, priorityMinorAffixes: [null] });
+    expect(() => deserialiseTeam(item)).toThrow(
+      /artifactPlan\.priorityMinorAffixes\[0\] must be a string/,
+    );
+  });
+
+  it('rejects sets with fewer than 1 element', () => {
+    const item = itemWithArtifactPlan({ ...VALID_PLAN, sets: [] });
+    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sets must have between 1 and 2/);
+  });
+
+  it('rejects sets with more than 2 elements', () => {
+    const item = itemWithArtifactPlan({ ...VALID_PLAN, sets: ['a', 'b', 'c'] });
+    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sets must have between 1 and 2/);
+  });
+
+  it('rejects a minor affix array with more than 3 elements', () => {
+    const item = itemWithArtifactPlan({
+      ...VALID_PLAN,
+      secondaryMinorAffixes: ['a', 'b', 'c', 'd'],
+    });
+    expect(() => deserialiseTeam(item)).toThrow(
+      /artifactPlan\.secondaryMinorAffixes must have between 0 and 3/,
+    );
+  });
+});
+
+describe('deserialiseTeam member sanitisation', () => {
+  /**
+   * Builds a team Item with raw member JSON that serialiseTeam's typed input
+   * can't produce, exercising deserialisation of untrusted wire data.
+   */
+  function itemWithRawMembers(members: unknown[]): Item {
+    const item = serialiseTeam(VALID_TEAM, BASE_URL);
+    return {
+      ...item,
+      data: item.data.map((d) =>
+        d.name === 'members' ? { ...d, value: JSON.stringify(members) } : d,
+      ),
+    };
+  }
 
   it('strips unknown properties off deserialised members', () => {
     const item = itemWithRawMembers([
@@ -133,38 +221,4 @@ describe('team serialisation round-trip', () => {
     const item = itemWithRawMembers([{ characterId: 42 }, null, null, null]);
     expect(() => deserialiseTeam(item)).toThrow(/members\[0\]\.characterId must be a string/);
   });
-
-  it('rejects an artifact plan whose sets is not an array', () => {
-    const item = itemWithRawMembers([
-      {
-        characterId: 'columbina',
-        artifactPlan: {
-          sands: 'ATK Percentage',
-          goblet: 'Hydro DMG Bonus',
-          circlet: 'CRIT Rate',
-          sets: 'not-an-array',
-          priorityMinorAffixes: [],
-          secondaryMinorAffixes: [],
-        },
-      },
-      null,
-      null,
-      null,
-    ]);
-    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sets must be an array/);
-  });
 });
-
-/**
- * Builds a team Item with raw member JSON that serialiseTeam's typed input
- * can't produce, exercising deserialisation of untrusted wire data.
- */
-function itemWithRawMembers(members: unknown[]): Item {
-  const item = serialiseTeam(VALID_TEAM, BASE_URL);
-  return {
-    ...item,
-    data: item.data.map((d) =>
-      d.name === 'members' ? { ...d, value: JSON.stringify(members) } : d,
-    ),
-  };
-}

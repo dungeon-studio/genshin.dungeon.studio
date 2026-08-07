@@ -1,115 +1,69 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:best-practices"],
-  "baseBranchPatterns": ["develop"],
-  "schedule": ["before 6pm on friday"],
+  "extends": [
+    "config:best-practices",
+    "security:openssf-scorecard",
+    "customManagers:githubActionsVersions",
+    "customManagers:dockerfileVersions"
+  ],
   "timezone": "Europe/London",
   "labels": ["dependencies", "automated"],
   "reviewers": ["alunduil"],
-  "branchPrefix": "renovate/",
   "rangeStrategy": "pin",
   "minimumReleaseAge": "3 days",
-  "internalChecksFilter": "strict",
   "osvVulnerabilityAlerts": true,
-  "vulnerabilityAlerts": {
-    "minimumReleaseAge": "0 days"
-  },
   "pre-commit": {
     "enabled": true
-  },
-  "lockFileMaintenance": {
-    "enabled": true,
-    "schedule": ["* 0-17 1-7 * 5"]
   },
   "packageRules": [
     {
       "description": "Exempt update types that carry no release timestamp from the minimum release-age bake, so their renovate/stability-days check can resolve under internalChecksFilter:strict",
-      "matchUpdateTypes": ["pin", "pinDigest", "digest", "lockFileMaintenance"],
-      "minimumReleaseAge": "0 days"
+      "matchUpdateTypes": [
+        "pin",
+        "pinDigest",
+        "digest",
+        "lockFileMaintenance",
+        "lockfileUpdate",
+        "rollback",
+        "bump",
+        "replacement"
+      ],
+      "minimumReleaseAge": null
     },
     {
-      "description": "Group all npm dependencies in a single PR",
-      "matchManagers": ["npm"],
-      "groupName": "npm dependencies",
-      "groupSlug": "npm",
-      "addLabels": ["npm"]
-    },
-    {
-      "description": "Group all Terraform dependencies in a single PR",
-      "matchManagers": ["terraform"],
-      "groupName": "terraform dependencies",
-      "groupSlug": "terraform",
-      "addLabels": ["terraform", "infrastructure"]
-    },
-    {
-      "description": "Bump the Terraform CLI version in lockstep across the infrastructure required_version constraint and the CI workflow terraform_version pins",
+      "description": "Move the Terraform CLI in one pull request across the bootstrap and dev required_version constraints and the TERRAFORM_VERSION pins in four workflows",
       "matchDepNames": ["hashicorp/terraform"],
-      "groupName": "terraform dependencies",
-      "groupSlug": "terraform",
-      "addLabels": ["terraform", "infrastructure"]
+      "groupName": "terraform cli"
     },
     {
-      "description": "Group all GitHub Actions updates in a single PR",
-      "matchManagers": ["github-actions"],
-      "groupName": "github actions",
-      "groupSlug": "github-actions",
-      "addLabels": ["actions"]
-    },
-    {
-      "description": "Group all Docker updates in a single PR",
-      "matchManagers": ["dockerfile"],
-      "groupName": "docker dependencies",
-      "groupSlug": "docker",
-      "addLabels": ["docker"]
-    },
-    {
-      "description": "Group all DevContainer updates in a single PR",
-      "matchManagers": ["devcontainer"],
-      "groupName": "devcontainer dependencies",
-      "groupSlug": "devcontainer",
-      "addLabels": ["devcontainer"]
-    },
-    {
-      "description": "Group all pre-commit hook updates in a single PR",
-      "matchManagers": ["pre-commit"],
-      "groupName": "pre-commit hooks",
-      "groupSlug": "pre-commit",
-      "addLabels": ["pre-commit"]
-    },
-    {
-      "description": "Bump fsfe/reuse-tool in lockstep across pre-commit and install-reuse.sh",
+      "description": "Move reuse in one pull request across the pre-commit rev and the REUSE_VERSION pin in scripts/install-reuse.sh",
       "matchDepNames": ["fsfe/reuse-tool"],
-      "groupName": "pre-commit hooks",
-      "groupSlug": "pre-commit",
-      "addLabels": ["pre-commit"]
+      "groupName": "reuse"
     },
     {
-      "description": "Group the Node.js version across .nvmrc, the devcontainer feature, and the API runtime Dockerfile into a single PR, keeping dev, CI, and production on one version.",
-      "matchManagers": ["nvm", "devcontainer", "dockerfile"],
+      "description": "Move hadolint in one pull request across the ci.yml pin and the devcontainer bootstrap script",
+      "matchDepNames": ["hadolint/hadolint"],
+      "groupName": "hadolint"
+    },
+    {
+      "description": "Move the lychee binary in one pull request across the ci.yml pin and the devcontainer bootstrap script; lycheeverse/lychee-action versions separately and stays out of the group",
+      "matchDepNames": ["lycheeverse/lychee"],
+      "groupName": "lychee"
+    },
+    {
+      "description": "Move Node in one pull request across .nvmrc, the API runtime image, the devcontainer feature, and the package.json engines field",
       "matchDepNames": ["node"],
-      "groupName": "node",
-      "groupSlug": "node",
-      "addLabels": ["node"]
+      "groupName": "node"
     }
   ],
   "customManagers": [
     {
       "customType": "regex",
-      "description": "Track REUSE_VERSION in scripts/install-reuse.sh against fsfe/reuse-tool releases",
-      "managerFilePatterns": ["/^scripts/install-reuse\\.sh$/"],
-      "matchStrings": ["REUSE_VERSION=\"\\$\\{REUSE_VERSION:-(?<currentValue>[^}]+)\\}\""],
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "fsfe/reuse-tool",
-      "extractVersionTemplate": "^v(?<version>.+)$"
-    },
-    {
-      "customType": "regex",
-      "description": "Track terraform_version in the CI workflows against hashicorp/terraform releases",
-      "managerFilePatterns": ["/^\\.github/workflows/.+\\.ya?ml$/"],
-      "matchStrings": ["terraform_version: ['\"](?<currentValue>[^'\"]+)['\"]"],
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "hashicorp/terraform",
-      "extractVersionTemplate": "^v(?<version>.+)$"
+      "description": "Track annotated *_VERSION pins in shell scripts, including the ${VAR:-default} override form",
+      "managerFilePatterns": ["scripts/*.sh", ".devcontainer/*.sh"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: (?:lookupName|packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?(?: extractVersion=(?<extractVersion>[^\\s]+?))?(?: registryUrl=(?<registryUrl>[^\\s]+?))?\\s+[A-Za-z0-9_]+?_VERSION=[\"']?(?:\\$\\{[A-Za-z0-9_]+:-)?(?<currentValue>[^\"'}\\s]+)\\}?[\"']?\\s"
+      ]
     }
   ]
 }

@@ -1,0 +1,107 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+name: Daily
+
+on:
+  schedule:
+    # A passing run is silent and only a failure emails repo admins, so a daily
+    # cadence costs nothing while everything is healthy.
+    - cron: '0 9 * * *'
+      timezone: Europe/London
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+
+concurrency:
+  # A truncated stale sweep loses the operations-per-run resume cache and
+  # restarts from the first pull request, so in-progress runs are never
+  # cancelled.
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  # A failed Renovate job on Mend's hosted runner stalls silently and is never
+  # retried. The Dependency Dashboard issue is Renovate's heartbeat, so a stale
+  # one is the only available signal.
+  renovate-liveness:
+    name: Check Renovate liveness
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Fail if the Dependency Dashboard is stale
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const STALE_DAYS = 10;
+
+            const q = [
+              `repo:${context.repo.owner}/${context.repo.repo}`,
+              'is:issue',
+              'is:open',
+              'in:title "Dependency Dashboard"',
+              'author:app/renovate',
+            ].join(' ');
+
+            const { data } = await github.rest.search.issuesAndPullRequests({ q });
+            const dashboard = data.items[0];
+
+            if (!dashboard) {
+              core.setFailed(
+                'No open Renovate "Dependency Dashboard" issue found. Renovate may ' +
+                'be uninstalled or disabled on this repository.',
+              );
+              return;
+            }
+
+            const updatedAt = new Date(dashboard.updated_at);
+            const ageDays = (Date.now() - updatedAt.getTime()) / 86_400_000;
+            const summary =
+              `Dependency Dashboard (#${dashboard.number}) last updated ` +
+              `${updatedAt.toISOString()} (${ageDays.toFixed(1)} days ago).`;
+
+            if (ageDays > STALE_DAYS) {
+              core.setFailed(
+                `${summary} Exceeds the ${STALE_DAYS}-day staleness window — ` +
+                'Renovate has likely stalled (check the Mend job log for ' +
+                'kernel-out-of-memory). Trigger a manual run to recover.',
+              );
+              return;
+            }
+
+            core.info(`${summary} Within the ${STALE_DAYS}-day window.`);
+
+  stale-pull-requests:
+    name: Prune stale pull requests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      # `actions: write` is omitted: it covers only the resume cache, so a
+      # truncated run warns and restarts rather than failing.
+      issues: write
+      pull-requests: write
+
+    steps:
+      # Both issue legs are disabled, not just marking: an issue already
+      # carrying the label would otherwise stay eligible for closing.
+      - uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v11.0.0
+        with:
+          days-before-issue-stale: -1
+          days-before-issue-close: -1
+          days-before-pr-stale: 30
+          days-before-pr-close: 14
+          # Closing a Renovate pull request tells Renovate the version is
+          # unwanted and it will not re-offer it. Renovate labels nothing by
+          # default, so this depends on renovate.json applying the label.
+          exempt-pr-labels: dependencies
+          stale-pr-message: >-
+            This has been quiet for 30 days, so it's picked up a stale label. A
+            comment or a push clears the label and restarts the clock. Otherwise
+            this closes in another 14 days.
+          close-pr-message: >-
+            Closing this after 44 quiet days. That isn't a call on the change
+            itself, and nothing is lost: the branch stays where it is, so
+            comment here if you want to pick it back up and I'll reopen it.

@@ -22,9 +22,10 @@
   "devDependencies": {
     "@genshin/eslint-config": "workspace:*",
     "@types/node": "25.9.5",
+    "@typescript/native": "npm:typescript@7.0.2",
     "@vitest/coverage-v8": "4.1.10",
-    "eslint": "10.7.0",
-    "typescript": "6.0.3",
+    "eslint": "10.8.0",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
     "vitest": "4.1.10"
   }
 }

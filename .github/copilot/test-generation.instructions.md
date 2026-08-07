@@ -3,10 +3,13 @@
 
 # Test generation instructions
 
-## Framework (planned)
+## Framework
 
-The project plans to use **Vitest** as the test runner and **React Testing
-Library** for component tests. Generate tests targeting this stack.
+**Vitest** is the test runner for `apps/api` and `apps/web`, with **React
+Testing Library** for web component tests. Generate tests targeting this stack.
+
+**Playwright** end-to-end specs live in `tools/e2e` rather than beside the code
+they exercise, and fall outside these instructions.
 
 ## File placement
 

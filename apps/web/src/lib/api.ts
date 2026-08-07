@@ -7,10 +7,9 @@ import { auth } from '@/lib/firebase';
 
 export type { ProblemDetail };
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-if (!API_BASE_URL) {
-  throw new Error('Missing required environment variable: VITE_API_BASE_URL');
-}
+// `pnpm dev` needs no .env file; vite.config.ts fails deployed builds on a
+// missing variable.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 export class ApiError extends Error {
   readonly problem: ProblemDetail;

@@ -46,11 +46,17 @@ closest template.
     },
     "devDependencies": {
       "@genshin/eslint-config": "workspace:*",
+      "@typescript/native": "npm:typescript@7.0.2",
       "eslint": "10.4.0",
-      "typescript": "6.0.3"
+      "typescript": "npm:@typescript/typescript6@6.0.2"
     }
   }
   ```
+
+  The `typecheck` and `build` scripts run `tsc` from `@typescript/native`. The
+  `typescript` name resolves to the TypeScript 6 compatibility package, because
+  `typescript-eslint` imports the compiler API through a `typescript` peer
+  dependency and rejects TypeScript 7.
 
   Add `test` only once tests exist, along with the `vitest` and
   `@vitest/coverage-v8` dev dependencies and a `vitest.config.ts`.
@@ -82,15 +88,15 @@ closest template.
 
 ## 3) Add it to continuous integration
 
-- [ ] Add a matrix entry under `strategy.matrix.include` in
-      `.github/workflows/ci.yml`:
+- [ ] The `workspace` job in `.github/workflows/ci.yml` runs `typecheck`,
+      `test`, and `build` across the whole workspace, so turbo picks up the new
+      package from `pnpm-workspace.yaml`. No change to the job is required.
 
-  ```yaml
-  - display: <Display Name>
-    filter: '@genshin/<name>'
-    path-prefix: packages/<name>
-    flag: <name>
-  ```
+- [ ] Add an upload pair to `.github/actions/codecov-upload/action.yml` so the
+      package reports under its own flag, and declare that flag in
+      `codecov.yml` under `flag_management.individual_flags`. Copy an existing
+      pair and change the paths and flag; one upload per flag is required, and
+      the action explains why.
 
   Every entry runs the `typecheck`, `test`, and `build` tasks. Add the entry
   only once the package has a `test` script, or the `test` task fails.

@@ -54,7 +54,8 @@ step "Installing reuse-tool"
 # ---------------------------------------------------------------------------
 step "Installing hadolint"
 
-HADOLINT_VERSION="v2.12.0"
+# renovate: datasource=github-releases depName=hadolint/hadolint
+HADOLINT_VERSION="v2.15.1"
 sudo curl -fsSL \
   "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64" \
   -o /usr/local/bin/hadolint
@@ -65,18 +66,22 @@ sudo chmod +x /usr/local/bin/hadolint
 # ---------------------------------------------------------------------------
 step "Installing lychee"
 
-LYCHEE_VERSION="lychee-v0.24.2"
+# renovate: datasource=github-releases depName=lycheeverse/lychee extractVersion=^lychee-v(?<version>.+)$
+LYCHEE_VERSION="0.24.2"
+LYCHEE_DIR=lychee-x86_64-unknown-linux-gnu
 curl -fsSL \
-  "https://github.com/lycheeverse/lychee/releases/download/${LYCHEE_VERSION}/lychee-x86_64-unknown-linux-gnu.tar.gz" \
-  | sudo tar -xz -C /usr/local/bin --strip-components=1 lychee-x86_64-unknown-linux-gnu/lychee
+  "https://github.com/lycheeverse/lychee/releases/download/lychee-v${LYCHEE_VERSION}/${LYCHEE_DIR}.tar.gz" \
+  | sudo tar -xz -C /usr/local/bin --strip-components=1 "${LYCHEE_DIR}/lychee"
 sudo chmod +x /usr/local/bin/lychee
 
 # ---------------------------------------------------------------------------
-# 8. Playwright browsers (for Playwright MCP server)
+# 8. Playwright browsers (for the end-to-end suite and the Playwright MCP server)
 # ---------------------------------------------------------------------------
 step "Installing Playwright Chromium and Chrome"
 
-npx --yes playwright install --with-deps chromium chrome
+# Through the workspace, so the browsers match the @playwright/test version
+# tools/e2e pins — the one the suite and the CI job run.
+pnpm --filter @genshin/e2e exec playwright install --with-deps chromium chrome
 
 # ---------------------------------------------------------------------------
 # Verify and report

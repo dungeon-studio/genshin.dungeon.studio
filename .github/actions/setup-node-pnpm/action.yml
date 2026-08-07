@@ -10,7 +10,7 @@ runs:
 
   steps:
     - name: Set up Node.js
-      uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
       with:
         # Single source of truth for the Node toolchain version (CI, the
         # devcontainer, and `nvm use`). Renovate's nvm manager keeps .nvmrc
@@ -19,7 +19,7 @@ runs:
         node-version-file: .nvmrc
 
     - name: Install pnpm
-      uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+      uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
       with:
         run_install: false
 
@@ -33,7 +33,13 @@ runs:
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ env.STORE_PATH }}
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        # Root-anchored (not `**/`): there is a single lockfile at the repo
+        # root, so the hash is identical, but the jobs that run `pnpm dev`
+        # (dev-smoke, e2e) leave the workspace tree churning as the emulator
+        # stack tears down. A `**/` walk at post-job cache time races those
+        # deletions and fails with "Fail to hash files under directory";
+        # hashing one known file sidesteps the walk entirely.
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
 
