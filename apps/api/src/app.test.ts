@@ -63,26 +63,18 @@ describe('Allow header', () => {
     return (res.headers.get('allow') ?? '').split(',').map((method) => method.trim());
   }
 
-  it('advertises the methods of a read-only collection', async () => {
-    const res = await app.request('/api/characters', { method: 'OPTIONS' });
-    expect(allowed(res)).toEqual(['GET', 'HEAD', 'OPTIONS']);
-  });
-
-  it('advertises the methods of a writable collection', async () => {
-    const res = await app.request('/api/weapons', { method: 'OPTIONS' });
-    expect(allowed(res)).toEqual(['GET', 'HEAD', 'OPTIONS', 'POST']);
-  });
-
-  it('advertises the methods of a parameterized item resource', async () => {
-    const res = await app.request('/api/weapons/8c1a9c4e-1c2e-4a3f-9d5b-6f7a8b9c0d1e', {
-      method: 'OPTIONS',
-    });
-    expect(allowed(res)).toEqual(['DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH']);
-  });
-
-  it('advertises the methods of the user profile', async () => {
-    const res = await app.request('/api/profile', { method: 'OPTIONS' });
-    expect(allowed(res)).toEqual(['GET', 'HEAD', 'OPTIONS', 'PATCH']);
+  it.each([
+    ['a read-only collection', '/api/characters', ['GET', 'HEAD', 'OPTIONS']],
+    ['a writable collection', '/api/weapons', ['GET', 'HEAD', 'OPTIONS', 'POST']],
+    [
+      'a parameterized item resource',
+      '/api/weapons/8c1a9c4e-1c2e-4a3f-9d5b-6f7a8b9c0d1e',
+      ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH'],
+    ],
+    ['the user profile', '/api/profile', ['GET', 'HEAD', 'OPTIONS', 'PATCH']],
+  ])('advertises the methods of %s', async (_resource, path, methods) => {
+    const res = await app.request(path, { method: 'OPTIONS' });
+    expect(allowed(res)).toEqual(methods);
   });
 
   it('withholds the header where nothing is routed', async () => {
