@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { readFileSync } from 'node:fs';
 import { STATUS_CODES } from 'node:http';
 
 import type { ProblemDetail } from '@genshin/domain';
@@ -13,19 +12,18 @@ import { logger } from 'hono/logger';
 
 import { ABOUT_BLANK, problemTypeOf } from '@/http/problem.js';
 import { retryAfterSeconds } from '@/http/retry-after.js';
+import { allow } from '@/middleware/allow.js';
 import type { AuthVariables } from '@/middleware/auth.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { firestoreErrorToHttpException } from '@/repositories/firestore-error.js';
 import { alpsProfiles } from '@/routes/alps-profiles.js';
 import { characters } from '@/routes/characters.js';
+import { health } from '@/routes/health.js';
 import { jsonSchemaProfiles } from '@/routes/json-schema-profiles.js';
 import { root } from '@/routes/root.js';
 import { teams } from '@/routes/teams.js';
 import { userProfile } from '@/routes/user-profile.js';
 import { weapons } from '@/routes/weapons.js';
-
-// Read version from package.json to maintain single source of truth
-const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf-8'));
 
 export const PROBLEM_JSON = { 'Content-Type': 'application/problem+json' };
 
@@ -35,6 +33,9 @@ export const app = new Hono<{
 
 // Request logging middleware
 app.use('*', logger());
+
+// Must precede CORS, which short-circuits OPTIONS before this could run
+app.use('*', allow(app));
 
 // CORS middleware - allow frontend origin
 const rawFrontendOrigin = process.env.FRONTEND_ORIGIN ?? 'http://localhost:5173';
@@ -94,15 +95,8 @@ app.notFound((c) =>
   ),
 );
 
-app.get('/health', (c) =>
-  c.json({
-    status: 'ok',
-    version: packageJson.version,
-    sha: process.env.APP_GIT_SHA ?? null,
-  }),
-);
-
 // Routes
+app.route('/health', health);
 app.route('/profiles/json-schema', jsonSchemaProfiles);
 app.route('/profiles/alps', alpsProfiles);
 app.route('/api/characters', characters);
