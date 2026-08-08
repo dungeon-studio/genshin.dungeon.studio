@@ -1,11 +1,9 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# NOTE: This environment is `prod` everywhere it is addressable -- folder name,
-# state prefix, GitHub Actions environment, and the GCP_*_PROD_* secrets emitted
-# by bootstrap outputs. The bootstrap module labels the underlying project
-# `production` because its `environment` variable only accepts that spelling;
-# that label is not an addressing scheme and does not propagate here.
+# The bootstrap module labels this project `production` while everything
+# addressable here says `prod`. That label is not an addressing scheme, so the
+# mismatch is deliberate rather than drift.
 
 terraform {
   required_version = "1.15.8"
@@ -29,10 +27,8 @@ provider "google-beta" {
   project = var.project_id
 }
 
-# `web_domain` is this environment's own hostname; `base_domain` is the
-# registrable domain every environment shares, which is what Identity Platform
-# has to trust for sign-in redirects regardless of which environment serves.
-# Production serves the registrable domain itself, so the two coincide here.
+# Identity Platform must trust the registrable domain for sign-in redirects no
+# matter which environment serves, so it stays separate from the hostname.
 locals {
   base_domain = "genshin.dungeon.studio"
   web_domain  = local.base_domain

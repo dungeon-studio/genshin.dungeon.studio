@@ -20,8 +20,7 @@ resource "google_firestore_database" "default" {
   location_id = var.firestore_location_id
   type        = "FIRESTORE_NATIVE"
 
-  # Production holds the only copy of user collections, so refuse deletion at
-  # both layers: the API rejects the call, and Terraform refuses to plan one.
+  # Production holds the only copy of user collections.
   delete_protection_state = "DELETE_PROTECTION_ENABLED"
 
   lifecycle {

@@ -23,9 +23,8 @@ provider "google-beta" {
   project = var.project_id
 }
 
-# `web_domain` is this environment's own hostname; `base_domain` is the
-# registrable domain every environment shares, which is what Identity Platform
-# has to trust for sign-in redirects regardless of which environment serves.
+# Identity Platform must trust the registrable domain for sign-in redirects no
+# matter which environment serves, so it stays separate from the hostname.
 locals {
   base_domain = "genshin.dungeon.studio"
   web_domain  = "develop.${local.base_domain}"
