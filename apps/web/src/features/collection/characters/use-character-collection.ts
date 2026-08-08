@@ -25,7 +25,6 @@ import {
   useCollectionStore,
 } from './use-character-collection-store';
 
-/** Merged entries the server has not caught up with yet. */
 function entriesAheadOfServer(
   merged: CharacterCollection,
   server: CharacterCollection,

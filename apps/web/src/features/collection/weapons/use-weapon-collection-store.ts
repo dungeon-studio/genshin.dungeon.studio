@@ -16,7 +16,6 @@ interface WeaponCollectionState {
   clearWeapons: () => void;
 }
 
-/** The distinct catalogue weapons a set of owned instances covers. */
 export function weaponIdsOf(instances: Iterable<CollectionWeapon>): ReadonlySet<WeaponId> {
   return new Set(Array.from(instances, (instance) => instance.weaponId));
 }

@@ -8,10 +8,9 @@ import { persist } from 'zustand/middleware';
 
 import { CURRENT_VERSION, migratePersistedCollection } from './schemas/index.js';
 
-/** Owned characters keyed by ID. Sparse: a player owns a subset of the roster. */
+/** Sparse: a player owns a subset of the roster. */
 export type CharacterCollection = Partial<Record<CharacterId, CollectionCharacter>>;
 
-/** The collection's records, without the empty slots its key type admits. */
 export function ownedCharacters(collection: CharacterCollection): CollectionCharacter[] {
   return Object.values(collection).filter((entry) => entry !== undefined);
 }
