@@ -159,7 +159,7 @@ The pull request title becomes the commit message, so it carries these rules:
 
 - Format: `type(scope): subject`
 - Types: `feat`, `fix`, `docs`, `test`, `refactor`, `style`, `chore`
-- Write the subject in imperative mood ("Add character filter," not "Added" or "Adds"), capitalize it, keep it under 50 characters, and omit the trailing period
+- Write the subject in imperative mood ("add character filter," not "added" or "adds"), lowercase, under 50 characters, and with no trailing period
 
 Scope is the workspace package the change is confined to: `feat(web)` for `apps/web`, `fix(api)` for `apps/api`, `refactor(game-data)` for `packages/game-data`, `chore(domain)` for `packages/domain`, and `chore(infra)` for Terraform and infrastructure. Omit the scope for changes that span packages, including most `docs:` changes.
 
