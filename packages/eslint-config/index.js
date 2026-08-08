@@ -14,8 +14,8 @@ import tseslint from 'typescript-eslint';
 const LINTED_FILES = ['**/*.{ts,tsx,js,mjs,cjs}'];
 
 /**
- * The TypeScript subset of {@link LINTED_FILES}. Workspaces scope their own
- * overrides to it.
+ * The TypeScript subset of the files eslint reads. Workspaces scope their own
+ * overrides to this.
  */
 export const TYPESCRIPT_FILES = ['**/*.{ts,tsx}'];
 

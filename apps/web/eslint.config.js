@@ -58,8 +58,8 @@ export default defineConfig([
     },
   },
   {
-    // Kept out of the `extends` list above: this preset carries its own
-    // `languageOptions`, which would then resolve ahead of this workspace's.
+    // This preset brings its own `languageOptions`, which inside the `extends`
+    // list above would take precedence over this workspace's.
     files: TYPESCRIPT_FILES,
     extends: [jsxA11yX.configs.recommended],
   },
@@ -79,11 +79,12 @@ export default defineConfig([
   },
   {
     // `@eslint-react` has no counterpart for `function-component-definition`,
-    // which is the only reason this plugin is here. Registered by hand because
-    // its flat preset would enable the whole recommended set, and the React
-    // version is set because `detect` calls an API ESLint 10 removed.
+    // the only reason this plugin is here.
     files: TYPESCRIPT_FILES,
+    // Hand-registered because this plugin's flat preset would enable its whole
+    // recommended set.
     plugins: { react },
+    // Pinned because `detect` calls an API ESLint 10 removed.
     settings: { react: { version: '19' } },
     rules: {
       'react/function-component-definition': ['error', { namedComponents: 'function-declaration' }],
