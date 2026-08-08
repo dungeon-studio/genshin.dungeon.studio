@@ -9,7 +9,6 @@ import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { healthGetResponseV1 } from '@/profiles/json-schema/health/get-response-v1.js';
 
-// The package manifest is the single source of truth for the API version.
 const { version: apiVersion } = JSON.parse(
   readFileSync(new URL('../../package.json', import.meta.url), 'utf-8'),
 ) as { version: string };

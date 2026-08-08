@@ -38,9 +38,8 @@ describe('GET /health', () => {
     expect((await getHealthBody()).status).toBe('ok');
   });
 
-  // The deploy pipeline reads `sha` to confirm the instance answering is the
-  // one it just pushed, so the field has to track APP_GIT_SHA as the running
-  // process sees it rather than being stamped at build time.
+  // The deploy pipeline compares `sha` against the commit it just pushed, so
+  // this has to reflect the environment of the process actually answering.
   describe('build identity', () => {
     afterEach(() => {
       vi.unstubAllEnvs();

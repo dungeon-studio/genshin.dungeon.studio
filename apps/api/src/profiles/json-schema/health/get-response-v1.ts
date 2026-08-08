@@ -17,11 +17,11 @@ export const healthGetResponseV1 = {
       },
       version: {
         type: 'string',
-        description: 'API version from the package manifest',
+        description: 'Version of the API serving the response',
       },
       sha: {
         type: ['string', 'null'],
-        description: 'Git commit the instance was built from; null when the build left it unset',
+        description: 'Git commit the instance was built from; null when unavailable',
       },
     },
     required: ['status', 'version', 'sha'],
