@@ -11,7 +11,7 @@ import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 
-import { ProblemException } from '@/http/problem.js';
+import { ABOUT_BLANK, problemTypeOf } from '@/http/problem.js';
 import { retryAfterSeconds } from '@/http/retry-after.js';
 import type { AuthVariables } from '@/middleware/auth.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
@@ -60,7 +60,7 @@ app.onError((err, c) => {
     if (retryAfter !== undefined) headers['Retry-After'] = String(retryAfter);
     return c.json(
       {
-        type: resolved instanceof ProblemException ? resolved.type : 'about:blank',
+        type: problemTypeOf(resolved),
         title: STATUS_CODES[resolved.status] ?? 'Unknown Error',
         status: resolved.status,
         detail: resolved.message,
@@ -72,7 +72,7 @@ app.onError((err, c) => {
   console.error('Unexpected error:', resolved);
   return c.json(
     {
-      type: 'about:blank',
+      type: ABOUT_BLANK,
       title: 'Internal Server Error',
       status: 500,
       detail: 'An unexpected error occurred',
@@ -85,7 +85,7 @@ app.onError((err, c) => {
 app.notFound((c) =>
   c.json(
     {
-      type: 'about:blank',
+      type: ABOUT_BLANK,
       title: 'Not Found',
       status: 404,
       detail: 'The requested resource does not exist',

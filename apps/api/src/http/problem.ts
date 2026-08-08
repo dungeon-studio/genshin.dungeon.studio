@@ -4,6 +4,17 @@
 import { HTTPException } from 'hono/http-exception';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
 
+/** The RFC 9457 type for a problem carrying no classification beyond its status. */
+export const ABOUT_BLANK = 'about:blank';
+
+/** The classification and human-readable message of a problem. */
+export type ProblemOptions = {
+  /** URI reference identifying the problem type. */
+  type: string;
+  /** Human-readable explanation, serialised as the problem document's `detail`. */
+  message: string;
+};
+
 /**
  * An HTTP error carrying an RFC 9457 problem type URI.
  *
@@ -18,8 +29,13 @@ export class ProblemException extends HTTPException {
   /** URI reference identifying the problem type. */
   readonly type: string;
 
-  constructor(status: ContentfulStatusCode, options: { type: string; message: string }) {
+  constructor(status: ContentfulStatusCode, options: ProblemOptions) {
     super(status, { message: options.message });
     this.type = options.type;
   }
+}
+
+/** How an error classifies, which is `about:blank` unless it says otherwise. */
+export function problemTypeOf(err: unknown): string {
+  return err instanceof ProblemException ? err.type : ABOUT_BLANK;
 }

@@ -6,6 +6,7 @@ import { Ajv2020 } from 'ajv/dist/2020.js';
 import type { MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
+import type { ProblemOptions } from '@/http/problem.js';
 import { ProblemException } from '@/http/problem.js';
 import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
 
@@ -14,36 +15,47 @@ const ajv = new Ajv2020({ allErrors: true });
 /**
  * Problem type for a validation failure that resists a narrower label, either
  * because the keyword has no category or because the body broke several
- * categories at once and no single one describes the response.
+ * categories at once and no single one describes the response. Doubles as the
+ * prefix its narrower categories extend.
  */
 const VALIDATION = '/problems/validation';
+const MISSING_PROPERTY = `${VALIDATION}/missing-property`;
+const INVALID_TYPE = `${VALIDATION}/invalid-type`;
+const OUT_OF_RANGE = `${VALIDATION}/out-of-range`;
+const ADDITIONAL_PROPERTIES = `${VALIDATION}/additional-properties`;
 
 // The failure mode a client branches on, keyed by the ajv keyword that
 // rejected the body. Keywords absent here fall back to VALIDATION.
 const PROBLEM_TYPE_BY_KEYWORD: Record<string, string> = {
-  additionalProperties: `${VALIDATION}/additional-properties`,
-  exclusiveMaximum: `${VALIDATION}/out-of-range`,
-  exclusiveMinimum: `${VALIDATION}/out-of-range`,
-  maxItems: `${VALIDATION}/out-of-range`,
-  maxLength: `${VALIDATION}/out-of-range`,
-  maxProperties: `${VALIDATION}/out-of-range`,
-  maximum: `${VALIDATION}/out-of-range`,
-  minItems: `${VALIDATION}/out-of-range`,
-  minLength: `${VALIDATION}/out-of-range`,
-  minProperties: `${VALIDATION}/out-of-range`,
-  minimum: `${VALIDATION}/out-of-range`,
-  multipleOf: `${VALIDATION}/out-of-range`,
-  required: `${VALIDATION}/missing-property`,
-  type: `${VALIDATION}/invalid-type`,
-  unevaluatedProperties: `${VALIDATION}/additional-properties`,
+  additionalProperties: ADDITIONAL_PROPERTIES,
+  exclusiveMaximum: OUT_OF_RANGE,
+  exclusiveMinimum: OUT_OF_RANGE,
+  maxItems: OUT_OF_RANGE,
+  maxLength: OUT_OF_RANGE,
+  maxProperties: OUT_OF_RANGE,
+  maximum: OUT_OF_RANGE,
+  minItems: OUT_OF_RANGE,
+  minLength: OUT_OF_RANGE,
+  minProperties: OUT_OF_RANGE,
+  minimum: OUT_OF_RANGE,
+  multipleOf: OUT_OF_RANGE,
+  required: MISSING_PROPERTY,
+  type: INVALID_TYPE,
+  unevaluatedProperties: ADDITIONAL_PROPERTIES,
 };
 
-// A response carries one type, so a body failing several categories widens to
-// the parent rather than claiming a category that only covers part of it.
-function validationProblemType(errors: ErrorObject[]): string {
+/** The RFC 9457 classification and message describing why a body was rejected. */
+function validationProblem(errors: ErrorObject[]): ProblemOptions {
   const types = new Set(errors.map((e) => PROBLEM_TYPE_BY_KEYWORD[e.keyword] ?? VALIDATION));
   const [only] = types;
-  return types.size === 1 && only ? only : VALIDATION;
+  const detail = errors.map((e) => `${e.instancePath || '/'}: ${e.message}`).join('; ');
+
+  return {
+    // A response carries one type, so a body failing several categories widens
+    // to the parent rather than claiming one that covers only part of it.
+    type: types.size === 1 && only ? only : VALIDATION,
+    message: detail || 'Request body validation failed',
+  };
 }
 
 export type ValidatedRequestBodyVariables = {
@@ -86,18 +98,7 @@ export function validateRequestBody(schemas: JsonSchemaProfile[]): MiddlewareHan
     }
 
     if (!entry.validate(body)) {
-      const errors = entry.validate.errors ?? [];
-      const detail = errors
-        .map((e: ErrorObject) => {
-          const path = e.instancePath || '/';
-          return `${path}: ${e.message}`;
-        })
-        .join('; ');
-
-      throw new ProblemException(422, {
-        type: validationProblemType(errors),
-        message: detail || 'Request body validation failed',
-      });
+      throw new ProblemException(422, validationProblem(entry.validate.errors ?? []));
     }
 
     c.set('validatedBody', body);
