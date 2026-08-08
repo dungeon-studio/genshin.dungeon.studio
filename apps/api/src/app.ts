@@ -11,6 +11,7 @@ import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 
 import { retryAfterSeconds } from '@/http/retry-after.js';
+import { allow } from '@/middleware/allow.js';
 import type { AuthVariables } from '@/middleware/auth.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { firestoreErrorToHttpException } from '@/repositories/firestore-error.js';
@@ -31,6 +32,9 @@ export const app = new Hono<{
 
 // Request logging middleware
 app.use('*', logger());
+
+// Must precede CORS, which short-circuits OPTIONS before this could run
+app.use('*', allow(app));
 
 // CORS middleware - allow frontend origin
 const rawFrontendOrigin = process.env.FRONTEND_ORIGIN ?? 'http://localhost:5173';

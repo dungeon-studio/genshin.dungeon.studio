@@ -129,6 +129,12 @@ These statuses carry a `Retry-After` header, an integer count of seconds, keyed 
 
 See [RFC9110], Section 10.2.3: <https://www.rfc-editor.org/rfc/rfc9110.html#name-retry-after>
 
+### 14. Method discovery via OPTIONS
+
+The root response advertises resources without method hints, so a client learns what one supports by sending it `OPTIONS`. Derive the `Allow` list from the routing table rather than maintaining a method list per route by hand. `OPTIONS` answers before authentication, because a browser preflight carries no credentials.
+
+See [RFC9110], Section 9.3.7: <https://www.rfc-editor.org/rfc/rfc9110.html#name-options> and Section 10.2.1: <https://www.rfc-editor.org/rfc/rfc9110.html#name-allow>
+
 ## References
 
 <!-- vale Vale.Spelling = NO -->
