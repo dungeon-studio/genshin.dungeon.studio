@@ -7,7 +7,7 @@ allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 # Update game data
 
 Follow the conventions in
-[`code-generation.instructions.md`](../../.github/copilot/code-generation.instructions.md).
+[`copilot-instructions.md`](../../.github/copilot-instructions.md).
 
 Add or update game data in `packages/game-data`. Use
 [`characters.ts`](../../packages/game-data/src/characters.ts) as a reference for
