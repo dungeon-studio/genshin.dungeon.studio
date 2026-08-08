@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { indexById } from './lookup.js';
+
 /**
  * Artifact set piece types
  */
@@ -489,7 +491,7 @@ export type ArtifactMinorAffix = (typeof ARTIFACT_MINOR_AFFIXES)[number];
  */
 export type ArtifactMainAffix = SandsMainAffix | GobletMainAffix | CircletMainAffix;
 
-const ARTIFACT_SETS_BY_ID = new Map(ARTIFACT_SETS.map((s) => [s.id, s]));
+const ARTIFACT_SETS_BY_ID = indexById(ARTIFACT_SETS);
 
 /**
  * Helper to find artifact set by ID

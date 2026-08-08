@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type {
+  CharacterId,
   CollectionCharacter,
   CollectionTeam,
   CollectionWeapon,
@@ -20,7 +21,7 @@ interface TeamStripProps {
   members: CollectionTeam['members'];
   selectedMemberIndex: number | null;
   onSelect: (memberIndex: number) => void;
-  getCharacter: (characterId: string) => CollectionCharacter | undefined;
+  getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
   getCollectionWeapon: (collectionWeaponId: CollectionWeaponId) => CollectionWeapon | undefined;
 }
 

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { Weapon } from '@genshin/game-data';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
@@ -9,11 +10,11 @@ import { WeaponSummary } from './weapon-summary';
 const AMOS_BOW = {
   id: 'amos-bow',
   name: "Amos' Bow",
-  type: 'Bow' as const,
-  rarity: 5 as const,
+  type: 'Bow',
+  rarity: 5,
   baseATK: 46,
   version: '1.0',
-};
+} satisfies Weapon;
 
 describe('WeaponSummary', () => {
   it('renders placeholder when no weapon is provided', () => {

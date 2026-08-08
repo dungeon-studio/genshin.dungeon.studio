@@ -4,6 +4,7 @@
 import { randomUUID } from 'node:crypto';
 
 import type { CollectionWeapon, ISOTimestamp, UUID } from '@genshin/domain';
+import type { WeaponId } from '@genshin/game-data';
 
 import { db } from '@/lib/firebase/firestore.js';
 
@@ -42,7 +43,7 @@ export async function get(
 
 export async function create(
   userId: string,
-  weaponId: string,
+  weaponId: WeaponId,
   refinementLevel: number,
 ): Promise<CollectionWeapon> {
   const weaponInstanceId = randomUUID() as UUID;

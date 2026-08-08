@@ -31,7 +31,7 @@ export function initialFilterState(): WeaponFilterState {
 export function filterWeapons(
   weapons: readonly Weapon[],
   filters: WeaponFilterState,
-  ownedWeaponIds: Set<Weapon['id']>,
+  ownedWeaponIds: ReadonlySet<string>,
 ): Weapon[] {
   const searchLower = filters.search.toLowerCase();
 
