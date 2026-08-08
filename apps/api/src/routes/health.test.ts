@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import { Ajv2020 } from 'ajv/dist/2020.js';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import type { FromSchema } from 'json-schema-to-ts';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '@/app.js';
 import { healthGetResponseV1 } from '@/profiles/json-schema/health/get-response-v1.js';
@@ -13,14 +14,20 @@ const validateGetSchema = ajv.compile(healthGetResponseV1.schema);
 const EXPECTED_CONTENT_TYPE =
   'application/json; profile="http://localhost/profiles/json-schema/health/get-response-v1.json"';
 
+type HealthResponse = FromSchema<typeof healthGetResponseV1.schema>;
+
+async function getHealth(headers?: Record<string, string>): Promise<Response> {
+  return app.request('/health', { headers });
+}
+
+async function getHealthBody(): Promise<HealthResponse> {
+  const res = await getHealth();
+  return (await res.json()) as HealthResponse;
+}
+
 describe('GET /health', () => {
-  let res: Response;
-
-  beforeEach(async () => {
-    res = await app.request('/health');
-  });
-
   it('returns 200 with a response matching the health schema', async () => {
+    const res = await getHealth();
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     const body = await res.json();
@@ -28,40 +35,32 @@ describe('GET /health', () => {
   });
 
   it('reports the instance as live', async () => {
-    const body = (await res.json()) as { status: string };
-    expect(body.status).toBe('ok');
-  });
-});
-
-// The deploy pipeline reads `sha` to confirm the instance answering is the one
-// it just pushed, so the field has to track APP_GIT_SHA rather than being
-// stamped at build time.
-describe('GET /health build identity', () => {
-  const original = process.env.APP_GIT_SHA;
-
-  afterEach(() => {
-    if (original === undefined) delete process.env.APP_GIT_SHA;
-    else process.env.APP_GIT_SHA = original;
+    expect((await getHealthBody()).status).toBe('ok');
   });
 
-  it('reports the commit the instance was built from', async () => {
-    process.env.APP_GIT_SHA = 'c0ffee';
-    const res = await app.request('/health');
-    const body = (await res.json()) as { sha: string | null };
-    expect(body.sha).toBe('c0ffee');
+  // The deploy pipeline reads `sha` to confirm the instance answering is the
+  // one it just pushed, so the field has to track APP_GIT_SHA as the running
+  // process sees it rather than being stamped at build time.
+  describe('build identity', () => {
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it('reports the commit the instance was built from', async () => {
+      vi.stubEnv('APP_GIT_SHA', 'c0ffee');
+      expect((await getHealthBody()).sha).toBe('c0ffee');
+    });
+
+    it('reports null when the build left the commit unset', async () => {
+      vi.stubEnv('APP_GIT_SHA', undefined);
+      expect((await getHealthBody()).sha).toBeNull();
+    });
   });
 
-  it('reports null when the build left the commit unset', async () => {
-    delete process.env.APP_GIT_SHA;
-    const res = await app.request('/health');
-    const body = (await res.json()) as { sha: string | null };
-    expect(body.sha).toBeNull();
-  });
-});
-
-describe('GET /health content negotiation', () => {
-  it('refuses an Accept header it cannot satisfy', async () => {
-    const res = await app.request('/health', { headers: { Accept: 'text/html' } });
-    expect(res.status).toBe(406);
+  describe('content negotiation', () => {
+    it('refuses an Accept header it cannot satisfy', async () => {
+      const res = await getHealth({ Accept: 'text/html' });
+      expect(res.status).toBe(406);
+    });
   });
 });

@@ -9,10 +9,10 @@ import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { healthGetResponseV1 } from '@/profiles/json-schema/health/get-response-v1.js';
 
-// Read version from package.json to maintain single source of truth
-const packageJson = JSON.parse(
+// The package manifest is the single source of truth for the API version.
+const { version: apiVersion } = JSON.parse(
   readFileSync(new URL('../../package.json', import.meta.url), 'utf-8'),
-);
+) as { version: string };
 
 export const health = new Hono<{ Variables: NegotiatedResponseContentVariables }>();
 
@@ -23,7 +23,7 @@ health.get(
     c.json(
       {
         status: 'ok',
-        version: packageJson.version,
+        version: apiVersion,
         sha: process.env.APP_GIT_SHA ?? null,
       },
       200,
