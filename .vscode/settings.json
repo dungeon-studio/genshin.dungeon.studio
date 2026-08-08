@@ -92,8 +92,7 @@
   // ]
 
   // Testing
-  // Anchor the extension to the root config so the sidebar shows its declared
-  // projects instead of every discovered `*vite*.config.*` — the default search
-  // pattern also matches apps/web/vite.config.ts, which has no `test` block.
+  // Without this, the extension's default search pattern also picks up
+  // apps/web/vite.config.ts, which has no `test` block.
   "vitest.rootConfig": "./vitest.config.ts"
 }

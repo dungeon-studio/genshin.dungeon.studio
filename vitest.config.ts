@@ -3,15 +3,13 @@
 
 import { defineConfig } from 'vitest/config';
 
-// Aggregates every workspace package that opts into Vitest by owning a
-// `vitest.config.ts`. Globbing the config file rather than the directory keeps
-// `apps/web/vite.config.ts` (no `test` block) and `tools/e2e` (Playwright) out
-// of the project list without an exclusion to maintain.
+// Globbing the config filename, not the directory, leaves out
+// `apps/web/vite.config.ts` (no `test` block) and `tools/e2e` (Playwright)
+// with no exclusion list to maintain.
 //
-// `pnpm turbo run test` remains the build-ordered entry point and the only one
-// that produces reports. `coverage` and `reporters` are root-only options, so
-// each project's copies apply when turbo runs it as its own root and are
-// ignored here; a root `pnpm vitest` prints results and writes no artifacts.
+// `coverage` and `reporters` are root-only in Vitest: each project config's
+// copies apply only when turbo runs that package as its own root, so a root
+// `pnpm vitest` writes no junit or coverage artifacts.
 export default defineConfig({
   test: {
     projects: [
