@@ -6,17 +6,16 @@ SPDX-License-Identifier: MIT
 # Respond to a vulnerable dependency
 
 A vulnerable dependency surfaces two ways: the `Scan dependencies` job fails a
-pull request on a HIGH or CRITICAL advisory in `pnpm-lock.yaml`, or a
-Dependabot alert appears in the Security tab. Both end in the same three
-options—upgrade, wait for the upstream fix, or suppress.
+pull request, or a Dependabot alert appears in the Security tab. The gate's
+floor is HIGH and CRITICAL, so an alert below it never fails CI.
 
 ---
 
 ## Reproduce the finding
 
-`--config` is what applies the severity floor. Trivy looks for `trivy.yaml` by
-default, never `.trivy.yaml`, so without the flag the scan reports every
-severity and stops matching the gate:
+Trivy looks for `trivy.yaml`, never the dot-prefixed name this repository uses,
+so without `--config` the scan loads no severity floor and stops matching the
+gate:
 
 ```bash
 trivy fs --scanners vuln --config .trivy.yaml pnpm-lock.yaml
@@ -37,7 +36,7 @@ pnpm why <package> -r
 
 ## Upgrade a direct dependency
 
-Versions are pinned exactly, so set the new version in the owning
+This repository pins versions exactly, so set the new version in the owning
 `package.json` and reinstall:
 
 ```bash
@@ -47,16 +46,14 @@ pnpm install
 ## Upgrade a transitive dependency
 
 Bump the closest parent whose release widens the range—`pnpm why` names the
-chain. If no parent has published one, leave it to Renovate, which opens a
-`security`-labelled pull request as soon as a fix lands.
+chain. If no parent has published one, leave it to Renovate.
 
-A `pnpm.overrides` entry forces the version instead, against a parent that
-never resolved with it. Reserve that for a CRITICAL with no upstream timeline.
+A `pnpm.overrides` entry forces the version against a parent that never
+resolved with it. Reserve it for a CRITICAL with no upstream timeline.
 
 ## Suppress an advisory with no fix
 
-Add the advisory to `.trivyignore.yaml` under `vulnerabilities`, with the
-justification and expiry that file requires:
+Add the advisory to `.trivyignore.yaml`:
 
 ```yaml
 vulnerabilities:
@@ -68,12 +65,10 @@ vulnerabilities:
     expired_at: 2026-11-30
 ```
 
-Set `expired_at` to when the finding is worth another look. Trivy stops
-honouring the entry that day and the gate fails again, which is what stops a
-suppression becoming permanent.
+Set `expired_at` to when the finding is worth another look; Trivy stops
+honouring the entry that day and the gate fails again.
 
-Re-run the scan from the top of this guide before pushing; the finding should
-be gone.
+Re-run the scan from the top of this guide before pushing.
 
 ## Related
 

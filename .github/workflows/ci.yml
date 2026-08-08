@@ -383,14 +383,9 @@ jobs:
           sarif_file: dockerfile-results.sarif
           category: trivy-dockerfile
 
-  # Blocks on a table rather than reporting through SARIF like its siblings:
-  # trivy-action unsets TRIVY_SEVERITY whenever the format is sarif, which
-  # would discard the severity floor .trivy.yaml sets and fail this gate on
-  # every advisory in the tree.
-  #
-  # Unfixed advisories are deliberately not skipped. One with no upgrade path
-  # belongs in .trivyignore.yaml, where it carries a justification and an
-  # expiry, rather than passing silently.
+  # No SARIF here: trivy-action unsets TRIVY_SEVERITY whenever the format is
+  # sarif, which would discard the severity floor .trivy.yaml sets and fail
+  # this gate on every advisory in the tree.
   trivy-dependencies:
     name: Scan dependencies
     runs-on: ubuntu-latest
@@ -402,8 +397,8 @@ jobs:
         with:
           persist-credentials: false
 
-      # The lockfile alone, not the worktree: it resolves every workspace, and
-      # a directory scan would also walk build output and fixtures.
+      # The lockfile resolves every workspace; scanning the directory would
+      # also walk build output and fixtures.
       - name: Scan dependencies
         uses: aquasecurity/trivy-action@2736533278103862a861f4a35ebac3e97854d956 # master
         with:

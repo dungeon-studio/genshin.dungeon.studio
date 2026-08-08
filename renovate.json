@@ -13,7 +13,7 @@
   "minimumReleaseAge": "3 days",
   "osvVulnerabilityAlerts": true,
   "vulnerabilityAlerts": {
-    "description": "Add the security label to vulnerability-driven pull requests, keeping the repository-wide dependencies and automated labels",
+    "description": "Add the security label to vulnerability-driven pull requests",
     "addLabels": ["security"]
   },
   "pre-commit": {

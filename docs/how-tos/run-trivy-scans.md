@@ -39,7 +39,6 @@ trivy image api-local:scan
 
 ## Scan dependencies
 
-Unlike the scans above, this one blocks a pull request, and its severity floor
-depends on passing `--config`. See
+Unlike the scans above, this one blocks a pull request. See
 [Respond to a vulnerable dependency](respond-to-dependency-cves.md) for the
 command and the triage path.
