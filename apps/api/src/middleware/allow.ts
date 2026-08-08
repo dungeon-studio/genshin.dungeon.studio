@@ -3,7 +3,7 @@
 
 import type { Env, Hono, MiddlewareHandler } from 'hono';
 
-import { routedMethods } from '@/lib/hono/route-table.js';
+import { routedMethods } from '@/http/route-table.js';
 
 /** The methods to advertise at `path`, empty when nothing is routed there. */
 function allowedMethods<E extends Env>(app: Hono<E>, path: string): string[] {
