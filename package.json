@@ -33,8 +33,7 @@
     "typecheck": "turbo run typecheck",
     "clean": "turbo run clean",
     "reuse:check": "reuse lint",
-    "validate:workspace": "tsx scripts/validate-workspace.ts",
-    "validate": "pnpm lint && pnpm typecheck && pnpm knip && pnpm reuse:check && pnpm validate:workspace"
+    "validate:workspace": "tsx scripts/validate-workspace.ts"
   },
   "devDependencies": {
     "@ls-lint/ls-lint": "2.3.1",

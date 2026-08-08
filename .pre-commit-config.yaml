@@ -170,6 +170,13 @@ repos:
         pass_filenames: false
         always_run: true
 
+      - id: workspace-extensions
+        name: devcontainer and workspace extensions in sync
+        entry: pnpm validate:workspace
+        language: system
+        files: ^(\.vscode/extensions\.json|\.devcontainer/devcontainer\.json)$
+        pass_filenames: false
+
       - id: syncpack
         name: exact dependency versions
         entry: pnpm exec syncpack lint

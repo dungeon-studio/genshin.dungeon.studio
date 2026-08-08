@@ -10,9 +10,7 @@ on:
   pull_request:
     paths: &paths
       - '.devcontainer/**'
-      - '.vscode/extensions.json'
       - 'scripts/install-reuse.sh'
-      - 'scripts/validate-workspace.ts'
       - '.github/workflows/devcontainer.yml'
       - 'package.json'
       - 'pnpm-lock.yaml'
@@ -28,8 +26,8 @@ permissions:
   contents: read
 
 jobs:
-  validate:
-    name: Validate workspace
+  toolchain:
+    name: Verify toolchain
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -39,18 +37,22 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Build devcontainer and run pnpm validate
+      # The chain exercises each toolchain the image installs — turbo, eslint,
+      # knip, and the pipx-installed reuse — so it asserts the image, not the
+      # code; ci.yml already gates the code with these same checks. Add a
+      # command only when it exercises a tool nothing here already does.
+      # Project-wide checks belong in .pre-commit-config.yaml instead.
+      - name: Build the image and run the toolchain
         uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
         with:
           imageName: genshin-planner-devcontainer
           push: never
-          runCmd: pnpm validate
+          runCmd: pnpm lint && pnpm typecheck && pnpm knip && pnpm reuse:check
 
 # ---------------------------------------------------------------------------
 # Maintenance notes
 # - Cold devcontainer build (no cache) is the slow path. The job ceiling
 #   leaves headroom for first-time builds without retries.
-# - Runs pnpm validate (lint + typecheck + reuse + workspace consistency)
-#   inside the built image so devcontainer drift surfaces here, not in
-#   contributor terminals.
+# - Runs the toolchain inside the built image so devcontainer drift surfaces
+#   here, not in contributor terminals.
 # ---------------------------------------------------------------------------
