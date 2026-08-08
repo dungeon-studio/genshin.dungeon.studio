@@ -29,6 +29,7 @@ jobs:
   toolchain:
     name: Verify toolchain
     runs-on: ubuntu-latest
+    # Headroom for a cold build, which has no cache to fall back on.
     timeout-minutes: 30
 
     steps:
@@ -37,20 +38,12 @@ jobs:
         with:
           persist-credentials: false
 
-      # Asserts the image, not the code — ci.yml already gates the code with
-      # these same checks. The commands are chosen to reach what the image
-      # installs: the Node toolchain via turbo, and reuse via pipx. Add one
-      # only when it reaches a tool nothing here already does; project-wide
-      # checks belong in .pre-commit-config.yaml.
+      # Asserts the image, not the code: ci.yml already gates the code with
+      # these same checks. Add a command only when it reaches a tool nothing
+      # here already does; project-wide checks belong in .pre-commit-config.yaml.
       - name: Build the image and run the toolchain
         uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
         with:
           imageName: genshin-planner-devcontainer
           push: never
           runCmd: pnpm lint && pnpm typecheck && pnpm knip && pnpm reuse:check
-
-# ---------------------------------------------------------------------------
-# Maintenance notes
-# - Cold devcontainer build (no cache) is the slow path. The job ceiling
-#   leaves headroom for first-time builds without retries.
-# ---------------------------------------------------------------------------

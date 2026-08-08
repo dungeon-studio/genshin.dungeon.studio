@@ -1,14 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-// VS Code extension parity check.
-//
-// Asserts that VS Code extension recommendations in .vscode/extensions.json
-// stay in lockstep with the extensions installed by .devcontainer/devcontainer.json.
-// Both files carry a MAINTENANCE comment pointing at the other; this check
-// enforces it.
-//
-// Usage: pnpm vscode-extensions:check
+// Asserts that the VS Code extension recommendations in .vscode/extensions.json
+// stay in lockstep with the extensions .devcontainer/devcontainer.json installs.
+// Both files carry a MAINTENANCE comment pointing at the other; this enforces it.
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
