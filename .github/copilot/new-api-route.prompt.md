@@ -28,7 +28,7 @@ Problem Details, update these routes to match.
 1. Create `apps/api/src/${input:resource}/routes.ts` with the route handlers.
 2. Start the file with the SPDX header.
 3. Follow the REST conventions:
-   - Resource-oriented paths: `/api/${input:resource}`.
+   - Resource-oriented paths: `/${input:resource}`.
    - Correct HTTP method semantics.
    - Use `HTTPException` for errors; the global error handler formats the
      response.

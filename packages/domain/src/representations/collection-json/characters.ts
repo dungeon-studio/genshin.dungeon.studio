@@ -32,7 +32,7 @@ const CHARACTER_TEMPLATE: Template = {
 };
 
 export function characterItemHref(baseUrl: string, character: CollectionCharacter): string {
-  return `${baseUrl}/api/characters/${character.characterId}`;
+  return `${baseUrl}/characters/${character.characterId}`;
 }
 
 export function serialiseCharacter(character: CollectionCharacter, baseUrl: string): Item {

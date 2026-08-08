@@ -38,7 +38,7 @@ const TEAM_TEMPLATE: Template = {
 };
 
 export function teamItemHref(baseUrl: string, team: CollectionTeam): string {
-  return `${baseUrl}/api/teams/${team.slot}`;
+  return `${baseUrl}/teams/${team.slot}`;
 }
 
 export function serialiseTeam(team: CollectionTeam, baseUrl: string): Item {
@@ -54,14 +54,14 @@ export function serialiseTeam(team: CollectionTeam, baseUrl: string): Item {
 
 export function teamListDocument(teams: CollectionTeam[], baseUrl: string): CollectionDocument {
   return buildCollection(
-    `${baseUrl}/api/teams`,
+    `${baseUrl}/teams`,
     teams.map((t) => serialiseTeam(t, baseUrl)),
     { template: TEAM_TEMPLATE },
   );
 }
 
 export function teamItemDocument(team: CollectionTeam, baseUrl: string): CollectionDocument {
-  return buildCollection(`${baseUrl}/api/teams/${team.slot}`, [serialiseTeam(team, baseUrl)], {
+  return buildCollection(`${baseUrl}/teams/${team.slot}`, [serialiseTeam(team, baseUrl)], {
     template: TEAM_TEMPLATE,
   });
 }

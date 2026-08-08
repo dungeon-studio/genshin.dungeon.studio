@@ -75,14 +75,14 @@ describe('Allow header', () => {
   }
 
   it.each([
-    ['a read-only collection', '/api/characters', ['GET', 'HEAD', 'OPTIONS']],
-    ['a writable collection', '/api/weapons', ['GET', 'HEAD', 'OPTIONS', 'POST']],
+    ['a read-only collection', '/characters', ['GET', 'HEAD', 'OPTIONS']],
+    ['a writable collection', '/weapons', ['GET', 'HEAD', 'OPTIONS', 'POST']],
     [
       'a parameterized item resource',
-      '/api/weapons/8c1a9c4e-1c2e-4a3f-9d5b-6f7a8b9c0d1e',
+      '/weapons/8c1a9c4e-1c2e-4a3f-9d5b-6f7a8b9c0d1e',
       ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH'],
     ],
-    ['the user profile', '/api/profile', ['GET', 'HEAD', 'OPTIONS', 'PATCH']],
+    ['the user profile', '/profile', ['GET', 'HEAD', 'OPTIONS', 'PATCH']],
   ])('advertises the methods of %s', async (_resource, path, methods) => {
     const res = await app.request(path, { method: 'OPTIONS' });
     expect(allowed(res)).toEqual(methods);
@@ -107,7 +107,7 @@ describe('Allow header', () => {
   });
 
   it('accompanies the CORS preflight response', async () => {
-    const res = await app.request('/api/weapons', {
+    const res = await app.request('/weapons', {
       method: 'OPTIONS',
       headers: {
         Origin: 'http://localhost:5173',

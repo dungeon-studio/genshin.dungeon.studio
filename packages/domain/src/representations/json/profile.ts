@@ -18,7 +18,7 @@ export type { AuthIdentity } from '../../profile/auth-identity.js';
 /**
  * Wire format for the composite profile response.
  *
- * Matches the shape returned by GET /api/profile and the JSON Schema
+ * Matches the shape returned by GET /profile and the JSON Schema
  * in schemas/profile/get-response-v1.
  */
 export interface ProfileResponse {

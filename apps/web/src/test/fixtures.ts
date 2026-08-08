@@ -64,21 +64,21 @@ export function makeTeam(slot: TeamSlot, overrides: Partial<CollectionTeam> = {}
 // Collection+JSON envelope builders producing the wire format the hooks parse.
 export function charactersDocument(characters: CollectionCharacter[]): CollectionDocument {
   return buildCollection(
-    `${API_BASE_URL}/api/characters`,
+    `${API_BASE_URL}/characters`,
     characters.map((character) => serialiseCharacter(character, API_BASE_URL)),
   );
 }
 
 export function weaponsDocument(weapons: CollectionWeapon[]): CollectionDocument {
   return buildCollection(
-    `${API_BASE_URL}/api/weapons`,
+    `${API_BASE_URL}/weapons`,
     weapons.map((weapon) => serialiseWeapon(weapon, API_BASE_URL)),
   );
 }
 
 export function teamsDocument(teams: CollectionTeam[]): CollectionDocument {
   return buildCollection(
-    `${API_BASE_URL}/api/teams`,
+    `${API_BASE_URL}/teams`,
     teams.map((team) => serialiseTeam(team, API_BASE_URL)),
   );
 }

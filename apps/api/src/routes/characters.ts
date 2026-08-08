@@ -38,7 +38,7 @@ type SaveCharacterBody = FromSchema<typeof characterPutRequestV1.schema> & {
   constellationLevel: ConstellationLevel;
 };
 
-// GET /api/characters — List user's character collection
+// GET /characters — List user's character collection
 characters.get('/', async (c) => {
   const userId = c.get('user').uid;
   const items = await Characters.list(userId);
@@ -48,7 +48,7 @@ characters.get('/', async (c) => {
     JSON.stringify(
       serialiseCollection(
         characterRepresentation,
-        `${baseUrl}/api/characters`,
+        `${baseUrl}/characters`,
         items.map((item) => serialiseCharacter(item, baseUrl)),
       ),
     ),
@@ -58,7 +58,7 @@ characters.get('/', async (c) => {
   );
 });
 
-// GET /api/characters/:characterId — Get specific character record
+// GET /characters/:characterId — Get specific character record
 characters.get('/:characterId', async (c) => {
   const userId = c.get('user').uid;
   const { characterId } = c.req.param();
@@ -83,7 +83,7 @@ characters.get('/:characterId', async (c) => {
   );
 });
 
-// PUT /api/characters/:characterId — Save/update character (idempotent upsert)
+// PUT /characters/:characterId — Save/update character (idempotent upsert)
 characters.put(
   '/:characterId',
   negotiateRequestSchema([characterPutRequestV1]),
@@ -111,7 +111,7 @@ characters.put(
   },
 );
 
-// DELETE /api/characters/:characterId — Remove from collection
+// DELETE /characters/:characterId — Remove from collection
 characters.delete('/:characterId', async (c) => {
   const userId = c.get('user').uid;
   const { characterId } = c.req.param();

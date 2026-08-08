@@ -36,7 +36,7 @@ weapons.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: weapon
 type CreateWeaponBody = FromSchema<typeof weaponPostRequestV1.schema>;
 type UpdateWeaponBody = FromSchema<typeof weaponPatchRequestV1.schema>;
 
-// GET /api/weapons — List all weapon instances, optionally filtered by weaponId
+// GET /weapons — List all weapon instances, optionally filtered by weaponId
 weapons.get('/', async (c) => {
   const userId = c.get('user').uid;
   const weaponId = c.req.query('weaponId');
@@ -53,7 +53,7 @@ weapons.get('/', async (c) => {
       JSON.stringify(
         serialiseCollection(
           weaponRepresentation,
-          `${baseUrl}/api/weapons?weaponId=${encodeURIComponent(weaponId)}`,
+          `${baseUrl}/weapons?weaponId=${encodeURIComponent(weaponId)}`,
           instances.map((w) => serialiseWeapon(w, baseUrl)),
         ),
       ),
@@ -69,7 +69,7 @@ weapons.get('/', async (c) => {
     JSON.stringify(
       serialiseCollection(
         weaponRepresentation,
-        `${baseUrl}/api/weapons`,
+        `${baseUrl}/weapons`,
         items.map((w) => serialiseWeapon(w, baseUrl)),
       ),
     ),
@@ -79,7 +79,7 @@ weapons.get('/', async (c) => {
   );
 });
 
-// POST /api/weapons — Create new weapon instance
+// POST /weapons — Create new weapon instance
 weapons.post(
   '/',
   negotiateRequestSchema([weaponPostRequestV1]),
@@ -93,7 +93,7 @@ weapons.post(
 
     return c.body(
       JSON.stringify(
-        serialiseCollection(weaponRepresentation, `${baseUrl}/api/weapons`, [
+        serialiseCollection(weaponRepresentation, `${baseUrl}/weapons`, [
           serialiseWeapon(weapon, baseUrl),
         ]),
       ),
@@ -108,7 +108,7 @@ weapons.post(
   },
 );
 
-// GET /api/weapons/:weaponInstanceId — Get single weapon instance
+// GET /weapons/:weaponInstanceId — Get single weapon instance
 weapons.get('/:weaponInstanceId', async (c) => {
   const userId = c.get('user').uid;
   const weaponInstanceId = c.req.param('weaponInstanceId') as UUID;
@@ -133,7 +133,7 @@ weapons.get('/:weaponInstanceId', async (c) => {
   );
 });
 
-// PATCH /api/weapons/:weaponInstanceId — Update weapon instance
+// PATCH /weapons/:weaponInstanceId — Update weapon instance
 weapons.patch(
   '/:weaponInstanceId',
   negotiateRequestSchema([weaponPatchRequestV1]),
@@ -165,7 +165,7 @@ weapons.patch(
   },
 );
 
-// DELETE /api/weapons/:weaponInstanceId — Delete weapon instance
+// DELETE /weapons/:weaponInstanceId — Delete weapon instance
 weapons.delete('/:weaponInstanceId', async (c) => {
   const userId = c.get('user').uid;
   const weaponInstanceId = c.req.param('weaponInstanceId') as UUID;

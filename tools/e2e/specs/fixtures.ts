@@ -48,9 +48,9 @@ export function constellationLabel(character: Character, level: number): string 
  * separates the two: the HTTP method alongside it does.
  */
 export const apiPath = {
-  character: (character: Character) => `/api/characters/${encodeURIComponent(character.id)}`,
-  weapons: '/api/weapons',
-  team: (slot: number) => `/api/teams/${slot}`,
+  character: (character: Character) => `/characters/${encodeURIComponent(character.id)}`,
+  weapons: '/weapons',
+  team: (slot: number) => `/teams/${slot}`,
 } as const;
 
 /**

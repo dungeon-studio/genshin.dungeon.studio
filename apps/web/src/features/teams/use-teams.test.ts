@@ -27,8 +27,8 @@ beforeEach(() => {
 describe('useTeams (authenticated)', () => {
   it('rolls back an optimistic assignment when the save fails', async () => {
     server.use(
-      http.get('http://localhost:8080/api/teams', () => HttpResponse.json(teamsDocument([]))),
-      http.put('http://localhost:8080/api/teams/1', () => new HttpResponse(null, { status: 500 })),
+      http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([]))),
+      http.put('http://localhost:8080/teams/1', () => new HttpResponse(null, { status: 500 })),
     );
 
     const { result } = renderHook(() => useTeams(), {
@@ -51,13 +51,10 @@ describe('useTeams (authenticated)', () => {
 
   it('restores a cleared team when the delete fails', async () => {
     server.use(
-      http.get('http://localhost:8080/api/teams', () =>
+      http.get('http://localhost:8080/teams', () =>
         HttpResponse.json(teamsDocument([makeTeam(1, { members: MEMBERS })])),
       ),
-      http.delete(
-        'http://localhost:8080/api/teams/1',
-        () => new HttpResponse(null, { status: 500 }),
-      ),
+      http.delete('http://localhost:8080/teams/1', () => new HttpResponse(null, { status: 500 })),
     );
 
     const { result } = renderHook(() => useTeams(), {
@@ -82,8 +79,8 @@ describe('useTeams (authenticated)', () => {
       releasePut = resolve;
     });
     server.use(
-      http.get('http://localhost:8080/api/teams', () => HttpResponse.json(teamsDocument([]))),
-      http.put('http://localhost:8080/api/teams/1', async () => {
+      http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([]))),
+      http.put('http://localhost:8080/teams/1', async () => {
         await putGate;
         return new HttpResponse(null, { status: 204 });
       }),

@@ -29,7 +29,7 @@ export function useTeamsQuery(userId: string | undefined): UseQueryResult<Collec
   return useQuery({
     queryKey: teamKey(userId ?? ''),
     queryFn: async () => {
-      const response = await apiGet('/api/teams');
+      const response = await apiGet('/teams');
       return parseTeamsResponse(response);
     },
     enabled: userId !== undefined,
@@ -43,7 +43,7 @@ export function useSaveTeamMutation(
 
   return useMutation({
     mutationFn: async ({ slot, name, members, description }: SaveTeamPayload) => {
-      await apiPut(`/api/teams/${encodeURIComponent(slot)}`, { name, members, description });
+      await apiPut(`/teams/${encodeURIComponent(slot)}`, { name, members, description });
     },
     onSuccess: () => {
       if (userId !== undefined) queryClient.invalidateQueries({ queryKey: teamKey(userId) });
@@ -58,7 +58,7 @@ export function useDeleteTeamMutation(
 
   return useMutation({
     mutationFn: async (slot: TeamSlot) => {
-      await apiDelete(`/api/teams/${encodeURIComponent(slot)}`);
+      await apiDelete(`/teams/${encodeURIComponent(slot)}`);
     },
     onSuccess: () => {
       if (userId !== undefined) queryClient.invalidateQueries({ queryKey: teamKey(userId) });

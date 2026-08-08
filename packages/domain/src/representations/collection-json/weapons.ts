@@ -33,14 +33,14 @@ const WEAPON_TEMPLATE: Template = {
 };
 
 export function weaponItemHref(baseUrl: string, weapon: CollectionWeapon): string {
-  return `${baseUrl}/api/weapons/${weapon.weaponInstanceId}`;
+  return `${baseUrl}/weapons/${weapon.weaponInstanceId}`;
 }
 
 export function serialiseWeapon(weapon: CollectionWeapon, baseUrl: string): Item {
   const links: Link[] = [
     {
       rel: 'collection',
-      href: `${baseUrl}/api/weapons?weaponId=${encodeURIComponent(weapon.weaponId)}`,
+      href: `${baseUrl}/weapons?weaponId=${encodeURIComponent(weapon.weaponId)}`,
       prompt: `All instances of ${weapon.weaponId}`,
     },
   ];

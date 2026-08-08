@@ -18,7 +18,7 @@ const EMPTY_MEMBERS: CollectionTeamMembers = [null, null, null, null];
 describe('useTeamsQuery', () => {
   it('returns the deserialised teams from the collection document', async () => {
     server.use(
-      http.get('http://localhost:8080/api/teams', () =>
+      http.get('http://localhost:8080/teams', () =>
         HttpResponse.json(teamsDocument([makeTeam(1, { name: 'Alpha' })])),
       ),
     );
@@ -41,7 +41,7 @@ describe('useSaveTeamMutation', () => {
   it('sends a PUT to the slot path with the team payload', async () => {
     let putBody: unknown;
     server.use(
-      http.put('http://localhost:8080/api/teams/2', async ({ request }) => {
+      http.put('http://localhost:8080/teams/2', async ({ request }) => {
         putBody = await request.json();
         return new HttpResponse(null, { status: 204 });
       }),
@@ -65,11 +65,11 @@ describe('useSaveTeamMutation', () => {
   it('invalidates the teams query so it refetches after a save', async () => {
     let getCount = 0;
     server.use(
-      http.get('http://localhost:8080/api/teams', () => {
+      http.get('http://localhost:8080/teams', () => {
         getCount += 1;
         return HttpResponse.json(teamsDocument([makeTeam(1)]));
       }),
-      http.put('http://localhost:8080/api/teams/1', () => new HttpResponse(null, { status: 204 })),
+      http.put('http://localhost:8080/teams/1', () => new HttpResponse(null, { status: 204 })),
     );
 
     const { result } = renderHook(
