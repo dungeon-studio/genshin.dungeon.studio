@@ -167,32 +167,11 @@ jobs:
           printf '%s\n' "$IMAGE_TAGS"
           echo "Deploy image URI: $IMAGE_URI"
 
-      # Provenance labels are applied by BuildKit from the metadata step above,
-      # not by LABEL instructions, because a build-time --label overrides any
-      # LABEL of the same key. That puts them beyond the reach of a Dockerfile
-      # linter, so the published manifest is the only place they can be gated.
-      # Revision is compared rather than merely present: a label set that
-      # survives while pointing at the wrong commit is the failure that matters,
-      # since every consumer downstream reads it as this image's provenance.
       - name: Verify Image Labels
         env:
           IMAGE_URI: ${{ steps.image.outputs.image_uri }}
           EXPECTED_REVISION: ${{ github.sha }}
-        run: |
-          docker buildx imagetools inspect "$IMAGE_URI" \
-            --format '{{json .Image.Config.Labels}}' \
-            | jq -e --arg revision "$EXPECTED_REVISION" '
-                . as $labels
-                | $labels["org.opencontainers.image.revision"] as $actual
-                | ["source", "revision", "created", "licenses", "title", "description", "url"]
-                | map("org.opencontainers.image." + .)
-                | map(select(($labels[.] // "") == ""))
-                | if length > 0 then
-                    "image is missing OCI labels: \(join(", "))" | halt_error(1)
-                  elif $actual != $revision then
-                    "image revision \($actual) does not match \($revision)" | halt_error(1)
-                  else true end
-              ' > /dev/null
+        run: bash apps/api/scripts/verify-image-labels.sh "$IMAGE_URI" "$EXPECTED_REVISION"
 
       # Service lifecycle is intentionally CI-managed for fast app rollouts.
       # Terraform in dev manages supporting infra (APIs, Artifact Registry,
