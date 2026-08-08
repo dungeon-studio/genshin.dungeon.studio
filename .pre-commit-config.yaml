@@ -170,9 +170,9 @@ repos:
         pass_filenames: false
         always_run: true
 
-      - id: workspace-extensions
-        name: devcontainer and workspace extensions in sync
-        entry: pnpm validate:workspace
+      - id: vscode-extensions
+        name: devcontainer and editor extensions in sync
+        entry: pnpm vscode-extensions:check
         language: system
         files: ^(\.vscode/extensions\.json|\.devcontainer/devcontainer\.json)$
         pass_filenames: false

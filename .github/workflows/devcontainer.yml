@@ -37,11 +37,11 @@ jobs:
         with:
           persist-credentials: false
 
-      # The chain exercises each toolchain the image installs — turbo, eslint,
-      # knip, and the pipx-installed reuse — so it asserts the image, not the
-      # code; ci.yml already gates the code with these same checks. Add a
-      # command only when it exercises a tool nothing here already does.
-      # Project-wide checks belong in .pre-commit-config.yaml instead.
+      # Asserts the image, not the code — ci.yml already gates the code with
+      # these same checks. The commands are chosen to reach what the image
+      # installs: the Node toolchain via turbo, and reuse via pipx. Add one
+      # only when it reaches a tool nothing here already does; project-wide
+      # checks belong in .pre-commit-config.yaml.
       - name: Build the image and run the toolchain
         uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
         with:
@@ -53,6 +53,4 @@ jobs:
 # Maintenance notes
 # - Cold devcontainer build (no cache) is the slow path. The job ceiling
 #   leaves headroom for first-time builds without retries.
-# - Runs the toolchain inside the built image so devcontainer drift surfaces
-#   here, not in contributor terminals.
 # ---------------------------------------------------------------------------
