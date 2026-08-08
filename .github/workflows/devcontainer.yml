@@ -38,12 +38,13 @@ jobs:
         with:
           persist-credentials: false
 
-      # Asserts the image, not the code: ci.yml already gates the code with
-      # these same checks. Add a command only when it reaches a tool nothing
-      # here already does; project-wide checks belong in .pre-commit-config.yaml.
-      - name: Build the image and run the toolchain
+      - name: Build the image and run the checks inside it
         uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
         with:
           imageName: genshin-planner-devcontainer
           push: never
+          # Repeats ci.yml's checks on purpose: there they gate the code, here
+          # they prove the built image can still run them. Add a command only
+          # when it exercises a tool the others leave untouched; project-wide
+          # checks belong in .pre-commit-config.yaml.
           runCmd: pnpm lint && pnpm typecheck && pnpm knip && pnpm reuse:check
