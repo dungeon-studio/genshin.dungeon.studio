@@ -12,6 +12,10 @@
   "rangeStrategy": "pin",
   "minimumReleaseAge": "3 days",
   "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": {
+    "description": "Add the security label to vulnerability-driven pull requests",
+    "addLabels": ["security"]
+  },
   "pre-commit": {
     "enabled": true
   },

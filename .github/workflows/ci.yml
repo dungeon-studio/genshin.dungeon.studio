@@ -373,6 +373,31 @@ jobs:
           sarif_file: dockerfile-results.sarif
           category: trivy-dockerfile
 
+  # No SARIF here: trivy-action unsets TRIVY_SEVERITY whenever the format is
+  # sarif, which would discard the severity floor .trivy.yaml sets and fail
+  # this gate on every advisory in the tree.
+  trivy-dependencies:
+    name: Scan dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # The lockfile resolves every workspace; scanning the directory would
+      # also walk build output and fixtures.
+      - name: Scan dependencies
+        uses: aquasecurity/trivy-action@2736533278103862a861f4a35ebac3e97854d956 # master
+        with:
+          scan-type: fs
+          scan-ref: pnpm-lock.yaml
+          scanners: vuln
+          exit-code: '1'
+          trivy-config: .trivy.yaml
+
   # One build feeds both the scan and the smoke test. The scan goes first
   # because trivy-action defaults to exit-code 0 and reports through SARIF, so
   # a smoke-test failure cannot cost us its results.
