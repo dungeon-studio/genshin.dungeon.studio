@@ -37,6 +37,19 @@ const schemaV2: JsonSchemaProfile = {
   },
 };
 
+// `pattern` is absent from the middleware's keyword mapping, which is the point
+// of this fixture: it reaches the classification fallback.
+const schemaUnmapped: JsonSchemaProfile = {
+  path: '/profiles/json-schema/test/put-request-unmapped-v1.json',
+  schema: {
+    $schema: 'https://json-schema.org/draft/2020-12/schema',
+    type: 'object',
+    properties: { name: { type: 'string', pattern: '^[a-z]+$' } },
+    required: ['name'],
+    additionalProperties: false,
+  },
+};
+
 describe('validateRequestBody middleware', () => {
   function createApp(schemas: JsonSchemaProfile[], negotiatedPath: string) {
     const app = new Hono<{
@@ -134,6 +147,12 @@ describe('validateRequestBody middleware', () => {
 
     it('widens to the parent type when failures span categories', async () => {
       await expect(problemType(schemaV2, { level: 99, extra: true })).resolves.toBe(
+        '/problems/validation',
+      );
+    });
+
+    it('falls back to the parent type for a constraint outside the vocabulary', async () => {
+      await expect(problemType(schemaUnmapped, { name: 'UPPERCASE' })).resolves.toBe(
         '/problems/validation',
       );
     });
