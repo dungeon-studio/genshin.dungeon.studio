@@ -42,14 +42,13 @@ const PROBLEM_TYPE_BY_KEYWORD: Record<string, string> = {
 function validationProblem(errors: ErrorObject[]): ProblemOptions {
   const types = new Set(errors.map((e) => PROBLEM_TYPE_BY_KEYWORD[e.keyword] ?? VALIDATION));
   const [only] = types;
+  // A response carries one type, so a body failing several categories widens to
+  // the parent rather than claiming one that covers only part of it.
+  const type = types.size === 1 && only ? only : VALIDATION;
+
   const detail = errors.map((e) => `${e.instancePath || '/'}: ${e.message}`).join('; ');
 
-  return {
-    // A response carries one type, so a body failing several categories widens
-    // to the parent rather than claiming one that covers only part of it.
-    type: types.size === 1 && only ? only : VALIDATION,
-    message: detail || 'Request body validation failed',
-  };
+  return { type, message: detail || 'Request body validation failed' };
 }
 
 export type ValidatedRequestBodyVariables = {

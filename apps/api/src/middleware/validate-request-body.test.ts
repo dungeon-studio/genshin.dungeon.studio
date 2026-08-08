@@ -61,18 +61,18 @@ describe('validateRequestBody middleware', () => {
     return app;
   }
 
-  async function problemType(app: ReturnType<typeof createApp>, body: unknown) {
-    const res = await app.request(putRequest(body));
-    const json = (await res.json()) as { type: string };
-    return json.type;
-  }
-
   function putRequest(body: unknown) {
     return new Request('http://localhost/test', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
+  }
+
+  async function problemType(schema: JsonSchemaProfile, body: unknown) {
+    const res = await createApp([schema], schema.path).request(putRequest(body));
+    const json = (await res.json()) as { type: string };
+    return json.type;
   }
 
   it('sets validatedBody when body conforms to negotiated schema', async () => {
@@ -101,42 +101,39 @@ describe('validateRequestBody middleware', () => {
   });
 
   describe('problem type classification', () => {
-    it('classifies a missing required property', async () => {
-      const app = createApp([schemaV2], schemaV2.path);
+    const categories = [
+      {
+        failure: 'a missing required property',
+        schema: schemaV2,
+        body: { level: 5 },
+        type: '/problems/validation/missing-property',
+      },
+      {
+        failure: 'a property of the wrong type',
+        schema: schemaV2,
+        body: { name: 42, level: 5 },
+        type: '/problems/validation/invalid-type',
+      },
+      {
+        failure: 'a property outside its permitted range',
+        schema: schemaV2,
+        body: { name: 'test', level: 99 },
+        type: '/problems/validation/out-of-range',
+      },
+      {
+        failure: 'an unexpected property',
+        schema: schemaV1,
+        body: { name: 'test', extra: true },
+        type: '/problems/validation/additional-properties',
+      },
+    ];
 
-      await expect(problemType(app, { level: 5 })).resolves.toBe(
-        '/problems/validation/missing-property',
-      );
-    });
-
-    it('classifies a property of the wrong type', async () => {
-      const app = createApp([schemaV2], schemaV2.path);
-
-      await expect(problemType(app, { name: 42, level: 5 })).resolves.toBe(
-        '/problems/validation/invalid-type',
-      );
-    });
-
-    it('classifies a property outside its permitted range', async () => {
-      const app = createApp([schemaV2], schemaV2.path);
-
-      await expect(problemType(app, { name: 'test', level: 99 })).resolves.toBe(
-        '/problems/validation/out-of-range',
-      );
-    });
-
-    it('classifies an unexpected property', async () => {
-      const app = createApp([schemaV1], schemaV1.path);
-
-      await expect(problemType(app, { name: 'test', extra: true })).resolves.toBe(
-        '/problems/validation/additional-properties',
-      );
+    it.each(categories)('classifies $failure', async ({ schema, body, type }) => {
+      await expect(problemType(schema, body)).resolves.toBe(type);
     });
 
     it('widens to the parent type when failures span categories', async () => {
-      const app = createApp([schemaV2], schemaV2.path);
-
-      await expect(problemType(app, { level: 99, extra: true })).resolves.toBe(
+      await expect(problemType(schemaV2, { level: 99, extra: true })).resolves.toBe(
         '/problems/validation',
       );
     });
