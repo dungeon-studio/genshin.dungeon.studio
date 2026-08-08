@@ -56,6 +56,20 @@ Negotiation rules:
 
 Return errors as `application/problem+json` with stable fields and consistent extension members where needed. Every response includes a `detail` field, even generic ones such as `500 Internal Server Error` or `404 Not Found`, so clients parse error bodies uniformly without branching on status code.
 
+Clients branch on `type`, which classifies the failure; `detail` carries a human-readable message whose wording isn't part of the contract. Errors with no narrower classification use `about:blank`.
+
+Request body validation classifies against this vocabulary:
+
+| `type`                                       | Meaning                                                 |
+| -------------------------------------------- | ------------------------------------------------------- |
+| `/problems/validation/missing-property`      | A required property is absent.                          |
+| `/problems/validation/invalid-type`          | A property holds a value of the wrong type.             |
+| `/problems/validation/out-of-range`          | A value falls outside a numeric, length, or size bound. |
+| `/problems/validation/additional-properties` | The body carries a property the schema doesn't define.  |
+| `/problems/validation`                       | The failure spans several categories, or fits none.     |
+
+These URIs identify failure modes and don't resolve to a document.
+
 See [RFC9457]: <https://www.rfc-editor.org/rfc/rfc9457>
 
 ### 6. Consistent list behavior
