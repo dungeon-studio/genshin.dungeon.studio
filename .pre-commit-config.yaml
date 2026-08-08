@@ -94,8 +94,7 @@ repos:
       - id: zizmor
         args: [--no-progress, --offline]
 
-  # Dockerfile linting. Upstream's sibling `hadolint` id expects a binary on
-  # PATH, which nothing installs.
+  # Dockerfile linting
   - repo: https://github.com/hadolint/hadolint
     rev: v2.15.1
     hooks:
