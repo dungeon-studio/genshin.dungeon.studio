@@ -12,12 +12,7 @@ import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profi
 
 const ajv = new Ajv2020({ allErrors: true });
 
-/**
- * Problem type for a validation failure that resists a narrower label, either
- * because the keyword has no category or because the body broke several
- * categories at once and no single one describes the response. Doubles as the
- * prefix its narrower categories extend.
- */
+/** Parent type for a validation failure carrying no narrower classification. */
 const VALIDATION = '/problems/validation';
 const MISSING_PROPERTY = `${VALIDATION}/missing-property`;
 const INVALID_TYPE = `${VALIDATION}/invalid-type`;
@@ -25,7 +20,7 @@ const OUT_OF_RANGE = `${VALIDATION}/out-of-range`;
 const ADDITIONAL_PROPERTIES = `${VALIDATION}/additional-properties`;
 
 // The failure mode a client branches on, keyed by the ajv keyword that
-// rejected the body. Keywords absent here fall back to VALIDATION.
+// rejected the body.
 const PROBLEM_TYPE_BY_KEYWORD: Record<string, string> = {
   additionalProperties: ADDITIONAL_PROPERTIES,
   exclusiveMaximum: OUT_OF_RANGE,
@@ -44,7 +39,6 @@ const PROBLEM_TYPE_BY_KEYWORD: Record<string, string> = {
   unevaluatedProperties: ADDITIONAL_PROPERTIES,
 };
 
-/** The RFC 9457 classification and message describing why a body was rejected. */
 function validationProblem(errors: ErrorObject[]): ProblemOptions {
   const types = new Set(errors.map((e) => PROBLEM_TYPE_BY_KEYWORD[e.keyword] ?? VALIDATION));
   const [only] = types;

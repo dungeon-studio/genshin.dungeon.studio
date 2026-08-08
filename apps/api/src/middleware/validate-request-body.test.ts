@@ -54,7 +54,7 @@ describe('validateRequestBody middleware', () => {
       },
     );
     // Stands in for the application error handler, which is what actually puts
-    // `type` on the wire; here it only has to expose what the middleware threw.
+    // `type` on the wire; this one only exposes what the middleware threw.
     app.onError((err, c) =>
       c.json(
         { type: err instanceof ProblemException ? err.type : 'about:blank' },
@@ -103,8 +103,6 @@ describe('validateRequestBody middleware', () => {
     expect(res.status).toBe(422);
   });
 
-  // RFC 9457 makes `type` the classifier clients branch on, so each failure
-  // mode has to be distinguishable without parsing the human-readable detail.
   describe('problem type classification', () => {
     it('classifies a missing required property', async () => {
       const app = createApp([schemaV2], schemaV2.path);
