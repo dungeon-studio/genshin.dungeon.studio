@@ -38,6 +38,9 @@ export function ArtifactSetSearch({
         <PopoverTrigger asChild>
           <button
             type="button"
+            // Radix clones the `asChild` trigger with `aria-controls` pointing
+            // at the popover content, which no static check can see.
+            // eslint-disable-next-line jsx-a11y-x/role-has-required-aria-props
             role="combobox"
             aria-expanded={open}
             aria-label={label}

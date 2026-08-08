@@ -18,8 +18,9 @@ interface ThemedIconProps {
 export function ThemedIcon({ lightSrc, darkSrc, alt, className }: ThemedIconProps): JSX.Element {
   const decorative = alt === '';
 
+  // `alt` stays an explicit attribute below rather than joining this object;
+  // static a11y checks cannot resolve it through a spread.
   const shared = {
-    alt,
     'aria-hidden': decorative || undefined,
     loading: 'lazy',
     decoding: 'async',
@@ -29,8 +30,8 @@ export function ThemedIcon({ lightSrc, darkSrc, alt, className }: ThemedIconProp
   // each variant's `dark:` utility trails to win the theme-active conflict.
   return (
     <>
-      <img {...shared} src={lightSrc} className={cn(className, 'dark:hidden')} />
-      <img {...shared} src={darkSrc} className={cn('hidden', className, 'dark:block')} />
+      <img {...shared} alt={alt} src={lightSrc} className={cn(className, 'dark:hidden')} />
+      <img {...shared} alt={alt} src={darkSrc} className={cn('hidden', className, 'dark:block')} />
     </>
   );
 }
