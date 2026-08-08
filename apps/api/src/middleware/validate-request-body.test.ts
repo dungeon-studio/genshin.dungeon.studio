@@ -12,43 +12,38 @@ import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profi
 import type { ValidatedRequestBodyVariables } from './validate-request-body.js';
 import { validateRequestBody } from './validate-request-body.js';
 
-const schemaV1: JsonSchemaProfile = {
-  path: '/profiles/json-schema/test/put-request-v1.json',
-  schema: {
-    $schema: 'https://json-schema.org/draft/2020-12/schema',
-    type: 'object',
-    properties: { name: { type: 'string' } },
-    required: ['name'],
-    additionalProperties: false,
-  },
-};
-
-const schemaV2: JsonSchemaProfile = {
-  path: '/profiles/json-schema/test/put-request-v2.json',
-  schema: {
-    $schema: 'https://json-schema.org/draft/2020-12/schema',
-    type: 'object',
-    properties: {
-      name: { type: 'string' },
-      level: { type: 'integer', minimum: 1, maximum: 10 },
+function putRequestSchema(
+  version: string,
+  properties: Record<string, unknown>,
+  required: string[],
+): JsonSchemaProfile {
+  return {
+    path: `/profiles/json-schema/test/put-request-${version}.json`,
+    schema: {
+      $schema: 'https://json-schema.org/draft/2020-12/schema',
+      type: 'object',
+      properties,
+      required,
+      additionalProperties: false,
     },
-    required: ['name', 'level'],
-    additionalProperties: false,
-  },
-};
+  };
+}
 
-// `pattern` is absent from the middleware's keyword mapping, which is the point
-// of this fixture: it reaches the classification fallback.
-const schemaUnmapped: JsonSchemaProfile = {
-  path: '/profiles/json-schema/test/put-request-unmapped-v1.json',
-  schema: {
-    $schema: 'https://json-schema.org/draft/2020-12/schema',
-    type: 'object',
-    properties: { name: { type: 'string', pattern: '^[a-z]+$' } },
-    required: ['name'],
-    additionalProperties: false,
-  },
-};
+const schemaV1 = putRequestSchema('v1', { name: { type: 'string' } }, ['name']);
+
+const schemaV2 = putRequestSchema(
+  'v2',
+  { name: { type: 'string' }, level: { type: 'integer', minimum: 1, maximum: 10 } },
+  ['name', 'level'],
+);
+
+// `pattern` has no entry in the keyword mapping, so this fixture reaches the
+// classification fallback.
+const schemaUnmapped = putRequestSchema(
+  'unmapped-v1',
+  { name: { type: 'string', pattern: '^[a-z]+$' } },
+  ['name'],
+);
 
 describe('validateRequestBody middleware', () => {
   function createApp(schemas: JsonSchemaProfile[], negotiatedPath: string) {
