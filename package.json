@@ -2,6 +2,7 @@
   "name": "genshin-dungeon-studio",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "Team building companion for Genshin Impact",
   "keywords": [
     "genshin-impact",
@@ -47,7 +48,8 @@
     "syncpack": "15.3.2",
     "tsx": "4.23.7",
     "turbo": "2.10.8",
-    "typescript": "npm:@typescript/typescript6@6.0.2"
+    "typescript": "npm:@typescript/typescript6@6.0.2",
+    "vitest": "4.1.10"
   },
   "packageManager": "pnpm@11.20.0",
   "engines": {
