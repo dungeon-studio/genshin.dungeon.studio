@@ -52,7 +52,7 @@ export function useCharacterCollectionQuery(
   return useQuery({
     queryKey: collectionKey(userId ?? ''),
     queryFn: async () => {
-      const response = await apiGet('/api/characters');
+      const response = await apiGet('/characters');
       return parseCollectionResponse(response);
     },
     enabled: userId !== undefined,
@@ -66,7 +66,7 @@ export function useAddCharacterMutation(
 
   return useMutation({
     mutationFn: async (characterId: CharacterId): Promise<MutationResult> => {
-      const response = await apiPut(`/api/characters/${encodeURIComponent(characterId)}`, {
+      const response = await apiPut(`/characters/${encodeURIComponent(characterId)}`, {
         constellationLevel: MIN_CONSTELLATION_LEVEL,
       });
       return parseSingleCharacterResponse(response);
@@ -84,7 +84,7 @@ export function useRemoveCharacterMutation(
 
   return useMutation({
     mutationFn: async (characterId: CharacterId) => {
-      await apiDelete(`/api/characters/${encodeURIComponent(characterId)}`);
+      await apiDelete(`/characters/${encodeURIComponent(characterId)}`);
     },
     onSuccess: () => {
       if (userId !== undefined) queryClient.invalidateQueries({ queryKey: collectionKey(userId) });
@@ -107,7 +107,7 @@ export function useSetConstellationLevelMutation(
       characterId,
       level,
     }: SetConstellationLevelVariables): Promise<MutationResult> => {
-      const response = await apiPut(`/api/characters/${encodeURIComponent(characterId)}`, {
+      const response = await apiPut(`/characters/${encodeURIComponent(characterId)}`, {
         constellationLevel: level,
       });
       return parseSingleCharacterResponse(response);

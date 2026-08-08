@@ -36,10 +36,8 @@ describe('useCollection merge-on-first-login', () => {
 
     const putBodies: unknown[] = [];
     server.use(
-      http.get('http://localhost:8080/api/characters', () =>
-        HttpResponse.json(charactersDocument([])),
-      ),
-      http.put('http://localhost:8080/api/characters/skirk', async ({ request }) => {
+      http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
+      http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
         putBodies.push(await request.json());
         return HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 3)]));
       }),
@@ -61,11 +59,11 @@ describe('useCollection merge-on-first-login', () => {
     let getCount = 0;
     let putCount = 0;
     server.use(
-      http.get('http://localhost:8080/api/characters', () => {
+      http.get('http://localhost:8080/characters', () => {
         getCount += 1;
         return HttpResponse.json(charactersDocument([]));
       }),
-      http.put('http://localhost:8080/api/characters/skirk', () => {
+      http.put('http://localhost:8080/characters/skirk', () => {
         putCount += 1;
         return HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 3)]));
       }),
@@ -89,8 +87,8 @@ describe('useCollection merge-on-first-login', () => {
 
     let serverCharacters = charactersDocument([]);
     server.use(
-      http.get('http://localhost:8080/api/characters', () => HttpResponse.json(serverCharacters)),
-      http.put('http://localhost:8080/api/characters/skirk', () =>
+      http.get('http://localhost:8080/characters', () => HttpResponse.json(serverCharacters)),
+      http.put('http://localhost:8080/characters/skirk', () =>
         HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 3)])),
       ),
     );
@@ -132,11 +130,11 @@ describe('useCollection merge-on-first-login', () => {
 describe('useCollection mutations', () => {
   it('restores a removed character when the delete fails', async () => {
     server.use(
-      http.get('http://localhost:8080/api/characters', () =>
+      http.get('http://localhost:8080/characters', () =>
         HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 3)])),
       ),
       http.delete(
-        'http://localhost:8080/api/characters/skirk',
+        'http://localhost:8080/characters/skirk',
         () => new HttpResponse(null, { status: 500 }),
       ),
     );

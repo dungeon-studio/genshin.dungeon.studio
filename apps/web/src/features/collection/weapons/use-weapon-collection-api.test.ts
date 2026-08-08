@@ -24,7 +24,7 @@ const INSTANCE_ID = 'weapon-instance-1' as CollectionWeaponId;
 describe('useWeaponCollectionQuery', () => {
   it('returns the deserialised weapons keyed by instance id', async () => {
     server.use(
-      http.get('http://localhost:8080/api/weapons', () =>
+      http.get('http://localhost:8080/weapons', () =>
         HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 3)])),
       ),
     );
@@ -44,7 +44,7 @@ describe('useAddWeaponMutation', () => {
   it('POSTs the weapon id at the minimum refinement level', async () => {
     let postBody: unknown;
     server.use(
-      http.post('http://localhost:8080/api/weapons', async ({ request }) => {
+      http.post('http://localhost:8080/weapons', async ({ request }) => {
         postBody = await request.json();
         return HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 1)]));
       }),
@@ -66,11 +66,11 @@ describe('useAddWeaponMutation', () => {
   it('invalidates the collection query so it refetches after adding', async () => {
     let getCount = 0;
     server.use(
-      http.get('http://localhost:8080/api/weapons', () => {
+      http.get('http://localhost:8080/weapons', () => {
         getCount += 1;
         return HttpResponse.json(weaponsDocument([]));
       }),
-      http.post('http://localhost:8080/api/weapons', () =>
+      http.post('http://localhost:8080/weapons', () =>
         HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 1)])),
       ),
     );
@@ -95,7 +95,7 @@ describe('useSetRefinementLevelMutation', () => {
   it('PATCHes the requested refinement level and returns the parsed weapon', async () => {
     let patchBody: unknown;
     server.use(
-      http.patch('http://localhost:8080/api/weapons/weapon-instance-1', async ({ request }) => {
+      http.patch('http://localhost:8080/weapons/weapon-instance-1', async ({ request }) => {
         patchBody = await request.json();
         return HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 5)]));
       }),

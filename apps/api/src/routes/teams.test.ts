@@ -87,13 +87,13 @@ describe('Team routes', () => {
     vi.restoreAllMocks();
   });
 
-  describe('GET /api/teams', () => {
+  describe('GET /teams', () => {
     let res: Response;
     let body: CollectionDocument;
 
     beforeEach(async () => {
       vi.mocked(Teams.list).mockResolvedValue([FAKE_TEAM, FAKE_EMPTY_TEAM]);
-      res = await app.request(authedRequest('GET', '/api/teams'));
+      res = await app.request(authedRequest('GET', '/teams'));
       body = (await res.json()) as CollectionDocument;
     });
 
@@ -121,7 +121,7 @@ describe('Team routes', () => {
     it('returns empty items when no teams exist', async () => {
       vi.mocked(Teams.list).mockResolvedValue([]);
 
-      const res = await app.request(authedRequest('GET', '/api/teams'));
+      const res = await app.request(authedRequest('GET', '/teams'));
 
       const body = (await res.json()) as CollectionDocument;
       expect(body.collection.items).toEqual([]);
@@ -130,7 +130,7 @@ describe('Team routes', () => {
     it('returns 500 when repository throws', async () => {
       vi.mocked(Teams.list).mockRejectedValue(new Error('Firestore unavailable'));
 
-      const res = await app.request(authedRequest('GET', '/api/teams'));
+      const res = await app.request(authedRequest('GET', '/teams'));
 
       expect(res.status).toBe(500);
       const body = (await res.json()) as { detail: string };
@@ -138,13 +138,13 @@ describe('Team routes', () => {
     });
   });
 
-  describe('GET /api/teams/:slot', () => {
+  describe('GET /teams/:slot', () => {
     let res: Response;
     let body: CollectionDocument;
 
     beforeEach(async () => {
       vi.mocked(Teams.get).mockResolvedValue(FAKE_TEAM);
-      res = await app.request(authedRequest('GET', '/api/teams/1'));
+      res = await app.request(authedRequest('GET', '/teams/1'));
       body = (await res.json()) as CollectionDocument;
     });
 
@@ -172,7 +172,7 @@ describe('Team routes', () => {
     it('returns 404 when team not found', async () => {
       vi.mocked(Teams.get).mockResolvedValue(null);
 
-      const res = await app.request(authedRequest('GET', '/api/teams/1'));
+      const res = await app.request(authedRequest('GET', '/teams/1'));
 
       expect(res.status).toBe(404);
       const body = (await res.json()) as { detail: string };
@@ -180,7 +180,7 @@ describe('Team routes', () => {
     });
 
     it('returns 404 for invalid slot', async () => {
-      const res = await app.request(authedRequest('GET', '/api/teams/5'));
+      const res = await app.request(authedRequest('GET', '/teams/5'));
 
       expect(res.status).toBe(404);
       const body = (await res.json()) as { detail: string };
@@ -188,25 +188,25 @@ describe('Team routes', () => {
     });
 
     it('returns 404 for non-numeric slot', async () => {
-      const res = await app.request(authedRequest('GET', '/api/teams/abc'));
+      const res = await app.request(authedRequest('GET', '/teams/abc'));
 
       expect(res.status).toBe(404);
     });
 
     it('returns 404 for slot with trailing characters', async () => {
-      const res = await app.request(authedRequest('GET', '/api/teams/1abc'));
+      const res = await app.request(authedRequest('GET', '/teams/1abc'));
 
       expect(res.status).toBe(404);
     });
 
     it('returns 404 for non-canonical slot like 01', async () => {
-      const res = await app.request(authedRequest('GET', '/api/teams/01'));
+      const res = await app.request(authedRequest('GET', '/teams/01'));
 
       expect(res.status).toBe(404);
     });
   });
 
-  describe('PUT /api/teams/:slot', () => {
+  describe('PUT /teams/:slot', () => {
     beforeEach(() => {
       mockCharacterOwned();
       mockWeaponOwned();
@@ -222,7 +222,7 @@ describe('Team routes', () => {
         created: true,
       });
       res = await app.request(
-        authedRequest('PUT', '/api/teams/1', {
+        authedRequest('PUT', '/teams/1', {
           name: 'Team 1',
           members: FAKE_TEAM.members,
         }),
@@ -258,7 +258,7 @@ describe('Team routes', () => {
       });
 
       const res = await app.request(
-        authedRequest('PUT', '/api/teams/1', {
+        authedRequest('PUT', '/teams/1', {
           name: 'Updated Team',
         }),
       );
@@ -267,7 +267,7 @@ describe('Team routes', () => {
     });
 
     it('returns 404 for invalid slot', async () => {
-      const res = await app.request(authedRequest('PUT', '/api/teams/5', { name: 'Team' }));
+      const res = await app.request(authedRequest('PUT', '/teams/5', { name: 'Team' }));
 
       expect(res.status).toBe(404);
       const body = (await res.json()) as { detail: string };
@@ -280,7 +280,7 @@ describe('Team routes', () => {
         created: false,
       });
 
-      const res = await app.request(authedRequest('PUT', '/api/teams/1', { name: 'Renamed' }));
+      const res = await app.request(authedRequest('PUT', '/teams/1', { name: 'Renamed' }));
 
       expect(res.status).toBe(200);
     });
@@ -292,7 +292,7 @@ describe('Team routes', () => {
       });
 
       const res = await app.request(
-        authedRequest('PUT', '/api/teams/1', { members: [null, null, null, null] }),
+        authedRequest('PUT', '/teams/1', { members: [null, null, null, null] }),
       );
 
       expect(res.status).toBe(200);
@@ -313,7 +313,7 @@ describe('Team routes', () => {
       });
 
       const res = await app.request(
-        authedRequest('PUT', '/api/teams/1', {
+        authedRequest('PUT', '/teams/1', {
           members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }, null, null, null],
         }),
       );
@@ -331,7 +331,7 @@ describe('Team routes', () => {
       });
 
       const res = await app.request(
-        authedRequest('PUT', '/api/teams/1', {
+        authedRequest('PUT', '/teams/1', {
           members: [{ characterId: 'hu-tao' }, null, null, null],
         }),
       );
@@ -341,7 +341,7 @@ describe('Team routes', () => {
 
     it('returns 422 when members array has more than 4', async () => {
       const res = await app.request(
-        authedRequest('PUT', '/api/teams/1', {
+        authedRequest('PUT', '/teams/1', {
           members: [
             { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' },
             { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
@@ -357,7 +357,7 @@ describe('Team routes', () => {
 
     it('returns 422 when members array has fewer than 4', async () => {
       const res = await app.request(
-        authedRequest('PUT', '/api/teams/1', {
+        authedRequest('PUT', '/teams/1', {
           members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }],
         }),
       );
@@ -367,7 +367,7 @@ describe('Team routes', () => {
 
     it('returns 422 when body contains extra properties', async () => {
       const res = await app.request(
-        authedRequest('PUT', '/api/teams/1', { name: 'Team', extra: true }),
+        authedRequest('PUT', '/teams/1', { name: 'Team', extra: true }),
       );
 
       expect(res.status).toBe(422);
@@ -375,7 +375,7 @@ describe('Team routes', () => {
 
     it('returns 400 when body is not valid JSON', async () => {
       const res = await app.request(
-        new Request('http://localhost/api/teams/1', {
+        new Request('http://localhost/teams/1', {
           method: 'PUT',
           headers: { Authorization: 'Bearer valid-token', 'Content-Type': 'application/json' },
           body: 'not-json',
@@ -388,7 +388,7 @@ describe('Team routes', () => {
     describe('ownership validation', () => {
       it('returns 400 for duplicate character IDs', async () => {
         const res = await app.request(
-          authedRequest('PUT', '/api/teams/1', {
+          authedRequest('PUT', '/teams/1', {
             members: [
               { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' },
               { characterId: 'hu-tao', weaponInstanceId: 'uuid-2' },
@@ -407,7 +407,7 @@ describe('Team routes', () => {
         vi.mocked(Characters.get).mockResolvedValue(null);
 
         const res = await app.request(
-          authedRequest('PUT', '/api/teams/1', {
+          authedRequest('PUT', '/teams/1', {
             members: [
               { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' },
               { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
@@ -426,7 +426,7 @@ describe('Team routes', () => {
         vi.mocked(Weapons.get).mockResolvedValue(null);
 
         const res = await app.request(
-          authedRequest('PUT', '/api/teams/1', {
+          authedRequest('PUT', '/teams/1', {
             members: [
               { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' },
               { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
@@ -443,7 +443,7 @@ describe('Team routes', () => {
 
       it('returns 400 when duplicate weapon instance IDs in same team', async () => {
         const res = await app.request(
-          authedRequest('PUT', '/api/teams/1', {
+          authedRequest('PUT', '/teams/1', {
             members: [
               { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' },
               { characterId: 'xingqiu', weaponInstanceId: 'uuid-1' },
@@ -473,7 +473,7 @@ describe('Team routes', () => {
         ]);
 
         const res = await app.request(
-          authedRequest('PUT', '/api/teams/1', {
+          authedRequest('PUT', '/teams/1', {
             members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }, null, null, null],
           }),
         );
@@ -510,7 +510,7 @@ describe('Team routes', () => {
         });
 
         const res = await app.request(
-          authedRequest('PUT', '/api/teams/1', {
+          authedRequest('PUT', '/teams/1', {
             members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }, null, null, null],
           }),
         );
@@ -520,7 +520,7 @@ describe('Team routes', () => {
 
       it('returns 400 for unknown artifact set', async () => {
         const res = await app.request(
-          authedRequest('PUT', '/api/teams/1', {
+          authedRequest('PUT', '/teams/1', {
             members: [
               {
                 characterId: 'hu-tao',
@@ -548,7 +548,7 @@ describe('Team routes', () => {
 
       it('returns 400 when priority and secondary minor affixes overlap', async () => {
         const res = await app.request(
-          authedRequest('PUT', '/api/teams/1', {
+          authedRequest('PUT', '/teams/1', {
             members: [
               {
                 characterId: 'hu-tao',
@@ -581,7 +581,7 @@ describe('Team routes', () => {
         });
 
         const res = await app.request(
-          authedRequest('PUT', '/api/teams/1', {
+          authedRequest('PUT', '/teams/1', {
             members: [
               {
                 characterId: 'hu-tao',
@@ -612,7 +612,7 @@ describe('Team routes', () => {
         });
 
         const res = await app.request(
-          authedRequest('PUT', '/api/teams/1', {
+          authedRequest('PUT', '/teams/1', {
             members: [
               {
                 characterId: 'hu-tao',
@@ -640,7 +640,7 @@ describe('Team routes', () => {
         });
 
         const res = await app.request(
-          authedRequest('PUT', '/api/teams/1', {
+          authedRequest('PUT', '/teams/1', {
             members: [
               {
                 characterId: 'hu-tao',
@@ -666,7 +666,7 @@ describe('Team routes', () => {
         });
 
         const res = await app.request(
-          authedRequest('PUT', '/api/teams/1', {
+          authedRequest('PUT', '/teams/1', {
             members: [
               {
                 characterId: 'hu-tao',
@@ -685,11 +685,11 @@ describe('Team routes', () => {
     });
   });
 
-  describe('DELETE /api/teams/:slot', () => {
+  describe('DELETE /teams/:slot', () => {
     it('returns 204 with no body', async () => {
       vi.mocked(Teams.remove).mockResolvedValue();
 
-      const res = await app.request(authedRequest('DELETE', '/api/teams/1'));
+      const res = await app.request(authedRequest('DELETE', '/teams/1'));
 
       expect(res.status).toBe(204);
       expect(await res.text()).toBe('');
@@ -698,13 +698,13 @@ describe('Team routes', () => {
     it('returns 204 when team does not exist', async () => {
       vi.mocked(Teams.remove).mockResolvedValue();
 
-      const res = await app.request(authedRequest('DELETE', '/api/teams/4'));
+      const res = await app.request(authedRequest('DELETE', '/teams/4'));
 
       expect(res.status).toBe(204);
     });
 
     it('returns 404 for invalid slot', async () => {
-      const res = await app.request(authedRequest('DELETE', '/api/teams/5'));
+      const res = await app.request(authedRequest('DELETE', '/teams/5'));
 
       expect(res.status).toBe(404);
       const body = (await res.json()) as { detail: string };

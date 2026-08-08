@@ -71,7 +71,7 @@ body:
         - OS: macOS 15
 
         For API or backend issues:
-        - Endpoint: POST /api/teams
+        - Endpoint: POST /teams
         - Node: 22.x
         - OS: Debian 13
 

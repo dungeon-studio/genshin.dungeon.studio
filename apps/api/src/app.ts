@@ -99,10 +99,10 @@ app.notFound((c) =>
 app.route('/health', health);
 app.route('/profiles/json-schema', jsonSchemaProfiles);
 app.route('/profiles/alps', alpsProfiles);
-app.route('/api/characters', characters);
-app.route('/api/profile', userProfile);
-app.route('/api/teams', teams);
-app.route('/api/weapons', weapons);
+app.route('/characters', characters);
+app.route('/profile', userProfile);
+app.route('/teams', teams);
+app.route('/weapons', weapons);
 
 // Root must be registered after all other routes so it can discover them
 app.route('/', root(app));

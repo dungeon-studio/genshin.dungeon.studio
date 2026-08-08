@@ -3,7 +3,12 @@
 
 import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
 import type { ConstellationLevel } from '@genshin/domain';
-import { characterItemHref, characterRepresentation, serialiseCharacter } from '@genshin/domain';
+import {
+  characterCollectionHref,
+  characterItemHref,
+  characterRepresentation,
+  serialiseCharacter,
+} from '@genshin/domain';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import type { FromSchema } from 'json-schema-to-ts';
@@ -38,7 +43,7 @@ type SaveCharacterBody = FromSchema<typeof characterPutRequestV1.schema> & {
   constellationLevel: ConstellationLevel;
 };
 
-// GET /api/characters — List user's character collection
+// GET /characters — List user's character collection
 characters.get('/', async (c) => {
   const userId = c.get('user').uid;
   const items = await Characters.list(userId);
@@ -48,7 +53,7 @@ characters.get('/', async (c) => {
     JSON.stringify(
       serialiseCollection(
         characterRepresentation,
-        `${baseUrl}/api/characters`,
+        characterCollectionHref(baseUrl),
         items.map((item) => serialiseCharacter(item, baseUrl)),
       ),
     ),
@@ -58,7 +63,7 @@ characters.get('/', async (c) => {
   );
 });
 
-// GET /api/characters/:characterId — Get specific character record
+// GET /characters/:characterId — Get specific character record
 characters.get('/:characterId', async (c) => {
   const userId = c.get('user').uid;
   const { characterId } = c.req.param();
@@ -83,7 +88,7 @@ characters.get('/:characterId', async (c) => {
   );
 });
 
-// PUT /api/characters/:characterId — Save/update character (idempotent upsert)
+// PUT /characters/:characterId — Save/update character (idempotent upsert)
 characters.put(
   '/:characterId',
   negotiateRequestSchema([characterPutRequestV1]),
@@ -111,7 +116,7 @@ characters.put(
   },
 );
 
-// DELETE /api/characters/:characterId — Remove from collection
+// DELETE /characters/:characterId — Remove from collection
 characters.delete('/:characterId', async (c) => {
   const userId = c.get('user').uid;
   const { characterId } = c.req.param();

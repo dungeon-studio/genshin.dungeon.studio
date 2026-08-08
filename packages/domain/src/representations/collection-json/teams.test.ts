@@ -40,7 +40,7 @@ describe('team serialisation round-trip', () => {
 
   it('serialises with the correct href', () => {
     const item = serialiseTeam(VALID_TEAM, BASE_URL);
-    expect(item.href).toBe(`${BASE_URL}/api/teams/1`);
+    expect(item.href).toBe(`${BASE_URL}/teams/1`);
   });
 
   it('preserves all-null members through round-trip', () => {
@@ -105,7 +105,7 @@ describe('deserialiseTeam artifact plan validation', () => {
   function itemWithArtifactPlan(artifactPlan: unknown): Item {
     const members = [{ characterId: 'columbina', artifactPlan }, null, null, null];
     return {
-      href: `${BASE_URL}/api/teams/1`,
+      href: `${BASE_URL}/teams/1`,
       data: [
         { name: 'slot', value: 1 },
         { name: 'name', value: 'Team 1' },

@@ -12,7 +12,7 @@ import { rootGetResponseV1 } from '@/profiles/json-schema/root/get-response-v1.j
 /**
  * Discover top-level resource paths from the app's registered routes.
  * Returns GET-accessible paths that have a discrete handler (e.g.
- * `/api/characters`, `/health`).
+ * `/characters`, `/health`).
  *
  * Excludes the root path itself, wildcard catch-all routes (like
  * `/profiles/json-schema/*` and `/profiles/alps/*`), and sub-resource
@@ -33,7 +33,6 @@ function discoverLinks<E extends Env>(app: HonoApp<E>): Record<string, { href: s
     if (seen.has(path)) continue;
     seen.add(path);
 
-    // Derive a name from the last path segment: /api/characters → characters
     const segments = path.split('/').filter(Boolean);
     const name = segments[segments.length - 1];
     links[name] = { href: path };

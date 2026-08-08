@@ -48,7 +48,7 @@ export function useWeaponCollectionQuery(
   return useQuery({
     queryKey: weaponCollectionKey(userId ?? ''),
     queryFn: async () => {
-      const response = await apiGet('/api/weapons');
+      const response = await apiGet('/weapons');
       return parseWeaponCollectionResponse(response);
     },
     enabled: userId !== undefined,
@@ -62,7 +62,7 @@ export function useAddWeaponMutation(
 
   return useMutation({
     mutationFn: async (weaponId: string): Promise<WeaponMutationResult> => {
-      const response = await apiPost('/api/weapons', {
+      const response = await apiPost('/weapons', {
         weaponId,
         refinementLevel: MIN_REFINEMENT_LEVEL,
       });
@@ -82,7 +82,7 @@ export function useRemoveWeaponMutation(
 
   return useMutation({
     mutationFn: async (collectionWeaponId: CollectionWeaponId) => {
-      await apiDelete(`/api/weapons/${encodeURIComponent(collectionWeaponId)}`);
+      await apiDelete(`/weapons/${encodeURIComponent(collectionWeaponId)}`);
     },
     onSuccess: () => {
       if (userId !== undefined)
@@ -108,7 +108,7 @@ export function useSetRefinementLevelMutation(
       collectionWeaponId: CollectionWeaponId;
       level: number;
     }): Promise<WeaponMutationResult> => {
-      const response = await apiPatch(`/api/weapons/${encodeURIComponent(collectionWeaponId)}`, {
+      const response = await apiPatch(`/weapons/${encodeURIComponent(collectionWeaponId)}`, {
         refinementLevel: level,
       });
       return parseSingleWeaponResponse(response);

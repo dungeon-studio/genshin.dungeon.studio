@@ -28,7 +28,7 @@ describe('weapon serialisation round-trip', () => {
 
   it('serialises with the correct href', () => {
     const item = serialiseWeapon(VALID_WEAPON, BASE_URL);
-    expect(item.href).toBe(`${BASE_URL}/api/weapons/wep-001`);
+    expect(item.href).toBe(`${BASE_URL}/weapons/wep-001`);
   });
 
   it('includes a collection link for the weapon type', () => {

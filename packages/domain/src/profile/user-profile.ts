@@ -16,7 +16,7 @@ export interface UserProfile {
   updatedAt: ISOTimestamp;
 }
 
-/** The shape accepted by PATCH /api/profile. */
+/** The shape accepted by PATCH /profile. */
 export type ProfileUpdate = Partial<Pick<UserProfile, 'name'>>;
 
 export function assertUserProfile(value: unknown): asserts value is UserProfile {

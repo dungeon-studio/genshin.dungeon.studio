@@ -23,7 +23,7 @@ const CHARACTER = 'skirk' as CharacterId;
 describe('useCharacterCollectionQuery', () => {
   it('returns the deserialised characters keyed by id', async () => {
     server.use(
-      http.get('http://localhost:8080/api/characters', () =>
+      http.get('http://localhost:8080/characters', () =>
         HttpResponse.json(charactersDocument([makeCharacter(CHARACTER, 2)])),
       ),
     );
@@ -43,7 +43,7 @@ describe('useAddCharacterMutation', () => {
   it('PUTs the minimum constellation level and returns the parsed entry', async () => {
     let putBody: unknown;
     server.use(
-      http.put('http://localhost:8080/api/characters/skirk', async ({ request }) => {
+      http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
         putBody = await request.json();
         return HttpResponse.json(charactersDocument([makeCharacter(CHARACTER, 0)]));
       }),
@@ -68,11 +68,11 @@ describe('useAddCharacterMutation', () => {
   it('invalidates the collection query so it refetches after adding', async () => {
     let getCount = 0;
     server.use(
-      http.get('http://localhost:8080/api/characters', () => {
+      http.get('http://localhost:8080/characters', () => {
         getCount += 1;
         return HttpResponse.json(charactersDocument([]));
       }),
-      http.put('http://localhost:8080/api/characters/skirk', () =>
+      http.put('http://localhost:8080/characters/skirk', () =>
         HttpResponse.json(charactersDocument([makeCharacter(CHARACTER, 0)])),
       ),
     );
@@ -100,7 +100,7 @@ describe('useSetConstellationLevelMutation', () => {
   it('PUTs the requested level and returns the parsed entry', async () => {
     let putBody: unknown;
     server.use(
-      http.put('http://localhost:8080/api/characters/skirk', async ({ request }) => {
+      http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
         putBody = await request.json();
         return HttpResponse.json(charactersDocument([makeCharacter(CHARACTER, 4)]));
       }),

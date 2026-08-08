@@ -54,7 +54,7 @@ function parseSlot(param: string): TeamSlot {
   return slot;
 }
 
-// GET /api/teams — List user's teams
+// GET /teams — List user's teams
 teams.get('/', async (c) => {
   const userId = c.get('user').uid;
   const items = await Teams.list(userId);
@@ -65,7 +65,7 @@ teams.get('/', async (c) => {
   });
 });
 
-// GET /api/teams/:slot — Get specific team
+// GET /teams/:slot — Get specific team
 teams.get('/:slot', async (c) => {
   const userId = c.get('user').uid;
   const slot = parseSlot(c.req.param('slot'));
@@ -83,7 +83,7 @@ teams.get('/:slot', async (c) => {
   });
 });
 
-// PUT /api/teams/:slot — Create or update team composition (idempotent upsert)
+// PUT /teams/:slot — Create or update team composition (idempotent upsert)
 teams.put(
   '/:slot',
   negotiateRequestSchema([teamPutRequestV1]),
@@ -123,7 +123,7 @@ teams.put(
   },
 );
 
-// DELETE /api/teams/:slot — Remove team
+// DELETE /teams/:slot — Remove team
 teams.delete('/:slot', async (c) => {
   const userId = c.get('user').uid;
   const slot = parseSlot(c.req.param('slot'));

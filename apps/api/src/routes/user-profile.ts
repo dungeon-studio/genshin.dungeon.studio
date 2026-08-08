@@ -42,7 +42,7 @@ userProfile.use(
 // @genshin/domain handles building the composite response from an AuthIdentity
 // and a UserProfile.
 
-// GET /api/profile — Return the authenticated user's composite profile
+// GET /profile — Return the authenticated user's composite profile
 userProfile.get('/', async (c) => {
   const decoded = c.get('user');
   const profile = await Profile.get(decoded.uid);
@@ -56,7 +56,7 @@ userProfile.get('/', async (c) => {
   });
 });
 
-// PATCH /api/profile — Partial update of mutable profile fields
+// PATCH /profile — Partial update of mutable profile fields
 userProfile.patch(
   '/',
   negotiateRequestSchema([profilePatchRequestV1]),

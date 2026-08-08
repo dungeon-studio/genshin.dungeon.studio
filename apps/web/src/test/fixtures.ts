@@ -13,10 +13,13 @@ import type {
   UUID,
 } from '@genshin/domain';
 import {
+  characterCollectionHref,
   createEmptyTeam,
   serialiseCharacter,
   serialiseTeam,
   serialiseWeapon,
+  teamCollectionHref,
+  weaponCollectionHref,
 } from '@genshin/domain';
 import type { WeaponId } from '@genshin/game-data';
 
@@ -64,21 +67,21 @@ export function makeTeam(slot: TeamSlot, overrides: Partial<CollectionTeam> = {}
 // Collection+JSON envelope builders producing the wire format the hooks parse.
 export function charactersDocument(characters: CollectionCharacter[]): CollectionDocument {
   return buildCollection(
-    `${API_BASE_URL}/api/characters`,
+    characterCollectionHref(API_BASE_URL),
     characters.map((character) => serialiseCharacter(character, API_BASE_URL)),
   );
 }
 
 export function weaponsDocument(weapons: CollectionWeapon[]): CollectionDocument {
   return buildCollection(
-    `${API_BASE_URL}/api/weapons`,
+    weaponCollectionHref(API_BASE_URL),
     weapons.map((weapon) => serialiseWeapon(weapon, API_BASE_URL)),
   );
 }
 
 export function teamsDocument(teams: CollectionTeam[]): CollectionDocument {
   return buildCollection(
-    `${API_BASE_URL}/api/teams`,
+    teamCollectionHref(API_BASE_URL),
     teams.map((team) => serialiseTeam(team, API_BASE_URL)),
   );
 }

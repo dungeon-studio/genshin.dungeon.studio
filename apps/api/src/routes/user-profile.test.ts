@@ -59,13 +59,13 @@ describe('Profile routes', () => {
 
   describe('authentication', () => {
     it('returns 401 without Authorization header', async () => {
-      const res = await app.request('/api/profile');
+      const res = await app.request('/profile');
 
       expect(res.status).toBe(401);
     });
 
     it('returns 401 with malformed Authorization header', async () => {
-      const res = await app.request('/api/profile', {
+      const res = await app.request('/profile', {
         headers: { Authorization: 'NotBearer token' },
       });
 
@@ -75,7 +75,7 @@ describe('Profile routes', () => {
     it('returns 401 when token is expired', async () => {
       vi.mocked(verifyToken).mockRejectedValue({ code: 'auth/id-token-expired' });
 
-      const res = await app.request(authedRequest('GET', '/api/profile'));
+      const res = await app.request(authedRequest('GET', '/profile'));
 
       expect(res.status).toBe(401);
       const body = (await res.json()) as { detail: string };
@@ -83,11 +83,11 @@ describe('Profile routes', () => {
     });
   });
 
-  describe('GET /api/profile', () => {
+  describe('GET /profile', () => {
     it('returns 200 with a response matching the profile schema', async () => {
       vi.mocked(Profile.get).mockResolvedValue(FAKE_PROFILE);
 
-      const res = await app.request(authedRequest('GET', '/api/profile'));
+      const res = await app.request(authedRequest('GET', '/profile'));
 
       expect(res.status).toBe(200);
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
@@ -99,7 +99,7 @@ describe('Profile routes', () => {
     it('returns 404 when profile does not exist', async () => {
       vi.mocked(Profile.get).mockResolvedValue(null);
 
-      const res = await app.request(authedRequest('GET', '/api/profile'));
+      const res = await app.request(authedRequest('GET', '/profile'));
 
       expect(res.status).toBe(404);
       const body = (await res.json()) as { detail: string };
@@ -109,7 +109,7 @@ describe('Profile routes', () => {
     it('returns 500 when repository throws', async () => {
       vi.mocked(Profile.get).mockRejectedValue(new Error('Firestore unavailable'));
 
-      const res = await app.request(authedRequest('GET', '/api/profile'));
+      const res = await app.request(authedRequest('GET', '/profile'));
 
       expect(res.status).toBe(500);
       const body = (await res.json()) as { detail: string };
@@ -117,12 +117,12 @@ describe('Profile routes', () => {
     });
   });
 
-  describe('PATCH /api/profile', () => {
+  describe('PATCH /profile', () => {
     it('returns 200 with a response matching the profile schema', async () => {
       const updated = { ...FAKE_PROFILE, name: 'Aether' };
       vi.mocked(Profile.update).mockResolvedValue(updated);
 
-      const res = await app.request(authedRequest('PATCH', '/api/profile', { name: 'Aether' }));
+      const res = await app.request(authedRequest('PATCH', '/profile', { name: 'Aether' }));
 
       expect(res.status).toBe(200);
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
@@ -132,14 +132,14 @@ describe('Profile routes', () => {
     });
 
     it('rejects empty body', async () => {
-      const res = await app.request(authedRequest('PATCH', '/api/profile', {}));
+      const res = await app.request(authedRequest('PATCH', '/profile', {}));
 
       expect(res.status).toBe(422);
     });
 
     it('rejects auth-managed fields', async () => {
       const res = await app.request(
-        authedRequest('PATCH', '/api/profile', { email: 'hacked@example.com' }),
+        authedRequest('PATCH', '/profile', { email: 'hacked@example.com' }),
       );
 
       expect(res.status).toBe(422);
@@ -147,7 +147,7 @@ describe('Profile routes', () => {
 
     it('rejects system-managed fields', async () => {
       const res = await app.request(
-        authedRequest('PATCH', '/api/profile', { createdAt: '2020-01-01T00:00:00.000Z' }),
+        authedRequest('PATCH', '/profile', { createdAt: '2020-01-01T00:00:00.000Z' }),
       );
 
       expect(res.status).toBe(422);
@@ -155,7 +155,7 @@ describe('Profile routes', () => {
 
     it('rejects unknown fields', async () => {
       const res = await app.request(
-        authedRequest('PATCH', '/api/profile', { name: 'Aether', role: 'admin' }),
+        authedRequest('PATCH', '/profile', { name: 'Aether', role: 'admin' }),
       );
 
       expect(res.status).toBe(422);
@@ -163,7 +163,7 @@ describe('Profile routes', () => {
 
     it('rejects request without JSON body', async () => {
       const res = await app.request(
-        new Request('http://localhost/api/profile', {
+        new Request('http://localhost/profile', {
           method: 'PATCH',
           headers: { Authorization: 'Bearer valid-token' },
         }),
