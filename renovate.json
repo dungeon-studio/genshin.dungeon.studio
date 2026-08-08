@@ -41,11 +41,6 @@
       "groupName": "reuse"
     },
     {
-      "description": "Move hadolint in one pull request across the ci.yml pin and the devcontainer bootstrap script",
-      "matchDepNames": ["hadolint/hadolint"],
-      "groupName": "hadolint"
-    },
-    {
       "description": "Move the lychee binary in one pull request across the ci.yml pin and the devcontainer bootstrap script; lycheeverse/lychee-action versions separately and stays out of the group",
       "matchDepNames": ["lycheeverse/lychee"],
       "groupName": "lychee"

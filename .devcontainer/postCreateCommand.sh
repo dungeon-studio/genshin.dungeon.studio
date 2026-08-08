@@ -50,19 +50,7 @@ step "Installing reuse-tool"
 "${REPO_ROOT}/scripts/install-reuse.sh"
 
 # ---------------------------------------------------------------------------
-# 6. Dockerfile linter
-# ---------------------------------------------------------------------------
-step "Installing hadolint"
-
-# renovate: datasource=github-releases depName=hadolint/hadolint
-HADOLINT_VERSION="v2.15.1"
-sudo curl -fsSL \
-  "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64" \
-  -o /usr/local/bin/hadolint
-sudo chmod +x /usr/local/bin/hadolint
-
-# ---------------------------------------------------------------------------
-# 7. Link checker
+# 6. Link checker
 # ---------------------------------------------------------------------------
 step "Installing lychee"
 
@@ -75,7 +63,7 @@ curl -fsSL \
 sudo chmod +x /usr/local/bin/lychee
 
 # ---------------------------------------------------------------------------
-# 8. Playwright browsers (for the end-to-end suite and the Playwright MCP server)
+# 7. Playwright browsers (for the end-to-end suite and the Playwright MCP server)
 # ---------------------------------------------------------------------------
 step "Installing Playwright Chromium and Chrome"
 
