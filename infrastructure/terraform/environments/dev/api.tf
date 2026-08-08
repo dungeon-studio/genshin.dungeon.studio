@@ -8,20 +8,20 @@ locals {
   # NOTE: Cloud Run domain mappings expect a bare domain name without a
   # trailing dot. The corresponding DNS CNAME record in core intentionally
   # uses an FQDN with a trailing dot.
-  api_domain_name = "api.develop.genshin.dungeon.studio"
+  api_domain_name = "api.${local.web_domain}"
   api_route_name  = "api"
 }
 
 # Enable APIs required for API image storage and runtime deployment
 resource "google_project_service" "artifactregistry" {
-  project = var.gcp_dev_project_id
+  project = var.project_id
   service = "artifactregistry.googleapis.com"
 
   disable_on_destroy = false
 }
 
 resource "google_project_service" "cloudrun" {
-  project = var.gcp_dev_project_id
+  project = var.project_id
   service = "run.googleapis.com"
 
   disable_on_destroy = false
@@ -34,7 +34,7 @@ resource "google_project_service" "cloudrun" {
 
 # Artifact Registry repository for API container images
 resource "google_artifact_registry_repository" "api" {
-  project       = var.gcp_dev_project_id
+  project       = var.project_id
   location      = local.api_artifact_repository_location
   repository_id = local.api_artifact_repository_name
   format        = "DOCKER"
@@ -51,12 +51,12 @@ resource "google_artifact_registry_repository" "api" {
 resource "google_cloud_run_domain_mapping" "api" {
   count = var.enable_api_domain_mapping ? 1 : 0
 
-  project  = var.gcp_dev_project_id
+  project  = var.project_id
   location = local.api_cloud_run_location
   name     = local.api_domain_name
 
   metadata {
-    namespace = var.gcp_dev_project_id
+    namespace = var.project_id
   }
 
   spec {
@@ -73,7 +73,7 @@ resource "google_cloud_run_domain_mapping" "api" {
 resource "google_cloud_run_service_iam_member" "api_public_invoker" {
   count = var.enable_api_public_invoker ? 1 : 0
 
-  project  = var.gcp_dev_project_id
+  project  = var.project_id
   location = local.api_cloud_run_location
   service  = local.api_route_name
 

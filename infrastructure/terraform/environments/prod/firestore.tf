@@ -7,7 +7,7 @@ locals {
 
 # Enable Firestore API
 resource "google_project_service" "firestore" {
-  project = var.gcp_prod_project_id
+  project = var.project_id
   service = "firestore.googleapis.com"
 
   disable_on_destroy = false
@@ -15,7 +15,7 @@ resource "google_project_service" "firestore" {
 
 # Firestore database for application persistence
 resource "google_firestore_database" "default" {
-  project     = var.gcp_prod_project_id
+  project     = var.project_id
   name        = local.firestore_database_name
   location_id = var.firestore_location_id
   type        = "FIRESTORE_NATIVE"

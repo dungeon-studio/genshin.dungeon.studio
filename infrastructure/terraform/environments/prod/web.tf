@@ -4,14 +4,14 @@
 # Initialize Firebase on the GCP project
 resource "google_firebase_project" "default" {
   provider = google-beta
-  project  = var.gcp_prod_project_id
+  project  = var.project_id
 
   depends_on = [google_project_service.firebase]
 }
 
 # Enable Firebase Hosting API
 resource "google_project_service" "firebase_hosting" {
-  project = var.gcp_prod_project_id
+  project = var.project_id
   service = "firebasehosting.googleapis.com"
 
   disable_on_destroy = false
@@ -22,7 +22,7 @@ resource "google_project_service" "firebase_hosting" {
 # Firebase Hosting site for the web application
 resource "google_firebase_hosting_site" "web" {
   provider = google-beta
-  project  = var.gcp_prod_project_id
+  project  = var.project_id
   site_id  = "dungeon-studio-genshin-prod"
 
   depends_on = [
@@ -36,9 +36,9 @@ resource "google_firebase_hosting_custom_domain" "web" {
   count = var.enable_web_custom_domain ? 1 : 0
 
   provider      = google-beta
-  project       = var.gcp_prod_project_id
+  project       = var.project_id
   site_id       = google_firebase_hosting_site.web.site_id
-  custom_domain = "genshin.dungeon.studio"
+  custom_domain = local.web_domain
 
   cert_preference       = "GROUPED"
   wait_dns_verification = false
@@ -50,7 +50,7 @@ resource "google_firebase_hosting_custom_domain" "web" {
 # The SDK config (API key, auth domain, etc.) is derived from this resource.
 resource "google_firebase_web_app" "web" {
   provider     = google-beta
-  project      = var.gcp_prod_project_id
+  project      = var.project_id
   display_name = "Genshin Planner"
 
   depends_on = [google_firebase_project.default]
@@ -59,6 +59,6 @@ resource "google_firebase_web_app" "web" {
 # Read the SDK config for the registered web app.
 data "google_firebase_web_app_config" "web" {
   provider   = google-beta
-  project    = var.gcp_prod_project_id
+  project    = var.project_id
   web_app_id = google_firebase_web_app.web.app_id
 }

@@ -3,7 +3,7 @@
 
 # Enable Secret Manager API for the project.
 resource "google_project_service" "secretmanager" {
-  project = var.gcp_dev_project_id
+  project = var.project_id
   service = "secretmanager.googleapis.com"
 
   disable_on_destroy = false
@@ -13,7 +13,7 @@ resource "google_project_service" "secretmanager" {
 # The actual value must be stored manually via GCP Console or gcloud CLI
 # after creating the OAuth consent screen.
 resource "google_secret_manager_secret" "firebase_auth_google_client_id" {
-  project   = var.gcp_dev_project_id
+  project   = var.project_id
   secret_id = "firebase-auth-google-client-id"
 
   labels = var.common_labels
@@ -29,7 +29,7 @@ resource "google_secret_manager_secret" "firebase_auth_google_client_id" {
 # The actual value must be stored manually via GCP Console or gcloud CLI
 # after creating the OAuth consent screen.
 resource "google_secret_manager_secret" "firebase_auth_google_client_secret" {
-  project   = var.gcp_dev_project_id
+  project   = var.project_id
   secret_id = "firebase-auth-google-client-secret"
 
   labels = var.common_labels

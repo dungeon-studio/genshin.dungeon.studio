@@ -16,13 +16,17 @@ terraform {
 }
 
 provider "google" {
-  project = var.gcp_dev_project_id
+  project = var.project_id
 }
 
 provider "google-beta" {
-  project = var.gcp_dev_project_id
+  project = var.project_id
 }
 
-data "google_project" "dev" {
-  project_id = var.gcp_dev_project_id
+# `web_domain` is this environment's own hostname; `base_domain` is the
+# registrable domain every environment shares, which is what Identity Platform
+# has to trust for sign-in redirects regardless of which environment serves.
+locals {
+  base_domain = "genshin.dungeon.studio"
+  web_domain  = "develop.${local.base_domain}"
 }

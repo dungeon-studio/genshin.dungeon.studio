@@ -12,9 +12,5 @@ terraform {
 }
 
 provider "google" {
-  project = var.gcp_staging_project_id
-}
-
-data "google_project" "staging" {
-  project_id = var.gcp_staging_project_id
+  project = var.project_id
 }
