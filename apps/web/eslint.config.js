@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: MIT
 
 import eslintReact from '@eslint-react/eslint-plugin';
-import genshinConfig from '@genshin/eslint-config';
+import genshinConfig, { TYPESCRIPT_FILES } from '@genshin/eslint-config';
 import { defineConfig } from 'eslint/config';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 
-const TS_FILES = ['**/*.{ts,tsx}'];
 const TEST_FILES = ['**/*.{test,spec}.{ts,tsx}', 'src/test/**/*.{ts,tsx}'];
 const SHADCN_SCAFFOLDS = ['src/components/ui/**/*.{ts,tsx}'];
 
@@ -30,21 +29,25 @@ const RULES_OWNED_BY_REACT_HOOKS = {
   '@eslint-react/use-memo': 'off',
 };
 
+// Scoping every block to `TYPESCRIPT_FILES` is deliberate, not leftover: this
+// workspace also lints `eslint.config.js`, `postcss.config.js`, and
+// `tailwind.config.js`, which none of the rules below apply to.
 export default defineConfig([
   genshinConfig(import.meta.dirname),
   {
-    // The glob is not redundant: `postcss.config.js` and `tailwind.config.js`
-    // are linted too, and the React rules have nothing to say about them.
-    files: TS_FILES,
+    files: TYPESCRIPT_FILES,
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+    },
+  },
+  {
+    files: TYPESCRIPT_FILES,
     extends: [
       eslintReact.configs['recommended-typescript'],
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
-    languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
-    },
     rules: {
       // Wants every `useRef` result named `*Ref`; ours hold mutable instance
       // state rather than element handles.
@@ -52,6 +55,11 @@ export default defineConfig([
       ...RULES_OWNED_BY_REACT_HOOKS,
       // The Vite preset errors; a missed fast refresh costs a manual reload.
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+    },
+  },
+  {
+    files: TYPESCRIPT_FILES,
+    rules: {
       '@typescript-eslint/naming-convention': [
         'error',
         {
@@ -68,7 +76,7 @@ export default defineConfig([
     // `function-component-definition` has no counterpart. The version pin
     // avoids a `detect` path that calls an API ESLint 10 removed. Registered by
     // hand because this plugin's only flat preset turns on 22 other rules.
-    files: TS_FILES,
+    files: TYPESCRIPT_FILES,
     plugins: { react },
     settings: { react: { version: '19' } },
     rules: {
