@@ -1,8 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { ProblemDetail } from '@genshin/domain';
+import type { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
+
+import { retryAfterSeconds } from './retry-after.js';
 
 /** RFC 9457's type for a problem with no classification beyond its status. */
 export const ABOUT_BLANK = 'about:blank';
@@ -34,4 +38,28 @@ export class ProblemException extends HTTPException {
 /** How an error classifies, which is `about:blank` unless it says otherwise. */
 export function problemTypeOf(err: unknown): string {
   return err instanceof ProblemException ? err.type : ABOUT_BLANK;
+}
+
+/** A problem document, narrowed to the statuses permitted to carry a body. */
+type ProblemPayload = Omit<ProblemDetail, 'status'> & { status: ContentfulStatusCode };
+
+/**
+ * The HTTP response carrying a problem document.
+ *
+ * Serialises through `c.body()` rather than `c.json()` because `c.json()`,
+ * handed a `ResponseInit`, layers its own `application/json` over the
+ * Content-Type that init carried — which would leave an error indistinguishable
+ * from a success to a client branching on the media type. `c.body()` applies no
+ * default of its own.
+ *
+ * Every problem response goes through here so that the media type and the
+ * retry hint stay properties of a problem response rather than something each
+ * call site has to remember.
+ */
+export function problemResponse(c: Context, problem: ProblemPayload): Response {
+  const headers: Record<string, string> = { 'Content-Type': 'application/problem+json' };
+  const retryAfter = retryAfterSeconds(problem.status);
+  if (retryAfter !== undefined) headers['Retry-After'] = String(retryAfter);
+
+  return c.body(JSON.stringify(problem), { status: problem.status, headers });
 }

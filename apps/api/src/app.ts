@@ -3,15 +3,13 @@
 
 import { STATUS_CODES } from 'node:http';
 
-import type { ProblemDetail } from '@genshin/domain';
 import { GoogleError } from 'google-gax';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 
-import { ABOUT_BLANK, problemTypeOf } from '@/http/problem.js';
-import { retryAfterSeconds } from '@/http/retry-after.js';
+import { ABOUT_BLANK, problemResponse, problemTypeOf } from '@/http/problem.js';
 import { allow } from '@/middleware/allow.js';
 import type { AuthVariables } from '@/middleware/auth.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
@@ -24,12 +22,6 @@ import { root } from '@/routes/root.js';
 import { teams } from '@/routes/teams.js';
 import { userProfile } from '@/routes/user-profile.js';
 import { weapons } from '@/routes/weapons.js';
-
-// Handlers below serialise through `c.body()` rather than `c.json()`: given a
-// `ResponseInit`, `c.json()` layers its own `application/json` over the
-// Content-Type the init carried, and would silently downgrade these to plain
-// JSON. `c.body()` applies no default of its own.
-export const PROBLEM_JSON = { 'Content-Type': 'application/problem+json' };
 
 export const app = new Hono<{
   Variables: Partial<AuthVariables> & NegotiatedResponseContentVariables;
@@ -60,43 +52,31 @@ app.onError((err, c) => {
   const resolved = err instanceof GoogleError ? firestoreErrorToHttpException(err) : err;
 
   if (resolved instanceof HTTPException) {
-    const headers: Record<string, string> = { ...PROBLEM_JSON };
-    const retryAfter = retryAfterSeconds(resolved.status);
-    if (retryAfter !== undefined) headers['Retry-After'] = String(retryAfter);
-    return c.body(
-      JSON.stringify({
-        type: problemTypeOf(resolved),
-        title: STATUS_CODES[resolved.status] ?? 'Unknown Error',
-        status: resolved.status,
-        detail: resolved.message,
-      } satisfies ProblemDetail),
-      { status: resolved.status, headers },
-    );
+    return problemResponse(c, {
+      type: problemTypeOf(resolved),
+      title: STATUS_CODES[resolved.status] ?? 'Unknown Error',
+      status: resolved.status,
+      detail: resolved.message,
+    });
   }
 
   console.error('Unexpected error:', resolved);
-  return c.body(
-    JSON.stringify({
-      type: ABOUT_BLANK,
-      title: 'Internal Server Error',
-      status: 500,
-      detail: 'An unexpected error occurred',
-    } satisfies ProblemDetail),
-    { status: 500, headers: PROBLEM_JSON },
-  );
+  return problemResponse(c, {
+    type: ABOUT_BLANK,
+    title: 'Internal Server Error',
+    status: 500,
+    detail: 'An unexpected error occurred',
+  });
 });
 
 // 404 handler for unmatched routes — RFC 9457 Problem Details
 app.notFound((c) =>
-  c.body(
-    JSON.stringify({
-      type: ABOUT_BLANK,
-      title: 'Not Found',
-      status: 404,
-      detail: 'The requested resource does not exist',
-    } satisfies ProblemDetail),
-    { status: 404, headers: PROBLEM_JSON },
-  ),
+  problemResponse(c, {
+    type: ABOUT_BLANK,
+    title: 'Not Found',
+    status: 404,
+    detail: 'The requested resource does not exist',
+  }),
 );
 
 // Routes
