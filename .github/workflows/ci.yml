@@ -258,16 +258,14 @@ jobs:
             "${LYCHEE_URL}/lychee-v${LYCHEE_VERSION}/${LYCHEE_DIR}.tar.gz" \
             | sudo tar -xz -C /usr/local/bin --strip-components=1 "${LYCHEE_DIR}/lychee"
 
-      # Inlined rather than pre-commit/action, whose composite steps reference
-      # actions/cache by floating tag. The org policy requiring full-length SHA
-      # pins rejects that, and upstream has declined every pin request
-      # (pre-commit/action#230).
+      # Not pre-commit/action: its composite steps float actions/cache to a
+      # tag, which the org SHA-pin policy rejects, and upstream declines to
+      # pin (pre-commit/action#230).
       - name: Install pre-commit
         run: python -m pip install "pre-commit==${PRE_COMMIT_VERSION}"
 
-      # pre-commit health-checks a hook environment and rebuilds it when the
-      # interpreter no longer matches, so the key needs no Python component. It
-      # makes no such promise across its own store layout, hence the version.
+      # pre-commit promises nothing across changes to its own store layout,
+      # so a version bump has to miss the cache.
       - name: Cache pre-commit environments
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
