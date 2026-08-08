@@ -44,6 +44,9 @@ export function TeamStrip({
 
         return (
           <button
+            // Team slots are positional and fixed in number, so the index is a
+            // stable identity.
+            // eslint-disable-next-line @eslint-react/no-array-index-key
             key={i}
             type="button"
             onClick={() => onSelect(i)}
