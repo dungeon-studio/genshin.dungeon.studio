@@ -1,6 +1,10 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
+locals {
+  github_deployer_ro_member = "serviceAccount:${google_service_account.github_deployer_ro.email}"
+}
+
 # RO service account
 resource "google_service_account" "github_deployer_ro" {
   project      = google_project.env.project_id
@@ -64,17 +68,17 @@ resource "google_project_iam_custom_role" "github_deployer_ro_planner" {
 resource "google_project_iam_member" "github_deployer_ro_planner" {
   project = google_project.env.project_id
   role    = google_project_iam_custom_role.github_deployer_ro_planner.name
-  member  = "serviceAccount:${google_service_account.github_deployer_ro.email}"
+  member  = local.github_deployer_ro_member
 }
 
 resource "google_storage_bucket_iam_member" "github_deployer_ro_state_bucket" {
   bucket = var.state_bucket_name
   role   = "roles/storage.objectViewer"
-  member = "serviceAccount:${google_service_account.github_deployer_ro.email}"
+  member = local.github_deployer_ro_member
 }
 
 resource "google_storage_bucket_iam_member" "github_deployer_ro_bucket_reader" {
   bucket = var.state_bucket_name
   role   = "roles/storage.legacyBucketReader"
-  member = "serviceAccount:${google_service_account.github_deployer_ro.email}"
+  member = local.github_deployer_ro_member
 }

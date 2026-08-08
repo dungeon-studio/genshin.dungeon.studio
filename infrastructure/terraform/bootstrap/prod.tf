@@ -6,12 +6,12 @@
 module "prod" {
   source = "./modules/project_bootstrap"
 
-  environment        = "production"
-  project_id         = "dungeon-studio-genshin-prod"
-  project_name       = "DS Genshin Production"
-  billing_account_id = var.billing_account_id
-  state_bucket_name  = data.google_storage_bucket.state.name
-  enable_cloud_run   = true
+  environment                 = "production"
+  project_id                  = "dungeon-studio-genshin-prod"
+  project_name                = "DS Genshin Production"
+  billing_account_id          = var.billing_account_id
+  state_bucket_name           = data.google_storage_bucket.state.name
+  grant_cloud_run_permissions = true
 
   depends_on = [module.shared, module.core]
 }

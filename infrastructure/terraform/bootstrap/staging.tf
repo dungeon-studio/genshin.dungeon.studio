@@ -6,12 +6,12 @@
 module "staging" {
   source = "./modules/project_bootstrap"
 
-  environment        = "staging"
-  project_id         = "dungeon-studio-genshin-staging"
-  project_name       = "DS Genshin Staging"
-  billing_account_id = var.billing_account_id
-  state_bucket_name  = data.google_storage_bucket.state.name
-  enable_cloud_run   = true
+  environment                 = "staging"
+  project_id                  = "dungeon-studio-genshin-staging"
+  project_name                = "DS Genshin Staging"
+  billing_account_id          = var.billing_account_id
+  state_bucket_name           = data.google_storage_bucket.state.name
+  grant_cloud_run_permissions = true
 
   depends_on = [module.shared, module.core]
 }

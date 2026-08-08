@@ -42,7 +42,7 @@ variable "billing_account_id" {
   }
 }
 
-variable "enable_cloud_run" {
+variable "grant_cloud_run_permissions" {
   type        = bool
   description = "Add Cloud Run permissions to the RW service account's custom role"
   default     = false
