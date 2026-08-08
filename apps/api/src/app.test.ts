@@ -121,6 +121,20 @@ describe('Allow header', () => {
   });
 });
 
+// RFC 9457 makes the media type how a client tells a problem document from a
+// successful one; `apps/web`'s api client branches on exactly this string.
+describe('problem document media type', () => {
+  it.each([
+    ['a classified error', '/__test/problem-exception'],
+    ['an unclassified HTTPException', '/__test/http-exception'],
+    ['an unexpected error', '/__test/permission-denied'],
+    ['an unmatched route', '/api/not-a-resource'],
+  ])('marks the response from %s as problem+json', async (_case, path) => {
+    const res = await app.request(path);
+    expect(res.headers.get('content-type')).toBe('application/problem+json');
+  });
+});
+
 describe('onError problem type', () => {
   it('carries the type of a classified error into the problem document', async () => {
     const res = await app.request('/__test/problem-exception');
