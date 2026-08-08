@@ -4,6 +4,7 @@
 import eslintReact from '@eslint-react/eslint-plugin';
 import genshinConfig, { TYPESCRIPT_FILES } from '@genshin/eslint-config';
 import { defineConfig } from 'eslint/config';
+import jsxA11yX from 'eslint-plugin-jsx-a11y-x';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
@@ -58,6 +59,10 @@ export default defineConfig([
   },
   {
     files: TYPESCRIPT_FILES,
+    extends: [jsxA11yX.configs.recommended],
+  },
+  {
+    files: TYPESCRIPT_FILES,
     rules: {
       '@typescript-eslint/naming-convention': [
         'error',
@@ -88,6 +93,8 @@ export default defineConfig([
     files: SHADCN_SCAFFOLDS,
     rules: {
       'react/function-component-definition': 'off',
+      // `CardTitle` spreads children into its `<h3>`, so content lives at the call site.
+      'jsx-a11y-x/heading-has-content': 'off',
     },
   },
   {
