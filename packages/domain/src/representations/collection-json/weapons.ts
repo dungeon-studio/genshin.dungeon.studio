@@ -32,15 +32,28 @@ const WEAPON_TEMPLATE: Template = {
   ],
 };
 
+/**
+ * The weapon collection, optionally narrowed to one weapon's instances.
+ *
+ * A player owns any number of instances of the same weapon, so the filtered
+ * form is a first-class collection: it is what an item's `collection` link
+ * points back to, and what the API serves for a `weaponId` query.
+ */
+export function weaponCollectionHref(baseUrl: string, weaponId?: string): string {
+  const collection = `${baseUrl}/weapons`;
+  if (weaponId === undefined) return collection;
+  return `${collection}?weaponId=${encodeURIComponent(weaponId)}`;
+}
+
 export function weaponItemHref(baseUrl: string, weapon: CollectionWeapon): string {
-  return `${baseUrl}/weapons/${weapon.weaponInstanceId}`;
+  return `${weaponCollectionHref(baseUrl)}/${weapon.weaponInstanceId}`;
 }
 
 export function serialiseWeapon(weapon: CollectionWeapon, baseUrl: string): Item {
   const links: Link[] = [
     {
       rel: 'collection',
-      href: `${baseUrl}/weapons?weaponId=${encodeURIComponent(weapon.weaponId)}`,
+      href: weaponCollectionHref(baseUrl, weapon.weaponId),
       prompt: `All instances of ${weapon.weaponId}`,
     },
   ];

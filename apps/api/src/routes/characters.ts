@@ -3,7 +3,12 @@
 
 import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
 import type { ConstellationLevel } from '@genshin/domain';
-import { characterItemHref, characterRepresentation, serialiseCharacter } from '@genshin/domain';
+import {
+  characterCollectionHref,
+  characterItemHref,
+  characterRepresentation,
+  serialiseCharacter,
+} from '@genshin/domain';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import type { FromSchema } from 'json-schema-to-ts';
@@ -48,7 +53,7 @@ characters.get('/', async (c) => {
     JSON.stringify(
       serialiseCollection(
         characterRepresentation,
-        `${baseUrl}/characters`,
+        characterCollectionHref(baseUrl),
         items.map((item) => serialiseCharacter(item, baseUrl)),
       ),
     ),

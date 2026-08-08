@@ -3,7 +3,12 @@
 
 import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
 import type { UUID } from '@genshin/domain';
-import { serialiseWeapon, weaponItemHref, weaponRepresentation } from '@genshin/domain';
+import {
+  serialiseWeapon,
+  weaponCollectionHref,
+  weaponItemHref,
+  weaponRepresentation,
+} from '@genshin/domain';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import type { FromSchema } from 'json-schema-to-ts';
@@ -53,7 +58,7 @@ weapons.get('/', async (c) => {
       JSON.stringify(
         serialiseCollection(
           weaponRepresentation,
-          `${baseUrl}/weapons?weaponId=${encodeURIComponent(weaponId)}`,
+          weaponCollectionHref(baseUrl, weaponId),
           instances.map((w) => serialiseWeapon(w, baseUrl)),
         ),
       ),
@@ -69,7 +74,7 @@ weapons.get('/', async (c) => {
     JSON.stringify(
       serialiseCollection(
         weaponRepresentation,
-        `${baseUrl}/weapons`,
+        weaponCollectionHref(baseUrl),
         items.map((w) => serialiseWeapon(w, baseUrl)),
       ),
     ),
@@ -93,7 +98,7 @@ weapons.post(
 
     return c.body(
       JSON.stringify(
-        serialiseCollection(weaponRepresentation, `${baseUrl}/weapons`, [
+        serialiseCollection(weaponRepresentation, weaponCollectionHref(baseUrl), [
           serialiseWeapon(weapon, baseUrl),
         ]),
       ),
