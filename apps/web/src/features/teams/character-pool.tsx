@@ -1,12 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type {
-  CharacterId,
-  CollectionCharacter,
-  ConstellationLevel,
-  TeamSlot,
-} from '@genshin/domain';
+import type { CharacterId, ConstellationLevel, TeamSlot } from '@genshin/domain';
 import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import type { Character, WeaponType } from '@genshin/game-data';
 import { CHARACTERS } from '@genshin/game-data';
@@ -20,6 +15,8 @@ import { Button } from '@/components/ui/button';
 import { CharacterFilters } from '@/features/collection/characters/character-filters';
 import type { CharacterFilterState } from '@/features/collection/characters/filtering';
 import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
+import type { CharacterCollection } from '@/features/collection/characters/use-character-collection-store';
+import { ownedCharacterIds } from '@/features/collection/characters/use-character-collection-store';
 import { useTeamStore } from '@/features/teams/use-team-store';
 import { ELEMENT_BORDER_COLORS, ELEMENT_SELECTED_RINGS } from '@/lib/element-styles';
 import { cn } from '@/lib/utils';
@@ -29,7 +26,7 @@ function poolFilterState(): CharacterFilterState {
 }
 
 interface CharacterPoolProps {
-  characters: Record<CharacterId, CollectionCharacter>;
+  characters: CharacterCollection;
   slot: TeamSlot;
   memberIndex: number;
   /**
@@ -38,7 +35,7 @@ interface CharacterPoolProps {
    * clear it and pick one that cannot equip the weapon.
    */
   weaponType?: WeaponType;
-  onAssign: (characterId: string) => void;
+  onAssign: (characterId: CharacterId) => void;
 }
 
 export function CharacterPool({
@@ -65,7 +62,7 @@ export function CharacterPool({
     setFilters({ ...next, ownership: 'owned' });
   }
 
-  const ownedIds = useMemo(() => new Set(Object.keys(characters)), [characters]);
+  const ownedIds = useMemo(() => ownedCharacterIds(characters), [characters]);
   const ownedCount = ownedIds.size;
 
   const eligibleCharacters = useMemo(

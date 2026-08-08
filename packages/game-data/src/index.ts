@@ -30,6 +30,7 @@ export {
   getCharactersByVersion,
   getCharactersByWeaponType,
   type Character,
+  type CharacterId,
 } from './characters.js';
 
 // Weapons
@@ -42,6 +43,7 @@ export {
   WEAPON_TYPES,
   WEAPONS,
   type Weapon,
+  type WeaponId,
   type WeaponStatType,
   type WeaponType,
 } from './weapons.js';

@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { indexById } from './lookup.js';
 import type { Rarity } from './rarities.js';
-import { WEAPONS } from './weapons.generated.js';
+import { WEAPON_DATA } from './weapons.generated.js';
 
 /**
  * Weapon types
@@ -33,11 +34,13 @@ export const WEAPON_STAT_TYPES = {
 
 export type WeaponStatType = (typeof WEAPON_STAT_TYPES)[keyof typeof WEAPON_STAT_TYPES];
 
+export type WeaponId = (typeof WEAPON_DATA)[number]['id'];
+
 /**
  * Weapon definition
  */
 export interface Weapon {
-  id: string;
+  id: WeaponId;
   name: string;
   type: WeaponType;
   rarity: Rarity;
@@ -51,9 +54,9 @@ export interface Weapon {
   passiveDescription?: string;
 }
 
-export { WEAPONS };
+export const WEAPONS: readonly Weapon[] = WEAPON_DATA;
 
-const WEAPONS_BY_ID = new Map(WEAPONS.map((w) => [w.id, w]));
+const WEAPONS_BY_ID = indexById(WEAPONS);
 
 /**
  * Helper to find weapon by ID

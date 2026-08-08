@@ -31,11 +31,12 @@ From the wiki, collect:
 
 ### 2. Update `packages/game-data/src/characters.ts`
 
-Add the character to the `CHARACTERS` array. Use the `Character` interface:
+Add the character to the `CHARACTER_DATA` array. Its `id` joins the `CharacterId`
+union that other packages type-check against:
 
 ```typescript
 interface Character {
-  id: string; // kebab-case unique identifier
+  id: CharacterId; // kebab-case unique identifier
   name: string; // Display name
   element: Element; // Use ELEMENTS constants
   weaponType: WeaponType; // Use WEAPON_TYPES constants
@@ -63,7 +64,7 @@ interface Character {
 
 ### 3. Keep array sorted
 
-Maintain the `CHARACTERS` array in a logical order:
+Maintain the `CHARACTER_DATA` array in a logical order:
 
 - By rarity: 5-stars first, then 4-stars
 - By version descending: newest first within each rarity group

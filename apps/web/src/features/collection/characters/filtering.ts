@@ -30,7 +30,7 @@ export function initialFilterState(): CharacterFilterState {
 export function filterCharacters(
   characters: readonly Character[],
   filters: CharacterFilterState,
-  ownedIds: Set<Character['id']>,
+  ownedIds: ReadonlySet<string>,
 ): Character[] {
   const searchLower = filters.search.toLowerCase();
 

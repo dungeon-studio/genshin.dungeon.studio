@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { characterPutRequestV1 } from '@/profiles/json-schema/characters/put-request-v1.js';
+import { healthGetResponseV1 } from '@/profiles/json-schema/health/get-response-v1.js';
 import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
 import { profileGetResponseV1 } from '@/profiles/json-schema/profile/get-response-v1.js';
 import { profilePatchRequestV1 } from '@/profiles/json-schema/profile/patch-request-v1.js';
@@ -12,6 +13,7 @@ import { weaponPostRequestV1 } from '@/profiles/json-schema/weapons/post-request
 
 export const jsonSchemaRegistry: readonly JsonSchemaProfile[] = [
   rootGetResponseV1,
+  healthGetResponseV1,
   profileGetResponseV1,
   profilePatchRequestV1,
   characterPutRequestV1,

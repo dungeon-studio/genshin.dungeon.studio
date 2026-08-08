@@ -18,22 +18,27 @@ import {
   useRemoveCharacterMutation,
   useSetConstellationLevelMutation,
 } from './use-character-collection-api';
-import { mergeCollections, useCollectionStore } from './use-character-collection-store';
+import type { CharacterCollection } from './use-character-collection-store';
+import {
+  mergeCollections,
+  ownedCharacters,
+  useCollectionStore,
+} from './use-character-collection-store';
 
 function entriesAheadOfServer(
-  merged: Record<CharacterId, CollectionCharacter>,
-  server: Record<CharacterId, CollectionCharacter>,
+  merged: CharacterCollection,
+  server: CharacterCollection,
 ): SetConstellationLevelVariables[] {
-  return Object.entries(merged)
-    .filter(([id, entry]) => {
-      const serverEntry = server[id];
+  return ownedCharacters(merged)
+    .filter((entry) => {
+      const serverEntry = server[entry.characterId];
       return !serverEntry || entry.constellationLevel > serverEntry.constellationLevel;
     })
-    .map(([id, entry]) => ({ characterId: id, level: entry.constellationLevel }));
+    .map((entry) => ({ characterId: entry.characterId, level: entry.constellationLevel }));
 }
 
 export interface UseCollectionResult {
-  characters: Record<CharacterId, CollectionCharacter>;
+  characters: CharacterCollection;
   addCharacter: (characterId: CharacterId) => void;
   removeCharacter: (characterId: CharacterId) => void;
   setConstellationLevel: (characterId: CharacterId, level: ConstellationLevel) => void;

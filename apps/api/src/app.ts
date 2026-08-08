@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { readFileSync } from 'node:fs';
 import { STATUS_CODES } from 'node:http';
 
 import type { ProblemDetail } from '@genshin/domain';
@@ -18,14 +17,12 @@ import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-
 import { firestoreErrorToHttpException } from '@/repositories/firestore-error.js';
 import { alpsProfiles } from '@/routes/alps-profiles.js';
 import { characters } from '@/routes/characters.js';
+import { health } from '@/routes/health.js';
 import { jsonSchemaProfiles } from '@/routes/json-schema-profiles.js';
 import { root } from '@/routes/root.js';
 import { teams } from '@/routes/teams.js';
 import { userProfile } from '@/routes/user-profile.js';
 import { weapons } from '@/routes/weapons.js';
-
-// Read version from package.json to maintain single source of truth
-const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf-8'));
 
 export const PROBLEM_JSON = { 'Content-Type': 'application/problem+json' };
 
@@ -97,15 +94,8 @@ app.notFound((c) =>
   ),
 );
 
-app.get('/health', (c) =>
-  c.json({
-    status: 'ok',
-    version: packageJson.version,
-    sha: process.env.APP_GIT_SHA ?? null,
-  }),
-);
-
 // Routes
+app.route('/health', health);
 app.route('/profiles/json-schema', jsonSchemaProfiles);
 app.route('/profiles/alps', alpsProfiles);
 app.route('/api/characters', characters);

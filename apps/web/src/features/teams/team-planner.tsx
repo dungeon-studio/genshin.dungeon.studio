@@ -3,6 +3,7 @@
 
 import type {
   ArtifactPlan,
+  CharacterId,
   CollectionCharacter,
   CollectionTeam,
   CollectionWeapon,
@@ -22,7 +23,7 @@ interface TeamPlannerProps {
   slot: TeamSlot;
   name: string;
   members: CollectionTeam['members'];
-  getCharacter: (characterId: string) => CollectionCharacter | undefined;
+  getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
   getCollectionWeapon: (collectionWeaponId: CollectionWeaponId) => CollectionWeapon | undefined;
   selectedMemberIndex?: number | null;
   onMemberSelect?: (memberIndex: number) => void;
