@@ -84,15 +84,16 @@
   ],
 
   // CSS/Tailwind - DISABLED until Issue #20 is implemented
-  "css.validate": true
+  "css.validate": true,
   // Uncomment when Tailwind is installed:
   // "tailwindCSS.experimental.classRegex": [
   //   ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
   //   ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
   // ]
 
-  // Testing - DISABLED until Vitest is installed (Phase 4)
-  // Uncomment these settings when Vitest is added to package.json
-  // "vitest.enable": true,
-  // "vitest.commandLine": "pnpm test"
+  // Testing
+  // Anchor the extension to the root config so the sidebar shows its declared
+  // projects instead of every discovered `*vite*.config.*` — the default search
+  // pattern also matches apps/web/vite.config.ts, which has no `test` block.
+  "vitest.rootConfig": "./vitest.config.ts"
 }
