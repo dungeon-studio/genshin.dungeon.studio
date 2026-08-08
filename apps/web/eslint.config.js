@@ -13,9 +13,9 @@ const TEST_FILES = ['**/*.{test,spec}.{ts,tsx}', 'src/test/**/*.{ts,tsx}'];
 const SHADCN_SCAFFOLDS = ['src/components/ui/**/*.{ts,tsx}'];
 
 /**
- * Both plugins implement these. `eslint-plugin-react-hooks` is first-party and
- * compiler-backed, so it keeps them; enabling both reports every hook violation
- * twice.
+ * `@eslint-react` and `eslint-plugin-react-hooks` both implement these.
+ * react-hooks is first-party and compiler-backed, so it keeps them; enabling
+ * both reports every hook violation twice.
  */
 const RULES_OWNED_BY_REACT_HOOKS = {
   '@eslint-react/error-boundaries': 'off',
@@ -29,9 +29,8 @@ const RULES_OWNED_BY_REACT_HOOKS = {
   '@eslint-react/use-memo': 'off',
 };
 
-// Scoping every block to `TYPESCRIPT_FILES` is deliberate, not leftover: this
-// workspace also lints `eslint.config.js`, `postcss.config.js`, and
-// `tailwind.config.js`, which none of the rules below apply to.
+// Rules here scope to `TYPESCRIPT_FILES` because this workspace also lints
+// plain-JavaScript config files, which none of them apply to.
 export default defineConfig([
   genshinConfig(import.meta.dirname),
   {
@@ -72,10 +71,10 @@ export default defineConfig([
     },
   },
   {
-    // `@eslint-react` takes no position on declaration syntax, so
-    // `function-component-definition` has no counterpart. The version pin
-    // avoids a `detect` path that calls an API ESLint 10 removed. Registered by
-    // hand because this plugin's only flat preset turns on 22 other rules.
+    // `@eslint-react` has no counterpart for `function-component-definition`,
+    // which is the only reason this plugin is here. Registered by hand because
+    // its flat preset would enable the whole recommended set, and the React
+    // version is set because `detect` calls an API ESLint 10 removed.
     files: TYPESCRIPT_FILES,
     plugins: { react },
     settings: { react: { version: '19' } },

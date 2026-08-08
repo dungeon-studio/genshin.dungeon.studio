@@ -14,12 +14,12 @@ import tseslint from 'typescript-eslint';
 export const LINTED_FILES = ['**/*.{ts,tsx,js,mjs,cjs}'];
 
 /**
- * The TypeScript subset of {@link LINTED_FILES}. Exported so workspaces scope
- * their own overrides to the same set instead of respelling the glob.
+ * The TypeScript subset of {@link LINTED_FILES}. Workspaces scope their own
+ * overrides to it.
  */
 export const TYPESCRIPT_FILES = ['**/*.{ts,tsx}'];
 
-/** Paths whose imports may legitimately come from `devDependencies`. */
+/** Paths allowed to import `devDependencies`. */
 const DEV_DEPENDENCY_FILES = [
   '**/*.{test,spec}.{ts,tsx}',
   '**/test/**',
@@ -28,7 +28,7 @@ const DEV_DEPENDENCY_FILES = [
   '*.config.{ts,js,mjs,cjs}',
 ];
 
-/** Rules tightening `tseslint.configs.recommended` past its defaults. */
+/** Rules tightening `tseslint.configs.recommended`. */
 const TYPESCRIPT_STRICTNESS = {
   files: TYPESCRIPT_FILES,
   rules: {
@@ -57,16 +57,15 @@ const TYPESCRIPT_STRICTNESS = {
 };
 
 /**
- * Import hygiene. The only part of the base that varies per workspace, because
- * `no-extraneous-dependencies` has to know which `package.json` files may
- * satisfy an import.
+ * Parameterised because `no-extraneous-dependencies` has to know which
+ * `package.json` files may satisfy an import.
  *
  * @param {string} packageDir - the consuming workspace's directory.
- * @returns {import('eslint').Linter.Config} a single flat config entry.
+ * @returns {import('eslint').Linter.Config}
  */
 function importDiscipline(packageDir) {
-  // Every workspace sits exactly two levels down, and the root `package.json`
-  // holds the tooling dependencies they all share.
+  // Workspaces sit two levels below the root, whose `package.json` holds the
+  // tooling dependencies they all share.
   const repoRoot = resolve(packageDir, '../..');
 
   return {
@@ -112,16 +111,15 @@ function importDiscipline(packageDir) {
  *
  * @param {string} packageDir - the consuming workspace's directory
  *   (`import.meta.dirname`), not this package's.
- * @returns {import('eslint').Linter.Config[]} flat config entries; already
- *   normalised, so consumers can nest the result inside their own
- *   `defineConfig` call rather than spreading it.
+ * @returns {import('eslint').Linter.Config[]} flat config entries, already
+ *   normalised, so consumers can nest the result in their own `defineConfig`.
  */
 export default function genshinConfig(packageDir) {
   return defineConfig([
     globalIgnores(['dist', 'node_modules']),
     js.configs.recommended,
-    // Left unscoped so the preset keeps its own file matching, which reaches
-    // `.mts`/`.cts` as well as `TYPESCRIPT_FILES`.
+    // Unscoped: the preset's own file matching reaches `.mts` and `.cts`, which
+    // `TYPESCRIPT_FILES` does not.
     tseslint.configs.recommended,
     TYPESCRIPT_STRICTNESS,
     importDiscipline(packageDir),
