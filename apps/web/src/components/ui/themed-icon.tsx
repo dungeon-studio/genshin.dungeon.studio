@@ -18,7 +18,7 @@ interface ThemedIconProps {
 export function ThemedIcon({ lightSrc, darkSrc, alt, className }: ThemedIconProps): JSX.Element {
   const decorative = alt === '';
 
-  // `alt` stays explicit below; a11y lint cannot resolve it through a spread.
+  // a11y lint cannot resolve `alt` through a spread.
   const shared = {
     'aria-hidden': decorative || undefined,
     loading: 'lazy',

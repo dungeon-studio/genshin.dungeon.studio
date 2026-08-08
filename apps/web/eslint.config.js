@@ -78,9 +78,6 @@ export default [
     },
   },
   {
-    // The canonical `eslint-plugin-jsx-a11y` has shipped nothing since 2024-10
-    // and peers at ESLint 9. This fork tracks it rule-for-rule under a
-    // `jsx-a11y-x/` namespace and declares ESLint 10.
     files: TS_FILES,
     ...jsxA11yX.configs.recommended,
   },
@@ -102,8 +99,7 @@ export default [
     files: SHADCN_SCAFFOLDS,
     rules: {
       'react/function-component-definition': 'off',
-      // `CardTitle` forwards children into its `<h3>` through a props spread,
-      // so the heading's content is only knowable at the call site.
+      // `CardTitle` spreads children into its `<h3>`, so content lives at the call site.
       'jsx-a11y-x/heading-has-content': 'off',
     },
   },
