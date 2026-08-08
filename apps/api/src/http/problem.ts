@@ -40,21 +40,15 @@ export function problemTypeOf(err: unknown): string {
   return err instanceof ProblemException ? err.type : ABOUT_BLANK;
 }
 
-/** A problem document, narrowed to the statuses permitted to carry a body. */
+/** `ProblemDetail` with the status type Hono requires of a response with a body. */
 type ProblemPayload = Omit<ProblemDetail, 'status'> & { status: ContentfulStatusCode };
 
 /**
  * The HTTP response carrying a problem document.
  *
- * Serialises through `c.body()` rather than `c.json()` because `c.json()`,
- * handed a `ResponseInit`, layers its own `application/json` over the
- * Content-Type that init carried — which would leave an error indistinguishable
- * from a success to a client branching on the media type. `c.body()` applies no
- * default of its own.
- *
- * Every problem response goes through here so that the media type and the
- * retry hint stay properties of a problem response rather than something each
- * call site has to remember.
+ * Uses `c.body()`, not `c.json()`: handed a `ResponseInit`, `c.json()` overwrites
+ * the Content-Type it carried with `application/json`, which would leave a client
+ * unable to tell an error from a success.
  */
 export function problemResponse(c: Context, problem: ProblemPayload): Response {
   const headers: Record<string, string> = { 'Content-Type': 'application/problem+json' };

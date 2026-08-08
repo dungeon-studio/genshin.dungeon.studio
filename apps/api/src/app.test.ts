@@ -121,9 +121,8 @@ describe('Allow header', () => {
   });
 });
 
-// RFC 9457 makes the media type how a client tells a problem document apart
-// from a successful representation, so `apps/web`'s api client branches on it.
-// Serving plain `application/json` would leave errors indistinguishable.
+// RFC 9457 makes the media type how a client tells a problem document from a
+// successful one; `apps/web`'s api client branches on exactly this string.
 describe('problem document media type', () => {
   it.each([
     ['a classified error', '/__test/problem-exception'],
