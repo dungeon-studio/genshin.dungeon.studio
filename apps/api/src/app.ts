@@ -25,6 +25,10 @@ import { teams } from '@/routes/teams.js';
 import { userProfile } from '@/routes/user-profile.js';
 import { weapons } from '@/routes/weapons.js';
 
+// Handlers below serialise through `c.body()` rather than `c.json()`: given a
+// `ResponseInit`, `c.json()` layers its own `application/json` over the
+// Content-Type the init carried, and would silently downgrade these to plain
+// JSON. `c.body()` applies no default of its own.
 export const PROBLEM_JSON = { 'Content-Type': 'application/problem+json' };
 
 export const app = new Hono<{
@@ -59,38 +63,38 @@ app.onError((err, c) => {
     const headers: Record<string, string> = { ...PROBLEM_JSON };
     const retryAfter = retryAfterSeconds(resolved.status);
     if (retryAfter !== undefined) headers['Retry-After'] = String(retryAfter);
-    return c.json(
-      {
+    return c.body(
+      JSON.stringify({
         type: problemTypeOf(resolved),
         title: STATUS_CODES[resolved.status] ?? 'Unknown Error',
         status: resolved.status,
         detail: resolved.message,
-      } satisfies ProblemDetail,
+      } satisfies ProblemDetail),
       { status: resolved.status, headers },
     );
   }
 
   console.error('Unexpected error:', resolved);
-  return c.json(
-    {
+  return c.body(
+    JSON.stringify({
       type: ABOUT_BLANK,
       title: 'Internal Server Error',
       status: 500,
       detail: 'An unexpected error occurred',
-    } satisfies ProblemDetail,
+    } satisfies ProblemDetail),
     { status: 500, headers: PROBLEM_JSON },
   );
 });
 
 // 404 handler for unmatched routes — RFC 9457 Problem Details
 app.notFound((c) =>
-  c.json(
-    {
+  c.body(
+    JSON.stringify({
       type: ABOUT_BLANK,
       title: 'Not Found',
       status: 404,
       detail: 'The requested resource does not exist',
-    } satisfies ProblemDetail,
+    } satisfies ProblemDetail),
     { status: 404, headers: PROBLEM_JSON },
   ),
 );
