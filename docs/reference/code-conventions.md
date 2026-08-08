@@ -46,7 +46,7 @@ Branded types in `packages/domain/` each get their own file (for example, `uuid.
 
 ## React components
 
-Page and layout components use function declarations (`export function CharactersPage()`). Reserve `const` with `React.forwardRef` for `shadcn/ui` primitives, which need the ref forwarding.
+Page and layout components use function declarations (`export function CharactersPage()`). Reserve `const` with `React.forwardRef` for `shadcn/ui` primitives.
 
 Colocate a small helper component in the same file as its only caller, as a private function that isn't exported. Promote it to its own file when a second caller appears.
 

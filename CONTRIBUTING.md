@@ -155,7 +155,7 @@ For code conventions—comments, documentation strategy, naming, shared types, t
 
 ### Commit messages
 
-Because squash and merge turns the pull request title into the commit message, the title carries these rules:
+The pull request title becomes the commit message, so it carries these rules:
 
 - Format: `type(scope): subject`
 - Types: `feat`, `fix`, `docs`, `test`, `refactor`, `style`, `chore`

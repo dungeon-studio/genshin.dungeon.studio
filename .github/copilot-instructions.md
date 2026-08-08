@@ -21,7 +21,7 @@ per-repository instruction file either tool loads.
 - Web: React, Vite, Tailwind, `shadcn/ui`, zustand, TanStack Query, `react-router-dom`.
 - API: Hono + Node.js, Firestore, Firebase Auth.
 - Testing: Vitest, React Testing Library, and Playwright end-to-end specs in `tools/e2e`.
-- Versions live in `package.json`. Read them there rather than restating them here.
+- Versions live in `package.json`.
 - `shadcn/ui` uses New York style, CSS variables, and ESM Tailwind plugin imports. `components.json` names the `neutral` base color, but `apps/web/src/index.css` carries a brand-derived palette.
 
 ## Repository map
@@ -68,10 +68,10 @@ per-repository instruction file either tool loads.
 
 ## Testing
 
-- Test behavior, not constant values; don't assert what's true by definition or what a library, the language, or config already guarantees.
-- Annotate fixtures with `satisfies` to validate their shape without changing the inferred type.
-- Validate route responses against the published JSON Schema with AJV first, then make one field-level spot check; don't re-assert the schema field by field.
-- Test alongside code. See [`CONTRIBUTING.md`](../CONTRIBUTING.md) for the full testing principles and [Code conventions](../docs/reference/code-conventions.md) for test structure.
+Test alongside code. What to assert is in the testing principles in
+[`CONTRIBUTING.md`](../CONTRIBUTING.md); how to shape a test is in
+[Code conventions](../docs/reference/code-conventions.md). Read both before
+writing tests.
 
 ## Frontend rules
 
@@ -146,9 +146,9 @@ per-repository instruction file either tool loads.
 
 ## Playwright MCP rules
 
-The Playwright MCP server is configured in `.vscode/mcp.json` and runs headless
-Chrome. Save screenshots to `/tmp/` (for example, `/tmp/dark-mode.png`), never
-to the workspace, so the repo stays clean without gitignore entries.
+Save screenshots to `/tmp/` (for example, `/tmp/dark-mode.png`), never to the
+workspace, so the repo stays clean without gitignore entries. The server itself
+is configured in `.vscode/mcp.json`.
 
 ## Infrastructure rules
 
@@ -166,8 +166,8 @@ to the workspace, so the repo stays clean without gitignore entries.
 
 ## File naming
 
-Enforced by `ls-lint` (see `.ls-lint.yml`).
+`.ls-lint.yml` holds the per-extension casing rules and enforces them. Two
+conventions it can't express:
 
-- All files and directories use `kebab-case` (`user-profile.ts`, `character-card.tsx`, `features/collection/characters/`), including React component files. Component _identifiers_ stay `PascalCase` (`function CharacterCard() {}`); only the filename is kebab.
-- Co-located test files mirror their source and use the `.test.` suffix, not `.spec.`: `use-auth.ts` becomes `use-auth.test.ts`, and `character-card.tsx` becomes `character-card.test.tsx`.
-- Terraform (`infrastructure/terraform/**`) uses HashiCorp-style `snake_case` for `.tf`, `.tfvars`, `.hcl`, and module directories.
+- React component files are `kebab-case` like every other file, but component _identifiers_ stay `PascalCase` (`character-card.tsx` exports `function CharacterCard() {}`).
+- Co-located test files mirror their source and use the `.test.` suffix, not `.spec.`: `use-auth.ts` becomes `use-auth.test.ts`.

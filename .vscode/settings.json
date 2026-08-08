@@ -69,8 +69,6 @@
   // Prettier (redundant with .prettierrc but explicit for clarity)
   "prettier.requireConfig": true,
 
-  // Copilot reads .github/copilot-instructions.md on its own; no wiring needed.
-
   // CSS/Tailwind - DISABLED until Issue #20 is implemented
   "css.validate": true,
   // Uncomment when Tailwind is installed:
