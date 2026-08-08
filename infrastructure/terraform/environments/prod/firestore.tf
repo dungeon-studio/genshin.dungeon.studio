@@ -20,8 +20,12 @@ resource "google_firestore_database" "default" {
   location_id = var.firestore_location_id
   type        = "FIRESTORE_NATIVE"
 
-  # Dev environment should not block teardown workflows.
-  delete_protection_state = "DELETE_PROTECTION_DISABLED"
+  # Production holds the only copy of user collections.
+  delete_protection_state = "DELETE_PROTECTION_ENABLED"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 
   depends_on = [google_project_service.firestore]
 }

@@ -3,7 +3,7 @@
 
 variable "project_id" {
   type        = string
-  description = "GCP Project ID for development environment"
+  description = "GCP Project ID for production environment"
 
   validation {
     condition     = can(regex("^[a-z]([a-z0-9-]*[a-z0-9])?$", var.project_id)) && length(var.project_id) >= 6 && length(var.project_id) <= 30
@@ -28,9 +28,15 @@ variable "enable_api_public_invoker" {
   default     = false
 }
 
+variable "enable_web_custom_domain" {
+  type        = bool
+  description = "Whether to attach the custom domain to the web Firebase Hosting site"
+  default     = false
+}
+
 variable "firestore_location_id" {
   type        = string
-  description = "Firestore location for the dev database"
+  description = "Firestore location for the prod database"
   default     = "eur3"
 
   validation {

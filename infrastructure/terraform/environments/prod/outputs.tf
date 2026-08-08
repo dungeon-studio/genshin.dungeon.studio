@@ -14,19 +14,19 @@ output "api_artifact_repository_id" {
 }
 
 output "firestore_database_name" {
-  description = "Firestore database name for the development environment"
+  description = "Firestore database name for the production environment"
   value       = google_firestore_database.default.name
   sensitive   = false
 }
 
 output "firestore_location_id" {
-  description = "Firestore location ID for the development environment"
+  description = "Firestore location ID for the production environment"
   value       = google_firestore_database.default.location_id
   sensitive   = false
 }
 
 output "firebase_auth_config_name" {
-  description = "Identity Platform config resource name for the development environment"
+  description = "Identity Platform config resource name for the production environment"
   value       = google_identity_platform_config.default.name
   sensitive   = false
 }

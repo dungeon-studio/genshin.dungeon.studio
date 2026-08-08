@@ -23,7 +23,7 @@ resource "google_project_service" "firebase_hosting" {
 resource "google_firebase_hosting_site" "web" {
   provider = google-beta
   project  = var.project_id
-  site_id  = "dungeon-studio-genshin-dev"
+  site_id  = "dungeon-studio-genshin-prod"
 
   depends_on = [
     google_firebase_project.default,
@@ -33,6 +33,8 @@ resource "google_firebase_hosting_site" "web" {
 
 # Custom domain for the Firebase Hosting site
 resource "google_firebase_hosting_custom_domain" "web" {
+  count = var.enable_web_custom_domain ? 1 : 0
+
   provider      = google-beta
   project       = var.project_id
   site_id       = google_firebase_hosting_site.web.site_id
@@ -49,7 +51,7 @@ resource "google_firebase_hosting_custom_domain" "web" {
 resource "google_firebase_web_app" "web" {
   provider     = google-beta
   project      = var.project_id
-  display_name = "Genshin Planner (dev)"
+  display_name = "Genshin Planner"
 
   depends_on = [google_firebase_project.default]
 }

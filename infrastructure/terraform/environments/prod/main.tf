@@ -1,6 +1,10 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
+# The bootstrap module labels this project `production` while everything
+# addressable here says `prod`. That label is not an addressing scheme, so the
+# mismatch is deliberate rather than drift.
+
 terraform {
   required_version = "1.15.8"
   required_providers {
@@ -27,5 +31,5 @@ provider "google-beta" {
 # matter which environment serves, so it stays separate from the hostname.
 locals {
   base_domain = "genshin.dungeon.studio"
-  web_domain  = "develop.${local.base_domain}"
+  web_domain  = local.base_domain
 }

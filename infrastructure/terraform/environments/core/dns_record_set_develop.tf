@@ -8,7 +8,7 @@ resource "google_dns_record_set" "web_develop" {
   managed_zone = google_dns_managed_zone.genshin_dungeon_studio.name
   type         = "CNAME"
   ttl          = 3600
-  project      = var.gcp_core_project_id
+  project      = var.project_id
 
   rrdatas = ["dungeon-studio-genshin-dev.web.app."]
 }
@@ -20,7 +20,7 @@ resource "google_dns_record_set" "api_develop" {
   managed_zone = google_dns_managed_zone.genshin_dungeon_studio.name
   type         = "CNAME"
   ttl          = 3600
-  project      = var.gcp_core_project_id
+  project      = var.project_id
 
   rrdatas = ["ghs.googlehosted.com."]
 }

@@ -47,7 +47,7 @@ resource "google_artifact_registry_repository" "api" {
 # Cloud Run custom domain mapping for API service.
 # NOTE: The mapped service route (`api`) is created by CI/CD deploy,
 # so this resource has an external ordering dependency on a successful deploy.
-# Keep this in `dev` to avoid core->dev state dependencies.
+# Keep this in `prod` to avoid core->prod state dependencies.
 resource "google_cloud_run_domain_mapping" "api" {
   count = var.enable_api_domain_mapping ? 1 : 0
 

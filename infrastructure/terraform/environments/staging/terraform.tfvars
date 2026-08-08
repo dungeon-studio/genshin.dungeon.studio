@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 # Non-sensitive values for staging environment
 
-gcp_staging_project_id = "dungeon-studio-genshin-staging"
+project_id = "dungeon-studio-genshin-staging"
 
 common_labels = {
   environment = "staging"
