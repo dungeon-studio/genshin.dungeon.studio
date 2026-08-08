@@ -26,6 +26,8 @@ resource "google_project_iam_custom_role" "github_deployer_ro_planner" {
     "artifactregistry.repositories.get",
     "artifactregistry.repositories.list",
     "datastore.databases.get",
+    # The Firestore Admin API checks getMetadata, not get, on databases.get.
+    "datastore.databases.getMetadata",
     "datastore.databases.list",
     "dns.managedZones.get",
     "dns.managedZones.list",
@@ -62,31 +64,6 @@ resource "google_project_iam_custom_role" "github_deployer_ro_planner" {
 resource "google_project_iam_member" "github_deployer_ro_planner" {
   project = google_project.env.project_id
   role    = google_project_iam_custom_role.github_deployer_ro_planner.name
-  member  = "serviceAccount:${google_service_account.github_deployer_ro.email}"
-}
-
-resource "google_project_iam_member" "github_deployer_ro_sa_viewer" {
-  project = google_project.env.project_id
-  role    = "roles/iam.serviceAccountViewer"
-  member  = "serviceAccount:${google_service_account.github_deployer_ro.email}"
-}
-
-# Required for Terraform plan refresh of `google_firestore_database`.
-# The equivalent least-privilege custom permission set is currently insufficient
-# for provider read behavior; track tightening in a follow-up issue.
-resource "google_project_iam_member" "github_deployer_ro_datastore_viewer" {
-  project = google_project.env.project_id
-  role    = "roles/datastore.viewer"
-  member  = "serviceAccount:${google_service_account.github_deployer_ro.email}"
-}
-
-# Required for Terraform plan refresh of `google_firebase_web_app`.
-# The custom role includes `firebase.clients.get` and `firebase.projects.get`,
-# but the google-beta provider requires additional permissions covered by this
-# predefined role; track tightening in a follow-up issue.
-resource "google_project_iam_member" "github_deployer_ro_firebase_viewer" {
-  project = google_project.env.project_id
-  role    = "roles/firebase.viewer"
   member  = "serviceAccount:${google_service_account.github_deployer_ro.email}"
 }
 

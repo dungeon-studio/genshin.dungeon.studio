@@ -22,7 +22,7 @@ resource "google_project_iam_custom_role" "github_deployer_rw_applier" {
   # Prefer adding narrowly scoped permissions here over granting broad roles
   # such as `roles/editor`.
 
-  permissions = [
+  permissions = concat([
     "artifactregistry.repositories.create",
     "artifactregistry.repositories.delete",
     "artifactregistry.repositories.downloadArtifacts",
@@ -30,8 +30,13 @@ resource "google_project_iam_custom_role" "github_deployer_rw_applier" {
     "artifactregistry.repositories.list",
     "artifactregistry.repositories.uploadArtifacts",
     "artifactregistry.repositories.update",
+    "datastore.databases.create",
+    "datastore.databases.delete",
     "datastore.databases.get",
+    # The Firestore Admin API checks getMetadata, not get, on databases.get.
+    "datastore.databases.getMetadata",
     "datastore.databases.list",
+    "datastore.databases.update",
     "dns.changes.create",
     "dns.changes.get",
     "dns.changes.list",
@@ -59,6 +64,9 @@ resource "google_project_iam_custom_role" "github_deployer_rw_applier" {
     "firebasehosting.sites.get",
     "firebasehosting.sites.list",
     "firebasehosting.sites.update",
+    "iam.serviceAccounts.actAs",
+    "iam.serviceAccounts.get",
+    "iam.serviceAccounts.list",
     "resourcemanager.projects.get",
     "secretmanager.secrets.create",
     "secretmanager.secrets.delete",
@@ -86,7 +94,34 @@ resource "google_project_iam_custom_role" "github_deployer_rw_applier" {
     "storage.objects.get",
     "storage.objects.list",
     "storage.objects.update"
-  ]
+    ], var.enable_cloud_run ? [
+    # Terraform owns the domain mapping and the invoker IAM policy; the deploy
+    # workflow owns the service itself, so both call paths are covered here.
+    # `run.domainmappings.*` is absent from `roles/run.admin` and from
+    # `gcloud iam list-testable-permissions`, but is enforced on refresh and is
+    # accepted in a custom role.
+    "run.configurations.get",
+    "run.configurations.list",
+    "run.domainmappings.create",
+    "run.domainmappings.delete",
+    "run.domainmappings.get",
+    "run.domainmappings.list",
+    "run.locations.list",
+    "run.operations.get",
+    "run.revisions.delete",
+    "run.revisions.get",
+    "run.revisions.list",
+    "run.routes.get",
+    # The deploy workflow mints an ID token to probe the service after rollout.
+    "run.routes.invoke",
+    "run.routes.list",
+    "run.services.create",
+    "run.services.get",
+    "run.services.getIamPolicy",
+    "run.services.list",
+    "run.services.setIamPolicy",
+    "run.services.update",
+  ] : [])
 
   depends_on = [google_project_service.serviceusage]
 }
@@ -94,28 +129,6 @@ resource "google_project_iam_custom_role" "github_deployer_rw_applier" {
 resource "google_project_iam_member" "github_deployer_rw_applier" {
   project = google_project.env.project_id
   role    = google_project_iam_custom_role.github_deployer_rw_applier.name
-  member  = "serviceAccount:${google_service_account.github_deployer_rw.email}"
-}
-
-# Grant permission to create and manage service accounts in this project
-# Needed if environment terraform creates application service accounts
-resource "google_project_iam_member" "github_deployer_rw_sa_admin" {
-  project = google_project.env.project_id
-  role    = "roles/iam.serviceAccountAdmin"
-  member  = "serviceAccount:${google_service_account.github_deployer_rw.email}"
-}
-
-# Required for Cloud Run deploy to act as the default Compute Engine SA
-resource "google_project_iam_member" "github_deployer_rw_sa_user" {
-  project = google_project.env.project_id
-  role    = "roles/iam.serviceAccountUser"
-  member  = "serviceAccount:${google_service_account.github_deployer_rw.email}"
-}
-
-# Required for google_firestore_database (datastore.databases.create)
-resource "google_project_iam_member" "github_deployer_rw_datastore_owner" {
-  project = google_project.env.project_id
-  role    = "roles/datastore.owner"
   member  = "serviceAccount:${google_service_account.github_deployer_rw.email}"
 }
 

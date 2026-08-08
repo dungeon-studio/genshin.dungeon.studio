@@ -42,6 +42,12 @@ variable "billing_account_id" {
   }
 }
 
+variable "enable_cloud_run" {
+  type        = bool
+  description = "Add Cloud Run permissions to the RW service account's custom role"
+  default     = false
+}
+
 variable "state_bucket_name" {
   type        = string
   description = "Name of the GCS bucket for Terraform state storage"
