@@ -36,3 +36,13 @@ trivy config apps/api
 docker build -t api-local:scan -f apps/api/Dockerfile .
 trivy image api-local:scan
 ```
+
+## Scan dependencies
+
+```bash
+trivy fs --scanners vuln pnpm-lock.yaml
+```
+
+Unlike the scans above, this one blocks a pull request. See
+[Respond to a vulnerable dependency](respond-to-dependency-cves.md) for the
+triage path.
