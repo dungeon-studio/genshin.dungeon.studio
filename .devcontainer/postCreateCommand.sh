@@ -11,7 +11,7 @@ REPO_ROOT="$(git -C "${SCRIPT_DIR}" rev-parse --show-toplevel)"
 source "${SCRIPT_DIR}/lib.sh"
 
 # ---------------------------------------------------------------------------
-# 1. Package manager
+# Package manager
 # ---------------------------------------------------------------------------
 step "Installing pnpm via corepack"
 
@@ -19,7 +19,7 @@ corepack enable
 corepack install
 
 # ---------------------------------------------------------------------------
-# 2. Google Cloud SDK
+# Google Cloud SDK
 # ---------------------------------------------------------------------------
 step "Installing Google Cloud SDK"
 
@@ -29,28 +29,28 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get update && \
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y google-cloud-sdk
 
 # ---------------------------------------------------------------------------
-# 3. Project dependencies
+# Project dependencies
 # ---------------------------------------------------------------------------
 step "Installing project dependencies"
 
 pnpm install
 
 # ---------------------------------------------------------------------------
-# 4. Pre-commit hooks
+# Pre-commit hooks
 # ---------------------------------------------------------------------------
 step "Installing pre-commit hooks"
 
 pre-commit install
 
 # ---------------------------------------------------------------------------
-# 5. SPDX license compliance checker
+# SPDX license compliance checker
 # ---------------------------------------------------------------------------
 step "Installing reuse-tool"
 
 "${REPO_ROOT}/scripts/install-reuse.sh"
 
 # ---------------------------------------------------------------------------
-# 6. Link checker
+# Link checker
 # ---------------------------------------------------------------------------
 step "Installing lychee"
 
@@ -63,7 +63,7 @@ curl -fsSL \
 sudo chmod +x /usr/local/bin/lychee
 
 # ---------------------------------------------------------------------------
-# 7. Playwright browsers (for the end-to-end suite and the Playwright MCP server)
+# Playwright browsers (for the end-to-end suite and the Playwright MCP server)
 # ---------------------------------------------------------------------------
 step "Installing Playwright Chromium and Chrome"
 
