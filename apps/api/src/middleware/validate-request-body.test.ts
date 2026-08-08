@@ -5,7 +5,7 @@ import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { describe, expect, it } from 'vitest';
 
-import { ProblemException } from '@/http/problem.js';
+import { problemTypeOf } from '@/http/problem.js';
 import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
 import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
 
@@ -56,10 +56,7 @@ describe('validateRequestBody middleware', () => {
     // Stands in for the application error handler, which is what actually puts
     // `type` on the wire; this one only exposes what the middleware threw.
     app.onError((err, c) =>
-      c.json(
-        { type: err instanceof ProblemException ? err.type : 'about:blank' },
-        err instanceof HTTPException ? err.status : 500,
-      ),
+      c.json({ type: problemTypeOf(err) }, err instanceof HTTPException ? err.status : 500),
     );
     return app;
   }
