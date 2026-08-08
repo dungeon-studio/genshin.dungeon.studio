@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { WeaponType } from '@genshin/game-data';
+import type { WeaponId, WeaponType } from '@genshin/game-data';
 import { WEAPONS, WEAPON_TYPES } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
 import type { JSX } from 'react';
@@ -14,6 +14,7 @@ import { signInWithGoogle } from '@/features/auth';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
+import { weaponIdsOf } from '@/features/collection/weapons/use-weapon-collection-store';
 import { WeaponCard } from '@/features/collection/weapons/weapon-card';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
 import { WeaponInstanceSidebar } from '@/features/collection/weapons/weapon-instance-sidebar';
@@ -52,18 +53,11 @@ export function WeaponsPage(): JSX.Element {
     }
     return state;
   });
-  const [selectedWeaponId, setSelectedWeaponId] = useState<string | null>(null);
+  const [selectedWeaponId, setSelectedWeaponId] = useState<WeaponId | null>(null);
 
   const effectiveSelectedWeaponId = isAuthenticated ? selectedWeaponId : null;
 
-  // Collect weapon IDs that have at least one instance
-  const ownedWeaponIds = useMemo(() => {
-    const ids = new Set<string>();
-    for (const instance of Object.values(weapons)) {
-      ids.add(instance.weaponId);
-    }
-    return ids;
-  }, [weapons]);
+  const ownedWeaponIds = useMemo(() => weaponIdsOf(Object.values(weapons)), [weapons]);
 
   // Count instances per weaponId for badges
   const instanceCounts = useMemo(() => {
@@ -88,7 +82,7 @@ export function WeaponsPage(): JSX.Element {
   );
 
   const handleWeaponClick = useCallback(
-    (weaponId: string) => {
+    (weaponId: WeaponId) => {
       if (selectedWeaponId === weaponId) {
         setSelectedWeaponId(null);
         return;
@@ -106,7 +100,7 @@ export function WeaponsPage(): JSX.Element {
   );
 
   const handleAddWeapon = useCallback(
-    (weaponId: string) => {
+    (weaponId: WeaponId) => {
       addWeapon(weaponId);
     },
     [addWeapon],

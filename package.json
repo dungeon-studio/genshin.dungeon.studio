@@ -45,12 +45,12 @@
     "stylelint": "17.14.1",
     "stylelint-config-standard": "40.0.0",
     "syncpack": "15.3.2",
-    "tsx": "4.23.5",
+    "tsx": "4.23.7",
     "turbo": "2.10.8",
     "typescript": "npm:@typescript/typescript6@6.0.2"
   },
   "packageManager": "pnpm@11.20.0",
   "engines": {
-    "node": "26.6.0"
+    "node": "26.7.0"
   }
 }

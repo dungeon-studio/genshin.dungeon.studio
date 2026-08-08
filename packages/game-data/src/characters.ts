@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { Element } from './elements.js';
+import { indexById } from './lookup.js';
 import type { Rarity } from './rarities.js';
 import type { WeaponType } from './weapons.js';
 
@@ -9,7 +10,7 @@ import type { WeaponType } from './weapons.js';
  * Character definition
  */
 export interface Character {
-  id: string;
+  id: CharacterId;
   name: string;
   element: Element;
   weaponType: WeaponType;
@@ -31,7 +32,7 @@ export interface Character {
  *
  * To add more characters, follow the guide in docs/how-tos/update-game-characters.md
  */
-export const CHARACTERS: Character[] = [
+const CHARACTER_DATA = [
   // 5-star characters (sorted by version descending)
 
   // Luna IV
@@ -1271,9 +1272,13 @@ export const CHARACTERS: Character[] = [
     version: '1.0',
     releaseDate: '2020-09-28',
   },
-];
+] as const;
 
-const CHARACTERS_BY_ID = new Map(CHARACTERS.map((c) => [c.id, c]));
+export type CharacterId = (typeof CHARACTER_DATA)[number]['id'];
+
+export const CHARACTERS: readonly Character[] = CHARACTER_DATA;
+
+const CHARACTERS_BY_ID = indexById(CHARACTERS);
 
 /**
  * Helper to find character by ID

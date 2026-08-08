@@ -9,7 +9,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPut } from '@/lib/api';
 
-type CharacterRecord = Record<CharacterId, CollectionCharacter>;
+import type { CharacterCollection } from './use-character-collection-store';
 
 export interface MutationResult {
   characterId: CharacterId;
@@ -20,9 +20,9 @@ export function collectionKey(userId: string): readonly [string, string] {
   return ['characters', userId] as const;
 }
 
-export function parseCollectionResponse(response: unknown): CharacterRecord {
+export function parseCollectionResponse(response: unknown): CharacterCollection {
   assertCollectionDocument(response);
-  const record: CharacterRecord = {};
+  const record: CharacterCollection = {};
 
   for (const item of response.collection.items) {
     const character = deserialiseCharacter(item);
@@ -48,7 +48,7 @@ function parseSingleCharacterResponse(response: unknown): MutationResult {
 
 export function useCharacterCollectionQuery(
   userId: string | undefined,
-): UseQueryResult<CharacterRecord, Error> {
+): UseQueryResult<CharacterCollection, Error> {
   return useQuery({
     queryKey: collectionKey(userId ?? ''),
     queryFn: async () => {

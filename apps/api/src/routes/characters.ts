@@ -4,11 +4,11 @@
 import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
 import type { ConstellationLevel } from '@genshin/domain';
 import { characterItemHref, characterRepresentation, serialiseCharacter } from '@genshin/domain';
-import { getCharacterById } from '@genshin/game-data';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import type { FromSchema } from 'json-schema-to-ts';
 
+import { requireCharacterId } from '@/lib/catalogue.js';
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
@@ -92,12 +92,9 @@ characters.put(
     const userId = c.get('user').uid;
     const { characterId } = c.req.param();
 
-    if (!getCharacterById(characterId)) {
-      throw new HTTPException(400, { message: `Unknown character: ${characterId}` });
-    }
-
+    const knownId = requireCharacterId(characterId);
     const { constellationLevel } = c.get('validatedBody') as SaveCharacterBody;
-    const { character, created } = await Characters.save(userId, characterId, constellationLevel);
+    const { character, created } = await Characters.save(userId, knownId, constellationLevel);
     const baseUrl = new URL(c.req.url).origin;
 
     return c.body(

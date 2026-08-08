@@ -8,37 +8,51 @@ import { persist } from 'zustand/middleware';
 
 import { CURRENT_VERSION, migratePersistedCollection } from './schemas/index.js';
 
-// Additive merge: union of both sets, keep higher constellation level on conflicts.
-export function mergeCollections(
-  local: Record<CharacterId, CollectionCharacter>,
-  server: Record<CharacterId, CollectionCharacter>,
-): Record<CharacterId, CollectionCharacter> {
-  const merged: Record<CharacterId, CollectionCharacter> = { ...server };
+/** Sparse: a player owns a subset of the roster. */
+export type CharacterCollection = Partial<Record<CharacterId, CollectionCharacter>>;
 
-  for (const [id, localEntry] of Object.entries(local)) {
-    const serverEntry = merged[id];
-    if (!serverEntry) {
-      merged[id] = localEntry;
-    } else if (localEntry.constellationLevel > serverEntry.constellationLevel) {
-      merged[id] = {
-        ...serverEntry,
-        constellationLevel: localEntry.constellationLevel,
-        updatedAt: nowTimestamp(),
-      };
-    }
+export function ownedCharacters(collection: CharacterCollection): CollectionCharacter[] {
+  return Object.values(collection).filter((entry) => entry !== undefined);
+}
+
+export function ownedCharacterIds(collection: CharacterCollection): ReadonlySet<CharacterId> {
+  return new Set(ownedCharacters(collection).map((entry) => entry.characterId));
+}
+
+/** The server record is the base, so its `createdAt` survives a level bump. */
+function preferHigherConstellation(
+  local: CollectionCharacter,
+  server: CollectionCharacter | undefined,
+): CollectionCharacter {
+  if (!server) return local;
+  if (local.constellationLevel <= server.constellationLevel) return server;
+
+  return { ...server, constellationLevel: local.constellationLevel, updatedAt: nowTimestamp() };
+}
+
+// Additive merge: union of both sets.
+export function mergeCollections(
+  local: CharacterCollection,
+  server: CharacterCollection,
+): CharacterCollection {
+  const merged: CharacterCollection = { ...server };
+
+  for (const localEntry of ownedCharacters(local)) {
+    const id = localEntry.characterId;
+    merged[id] = preferHigherConstellation(localEntry, merged[id]);
   }
 
   return merged;
 }
 
 interface CollectionState {
-  characters: Record<CharacterId, CollectionCharacter>;
+  characters: CharacterCollection;
   addCharacter: (characterId: CharacterId) => void;
   removeCharacter: (characterId: CharacterId) => void;
   setConstellationLevel: (characterId: CharacterId, level: ConstellationLevel) => void;
   isOwned: (characterId: CharacterId) => boolean;
   getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
-  replaceCharacters: (characters: Record<CharacterId, CollectionCharacter>) => void;
+  replaceCharacters: (characters: CharacterCollection) => void;
   clearCharacters: () => void;
 }
 
