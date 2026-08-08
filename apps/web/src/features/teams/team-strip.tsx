@@ -44,8 +44,8 @@ export function TeamStrip({
 
         return (
           <button
-            // A slot's index is its identity: the array is fixed-arity and
-            // empty slots are null, so nothing reorders.
+            // Team slots are positional and fixed in number, so the index is a
+            // stable identity.
             // eslint-disable-next-line @eslint-react/no-array-index-key
             key={i}
             type="button"

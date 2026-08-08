@@ -15,10 +15,9 @@ const SHADCN_SCAFFOLDS = ['src/components/ui/**/*.{ts,tsx}'];
 const eslintReactRecommended = eslintReact.configs['recommended-typescript'];
 
 /**
- * Rules `@eslint-react` implements under its own names that
- * `eslint-plugin-react-hooks` already covers. React ships that plugin and backs
- * it with the compiler's analysis, so it stays authoritative here and these
- * copies stay off — leaving them on double-reports every hook violation.
+ * Both plugins implement these. `eslint-plugin-react-hooks` is first-party and
+ * compiler-backed, so it keeps them; enabling both reports every hook violation
+ * twice.
  */
 const RULES_OWNED_BY_REACT_HOOKS = {
   '@eslint-react/error-boundaries': 'off',
@@ -46,8 +45,8 @@ export default [
     ...eslintReactRecommended,
     rules: {
       ...eslintReactRecommended.rules,
-      // Flags any `useRef` result not named `*Ref`, which catches refs used as
-      // mutable instance state rather than as element handles.
+      // Wants every `useRef` result named `*Ref`; ours hold mutable instance
+      // state rather than element handles.
       '@eslint-react/naming-convention-ref-name': 'off',
     },
   },
@@ -60,10 +59,9 @@ export default [
     },
   },
   {
-    // `@eslint-react` takes no position on declaration syntax, so the classical
-    // plugin stays loaded for this one rule. The version pin works around its
-    // `detect` path calling an API that ESLint 10 removed; both go away
-    // together when the rule does.
+    // `@eslint-react` takes no position on declaration syntax, so
+    // `function-component-definition` has no counterpart. The version pin
+    // avoids a `detect` path that calls an API ESLint 10 removed.
     files: TS_FILES,
     plugins: { react },
     settings: { react: { version: '19' } },
@@ -101,9 +99,8 @@ export default [
   {
     files: TEST_FILES,
     rules: {
-      // `renderHook`'s `wrapper` is defined per test so it can close over that
-      // test's state. The rule guards against remounting on parent re-render,
-      // which a wrapper passed straight to the renderer never does.
+      // A `renderHook` wrapper closes over per-test state and never remounts on
+      // a parent re-render, so the rule's premise does not hold.
       '@eslint-react/no-nested-component-definitions': 'off',
     },
   },
