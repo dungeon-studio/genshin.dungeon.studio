@@ -8,8 +8,10 @@ import { defineConfig } from 'vitest/config';
 // `apps/web/vite.config.ts` (no `test` block) and `tools/e2e` (Playwright) out
 // of the project list without an exclusion to maintain.
 //
-// `pnpm turbo run test` remains the build-ordered entry point; this config
-// serves the editor and a single-process `pnpm vitest` at the root.
+// `pnpm turbo run test` remains the build-ordered entry point and the only one
+// that produces reports. `coverage` and `reporters` are root-only options, so
+// each project's copies apply when turbo runs it as its own root and are
+// ignored here; a root `pnpm vitest` prints results and writes no artifacts.
 export default defineConfig({
   test: {
     projects: [
