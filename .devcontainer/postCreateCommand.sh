@@ -10,17 +10,11 @@ REPO_ROOT="$(git -C "${SCRIPT_DIR}" rev-parse --show-toplevel)"
 # shellcheck source=lib.sh
 source "${SCRIPT_DIR}/lib.sh"
 
-# ---------------------------------------------------------------------------
-# 1. Package manager
-# ---------------------------------------------------------------------------
 step "Installing pnpm via corepack"
 
 corepack enable
 corepack install
 
-# ---------------------------------------------------------------------------
-# 2. Google Cloud SDK
-# ---------------------------------------------------------------------------
 step "Installing Google Cloud SDK"
 
 curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor --batch --yes -o /usr/share/keyrings/cloud.google.gpg && \
@@ -28,43 +22,19 @@ echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.clou
 sudo DEBIAN_FRONTEND=noninteractive apt-get update && \
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y google-cloud-sdk
 
-# ---------------------------------------------------------------------------
-# 3. Project dependencies
-# ---------------------------------------------------------------------------
 step "Installing project dependencies"
 
 pnpm install
 
-# ---------------------------------------------------------------------------
-# 4. Pre-commit hooks
-# ---------------------------------------------------------------------------
 step "Installing pre-commit hooks"
 
 pre-commit install
 
-# ---------------------------------------------------------------------------
-# 5. SPDX license compliance checker
-# ---------------------------------------------------------------------------
-step "Installing reuse-tool"
+step "Installing reuse-tool for SPDX license compliance"
 
 "${REPO_ROOT}/scripts/install-reuse.sh"
 
-# ---------------------------------------------------------------------------
-# 6. Dockerfile linter
-# ---------------------------------------------------------------------------
-step "Installing hadolint"
-
-# renovate: datasource=github-releases depName=hadolint/hadolint
-HADOLINT_VERSION="v2.15.1"
-sudo curl -fsSL \
-  "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64" \
-  -o /usr/local/bin/hadolint
-sudo chmod +x /usr/local/bin/hadolint
-
-# ---------------------------------------------------------------------------
-# 7. Link checker
-# ---------------------------------------------------------------------------
-step "Installing lychee"
+step "Installing lychee link checker"
 
 # renovate: datasource=github-releases depName=lycheeverse/lychee extractVersion=^lychee-v(?<version>.+)$
 LYCHEE_VERSION="0.24.2"
@@ -74,18 +44,12 @@ curl -fsSL \
   | sudo tar -xz -C /usr/local/bin --strip-components=1 "${LYCHEE_DIR}/lychee"
 sudo chmod +x /usr/local/bin/lychee
 
-# ---------------------------------------------------------------------------
-# 8. Playwright browsers (for the end-to-end suite and the Playwright MCP server)
-# ---------------------------------------------------------------------------
 step "Installing Playwright Chromium and Chrome"
 
 # Through the workspace, so the browsers match the @playwright/test version
-# tools/e2e pins — the one the suite and the CI job run.
+# tools/e2e pins — the one the suite and the CI job run. The Playwright MCP
+# server uses them too.
 pnpm --filter @genshin/e2e exec playwright install --with-deps chromium chrome
-
-# ---------------------------------------------------------------------------
-# Verify and report
-# ---------------------------------------------------------------------------
 
 run_verification
 run_version_summary

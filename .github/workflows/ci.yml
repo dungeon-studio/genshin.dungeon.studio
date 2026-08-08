@@ -220,8 +220,6 @@ jobs:
     env:
       # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
       TERRAFORM_VERSION: '1.15.8'
-      # renovate: datasource=github-releases depName=hadolint/hadolint
-      HADOLINT_VERSION: 'v2.15.1'
       # renovate: datasource=github-releases depName=lycheeverse/lychee extractVersion=^lychee-v(?<version>.+)$
       LYCHEE_VERSION: '0.24.2'
       # renovate: datasource=github-releases depName=aquasecurity/trivy extractVersion=^v(?<version>.+)$
@@ -247,14 +245,6 @@ jobs:
           curl -fsSL \
             "${TRIVY_URL}/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" \
             | sudo tar -xz -C /usr/local/bin trivy
-
-      - name: Install hadolint
-        run: |
-          set -euo pipefail
-          sudo curl -fsSL \
-            "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64" \
-            -o /usr/local/bin/hadolint
-          sudo chmod +x /usr/local/bin/hadolint
 
       # musl, so the binary is static and carries no glibc floor.
       - name: Install lychee

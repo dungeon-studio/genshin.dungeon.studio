@@ -94,6 +94,12 @@ repos:
       - id: zizmor
         args: [--no-progress, --offline]
 
+  # Dockerfile linting
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.15.1
+    hooks:
+      - id: hadolint-docker
+
   # Renovate config validation
   - repo: https://github.com/renovatebot/pre-commit-hooks
     rev: 44.13.2
@@ -142,12 +148,6 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
-
-      - id: hadolint
-        name: hadolint
-        entry: hadolint
-        language: system
-        types: [dockerfile]
 
       # Offline resolves on-disk paths and makes no network request, so it
       # gates every commit and every pull request. The weekly external sweep
