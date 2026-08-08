@@ -3,7 +3,7 @@
 
 import eslintReact from '@eslint-react/eslint-plugin';
 import genshinConfig from '@genshin/eslint-config';
-import jsxA11y from 'eslint-plugin-jsx-a11y-x';
+import jsxA11yX from 'eslint-plugin-jsx-a11y-x';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
@@ -14,8 +14,6 @@ const TEST_FILES = ['**/*.{test,spec}.{ts,tsx}', 'src/test/**/*.{ts,tsx}'];
 const SHADCN_SCAFFOLDS = ['src/components/ui/**/*.{ts,tsx}'];
 
 const eslintReactRecommended = eslintReact.configs['recommended-typescript'];
-
-const jsxA11yRecommended = jsxA11y.configs.recommended;
 
 /**
  * Both plugins implement these. `eslint-plugin-react-hooks` is first-party and
@@ -84,7 +82,7 @@ export default [
     // and peers at ESLint 9. This fork tracks it rule-for-rule under a
     // `jsx-a11y-x/` namespace and declares ESLint 10.
     files: TS_FILES,
-    ...jsxA11yRecommended,
+    ...jsxA11yX.configs.recommended,
   },
   {
     files: TS_FILES,
