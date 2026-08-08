@@ -58,6 +58,8 @@ export default defineConfig([
     },
   },
   {
+    // Kept out of the `extends` list above: this preset carries its own
+    // `languageOptions`, which would then resolve ahead of this workspace's.
     files: TYPESCRIPT_FILES,
     extends: [jsxA11yX.configs.recommended],
   },
@@ -88,10 +90,10 @@ export default defineConfig([
     },
   },
   {
-    // Upstream shadcn scaffolds are `const X = React.forwardRef(...)`, not
-    // function declarations; rewriting them would fight every regeneration.
     files: SHADCN_SCAFFOLDS,
     rules: {
+      // Upstream scaffolds are `const X = React.forwardRef(...)`, not function
+      // declarations; rewriting them would fight every regeneration.
       'react/function-component-definition': 'off',
       // `CardTitle` spreads children into its `<h3>`, so content lives at the call site.
       'jsx-a11y-x/heading-has-content': 'off',

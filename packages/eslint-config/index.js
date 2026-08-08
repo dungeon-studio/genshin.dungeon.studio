@@ -11,7 +11,7 @@ import unusedImports from 'eslint-plugin-unused-imports';
 import tseslint from 'typescript-eslint';
 
 /** Every file eslint reads in a workspace. */
-export const LINTED_FILES = ['**/*.{ts,tsx,js,mjs,cjs}'];
+const LINTED_FILES = ['**/*.{ts,tsx,js,mjs,cjs}'];
 
 /**
  * The TypeScript subset of {@link LINTED_FILES}. Workspaces scope their own
