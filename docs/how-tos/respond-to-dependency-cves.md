@@ -14,15 +14,19 @@ options—upgrade, wait for the upstream fix, or suppress.
 
 ## Reproduce the finding
 
+`--config` is what applies the severity floor. Trivy looks for `trivy.yaml` by
+default, never `.trivy.yaml`, so without the flag the scan reports every
+severity and stops matching the gate:
+
 ```bash
-trivy fs --scanners vuln pnpm-lock.yaml
+trivy fs --scanners vuln --config .trivy.yaml pnpm-lock.yaml
 ```
 
-An alert with no matching CI failure is below the gate's floor. Widen the
-scan to see it:
+An alert with no matching CI failure sits below the floor. Drop the flag to
+see it:
 
 ```bash
-trivy fs --scanners vuln --severity MEDIUM,HIGH,CRITICAL pnpm-lock.yaml
+trivy fs --scanners vuln pnpm-lock.yaml
 ```
 
 ## Find what pulls the package in
@@ -68,11 +72,8 @@ Set `expired_at` to when the finding is worth another look. Trivy stops
 honouring the entry that day and the gate fails again, which is what stops a
 suppression becoming permanent.
 
-Confirm the gate passes before pushing:
-
-```bash
-trivy fs --scanners vuln --exit-code 1 pnpm-lock.yaml
-```
+Re-run the scan from the top of this guide before pushing; the finding should
+be gone.
 
 ## Related
 

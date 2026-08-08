@@ -39,10 +39,7 @@ trivy image api-local:scan
 
 ## Scan dependencies
 
-```bash
-trivy fs --scanners vuln pnpm-lock.yaml
-```
-
-Unlike the scans above, this one blocks a pull request. See
+Unlike the scans above, this one blocks a pull request, and its severity floor
+depends on passing `--config`. See
 [Respond to a vulnerable dependency](respond-to-dependency-cves.md) for the
-triage path.
+command and the triage path.

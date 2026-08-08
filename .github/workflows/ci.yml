@@ -383,12 +383,10 @@ jobs:
           sarif_file: dockerfile-results.sarif
           category: trivy-dockerfile
 
-  # The one Trivy job that blocks rather than reporting through SARIF: a
-  # misconfiguration is a judgement call worth reading in the Security tab,
-  # while a known-vulnerable dependency should not reach develop at all.
-  # SARIF is unavailable here regardless — trivy-action unsets TRIVY_SEVERITY
-  # whenever the format is sarif, which would drop the HIGH/CRITICAL floor
-  # .trivy.yaml sets and fail the gate on every LOW advisory in the tree.
+  # Blocks on a table rather than reporting through SARIF like its siblings:
+  # trivy-action unsets TRIVY_SEVERITY whenever the format is sarif, which
+  # would discard the severity floor .trivy.yaml sets and fail this gate on
+  # every advisory in the tree.
   #
   # Unfixed advisories are deliberately not skipped. One with no upgrade path
   # belongs in .trivyignore.yaml, where it carries a justification and an
