@@ -5,7 +5,6 @@ locals {
   github_deployer_ro_member = "serviceAccount:${google_service_account.github_deployer_ro.email}"
 }
 
-# RO service account
 resource "google_service_account" "github_deployer_ro" {
   project      = google_project.env.project_id
   account_id   = "github-deployer-ro"
@@ -21,11 +20,8 @@ resource "google_project_iam_custom_role" "github_deployer_ro_planner" {
   title       = "GitHub Deployer Planner"
   description = "Least-privilege read role for Terraform plan workflows"
 
-  # Keep this list limited to read/refresh permissions required by
-  # `infrastructure/terraform/environments/*` during `terraform plan`.
-  # When adding new environment resources, extend this role only for
-  # plan-time read failures and avoid broad predefined project roles.
-
+  # Scope to what `infrastructure/terraform/environments/*` needs during
+  # `terraform plan`. Extend this list rather than granting a predefined role.
   permissions = [
     "artifactregistry.repositories.get",
     "artifactregistry.repositories.list",

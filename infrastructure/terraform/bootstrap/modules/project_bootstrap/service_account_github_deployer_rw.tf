@@ -4,10 +4,8 @@
 locals {
   github_deployer_rw_member = "serviceAccount:${google_service_account.github_deployer_rw.email}"
 
-  # Keep this list scoped to project-level mutate/read permissions needed by
-  # `infrastructure/terraform/environments/*` during `terraform apply`.
-  # Prefer adding narrowly scoped permissions here over granting broad roles
-  # such as `roles/editor`.
+  # Scope to what `infrastructure/terraform/environments/*` needs during
+  # `terraform apply`. Extend this list rather than granting a predefined role.
   github_deployer_rw_permissions = [
     "artifactregistry.repositories.create",
     "artifactregistry.repositories.delete",
@@ -50,9 +48,8 @@ locals {
     "firebasehosting.sites.get",
     "firebasehosting.sites.list",
     "firebasehosting.sites.update",
-    # The deploy workflow acts as the runtime service account when it rolls
-    # out Cloud Run; `roles/run.admin` carries no iam permissions, so actAs
-    # has no other source.
+    # The deploy workflow acts as the runtime service account to roll out
+    # Cloud Run.
     "iam.serviceAccounts.actAs",
     "iam.serviceAccounts.get",
     "iam.serviceAccounts.list",
@@ -86,12 +83,11 @@ locals {
   ]
 
   # Terraform owns the domain mapping and the invoker IAM policy; the deploy
-  # workflow owns the service itself, so both call paths are covered here.
+  # workflow owns the service itself.
   #
-  # `run.domainmappings.*` is absent from `roles/run.admin` and from
-  # `gcloud iam list-testable-permissions`, but is enforced on refresh and is
-  # accepted in a custom role. Neither source you would normally check is
-  # evidence these are unused.
+  # `run.domainmappings.*` appears in neither `roles/run.admin` nor
+  # `gcloud iam list-testable-permissions`, yet domain mapping refresh fails
+  # without it.
   github_deployer_rw_cloud_run_permissions = [
     "run.configurations.get",
     "run.configurations.list",
@@ -117,7 +113,6 @@ locals {
   ]
 }
 
-# RW service account
 resource "google_service_account" "github_deployer_rw" {
   project      = google_project.env.project_id
   account_id   = "github-deployer-rw"

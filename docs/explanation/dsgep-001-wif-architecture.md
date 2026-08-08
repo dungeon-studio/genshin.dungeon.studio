@@ -175,18 +175,7 @@ This ensures only workflows from this repository can impersonate service account
 
 ### Cross-project permissions
 
-The dev environment has read-only access to core project resources:
-
-```hcl
-# In bootstrap/dev.tf
-resource "google_project_iam_member" "dev_ro_to_core" {
-  project = module.core.project_id
-  role    = "roles/viewer"
-  member  = "serviceAccount:${module.dev.github_deployer_ro_email}"
-}
-```
-
-This lets dev workflows reference core resources like DNS zones without write access.
+The non-core environments read core project resources through `core_cross_project_reader`, a custom role limited to reading DNS zones and record sets. This lets their workflows resolve core resources without write access.
 
 ## Related documents
 
