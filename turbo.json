@@ -20,7 +20,8 @@
       "persistent": true
     },
     "lint": {
-      "inputs": ["**/*.{ts,tsx}", "package.json", "eslint.config.*"]
+      "dependsOn": ["^lint"],
+      "inputs": ["**/*.{ts,tsx,js,mjs,cjs}", "package.json"]
     },
     "test": {
       "dependsOn": ["^build"],

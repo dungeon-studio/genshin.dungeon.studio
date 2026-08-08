@@ -3,6 +3,7 @@
 
 import eslintReact from '@eslint-react/eslint-plugin';
 import genshinConfig from '@genshin/eslint-config';
+import { defineConfig } from 'eslint/config';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
@@ -11,8 +12,6 @@ import globals from 'globals';
 const TS_FILES = ['**/*.{ts,tsx}'];
 const TEST_FILES = ['**/*.{test,spec}.{ts,tsx}', 'src/test/**/*.{ts,tsx}'];
 const SHADCN_SCAFFOLDS = ['src/components/ui/**/*.{ts,tsx}'];
-
-const eslintReactRecommended = eslintReact.configs['recommended-typescript'];
 
 /**
  * Both plugins implement these. `eslint-plugin-react-hooks` is first-party and
@@ -31,54 +30,28 @@ const RULES_OWNED_BY_REACT_HOOKS = {
   '@eslint-react/use-memo': 'off',
 };
 
-export default [
-  ...genshinConfig(import.meta.dirname),
+export default defineConfig([
+  genshinConfig(import.meta.dirname),
   {
+    // The glob is not redundant: `postcss.config.js` and `tailwind.config.js`
+    // are linted too, and the React rules have nothing to say about them.
     files: TS_FILES,
+    extends: [
+      eslintReact.configs['recommended-typescript'],
+      reactHooks.configs.flat.recommended,
+      reactRefresh.configs.vite,
+    ],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
     },
-  },
-  {
-    files: TS_FILES,
-    ...eslintReactRecommended,
     rules: {
-      ...eslintReactRecommended.rules,
       // Wants every `useRef` result named `*Ref`; ours hold mutable instance
       // state rather than element handles.
       '@eslint-react/naming-convention-ref-name': 'off',
-    },
-  },
-  {
-    files: TS_FILES,
-    plugins: { 'react-hooks': reactHooks },
-    rules: {
-      ...reactHooks.configs.recommended.rules,
       ...RULES_OWNED_BY_REACT_HOOKS,
-    },
-  },
-  {
-    // `@eslint-react` takes no position on declaration syntax, so
-    // `function-component-definition` has no counterpart. The version pin
-    // avoids a `detect` path that calls an API ESLint 10 removed.
-    files: TS_FILES,
-    plugins: { react },
-    settings: { react: { version: '19' } },
-    rules: {
-      'react/function-component-definition': ['error', { namedComponents: 'function-declaration' }],
-    },
-  },
-  {
-    files: TS_FILES,
-    plugins: { 'react-refresh': reactRefresh },
-    rules: {
+      // The Vite preset errors; a missed fast refresh costs a manual reload.
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-    },
-  },
-  {
-    files: TS_FILES,
-    rules: {
       '@typescript-eslint/naming-convention': [
         'error',
         {
@@ -91,6 +64,20 @@ export default [
     },
   },
   {
+    // `@eslint-react` takes no position on declaration syntax, so
+    // `function-component-definition` has no counterpart. The version pin
+    // avoids a `detect` path that calls an API ESLint 10 removed. Registered by
+    // hand because this plugin's only flat preset turns on 22 other rules.
+    files: TS_FILES,
+    plugins: { react },
+    settings: { react: { version: '19' } },
+    rules: {
+      'react/function-component-definition': ['error', { namedComponents: 'function-declaration' }],
+    },
+  },
+  {
+    // Upstream shadcn scaffolds are `const X = React.forwardRef(...)`, not
+    // function declarations; rewriting them would fight every regeneration.
     files: SHADCN_SCAFFOLDS,
     rules: {
       'react/function-component-definition': 'off',
@@ -104,4 +91,4 @@ export default [
       '@eslint-react/no-nested-component-definitions': 'off',
     },
   },
-];
+]);

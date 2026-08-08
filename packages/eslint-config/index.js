@@ -4,10 +4,14 @@
 import { resolve } from 'node:path';
 
 import js from '@eslint/js';
+import { defineConfig, globalIgnores } from 'eslint/config';
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 import importX from 'eslint-plugin-import-x';
 import unusedImports from 'eslint-plugin-unused-imports';
 import tseslint from 'typescript-eslint';
+
+const TYPESCRIPT_FILES = ['**/*.{ts,tsx}'];
+const LINTED_FILES = ['**/*.{ts,tsx,js,mjs,cjs}'];
 
 /**
  * Shared flat-config base for every workspace in the monorepo.
@@ -16,15 +20,19 @@ import tseslint from 'typescript-eslint';
  *   (`import.meta.dirname`). Used to resolve
  *   `import-x/no-extraneous-dependencies` against the workspace and the repo
  *   root, so it must be the consumer's path, not this package's.
- * @returns {import('eslint').Linter.Config[]} flat config entries to spread.
+ * @returns {import('eslint').Linter.Config[]} flat config entries; already
+ *   normalised, so consumers can nest the result inside their own
+ *   `defineConfig` call rather than spreading it.
  */
 export default function genshinConfig(packageDir) {
-  return [
-    { ignores: ['dist', 'node_modules'] },
+  return defineConfig([
+    globalIgnores(['dist', 'node_modules']),
     js.configs.recommended,
-    ...tseslint.configs.recommended,
+    // Left unscoped so the preset keeps its own file matching, which reaches
+    // `.mts`/`.cts` as well as `TYPESCRIPT_FILES`.
+    tseslint.configs.recommended,
     {
-      files: ['**/*.{ts,tsx}'],
+      files: TYPESCRIPT_FILES,
       rules: {
         '@typescript-eslint/no-explicit-any': 'error',
         '@typescript-eslint/no-non-null-assertion': 'error',
@@ -50,7 +58,7 @@ export default function genshinConfig(packageDir) {
       },
     },
     {
-      files: ['**/*.{ts,tsx,js,mjs,cjs}'],
+      files: LINTED_FILES,
       plugins: { 'import-x': importX, 'unused-imports': unusedImports },
       settings: {
         'import-x/resolver-next': [createTypeScriptImportResolver({ alwaysTryTypes: true })],
@@ -91,5 +99,5 @@ export default function genshinConfig(packageDir) {
         ],
       },
     },
-  ];
+  ]);
 }
