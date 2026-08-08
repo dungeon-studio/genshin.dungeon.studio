@@ -153,6 +153,18 @@ For code conventions—comments, documentation strategy, naming, shared types, t
 - The pull request title becomes the final commit message. Use conventional commit format.
 - Keep commit history clean - one feature equals one commit
 
+### Commit messages
+
+Because squash and merge turns the pull request title into the commit message, the title carries these rules:
+
+- Format: `type(scope): subject`
+- Types: `feat`, `fix`, `docs`, `test`, `refactor`, `style`, `chore`
+- Write the subject in imperative mood ("Add character filter," not "Added" or "Adds"), capitalize it, keep it under 50 characters, and omit the trailing period
+
+Scope is the workspace package the change is confined to: `feat(web)` for `apps/web`, `fix(api)` for `apps/api`, `refactor(game-data)` for `packages/game-data`, `chore(domain)` for `packages/domain`, and `chore(infra)` for Terraform and infrastructure. Omit the scope for changes that span packages, including most `docs:` changes.
+
+When a commit needs a body, separate it from the subject with a blank line, wrap it at 72 characters, and use it to explain what changed and why rather than how.
+
 ### Addressing review comments
 
 1. Address feedback completely
