@@ -71,12 +71,6 @@ Files: apps/web/public/favicon.ico apps/web/public/favicon-32x32.png apps/web/pu
 Copyright: 2026 Alex Brandt <alunduil@gmail.com>
 License: MIT
 
-# Copilot prompt files (frontmatter must be first line, no room for SPDX)
-
-Files: .github/copilot/*.prompt.md
-Copyright: 2026 Alex Brandt <alunduil@gmail.com>
-License: MIT
-
 # Claude Code slash commands (frontmatter must be first line, no room for SPDX)
 
 Files: .claude/commands/*.md

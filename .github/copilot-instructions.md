@@ -7,16 +7,22 @@
 
 <!-- vale Microsoft.Headings = YES -->
 
-> AI-only guidance. Keep this file short and practical; linters and CONTRIBUTING.md handle the remainder.
+AI decision rules. Human contribution guidance lives in
+[`CONTRIBUTING.md`](../CONTRIBUTING.md) and
+[`docs/reference/`](../docs/reference/); linters cover everything else.
+
+Keep this filename. GitHub Copilot reads this exact path, and root
+[`CLAUDE.md`](../CLAUDE.md) points here for detailed conventions. It's the only
+per-repository instruction file either tool loads.
 
 ## Snapshot
 
-- Stack: Turborepo + pnpm + TypeScript 6.0 strict mode.
-- Web: React 19, Vite, Tailwind, `shadcn/ui`, zustand, TanStack Query, `react-router-dom`.
+- Stack: Turborepo + pnpm + TypeScript strict mode.
+- Web: React, Vite, Tailwind, `shadcn/ui`, zustand, TanStack Query, `react-router-dom`.
 - API: Hono + Node.js, Firestore, Firebase Auth.
-- Testing: Vitest (API integration tests).
-- Not yet implemented: Claude MCP, React Testing Library, Bun.
-- `shadcn/ui` setup: New York style, CSS variables, and ESM Tailwind plugin imports. `components.json` names the `neutral` base color, but `apps/web/src/index.css` carries a brand-derived palette.
+- Testing: Vitest, React Testing Library, and Playwright end-to-end specs in `tools/e2e`.
+- Versions live in `package.json`.
+- `shadcn/ui` uses New York style, CSS variables, and ESM Tailwind plugin imports. `components.json` names the `neutral` base color, but `apps/web/src/index.css` carries a brand-derived palette.
 
 ## Repository map
 
@@ -26,43 +32,31 @@
 - `packages/domain`: Shared domain model: types, invariants, and wire format representations.
 - `tools/game-data-codegen`: CLI that generates `game-data` sources like `weapons.generated.ts` from `genshin-db`. Never hand-edit generated files.
 
-## Dependency management in the monorepo
-
-- Pin exact versions without `^` or `~` prefixes; Renovate handles updates weekly.
-- Root `package.json` is the source of truth for shared tooling: turbo, TypeScript, ESLint, Prettier, and Stylelint.
-- Workspace `package.json` holds app-specific dependencies. Declare every direct import explicitly, even when the same package exists at the root.
-- When a shared tool appears in both root and workspace `package.json`, keep the versions identical.
-- `pnpm-workspace.yaml` declares workspace package globs and engine constraints only; don't use it for version overrides.
-
 ## Core coding rules
 
-- Use strict TypeScript and keep components/functions focused.
+- Use strict TypeScript. No `any` without a justifying comment, no non-null assertion (`!`) without one, and no `@ts-ignore` without an issue reference.
+- Use `import type` for type-only imports, and prefer named exports unless a framework requires a default.
 - Extract reusable patterns after the third repetition.
 - Prefer runtime modules over type-only packages; emit JavaScript with declarations.
 - Workspace packages consumed by other packages must expose `types` and `default` in `exports` and include `main`.
 - Use ISO 8601 strings for timestamps such as `createdAt` and `updatedAt`, not `Date` objects.
-- Maintain game-data accuracy when working with `packages/game-data`.
-- Test alongside code when possible; Vitest covers both apps, and Playwright end-to-end specs live in `tools/e2e`.
-- Each branded type in `packages/domain/` gets its own file (for example, `uuid.ts`, `isoTimestamp.ts`).
-- Shared API test utilities go in `apps/api/src/test/` with descriptive names (not generic names like "helpers"). This directory is excluded from production builds via `tsconfig.build.json`.
-- Use descriptive, specific file names. Avoid generic names like "helpers."
+- Never leave `console.log` in production code; use structured logging or remove it.
+- Use zustand for UI state, TanStack Query for server state, and `@genshin/game-data` helpers for static game data. Don't put async or fetch logic in a zustand store.
+- For comments, documentation strings, naming, React components, and test structure, follow [Code conventions](../docs/reference/code-conventions.md).
 
 ## Build and CI rules
 
 - Always use `pnpm turbo run <task>` for `build`, `typecheck`, and `test` in CI, Docker, and deploy workflows. Never use raw `pnpm --filter <pkg> <task>` for these because pnpm doesn't automatically build workspace dependencies first; turbo handles dependency ordering via `^build` in `turbo.json`.
 - The API uses `tsconfig.json` (includes tests) for typechecking and `tsconfig.build.json` (excludes tests) for emit. The build config extends `tsconfig.json`, so compiler options stay in sync automatically; only the exclude patterns differ.
 - When `tsconfig.json` uses project references, type-check with `tsc -b --noEmit`. Plain `tsc --noEmit` won't follow references.
-- Turbo 2.0+ renamed `pipeline` to `tasks` in `turbo.json`. When upgrading Turbo major versions, check the `turbo.json` schema for deprecated fields.
-
-## State usage
-
-- Use zustand for UI state, TanStack Query for server state, and `@genshin/game-data` helpers for static game data.
 
 ## API design rules
 
-- Use the [REST API conventions reference](../docs/reference/rest-api-conventions.md) as guidance for API route shape, methods, status codes, error format, pagination, and auth handling.
-- All error responses use RFC 9457 Problem Details (`application/problem+json`). Always include a `detail` field, even for generic errors, to keep a stable schema for clients.
+- Use the [REST API conventions reference](../docs/reference/rest-api-conventions.md) for route shape, methods, status codes, error format, pagination, and auth handling.
+- All error responses use RFC 9457 Problem Details (`application/problem+json`) via `apps/api/src/http/problem.ts`. Always include a `detail` field, even for generic errors, to keep a stable schema for clients.
+- List endpoints use cursor-based pagination (`limit` and `cursor`).
 - Prefer explicit types over type munging. For example, define `ProfileUpdate` rather than using `Partial<Pick<UserProfile, 'name'>>` inline.
+- Keep route handlers thin, compose middleware, and validate inputs at the boundary.
 
 ## Schema module conventions
 
@@ -74,15 +68,15 @@
 
 ## Testing
 
-- Test behavior, not constant values; don't assert what's true by definition or what a library, the language, or config already guarantees.
-- Annotate fixtures with `satisfies` to validate their shape without changing the inferred type.
-- Validate route responses against the published JSON Schema with AJV first, then make one field-level spot check; don't re-assert the schema field by field.
-- See [`CONTRIBUTING.md`](../CONTRIBUTING.md) for the full testing principles.
+Test alongside code. What to assert is in the testing principles in
+[`CONTRIBUTING.md`](../CONTRIBUTING.md); how to shape a test is in
+[Code conventions](../docs/reference/code-conventions.md). Read both before
+writing tests.
 
 ## Frontend rules
 
 - Prefer composition over inheritance and use early returns for conditional rendering.
-- Use semantic HTML: proper heading hierarchy, structural elements, and native interactive elements.
+- Use semantic HTML: proper heading hierarchy, structural elements, and native interactive elements (`<button>`, not `<div onClick>`).
 - Mark decorative Lucide icons with `aria-hidden="true"` and `focusable={false}`. Icons inside labeled buttons, or adjacent to labeled inputs, are decorative.
 - Use aliases such as `@/components`, `@/components/ui`, `@/lib`, and `@/lib/utils`.
 - `shadcn/ui` gotchas:
@@ -93,57 +87,43 @@
 
 ## Dependencies and linting
 
-- `package.json` is source of truth; run `pnpm install` and commit `pnpm-lock.yaml` after dependency changes.
-- Every import must exist in `dependencies` or `devDependencies`. Enforced by `import-x/no-extraneous-dependencies` in every workspace `eslint.config.js`; `devDependencies` may appear in test files (`*.test.ts`, `**/test/**`) and tooling configs (`eslint.config.js`, `*.config.{ts,js}`) but never in production source.
-- Classify packages correctly:
-  - `dependencies`: runtime code shipped to production.
-  - `devDependencies`: build tools, plugins, type definitions, and local tooling.
-- Use `pnpm why <package>` to detect duplicate transitive versions and pin when needed.
+- Pin exact versions without `^` or `~` prefixes; Renovate handles updates. Ask before adding a dependency.
+- Root `package.json` is the source of truth for shared tooling: turbo, TypeScript, ESLint, Prettier, and Stylelint. Workspace `package.json` holds app-specific dependencies, and a tool appearing in both keeps identical versions.
+- Declare every direct import explicitly, even when the same package exists at the root. Enforced by `import-x/no-extraneous-dependencies` in every workspace `eslint.config.js`; `devDependencies` may appear in test files (`*.test.ts`, `**/test/**`) and tooling configs (`eslint.config.js`, `*.config.{ts,js}`) but never in production source.
+- Classify packages correctly: `dependencies` for runtime code shipped to production, `devDependencies` for build tools, plugins, type definitions, and local tooling.
+- `pnpm-workspace.yaml` declares workspace package globs and engine constraints only; don't use it for version overrides.
+- Run `pnpm install` and commit `pnpm-lock.yaml` after dependency changes. Use `pnpm why <package>` to detect duplicate transitive versions.
 - New workspace packages should match the root `package.json` metadata fields (`description`, `keywords`, `author`, `homepage`, `bugs`, `license`).
 - ESLint uses flat config via workspace-local `eslint.config.js` files; configure ignore patterns with `ignores`, not `.eslintignore`.
 
 ## Documentation rules
 
-- Put information in the right place, in this priority order:
-  1. Inline comments explaining _why_ code works a certain way.
-  2. Documentation strings on functions or modules.
-  3. `docs/` for how-tos, references, and explanations following [Diátaxis](https://diataxis.fr/).
-  4. `CONTRIBUTING.md` for human workflow guidance.
-  5. `.github/copilot-instructions.md` for AI decision rules.
-- Prefer this order when documenting decisions: inline comments, documentation strings, updates to existing docs, then new long-form docs.
-- Keep docs accurate to `HEAD`: verify dependencies, command availability, and feature status.
-- Run Vale through pre-commit (`pre-commit run vale --all-files`), not `vale .`. Vale has no directory-ignore mechanism and scans everything, including `node_modules`. For targeted checks on specific files, use `vale <filename>` directly.
-- Handle Vale output in this order:
-  1. Process suggestions first: review every suggestion one by one, then either apply it or make an explicit, reasoned decision not to apply it.
-  2. Fix all warnings second.
-  3. Fix all errors last because they're commit-blocking.
-  4. Never bulk-ignore suggestions or skip the suggestions pass.
-- Vale's `Microsoft.Dashes` rule flags em dashes adjacent to backtick-wrapped text as having spaces. Rephrase the sentence to avoid the adjacency rather than suppressing the rule.
-- When Vale's `Vale.Terms` rule enforces casing for a term such as `cacheable`, the Vale rule wins over prose formatting conventions like capitalized bold labels.
-- Vale vocabulary categorization when a term is flagged:
-  - Proper nouns (products, tools, libraries, people, conferences): add to `.styles/config/vocabularies/Project/accept.txt`.
-  - Prose terms (technical English such as `monorepo`, `cacheable`; naming conventions such as `camelCase`, `PascalCase`): add to `accept.txt`.
-  - Code identifiers (field names such as `createdAt`, function names such as `toDocument()`, variable names): wrap in backticks in prose, never in `accept.txt`. Vale skips backtick-wrapped content.
-  - Case corrections and preference enforcement (`firebase` → `Firebase`, `npm` → `pnpm`): add to `reject.txt` as substitution rules.
-- Don't modify third-party Vale styles generated under `.styles/`, except `.styles/config/`.
+- Place guidance at the highest-priority location that fits, following the documentation strategy in [Code conventions](../docs/reference/code-conventions.md). Don't duplicate guidance across files; link to the canonical source.
+- Keep docs accurate to `HEAD`: verify dependencies, command availability, and feature status. State plans explicitly as planned or not yet implemented.
 - Every source file needs SPDX headers. For files without comment syntax, declare them in `.reuse/dep5`; see [How to add SPDX headers to new files](../docs/how-tos/add-spdx-headers.md).
-- Wrap file and directory paths in backticks when they appear in prose (for example, `apps/web`, `packages/game-data/src/index.ts`). Markdown link targets don't need backticks.
+- Wrap file and directory paths in backticks in prose and YAML metadata (for example, `apps/web`, `packages/game-data/src/index.ts`). Markdown link targets don't need backticks.
 - When adding features, keep these descriptions in sync: `package.json` `description`, `README.md` tagline or summary, and `CONTRIBUTING.md` references to commands or scripts.
-- Documentation principles:
-  - Prefer concise, factual, present-tense writing.
-  - Keep guidance implementation-oriented, not aspirational.
-  - Avoid duplicating long guidance across files; link to canonical docs instead.
-  - State plans explicitly as planned or not yet implemented.
+
+### Vale
+
+- Run Vale through pre-commit (`pre-commit run vale --all-files`), not `vale .`. Vale has no directory-ignore mechanism and scans everything, including `node_modules`. For targeted checks, use `vale <filename>` directly.
+- Handle output in order: review every suggestion one by one and either apply it or make an explicit, reasoned decision not to; then fix all warnings; then fix all errors, which are commit-blocking. Never bulk-ignore suggestions or skip the suggestions pass.
+- `Microsoft.Dashes` flags em dashes adjacent to backtick-wrapped text as having spaces. Rephrase to avoid the adjacency rather than suppressing the rule.
+- When `Vale.Terms` enforces casing for a term such as `cacheable`, the Vale rule wins over prose formatting conventions like capitalized bold labels.
+- Categorize a flagged term by type:
+  - Proper nouns (products, tools, libraries, people, conferences): add to `.styles/config/vocabularies/Project/accept.txt`.
+  - Prose terms (technical English such as `monorepo`; naming conventions such as `camelCase`): add to `accept.txt`.
+  - Code identifiers (field names such as `createdAt`, function names such as `toDocument()`, variable names): wrap in backticks in prose, never in `accept.txt`. Vale skips backtick-wrapped content.
+  - Case corrections and preference enforcement (`firebase` to `Firebase`, `npm` to `pnpm`): add to `reject.txt` as substitution rules.
+- Don't modify third-party Vale styles generated under `.styles/`, except `.styles/config/`.
 
 ## Changelog rules
 
-- `CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-- Write entries from the **user's perspective**. Describe what someone using Genshin Planner can see or do, not the implementation.
-- Don't include infrastructure, CI/CD, developer tooling, dependency updates, refactors, or internal package changes. Those are invisible to users.
-- Use the standard sections: Added, Changed, Deprecated, Removed, Fixed, Security. Each section is relative to the **previous release**, not the previous commit.
-- Before the first release, only **Added** applies. Other sections require a released baseline to compare against.
-- Keep entries concise. One bullet per user-visible change; combine related commits into a single entry.
-- Don't mention technology choices such as "zustand store" or "TanStack Query" unless the user directly interacts with that technology.
+- `CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), with sections relative to the previous release rather than the previous commit.
+- Write entries from the user's perspective: what someone using the app can see or do. One bullet per user-visible change.
+- Leave out infrastructure, CI/CD, developer tooling, dependency updates, refactors, and internal package changes. Those are invisible to users.
+- Don't name technology choices such as "zustand store" or "TanStack Query" unless the user interacts with that technology directly.
+- Before the first release, only **Added** applies; the other sections need a released baseline to compare against.
 
 ## Workflow guardrails
 
@@ -151,9 +131,10 @@
 - Run `pnpm typecheck` manually because it's not part of local pre-commit hooks.
 - Never use `git commit --amend` or `git push --force`.
 - Fixes after hook failures should be new commits; squash merge handles cleanup.
-- For GitHub issues, track dependencies only with native issue relationships (`blocked by` / `is blocking`), not issue body text or comments.
-- Prefer filing follow-up issues for out-of-scope concerns over expanding a PR.
-- Evaluate automated PR review suggestions critically. Verify that a suggestion actually solves the stated problem before applying it.
+- Track issue dependencies only with native GitHub issue relationships (`blocked by` and `is blocking`), not issue body text or comments.
+- Prefer filing follow-up issues for out-of-scope concerns over expanding a pull request.
+- Evaluate automated review suggestions critically. Verify a suggestion actually solves the stated problem before applying it.
+- Check the codebase before assuming, and check issues and milestones before starting work.
 
 ## Shell script rules
 
@@ -165,19 +146,17 @@
 
 ## Playwright MCP rules
 
-- The Playwright MCP server is configured in `.vscode/mcp.json` and runs headless Chrome.
-- Save screenshots to `/tmp/` (for example, `/tmp/dark-mode.png`), never to the workspace. This keeps the repo clean without needing gitignore entries.
+Save screenshots to `/tmp/` (for example, `/tmp/dark-mode.png`), never to the
+workspace, so the repo stays clean without gitignore entries. The server itself
+is configured in `.vscode/mcp.json`.
 
 ## Infrastructure rules
 
 - GCP projects use `dungeon-studio-genshin-{env}`; `shared` and `core` are production-grade infrastructure.
 - Apply environment labels on creation with `gcloud alpha projects update --update-labels=environment=VALUE`.
 - Enable Google Cloud APIs on demand when required by active work.
-- Keep Terraform version aligned across:
-  - `.github/workflows/terraform-plan.yml`
-  - `.github/workflows/terraform-apply.yml`
-  - `.github/workflows/ci.yml` pre-commit job, when Terraform is in use
-- Current Terraform version baseline: `1.9.0`.
+- The Terraform version is set once per workflow as the `TERRAFORM_VERSION` environment variable. When changing it, keep every workflow that declares it aligned.
+- Terraform files need SPDX headers using `#` comment syntax. Never hard-code secrets; use environment variables.
 
 ## Docker rules
 
@@ -187,21 +166,8 @@
 
 ## File naming
 
-Enforced by `ls-lint` (see `.ls-lint.yml`).
+`.ls-lint.yml` holds the per-extension casing rules and enforces them. Two
+conventions it can't express:
 
-- All files and directories: `kebab-case` (`user-profile.ts`,
-  `character-card.tsx`, `features/collection/characters/`). React
-  component files use the same `kebab-case` filename style as `shadcn/ui`.
-  Component _identifiers_ remain `PascalCase`
-  (`function CharacterCard() {}`); only the filename is kebab.
-- Co-located test files mirror their source:
-  `use-auth.ts` → `use-auth.test.ts`;
-  `character-card.tsx` → `character-card.test.tsx`.
-- Terraform (`infrastructure/terraform/**`): HashiCorp-style `snake_case`
-  for `.tf`, `.tfvars`, `.hcl`, and module directories.
-
-## When unsure
-
-- Check issues and milestones first.
-- Check the codebase before assuming.
-- Ask before adding dependencies.
+- React component files are `kebab-case` like every other file, but component _identifiers_ stay `PascalCase` (`character-card.tsx` exports `function CharacterCard() {}`).
+- Co-located test files mirror their source and use the `.test.` suffix, not `.spec.`: `use-auth.ts` becomes `use-auth.test.ts`.

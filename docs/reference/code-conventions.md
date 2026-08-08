@@ -44,6 +44,29 @@ Use descriptive, specific names for files and modules. Avoid generic names like 
 
 Branded types in `packages/domain/` each get their own file (for example, `uuid.ts`, `iso-timestamp.ts`). Export both the type and any related validation functions from the same file.
 
+## React components
+
+Page and layout components use function declarations (`export function CharactersPage()`). Reserve `const` with `React.forwardRef` for `shadcn/ui` primitives.
+
+Colocate a small helper component in the same file as its only caller, as a private function that isn't exported. Promote it to its own file when a second caller appears.
+
+Apply Tailwind utility classes directly rather than inline `style` objects, and merge conditional class names with `cn()` from `@/lib/utils`.
+
+## Tests
+
+Structure:
+
+- `describe` blocks mirror the module or component under test.
+- Use `it`, not `test`.
+- Name tests as plain-English sentences starting with a verb: `it('returns characters filtered by element')`.
+- Follow Arrange, Act, Assert within each test.
+
+Component tests query the way a user finds things—by accessible role or label (`screen.getByRole('heading')`, `screen.getByLabelText('Email')`). Reach for a test ID only when no accessible query works. Drive interactions with `userEvent` rather than `fireEvent`, and avoid snapshot tests for components; assert on behavior and accessible roles instead.
+
+Mock network calls at the fetch or adapter boundary, not inside library internals.
+
+For what to assert, see the testing principles in [CONTRIBUTING.md](../../CONTRIBUTING.md).
+
 ## Test utilities
 
 Shared API test utilities live in `apps/api/src/test/` with descriptive file names. The build excludes this directory via `tsconfig.build.json`.
