@@ -3,7 +3,7 @@
 
 import { getFirestore } from 'firebase-admin/firestore';
 
-import { app } from '@/lib/firebase/app.js';
+import { app } from '@/firebase/app.js';
 
 const rawDatabaseId = process.env.FIRESTORE_DATABASE_ID ?? '(default)';
 const databaseId = rawDatabaseId.trim();

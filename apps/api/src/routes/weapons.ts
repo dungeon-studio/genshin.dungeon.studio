@@ -8,7 +8,7 @@ import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import type { FromSchema } from 'json-schema-to-ts';
 
-import { requireWeaponId } from '@/lib/catalogue.js';
+import { requireWeaponId } from '@/catalogue.js';
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';

@@ -23,7 +23,7 @@ const firebaseConfig = {
 // Emulators, started at the repository root with the matching --project flag.
 // A real project ID in .env.local cannot reach real Firestore from there. The
 // deployed dev environment is a different, real project and is unaffected.
-// This mirrors the API's forced project ID in apps/api/src/lib/firebase/app.ts.
+// This mirrors the API's forced project ID in apps/api/src/firebase/app.ts.
 // Dead-code-eliminated during production builds.
 if (import.meta.env.DEV) {
   firebaseConfig.projectId = EMULATOR_PROJECT_ID;
