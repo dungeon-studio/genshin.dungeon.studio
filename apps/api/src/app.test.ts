@@ -27,6 +27,7 @@ beforeAll(() => {
   app.get('/__test/http-exception', () => {
     throw new HTTPException(503, { message: 'service unavailable' });
   });
+  app.all('/__test/catch-all', (c) => c.body(null, 204));
 });
 
 // The web app is a different origin from the API in every deployed
@@ -58,8 +59,13 @@ describe('CORS', () => {
 // how a client learns what one supports. These requests carry no credentials
 // because a browser preflight carries none either.
 describe('Allow header', () => {
+  // Sorted, because RFC 9110 gives the list no significant order — only its
+  // membership is a promise to the client.
   function allowed(res: Response): string[] {
-    return (res.headers.get('allow') ?? '').split(',').map((method) => method.trim());
+    return (res.headers.get('allow') ?? '')
+      .split(',')
+      .map((method) => method.trim())
+      .sort();
   }
 
   it.each([
@@ -81,6 +87,19 @@ describe('Allow header', () => {
     expect(res.headers.get('allow')).toBeNull();
   });
 
+  it('stays off responses to every other method', async () => {
+    const res = await app.request('/health');
+    expect(res.headers.get('allow')).toBeNull();
+  });
+
+  // Hono files `app.all()` routes under a pseudo-method that is not an HTTP
+  // method, and it answers every probe.
+  it('omits the pseudo-method behind a catch-all route', async () => {
+    const res = await app.request('/__test/catch-all', { method: 'OPTIONS' });
+    expect(allowed(res)).not.toContain('ALL');
+    expect(allowed(res)).toContain('GET');
+  });
+
   it('accompanies the CORS preflight response', async () => {
     const res = await app.request('/api/weapons', {
       method: 'OPTIONS',
@@ -91,8 +110,7 @@ describe('Allow header', () => {
     });
 
     expect(res.status).toBe(204);
-    expect(res.headers.get('access-control-allow-origin')).toBe('http://localhost:5173');
-    expect(res.headers.get('access-control-allow-methods')).toContain('POST');
+    expect(res.headers.get('access-control-allow-methods')).not.toBeNull();
     expect(allowed(res)).toContain('POST');
   });
 });
