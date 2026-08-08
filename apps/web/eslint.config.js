@@ -2,23 +2,21 @@
 // SPDX-License-Identifier: MIT
 
 import eslintReact from '@eslint-react/eslint-plugin';
-import genshinConfig from '@genshin/eslint-config';
+import genshinConfig, { TYPESCRIPT_FILES } from '@genshin/eslint-config';
+import { defineConfig } from 'eslint/config';
 import jsxA11yX from 'eslint-plugin-jsx-a11y-x';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 
-const TS_FILES = ['**/*.{ts,tsx}'];
 const TEST_FILES = ['**/*.{test,spec}.{ts,tsx}', 'src/test/**/*.{ts,tsx}'];
 const SHADCN_SCAFFOLDS = ['src/components/ui/**/*.{ts,tsx}'];
 
-const eslintReactRecommended = eslintReact.configs['recommended-typescript'];
-
 /**
- * Both plugins implement these. `eslint-plugin-react-hooks` is first-party and
- * compiler-backed, so it keeps them; enabling both reports every hook violation
- * twice.
+ * `@eslint-react` and `eslint-plugin-react-hooks` both implement these.
+ * react-hooks is first-party and compiler-backed, so it keeps them; enabling
+ * both reports every hook violation twice.
  */
 const RULES_OWNED_BY_REACT_HOOKS = {
   '@eslint-react/error-boundaries': 'off',
@@ -32,57 +30,41 @@ const RULES_OWNED_BY_REACT_HOOKS = {
   '@eslint-react/use-memo': 'off',
 };
 
-export default [
-  ...genshinConfig(import.meta.dirname),
+// Rules here scope to `TYPESCRIPT_FILES` because this workspace also lints
+// plain-JavaScript config files, which none of them apply to.
+export default defineConfig([
+  genshinConfig(import.meta.dirname),
   {
-    files: TS_FILES,
+    files: TYPESCRIPT_FILES,
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
     },
   },
   {
-    files: TS_FILES,
-    ...eslintReactRecommended,
+    files: TYPESCRIPT_FILES,
+    extends: [
+      eslintReact.configs['recommended-typescript'],
+      reactHooks.configs.flat.recommended,
+      reactRefresh.configs.vite,
+    ],
     rules: {
-      ...eslintReactRecommended.rules,
       // Wants every `useRef` result named `*Ref`; ours hold mutable instance
       // state rather than element handles.
       '@eslint-react/naming-convention-ref-name': 'off',
-    },
-  },
-  {
-    files: TS_FILES,
-    plugins: { 'react-hooks': reactHooks },
-    rules: {
-      ...reactHooks.configs.recommended.rules,
       ...RULES_OWNED_BY_REACT_HOOKS,
-    },
-  },
-  {
-    // `@eslint-react` takes no position on declaration syntax, so
-    // `function-component-definition` has no counterpart. The version pin
-    // avoids a `detect` path that calls an API ESLint 10 removed.
-    files: TS_FILES,
-    plugins: { react },
-    settings: { react: { version: '19' } },
-    rules: {
-      'react/function-component-definition': ['error', { namedComponents: 'function-declaration' }],
-    },
-  },
-  {
-    files: TS_FILES,
-    plugins: { 'react-refresh': reactRefresh },
-    rules: {
+      // The Vite preset errors; a missed fast refresh costs a manual reload.
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
   },
   {
-    files: TS_FILES,
-    ...jsxA11yX.configs.recommended,
+    // This preset brings its own `languageOptions`, which inside the `extends`
+    // list above would take precedence over this workspace's.
+    files: TYPESCRIPT_FILES,
+    extends: [jsxA11yX.configs.recommended],
   },
   {
-    files: TS_FILES,
+    files: TYPESCRIPT_FILES,
     rules: {
       '@typescript-eslint/naming-convention': [
         'error',
@@ -96,8 +78,23 @@ export default [
     },
   },
   {
+    // `@eslint-react` has no counterpart for `function-component-definition`,
+    // the only reason this plugin is here.
+    files: TYPESCRIPT_FILES,
+    // Hand-registered because this plugin's flat preset would enable its whole
+    // recommended set.
+    plugins: { react },
+    // Pinned because `detect` calls an API ESLint 10 removed.
+    settings: { react: { version: '19' } },
+    rules: {
+      'react/function-component-definition': ['error', { namedComponents: 'function-declaration' }],
+    },
+  },
+  {
     files: SHADCN_SCAFFOLDS,
     rules: {
+      // Upstream scaffolds are `const X = React.forwardRef(...)`, not function
+      // declarations; rewriting them would fight every regeneration.
       'react/function-component-definition': 'off',
       // `CardTitle` spreads children into its `<h3>`, so content lives at the call site.
       'jsx-a11y-x/heading-has-content': 'off',
@@ -111,4 +108,4 @@ export default [
       '@eslint-react/no-nested-component-definitions': 'off',
     },
   },
-];
+]);
