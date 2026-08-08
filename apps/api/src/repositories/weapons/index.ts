@@ -6,7 +6,7 @@ import { randomUUID } from 'node:crypto';
 import type { CollectionWeapon, ISOTimestamp, UUID } from '@genshin/domain';
 import type { WeaponId } from '@genshin/game-data';
 
-import { db } from '@/lib/firebase/firestore.js';
+import { db } from '@/firebase/firestore.js';
 
 import { fromDocument, toDocument } from './document.js';
 

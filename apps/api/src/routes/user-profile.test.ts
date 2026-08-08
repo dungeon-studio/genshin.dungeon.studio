@@ -6,12 +6,12 @@ import { Ajv2020 } from 'ajv/dist/2020.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '@/app.js';
-import { verifyToken } from '@/lib/firebase/auth.js';
+import { verifyToken } from '@/firebase/auth.js';
 import { profileGetResponseV1 } from '@/profiles/json-schema/profile/get-response-v1.js';
 import * as Profile from '@/repositories/profile/index.js';
 import { FAKE_UID, authedRequest } from '@/test/auth-requests.js';
 
-vi.mock('@/lib/firebase/auth.js', () => ({
+vi.mock('@/firebase/auth.js', () => ({
   verifyToken: vi.fn(),
 }));
 

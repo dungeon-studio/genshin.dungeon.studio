@@ -6,7 +6,7 @@ import type { CollectionCharacter, CollectionTeam, CollectionWeapon, UUID } from
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '@/app.js';
-import { verifyToken } from '@/lib/firebase/auth.js';
+import { verifyToken } from '@/firebase/auth.js';
 import { toMediaTypeString } from '@/middleware/negotiate-content.js';
 import { teamItemV1 } from '@/profiles/alps/team/item-v1.js';
 import * as Characters from '@/repositories/characters/index.js';
@@ -14,7 +14,7 @@ import * as Teams from '@/repositories/teams/index.js';
 import * as Weapons from '@/repositories/weapons/index.js';
 import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
 
-vi.mock('@/lib/firebase/auth.js', () => ({
+vi.mock('@/firebase/auth.js', () => ({
   verifyToken: vi.fn(),
 }));
 

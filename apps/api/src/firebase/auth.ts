@@ -3,7 +3,7 @@
 
 import { type DecodedIdToken, getAuth } from 'firebase-admin/auth';
 
-import { app } from '@/lib/firebase/app.js';
+import { app } from '@/firebase/app.js';
 
 const auth = getAuth(app);
 

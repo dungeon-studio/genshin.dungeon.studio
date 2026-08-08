@@ -4,8 +4,8 @@
 import { createMiddleware } from 'hono/factory';
 import { HTTPException } from 'hono/http-exception';
 
-import type { DecodedIdToken } from '@/lib/firebase/auth.js';
-import { verifyToken } from '@/lib/firebase/auth.js';
+import type { DecodedIdToken } from '@/firebase/auth.js';
+import { verifyToken } from '@/firebase/auth.js';
 
 export type AuthVariables = {
   user: DecodedIdToken;

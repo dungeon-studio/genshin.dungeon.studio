@@ -8,7 +8,7 @@ import type {
   ISOTimestamp,
 } from '@genshin/domain';
 
-import { db } from '@/lib/firebase/firestore.js';
+import { db } from '@/firebase/firestore.js';
 
 import { fromDocument, toDocument } from './document.js';
 
