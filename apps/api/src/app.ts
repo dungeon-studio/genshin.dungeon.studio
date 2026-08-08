@@ -11,6 +11,7 @@ import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 
+import { ProblemException } from '@/http/problem.js';
 import { retryAfterSeconds } from '@/http/retry-after.js';
 import type { AuthVariables } from '@/middleware/auth.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
@@ -59,7 +60,7 @@ app.onError((err, c) => {
     if (retryAfter !== undefined) headers['Retry-After'] = String(retryAfter);
     return c.json(
       {
-        type: 'about:blank',
+        type: resolved instanceof ProblemException ? resolved.type : 'about:blank',
         title: STATUS_CODES[resolved.status] ?? 'Unknown Error',
         status: resolved.status,
         detail: resolved.message,

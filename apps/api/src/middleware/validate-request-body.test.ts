@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import { Hono } from 'hono';
+import { HTTPException } from 'hono/http-exception';
 import { describe, expect, it } from 'vitest';
 
+import { ProblemException } from '@/http/problem.js';
 import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
 import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
 
@@ -26,7 +28,10 @@ const schemaV2: JsonSchemaProfile = {
   schema: {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
     type: 'object',
-    properties: { name: { type: 'string' }, level: { type: 'integer' } },
+    properties: {
+      name: { type: 'string' },
+      level: { type: 'integer', minimum: 1, maximum: 10 },
+    },
     required: ['name', 'level'],
     additionalProperties: false,
   },
@@ -48,7 +53,21 @@ describe('validateRequestBody middleware', () => {
         return c.json({ body: c.get('validatedBody') }, 200);
       },
     );
+    // Stands in for the application error handler, which is what actually puts
+    // `type` on the wire; here it only has to expose what the middleware threw.
+    app.onError((err, c) =>
+      c.json(
+        { type: err instanceof ProblemException ? err.type : 'about:blank' },
+        err instanceof HTTPException ? err.status : 500,
+      ),
+    );
     return app;
+  }
+
+  async function problemType(app: ReturnType<typeof createApp>, body: unknown) {
+    const res = await app.request(putRequest(body));
+    const json = (await res.json()) as { type: string };
+    return json.type;
   }
 
   function putRequest(body: unknown) {
@@ -84,11 +103,48 @@ describe('validateRequestBody middleware', () => {
     expect(res.status).toBe(422);
   });
 
-  it('returns 422 when body has extra properties', async () => {
-    const app = createApp([schemaV1], schemaV1.path);
-    const res = await app.request(putRequest({ name: 'test', extra: true }));
+  // RFC 9457 makes `type` the classifier clients branch on, so each failure
+  // mode has to be distinguishable without parsing the human-readable detail.
+  describe('problem type classification', () => {
+    it('classifies a missing required property', async () => {
+      const app = createApp([schemaV2], schemaV2.path);
 
-    expect(res.status).toBe(422);
+      await expect(problemType(app, { level: 5 })).resolves.toBe(
+        '/problems/validation/missing-property',
+      );
+    });
+
+    it('classifies a property of the wrong type', async () => {
+      const app = createApp([schemaV2], schemaV2.path);
+
+      await expect(problemType(app, { name: 42, level: 5 })).resolves.toBe(
+        '/problems/validation/invalid-type',
+      );
+    });
+
+    it('classifies a property outside its permitted range', async () => {
+      const app = createApp([schemaV2], schemaV2.path);
+
+      await expect(problemType(app, { name: 'test', level: 99 })).resolves.toBe(
+        '/problems/validation/out-of-range',
+      );
+    });
+
+    it('classifies an unexpected property', async () => {
+      const app = createApp([schemaV1], schemaV1.path);
+
+      await expect(problemType(app, { name: 'test', extra: true })).resolves.toBe(
+        '/problems/validation/additional-properties',
+      );
+    });
+
+    it('widens to the parent type when failures span categories', async () => {
+      const app = createApp([schemaV2], schemaV2.path);
+
+      await expect(problemType(app, { level: 99, extra: true })).resolves.toBe(
+        '/problems/validation',
+      );
+    });
   });
 
   it('returns 400 for invalid JSON body', async () => {

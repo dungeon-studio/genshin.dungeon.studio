@@ -1,9 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { ProblemDetail } from '@genshin/domain';
 import { GoogleError, Status } from 'google-gax';
 import { HTTPException } from 'hono/http-exception';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
+
+import { ProblemException } from '@/http/problem.js';
 
 import { app } from './app.js';
 
@@ -26,6 +29,9 @@ beforeAll(() => {
   });
   app.get('/__test/http-exception', () => {
     throw new HTTPException(503, { message: 'service unavailable' });
+  });
+  app.get('/__test/problem-exception', () => {
+    throw new ProblemException(422, { type: '/problems/test', message: 'classified failure' });
   });
 });
 
@@ -51,6 +57,24 @@ describe('CORS', () => {
   it('allows credentials, so the browser sends the ID token', async () => {
     const res = await app.request('/health', { headers: { Origin: origin } });
     expect(res.headers.get('access-control-allow-credentials')).toBe('true');
+  });
+});
+
+describe('onError problem type', () => {
+  it('carries the type of a classified error into the problem document', async () => {
+    const res = await app.request('/__test/problem-exception');
+    const problem = (await res.json()) as ProblemDetail;
+
+    expect(res.status).toBe(422);
+    expect(problem.type).toBe('/problems/test');
+    expect(problem.detail).toBe('classified failure');
+  });
+
+  it('falls back to about:blank for an unclassified error', async () => {
+    const res = await app.request('/__test/http-exception');
+    const problem = (await res.json()) as ProblemDetail;
+
+    expect(problem.type).toBe('about:blank');
   });
 });
 
