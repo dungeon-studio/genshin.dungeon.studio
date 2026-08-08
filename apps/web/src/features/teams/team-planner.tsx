@@ -112,6 +112,9 @@ export function TeamPlanner({
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {slots.map((member, i) => (
           <TeamMemberPlanner
+            // A slot's index is its identity: the array is fixed-arity and
+            // empty slots are null, so nothing reorders.
+            // eslint-disable-next-line @eslint-react/no-array-index-key
             key={i}
             member={member}
             collectionCharacter={member ? getCharacter(member.characterId) : undefined}
