@@ -48,9 +48,14 @@ run_verification() {
 
   verify "node"                 node --version
   verify "pnpm"                 pnpm --version
+  verify "docker"               docker --version
+  verify "gh"                   gh --version
   verify "gcloud"               gcloud --version
+  verify "terraform"            terraform version
+  verify "java"                 java -version
   verify "pre-commit"           pre-commit --version
   verify "reuse"                reuse --version
+  verify "vale"                 vale --version
   verify "lychee"               lychee --version
   verify "firebase"             firebase --version
   verify "playwright-cli"       pnpm --filter @genshin/e2e exec playwright --version
@@ -70,9 +75,14 @@ run_version_summary() {
 
   print_version "node"       node --version
   print_version "pnpm"       pnpm --version
+  print_version "docker"     docker --version
+  print_version "gh"         gh --version
   print_version "gcloud"     gcloud --version
+  print_version "terraform"  terraform version
+  print_version "java"       java -version
   print_version "pre-commit" pre-commit --version
   print_version "reuse"      reuse --version
+  print_version "vale"       vale --version
   print_version "lychee"     lychee --version
   print_version "firebase"   firebase --version
   print_version "playwright" pnpm --filter @genshin/e2e exec playwright --version
