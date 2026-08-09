@@ -13,19 +13,17 @@ type UserSubcollection = 'characters' | 'teams' | 'weapons';
 /**
  * A user id no other test uses.
  *
- * Every integration test owns one, so no test observes another's documents and
- * the emulator never needs clearing between them.
+ * Isolation rests on this rather than on clearing the emulator between tests,
+ * which is what lets the suites run in parallel.
  */
 export const newUserId = (): string => randomUUID();
 
 /**
- * A document at the path the repositories read and write.
+ * A document at the path the repositories read and write, for planting stored
+ * shapes no route can produce.
  *
- * Spelled out here rather than imported from the repository under test: a test
- * that derived the path from the code it exercises could not notice the path
- * changing. Tests reach for this to plant documents the API itself would never
- * write — a stored shape predating `schemaVersion`, or an id no route would
- * accept — since those are the cases nothing else can set up.
+ * The path is restated rather than imported from the repository under test: a
+ * fixture deriving it from the code it exercises could not notice it changing.
  */
 export function documentRef(
   userId: string,

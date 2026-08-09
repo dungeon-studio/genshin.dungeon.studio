@@ -21,8 +21,8 @@ const RAISED_REFINEMENT_LEVEL = 5;
 const CREATED_AT = '2026-01-01T00:00:00.000Z';
 const UPDATED_AT = '2026-01-02T00:00:00.000Z';
 
-// The instance id is a branded string the collection carries as a plain one, so
-// every hand-off back into the repository restates the brand the routes assert.
+// The collection type widens the branded instance id to a plain string, so
+// every hand-off back into the repository restates the brand, as the routes do.
 const idOf = (weapon: CollectionWeapon) => weapon.weaponInstanceId as UUID;
 const newInstanceId = () => randomUUID() as UUID;
 

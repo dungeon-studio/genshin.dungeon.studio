@@ -161,9 +161,9 @@ jobs:
         run: bash scripts/verify-dev.sh
 
   # Exercises the repository layer against a real Firestore. The workspace job
-  # above mocks it away, and the browser suite below reaches it only along the
-  # paths the UI offers — neither can plant a document the API is incapable of
-  # writing, which is what the version-union and slot-filter cases need.
+  # above mocks it away and the browser suite below reaches it only along the
+  # paths the UI offers, so neither can plant a stored document the API is
+  # incapable of writing.
   integration:
     name: Test against Firestore
     runs-on: ubuntu-latest

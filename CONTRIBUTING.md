@@ -128,7 +128,7 @@ For code conventions—comments, documentation strategy, naming, shared types, t
 - **Assert only the necessary properties**: keep each assertion as close to the property under test as possible; redundant assertions obscure what the test proves.
 - **Use `satisfies` for fixture annotations**: it validates the fixture shape at the declaration site without changing the inferred type, avoiding index-signature assignability errors.
 - **One schema assertion per route test, then field-level spot checks**: validate the response against the published JSON Schema with AJV first, then assert one specific value; don't re-test the schema field by field.
-- **Reserve the emulator suite for what no route can produce**: `*.integration.test.ts` files run against a real Firestore under `pnpm --filter @genshin/api test:integration`; a test belongs there when it has to plant a stored document the API itself would never write, not to re-cover ground the route or browser suites already reach.
+- **Reserve the emulator suite for what no route can produce**: an `*.integration.test.ts` earns its place when it has to plant a stored document the API itself would never write, not by re-covering ground the route or browser suites already reach.
 
 ---
 

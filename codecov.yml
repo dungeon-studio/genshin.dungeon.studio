@@ -1,8 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 ---
-# The other repositories are covered by the emulator-backed suite; this one is
-# inert and awaiting deletion in #879, so it gets no tests written for it.
+# Inert and awaiting deletion in #879, so no tests are written for it.
 ignore:
   - 'apps/api/src/repositories/profile/index.ts'
 

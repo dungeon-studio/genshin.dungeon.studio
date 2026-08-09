@@ -20,9 +20,8 @@
       // verify-deployment.ts is invoked from deploy.yml, so knip can't see it.
       // The schemas:* scripts are auto-detected from their package.json entries.
       "entry": ["scripts/verify-deployment.ts"],
-      // The emulator-backed suite runs under a config knip's vitest plugin does
-      // not recognise by name; listing it here is what reaches its setup file
-      // and specs.
+      // knip's vitest plugin recognises only the conventional config name;
+      // listing the integration config reaches its setup file and specs.
       "vitest": {
         "config": ["vitest.config.ts", "vitest.integration.config.ts"]
       }

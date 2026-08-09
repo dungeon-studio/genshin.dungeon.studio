@@ -5,12 +5,12 @@ import { fileURLToPath } from 'node:url';
 
 import { defineConfig } from 'vitest/config';
 
-// The suite that talks to a real Firestore, so it needs an emulator and cannot
-// join the default run. Named off the `vitest.config.ts` pattern the root
-// config globs as projects, which keeps `pnpm test` from picking it up.
+// Needs a running emulator, so it cannot join the default run: the root config
+// globs `vitest.config.ts` as its projects, and this filename falls outside
+// that glob.
 //
-// Its artifacts sit beside the unit suite's rather than replacing them: both
-// runs upload under the `api` flag, and Codecov merges the two reports.
+// Artifact paths sit beside the unit suite's rather than replacing them. Both
+// upload under the `api` flag, and Codecov merges the two reports.
 export default defineConfig({
   resolve: {
     alias: {
@@ -21,10 +21,6 @@ export default defineConfig({
     globals: true,
     include: ['src/**/*.integration.test.ts'],
     setupFiles: ['./src/test/integration-setup.ts'],
-    // Every test owns a freshly generated user id, so the documents one test
-    // writes are invisible to the rest and the emulator never needs clearing.
-    // Sharing one Firestore connection across files is what makes that cheap.
-    fileParallelism: false,
     reporters: ['default', 'junit'],
     outputFile: {
       junit: './test-results/integration-junit.xml',
