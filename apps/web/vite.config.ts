@@ -18,9 +18,12 @@ const requiredEnvVars: readonly string[] = [
   'VITE_API_BASE_URL',
 ];
 
-const { version: appVersion } = JSON.parse(
-  fs.readFileSync(path.resolve(__dirname, 'package.json'), 'utf-8'),
-) as { version: string };
+function packageVersion(): string {
+  const { version } = JSON.parse(
+    fs.readFileSync(path.resolve(__dirname, 'package.json'), 'utf-8'),
+  ) as { version: string };
+  return version;
+}
 
 function shortSha(): string {
   try {
@@ -30,6 +33,7 @@ function shortSha(): string {
   }
 }
 
+const appVersion: string = packageVersion();
 const buildSha: string = shortSha();
 
 // https://vite.dev/config/

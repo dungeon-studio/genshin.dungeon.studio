@@ -2,7 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
-import type { CollectionCharacter, CollectionTeam, CollectionWeapon } from '@genshin/domain';
+import type {
+  CollectionCharacter,
+  CollectionTeam,
+  CollectionTeamMember,
+  CollectionWeapon,
+} from '@genshin/domain';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '@/app.js';
@@ -32,6 +37,11 @@ vi.mock('@/repositories/characters/index.js', () => ({
 vi.mock('@/repositories/weapons/index.js', () => ({
   get: vi.fn(),
 }));
+
+/** A members tuple holding one member, the rest of the slots empty. */
+function soloMembers(member: CollectionTeamMember): CollectionTeam['members'] {
+  return [member, null, null, null];
+}
 
 const FAKE_TEAM: CollectionTeam = {
   slot: 1,
@@ -302,14 +312,14 @@ describe('Team routes', () => {
       vi.mocked(Teams.save).mockResolvedValue({
         team: {
           ...FAKE_TEAM,
-          members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }, null, null, null],
+          members: soloMembers({ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }),
         },
         created: false,
       });
 
       const res = await app.request(
         authedRequest('PUT', '/teams/1', {
-          members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }, null, null, null],
+          members: soloMembers({ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }),
         }),
       );
 
@@ -458,13 +468,13 @@ describe('Team routes', () => {
           {
             ...FAKE_TEAM,
             slot: 2,
-            members: [{ characterId: 'ganyu', weaponInstanceId: 'uuid-1' }, null, null, null],
+            members: soloMembers({ characterId: 'ganyu', weaponInstanceId: 'uuid-1' }),
           },
         ]);
 
         const res = await app.request(
           authedRequest('PUT', '/teams/1', {
-            members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }, null, null, null],
+            members: soloMembers({ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }),
           }),
         );
 
@@ -478,20 +488,20 @@ describe('Team routes', () => {
           {
             ...FAKE_TEAM,
             slot: 2,
-            members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }, null, null, null],
+            members: soloMembers({ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }),
           },
         ]);
         vi.mocked(Teams.save).mockResolvedValue({
           team: {
             ...FAKE_TEAM,
-            members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }, null, null, null],
+            members: soloMembers({ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }),
           },
           created: false,
         });
 
         const res = await app.request(
           authedRequest('PUT', '/teams/1', {
-            members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }, null, null, null],
+            members: soloMembers({ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }),
           }),
         );
 

@@ -8,6 +8,7 @@ import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPut } from '@/lib/api';
+import { invalidateUserQuery } from '@/lib/invalidate-user-query';
 
 import type { CharacterCollection } from './use-character-collection-store';
 
@@ -71,10 +72,7 @@ export function useAddCharacterMutation(
       });
       return parseSingleCharacterResponse(response);
     },
-    onSuccess: () => {
-      if (userId !== undefined)
-        void queryClient.invalidateQueries({ queryKey: collectionKey(userId) });
-    },
+    onSuccess: invalidateUserQuery(queryClient, userId, collectionKey),
   });
 }
 
@@ -87,10 +85,7 @@ export function useRemoveCharacterMutation(
     mutationFn: async (characterId: CharacterId) => {
       await apiDelete(`/characters/${encodeURIComponent(characterId)}`);
     },
-    onSuccess: () => {
-      if (userId !== undefined)
-        void queryClient.invalidateQueries({ queryKey: collectionKey(userId) });
-    },
+    onSuccess: invalidateUserQuery(queryClient, userId, collectionKey),
   });
 }
 
@@ -114,9 +109,6 @@ export function useSetConstellationLevelMutation(
       });
       return parseSingleCharacterResponse(response);
     },
-    onSuccess: () => {
-      if (userId !== undefined)
-        void queryClient.invalidateQueries({ queryKey: collectionKey(userId) });
-    },
+    onSuccess: invalidateUserQuery(queryClient, userId, collectionKey),
   });
 }

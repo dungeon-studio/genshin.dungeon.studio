@@ -131,14 +131,9 @@ describe('validateTeams', () => {
       null,
       null,
     ];
-    const otherTeam = {
-      slot: 2 as TeamSlot,
-      members: [
-        { characterId: 'durin', weaponInstanceId: 'weapon-1' },
-        null,
-        null,
-        null,
-      ] as CollectionTeamMembers,
+    const otherTeam: { slot: TeamSlot; members: CollectionTeamMembers } = {
+      slot: 2,
+      members: [{ characterId: 'durin', weaponInstanceId: 'weapon-1' }, null, null, null],
     };
     const issues = validateTeams(1, current, [otherTeam]);
     expect(issues.length).toBeGreaterThan(0);
