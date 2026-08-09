@@ -51,21 +51,24 @@ export async function save(
   constellationLevel: ConstellationLevel,
 ): Promise<SaveResult> {
   const docRef = collectionRef(userId).doc(characterId);
-  const existing = await docRef.get();
-  const now = new Date().toISOString() as ISOTimestamp;
 
-  const existingData = existing.exists ? existing.data() : undefined;
+  return db.runTransaction(async (transaction) => {
+    const existing = await transaction.get(docRef);
+    const now = new Date().toISOString() as ISOTimestamp;
 
-  const character: CollectionCharacter = {
-    characterId,
-    constellationLevel,
-    createdAt: existingData ? fromDocument(characterId, existingData).createdAt : now,
-    updatedAt: now,
-  };
+    const existingData = existing.exists ? existing.data() : undefined;
 
-  await docRef.set(toDocument(character));
+    const character: CollectionCharacter = {
+      characterId,
+      constellationLevel,
+      createdAt: existingData ? fromDocument(characterId, existingData).createdAt : now,
+      updatedAt: now,
+    };
 
-  return { character, created: !existing.exists };
+    transaction.set(docRef, toDocument(character));
+
+    return { character, created: !existing.exists };
+  });
 }
 
 export async function remove(userId: string, characterId: string): Promise<void> {
