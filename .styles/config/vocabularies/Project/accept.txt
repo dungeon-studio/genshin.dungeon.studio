@@ -1,182 +1,150 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# Accepted terminology for this project
-# Vale will not flag these terms as spelling errors
-# Format: one term per line, case-sensitive
+# Terms Vale accepts in Markdown prose.
+#
+# Every entry does two jobs: Vale.Spelling stops flagging the term, and
+# Vale.Terms reports any other capitalization of it. Entries are regular
+# expressions matched against whole words, so two forms are in use:
+#
+#   Genshin      a name with one correct spelling; other casings are errors
+#   [Cc]onfig    an ordinary word the dictionary lacks; capitalization is
+#                the writer's call, so both forms pass
+#
+# A term earns a line when Vale flags it in this repo's prose, or when it
+# names a tool, service, or standard the repo depends on. Sections sort
+# alphabetically, ignoring case and the bracket.
 
-# Project names and brands
+# Project and site names
 Genshin
 Genshin Impact
 genshin.dungeon.studio
-Tailwind CSS
 
-# Languages and frameworks
-TypeScript
-JavaScript
-React Compiler
-zustand
+# Genshin Impact game terms: elements and weapon types
+Anemo
+Cryo
+Dendro
+Electro
+Geo
+Hydro
+Polearm
+Pyro
 
-# Build tools and package managers
-Turborepo
-Vite
-Bun
-pnpm
-npm
-corepack
-Dockerfile
-
-# Code quality tools
-Codecov
-knip
-jq
-pipx
-ESLint
-Prettier
-Stylelint
-Vitest
-hadolint
-markdownlint
-yamllint
-syncpack
-Colocate
-middleware
-tooltip
-
-# Configuration and tooling terms
-config
-configs
-formatters
-toolchain
-
-# Backend and database
-Firebase
-Firestore
-Verzod
-
-# Schema tooling
-backfilled
-deserializer
-jsoncompat
-Memcache
-optionalslop
-Ostrow
-Parseable
-rollouts
-serializer
-SRECon
-superset
-Zod
-Hono
-
-# Environment and deployment
-gcloud
-
-# Other tools and libraries
-Babel
-Lucide
-OXC
-SWC
-
-# API and architecture
-API
-APIs
+# Tools, libraries, and services the repo runs or depends on
 AJV
-cacheable
-CLI
-CI/CD
-dereferenceable
-dereferencing
-ETag
-HMR
-MCP
-monorepo
-namespace
-OpenAPI
-repo
-repos
-roadmaps
-semver
-typechecking
-unversioned
-Unprocessable
-validators
-
-# Cloud infrastructure
-GCP
+Babel
+Claude
 Cloud Run
 Cloud Storage
-auditable
-keyless
-
-# AI services
-Claude
-Anthropic
-Copilot
-claustre
-Claustre
-
-# Git concepts
-worktree
-worktrees
-
-# DevOps and automation
-GitHub Actions
+Codecov
 CodeQL
+Copilot
+corepack
 Dependabot
-Renovate
-Trivy
-SARIF
-misconfiguration
-misconfigurations
-
-# Web assets
-favicon
-polearm
-Polearm
-
-# Development workflow
-dev
-async
-allowlist
-allowlists
-hardcoded
-memoization
-playstyles
-ddbeck's
 DevContainers
 Diátaxis
-UTC
+Dockerfile
+ESLint
+Firebase
+Firestore
+gcloud
+GCP
+GitHub Actions
+hadolint
+Hono
+JavaScript
+jq
+jsoncompat
+knip
+Lucide
+markdownlint
+Memcache
+npm
+OXC
+pipx
+pnpm
+Prettier
+React Compiler
+Renovate
+Stylelint
+SWC
+syncpack
+Tailwind CSS
+Trivy
+Turborepo
+TypeScript
+Verzod
+Vite
+Vitest
+yamllint
+Zod
+zustand
+
+# Standards, formats, and acronyms
+API
+APIs
 camelCase
+CI/CD
+CLI
+DSGEP
+ESM
+ETag
+HMR
+HTTP
+IAM
+IETF
+INI
+ISBN
+ISO
+JSONC
+MCP
+OAuth
+OpenAPI
 PascalCase
 REST
-HTTP
-URI
-URIs
-ESM
-ISO
-SPDX
 REUSE
 RFC
-IETF
-ISBN
-OAuth
-Masse
-Hardt
-Dalal
-O'Reilly
-DSGEP
-IAM
+SARIF
+semver
 SPA
-JSONC
-INI
+SPDX
+URI
+URIs
+UTC
 
-# Game elements (Genshin Impact)
-Pyro
-Hydro
-Anemo
-Electro
-Dendro
-Cryo
-Geo
-DPS
+# Authors and works cited in docs
+Dalal
+Hardt
+Masse
+O'Reilly
+Ostrow
+SRECon
+
+# Ordinary words the dictionary lacks; either capitalization passes
+[Aa]sync
+[Aa]uditable
+[Bb]ackfilled
+[Cc]acheable
+[Cc]olocate
+[Cc]onfig
+[Cc]onfigs
+[Dd]eserializer
+[Dd]ev
+[Ff]avicon
+[Ff]ormatters
+[Hh]ardcoded
+[Kk]eyless
+[Mm]iddleware
+[Mm]onorepo
+[Nn]amespace
+[Oo]ptionalslop
+[Pp]arseable
+[Rr]epo
+[Rr]ollouts
+[Ss]erializer
+[Ss]uperset
+[Tt]oolchain
+[Tt]ypechecking
+[Uu]nprocessable
+[Uu]nversioned
+[Vv]alidators
