@@ -8,8 +8,7 @@ import { buildWeapons } from './weapons.js';
 
 type BuiltWeapon = ReturnType<typeof buildWeapons>[number];
 
-/** The roster's intended order: rarity descending, then version descending. */
-function ordered(previous: BuiltWeapon, current: BuiltWeapon): boolean {
+function precedes(previous: BuiltWeapon, current: BuiltWeapon): boolean {
   return previous.rarity === current.rarity
     ? compareVersions(previous.version, current.version) >= 0
     : previous.rarity > current.rarity;
@@ -37,7 +36,7 @@ describe('buildWeapons', () => {
   it('sorts by rarity descending, then version descending', () => {
     const outOfOrder = weapons
       .slice(1)
-      .filter((current, index) => !ordered(weapons[index], current));
+      .filter((current, index) => !precedes(weapons[index], current));
 
     expect(outOfOrder).toEqual([]);
   });

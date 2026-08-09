@@ -18,10 +18,9 @@ const AMOS_BOW = {
 } satisfies Weapon;
 
 /**
- * The type icons render `alt=""`: they restate the name beside them, so they
- * are decorative, and Testing Library's queries read the accessibility tree
- * that decorative nodes are absent from. Reaching them means going around it,
- * which this is the only place allowed to do.
+ * The type icons restate the name beside them, so they render `alt=""`. That
+ * keeps them out of the accessibility tree every Testing Library query reads,
+ * leaving direct DOM access the only way to reach them.
  */
 function typeIconsFor(summary: ReactElement): NodeListOf<HTMLImageElement> {
   const { container } = render(summary);

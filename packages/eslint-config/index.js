@@ -21,8 +21,8 @@ const LINTED_FILES = ['**/*.{ts,tsx,js,mjs,cjs}'];
 export const TYPESCRIPT_FILES = ['**/*.{ts,tsx}'];
 
 /**
- * The vitest suites and the helpers they share. Playwright names its suites
- * `*.spec.ts`, so that convention deliberately falls outside this.
+ * The vitest suites and their shared helpers. Playwright's `*.spec.ts` is left
+ * out on purpose; these rules do not describe it.
  */
 export const VITEST_FILES = ['**/*.test.{ts,tsx}', '**/test/**/*.{ts,tsx}'];
 
@@ -35,7 +35,6 @@ const DEV_DEPENDENCY_FILES = [
   '*.config.{ts,js,mjs,cjs}',
 ];
 
-/** Rules holding the vitest suites to the shape a test runner expects. */
 const VITEST_CONVENTIONS = {
   files: VITEST_FILES,
   extends: [vitest.configs.recommended],

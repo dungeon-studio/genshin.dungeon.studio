@@ -169,8 +169,8 @@ describe('FilterBar', () => {
 
   it('collapses only the chips, leaving search and sort reachable', () => {
     renderBar({ collapsible: true });
-    // Resolving `aria-controls` is an id lookup by definition; no Testing
-    // Library query expresses "the region this button controls".
+    // `aria-controls` holds an element id; no Testing Library query expresses
+    // "the region this button controls".
     // eslint-disable-next-line testing-library/no-node-access
     const region = document.getElementById(
       screen.getByRole('button', { name: 'Filters' }).getAttribute('aria-controls') ?? '',
