@@ -36,6 +36,10 @@
         // TypeScript enhancements
         "yoavbls.pretty-ts-errors",
 
+        // Shell scripts
+        "timonwong.shellcheck",
+        "foxundermoon.shell-format",
+
         // Documentation
         "chrischinchilla.vale-vscode",
 
