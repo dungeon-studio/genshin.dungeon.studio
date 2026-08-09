@@ -1,182 +1,136 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# Accepted terminology for this project
-# Vale will not flag these terms as spelling errors
-# Format: one term per line, case-sensitive
+# Each entry tells Vale.Spelling to accept the word and Vale.Terms to
+# report every other capitalization of it. Entries are regular expressions
+# matched against whole words.
+#
+# Add a term when Vale flags it in this repo's prose, or when it names a
+# tool, service, or standard the repo depends on.
 
-# Project names and brands
+# Project and site names
 Genshin
 Genshin Impact
 genshin.dungeon.studio
-Tailwind CSS
 
-# Languages and frameworks
-TypeScript
-JavaScript
-React Compiler
-zustand
+# Game terms: elements and weapon types
+Anemo
+Cryo
+Dendro
+Electro
+Geo
+Hydro
+Polearm
+Pyro
 
-# Build tools and package managers
-Turborepo
-Vite
-Bun
-pnpm
-npm
-corepack
-Dockerfile
-
-# Code quality tools
-Codecov
-knip
-jq
-pipx
-ESLint
-Prettier
-Stylelint
-Vitest
-hadolint
-markdownlint
-yamllint
-syncpack
-Colocate
-middleware
-tooltip
-
-# Configuration and tooling terms
-config
-configs
-formatters
-toolchain
-
-# Backend and database
-Firebase
-Firestore
-Verzod
-
-# Schema tooling
-backfilled
-deserializer
-jsoncompat
-Memcache
-optionalslop
-Ostrow
-Parseable
-rollouts
-serializer
-SRECon
-superset
-Zod
-Hono
-
-# Environment and deployment
-gcloud
-
-# Other tools and libraries
-Babel
-Lucide
-OXC
-SWC
-
-# API and architecture
-API
-APIs
+# Tools, libraries, and services the repo depends on
 AJV
-cacheable
-CLI
-CI/CD
-dereferenceable
-dereferencing
-ETag
-HMR
-MCP
-monorepo
-namespace
-OpenAPI
-repo
-repos
-roadmaps
-semver
-typechecking
-unversioned
-Unprocessable
-validators
-
-# Cloud infrastructure
-GCP
+Babel
 Cloud Run
 Cloud Storage
-auditable
-keyless
-
-# AI services
-Claude
-Anthropic
-Copilot
-claustre
-Claustre
-
-# Git concepts
-worktree
-worktrees
-
-# DevOps and automation
-GitHub Actions
+Codecov
 CodeQL
+Copilot
+corepack
 Dependabot
-Renovate
-Trivy
-SARIF
-misconfiguration
-misconfigurations
-
-# Web assets
-favicon
-polearm
-Polearm
-
-# Development workflow
-dev
-async
-allowlist
-allowlists
-hardcoded
-memoization
-playstyles
-ddbeck's
 DevContainers
 Diátaxis
-UTC
+Dockerfile
+ESLint
+Firebase
+Firestore
+GCP
+GitHub Actions
+hadolint
+Hono
+JavaScript
+jq
+jsoncompat
+knip
+Lucide
+Memcache
+OXC
+pipx
+pnpm
+Prettier
+React Compiler
+Renovate
+Stylelint
+SWC
+syncpack
+Trivy
+Turborepo
+TypeScript
+Verzod
+Vite
+Vitest
+yamllint
+Zod
+zustand
+
+# Standards, formats, and acronyms
+API
+APIs
 camelCase
-PascalCase
-REST
-HTTP
-URI
-URIs
+CI/CD
+CLI
+DSGEP
 ESM
+HMR
+HTTP
+IAM
+IETF
+INI
+ISBN
 ISO
-SPDX
+JSONC
+MCP
+OAuth
+OpenAPI
+REST
 REUSE
 RFC
-IETF
-ISBN
-OAuth
-Masse
-Hardt
-Dalal
-O'Reilly
-DSGEP
-IAM
+SARIF
+semver
 SPA
-JSONC
-INI
+SPDX
+URI
+URIs
+UTC
 
-# Game elements (Genshin Impact)
-Pyro
-Hydro
-Anemo
-Electro
-Dendro
-Cryo
-Geo
-DPS
+# Authors and works cited in docs
+Dalal
+Hardt
+Masse
+O'Reilly
+Ostrow
+SRECon
+
+# Ordinary words the dictionary lacks, in either capitalization
+[Aa]sync
+[Aa]uditable
+[Bb]ackfilled
+[Cc]acheable
+[Cc]olocate
+[Cc]onfig
+[Cc]onfigs
+[Dd]eserializer
+[Dd]ev
+[Ff]avicon
+[Ff]ormatters
+[Hh]ardcoded
+[Kk]eyless
+[Mm]iddleware
+[Mm]onorepo
+[Nn]amespace
+[Oo]ptionalslop
+[Pp]arseable
+[Rr]epo
+[Rr]ollouts
+[Ss]erializer
+[Ss]uperset
+[Tt]oolchain
+[Tt]ypechecking
+[Uu]nprocessable
+[Uu]nversioned
+[Vv]alidators

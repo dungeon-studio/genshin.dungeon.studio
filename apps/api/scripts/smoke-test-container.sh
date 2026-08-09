@@ -17,7 +17,7 @@ docker run -d --name "$CONTAINER_NAME" \
   "$IMAGE_TAG"
 
 for i in $(seq 1 "$HEALTH_TIMEOUT_SECONDS"); do
-  if curl -fsSL "http://localhost:$PORT/health" > /dev/null 2>&1; then
+  if curl -fsSL "http://localhost:$PORT/health" >/dev/null 2>&1; then
     echo "Health check passed on attempt $i"
     break
   fi

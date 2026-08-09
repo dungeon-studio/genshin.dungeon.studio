@@ -32,6 +32,13 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.wordWrap": "on"
   },
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+
+  // Shell scripts
+  // Keep in step with the shfmt pre-commit hook's flags.
+  "shellformat.flag": "-i 2 -ci",
 
   // TypeScript
   "typescript.preferences.importModuleSpecifier": "shortest",

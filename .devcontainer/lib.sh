@@ -20,7 +20,7 @@ step() {
 verify() {
   local label="$1"
   shift
-  if "$@" > /dev/null 2>&1; then
+  if "$@" >/dev/null 2>&1; then
     echo "  [ok] ${label}"
   else
     echo "  [FAIL] ${label}"
@@ -36,61 +36,73 @@ print_version() {
   echo "  ${label}: ${version}"
 }
 
-# ---------------------------------------------------------------------------
-# Provisioned tools
-# ---------------------------------------------------------------------------
+# The lifecycle scripts run under `set -x`, which drowns these reports in trace
+# output. `shopt -po` prints the command that restores the caller's setting,
+# whatever it was.
+quietly() {
+  local restore
+  restore="$(shopt -po xtrace 2>/dev/null)" || true
+  { set +x; } 2>/dev/null
+  "$@"
+  eval "${restore}"
+}
 
-# Every tool the container provisions, feature-installed or script-installed,
-# as "label|version command".
-TOOLS=(
-  "node|node --version"
-  "pnpm|pnpm --version"
-  "docker|docker --version"
-  "gh|gh --version"
-  "gcloud|gcloud --version"
-  "terraform|terraform version"
-  "java|java -version"
-  "pre-commit|pre-commit --version"
-  "reuse|reuse --version"
-  "vale|vale --version"
-  "lychee|lychee --version"
-  "firebase|firebase --version"
-  "playwright|pnpm --filter @genshin/e2e exec playwright --version"
-)
-
-# A loop rather than a pipeline: verify appends to FAILURES, and a subshell
-# would discard every failure.
+# Verification and the version summary have to cover the same tools; one list
+# is what stops them drifting apart. It spans everything the container
+# provisions, feature-installed or script-installed.
 for_each_tool() {
   local action="$1"
-  local entry label command argv
-  for entry in "${TOOLS[@]}"; do
-    IFS='|' read -r label command <<< "${entry}"
-    read -ra argv <<< "${command}"
-    "${action}" "${label}" "${argv[@]}"
-  done
+  "${action}" "node" node --version
+  "${action}" "pnpm" pnpm --version
+  "${action}" "docker" docker --version
+  "${action}" "gh" gh --version
+  "${action}" "gcloud" gcloud --version
+  "${action}" "terraform" terraform version
+  "${action}" "java" java -version
+  "${action}" "pre-commit" pre-commit --version
+  "${action}" "reuse" reuse --version
+  "${action}" "vale" vale --version
+  "${action}" "lychee" lychee --version
+  "${action}" "firebase" firebase --version
+  "${action}" "playwright" pnpm --filter @genshin/e2e exec playwright --version
 }
 
 # ---------------------------------------------------------------------------
-# Reports
+# Verification
 # ---------------------------------------------------------------------------
 
-report_verification() {
+check_tools() {
   step "Verifying installed tools"
 
   for_each_tool verify
-
-  # Not in the table: the browsers report no version, so `install --list` is
-  # the only proof they installed.
+  # The browsers install separately from the CLI and report no version, so
+  # only an install check can see them.
   verify "playwright-browsers" pnpm --filter @genshin/e2e exec playwright install --list
 }
 
-report_versions() {
+run_verification() {
+  quietly check_tools
+}
+
+# ---------------------------------------------------------------------------
+# Version summary
+# ---------------------------------------------------------------------------
+
+show_versions() {
   step "Environment versions"
 
   for_each_tool print_version
 }
 
-report_status() {
+run_version_summary() {
+  quietly show_versions
+}
+
+# ---------------------------------------------------------------------------
+# Final status
+# ---------------------------------------------------------------------------
+
+show_status() {
   echo ""
   if [[ ${#FAILURES[@]} -gt 0 ]]; then
     echo "Setup completed with failures:"
@@ -105,20 +117,6 @@ report_status() {
   echo "Setup complete — all tools verified."
 }
 
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
-
-# Suppresses `set -x` tracing so the formatted output stays readable, then
-# restores whatever the caller had set.
-run_report() {
-  local xtrace
-  xtrace="$(shopt -po xtrace 2>/dev/null)" || true
-  { set +x; } 2>/dev/null
-
-  report_verification
-  report_versions
-  report_status
-
-  eval "${xtrace}"
+run_status() {
+  quietly show_status
 }

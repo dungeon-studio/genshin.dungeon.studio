@@ -22,4 +22,4 @@ CFG=$(terraform output -json firebase_web_app_config)
   echo "VITE_FIREBASE_STORAGE_BUCKET=$(echo "$CFG" | jq -er .storage_bucket)"
   echo "VITE_FIREBASE_MESSAGING_SENDER_ID=$(echo "$CFG" | jq -er .messaging_sender_id)"
   echo "VITE_FIREBASE_APP_ID=$(echo "$CFG" | jq -er .app_id)"
-} >> "$GITHUB_OUTPUT"
+} >>"$GITHUB_OUTPUT"
