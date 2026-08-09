@@ -1,26 +1,19 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# Terms Vale accepts in Markdown prose.
+# Each entry tells Vale.Spelling to accept the word and Vale.Terms to
+# report every other capitalization of it. Entries are regular expressions
+# matched against whole words.
 #
-# Every entry does two jobs: Vale.Spelling stops flagging the term, and
-# Vale.Terms reports any other capitalization of it. Entries are regular
-# expressions matched against whole words, so two forms are in use:
-#
-#   Genshin      a name with one correct spelling; other casings are errors
-#   [Cc]onfig    an ordinary word the dictionary lacks; capitalization is
-#                the writer's call, so both forms pass
-#
-# A term earns a line when Vale flags it in this repo's prose, or when it
-# names a tool, service, or standard the repo depends on. Sections sort
-# alphabetically, ignoring case and the bracket.
+# Add a term when Vale flags it in this repo's prose, or when it names a
+# tool, service, or standard the repo depends on.
 
 # Project and site names
 Genshin
 Genshin Impact
 genshin.dungeon.studio
 
-# Genshin Impact game terms: elements and weapon types
+# Game terms: elements and weapon types
 Anemo
 Cryo
 Dendro
@@ -30,7 +23,7 @@ Hydro
 Polearm
 Pyro
 
-# Tools, libraries, and services the repo runs or depends on
+# Tools, libraries, and services the repo depends on
 AJV
 Babel
 Claude
@@ -120,7 +113,7 @@ O'Reilly
 Ostrow
 SRECon
 
-# Ordinary words the dictionary lacks; either capitalization passes
+# Ordinary words the dictionary lacks, in either capitalization
 [Aa]sync
 [Aa]uditable
 [Bb]ackfilled
