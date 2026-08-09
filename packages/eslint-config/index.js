@@ -4,6 +4,7 @@
 import { resolve } from 'node:path';
 
 import js from '@eslint/js';
+import vitest from '@vitest/eslint-plugin';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 import importX from 'eslint-plugin-import-x';
@@ -22,6 +23,12 @@ const LINTED_FILES = [`**/*.{${MODULE_EXTENSIONS.join(',')}}`];
  */
 export const TYPESCRIPT_FILES = ['**/*.{ts,tsx}'];
 
+/**
+ * The vitest suites and their shared helpers. Playwright's `*.spec.ts` is left
+ * out on purpose; these rules do not describe it.
+ */
+export const VITEST_FILES = ['**/*.test.{ts,tsx}', '**/test/**/*.{ts,tsx}'];
+
 /** Paths allowed to import `devDependencies`. */
 const DEV_DEPENDENCY_FILES = [
   '**/*.{test,spec}.{ts,tsx}',
@@ -30,6 +37,11 @@ const DEV_DEPENDENCY_FILES = [
   'eslint.config.js',
   '*.config.{ts,js,mjs,cjs}',
 ];
+
+const VITEST_CONVENTIONS = {
+  files: VITEST_FILES,
+  extends: [vitest.configs.recommended],
+};
 
 /** Rules tightening `tseslint.configs.recommended`. */
 const TYPESCRIPT_STRICTNESS = {
@@ -142,5 +154,6 @@ export default function genshinConfig(packageDir) {
     TYPESCRIPT_STRICTNESS,
     IMPORT_DISCIPLINE,
     declaredDependencies(packageDir),
+    VITEST_CONVENTIONS,
   ]);
 }

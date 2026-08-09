@@ -49,6 +49,6 @@ describe('WeaponCard', () => {
     render(<WeaponCard weapon={SWORD} instanceCount={1} selected />);
 
     const button = screen.getByRole('button');
-    expect(button.className).toContain('ring-primary');
+    expect(button).toHaveClass('ring-primary');
   });
 });

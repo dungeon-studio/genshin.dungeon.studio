@@ -111,16 +111,12 @@ describe('useCollection merge-on-first-login', () => {
 
     // A second account signs in.
     serverCharacters = charactersDocument([makeCharacter(ESCOFFIER, 2)]);
-    act(() => {
-      authUser = null;
-      rerender();
-    });
+    authUser = null;
+    rerender();
     await waitFor(() => expect(result.current.getCharacter(SKIRK)).toBeUndefined());
 
-    act(() => {
-      authUser = fakeUser('user-2');
-      rerender();
-    });
+    authUser = fakeUser('user-2');
+    rerender();
 
     await waitFor(() => expect(result.current.getCharacter(ESCOFFIER)?.constellationLevel).toBe(2));
     expect(result.current.getCharacter(SKIRK)).toBeUndefined();
