@@ -17,8 +17,7 @@ function collectionRef(userId: string) {
   return db.collection('users').doc(userId).collection('characters');
 }
 
-// `data()` is undefined exactly when the document is absent, so it subsumes an
-// `exists` check.
+// `data()` returns undefined exactly when the document does not exist.
 function fromSnapshot(characterId: string, snapshot: DocumentSnapshot): CollectionCharacter | null {
   const data = snapshot.data();
 
