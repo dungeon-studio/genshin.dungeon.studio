@@ -66,8 +66,8 @@ repos:
     rev: v0.11.0.1
     hooks:
       - id: shellcheck
-        # -x follows sourced files, so helpers in .devcontainer/lib.sh are
-        # checked against their callers rather than reported as unresolved.
+        # Without -x, the .devcontainer entrypoints report lib.sh as
+        # unresolvable instead of checking against it.
         args: [-x]
 
   # Shell script formatting
@@ -75,9 +75,9 @@ repos:
     rev: v3.13.1-1
     hooks:
       - id: shfmt
-        # --write is in the hook's default args, and pre-commit replaces
-        # those wholesale rather than appending; without it shfmt prints to
-        # stdout, exits 0, and gates nothing.
+        # Keep --write. It is one of the hook's default args, and pre-commit
+        # replaces those wholesale rather than appending; without it shfmt
+        # writes to stdout and exits 0 on files it would have rewritten.
         args: [--write, -i, '2', -ci]
 
   # Vale - Prose linting

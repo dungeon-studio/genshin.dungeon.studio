@@ -37,8 +37,8 @@ print_version() {
 }
 
 # The lifecycle scripts run under `set -x`, which drowns these reports in trace
-# output. Run the report with xtrace off and put the caller's setting back,
-# whatever it was — `shopt -po` prints the restoring command itself.
+# output. `shopt -po` prints the command that restores the caller's setting,
+# whatever it was.
 quietly() {
   local restore
   restore="$(shopt -po xtrace 2>/dev/null)" || true
@@ -47,8 +47,8 @@ quietly() {
   eval "${restore}"
 }
 
-# Applies an action to every tool the devcontainer installs, so verification and
-# the version summary cannot list different tools.
+# Verification and the version summary have to cover the same tools; one list
+# is what stops them drifting apart.
 for_each_tool() {
   local action="$1"
   "${action}" "node" node --version
@@ -69,8 +69,8 @@ check_tools() {
   step "Verifying installed tools"
 
   for_each_tool verify
-  # The browsers are a separate artifact from the CLI that only an install
-  # check can see, and they report no version, so they sit outside the table.
+  # The browsers install separately from the CLI and report no version, so
+  # only an install check can see them.
   verify "playwright-browsers" pnpm --filter @genshin/e2e exec playwright install --list
 }
 

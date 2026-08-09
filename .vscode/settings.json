@@ -37,8 +37,7 @@
   },
 
   // Shell scripts
-  // Mirrors the shfmt pre-commit hook's flags so formatting on save produces
-  // what the commit gate expects.
+  // Keep in step with the shfmt pre-commit hook's flags.
   "shellformat.flag": "-i 2 -ci",
 
   // TypeScript

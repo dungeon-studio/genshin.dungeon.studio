@@ -16,7 +16,6 @@ require() {
   }
 }
 
-# Verify build artifacts exist and have expected structure
 require -d apps/web/dist
 require -f apps/web/dist/index.html
 require -d apps/web/dist/assets
