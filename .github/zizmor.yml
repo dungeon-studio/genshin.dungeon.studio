@@ -15,3 +15,11 @@ rules:
     # request cannot write into the scope a develop or main run restores from.
     ignore:
       - ci.yml
+
+  secrets-inherit:
+    # terraform-apply.yml uses secret inheritance into its reusable workflow
+    # because the GCP_RW_* credentials are environment-scoped (core/dev/staging).
+    # Only the reusable declares `environment:`, so the caller cannot resolve
+    # those credentials to pass them explicitly.
+    ignore:
+      - terraform-apply.yml

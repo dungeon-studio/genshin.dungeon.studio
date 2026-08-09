@@ -26,6 +26,7 @@ jobs:
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: core
+    secrets: inherit
 
   dev:
     name: Dev
@@ -37,6 +38,7 @@ jobs:
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: dev
+    secrets: inherit
 
   staging:
     name: Staging
@@ -48,3 +50,4 @@ jobs:
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: staging
+    secrets: inherit
