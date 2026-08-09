@@ -161,8 +161,6 @@ The pull request title becomes the commit message, so it carries these rules:
 - Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
 - Write the subject in imperative mood ("add character filter," not "added" or "adds"), lowercase, under 50 characters, and with no trailing period
 
-A [CI check](.github/workflows/pull-request-metadata.yml) blocks the pull request on an unknown type, an uppercase first letter, or a trailing period. Scope, subject length, and local commits go unchecked, so treat the 50 characters as a target rather than a limit.
-
 Scope is the workspace package the change is confined to: `feat(web)` for `apps/web`, `fix(api)` for `apps/api`, `refactor(game-data)` for `packages/game-data`, `chore(domain)` for `packages/domain`, and `chore(infra)` for Terraform and infrastructure. Omit the scope for changes that span packages, including most `docs:` changes.
 
 When a commit needs a body, separate it from the subject with a blank line, wrap it at 72 characters, and use it to explain what changed and why rather than how.
