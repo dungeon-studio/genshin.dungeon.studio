@@ -19,7 +19,12 @@
     "apps/api": {
       // verify-deployment.ts is invoked from deploy.yml, so knip can't see it.
       // The schemas:* scripts are auto-detected from their package.json entries.
-      "entry": ["scripts/verify-deployment.ts"]
+      "entry": ["scripts/verify-deployment.ts"],
+      // knip's vitest plugin recognises only the conventional config name;
+      // listing the integration config reaches its setup file and specs.
+      "vitest": {
+        "config": ["vitest.config.ts", "vitest.integration.config.ts"]
+      }
     },
     "apps/web": {
       // env.d.ts holds Vite ambient client types referenced via tsconfig, not imports.

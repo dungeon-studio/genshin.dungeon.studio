@@ -28,6 +28,10 @@
       "inputs": ["src/**", "package.json", "vite.config.*", "vitest.config.*", "tsconfig*.json"],
       "env": ["FAST_CHECK_SEED"]
     },
+    "test:integration": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
     "test:e2e": {
       "dependsOn": ["^build", "@genshin/api#build"],
       "cache": false

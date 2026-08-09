@@ -3,7 +3,7 @@
 
 import { fileURLToPath } from 'node:url';
 
-import { defineConfig } from 'vitest/config';
+import { configDefaults, defineConfig } from 'vitest/config';
 
 export default defineConfig({
   resolve: {
@@ -13,6 +13,9 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    // Spread the defaults: assigning `exclude` replaces them, which would drop
+    // node_modules and dist from the ignore list.
+    exclude: [...configDefaults.exclude, '**/*.integration.test.ts'],
     setupFiles: ['./src/test/setup.ts'],
     reporters: ['default', 'junit'],
     outputFile: {

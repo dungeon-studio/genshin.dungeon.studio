@@ -160,6 +160,57 @@ jobs:
           TIMEOUT_SECONDS: '120'
         run: bash scripts/verify-dev.sh
 
+  # Exercises the repository layer against a real Firestore. The workspace job
+  # above mocks it away and the browser suite below reaches it only along the
+  # paths the UI offers, so neither can plant a stored document the API is
+  # incapable of writing.
+  integration:
+    name: Test against Firestore
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      # renovate: datasource=java-version depName=java
+      JAVA_VERSION: '21'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - uses: ./.github/actions/setup-firebase-emulators
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+
+      # Coverage lives in the script rather than a `--` passthrough, which would
+      # reach `firebase emulators:exec` instead of the vitest run inside it.
+      - name: Run integration tests
+        run: pnpm turbo run test:integration --filter @genshin/api
+
+      # Under the same flag as the unit suite, whose paths already cover
+      # apps/api/src/**; Codecov merges the two reports.
+      - name: Upload integration coverage to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: apps/api/coverage-integration/lcov.info
+          flags: api
+          fail_ci_if_error: false
+
+      - name: Upload integration test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: apps/api/test-results/integration-junit.xml
+          flags: api
+          report_type: test_results
+          fail_ci_if_error: false
+
   # Drives a real browser through the assembled stack — Firebase emulators, the
   # API, and the Vite dev server. Separate from the workspace job because it is
   # the only check needing a JDK and a browser, and turbo cannot schedule either.

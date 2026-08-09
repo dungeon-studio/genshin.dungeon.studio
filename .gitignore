@@ -57,6 +57,7 @@ out/
 
 # Coverage reports
 coverage/
+coverage-integration/
 
 # Test results
 test-results/
