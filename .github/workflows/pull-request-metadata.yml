@@ -8,10 +8,6 @@ name: Pull Request Metadata
 # every title or description tweak. `synchronize` keeps a result on each head
 # commit, which a required status check needs.
 # See docs/reference/workflow-conventions.md.
-#
-# Labelling belongs to this same when but stays in labels.yml until #1211
-# makes it idempotent; the autolabeler only adds, so running it on `edited`
-# leaves the superseded category label behind.
 on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
@@ -26,7 +22,7 @@ concurrency:
 jobs:
   # Squash is the only merge method enabled and the repository takes the squash
   # commit title from the pull request title, so this title is the commit
-  # message that lands on develop. Local commits stay unvalidated.
+  # message that lands on develop.
   title:
     name: Check pull request title
     runs-on: ubuntu-latest
@@ -57,6 +53,6 @@ jobs:
           requireScope: false
 
           subjectPattern: '^(?![A-Z]).*[^.\s]$'
-          subjectPatternError: |
-            The subject "{subject}" in the title "{title}" must start with a
-            lowercase character and must not end with a period.
+          subjectPatternError: >-
+            The subject "{subject}" must start with a lowercase character and
+            must not end with a period.
