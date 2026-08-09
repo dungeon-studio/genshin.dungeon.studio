@@ -15,28 +15,22 @@ function renderNav(initialRoute = '/') {
   );
 }
 
-describe('Nav', () => {
-  it('marks the Teams link as active on the root route', () => {
-    renderNav('/');
+const ROUTES = [
+  { route: '/', link: 'Teams' },
+  { route: '/characters', link: 'Characters' },
+  { route: '/weapons', link: 'Weapons' },
+];
 
-    const teamsLink = screen.getByRole('link', { name: 'Teams' });
-    expect(teamsLink).toHaveClass('border-primary');
+describe('Nav', () => {
+  it.each(ROUTES)('marks the $link link as active on $route', ({ route, link }) => {
+    renderNav(route);
+
+    expect(screen.getByRole('link', { name: link })).toHaveClass('border-primary');
   });
 
-  it('marks the Characters link as active on /characters', () => {
+  it('leaves the links for every other route inactive', () => {
     renderNav('/characters');
 
-    const charactersLink = screen.getByRole('link', { name: 'Characters' });
-    expect(charactersLink).toHaveClass('border-primary');
-
-    const teamsLink = screen.getByRole('link', { name: 'Teams' });
-    expect(teamsLink).toHaveClass('border-transparent');
-  });
-
-  it('marks the Weapons link as active on /weapons', () => {
-    renderNav('/weapons');
-
-    const weaponsLink = screen.getByRole('link', { name: 'Weapons' });
-    expect(weaponsLink).toHaveClass('border-primary');
+    expect(screen.getByRole('link', { name: 'Teams' })).toHaveClass('border-transparent');
   });
 });

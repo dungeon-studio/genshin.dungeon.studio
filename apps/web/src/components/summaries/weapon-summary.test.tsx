@@ -3,6 +3,7 @@
 
 import type { Weapon } from '@genshin/game-data';
 import { render, screen } from '@testing-library/react';
+import type { ReactElement } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { WeaponSummary } from './weapon-summary';
@@ -16,10 +17,19 @@ const AMOS_BOW = {
   version: '1.0',
 } satisfies Weapon;
 
-// The type icons render `alt=""`: they restate the name beside them, so they
-// are decorative and Testing Library's queries, which read the accessibility
-// tree, cannot reach them.
-/* eslint-disable testing-library/no-container, testing-library/no-node-access */
+/**
+ * The type icons render `alt=""`: they restate the name beside them, so they
+ * are decorative, and Testing Library's queries read the accessibility tree
+ * that decorative nodes are absent from. Reaching them means going around it,
+ * which this is the only place allowed to do.
+ */
+function typeIconsFor(summary: ReactElement): NodeListOf<HTMLImageElement> {
+  const { container } = render(summary);
+
+  // eslint-disable-next-line testing-library/no-container
+  return container.querySelectorAll('img');
+}
+
 describe('WeaponSummary', () => {
   it('renders placeholder when no weapon is provided', () => {
     render(<WeaponSummary />);
@@ -28,18 +38,16 @@ describe('WeaponSummary', () => {
   });
 
   it('renders the weapon type icon with correct src path', () => {
-    const { container } = render(<WeaponSummary weapon={AMOS_BOW} />);
+    const images = typeIconsFor(<WeaponSummary weapon={AMOS_BOW} />);
 
-    const images = container.querySelectorAll('img');
     expect(images).toHaveLength(2);
     expect(images[0]).toHaveAttribute('src', '/weapon-types/bow-light.png');
     expect(images[1]).toHaveAttribute('src', '/weapon-types/bow-dark.png');
   });
 
   it('applies dimmed styling when dimmed prop is true', () => {
-    const { container } = render(<WeaponSummary weapon={AMOS_BOW} dimmed />);
+    const images = typeIconsFor(<WeaponSummary weapon={AMOS_BOW} dimmed />);
 
-    const images = container.querySelectorAll('img');
     expect(images[0]).toHaveClass('opacity-30');
     expect(images[1]).toHaveClass('opacity-30');
   });

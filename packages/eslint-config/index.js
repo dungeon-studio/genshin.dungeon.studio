@@ -35,6 +35,12 @@ const DEV_DEPENDENCY_FILES = [
   '*.config.{ts,js,mjs,cjs}',
 ];
 
+/** Rules holding the vitest suites to the shape a test runner expects. */
+const VITEST_CONVENTIONS = {
+  files: VITEST_FILES,
+  extends: [vitest.configs.recommended],
+};
+
 /** Rules tightening `tseslint.configs.recommended`. */
 const TYPESCRIPT_STRICTNESS = {
   files: TYPESCRIPT_FILES,
@@ -130,6 +136,6 @@ export default function genshinConfig(packageDir) {
     tseslint.configs.recommended,
     TYPESCRIPT_STRICTNESS,
     importDiscipline(packageDir),
-    { files: VITEST_FILES, extends: [vitest.configs.recommended] },
+    VITEST_CONVENTIONS,
   ]);
 }
