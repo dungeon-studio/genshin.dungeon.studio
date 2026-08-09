@@ -13,9 +13,21 @@ const GRPC_TO_HTTP: Partial<Record<Status, ContentfulStatusCode>> = {
   [Status.UNAVAILABLE]: 503,
 };
 
+function httpStatusFor(code: Status | undefined): ContentfulStatusCode {
+  if (code === undefined) return 500;
+  return GRPC_TO_HTTP[code] ?? 500;
+}
+
+function labelFor(code: Status | undefined): string {
+  if (code === undefined) return '(unknown)';
+  // A numeric enum's reverse mapping is typed `string`, but yields `undefined`
+  // for codes google-gax does not know.
+  return Status[code] ?? String(code);
+}
+
 export function firestoreErrorToHttpException(err: GoogleError): HTTPException {
-  const httpStatus = (err.code !== undefined && GRPC_TO_HTTP[err.code]) || 500;
-  const label = err.code !== undefined ? (Status[err.code] ?? String(err.code)) : '(unknown)';
-  console.error(`Firestore error [gRPC ${label}]:`, err.message);
-  return new HTTPException(httpStatus, { message: 'An unexpected error occurred' });
+  console.error(`Firestore error [gRPC ${labelFor(err.code)}]:`, err.message);
+  return new HTTPException(httpStatusFor(err.code), {
+    message: 'An unexpected error occurred',
+  });
 }

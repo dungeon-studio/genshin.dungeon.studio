@@ -6,25 +6,20 @@ import { describe, expect, it } from 'vitest';
 
 import { deserialiseTeam, serialiseTeam } from './teams.js';
 import type { ISOTimestamp } from '../../iso-timestamp.js';
-import type {
-  CollectionTeam,
-  CollectionTeamMembers,
-  TeamSlot,
-} from '../../team/collection-team.js';
-import type { UUID } from '../../uuid.js';
+import type { CollectionTeam, CollectionTeamMembers } from '../../team/collection-team.js';
 
 const BASE_URL = 'http://localhost:8080';
 const VALID_TIMESTAMP = '2024-01-15T12:00:00Z' as ISOTimestamp;
 
 const VALID_MEMBERS: CollectionTeamMembers = [
-  { characterId: 'columbina', weaponInstanceId: 'wep-001' as UUID },
+  { characterId: 'columbina', weaponInstanceId: 'wep-001' },
   { characterId: 'durin' },
   null,
   null,
 ];
 
 const VALID_TEAM: CollectionTeam = {
-  slot: 1 as TeamSlot,
+  slot: 1,
   name: 'Team 1',
   members: VALID_MEMBERS,
   createdAt: VALID_TIMESTAMP,

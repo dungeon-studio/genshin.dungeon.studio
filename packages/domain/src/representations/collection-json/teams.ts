@@ -144,7 +144,7 @@ function deserialiseCollectionTeamMember(value: unknown, index: number): Collect
     characterId: raw.characterId as CollectionTeamMember['characterId'],
   };
   if (raw.weaponInstanceId !== undefined) {
-    member.weaponInstanceId = raw.weaponInstanceId as CollectionTeamMember['weaponInstanceId'];
+    member.weaponInstanceId = raw.weaponInstanceId;
   }
   if (raw.artifactPlan !== undefined) {
     member.artifactPlan = deserialiseArtifactPlan(raw.artifactPlan);

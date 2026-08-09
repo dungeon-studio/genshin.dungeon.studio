@@ -31,7 +31,7 @@ export const auth = createMiddleware<{ Variables: AuthVariables }>(async (c, nex
     const decoded = await verifyToken(token);
     c.set('user', decoded);
   } catch (error) {
-    const code = (error as { code?: string })?.code;
+    const code = (error as { code?: string } | null | undefined)?.code;
     if (code?.startsWith('auth/')) {
       throw new HTTPException(401, { message: 'Invalid or expired token' });
     }

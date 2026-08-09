@@ -3,11 +3,10 @@
 
 import { describe, expect, it } from 'vitest';
 
-import type { ArtifactPlan } from '../artifact/artifact-plan.js';
-import type { UUID } from '../uuid.js';
 import type { CollectionTeamMembers, TeamSlot } from './collection-team.js';
 import type { TeamValidationContext } from './team-validation.js';
 import { validateTeam, validateTeams } from './team-validation.js';
+import type { ArtifactPlan } from '../artifact/artifact-plan.js';
 
 const EMPTY_MEMBERS: CollectionTeamMembers = [null, null, null, null];
 
@@ -38,8 +37,8 @@ describe('validateTeam', () => {
     const issues = validateTeam({
       name: 'Dupe weapons',
       members: [
-        { characterId: 'columbina', weaponInstanceId: 'weapon-1' as UUID },
-        { characterId: 'durin', weaponInstanceId: 'weapon-1' as UUID },
+        { characterId: 'columbina', weaponInstanceId: 'weapon-1' },
+        { characterId: 'durin', weaponInstanceId: 'weapon-1' },
         null,
         null,
       ],
@@ -81,12 +80,7 @@ describe('validateTeam', () => {
       const issues = validateTeam(
         {
           name: 'Bad weapon',
-          members: [
-            { characterId: 'columbina', weaponInstanceId: 'weapon-999' as UUID },
-            null,
-            null,
-            null,
-          ],
+          members: [{ characterId: 'columbina', weaponInstanceId: 'weapon-999' }, null, null, null],
         },
         context,
       );
@@ -115,52 +109,45 @@ describe('validateTeam', () => {
 
 describe('validateTeams', () => {
   it('returns no issues when no weapon conflicts exist', () => {
-    const issues = validateTeams(1 as TeamSlot, EMPTY_MEMBERS, [
-      { slot: 2 as TeamSlot, members: EMPTY_MEMBERS },
-    ]);
+    const issues = validateTeams(1, EMPTY_MEMBERS, [{ slot: 2, members: EMPTY_MEMBERS }]);
     expect(issues).toEqual([]);
   });
 
   it('allows the same character with the same weapon on different teams', () => {
     const members: CollectionTeamMembers = [
-      { characterId: 'columbina', weaponInstanceId: 'weapon-1' as UUID },
+      { characterId: 'columbina', weaponInstanceId: 'weapon-1' },
       null,
       null,
       null,
     ];
-    const issues = validateTeams(1 as TeamSlot, members, [{ slot: 2 as TeamSlot, members }]);
+    const issues = validateTeams(1, members, [{ slot: 2, members }]);
     expect(issues).toEqual([]);
   });
 
   it('detects weapon conflicts across teams', () => {
     const current: CollectionTeamMembers = [
-      { characterId: 'columbina', weaponInstanceId: 'weapon-1' as UUID },
+      { characterId: 'columbina', weaponInstanceId: 'weapon-1' },
       null,
       null,
       null,
     ];
-    const otherTeam = {
-      slot: 2 as TeamSlot,
-      members: [
-        { characterId: 'durin', weaponInstanceId: 'weapon-1' as UUID },
-        null,
-        null,
-        null,
-      ] as CollectionTeamMembers,
+    const otherTeam: { slot: TeamSlot; members: CollectionTeamMembers } = {
+      slot: 2,
+      members: [{ characterId: 'durin', weaponInstanceId: 'weapon-1' }, null, null, null],
     };
-    const issues = validateTeams(1 as TeamSlot, current, [otherTeam]);
+    const issues = validateTeams(1, current, [otherTeam]);
     expect(issues.length).toBeGreaterThan(0);
     expect(issues[0].message).toMatch(/already equipped/i);
   });
 
   it('ignores the same team slot when checking other teams', () => {
     const members: CollectionTeamMembers = [
-      { characterId: 'columbina', weaponInstanceId: 'weapon-1' as UUID },
+      { characterId: 'columbina', weaponInstanceId: 'weapon-1' },
       null,
       null,
       null,
     ];
-    const issues = validateTeams(1 as TeamSlot, members, [{ slot: 1 as TeamSlot, members }]);
+    const issues = validateTeams(1, members, [{ slot: 1, members }]);
     expect(issues).toEqual([]);
   });
 });

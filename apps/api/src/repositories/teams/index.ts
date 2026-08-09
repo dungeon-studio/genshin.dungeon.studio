@@ -58,12 +58,7 @@ export async function save(
   const team: CollectionTeam = {
     slot,
     name: updates.name ?? existingTeam?.name ?? `Team ${slot}`,
-    members:
-      updates.members !== undefined
-        ? updates.members
-        : existingTeam
-          ? existingTeam.members
-          : [null, null, null, null],
+    members: updates.members ?? existingTeam?.members ?? [null, null, null, null],
     ...(updates.description !== undefined
       ? { description: updates.description }
       : existingTeam?.description !== undefined

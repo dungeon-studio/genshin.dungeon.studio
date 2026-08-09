@@ -108,7 +108,7 @@ describe('useTeams (authenticated)', () => {
 });
 
 describe('useTeams (local-only)', () => {
-  it('applies assignments to the store without calling the API', async () => {
+  it('applies assignments to the store without calling the API', () => {
     // No handlers: any request would trip the unhandled-request guard.
     const { result } = renderHook(() => useTeams(), {
       wrapper: createWrapper({ user: null }),

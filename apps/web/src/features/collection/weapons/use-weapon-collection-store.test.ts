@@ -13,12 +13,16 @@ function makeWeapon(
   refinementLevel = 1,
 ): CollectionWeapon {
   return {
-    weaponInstanceId: weaponInstanceId as CollectionWeaponId,
+    weaponInstanceId,
     weaponId: weaponId as Weapon['id'],
     refinementLevel,
     createdAt: '2026-01-01T00:00:00.000Z' as ISOTimestamp,
     updatedAt: '2026-01-01T00:00:00.000Z' as ISOTimestamp,
   };
+}
+
+function storedWeapon(weaponInstanceId: CollectionWeaponId): CollectionWeapon | undefined {
+  return useWeaponCollectionStore.getState().weapons[weaponInstanceId];
 }
 
 describe('useWeaponCollectionStore', () => {
@@ -31,47 +35,37 @@ describe('useWeaponCollectionStore', () => {
       const weapon = makeWeapon('inst-1', 'sword-1');
       useWeaponCollectionStore.getState().addWeapon(weapon);
 
-      expect(useWeaponCollectionStore.getState().weapons['inst-1' as CollectionWeaponId]).toEqual(
-        weapon,
-      );
+      expect(storedWeapon('inst-1')).toEqual(weapon);
     });
   });
 
   describe('removeWeapon', () => {
     it('removes a weapon by instance id', () => {
       useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', 'sword-1'));
-      useWeaponCollectionStore.getState().removeWeapon('inst-1' as CollectionWeaponId);
+      useWeaponCollectionStore.getState().removeWeapon('inst-1');
 
-      expect(
-        useWeaponCollectionStore.getState().weapons['inst-1' as CollectionWeaponId],
-      ).toBeUndefined();
+      expect(storedWeapon('inst-1')).toBeUndefined();
     });
   });
 
   describe('setRefinementLevel', () => {
     it('updates the refinement level', () => {
       useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', 'sword-1'));
-      useWeaponCollectionStore.getState().setRefinementLevel('inst-1' as CollectionWeaponId, 3);
+      useWeaponCollectionStore.getState().setRefinementLevel('inst-1', 3);
 
-      expect(
-        useWeaponCollectionStore.getState().weapons['inst-1' as CollectionWeaponId].refinementLevel,
-      ).toBe(3);
+      expect(storedWeapon('inst-1')?.refinementLevel).toBe(3);
     });
 
     it('ignores invalid refinement levels', () => {
       useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', 'sword-1'));
-      useWeaponCollectionStore.getState().setRefinementLevel('inst-1' as CollectionWeaponId, 0);
-      useWeaponCollectionStore.getState().setRefinementLevel('inst-1' as CollectionWeaponId, 6);
+      useWeaponCollectionStore.getState().setRefinementLevel('inst-1', 0);
+      useWeaponCollectionStore.getState().setRefinementLevel('inst-1', 6);
 
-      expect(
-        useWeaponCollectionStore.getState().weapons['inst-1' as CollectionWeaponId].refinementLevel,
-      ).toBe(1);
+      expect(storedWeapon('inst-1')?.refinementLevel).toBe(1);
     });
 
     it('ignores updates for nonexistent weapons', () => {
-      useWeaponCollectionStore
-        .getState()
-        .setRefinementLevel('nonexistent' as CollectionWeaponId, 3);
+      useWeaponCollectionStore.getState().setRefinementLevel('nonexistent', 3);
 
       expect(Object.keys(useWeaponCollectionStore.getState().weapons)).toHaveLength(0);
     });
@@ -104,16 +98,12 @@ describe('useWeaponCollectionStore', () => {
       useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', 'sword-1'));
 
       const newWeapons = {
-        ['inst-2' as CollectionWeaponId]: makeWeapon('inst-2', 'bow-1'),
+        'inst-2': makeWeapon('inst-2', 'bow-1'),
       };
       useWeaponCollectionStore.getState().setWeapons(newWeapons);
 
-      expect(
-        useWeaponCollectionStore.getState().weapons['inst-1' as CollectionWeaponId],
-      ).toBeUndefined();
-      expect(
-        useWeaponCollectionStore.getState().weapons['inst-2' as CollectionWeaponId],
-      ).toBeDefined();
+      expect(storedWeapon('inst-1')).toBeUndefined();
+      expect(storedWeapon('inst-2')).toBeDefined();
     });
   });
 

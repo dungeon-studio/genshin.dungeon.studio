@@ -144,7 +144,7 @@ export function useCollection(): UseCollectionResult {
           onSuccess: applyMutationResult,
           onError: () => {
             const current = useCollectionStore.getState().characters[id];
-            if (current && current.constellationLevel === MIN_CONSTELLATION_LEVEL) {
+            if (current?.constellationLevel === MIN_CONSTELLATION_LEVEL) {
               storeRemoveCharacter(id);
               toast.error('Failed to add character. Change has been reverted.');
             } else {

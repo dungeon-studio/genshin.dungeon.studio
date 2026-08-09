@@ -18,7 +18,13 @@ export function LogoutButton(): JSX.Element {
   }
 
   return (
-    <Button type="button" onClick={handleLogout} variant="ghost" size="icon" aria-label="Sign out">
+    <Button
+      type="button"
+      onClick={() => void handleLogout()}
+      variant="ghost"
+      size="icon"
+      aria-label="Sign out"
+    >
       <LogOut aria-hidden="true" focusable={false} className="h-4 w-4" />
     </Button>
   );

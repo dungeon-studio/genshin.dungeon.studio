@@ -8,6 +8,7 @@ import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPut } from '@/lib/api';
+import { invalidateUserQuery } from '@/lib/invalidate-user-query';
 
 export interface SaveTeamPayload {
   slot: TeamSlot;
@@ -45,9 +46,7 @@ export function useSaveTeamMutation(
     mutationFn: async ({ slot, name, members, description }: SaveTeamPayload) => {
       await apiPut(`/teams/${encodeURIComponent(slot)}`, { name, members, description });
     },
-    onSuccess: () => {
-      if (userId !== undefined) queryClient.invalidateQueries({ queryKey: teamKey(userId) });
-    },
+    onSuccess: invalidateUserQuery(queryClient, userId, teamKey),
   });
 }
 
@@ -60,8 +59,6 @@ export function useDeleteTeamMutation(
     mutationFn: async (slot: TeamSlot) => {
       await apiDelete(`/teams/${encodeURIComponent(slot)}`);
     },
-    onSuccess: () => {
-      if (userId !== undefined) queryClient.invalidateQueries({ queryKey: teamKey(userId) });
-    },
+    onSuccess: invalidateUserQuery(queryClient, userId, teamKey),
   });
 }

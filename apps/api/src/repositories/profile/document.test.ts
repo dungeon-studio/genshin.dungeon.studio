@@ -62,14 +62,14 @@ describe('toDocument', () => {
   it('round-trips a profile through toDocument then fromDocument', () => {
     const profile = fromDocument(makeV1Document());
     const doc = toDocument(profile);
-    const restored = fromDocument(doc as unknown as Record<string, unknown>);
+    const restored = fromDocument(doc);
     expect(restored).toEqual(profile);
   });
 
   it('round-trips any valid profile (property)', () => {
     fc.assert(
       fc.property(arbProfile, (profile) => {
-        const restored = fromDocument(toDocument(profile) as unknown as Record<string, unknown>);
+        const restored = fromDocument(toDocument(profile));
         expect(restored).toEqual(profile);
       }),
     );

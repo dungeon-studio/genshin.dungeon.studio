@@ -8,6 +8,7 @@ import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPatch, apiPost } from '@/lib/api';
+import { invalidateUserQuery } from '@/lib/invalidate-user-query';
 
 type WeaponRecord = Record<CollectionWeaponId, CollectionWeapon>;
 
@@ -68,10 +69,7 @@ export function useAddWeaponMutation(
       });
       return parseSingleWeaponResponse(response);
     },
-    onSuccess: () => {
-      if (userId !== undefined)
-        queryClient.invalidateQueries({ queryKey: weaponCollectionKey(userId) });
-    },
+    onSuccess: invalidateUserQuery(queryClient, userId, weaponCollectionKey),
   });
 }
 
@@ -84,10 +82,7 @@ export function useRemoveWeaponMutation(
     mutationFn: async (collectionWeaponId: CollectionWeaponId) => {
       await apiDelete(`/weapons/${encodeURIComponent(collectionWeaponId)}`);
     },
-    onSuccess: () => {
-      if (userId !== undefined)
-        queryClient.invalidateQueries({ queryKey: weaponCollectionKey(userId) });
-    },
+    onSuccess: invalidateUserQuery(queryClient, userId, weaponCollectionKey),
   });
 }
 
@@ -113,9 +108,6 @@ export function useSetRefinementLevelMutation(
       });
       return parseSingleWeaponResponse(response);
     },
-    onSuccess: () => {
-      if (userId !== undefined)
-        queryClient.invalidateQueries({ queryKey: weaponCollectionKey(userId) });
-    },
+    onSuccess: invalidateUserQuery(queryClient, userId, weaponCollectionKey),
   });
 }
