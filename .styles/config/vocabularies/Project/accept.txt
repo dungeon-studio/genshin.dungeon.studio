@@ -134,3 +134,4 @@ SRECon
 [Uu]nprocessable
 [Uu]nversioned
 [Vv]alidators
+[Ww]orktree

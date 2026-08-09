@@ -1,0 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+# act asks for a runner image on first use and caches the answer in the
+# contributor's own ~/.actrc. Naming one here keeps local runs comparable.
+-P ubuntu-latest=catthehacker/ubuntu:act-latest
