@@ -30,3 +30,7 @@ A push run attests a branch after a merge lands, because the merge result itself
 ## Pinning tool versions
 
 A tool installed in a workflow carries its version in a `*_VERSION` environment variable with a `# renovate:` annotation above it, so [`customManagers:githubActionsVersions`](https://docs.renovatebot.com/presets-customManagers/) tracks it. Download a release artifact at that version rather than piping an installer script from a moving branch, which pins nothing and hides the dependency from Renovate.
+
+## Trying a change
+
+To run a job before pushing it, see [run workflows locally](../how-tos/run-workflows-locally.md).

@@ -192,6 +192,7 @@ For step-by-step instructions and technical details:
 - [Manual Setup Guide](docs/how-tos/manual-setup.md): Development environment setup without DevContainers
 - [Build the API Docker image](docs/how-tos/build-api-docker-image.md): Build and run the `apps/api` container locally
 - [Add Terraform Environment](docs/how-tos/add-terraform-environment.md): Bootstrap, scaffold, lock file, and workflow updates for new environments
+- [Run workflows locally](docs/how-tos/run-workflows-locally.md): Iterate on a `.github/workflows/` change with act before pushing
 - [Infrastructure branch flow](docs/reference/infrastructure-branch-flow.md): How branches map to environments and Terraform actions
 - [Code conventions](docs/reference/code-conventions.md): Naming, shared types, test utilities, documentation strategy, and platform compatibility
 - [Workflow conventions](docs/reference/workflow-conventions.md): How workflows and jobs are named, which branches get push runs, and how tool versions are pinned
