@@ -19,6 +19,14 @@ const LINTED_FILES = ['**/*.{ts,tsx,js,mjs,cjs}'];
  */
 export const TYPESCRIPT_FILES = ['**/*.{ts,tsx}'];
 
+/**
+ * TypeScript files the project service cannot resolve a program for, so
+ * type-aware rules have to skip them. `vitest.config.ts` is claimed by no
+ * `tsconfig.json` at all; `scripts/` is claimed only by `tsconfig.scripts.json`,
+ * which the project service never reaches because nothing references it.
+ */
+const FILES_OUTSIDE_ANY_PROJECT = ['vitest.config.ts', 'scripts/**/*.ts'];
+
 /** Paths allowed to import `devDependencies`. */
 const DEV_DEPENDENCY_FILES = [
   '**/*.{test,spec}.{ts,tsx}',
@@ -28,7 +36,40 @@ const DEV_DEPENDENCY_FILES = [
   '*.config.{ts,js,mjs,cjs}',
 ];
 
-/** Rules tightening `tseslint.configs.recommended`. */
+/**
+ * The type-aware tier, plus the three type-aware rules worth taking from tiers
+ * this repo otherwise skips. Scoped to `TYPESCRIPT_FILES` because every rule
+ * here needs a TypeScript program, and only files a `tsconfig.json` claims
+ * have one.
+ *
+ * @param {string} packageDir - the consuming workspace's directory.
+ * @returns {import('eslint').Linter.Config}
+ */
+function typeAwareRules(packageDir) {
+  return {
+    files: TYPESCRIPT_FILES,
+    // Skipped files fall back to the non-type-aware tier above rather than
+    // failing to parse.
+    ignores: FILES_OUTSIDE_ANY_PROJECT,
+    extends: [tseslint.configs.recommendedTypeChecked],
+    languageOptions: {
+      parserOptions: {
+        // Resolves each file's program the way `tsserver` does, so solution-style
+        // `tsconfig.json` references resolve without enumerating projects here.
+        projectService: true,
+        tsconfigRootDir: packageDir,
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-unnecessary-condition': 'error',
+      // From `stylisticTypeChecked`, whose remaining rules overlap Prettier.
+      '@typescript-eslint/prefer-nullish-coalescing': 'error',
+      '@typescript-eslint/prefer-optional-chain': 'error',
+    },
+  };
+}
+
+/** Rules tightening the typescript-eslint tiers above. */
 const TYPESCRIPT_STRICTNESS = {
   files: TYPESCRIPT_FILES,
   rules: {
@@ -121,6 +162,7 @@ export default function genshinConfig(packageDir) {
     // Unscoped: the preset's own file matching reaches `.mts` and `.cts`, which
     // `TYPESCRIPT_FILES` does not.
     tseslint.configs.recommended,
+    typeAwareRules(packageDir),
     TYPESCRIPT_STRICTNESS,
     importDiscipline(packageDir),
   ]);

@@ -20,8 +20,8 @@
       "persistent": true
     },
     "lint": {
-      "dependsOn": ["^lint"],
-      "inputs": ["**/*.{ts,tsx,js,mjs,cjs}", "package.json"]
+      "dependsOn": ["^build"],
+      "inputs": ["**/*.{ts,tsx,js,mjs,cjs}", "package.json", "tsconfig*.json"]
     },
     "test": {
       "dependsOn": ["^build"],
