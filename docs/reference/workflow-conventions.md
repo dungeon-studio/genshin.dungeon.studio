@@ -33,9 +33,7 @@ A tool installed in a workflow carries its version in a `*_VERSION` environment 
 
 ## Trying a change locally
 
-[act](https://github.com/nektos/act) runs these jobs on a local Docker daemon, which is worth reaching for when the change is to the wiring—the job graph, an `if:` condition, what a composite action hands the step after it. For a check's result rather than its wiring, run the command the job runs: `pre-commit run --all-files` and `pnpm turbo run typecheck test build` finish sooner outside a container. The DevContainer installs act, and `.actrc` names the runner image so it won't prompt for one.
-
-`act -l` lists the jobs, `act push -j workspace` runs one, and `act push -n` resolves the graph without starting a step. The event argument decides which jobs exist, so a job gated on pull requests needs `act pull_request`.
+[act](https://github.com/nektos/act) runs these jobs on a local Docker daemon, so `act push -j workspace` answers a question about the wiring—the job graph, an `if:` condition, what a composite action hands the step after it—without pushing first. The event argument selects the jobs, so a pull-request-gated job like `schema-compat` needs `act pull_request`. For a check's result rather than its wiring, run the command the job runs: `pre-commit run --all-files` and `pnpm turbo run typecheck test build` finish sooner outside a container. The DevContainer installs act, and `.actrc` names the runner image so it won't prompt for one.
 
 No secret unlocks a step that wants a service only GitHub's runners reach: SARIF uploads to the Security tab, `cache-from: type=gha`, the Google Cloud deployments behind workload identity federation, and the workflows that act on repository state through the GitHub API. A step wanting nothing more than a secret does run, so `act push -j workspace -s CODECOV_TOKEN` completes the Codecov upload. Every step before a failing one still runs, which is usually the part under test.
 
