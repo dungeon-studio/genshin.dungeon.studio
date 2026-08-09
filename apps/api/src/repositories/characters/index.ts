@@ -7,6 +7,7 @@ import type {
   ConstellationLevel,
   ISOTimestamp,
 } from '@genshin/domain';
+import type { DocumentSnapshot } from 'firebase-admin/firestore';
 
 import { db } from '@/firebase/firestore.js';
 
@@ -14,6 +15,13 @@ import { fromDocument, toDocument } from './document.js';
 
 function collectionRef(userId: string) {
   return db.collection('users').doc(userId).collection('characters');
+}
+
+// `data()` returns undefined exactly when the document does not exist.
+function fromSnapshot(characterId: string, snapshot: DocumentSnapshot): CollectionCharacter | null {
+  const data = snapshot.data();
+
+  return data === undefined ? null : fromDocument(characterId, data);
 }
 
 export async function list(userId: string): Promise<CollectionCharacter[]> {
@@ -26,18 +34,7 @@ export async function get(
   userId: string,
   characterId: string,
 ): Promise<CollectionCharacter | null> {
-  const doc = await collectionRef(userId).doc(characterId).get();
-
-  if (!doc.exists) {
-    return null;
-  }
-
-  const data = doc.data();
-  if (data === undefined) {
-    return null;
-  }
-
-  return fromDocument(characterId, data);
+  return fromSnapshot(characterId, await collectionRef(userId).doc(characterId).get());
 }
 
 export interface SaveResult {
@@ -51,21 +48,23 @@ export async function save(
   constellationLevel: ConstellationLevel,
 ): Promise<SaveResult> {
   const docRef = collectionRef(userId).doc(characterId);
-  const existing = await docRef.get();
-  const now = new Date().toISOString() as ISOTimestamp;
 
-  const existingData = existing.exists ? existing.data() : undefined;
+  return db.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(docRef);
+    const existing = fromSnapshot(characterId, snapshot);
+    const now = new Date().toISOString() as ISOTimestamp;
 
-  const character: CollectionCharacter = {
-    characterId,
-    constellationLevel,
-    createdAt: existingData ? fromDocument(characterId, existingData).createdAt : now,
-    updatedAt: now,
-  };
+    const character: CollectionCharacter = {
+      characterId,
+      constellationLevel,
+      createdAt: existing?.createdAt ?? now,
+      updatedAt: now,
+    };
 
-  await docRef.set(toDocument(character));
+    transaction.set(docRef, toDocument(character));
 
-  return { character, created: !existing.exists };
+    return { character, created: !snapshot.exists };
+  });
 }
 
 export async function remove(userId: string, characterId: string): Promise<void> {
