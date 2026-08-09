@@ -11,8 +11,11 @@ import importX from 'eslint-plugin-import-x';
 import unusedImports from 'eslint-plugin-unused-imports';
 import tseslint from 'typescript-eslint';
 
+/** The file kinds this monorepo treats as modules. */
+const MODULE_EXTENSIONS = ['ts', 'tsx', 'cts', 'mts', 'js', 'jsx', 'cjs', 'mjs'];
+
 /** Every file eslint reads in a workspace. */
-const LINTED_FILES = ['**/*.{ts,tsx,js,mjs,cjs}'];
+const LINTED_FILES = [`**/*.{${MODULE_EXTENSIONS.join(',')}}`];
 
 /**
  * The TypeScript subset of the files eslint reads. Workspaces scope their own
@@ -68,6 +71,45 @@ const TYPESCRIPT_STRICTNESS = {
   },
 };
 
+/** Import rules that need no workspace context. */
+const IMPORT_DISCIPLINE = {
+  files: LINTED_FILES,
+  plugins: { 'import-x': importX, 'unused-imports': unusedImports },
+  settings: {
+    'import-x/resolver-next': [createTypeScriptImportResolver({ alwaysTryTypes: true })],
+    // `import-x` parses an imported file only if its extension is listed, and
+    // the default omits TypeScript — which leaves `no-cycle` silently inert.
+    'import-x/extensions': MODULE_EXTENSIONS.map((extension) => `.${extension}`),
+  },
+  rules: {
+    'import-x/order': [
+      'error',
+      {
+        groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index']],
+        'newlines-between': 'always',
+        alphabetize: { order: 'asc', caseInsensitive: true },
+      },
+    ],
+    'import-x/no-duplicates': 'error',
+    'import-x/newline-after-import': 'error',
+    // Sibling workspaces resolve through built `dist/`, so checking them would
+    // report whether the repo is built, not whether the import is correct.
+    'import-x/no-unresolved': ['error', { ignore: ['^@genshin/'] }],
+    // Cycles inside `node_modules` are not ours to break.
+    'import-x/no-cycle': ['error', { ignoreExternal: true }],
+    // `unused-imports` owns unused-symbol reporting so removals are
+    // autofixable; the recommended `no-unused-vars` rules are disabled to
+    // avoid double-reporting.
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': 'off',
+    'unused-imports/no-unused-imports': 'error',
+    'unused-imports/no-unused-vars': [
+      'error',
+      { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
+    ],
+  },
+};
+
 /**
  * Parameterised because `no-extraneous-dependencies` has to know which
  * `package.json` files may satisfy an import.
@@ -75,17 +117,13 @@ const TYPESCRIPT_STRICTNESS = {
  * @param {string} packageDir - the consuming workspace's directory.
  * @returns {import('eslint').Linter.Config}
  */
-function importDiscipline(packageDir) {
+function declaredDependencies(packageDir) {
   // Workspaces sit two levels below the root, whose `package.json` holds the
   // tooling dependencies they all share.
   const repoRoot = resolve(packageDir, '../..');
 
   return {
     files: LINTED_FILES,
-    plugins: { 'import-x': importX, 'unused-imports': unusedImports },
-    settings: {
-      'import-x/resolver-next': [createTypeScriptImportResolver({ alwaysTryTypes: true })],
-    },
     rules: {
       'import-x/no-extraneous-dependencies': [
         'error',
@@ -93,26 +131,6 @@ function importDiscipline(packageDir) {
           devDependencies: DEV_DEPENDENCY_FILES,
           packageDir: [packageDir, repoRoot],
         },
-      ],
-      'import-x/order': [
-        'error',
-        {
-          groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index']],
-          'newlines-between': 'always',
-          alphabetize: { order: 'asc', caseInsensitive: true },
-        },
-      ],
-      'import-x/no-duplicates': 'error',
-      'import-x/newline-after-import': 'error',
-      // `unused-imports` owns unused-symbol reporting so removals are
-      // autofixable; the recommended `no-unused-vars` rules are disabled to
-      // avoid double-reporting.
-      'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
-      'unused-imports/no-unused-imports': 'error',
-      'unused-imports/no-unused-vars': [
-        'error',
-        { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
       ],
     },
   };
@@ -134,7 +152,8 @@ export default function genshinConfig(packageDir) {
     // `TYPESCRIPT_FILES` does not.
     tseslint.configs.recommended,
     TYPESCRIPT_STRICTNESS,
-    importDiscipline(packageDir),
+    IMPORT_DISCIPLINE,
+    declaredDependencies(packageDir),
     VITEST_CONVENTIONS,
   ]);
 }
