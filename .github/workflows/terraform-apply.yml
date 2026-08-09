@@ -26,6 +26,10 @@ jobs:
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: core
+    # A called workflow resolves its `environment:` secrets only if the caller
+    # passes a secrets mapping; with none, `secrets` is empty and the GCP_RW_*
+    # credentials never reach the auth step.
+    secrets: inherit
 
   dev:
     name: Dev
@@ -37,6 +41,7 @@ jobs:
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: dev
+    secrets: inherit
 
   staging:
     name: Staging
@@ -48,3 +53,4 @@ jobs:
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: staging
+    secrets: inherit

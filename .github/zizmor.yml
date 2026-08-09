@@ -15,3 +15,9 @@ rules:
     # request cannot write into the scope a develop or main run restores from.
     ignore:
       - ci.yml
+
+  secrets-inherit:
+    # Environment secrets cannot be passed by name: only the reusable declares
+    # `environment:`, so the caller has no handle on them and must inherit.
+    ignore:
+      - terraform-apply.yml
