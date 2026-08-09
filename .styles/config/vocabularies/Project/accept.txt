@@ -26,7 +26,6 @@ Pyro
 # Tools, libraries, and services the repo depends on
 AJV
 Babel
-Claude
 Cloud Run
 Cloud Storage
 Codecov
@@ -40,7 +39,6 @@ Dockerfile
 ESLint
 Firebase
 Firestore
-gcloud
 GCP
 GitHub Actions
 hadolint
@@ -50,9 +48,7 @@ jq
 jsoncompat
 knip
 Lucide
-markdownlint
 Memcache
-npm
 OXC
 pipx
 pnpm
@@ -62,7 +58,6 @@ Renovate
 Stylelint
 SWC
 syncpack
-Tailwind CSS
 Trivy
 Turborepo
 TypeScript
@@ -81,7 +76,6 @@ CI/CD
 CLI
 DSGEP
 ESM
-ETag
 HMR
 HTTP
 IAM
@@ -93,7 +87,6 @@ JSONC
 MCP
 OAuth
 OpenAPI
-PascalCase
 REST
 REUSE
 RFC
@@ -130,7 +123,6 @@ SRECon
 [Mm]iddleware
 [Mm]onorepo
 [Nn]amespace
-[Oo]ptionalslop
 [Pp]arseable
 [Rr]epo
 [Rr]ollouts
