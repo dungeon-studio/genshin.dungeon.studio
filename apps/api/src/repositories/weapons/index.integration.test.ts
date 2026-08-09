@@ -3,11 +3,11 @@
 
 import { randomUUID } from 'node:crypto';
 
-import type { UUID } from '@genshin/domain';
+import type { CollectionWeapon, UUID } from '@genshin/domain';
 import { WEAPONS } from '@genshin/game-data';
 import { describe, expect, it } from 'vitest';
 
-import { db } from '@/firebase/firestore.js';
+import { documentRef, newUserId } from '@/test/firestore.js';
 
 import { create, get, list, remove, update } from './index.js';
 
@@ -16,19 +16,18 @@ import { create, get, list, remove, update } from './index.js';
 const [WEAPON, OTHER_WEAPON] = WEAPONS;
 
 const REFINEMENT_LEVEL = 1;
+const RAISED_REFINEMENT_LEVEL = 5;
 
-// A fresh user per test, so no test observes another's documents and the
-// emulator never needs clearing between them.
-const newUserId = () => randomUUID();
+const CREATED_AT = '2026-01-01T00:00:00.000Z';
+const UPDATED_AT = '2026-01-02T00:00:00.000Z';
 
-// `create` mints instance ids itself; these stand in where a test needs one the
-// collection does not hold. The brand carries no runtime check, so the routes
-// assert it the same way.
+// The instance id is a branded string the collection carries as a plain one, so
+// every hand-off back into the repository restates the brand the routes assert.
+const idOf = (weapon: CollectionWeapon) => weapon.weaponInstanceId as UUID;
 const newInstanceId = () => randomUUID() as UUID;
 
-function documentRef(userId: string, weaponInstanceId: string) {
-  return db.collection('users').doc(userId).collection('weapons').doc(weaponInstanceId);
-}
+const weaponRef = (userId: string, weaponInstanceId: string) =>
+  documentRef(userId, 'weapons', weaponInstanceId);
 
 describe('list', () => {
   it('returns only the instances of the weapon it is filtered to', async () => {
@@ -52,18 +51,18 @@ describe('update', () => {
     const userId = newUserId();
     const created = await create(userId, WEAPON.id, REFINEMENT_LEVEL);
 
-    const updated = await update(userId, created.weaponInstanceId as UUID, 5);
+    const updated = await update(userId, idOf(created), RAISED_REFINEMENT_LEVEL);
 
     expect(updated).toMatchObject({
       weaponInstanceId: created.weaponInstanceId,
       weaponId: created.weaponId,
       createdAt: created.createdAt,
-      refinementLevel: 5,
+      refinementLevel: RAISED_REFINEMENT_LEVEL,
     });
   });
 
   it('is null for an instance the user does not have', async () => {
-    expect(await update(newUserId(), newInstanceId(), 5)).toBeNull();
+    expect(await update(newUserId(), newInstanceId(), RAISED_REFINEMENT_LEVEL)).toBeNull();
   });
 });
 
@@ -73,16 +72,13 @@ describe('remove', () => {
     const doomed = await create(userId, WEAPON.id, REFINEMENT_LEVEL);
     const survivor = await create(userId, WEAPON.id, REFINEMENT_LEVEL);
 
-    await remove(userId, doomed.weaponInstanceId as UUID);
+    await remove(userId, idOf(doomed));
 
-    expect(await get(userId, doomed.weaponInstanceId as UUID)).toBeNull();
-    expect(await get(userId, survivor.weaponInstanceId as UUID)).not.toBeNull();
+    expect(await get(userId, idOf(doomed))).toBeNull();
+    expect(await get(userId, idOf(survivor))).not.toBeNull();
   });
 });
 
-// Nothing the API can do writes an unstamped document — `toDocument` always
-// stamps the current version — so this document can only be planted, and this
-// is the only place the stored side of the version union gets exercised.
 describe('a document stored before schemaVersion existed', () => {
   it('still reads', async () => {
     const userId = newUserId();
@@ -90,10 +86,10 @@ describe('a document stored before schemaVersion existed', () => {
     const unstamped = {
       weaponId: WEAPON.id,
       refinementLevel: 3,
-      createdAt: '2026-01-01T00:00:00.000Z',
-      updatedAt: '2026-01-02T00:00:00.000Z',
+      createdAt: CREATED_AT,
+      updatedAt: UPDATED_AT,
     };
-    await documentRef(userId, weaponInstanceId).set(unstamped);
+    await weaponRef(userId, weaponInstanceId).set(unstamped);
 
     const weapon = await get(userId, weaponInstanceId as UUID);
 
