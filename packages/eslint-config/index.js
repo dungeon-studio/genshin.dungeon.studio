@@ -73,6 +73,11 @@ function importDiscipline(packageDir) {
     plugins: { 'import-x': importX, 'unused-imports': unusedImports },
     settings: {
       'import-x/resolver-next': [createTypeScriptImportResolver({ alwaysTryTypes: true })],
+      // Load-bearing. Rules that follow an import into the *imported* file
+      // consult this list first and skip anything not on it, which defaults to
+      // `.js`/`.mjs`/`.cjs` — so without this `no-cycle` silently reports
+      // nothing across a TypeScript codebase rather than failing loudly.
+      'import-x/extensions': ['.ts', '.tsx', '.cts', '.mts', '.js', '.jsx', '.cjs', '.mjs'],
     },
     rules: {
       'import-x/no-extraneous-dependencies': [
@@ -92,6 +97,15 @@ function importDiscipline(packageDir) {
       ],
       'import-x/no-duplicates': 'error',
       'import-x/newline-after-import': 'error',
+      // Duplicates `tsc`, but `typecheck` is not a commit gate and `eslint` is,
+      // so this is where a broken import path gets caught first. Sibling
+      // workspaces are exempt: their entry points resolve through built
+      // `dist/`, so linting them would report build state, not import
+      // correctness, and would fail on any unbuilt checkout.
+      'import-x/no-unresolved': ['error', { ignore: ['^@genshin/'] }],
+      // `ignoreExternal` keeps the graph walk inside the repo; cycles in
+      // `node_modules` are not ours to break.
+      'import-x/no-cycle': ['error', { ignoreExternal: true }],
       // `unused-imports` owns unused-symbol reporting so removals are
       // autofixable; the recommended `no-unused-vars` rules are disabled to
       // avoid double-reporting.
