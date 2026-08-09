@@ -17,9 +17,10 @@ rules:
       - ci.yml
 
   secrets-inherit:
-    # terraform-apply.yml uses secret inheritance into its reusable workflow
-    # because the GCP_RW_* credentials are environment-scoped (core/dev/staging).
-    # Only the reusable declares `environment:`, so the caller cannot resolve
-    # those credentials to pass them explicitly.
+    # terraform-apply.yml must inherit. Its reusable workflow reads
+    # environment-scoped GCP_RW_* credentials, and a called workflow handed no
+    # secrets mapping resolves none of them, its own `environment:`
+    # notwithstanding. Naming them explicitly is not an option either: only the
+    # reusable declares `environment:`, so the caller cannot reach them.
     ignore:
       - terraform-apply.yml

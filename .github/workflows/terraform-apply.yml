@@ -26,6 +26,12 @@ jobs:
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: core
+    # Load-bearing on all three jobs. The GCP_RW_* credentials resolve from
+    # the reusable workflow's own `environment:`, but only for a called
+    # workflow that receives a secrets mapping --- hand it none and its
+    # `secrets` context is empty, the environment's own included. `inherit`
+    # is the only available form: the caller has no access to environment
+    # secrets, so it cannot name them.
     secrets: inherit
 
   dev:
