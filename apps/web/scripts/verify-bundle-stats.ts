@@ -1,15 +1,15 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-// Proves the Codecov bundle plugin still reads this app's bundle. It declares a
-// peer range ending at Vite 6, and Vite 8 builds through Rolldown rather than
-// Rollup, so the hooks it reads are compatible by convention rather than by
-// contract. A break there costs nothing at build time and uploads an empty
-// report, which Codecov renders as a bundle that simply stopped changing — so
-// the failure has to be asserted here rather than waited for.
+// Proves the Codecov bundle plugin still reads this app's bundle. It declares no
+// support for the Vite major this app builds on, and the bundler underneath is
+// Rolldown rather than the Rollup its hooks assume, so collection holds by
+// convention rather than by contract. It would break silently: the build still
+// succeeds, the report uploads empty, and Codecov shows a bundle that stopped
+// changing.
 //
-// Runs its own dry-run build because the plugin writes the stats file only when
-// it is not uploading; the uploading build in CI leaves nothing to inspect.
+// Builds in the plugin's dry-run mode, the only one that writes the report to
+// disk; the uploading build in CI leaves nothing to inspect.
 
 import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, rmSync } from 'node:fs';
@@ -29,10 +29,8 @@ interface BundleStats {
 const appDir = fileURLToPath(new URL('..', import.meta.url));
 const distDir = fileURLToPath(new URL('../dist', import.meta.url));
 
-// The plugin builds this filename from `bundleName` in vite.config.ts plus the
-// output format it appends. Discovering it rather than spelling it out keeps a
-// rename over there from surfacing here as a missing-report failure, which reads
-// like the plugin breakage this script exists to catch.
+// The plugin derives the filename from `bundleName` in vite.config.ts and the
+// output format it appends.
 const statsSuffix = '-stats.json';
 
 function statsReports(): string[] {
@@ -74,7 +72,7 @@ function collectBundleStats(): BundleStats {
   try {
     return JSON.parse(readFileSync(report, 'utf-8')) as BundleStats;
   } finally {
-    // Keeps an 80 kB report that only this script reads out of anything published.
+    // dist/ is published; the report is scaffolding for this script alone.
     rmSync(report, { force: true });
   }
 }
@@ -83,11 +81,9 @@ function sized<T extends Sized>(entries: T[], matching: (entry: T) => boolean = 
   return entries.filter((entry) => entry.size > 0 && matching(entry));
 }
 
-// A bundle this app could actually serve has at least one JavaScript asset, the
-// entry chunk holding it, and the modules that went into it. Each list empties
-// independently when the plugin loses hold of a different bundler hook, and
-// sizes go to zero separately again — the plugin can name every module while
-// measuring none of them, which costs the report its attribution.
+// Each list empties independently as the plugin loses hold of a different hook,
+// and sizes zero out separately again: it can name every module while measuring
+// none, which costs the report its attribution.
 function shortfallsIn(stats: BundleStats): string[] {
   const assets = stats.assets ?? [];
   const chunks = stats.chunks ?? [];
