@@ -7,6 +7,7 @@ import type {
   ConstellationLevel,
   ISOTimestamp,
 } from '@genshin/domain';
+import type { DocumentSnapshot } from 'firebase-admin/firestore';
 
 import { db } from '@/firebase/firestore.js';
 
@@ -14,6 +15,14 @@ import { fromDocument, toDocument } from './document.js';
 
 function collectionRef(userId: string) {
   return db.collection('users').doc(userId).collection('characters');
+}
+
+// `data()` is undefined exactly when the document is absent, so it subsumes an
+// `exists` check.
+function fromSnapshot(characterId: string, snapshot: DocumentSnapshot): CollectionCharacter | null {
+  const data = snapshot.data();
+
+  return data === undefined ? null : fromDocument(characterId, data);
 }
 
 export async function list(userId: string): Promise<CollectionCharacter[]> {
@@ -26,18 +35,7 @@ export async function get(
   userId: string,
   characterId: string,
 ): Promise<CollectionCharacter | null> {
-  const doc = await collectionRef(userId).doc(characterId).get();
-
-  if (!doc.exists) {
-    return null;
-  }
-
-  const data = doc.data();
-  if (data === undefined) {
-    return null;
-  }
-
-  return fromDocument(characterId, data);
+  return fromSnapshot(characterId, await collectionRef(userId).doc(characterId).get());
 }
 
 export interface SaveResult {
@@ -53,21 +51,20 @@ export async function save(
   const docRef = collectionRef(userId).doc(characterId);
 
   return db.runTransaction(async (transaction) => {
-    const existing = await transaction.get(docRef);
+    const snapshot = await transaction.get(docRef);
+    const existing = fromSnapshot(characterId, snapshot);
     const now = new Date().toISOString() as ISOTimestamp;
-
-    const existingData = existing.exists ? existing.data() : undefined;
 
     const character: CollectionCharacter = {
       characterId,
       constellationLevel,
-      createdAt: existingData ? fromDocument(characterId, existingData).createdAt : now,
+      createdAt: existing?.createdAt ?? now,
       updatedAt: now,
     };
 
     transaction.set(docRef, toDocument(character));
 
-    return { character, created: !existing.exists };
+    return { character, created: !snapshot.exists };
   });
 }
 
