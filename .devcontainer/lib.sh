@@ -37,66 +37,62 @@ print_version() {
 }
 
 # ---------------------------------------------------------------------------
-# Verification
+# Provisioned tools
 # ---------------------------------------------------------------------------
 
-run_verification() {
-  local _xtrace
-  _xtrace="$(shopt -po xtrace 2>/dev/null)" || true
-  { set +x; } 2>/dev/null
+# Every tool the container provisions, whether a devcontainer.json feature or a
+# postCreateCommand.sh step installed it, as "label|version command". Both
+# reports read this list, so a new tool costs one line here and nothing else.
+TOOLS=(
+  "node|node --version"
+  "pnpm|pnpm --version"
+  "docker|docker --version"
+  "gh|gh --version"
+  "gcloud|gcloud --version"
+  "terraform|terraform version"
+  "java|java -version"
+  "pre-commit|pre-commit --version"
+  "reuse|reuse --version"
+  "vale|vale --version"
+  "lychee|lychee --version"
+  "firebase|firebase --version"
+  "playwright|pnpm --filter @genshin/e2e exec playwright --version"
+)
+
+# Applies a reporting function to every tool. Takes verify or print_version,
+# which share a (label, command...) signature. A loop rather than a pipeline
+# because verify appends to FAILURES, and a subshell would discard that.
+for_each_tool() {
+  local action="$1"
+  local entry label command argv
+  for entry in "${TOOLS[@]}"; do
+    IFS='|' read -r label command <<< "${entry}"
+    read -ra argv <<< "${command}"
+    "${action}" "${label}" "${argv[@]}"
+  done
+}
+
+# ---------------------------------------------------------------------------
+# Reports
+# ---------------------------------------------------------------------------
+
+report_verification() {
   step "Verifying installed tools"
 
-  verify "node"                 node --version
-  verify "pnpm"                 pnpm --version
-  verify "docker"               docker --version
-  verify "gh"                   gh --version
-  verify "gcloud"               gcloud --version
-  verify "terraform"            terraform version
-  verify "java"                 java -version
-  verify "pre-commit"           pre-commit --version
-  verify "reuse"                reuse --version
-  verify "vale"                 vale --version
-  verify "lychee"               lychee --version
-  verify "firebase"             firebase --version
-  verify "playwright-cli"       pnpm --filter @genshin/e2e exec playwright --version
-  verify "playwright-browsers"  pnpm --filter @genshin/e2e exec playwright install --list
-  eval "${_xtrace}"
+  for_each_tool verify
+
+  # Outside the table: the browsers report no version of their own, so
+  # `install --list` is the only evidence they reached the disk.
+  verify "playwright-browsers" pnpm --filter @genshin/e2e exec playwright install --list
 }
 
-# ---------------------------------------------------------------------------
-# Version summary
-# ---------------------------------------------------------------------------
-
-run_version_summary() {
-  local _xtrace
-  _xtrace="$(shopt -po xtrace 2>/dev/null)" || true
-  { set +x; } 2>/dev/null
+report_versions() {
   step "Environment versions"
 
-  print_version "node"       node --version
-  print_version "pnpm"       pnpm --version
-  print_version "docker"     docker --version
-  print_version "gh"         gh --version
-  print_version "gcloud"     gcloud --version
-  print_version "terraform"  terraform version
-  print_version "java"       java -version
-  print_version "pre-commit" pre-commit --version
-  print_version "reuse"      reuse --version
-  print_version "vale"       vale --version
-  print_version "lychee"     lychee --version
-  print_version "firebase"   firebase --version
-  print_version "playwright" pnpm --filter @genshin/e2e exec playwright --version
-  eval "${_xtrace}"
+  for_each_tool print_version
 }
 
-# ---------------------------------------------------------------------------
-# Final status
-# ---------------------------------------------------------------------------
-
-run_status() {
-  local _xtrace
-  _xtrace="$(shopt -po xtrace 2>/dev/null)" || true
-  { set +x; } 2>/dev/null
+report_status() {
   echo ""
   if [[ ${#FAILURES[@]} -gt 0 ]]; then
     echo "Setup completed with failures:"
@@ -109,5 +105,23 @@ run_status() {
   fi
 
   echo "Setup complete — all tools verified."
-  eval "${_xtrace}"
+}
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
+# The closing block both lifecycle scripts share. Suppresses `set -x` tracing
+# for its duration so the formatted output stays readable, then restores
+# whatever the caller had set.
+run_report() {
+  local xtrace
+  xtrace="$(shopt -po xtrace 2>/dev/null)" || true
+  { set +x; } 2>/dev/null
+
+  report_verification
+  report_versions
+  report_status
+
+  eval "${xtrace}"
 }

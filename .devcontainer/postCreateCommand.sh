@@ -51,6 +51,4 @@ step "Installing Playwright Chromium and Chrome"
 # server uses them too.
 pnpm --filter @genshin/e2e exec playwright install --with-deps chromium chrome
 
-run_verification
-run_version_summary
-run_status
+run_report

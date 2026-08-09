@@ -148,7 +148,7 @@ writing tests.
 
 - Provision a tool through a `devcontainer.json` feature when one publishes it. The image build caches a feature; every step in `.devcontainer/postCreateCommand.sh` runs again on each container create.
 - Add a `postCreateCommand.sh` step when no feature publishes the tool, or when the step needs the checked-out repository. Dependency installs, hook installs, and workspace-pinned browsers belong there for that second reason.
-- Give every provisioned tool a `verify` and a `print_version` entry in `.devcontainer/lib.sh`, whichever mechanism installed it. Both lifecycle scripts exit non-zero on a failed check, so an unverified tool breaks on a contributor's machine rather than in the `Devcontainer / Verify toolchain` job.
+- Add every provisioned tool to the `TOOLS` table in `.devcontainer/lib.sh`, whichever mechanism installed it. Verification and the version summary both read that table, and the lifecycle scripts exit non-zero on a failed check, so a tool left out of it breaks on a contributor's machine rather than in the `Devcontainer / Verify toolchain` job.
 
 ## Playwright MCP rules
 
