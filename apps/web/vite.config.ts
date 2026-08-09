@@ -18,9 +18,9 @@ const requiredEnvVars: readonly string[] = [
   'VITE_API_BASE_URL',
 ];
 
-const appVersion: string = JSON.parse(
+const { version: appVersion } = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, 'package.json'), 'utf-8'),
-).version;
+) as { version: string };
 
 function shortSha(): string {
   try {

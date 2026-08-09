@@ -32,8 +32,8 @@ function renderBar(
     filteredOwnedCount?: number;
   } = {},
 ) {
-  const onChange = vi.fn();
-  const onToggle = vi.fn();
+  const onChange = vi.fn<(filters: BaseFilterState) => void>();
+  const onToggle = vi.fn<(value: string) => void>();
   const category: FilterCategoryConfig<string> = {
     values: ['A', 'B'],
     selected: new Set(),

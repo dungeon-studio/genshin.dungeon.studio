@@ -35,7 +35,7 @@ function substatNames(listLabel: string): string[] {
   const list = screen.getByRole('list', { name: listLabel });
   return within(list)
     .getAllByRole('listitem')
-    .map((item) => item.textContent?.trim() ?? '');
+    .map((item) => item.textContent.trim());
 }
 
 describe('ArtifactPlanner', () => {

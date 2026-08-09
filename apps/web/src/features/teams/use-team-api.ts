@@ -46,7 +46,7 @@ export function useSaveTeamMutation(
       await apiPut(`/teams/${encodeURIComponent(slot)}`, { name, members, description });
     },
     onSuccess: () => {
-      if (userId !== undefined) queryClient.invalidateQueries({ queryKey: teamKey(userId) });
+      if (userId !== undefined) void queryClient.invalidateQueries({ queryKey: teamKey(userId) });
     },
   });
 }
@@ -61,7 +61,7 @@ export function useDeleteTeamMutation(
       await apiDelete(`/teams/${encodeURIComponent(slot)}`);
     },
     onSuccess: () => {
-      if (userId !== undefined) queryClient.invalidateQueries({ queryKey: teamKey(userId) });
+      if (userId !== undefined) void queryClient.invalidateQueries({ queryKey: teamKey(userId) });
     },
   });
 }

@@ -17,6 +17,8 @@ if (process.env.DEV === 'true') {
   console.log('Firebase: using local emulators (auth :9099, firestore :8181)');
 }
 
+// `||`, not `??`: a blank `GOOGLE_CLOUD_PROJECT` means unset.
+// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 const projectId = process.env.GOOGLE_CLOUD_PROJECT?.trim() || undefined;
 
 console.log(`Firebase: projectId=${projectId ?? '(not set)'}`);

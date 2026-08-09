@@ -61,6 +61,8 @@ describe('useAddCharacterMutation', () => {
     expect(putBody).toEqual({ constellationLevel: MIN_CONSTELLATION_LEVEL });
     expect(result.current.data).toEqual({
       characterId: CHARACTER,
+      // `expect.objectContaining` is typed `any` by vitest.
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       entry: expect.objectContaining({ characterId: CHARACTER }),
     });
   });

@@ -15,7 +15,7 @@ export function SetConfiguration({
   onChange: (sets: ArtifactPlan['sets'] | undefined) => void;
 }): JSX.Element {
   const handleFirstChange = (setId: ArtifactSet['id']) => {
-    if (sets && sets.length === 2) {
+    if (sets?.length === 2) {
       onChange([setId, sets[1]]);
     } else {
       onChange([setId]);

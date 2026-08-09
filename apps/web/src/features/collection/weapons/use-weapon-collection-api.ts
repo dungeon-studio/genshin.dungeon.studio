@@ -70,7 +70,7 @@ export function useAddWeaponMutation(
     },
     onSuccess: () => {
       if (userId !== undefined)
-        queryClient.invalidateQueries({ queryKey: weaponCollectionKey(userId) });
+        void queryClient.invalidateQueries({ queryKey: weaponCollectionKey(userId) });
     },
   });
 }
@@ -86,7 +86,7 @@ export function useRemoveWeaponMutation(
     },
     onSuccess: () => {
       if (userId !== undefined)
-        queryClient.invalidateQueries({ queryKey: weaponCollectionKey(userId) });
+        void queryClient.invalidateQueries({ queryKey: weaponCollectionKey(userId) });
     },
   });
 }
@@ -115,7 +115,7 @@ export function useSetRefinementLevelMutation(
     },
     onSuccess: () => {
       if (userId !== undefined)
-        queryClient.invalidateQueries({ queryKey: weaponCollectionKey(userId) });
+        void queryClient.invalidateQueries({ queryKey: weaponCollectionKey(userId) });
     },
   });
 }

@@ -72,7 +72,8 @@ export function useAddCharacterMutation(
       return parseSingleCharacterResponse(response);
     },
     onSuccess: () => {
-      if (userId !== undefined) queryClient.invalidateQueries({ queryKey: collectionKey(userId) });
+      if (userId !== undefined)
+        void queryClient.invalidateQueries({ queryKey: collectionKey(userId) });
     },
   });
 }
@@ -87,7 +88,8 @@ export function useRemoveCharacterMutation(
       await apiDelete(`/characters/${encodeURIComponent(characterId)}`);
     },
     onSuccess: () => {
-      if (userId !== undefined) queryClient.invalidateQueries({ queryKey: collectionKey(userId) });
+      if (userId !== undefined)
+        void queryClient.invalidateQueries({ queryKey: collectionKey(userId) });
     },
   });
 }
@@ -113,7 +115,8 @@ export function useSetConstellationLevelMutation(
       return parseSingleCharacterResponse(response);
     },
     onSuccess: () => {
-      if (userId !== undefined) queryClient.invalidateQueries({ queryKey: collectionKey(userId) });
+      if (userId !== undefined)
+        void queryClient.invalidateQueries({ queryKey: collectionKey(userId) });
     },
   });
 }
