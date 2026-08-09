@@ -143,7 +143,12 @@ writing tests.
 - Use `curl -fsSL` for network fetches.
 - Never hard-code secrets; use environment variables.
 - Quote `${{ inputs.* }}` expansions in GitHub Actions composite action `run` steps to prevent shell word-splitting.
-- Add new DevContainer provisioning steps in `.devcontainer/postCreateCommand.sh`.
+
+## DevContainer rules
+
+- Provision a tool through a `devcontainer.json` feature when one publishes it. The image build caches a feature; every step in `.devcontainer/postCreateCommand.sh` runs again on each container create.
+- Add a `postCreateCommand.sh` step when no feature publishes the tool, or when the step needs the checked-out repository. Dependency installs, hook installs, and workspace-pinned browsers all need the repository.
+- Add every provisioned tool to `for_each_tool` in `.devcontainer/lib.sh`, whichever mechanism installed it. A tool missing from that list breaks on a contributor's machine instead of in the `Devcontainer / Verify toolchain` job.
 
 ## Playwright MCP rules
 

@@ -23,8 +23,16 @@ on your host before running it:
 - **pre-commit** (`pre-commit --version`)
 - **jq** (`jq --version`)
 - **pipx** (`pipx --version`)
+- **Docker**, required by the hadolint pre-commit hook (`docker --version`)
+- **Terraform**, required by the Terraform pre-commit hooks (`terraform version`)
+- **Vale**, used by the VS Code Vale extension (`vale --version`). The pre-commit hook builds its own copy, so commits pass without it.
 
 ### Install missing prerequisites
+
+Install [Docker](https://docs.docker.com/engine/install/),
+[Terraform](https://developer.hashicorp.com/terraform/install), and
+[Vale](https://vale.sh/docs/install) from their own platform-specific
+instructions. The commands below cover everything else.
 
 #### macOS
 

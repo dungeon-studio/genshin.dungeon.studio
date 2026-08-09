@@ -48,14 +48,20 @@ quietly() {
 }
 
 # Verification and the version summary have to cover the same tools; one list
-# is what stops them drifting apart.
+# is what stops them drifting apart. It spans everything the container
+# provisions, feature-installed or script-installed.
 for_each_tool() {
   local action="$1"
   "${action}" "node" node --version
   "${action}" "pnpm" pnpm --version
+  "${action}" "docker" docker --version
+  "${action}" "gh" gh --version
   "${action}" "gcloud" gcloud --version
+  "${action}" "terraform" terraform version
+  "${action}" "java" java -version
   "${action}" "pre-commit" pre-commit --version
   "${action}" "reuse" reuse --version
+  "${action}" "vale" vale --version
   "${action}" "lychee" lychee --version
   "${action}" "firebase" firebase --version
   "${action}" "playwright" pnpm --filter @genshin/e2e exec playwright --version
