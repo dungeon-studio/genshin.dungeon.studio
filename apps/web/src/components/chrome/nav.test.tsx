@@ -20,23 +20,23 @@ describe('Nav', () => {
     renderNav('/');
 
     const teamsLink = screen.getByRole('link', { name: 'Teams' });
-    expect(teamsLink.className).toContain('border-primary');
+    expect(teamsLink).toHaveClass('border-primary');
   });
 
   it('marks the Characters link as active on /characters', () => {
     renderNav('/characters');
 
     const charactersLink = screen.getByRole('link', { name: 'Characters' });
-    expect(charactersLink.className).toContain('border-primary');
+    expect(charactersLink).toHaveClass('border-primary');
 
     const teamsLink = screen.getByRole('link', { name: 'Teams' });
-    expect(teamsLink.className).toContain('border-transparent');
+    expect(teamsLink).toHaveClass('border-transparent');
   });
 
   it('marks the Weapons link as active on /weapons', () => {
     renderNav('/weapons');
 
     const weaponsLink = screen.getByRole('link', { name: 'Weapons' });
-    expect(weaponsLink.className).toContain('border-primary');
+    expect(weaponsLink).toHaveClass('border-primary');
   });
 });

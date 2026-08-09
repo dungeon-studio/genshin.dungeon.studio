@@ -26,14 +26,13 @@ describe('buildWeapons', () => {
   });
 
   it('sorts by rarity descending, then version descending', () => {
-    for (let i = 1; i < weapons.length; i++) {
-      const previous = weapons[i - 1];
-      const current = weapons[i];
-      if (previous.rarity !== current.rarity) {
-        expect(previous.rarity).toBeGreaterThan(current.rarity);
-        continue;
-      }
-      expect(compareVersions(previous.version, current.version)).toBeGreaterThanOrEqual(0);
-    }
+    const outOfOrder = weapons.slice(1).filter((current, index) => {
+      const previous = weapons[index];
+      return previous.rarity === current.rarity
+        ? compareVersions(previous.version, current.version) < 0
+        : previous.rarity < current.rarity;
+    });
+
+    expect(outOfOrder).toEqual([]);
   });
 });

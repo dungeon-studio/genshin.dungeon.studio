@@ -2,15 +2,16 @@
 // SPDX-License-Identifier: MIT
 
 import eslintReact from '@eslint-react/eslint-plugin';
-import genshinConfig, { TYPESCRIPT_FILES } from '@genshin/eslint-config';
+import genshinConfig, { TYPESCRIPT_FILES, VITEST_FILES } from '@genshin/eslint-config';
 import { defineConfig } from 'eslint/config';
+import jestDom from 'eslint-plugin-jest-dom';
 import jsxA11yX from 'eslint-plugin-jsx-a11y-x';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
+import testingLibrary from 'eslint-plugin-testing-library';
 import globals from 'globals';
 
-const TEST_FILES = ['**/*.{test,spec}.{ts,tsx}', 'src/test/**/*.{ts,tsx}'];
 const SHADCN_SCAFFOLDS = ['src/components/ui/**/*.{ts,tsx}'];
 
 /**
@@ -101,7 +102,8 @@ export default defineConfig([
     },
   },
   {
-    files: TEST_FILES,
+    files: VITEST_FILES,
+    extends: [testingLibrary.configs['flat/react'], jestDom.configs['flat/recommended']],
     rules: {
       // A `renderHook` wrapper closes over per-test state and never remounts on
       // a parent re-render, so the rule's premise does not hold.

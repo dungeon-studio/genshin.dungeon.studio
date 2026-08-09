@@ -4,6 +4,7 @@
 import { resolve } from 'node:path';
 
 import js from '@eslint/js';
+import vitest from '@vitest/eslint-plugin';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 import importX from 'eslint-plugin-import-x';
@@ -18,6 +19,12 @@ const LINTED_FILES = ['**/*.{ts,tsx,js,mjs,cjs}'];
  * overrides to this.
  */
 export const TYPESCRIPT_FILES = ['**/*.{ts,tsx}'];
+
+/**
+ * The vitest suites and the helpers they share. Playwright names its suites
+ * `*.spec.ts`, so that convention deliberately falls outside this.
+ */
+export const VITEST_FILES = ['**/*.test.{ts,tsx}', '**/test/**/*.{ts,tsx}'];
 
 /** Paths allowed to import `devDependencies`. */
 const DEV_DEPENDENCY_FILES = [
@@ -123,5 +130,6 @@ export default function genshinConfig(packageDir) {
     tseslint.configs.recommended,
     TYPESCRIPT_STRICTNESS,
     importDiscipline(packageDir),
+    { files: VITEST_FILES, extends: [vitest.configs.recommended] },
   ]);
 }

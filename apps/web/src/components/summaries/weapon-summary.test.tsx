@@ -16,6 +16,10 @@ const AMOS_BOW = {
   version: '1.0',
 } satisfies Weapon;
 
+// The type icons render `alt=""`: they restate the name beside them, so they
+// are decorative and Testing Library's queries, which read the accessibility
+// tree, cannot reach them.
+/* eslint-disable testing-library/no-container, testing-library/no-node-access */
 describe('WeaponSummary', () => {
   it('renders placeholder when no weapon is provided', () => {
     render(<WeaponSummary />);
@@ -36,7 +40,7 @@ describe('WeaponSummary', () => {
     const { container } = render(<WeaponSummary weapon={AMOS_BOW} dimmed />);
 
     const images = container.querySelectorAll('img');
-    expect(images[0].className).toContain('opacity-30');
-    expect(images[1].className).toContain('opacity-30');
+    expect(images[0]).toHaveClass('opacity-30');
+    expect(images[1]).toHaveClass('opacity-30');
   });
 });
