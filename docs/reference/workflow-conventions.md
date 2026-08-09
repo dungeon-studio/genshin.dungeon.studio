@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 # Workflow conventions
 
-Conventions for GitHub Actions workflows in `.github/workflows/`. For conventions covering the project's source, see [code conventions](code-conventions.md); to try a change before pushing it, see [run workflows locally](../how-tos/run-workflows-locally.md).
+Conventions for GitHub Actions workflows in `.github/workflows/`. For conventions covering the project's source, see [code conventions](code-conventions.md). To try a change before pushing it, see [run workflows locally](../how-tos/run-workflows-locally.md).
 
 ---
 

@@ -17,13 +17,12 @@ and they finish sooner.
 
 ## Prerequisites
 
-The DevContainer installs act and already exposes the host Docker socket.
-Elsewhere, follow the
-[act installation instructions](https://nektosact.com/installation/) and confirm
-`docker info` succeeds.
+The DevContainer installs act and exposes the host Docker socket. Elsewhere,
+follow the [act installation instructions](https://nektosact.com/installation/)
+and confirm `docker info` succeeds.
 
 `.actrc` in the repository root names the runner image, so act won't ask you to
-pick one. The first run pulls it, about 1.6 GB.
+pick one. The first run downloads it.
 
 ## List the jobs act sees
 
@@ -39,9 +38,8 @@ act -l
 act push -j workspace
 ```
 
-The event argument decides which jobs exist: `schema-compat` carries
-`if: github.event_name == 'pull_request'`, so only
-`act pull_request -j schema-compat` runs it.
+The event argument decides which jobs exist: `schema-compat` is gated on pull
+requests, so only `act pull_request -j schema-compat` runs it.
 
 ## Check the wiring without running it
 
@@ -50,11 +48,11 @@ act push -n
 ```
 
 A dry run resolves the job graph, the `if:` conditions, and every `uses:`
-reference without starting a step—the whole question most workflow edits raise.
+reference without starting a step.
 
 ## Pass a secret
 
-`workspace` and `e2e` finish their Codecov upload once you hand act a token:
+`workspace` and `e2e` finish their Codecov upload when act has the token:
 
 ```bash
 act push -j workspace -s CODECOV_TOKEN
@@ -65,7 +63,7 @@ once. Keep that file outside the repository.
 
 ## What can't work locally
 
-No secret unlocks a step that wants a service only GitHub's own runners reach:
+No secret unlocks a step that wants a service only GitHub's runners reach:
 
 - SARIF uploads to the Security tab, in the `trivy-*` and `workflow-audit` jobs
 - `cache-from: type=gha` in `container`, which wants the Actions cache service
@@ -82,9 +80,8 @@ test.
 act copies the working tree into the job container rather than mounting it, and
 a [linked worktree](https://git-scm.com/docs/git-worktree) stores `.git` as a
 file pointing at the main checkout. That path doesn't exist inside the
-container, so any step shelling out to git fails there. `verify-build-output.sh`
-is the one such step in `ci.yml` today. Run act from the main checkout when you
-need it.
+container, so a step shelling out to git fails there. Run act from the main
+checkout when a job runs git.
 
 Inside the DevContainer, act's job containers are siblings of it on the host
 daemon rather than children. Leave the copy-in behaviour alone: `--bind` mounts
