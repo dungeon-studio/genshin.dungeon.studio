@@ -10,8 +10,16 @@ import importX from 'eslint-plugin-import-x';
 import unusedImports from 'eslint-plugin-unused-imports';
 import tseslint from 'typescript-eslint';
 
+/**
+ * Every file kind eslint reads in a workspace. Written once and reshaped
+ * because two consumers want two shapes — eslint matches files by glob,
+ * `import-x` by extension — and hand-maintained copies drift: a kind missing
+ * from the `import-x` list is one `no-cycle` stops looking at, silently.
+ */
+const MODULE_EXTENSIONS = ['ts', 'tsx', 'cts', 'mts', 'js', 'jsx', 'cjs', 'mjs'];
+
 /** Every file eslint reads in a workspace. */
-const LINTED_FILES = ['**/*.{ts,tsx,js,mjs,cjs}'];
+const LINTED_FILES = [`**/*.{${MODULE_EXTENSIONS.join(',')}}`];
 
 /**
  * The TypeScript subset of the files eslint reads. Workspaces scope their own
@@ -56,29 +64,66 @@ const TYPESCRIPT_STRICTNESS = {
   },
 };
 
+/** Import hygiene that reads the same in every workspace. */
+const IMPORT_DISCIPLINE = {
+  files: LINTED_FILES,
+  plugins: { 'import-x': importX, 'unused-imports': unusedImports },
+  settings: {
+    'import-x/resolver-next': [createTypeScriptImportResolver({ alwaysTryTypes: true })],
+    // Load-bearing. Rules that follow an import into the *imported* file
+    // consult this list first and skip anything not on it, which defaults to
+    // `.js`/`.mjs`/`.cjs` — so without this `no-cycle` silently reports
+    // nothing across a TypeScript codebase rather than failing loudly.
+    'import-x/extensions': MODULE_EXTENSIONS.map((extension) => `.${extension}`),
+  },
+  rules: {
+    'import-x/order': [
+      'error',
+      {
+        groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index']],
+        'newlines-between': 'always',
+        alphabetize: { order: 'asc', caseInsensitive: true },
+      },
+    ],
+    'import-x/no-duplicates': 'error',
+    'import-x/newline-after-import': 'error',
+    // Duplicates `tsc`, but `typecheck` is not a commit gate and `eslint` is,
+    // so this is where a broken import path gets caught first. Sibling
+    // workspaces are exempt: their entry points resolve through built
+    // `dist/`, so linting them would report build state, not import
+    // correctness, and would fail on any unbuilt checkout.
+    'import-x/no-unresolved': ['error', { ignore: ['^@genshin/'] }],
+    // `ignoreExternal` keeps the graph walk inside the repo; cycles in
+    // `node_modules` are not ours to break.
+    'import-x/no-cycle': ['error', { ignoreExternal: true }],
+    // `unused-imports` owns unused-symbol reporting so removals are
+    // autofixable; the recommended `no-unused-vars` rules are disabled to
+    // avoid double-reporting.
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': 'off',
+    'unused-imports/no-unused-imports': 'error',
+    'unused-imports/no-unused-vars': [
+      'error',
+      { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
+    ],
+  },
+};
+
 /**
- * Parameterised because `no-extraneous-dependencies` has to know which
- * `package.json` files may satisfy an import.
+ * The one import rule that cannot be shared verbatim:
+ * `no-extraneous-dependencies` has to know which `package.json` files may
+ * satisfy an import.
  *
  * @param {string} packageDir - the consuming workspace's directory.
  * @returns {import('eslint').Linter.Config}
  */
-function importDiscipline(packageDir) {
+function declaredDependencies(packageDir) {
   // Workspaces sit two levels below the root, whose `package.json` holds the
   // tooling dependencies they all share.
   const repoRoot = resolve(packageDir, '../..');
 
   return {
     files: LINTED_FILES,
-    plugins: { 'import-x': importX, 'unused-imports': unusedImports },
-    settings: {
-      'import-x/resolver-next': [createTypeScriptImportResolver({ alwaysTryTypes: true })],
-      // Load-bearing. Rules that follow an import into the *imported* file
-      // consult this list first and skip anything not on it, which defaults to
-      // `.js`/`.mjs`/`.cjs` — so without this `no-cycle` silently reports
-      // nothing across a TypeScript codebase rather than failing loudly.
-      'import-x/extensions': ['.ts', '.tsx', '.cts', '.mts', '.js', '.jsx', '.cjs', '.mjs'],
-    },
     rules: {
       'import-x/no-extraneous-dependencies': [
         'error',
@@ -86,35 +131,6 @@ function importDiscipline(packageDir) {
           devDependencies: DEV_DEPENDENCY_FILES,
           packageDir: [packageDir, repoRoot],
         },
-      ],
-      'import-x/order': [
-        'error',
-        {
-          groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index']],
-          'newlines-between': 'always',
-          alphabetize: { order: 'asc', caseInsensitive: true },
-        },
-      ],
-      'import-x/no-duplicates': 'error',
-      'import-x/newline-after-import': 'error',
-      // Duplicates `tsc`, but `typecheck` is not a commit gate and `eslint` is,
-      // so this is where a broken import path gets caught first. Sibling
-      // workspaces are exempt: their entry points resolve through built
-      // `dist/`, so linting them would report build state, not import
-      // correctness, and would fail on any unbuilt checkout.
-      'import-x/no-unresolved': ['error', { ignore: ['^@genshin/'] }],
-      // `ignoreExternal` keeps the graph walk inside the repo; cycles in
-      // `node_modules` are not ours to break.
-      'import-x/no-cycle': ['error', { ignoreExternal: true }],
-      // `unused-imports` owns unused-symbol reporting so removals are
-      // autofixable; the recommended `no-unused-vars` rules are disabled to
-      // avoid double-reporting.
-      'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
-      'unused-imports/no-unused-imports': 'error',
-      'unused-imports/no-unused-vars': [
-        'error',
-        { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
       ],
     },
   };
@@ -136,6 +152,7 @@ export default function genshinConfig(packageDir) {
     // `TYPESCRIPT_FILES` does not.
     tseslint.configs.recommended,
     TYPESCRIPT_STRICTNESS,
-    importDiscipline(packageDir),
+    IMPORT_DISCIPLINE,
+    declaredDependencies(packageDir),
   ]);
 }
