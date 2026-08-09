@@ -123,6 +123,7 @@ SRECon
 [Mm]iddleware
 [Mm]onorepo
 [Nn]amespace
+[Oo]ptionalslop
 [Pp]arseable
 [Rr]epo
 [Rr]ollouts

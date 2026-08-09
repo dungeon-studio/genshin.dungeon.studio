@@ -169,5 +169,5 @@ stamp. Lifecycle:
 
 Robbie Ostrow (OpenAI), [Escaping Version Skew: Formalizing compatibility in a
 world of partial rollouts](https://www.usenix.org/conference/srecon26americas/presentation/ostrow),
-SRECon Americas 2026. Source for the two-role model, the optional-field
+SRECon Americas 2026. Source for the two-role model, the optionalslop
 anti-pattern, the subsumption checker approach, and the `jsoncompat` tool.
