@@ -20,10 +20,10 @@ const AMBER = {
 
 describe('CharacterSummary', () => {
   it('renders placeholder when no character is provided', () => {
-    const { container } = render(<CharacterSummary />);
+    render(<CharacterSummary />);
 
     expect(screen.getByText('No character')).toBeInTheDocument();
-    expect(container.querySelector('img')).toBeNull();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
   it('renders the element icon with correct src path', () => {
@@ -39,7 +39,7 @@ describe('CharacterSummary', () => {
     render(<CharacterSummary character={AMBER} dimmed />);
 
     const images = screen.getAllByAltText('Pyro');
-    expect(images[0].className).toContain('opacity-30');
-    expect(images[1].className).toContain('opacity-30');
+    expect(images[0]).toHaveClass('opacity-30');
+    expect(images[1]).toHaveClass('opacity-30');
   });
 });

@@ -44,7 +44,7 @@ const BOW_INSTANCE = 'bow-instance' as CollectionWeaponId;
 const TIMESTAMP = '2026-01-01T00:00:00.000Z' as ISOTimestamp;
 
 function renderTeamsPage() {
-  const result = render(
+  const view = render(
     <MemoryRouter>
       <TeamsPage />
     </MemoryRouter>,
@@ -84,7 +84,7 @@ function renderTeamsPage() {
     });
   });
 
-  return result;
+  return view;
 }
 
 describe('TeamsPage weapon-first flow', () => {

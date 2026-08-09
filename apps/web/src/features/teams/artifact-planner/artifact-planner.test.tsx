@@ -86,7 +86,9 @@ describe('ArtifactPlanner', () => {
     await user.selectOptions(screen.getByLabelText('Add priority substats'), 'CRIT Rate');
 
     const secondaryAdd = screen.getByLabelText('Add secondary substats');
-    expect(within(secondaryAdd).queryByRole('option', { name: 'CRIT Rate' })).toBeNull();
+    expect(
+      within(secondaryAdd).queryByRole('option', { name: 'CRIT Rate' }),
+    ).not.toBeInTheDocument();
   });
 
   it('stops offering more substats once the list is full', async () => {
@@ -98,7 +100,7 @@ describe('ArtifactPlanner', () => {
     }
 
     expect(substatNames('Priority substats')).toHaveLength(3);
-    expect(screen.queryByLabelText('Add priority substats')).toBeNull();
+    expect(screen.queryByLabelText('Add priority substats')).not.toBeInTheDocument();
   });
 
   it('removes a selected substat', async () => {
@@ -137,7 +139,7 @@ describe('ArtifactPlanner', () => {
 
     // Clearing the first set drops both selections.
     await user.click(screen.getAllByRole('button', { name: 'Clear selection' })[0]);
-    expect(screen.queryByText('Obsidian Codex')).toBeNull();
-    expect(screen.queryByText('Unfinished Reverie')).toBeNull();
+    expect(screen.queryByText('Obsidian Codex')).not.toBeInTheDocument();
+    expect(screen.queryByText('Unfinished Reverie')).not.toBeInTheDocument();
   });
 });
