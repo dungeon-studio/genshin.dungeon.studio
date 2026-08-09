@@ -1,14 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-// Workspace Configuration Validator.
-//
-// Asserts that VS Code extension recommendations in .vscode/extensions.json
-// stay in lockstep with the extensions installed by .devcontainer/devcontainer.json.
-// Both files carry a MAINTENANCE comment pointing at the other; this check
-// enforces it.
-//
-// Usage: pnpm tsx scripts/validate-workspace.ts
+// Asserts that the VS Code extension recommendations in .vscode/extensions.json
+// stay in lockstep with the extensions .devcontainer/devcontainer.json installs.
+// Both files carry a MAINTENANCE comment pointing at the other; this enforces it.
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -51,12 +46,12 @@ const onlyRecommended = [...recommendedSet].filter((ext) => !installedSet.has(ex
 const onlyInstalled = [...installedSet].filter((ext) => !recommendedSet.has(ext)).sort();
 
 if (onlyRecommended.length === 0 && onlyInstalled.length === 0) {
-  console.log(`workspace: ${recommended.length} extensions in sync.`);
+  console.log(`vscode-extensions: ${recommended.length} extensions in sync.`);
   process.exit(0);
 }
 
 console.error(
-  'workspace: extensions out of sync between .vscode/extensions.json and .devcontainer/devcontainer.json',
+  'vscode-extensions: out of sync between .vscode/extensions.json and .devcontainer/devcontainer.json',
 );
 if (onlyRecommended.length > 0) {
   console.error(`  only in .vscode/extensions.json: ${onlyRecommended.join(', ')}`);

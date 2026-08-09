@@ -47,6 +47,7 @@ tooltip
 config
 configs
 formatters
+toolchain
 
 # Backend and database
 Firebase
