@@ -4,16 +4,11 @@
 import type { QueryClient, QueryKey } from '@tanstack/react-query';
 
 /**
- * Builds an `onSuccess` handler that refetches a user-scoped query.
+ * Build an `onSuccess` handler that refetches a user-scoped query. Signed-out
+ * users have no query to refetch, so it is a no-op without a `userId`.
  *
- * Signed-out users have no query to refetch, so the handler is a no-op without a
- * `userId`. The invalidation is deliberately not awaited: returning it would
- * hold the mutation pending until the refetch settled.
- *
- * @param queryClient - the client the mutation already holds.
- * @param userId - the signed-in user, or `undefined` when signed out.
- * @param keyFor - the feature's query-key builder.
- * @returns a handler suitable for `useMutation`'s `onSuccess`.
+ * The invalidation is deliberately not awaited: returning it would hold the
+ * mutation pending until the refetch settled.
  */
 export function invalidateUserQuery(
   queryClient: QueryClient,

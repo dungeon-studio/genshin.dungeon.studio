@@ -20,10 +20,10 @@ const LINTED_FILES = ['**/*.{ts,tsx,js,mjs,cjs}'];
 export const TYPESCRIPT_FILES = ['**/*.{ts,tsx}'];
 
 /**
- * TypeScript files the project service cannot resolve a program for, so
- * type-aware rules have to skip them. `vitest.config.ts` is claimed by no
- * `tsconfig.json` at all; `scripts/` is claimed only by `tsconfig.scripts.json`,
- * which the project service never reaches because nothing references it.
+ * TypeScript files no reachable `tsconfig.json` claims, so type-aware rules
+ * skip them: nothing claims `vitest.config.ts`, and only
+ * `tsconfig.scripts.json` claims `scripts/`, which the project service never
+ * reaches because nothing references it.
  */
 const FILES_OUTSIDE_ANY_PROJECT = ['vitest.config.ts', 'scripts/**/*.ts'];
 
@@ -37,9 +37,9 @@ const DEV_DEPENDENCY_FILES = [
 ];
 
 /**
- * The type-aware tier, plus the type-aware rules worth taking from tiers this
- * repo otherwise skips. Scoped to `TYPESCRIPT_FILES` because every rule here
- * needs a TypeScript program, and only files a `tsconfig.json` claims have one.
+ * The type-aware tier, plus the rules worth taking from tiers this repo
+ * otherwise skips. Scoped to `TYPESCRIPT_FILES` because every rule here needs
+ * a TypeScript program, and only files a `tsconfig.json` claims have one.
  *
  * @param {string} packageDir - the consuming workspace's directory.
  * @returns {import('eslint').Linter.Config}
@@ -47,23 +47,17 @@ const DEV_DEPENDENCY_FILES = [
 function typeAwareRules(packageDir) {
   return {
     files: TYPESCRIPT_FILES,
-    // Skipped files fall back to the non-type-aware tier above rather than
-    // failing to parse.
     ignores: FILES_OUTSIDE_ANY_PROJECT,
     extends: [tseslint.configs.recommendedTypeChecked],
     languageOptions: {
       parserOptions: {
-        // Resolves each file's program the way `tsserver` does, so solution-style
-        // `tsconfig.json` references resolve without enumerating projects here.
+        // Finds each file's program the way `tsserver` does, which reaches
+        // solution-style `tsconfig.json` references without listing projects.
         projectService: true,
         tsconfigRootDir: packageDir,
       },
     },
     // Both from `stylisticTypeChecked`, whose remaining rules overlap Prettier.
-    // `strictTypeChecked`'s `no-unnecessary-condition` belongs here too, but it
-    // reads an index into an array or `Record` as non-optional until
-    // `noUncheckedIndexedAccess` is on, and so reports correct runtime guards as
-    // dead code. Enabled alongside that flag in #1217.
     rules: {
       '@typescript-eslint/prefer-nullish-coalescing': 'error',
       '@typescript-eslint/prefer-optional-chain': 'error',
@@ -71,7 +65,7 @@ function typeAwareRules(packageDir) {
   };
 }
 
-/** Rules tightening the typescript-eslint tiers above. */
+/** Rules tightening the typescript-eslint presets. */
 const TYPESCRIPT_STRICTNESS = {
   files: TYPESCRIPT_FILES,
   rules: {

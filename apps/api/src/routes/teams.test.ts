@@ -38,7 +38,6 @@ vi.mock('@/repositories/weapons/index.js', () => ({
   get: vi.fn(),
 }));
 
-/** A members tuple holding one member, the rest of the slots empty. */
 function soloMembers(member: CollectionTeamMember): CollectionTeam['members'] {
   return [member, null, null, null];
 }

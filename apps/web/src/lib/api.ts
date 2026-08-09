@@ -35,8 +35,8 @@ async function handleResponse(response: Response): Promise<unknown> {
   if (!response.ok) {
     const contentType = response.headers.get('content-type') ?? '';
     if (contentType.includes('application/problem+json')) {
-      // Trusted on the content type alone; unlike success bodies, which callers
-      // validate, an error body is never checked against the schema.
+      // Trusted on the content type alone. Success bodies stay `unknown` for
+      // callers to validate; error bodies are not validated at all.
       const problem = (await response.json()) as ProblemDetail;
       throw new ApiError(problem);
     }

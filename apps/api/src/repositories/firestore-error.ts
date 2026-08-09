@@ -21,7 +21,7 @@ function httpStatusFor(code: Status | undefined): ContentfulStatusCode {
 function labelFor(code: Status | undefined): string {
   if (code === undefined) return '(unknown)';
   // A numeric enum's reverse mapping is typed `string`, but yields `undefined`
-  // for codes the installed google-gax does not know.
+  // for codes google-gax does not know.
   return Status[code] ?? String(code);
 }
 
