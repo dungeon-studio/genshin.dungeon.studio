@@ -25,6 +25,16 @@ comment:
   behavior: default
   require_changes: false
 
+# apps/web only; `@codecov/vite-plugin` in its vite.config.ts uploads the report
+# from inside `vite build`. A ratchet against the base commit rather than a fixed
+# size ceiling, matching how the coverage statuses above are set: what a bundle
+# should weigh is not known yet, but a jump within one pull request is reviewable
+# either way. A real status, not `informational`, though nothing requires it to
+# pass until the develop ruleset gains required checks.
+bundle_analysis:
+  warning_threshold: '5%'
+  status: true
+
 flag_management:
   default_rules:
     carryforward: true

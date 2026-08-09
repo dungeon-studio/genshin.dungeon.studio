@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "schemas:export": "tsx scripts/export-schemas.ts",
     "test": "vitest run",
+    "verify:bundle-stats": "tsx scripts/verify-bundle-stats.ts",
     "typecheck": "tsc -b --noEmit && tsc --project tsconfig.scripts.json --noEmit"
   },
   "dependencies": {
@@ -36,6 +37,7 @@
     "zustand": "5.0.14"
   },
   "devDependencies": {
+    "@codecov/vite-plugin": "2.0.1",
     "@eslint-react/eslint-plugin": "5.18.3",
     "@genshin/eslint-config": "workspace:*",
     "@tailwindcss/postcss": "4.3.3",

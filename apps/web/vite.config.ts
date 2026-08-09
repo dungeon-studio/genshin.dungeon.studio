@@ -5,6 +5,7 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
+import { codecovVitePlugin } from '@codecov/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
@@ -36,10 +37,31 @@ function shortSha(): string {
 const appVersion: string = packageVersion();
 const buildSha: string = shortSha();
 
+// A dry run collects the same stats but writes them beside the bundle instead of
+// uploading, which is how scripts/verify-bundle-stats.ts inspects them.
+const bundleStatsDryRun: boolean = process.env.CODECOV_BUNDLE_DRY_RUN === 'true';
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    // Bundle size tracking. The upload happens inside `vite build` rather than as
+    // a later CI step, so the token has to reach this process — turbo's strict
+    // env mode drops it unless `build.passThroughEnv` in turbo.json lists it.
+    // Keying on the token confines uploads to CI; local builds do nothing.
+    //
+    // The declared peer range stops at Vite 6 and this app builds on Vite 8,
+    // whose Rolldown bundler reports the Rollup-compatible hooks the plugin
+    // reads. It works, but nothing upstream guarantees it keeps working, and a
+    // plugin that silently collected nothing would look exactly like a bundle
+    // that never changed — hence the verify:bundle-stats gate in CI.
+    codecovVitePlugin({
+      enableBundleAnalysis: bundleStatsDryRun || process.env.CODECOV_TOKEN !== undefined,
+      bundleName: 'web',
+      uploadToken: process.env.CODECOV_TOKEN,
+      dryRun: bundleStatsDryRun,
+      telemetry: false,
+    }),
     {
       name: 'validate-env',
       // .github/workflows/deploy.yml injects these for deployed builds. Failing
