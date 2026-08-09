@@ -9,6 +9,7 @@
     "start": "node dist/main.js",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:integration": "firebase emulators:exec --only firestore --project demo-dungeon-studio-genshin-dev \"vitest run --coverage --config vitest.integration.config.ts\"",
     "typecheck": "tsc --noEmit && tsc --project tsconfig.scripts.json --noEmit",
     "schemas:export": "tsx scripts/export-schemas.ts",
     "schemas:check": "tsx scripts/check-schema-compat.ts"

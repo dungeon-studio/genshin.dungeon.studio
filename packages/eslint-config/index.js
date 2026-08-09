@@ -31,11 +31,11 @@ export const VITEST_FILES = ['**/*.test.{ts,tsx}', '**/test/**/*.{ts,tsx}'];
 
 /**
  * TypeScript files no reachable `tsconfig.json` claims, so type-aware rules
- * skip them: nothing claims `vitest.config.ts`, and only
+ * skip them: nothing claims a `vitest.*config.ts`, and only
  * `tsconfig.scripts.json` claims `scripts/`, which the project service never
  * reaches because nothing references it.
  */
-const FILES_OUTSIDE_ANY_PROJECT = ['vitest.config.ts', 'scripts/**/*.ts'];
+const FILES_OUTSIDE_ANY_PROJECT = ['vitest.*config.ts', 'scripts/**/*.ts'];
 
 /** Paths allowed to import `devDependencies`. */
 const DEV_DEPENDENCY_FILES = [
