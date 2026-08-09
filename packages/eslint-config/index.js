@@ -10,12 +10,7 @@ import importX from 'eslint-plugin-import-x';
 import unusedImports from 'eslint-plugin-unused-imports';
 import tseslint from 'typescript-eslint';
 
-/**
- * Every file kind eslint reads in a workspace. Written once and reshaped
- * because two consumers want two shapes — eslint matches files by glob,
- * `import-x` by extension — and hand-maintained copies drift: a kind missing
- * from the `import-x` list is one `no-cycle` stops looking at, silently.
- */
+/** The file kinds this monorepo treats as modules. */
 const MODULE_EXTENSIONS = ['ts', 'tsx', 'cts', 'mts', 'js', 'jsx', 'cjs', 'mjs'];
 
 /** Every file eslint reads in a workspace. */
@@ -64,16 +59,14 @@ const TYPESCRIPT_STRICTNESS = {
   },
 };
 
-/** Import hygiene that reads the same in every workspace. */
+/** Import rules that need no workspace context. */
 const IMPORT_DISCIPLINE = {
   files: LINTED_FILES,
   plugins: { 'import-x': importX, 'unused-imports': unusedImports },
   settings: {
     'import-x/resolver-next': [createTypeScriptImportResolver({ alwaysTryTypes: true })],
-    // Load-bearing. Rules that follow an import into the *imported* file
-    // consult this list first and skip anything not on it, which defaults to
-    // `.js`/`.mjs`/`.cjs` — so without this `no-cycle` silently reports
-    // nothing across a TypeScript codebase rather than failing loudly.
+    // `import-x` parses an imported file only if its extension is listed, and
+    // the default omits TypeScript — which leaves `no-cycle` silently inert.
     'import-x/extensions': MODULE_EXTENSIONS.map((extension) => `.${extension}`),
   },
   rules: {
@@ -87,14 +80,10 @@ const IMPORT_DISCIPLINE = {
     ],
     'import-x/no-duplicates': 'error',
     'import-x/newline-after-import': 'error',
-    // Duplicates `tsc`, but `typecheck` is not a commit gate and `eslint` is,
-    // so this is where a broken import path gets caught first. Sibling
-    // workspaces are exempt: their entry points resolve through built
-    // `dist/`, so linting them would report build state, not import
-    // correctness, and would fail on any unbuilt checkout.
+    // Sibling workspaces resolve through built `dist/`, so checking them would
+    // report whether the repo is built, not whether the import is correct.
     'import-x/no-unresolved': ['error', { ignore: ['^@genshin/'] }],
-    // `ignoreExternal` keeps the graph walk inside the repo; cycles in
-    // `node_modules` are not ours to break.
+    // Cycles inside `node_modules` are not ours to break.
     'import-x/no-cycle': ['error', { ignoreExternal: true }],
     // `unused-imports` owns unused-symbol reporting so removals are
     // autofixable; the recommended `no-unused-vars` rules are disabled to
@@ -110,9 +99,8 @@ const IMPORT_DISCIPLINE = {
 };
 
 /**
- * The one import rule that cannot be shared verbatim:
- * `no-extraneous-dependencies` has to know which `package.json` files may
- * satisfy an import.
+ * Parameterised because `no-extraneous-dependencies` has to know which
+ * `package.json` files may satisfy an import.
  *
  * @param {string} packageDir - the consuming workspace's directory.
  * @returns {import('eslint').Linter.Config}
