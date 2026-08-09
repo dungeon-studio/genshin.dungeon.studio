@@ -46,8 +46,9 @@ workspace dependencies first. Turbo handles dependency ordering via `^build`.
 
 - Every source file needs SPDX headers. See `docs/how-tos/add-spdx-headers.md`.
   For files without comment syntax, declare them in `.reuse/dep5`.
-- Conventional commits: `feat:`, `fix:`, `docs:`, `test:`, `refactor:`,
-  `style:`, `chore:`.
+- Conventional commits: `feat:`, `fix:`, `docs:`, `style:`, `refactor:`,
+  `perf:`, `test:`, `build:`, `ci:`, `chore:`, `revert:`. CI checks the PR
+  title, not local commits; subject starts lowercase, no trailing period.
 - Never bypass pre-commit with `--no-verify`; fix root causes.
 - Never use `git commit --amend` or `git push --force`.
 - Fixes after hook failures should be new commits; squash merge handles cleanup.
