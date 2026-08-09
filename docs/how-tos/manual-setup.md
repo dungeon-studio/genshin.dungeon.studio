@@ -23,11 +23,16 @@ on your host before running it:
 - **pre-commit** (`pre-commit --version`)
 - **jq** (`jq --version`)
 - **pipx** (`pipx --version`)
-- **Docker** (`docker --version`), required by the hadolint pre-commit hook
-- **Terraform** (`terraform version`), required by the Terraform pre-commit hooks
-- **Vale** (`vale --version`), used by the VS Code Vale extension. The pre-commit hook builds its own copy, so prose linting works without this one.
+- **Docker**, required by the hadolint pre-commit hook (`docker --version`)
+- **Terraform**, required by the Terraform pre-commit hooks (`terraform version`)
+- **Vale**, used by the VS Code Vale extension (`vale --version`). The pre-commit hook builds its own copy, so commits pass without it.
 
 ### Install missing prerequisites
+
+Install [Docker](https://docs.docker.com/engine/install/),
+[Terraform](https://developer.hashicorp.com/terraform/install), and
+[Vale](https://vale.sh/docs/install) from their own platform-specific
+instructions. The commands below cover everything else.
 
 #### macOS
 
@@ -49,13 +54,6 @@ sudo dnf install java-21-openjdk-headless gh jq pipx
 pipx install pre-commit
 npm install -g firebase-tools
 ```
-
-#### Docker, Terraform, and Vale
-
-Each publishes platform-specific instructions, and the packaged versions in
-distribution repositories lag: [Docker](https://docs.docker.com/engine/install/),
-[Terraform](https://developer.hashicorp.com/terraform/install), and
-[Vale](https://vale.sh/docs/install).
 
 ---
 

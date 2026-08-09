@@ -40,9 +40,8 @@ print_version() {
 # Provisioned tools
 # ---------------------------------------------------------------------------
 
-# Every tool the container provisions, whether a devcontainer.json feature or a
-# postCreateCommand.sh step installed it, as "label|version command". Both
-# reports read this list, so a new tool costs one line here and nothing else.
+# Every tool the container provisions, feature-installed or script-installed,
+# as "label|version command".
 TOOLS=(
   "node|node --version"
   "pnpm|pnpm --version"
@@ -59,9 +58,8 @@ TOOLS=(
   "playwright|pnpm --filter @genshin/e2e exec playwright --version"
 )
 
-# Applies a reporting function to every tool. Takes verify or print_version,
-# which share a (label, command...) signature. A loop rather than a pipeline
-# because verify appends to FAILURES, and a subshell would discard that.
+# A loop rather than a pipeline: verify appends to FAILURES, and a subshell
+# would discard every failure.
 for_each_tool() {
   local action="$1"
   local entry label command argv
@@ -81,8 +79,8 @@ report_verification() {
 
   for_each_tool verify
 
-  # Outside the table: the browsers report no version of their own, so
-  # `install --list` is the only evidence they reached the disk.
+  # Not in the table: the browsers report no version, so `install --list` is
+  # the only proof they installed.
   verify "playwright-browsers" pnpm --filter @genshin/e2e exec playwright install --list
 }
 
@@ -111,9 +109,8 @@ report_status() {
 # Entry point
 # ---------------------------------------------------------------------------
 
-# The closing block both lifecycle scripts share. Suppresses `set -x` tracing
-# for its duration so the formatted output stays readable, then restores
-# whatever the caller had set.
+# Suppresses `set -x` tracing so the formatted output stays readable, then
+# restores whatever the caller had set.
 run_report() {
   local xtrace
   xtrace="$(shopt -po xtrace 2>/dev/null)" || true
