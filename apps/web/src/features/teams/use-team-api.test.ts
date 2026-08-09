@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionTeamMembers, TeamSlot } from '@genshin/domain';
+import type { CollectionTeamMembers } from '@genshin/domain';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
@@ -51,7 +51,7 @@ describe('useSaveTeamMutation', () => {
 
     act(() => {
       result.current.mutate({
-        slot: 2 as TeamSlot,
+        slot: 2,
         name: 'Bravo',
         members: EMPTY_MEMBERS,
         description: 'notes',
@@ -81,7 +81,7 @@ describe('useSaveTeamMutation', () => {
     expect(getCount).toBe(1);
 
     act(() => {
-      result.current.save.mutate({ slot: 1 as TeamSlot, name: 'Alpha', members: EMPTY_MEMBERS });
+      result.current.save.mutate({ slot: 1, name: 'Alpha', members: EMPTY_MEMBERS });
     });
 
     await waitFor(() => expect(getCount).toBe(2));

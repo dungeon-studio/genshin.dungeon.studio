@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
-import type { CollectionCharacter, CollectionTeam, CollectionWeapon, UUID } from '@genshin/domain';
+import type { CollectionCharacter, CollectionTeam, CollectionWeapon } from '@genshin/domain';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '@/app.js';
@@ -37,10 +37,10 @@ const FAKE_TEAM: CollectionTeam = {
   slot: 1,
   name: 'Team 1',
   members: [
-    { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' as UUID },
-    { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' as UUID },
-    { characterId: 'zhongli', weaponInstanceId: 'uuid-3' as UUID },
-    { characterId: 'albedo', weaponInstanceId: 'uuid-4' as UUID },
+    { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' },
+    { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
+    { characterId: 'zhongli', weaponInstanceId: 'uuid-3' },
+    { characterId: 'albedo', weaponInstanceId: 'uuid-4' },
   ],
   createdAt: '2026-01-01T00:00:00.000Z' as CollectionTeam['createdAt'],
   updatedAt: '2026-03-13T00:00:00.000Z' as CollectionTeam['updatedAt'],
@@ -302,12 +302,7 @@ describe('Team routes', () => {
       vi.mocked(Teams.save).mockResolvedValue({
         team: {
           ...FAKE_TEAM,
-          members: [
-            { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' as UUID },
-            null,
-            null,
-            null,
-          ],
+          members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }, null, null, null],
         },
         created: false,
       });
@@ -463,12 +458,7 @@ describe('Team routes', () => {
           {
             ...FAKE_TEAM,
             slot: 2,
-            members: [
-              { characterId: 'ganyu', weaponInstanceId: 'uuid-1' as UUID },
-              null,
-              null,
-              null,
-            ],
+            members: [{ characterId: 'ganyu', weaponInstanceId: 'uuid-1' }, null, null, null],
           },
         ]);
 
@@ -488,23 +478,13 @@ describe('Team routes', () => {
           {
             ...FAKE_TEAM,
             slot: 2,
-            members: [
-              { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' as UUID },
-              null,
-              null,
-              null,
-            ],
+            members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }, null, null, null],
           },
         ]);
         vi.mocked(Teams.save).mockResolvedValue({
           team: {
             ...FAKE_TEAM,
-            members: [
-              { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' as UUID },
-              null,
-              null,
-              null,
-            ],
+            members: [{ characterId: 'hu-tao', weaponInstanceId: 'uuid-1' }, null, null, null],
           },
           created: false,
         });

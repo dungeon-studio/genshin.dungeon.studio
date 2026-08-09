@@ -66,17 +66,14 @@ describe('toDocument', () => {
   it('round-trips a character through toDocument then fromDocument', () => {
     const char = fromDocument('columbina', makeV1Document());
     const doc = toDocument(char);
-    const restored = fromDocument('columbina', doc as unknown as Record<string, unknown>);
+    const restored = fromDocument('columbina', doc);
     expect(restored).toEqual(char);
   });
 
   it('round-trips any valid character (property)', () => {
     fc.assert(
       fc.property(arbCharacter, (character) => {
-        const restored = fromDocument(
-          character.characterId,
-          toDocument(character) as unknown as Record<string, unknown>,
-        );
+        const restored = fromDocument(character.characterId, toDocument(character));
         expect(restored).toEqual(character);
       }),
     );

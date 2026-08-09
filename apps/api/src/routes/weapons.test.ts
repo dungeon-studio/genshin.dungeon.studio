@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
-import type { CollectionWeapon, UUID } from '@genshin/domain';
+import type { CollectionWeapon } from '@genshin/domain';
 import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
 import { getWeaponById } from '@genshin/game-data';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -31,7 +31,7 @@ vi.mock('@genshin/game-data', () => ({
 }));
 
 const FAKE_WEAPON: CollectionWeapon = {
-  weaponInstanceId: 'instance-uuid-1' as UUID,
+  weaponInstanceId: 'instance-uuid-1',
   weaponId: 'mistsplitter-reforged',
   refinementLevel: 1,
   createdAt: '2026-01-01T00:00:00.000Z' as CollectionWeapon['createdAt'],

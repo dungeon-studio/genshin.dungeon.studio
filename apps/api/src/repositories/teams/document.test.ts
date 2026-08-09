@@ -131,17 +131,14 @@ describe('toDocument', () => {
   it('round-trips a team through toDocument then fromDocument', () => {
     const team = fromDocument(1, makeV1Document());
     const doc = toDocument(team);
-    const restored = fromDocument(1, doc as unknown as Record<string, unknown>);
+    const restored = fromDocument(1, doc);
     expect(restored).toEqual(team);
   });
 
   it('round-trips any valid team (property)', () => {
     fc.assert(
       fc.property(arbTeam, (team) => {
-        const restored = fromDocument(
-          team.slot,
-          toDocument(team) as unknown as Record<string, unknown>,
-        );
+        const restored = fromDocument(team.slot, toDocument(team));
         expect(restored).toEqual(team);
       }),
     );

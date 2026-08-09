@@ -143,7 +143,7 @@ export function validateTeams(
   }
 
   for (const [i, member] of currentMembers.entries()) {
-    if (member === null || !member.weaponInstanceId) continue;
+    if (!member?.weaponInstanceId) continue;
 
     const existingOwner = equippedWeapons.get(member.weaponInstanceId);
     if (existingOwner && existingOwner !== member.characterId) {

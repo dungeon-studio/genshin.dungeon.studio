@@ -77,7 +77,7 @@ export function buildWeapons(): GeneratedWeapon[] {
       id,
       name: record.name,
       type,
-      rarity: record.rarity as Rarity,
+      rarity: record.rarity,
       baseATK: Math.round(record.baseAtkValue),
       version: record.version,
     };

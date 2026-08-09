@@ -10,7 +10,6 @@ import type {
   ConstellationLevel,
   ISOTimestamp,
   TeamSlot,
-  UUID,
 } from '@genshin/domain';
 import {
   characterCollectionHref,
@@ -47,7 +46,7 @@ export function makeWeapon(
   refinementLevel = 1,
 ): CollectionWeapon {
   return {
-    weaponInstanceId: instanceId as UUID,
+    weaponInstanceId: instanceId,
     weaponId,
     refinementLevel,
     createdAt: FIXED_TIMESTAMP,

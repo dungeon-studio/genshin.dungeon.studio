@@ -13,7 +13,7 @@ function makeWeapon(
   refinementLevel = 1,
 ): CollectionWeapon {
   return {
-    weaponInstanceId: weaponInstanceId as CollectionWeaponId,
+    weaponInstanceId: weaponInstanceId,
     weaponId: weaponId as Weapon['id'],
     refinementLevel,
     createdAt: '2026-01-01T00:00:00.000Z' as ISOTimestamp,
@@ -40,7 +40,7 @@ describe('useWeaponCollectionStore', () => {
   describe('removeWeapon', () => {
     it('removes a weapon by instance id', () => {
       useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', 'sword-1'));
-      useWeaponCollectionStore.getState().removeWeapon('inst-1' as CollectionWeaponId);
+      useWeaponCollectionStore.getState().removeWeapon('inst-1');
 
       expect(
         useWeaponCollectionStore.getState().weapons['inst-1' as CollectionWeaponId],
@@ -51,7 +51,7 @@ describe('useWeaponCollectionStore', () => {
   describe('setRefinementLevel', () => {
     it('updates the refinement level', () => {
       useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', 'sword-1'));
-      useWeaponCollectionStore.getState().setRefinementLevel('inst-1' as CollectionWeaponId, 3);
+      useWeaponCollectionStore.getState().setRefinementLevel('inst-1', 3);
 
       expect(
         useWeaponCollectionStore.getState().weapons['inst-1' as CollectionWeaponId].refinementLevel,
@@ -60,8 +60,8 @@ describe('useWeaponCollectionStore', () => {
 
     it('ignores invalid refinement levels', () => {
       useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', 'sword-1'));
-      useWeaponCollectionStore.getState().setRefinementLevel('inst-1' as CollectionWeaponId, 0);
-      useWeaponCollectionStore.getState().setRefinementLevel('inst-1' as CollectionWeaponId, 6);
+      useWeaponCollectionStore.getState().setRefinementLevel('inst-1', 0);
+      useWeaponCollectionStore.getState().setRefinementLevel('inst-1', 6);
 
       expect(
         useWeaponCollectionStore.getState().weapons['inst-1' as CollectionWeaponId].refinementLevel,
@@ -69,9 +69,7 @@ describe('useWeaponCollectionStore', () => {
     });
 
     it('ignores updates for nonexistent weapons', () => {
-      useWeaponCollectionStore
-        .getState()
-        .setRefinementLevel('nonexistent' as CollectionWeaponId, 3);
+      useWeaponCollectionStore.getState().setRefinementLevel('nonexistent', 3);
 
       expect(Object.keys(useWeaponCollectionStore.getState().weapons)).toHaveLength(0);
     });
