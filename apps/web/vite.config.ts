@@ -5,6 +5,7 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
+import { codecovVitePlugin } from '@codecov/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
@@ -36,10 +37,25 @@ function shortSha(): string {
 const appVersion: string = packageVersion();
 const buildSha: string = shortSha();
 
+// Writes the report beside the bundle instead of uploading it, which is how
+// scripts/verify-bundle-stats.ts inspects what the plugin collected.
+const bundleStatsDryRun: boolean = process.env.CODECOV_BUNDLE_DRY_RUN === 'true';
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    // Uploads from inside `vite build`, so the token has to reach this process:
+    // turbo's strict env mode drops it unless `build.passThroughEnv` in
+    // turbo.json lists it. Keying on the token confines uploads to CI.
+    // scripts/verify-bundle-stats.ts guards the collection this relies on.
+    codecovVitePlugin({
+      enableBundleAnalysis: bundleStatsDryRun || process.env.CODECOV_TOKEN !== undefined,
+      bundleName: 'web',
+      uploadToken: process.env.CODECOV_TOKEN,
+      dryRun: bundleStatsDryRun,
+      telemetry: false,
+    }),
     {
       name: 'validate-env',
       // .github/workflows/deploy.yml injects these for deployed builds. Failing

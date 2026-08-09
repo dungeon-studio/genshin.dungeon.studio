@@ -21,6 +21,13 @@ comment:
   behavior: default
   require_changes: false
 
+# apps/web only, uploaded from inside `vite build` rather than by a CI step; see
+# its vite.config.ts. Compares each commit against its base, like the coverage
+# statuses above.
+bundle_analysis:
+  warning_threshold: '5%'
+  status: true
+
 flag_management:
   default_rules:
     carryforward: true

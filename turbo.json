@@ -12,7 +12,8 @@
         "index.html",
         "tsconfig*.json"
       ],
-      "outputs": ["dist/**", ".next/**", "build/**"]
+      "outputs": ["dist/**", ".next/**", "build/**"],
+      "passThroughEnv": ["CODECOV_TOKEN"]
     },
     "dev": {
       "dependsOn": ["^build"],

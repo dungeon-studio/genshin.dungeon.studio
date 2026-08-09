@@ -75,8 +75,11 @@ jobs:
       # lib/firebase.ts. This build only proves the app compiles and its output is
       # discarded, so any non-empty value satisfies it. Deployed bundles come from
       # the separate build step in deploy.yml, which injects the real config.
+      # apps/web's Codecov bundle report uploads from inside `vite build`, so the
+      # token is consumed here rather than by the upload step below.
       - name: Build
         env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           VITE_API_BASE_URL: https://api.invalid
           VITE_FIREBASE_API_KEY: ci
           VITE_FIREBASE_AUTH_DOMAIN: ci.invalid
@@ -88,6 +91,20 @@ jobs:
 
       - name: Verify Build Artifacts
         run: bash apps/web/scripts/verify-build-output.sh
+
+      # Rebuilds apps/web to inspect what the bundle plugin collected; the
+      # uploading build above leaves nothing on disk. See the script for the
+      # failure it guards.
+      - name: Verify bundle stats
+        env:
+          VITE_API_BASE_URL: https://api.invalid
+          VITE_FIREBASE_API_KEY: ci
+          VITE_FIREBASE_AUTH_DOMAIN: ci.invalid
+          VITE_FIREBASE_PROJECT_ID: ci
+          VITE_FIREBASE_STORAGE_BUCKET: ci.invalid
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ci
+          VITE_FIREBASE_APP_ID: ci
+        run: pnpm --filter @genshin/web verify:bundle-stats
 
       - name: Upload coverage and test results to Codecov
         if: ${{ !cancelled() }}
