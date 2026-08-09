@@ -37,10 +37,9 @@ const DEV_DEPENDENCY_FILES = [
 ];
 
 /**
- * The type-aware tier, plus the three type-aware rules worth taking from tiers
- * this repo otherwise skips. Scoped to `TYPESCRIPT_FILES` because every rule
- * here needs a TypeScript program, and only files a `tsconfig.json` claims
- * have one.
+ * The type-aware tier, plus the type-aware rules worth taking from tiers this
+ * repo otherwise skips. Scoped to `TYPESCRIPT_FILES` because every rule here
+ * needs a TypeScript program, and only files a `tsconfig.json` claims have one.
  *
  * @param {string} packageDir - the consuming workspace's directory.
  * @returns {import('eslint').Linter.Config}
@@ -60,9 +59,12 @@ function typeAwareRules(packageDir) {
         tsconfigRootDir: packageDir,
       },
     },
+    // Both from `stylisticTypeChecked`, whose remaining rules overlap Prettier.
+    // `strictTypeChecked`'s `no-unnecessary-condition` belongs here too, but it
+    // reads an index into an array or `Record` as non-optional until
+    // `noUncheckedIndexedAccess` is on, and so reports correct runtime guards as
+    // dead code. Enabled alongside that flag in #1217.
     rules: {
-      '@typescript-eslint/no-unnecessary-condition': 'error',
-      // From `stylisticTypeChecked`, whose remaining rules overlap Prettier.
       '@typescript-eslint/prefer-nullish-coalescing': 'error',
       '@typescript-eslint/prefer-optional-chain': 'error',
     },
