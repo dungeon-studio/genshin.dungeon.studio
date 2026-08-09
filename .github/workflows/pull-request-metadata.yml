@@ -3,11 +3,15 @@
 ---
 name: Pull Request Metadata
 
-# Sensors that read the pull request itself rather than the code it carries, so
-# they need the `edited` trigger ci.yml deliberately omits: adding it there
-# would rerun the whole suite on every title or description tweak. The
-# `synchronize` run keeps a result attached to each head commit, which a
-# required status check reads. See docs/reference/workflow-conventions.md.
+# Checks that read the pull request's own metadata, so they take the `edited`
+# trigger ci.yml omits: carrying `edited` there would rerun the whole suite on
+# every title or description tweak. `synchronize` keeps a result on each head
+# commit, which a required status check needs.
+# See docs/reference/workflow-conventions.md.
+#
+# Labelling belongs to this same when but stays in labels.yml until #1211
+# makes it idempotent; the autolabeler only adds, so running it on `edited`
+# leaves the superseded category label behind.
 on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
@@ -50,10 +54,6 @@ jobs:
             chore
             revert
 
-          # Scope is the workspace package a change is confined to, so the
-          # allowed set grows with the workspace and stays unenforced. Subject
-          # length is unenforced for the same reason CONTRIBUTING.md states it
-          # as a target rather than a limit.
           requireScope: false
 
           subjectPattern: '^(?![A-Z]).*[^.\s]$'
