@@ -54,6 +54,8 @@ reference without starting a step—the whole question most workflow edits raise
 
 ## Pass a secret
 
+`workspace` and `e2e` finish their Codecov upload once you hand act a token:
+
 ```bash
 act push -j workspace -s CODECOV_TOKEN
 ```
@@ -61,19 +63,16 @@ act push -j workspace -s CODECOV_TOKEN
 With no value attached, act prompts for one. `--secret-file` reads several at
 once. Keep that file outside the repository.
 
-## What can't finish locally
+## What can't work locally
 
-A step that authenticates to GitHub or Google Cloud, or writes back to the
-repository, fails where it would otherwise call out:
+No secret unlocks a step that wants a service only GitHub's own runners reach:
 
 - SARIF uploads to the Security tab, in the `trivy-*` and `workflow-audit` jobs
-- coverage uploads to Codecov, in `workspace` and `e2e`
 - `cache-from: type=gha` in `container`, which wants the Actions cache service
 - `deploy.yml` and the Terraform workflows, which reach Google Cloud through
   workload identity federation
-- `daily.yml`, `weekly.yml`, `labels.yml`, `release-notes.yml`, and
-  `pull-request-metadata.yml`, which act on repository state through the GitHub
-  API
+- the scheduled and repository-management workflows, which act on repository
+  state through the GitHub API
 
 Every step before the failing one still runs, and that's usually the part under
 test.

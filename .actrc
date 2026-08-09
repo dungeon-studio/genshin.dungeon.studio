@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# act asks which runner image to use on first run and remembers the answer in
-# ~/.actrc. Answering here instead keeps every contributor on one image, so a
-# job that passes locally for one of us fails for none of the others.
+# Answering act's runner-image question here rather than in each contributor's
+# ~/.actrc keeps everyone on one image, so a job that passes locally for one of
+# us fails for none of the others.
 -P ubuntu-latest=catthehacker/ubuntu:act-latest
