@@ -7,6 +7,7 @@ set -x
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(git -C "${SCRIPT_DIR}" rev-parse --show-toplevel)"
+# shellcheck source-path=SCRIPTDIR
 # shellcheck source=lib.sh
 source "${SCRIPT_DIR}/lib.sh"
 
@@ -17,10 +18,10 @@ corepack install
 
 step "Installing Google Cloud SDK"
 
-curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor --batch --yes -o /usr/share/keyrings/cloud.google.gpg && \
-echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list && \
-sudo DEBIAN_FRONTEND=noninteractive apt-get update && \
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y google-cloud-sdk
+curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor --batch --yes -o /usr/share/keyrings/cloud.google.gpg &&
+  echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list &&
+  sudo DEBIAN_FRONTEND=noninteractive apt-get update &&
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y google-cloud-sdk
 
 step "Installing project dependencies"
 
@@ -40,8 +41,8 @@ step "Installing lychee link checker"
 LYCHEE_VERSION="0.24.2"
 LYCHEE_DIR=lychee-x86_64-unknown-linux-gnu
 curl -fsSL \
-  "https://github.com/lycheeverse/lychee/releases/download/lychee-v${LYCHEE_VERSION}/${LYCHEE_DIR}.tar.gz" \
-  | sudo tar -xz -C /usr/local/bin --strip-components=1 "${LYCHEE_DIR}/lychee"
+  "https://github.com/lycheeverse/lychee/releases/download/lychee-v${LYCHEE_VERSION}/${LYCHEE_DIR}.tar.gz" |
+  sudo tar -xz -C /usr/local/bin --strip-components=1 "${LYCHEE_DIR}/lychee"
 sudo chmod +x /usr/local/bin/lychee
 
 step "Installing Playwright Chromium and Chrome"

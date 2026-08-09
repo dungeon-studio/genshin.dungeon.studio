@@ -20,7 +20,7 @@ step() {
 verify() {
   local label="$1"
   shift
-  if "$@" > /dev/null 2>&1; then
+  if "$@" >/dev/null 2>&1; then
     echo "  [ok] ${label}"
   else
     echo "  [FAIL] ${label}"
@@ -46,15 +46,15 @@ run_verification() {
   { set +x; } 2>/dev/null
   step "Verifying installed tools"
 
-  verify "node"                 node --version
-  verify "pnpm"                 pnpm --version
-  verify "gcloud"               gcloud --version
-  verify "pre-commit"           pre-commit --version
-  verify "reuse"                reuse --version
-  verify "lychee"               lychee --version
-  verify "firebase"             firebase --version
-  verify "playwright-cli"       pnpm --filter @genshin/e2e exec playwright --version
-  verify "playwright-browsers"  pnpm --filter @genshin/e2e exec playwright install --list
+  verify "node" node --version
+  verify "pnpm" pnpm --version
+  verify "gcloud" gcloud --version
+  verify "pre-commit" pre-commit --version
+  verify "reuse" reuse --version
+  verify "lychee" lychee --version
+  verify "firebase" firebase --version
+  verify "playwright-cli" pnpm --filter @genshin/e2e exec playwright --version
+  verify "playwright-browsers" pnpm --filter @genshin/e2e exec playwright install --list
   eval "${_xtrace}"
 }
 
@@ -68,13 +68,13 @@ run_version_summary() {
   { set +x; } 2>/dev/null
   step "Environment versions"
 
-  print_version "node"       node --version
-  print_version "pnpm"       pnpm --version
-  print_version "gcloud"     gcloud --version
+  print_version "node" node --version
+  print_version "pnpm" pnpm --version
+  print_version "gcloud" gcloud --version
   print_version "pre-commit" pre-commit --version
-  print_version "reuse"      reuse --version
-  print_version "lychee"     lychee --version
-  print_version "firebase"   firebase --version
+  print_version "reuse" reuse --version
+  print_version "lychee" lychee --version
+  print_version "firebase" firebase --version
   print_version "playwright" pnpm --filter @genshin/e2e exec playwright --version
   eval "${_xtrace}"
 }
