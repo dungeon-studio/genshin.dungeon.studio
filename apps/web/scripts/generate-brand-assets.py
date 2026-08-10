@@ -46,8 +46,8 @@ class Badge:
 
 
 BADGES = [
-    Badge(suffix="alpha", glyph="α", color="#b81e1e"),
-    Badge(suffix="beta", glyph="β", color="#8f5614"),
+    Badge(suffix="alpha", glyph="α", color="#752f93"),
+    Badge(suffix="beta", glyph="β", color="#1c5392"),
 ]
 
 

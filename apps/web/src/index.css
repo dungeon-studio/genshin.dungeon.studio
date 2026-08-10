@@ -48,6 +48,10 @@ body {
     --success-foreground: 0 0% 98%;
     --warning: 32 75% 32%;
     --warning-foreground: 0 0% 98%;
+    --env-dev: 282 52% 38%;
+    --env-dev-foreground: 0 0% 98%;
+    --env-staging: 212 68% 34%;
+    --env-staging-foreground: 0 0% 98%;
     --border: 180 12% 87%;
     --input: 180 12% 87%;
     --ring: 176 45% 22%;
@@ -80,6 +84,10 @@ body {
     --success-foreground: 150 45% 8%;
     --warning: 38 65% 60%;
     --warning-foreground: 36 50% 10%;
+    --env-dev: 282 48% 70%;
+    --env-dev-foreground: 282 45% 12%;
+    --env-staging: 212 60% 65%;
+    --env-staging-foreground: 212 45% 12%;
     --border: 178 14% 26%;
     --input: 178 14% 26%;
     --ring: 172 40% 55%;

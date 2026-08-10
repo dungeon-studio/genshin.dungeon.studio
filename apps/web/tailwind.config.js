@@ -83,6 +83,16 @@ export default {
           DEFAULT: 'hsl(var(--warning))',
           foreground: 'hsl(var(--warning-foreground))',
         },
+        env: {
+          dev: {
+            DEFAULT: 'hsl(var(--env-dev))',
+            foreground: 'hsl(var(--env-dev-foreground))',
+          },
+          staging: {
+            DEFAULT: 'hsl(var(--env-staging))',
+            foreground: 'hsl(var(--env-staging-foreground))',
+          },
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',

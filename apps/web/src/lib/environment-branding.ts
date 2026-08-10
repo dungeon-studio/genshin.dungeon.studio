@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { Environment } from './environments';
+import type { Environment } from './environments.ts';
 
 /**
  * index.html is authored as the production document, and every other

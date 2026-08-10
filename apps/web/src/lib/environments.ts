@@ -33,30 +33,35 @@ export interface Environment {
 }
 
 /**
- * Severity, not brand: the further an environment sits from production, the
- * louder it looks, so nobody has to learn a color key to read a tab. The
- * non-production hexes are the light-mode `--destructive` and `--warning` of
- * index.css; production keeps the brand teal derived from the app icon.
+ * Environment identity is its own signal, so it gets its own `--env-*` tokens
+ * rather than borrowing `--destructive` and `--warning`: a persistent ALPHA pill
+ * in the app's error red would compete with the transient errors that red is
+ * for. Purple and blue stay clear of every other role the palette assigns, and
+ * of each other. Production keeps the brand teal derived from the app icon.
+ *
+ * The hexes are the light-mode values of those tokens, duplicated because a
+ * meta tag cannot read a CSS variable; theme-contrast.test.ts holds the tokens
+ * themselves to WCAG AA.
  */
 export const ENVIRONMENTS: Readonly<Record<EnvironmentName, Environment>> = {
   dev: {
     name: 'dev',
-    themeColor: '#b81e1e',
+    themeColor: '#752f93',
     badge: {
       label: 'ALPHA',
       glyph: 'α',
       iconSuffix: 'alpha',
-      pillClassName: 'bg-destructive text-destructive-foreground',
+      pillClassName: 'bg-env-dev text-env-dev-foreground',
     },
   },
   staging: {
     name: 'staging',
-    themeColor: '#8f5614',
+    themeColor: '#1c5392',
     badge: {
       label: 'BETA',
       glyph: 'β',
       iconSuffix: 'beta',
-      pillClassName: 'bg-warning text-warning-foreground',
+      pillClassName: 'bg-env-staging text-env-staging-foreground',
     },
   },
   prod: {

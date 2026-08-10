@@ -9,8 +9,12 @@ import { codecovVitePlugin } from '@codecov/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
-import { brandIndexHtml } from './src/lib/environment-branding';
-import { ENVIRONMENT_NAMES, isEnvironmentName, resolveEnvironment } from './src/lib/environments';
+import { brandIndexHtml } from './src/lib/environment-branding.ts';
+import {
+  ENVIRONMENT_NAMES,
+  isEnvironmentName,
+  resolveEnvironment,
+} from './src/lib/environments.ts';
 
 const requiredEnvVars: readonly string[] = [
   'VITE_FIREBASE_API_KEY',
