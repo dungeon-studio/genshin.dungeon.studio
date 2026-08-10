@@ -72,8 +72,9 @@ a 16×16 tab, where color carries the signal the letter can't.
 
 Each tab icon gains one variant per non-production environment, named by
 inserting the environment's suffix before the extension: `favicon.ico` becomes
-`favicon-alpha.ico`. The home-screen and web app icons keep the plain mark,
-since they never sit beside another environment and the header carries a label.
+`favicon-alpha.ico`. The header shows the same badged mark as the tab. The
+home-screen and web app icons keep the plain mark, since they never sit beside
+another environment.
 
 ## Social preview
 

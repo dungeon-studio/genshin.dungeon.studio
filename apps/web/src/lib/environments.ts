@@ -13,14 +13,12 @@ export const ENVIRONMENT_NAMES = ['dev', 'staging', 'prod'] as const;
 export type EnvironmentName = (typeof ENVIRONMENT_NAMES)[number];
 
 export interface Badge {
-  /** Shown in the header pill and prefixed, bracketed, to the document title. */
+  /** Names the environment in the mark's accessible name and the document title. */
   label: string;
   /** Overlaid on the favicon by the brand-asset generator. */
   glyph: string;
   /** Names the favicon variant: `favicon-32x32.png` -> `favicon-32x32-alpha.png`. */
   iconSuffix: string;
-  /** Tailwind fill and text for the header pill. */
-  pillClassName: string;
 }
 
 export interface Environment {
@@ -31,9 +29,8 @@ export interface Environment {
 }
 
 /**
- * Environment identity owns the `--env-*` tokens and shares them with no other
- * role, so a new environment has to stay clear of the rest of the palette and
- * of its siblings. Each `themeColor` repeats the light-mode value of its token.
+ * A new environment has to look unmistakably unlike production and unlike its
+ * siblings, in a hue the palette does not already give a meaning to.
  */
 export const ENVIRONMENTS: Readonly<Record<EnvironmentName, Environment>> = {
   dev: {
@@ -43,7 +40,6 @@ export const ENVIRONMENTS: Readonly<Record<EnvironmentName, Environment>> = {
       label: 'ALPHA',
       glyph: 'α',
       iconSuffix: 'alpha',
-      pillClassName: 'bg-env-dev text-env-dev-foreground',
     },
   },
   staging: {
@@ -53,7 +49,6 @@ export const ENVIRONMENTS: Readonly<Record<EnvironmentName, Environment>> = {
       label: 'BETA',
       glyph: 'β',
       iconSuffix: 'beta',
-      pillClassName: 'bg-env-staging text-env-staging-foreground',
     },
   },
   prod: {
