@@ -9,6 +9,8 @@ import { codecovVitePlugin } from '@codecov/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
+import { siteFilesPlugin } from './scripts/site-files-plugin';
+
 const requiredEnvVars: readonly string[] = [
   'VITE_FIREBASE_API_KEY',
   'VITE_FIREBASE_AUTH_DOMAIN',
@@ -17,6 +19,7 @@ const requiredEnvVars: readonly string[] = [
   'VITE_FIREBASE_MESSAGING_SENDER_ID',
   'VITE_FIREBASE_APP_ID',
   'VITE_API_BASE_URL',
+  'VITE_SITE_ORIGIN',
 ];
 
 function packageVersion(): string {
@@ -70,6 +73,7 @@ export default defineConfig({
         }
       },
     },
+    siteFilesPlugin(),
     {
       name: 'generate-version',
       closeBundle() {
