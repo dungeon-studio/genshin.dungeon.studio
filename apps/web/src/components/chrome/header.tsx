@@ -4,6 +4,7 @@
 import type { JSX } from 'react';
 import { Link } from 'react-router-dom';
 
+import { BrandMark } from '@/components/chrome/brand-mark';
 import { Container } from '@/components/chrome/container';
 import { ThemeToggle } from '@/components/chrome/theme-toggle';
 import { LoginButton, LogoutButton, useAuth } from '@/features/auth';
@@ -18,22 +19,7 @@ export function Header(): JSX.Element {
           to="/"
           className="flex items-center gap-2 text-2xl font-bold text-foreground hover:text-foreground/80"
         >
-          <img
-            src="/favicon-32x32.png"
-            alt=""
-            aria-hidden="true"
-            width={32}
-            height={32}
-            className="dark:hidden"
-          />
-          <img
-            src="/favicon-32x32-dark.png"
-            alt=""
-            aria-hidden="true"
-            width={32}
-            height={32}
-            className="hidden dark:block"
-          />
+          <BrandMark />
           Genshin Planner
         </Link>
         <div className="flex items-center gap-3">

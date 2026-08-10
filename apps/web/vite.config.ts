@@ -7,9 +7,15 @@ import path from 'path';
 
 import { codecovVitePlugin } from '@codecov/vite-plugin';
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 
+import { brandIndexHtml } from './scripts/environment-branding.ts';
 import { siteFilesPlugin } from './scripts/site-files-plugin';
+import {
+  ENVIRONMENT_NAMES,
+  isEnvironmentName,
+  resolveEnvironment,
+} from './src/lib/environments.ts';
 
 const requiredEnvVars: readonly string[] = [
   'VITE_FIREBASE_API_KEY',
@@ -44,6 +50,69 @@ const buildSha: string = shortSha();
 // scripts/verify-bundle-stats.ts inspects what the plugin collected.
 const bundleStatsDryRun: boolean = process.env.CODECOV_BUNDLE_DRY_RUN === 'true';
 
+const devServerPort = 5173;
+const devServerOrigin = `http://localhost:${devServerPort}`;
+
+/** Vite types its resolved env as `any` per key; an unset var reads as `''` here. */
+function readEnv(env: Record<string, unknown>, key: string): string | undefined {
+  const value = env[key];
+  return typeof value === 'string' && value !== '' ? value : undefined;
+}
+
+function assertKnownEnvironment(env: Record<string, unknown>): void {
+  // Unset is the documented default, but a typo would otherwise resolve to dev
+  // and quietly badge a production build as alpha.
+  const appEnv = readEnv(env, 'VITE_APP_ENV');
+
+  if (appEnv !== undefined && !isEnvironmentName(appEnv)) {
+    throw new Error(`VITE_APP_ENV must be one of ${ENVIRONMENT_NAMES.join(', ')}; got '${appEnv}'`);
+  }
+}
+
+function assertRequiredEnv(env: Record<string, unknown>): void {
+  const missing = requiredEnvVars.filter((key) => readEnv(env, key) === undefined);
+
+  if (missing.length > 0) {
+    throw new Error(`Missing required environment variables:\n  ${missing.join('\n  ')}`);
+  }
+}
+
+// .github/workflows/deploy.yml injects these for deployed builds. Failing here
+// keeps the dev fallbacks in lib/firebase.ts and lib/api.ts out of any shipped
+// bundle.
+function validateEnv(): Plugin {
+  return {
+    name: 'validate-env',
+    configResolved(config) {
+      assertKnownEnvironment(config.env);
+
+      if (config.command !== 'build') return;
+
+      assertRequiredEnv(config.env);
+    },
+  };
+}
+
+// Runs on the dev server too, so a local tab carries the same markers a
+// deployed one does. `post` so the HTML it rewrites is the final document.
+function environmentBranding(): Plugin {
+  // configResolved supplies these; nothing outside this plugin reads them.
+  let appEnv: string | undefined;
+  let origin = devServerOrigin;
+
+  return {
+    name: 'environment-branding',
+    configResolved(config) {
+      appEnv = readEnv(config.env, 'VITE_APP_ENV');
+      origin = readEnv(config.env, 'VITE_SITE_ORIGIN') ?? devServerOrigin;
+    },
+    transformIndexHtml: {
+      order: 'post',
+      handler: (html: string) => brandIndexHtml(html, resolveEnvironment(appEnv), origin),
+    },
+  };
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -59,20 +128,8 @@ export default defineConfig({
       dryRun: bundleStatsDryRun,
       telemetry: false,
     }),
-    {
-      name: 'validate-env',
-      // .github/workflows/deploy.yml injects these for deployed builds. Failing
-      // here keeps the dev fallbacks in lib/firebase.ts and lib/api.ts out of
-      // any shipped bundle.
-      configResolved(config) {
-        if (config.command !== 'build') return;
-
-        const missing = requiredEnvVars.filter((key) => !config.env[key]);
-        if (missing.length > 0) {
-          throw new Error(`Missing required environment variables:\n  ${missing.join('\n  ')}`);
-        }
-      },
-    },
+    validateEnv(),
+    environmentBranding(),
     siteFilesPlugin(),
     {
       name: 'generate-version',
@@ -94,7 +151,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
+    port: devServerPort,
     // Bind to 0.0.0.0 instead of localhost to allow access from host machine when running in DevContainer.
     // The DevContainer's network is isolated; binding to all interfaces exposes the server to the host.
     // Without this, http://localhost:5173 would timeout from the host browser.
