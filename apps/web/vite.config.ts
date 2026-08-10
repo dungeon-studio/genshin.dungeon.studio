@@ -9,6 +9,9 @@ import { codecovVitePlugin } from '@codecov/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
+import { brandIndexHtml } from './src/lib/environment-branding';
+import { ENVIRONMENT_NAMES, isEnvironmentName, resolveEnvironment } from './src/lib/environments';
+
 const requiredEnvVars: readonly string[] = [
   'VITE_FIREBASE_API_KEY',
   'VITE_FIREBASE_AUTH_DOMAIN',
@@ -17,6 +20,7 @@ const requiredEnvVars: readonly string[] = [
   'VITE_FIREBASE_MESSAGING_SENDER_ID',
   'VITE_FIREBASE_APP_ID',
   'VITE_API_BASE_URL',
+  'VITE_APP_ORIGIN',
 ];
 
 function packageVersion(): string {
@@ -41,6 +45,19 @@ const buildSha: string = shortSha();
 // scripts/verify-bundle-stats.ts inspects what the plugin collected.
 const bundleStatsDryRun: boolean = process.env.CODECOV_BUNDLE_DRY_RUN === 'true';
 
+const devServerPort = 5173;
+
+/** Vite types its resolved env as `any` per key; an unset var reads as `''` here. */
+function readEnv(env: Record<string, unknown>, key: string): string | undefined {
+  const value = env[key];
+  return typeof value === 'string' && value !== '' ? value : undefined;
+}
+
+let branding: { appEnv: string | undefined; origin: string } = {
+  appEnv: undefined,
+  origin: `http://localhost:${devServerPort}`,
+};
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -62,12 +79,38 @@ export default defineConfig({
       // here keeps the dev fallbacks in lib/firebase.ts and lib/api.ts out of
       // any shipped bundle.
       configResolved(config) {
+        // Unset is the documented default, but a typo would otherwise resolve
+        // to dev and quietly badge a production build as alpha.
+        const appEnv = readEnv(config.env, 'VITE_APP_ENV');
+        if (appEnv !== undefined && !isEnvironmentName(appEnv)) {
+          throw new Error(
+            `VITE_APP_ENV must be one of ${ENVIRONMENT_NAMES.join(', ')}; got '${appEnv}'`,
+          );
+        }
+
         if (config.command !== 'build') return;
 
         const missing = requiredEnvVars.filter((key) => !config.env[key]);
         if (missing.length > 0) {
           throw new Error(`Missing required environment variables:\n  ${missing.join('\n  ')}`);
         }
+      },
+    },
+    {
+      // Runs on the dev server too, so a local tab carries the same markers a
+      // deployed one does. `post` so the HTML it rewrites is the final document.
+      name: 'environment-branding',
+      configResolved(config) {
+        branding = {
+          appEnv: readEnv(config.env, 'VITE_APP_ENV'),
+          origin: readEnv(config.env, 'VITE_APP_ORIGIN') ?? `http://localhost:${devServerPort}`,
+        };
+      },
+      transformIndexHtml: {
+        order: 'post',
+        handler(html: string) {
+          return brandIndexHtml(html, resolveEnvironment(branding.appEnv), branding.origin);
+        },
       },
     },
     {
@@ -90,7 +133,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
+    port: devServerPort,
     // Bind to 0.0.0.0 instead of localhost to allow access from host machine when running in DevContainer.
     // The DevContainer's network is isolated; binding to all interfaces exposes the server to the host.
     // Without this, http://localhost:5173 would timeout from the host browser.

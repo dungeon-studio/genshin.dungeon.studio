@@ -5,6 +5,7 @@ import type { JSX } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Container } from '@/components/chrome/container';
+import { EnvironmentBadge } from '@/components/chrome/environment-badge';
 import { ThemeToggle } from '@/components/chrome/theme-toggle';
 import { LoginButton, LogoutButton, useAuth } from '@/features/auth';
 
@@ -14,28 +15,31 @@ export function Header(): JSX.Element {
   return (
     <header className="border-b border-border bg-background">
       <Container className="flex items-center justify-between py-4">
-        <Link
-          to="/"
-          className="flex items-center gap-2 text-2xl font-bold text-foreground hover:text-foreground/80"
-        >
-          <img
-            src="/favicon-32x32.png"
-            alt=""
-            aria-hidden="true"
-            width={32}
-            height={32}
-            className="dark:hidden"
-          />
-          <img
-            src="/favicon-32x32-dark.png"
-            alt=""
-            aria-hidden="true"
-            width={32}
-            height={32}
-            className="hidden dark:block"
-          />
-          Genshin Planner
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-2xl font-bold text-foreground hover:text-foreground/80"
+          >
+            <img
+              src="/favicon-32x32.png"
+              alt=""
+              aria-hidden="true"
+              width={32}
+              height={32}
+              className="dark:hidden"
+            />
+            <img
+              src="/favicon-32x32-dark.png"
+              alt=""
+              aria-hidden="true"
+              width={32}
+              height={32}
+              className="hidden dark:block"
+            />
+            Genshin Planner
+          </Link>
+          <EnvironmentBadge />
+        </div>
         <div className="flex items-center gap-3">
           {!loading && (user ? <UserMenu user={user} /> : <LoginButton />)}
           <ThemeToggle />
