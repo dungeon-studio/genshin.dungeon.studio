@@ -5,10 +5,25 @@ import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-import { PUBLIC_ROUTES, robotsTxt, sitemapXml } from './site-files';
+import { PUBLIC_ROUTES, siteFiles } from './site-files';
 
 const PUBLIC_ORIGIN = 'https://genshin.dungeon.studio';
 const PREVIEW_ORIGIN = 'https://develop.genshin.dungeon.studio';
+
+function contentsOf(origin: string, name: string): string {
+  const file = siteFiles(origin).find((candidate) => candidate.name === name);
+  if (file === undefined) throw new Error(`${name} is not among the generated site files`);
+
+  return file.contents;
+}
+
+function robotsTxt(origin: string): string {
+  return contentsOf(origin, 'robots.txt');
+}
+
+function sitemapXml(origin: string): string {
+  return contentsOf(origin, 'sitemap.xml');
+}
 
 function agentRules(robots: string): Record<string, string> {
   return Object.fromEntries(

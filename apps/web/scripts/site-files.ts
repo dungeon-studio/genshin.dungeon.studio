@@ -2,12 +2,18 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * Builders for the crawler-facing files served from the site root.
+ * The crawler-facing files served from the site root.
  *
- * Both files name absolute URLs, so they cannot be checked in as static
- * assets: every deployed origin needs its own copy. `vite.config.ts` writes
- * them into `dist/` at the end of a build.
+ * They name absolute URLs, so they cannot be checked in as static assets:
+ * every deployed origin needs its own copy. `site-files-plugin.ts` writes
+ * them into the build output.
  */
+
+export interface SiteFile {
+  /** Path relative to the site root. */
+  readonly name: string;
+  readonly contents: string;
+}
 
 /**
  * The one origin whose content is meant to be indexed. Every other deployment
@@ -51,7 +57,7 @@ const AI_USER_AGENTS: readonly string[] = [
   'CCBot',
 ];
 
-export function robotsTxt(origin: string): string {
+function robotsTxt(origin: string): string {
   const rule = isPublicOrigin(origin) ? 'Allow: /' : 'Disallow: /';
   const groups = ['*', ...AI_USER_AGENTS].map((agent) => `User-agent: ${agent}\n${rule}`);
 
@@ -65,7 +71,7 @@ export function robotsTxt(origin: string): string {
   ].join('\n');
 }
 
-export function sitemapXml(origin: string): string {
+function sitemapXml(origin: string): string {
   const urls = PUBLIC_ROUTES.map((route) => `  <url>\n    <loc>${origin}${route}</loc>\n  </url>`);
 
   return [
@@ -75,4 +81,12 @@ export function sitemapXml(origin: string): string {
     '</urlset>',
     '',
   ].join('\n');
+}
+
+/** Everything the build has to drop at the root of `origin`. */
+export function siteFiles(origin: string): readonly SiteFile[] {
+  return [
+    { name: 'robots.txt', contents: robotsTxt(origin) },
+    { name: 'sitemap.xml', contents: sitemapXml(origin) },
+  ];
 }

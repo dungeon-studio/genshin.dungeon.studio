@@ -9,7 +9,7 @@ import { codecovVitePlugin } from '@codecov/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
-import { isPublicOrigin, robotsTxt, sitemapXml } from './scripts/site-files';
+import { siteFilesPlugin } from './scripts/site-files-plugin';
 
 const requiredEnvVars: readonly string[] = [
   'VITE_FIREBASE_API_KEY',
@@ -44,10 +44,6 @@ const buildSha: string = shortSha();
 // scripts/verify-bundle-stats.ts inspects what the plugin collected.
 const bundleStatsDryRun: boolean = process.env.CODECOV_BUNDLE_DRY_RUN === 'true';
 
-// Resolved from `.env` files as well as the environment, so it is only
-// readable once Vite has merged both.
-let siteOrigin: string | undefined;
-
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -77,39 +73,7 @@ export default defineConfig({
         }
       },
     },
-    {
-      name: 'generate-site-files',
-      // Generated rather than kept in public/ because both files carry
-      // absolute URLs, which differ per deployed origin.
-      configResolved(config) {
-        const env = config.env as Record<string, string | undefined>;
-        siteOrigin = env.VITE_SITE_ORIGIN;
-      },
-      closeBundle() {
-        if (siteOrigin === undefined) return;
-
-        const distPath = path.resolve(__dirname, 'dist');
-        fs.writeFileSync(path.join(distPath, 'robots.txt'), robotsTxt(siteOrigin));
-        fs.writeFileSync(path.join(distPath, 'sitemap.xml'), sitemapXml(siteOrigin));
-      },
-      // robots.txt keeps compliant crawlers off non-public origins entirely;
-      // this catches the ones that fetch anyway, for which a Disallow they
-      // ignored is no barrier to listing the page.
-      transformIndexHtml(html) {
-        if (siteOrigin === undefined || isPublicOrigin(siteOrigin)) return html;
-
-        return {
-          html,
-          tags: [
-            {
-              tag: 'meta',
-              attrs: { name: 'robots', content: 'noindex, nofollow' },
-              injectTo: 'head' as const,
-            },
-          ],
-        };
-      },
-    },
+    siteFilesPlugin(),
     {
       name: 'generate-version',
       closeBundle() {
