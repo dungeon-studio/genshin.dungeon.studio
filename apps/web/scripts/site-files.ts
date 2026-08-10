@@ -16,6 +16,10 @@
  */
 const PUBLIC_ORIGIN = 'https://genshin.dungeon.studio';
 
+export function isPublicOrigin(origin: string): boolean {
+  return origin === PUBLIC_ORIGIN;
+}
+
 /** Routes `src/app.tsx` renders, minus the catch-all. */
 export const PUBLIC_ROUTES: readonly string[] = [
   '/',
@@ -48,7 +52,7 @@ const AI_USER_AGENTS: readonly string[] = [
 ];
 
 export function robotsTxt(origin: string): string {
-  const rule = origin === PUBLIC_ORIGIN ? 'Allow: /' : 'Disallow: /';
+  const rule = isPublicOrigin(origin) ? 'Allow: /' : 'Disallow: /';
   const groups = ['*', ...AI_USER_AGENTS].map((agent) => `User-agent: ${agent}\n${rule}`);
 
   return [

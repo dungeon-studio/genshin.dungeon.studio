@@ -9,7 +9,7 @@ import { codecovVitePlugin } from '@codecov/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
-import { robotsTxt, sitemapXml } from './scripts/site-files';
+import { isPublicOrigin, robotsTxt, sitemapXml } from './scripts/site-files';
 
 const requiredEnvVars: readonly string[] = [
   'VITE_FIREBASE_API_KEY',
@@ -91,6 +91,23 @@ export default defineConfig({
         const distPath = path.resolve(__dirname, 'dist');
         fs.writeFileSync(path.join(distPath, 'robots.txt'), robotsTxt(siteOrigin));
         fs.writeFileSync(path.join(distPath, 'sitemap.xml'), sitemapXml(siteOrigin));
+      },
+      // robots.txt keeps compliant crawlers off non-public origins entirely;
+      // this catches the ones that fetch anyway, for which a Disallow they
+      // ignored is no barrier to listing the page.
+      transformIndexHtml(html) {
+        if (siteOrigin === undefined || isPublicOrigin(siteOrigin)) return html;
+
+        return {
+          html,
+          tags: [
+            {
+              tag: 'meta',
+              attrs: { name: 'robots', content: 'noindex, nofollow' },
+              injectTo: 'head' as const,
+            },
+          ],
+        };
       },
     },
     {
