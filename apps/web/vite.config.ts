@@ -95,8 +95,7 @@ function validateEnv(): Plugin {
 // Runs on the dev server too, so a local tab carries the same markers a
 // deployed one does. `post` so the HTML it rewrites is the final document.
 function environmentBranding(): Plugin {
-  // Held in the closure rather than at module scope: nothing can read these
-  // before configResolved has supplied them.
+  // configResolved supplies these; nothing outside this plugin reads them.
   let appEnv: string | undefined;
   let origin = devServerOrigin;
 

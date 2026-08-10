@@ -5,8 +5,7 @@ import type { Environment } from './environments.ts';
 
 /**
  * index.html is authored as the production document, and every other
- * environment is derived from it here. That keeps the file readable on its own
- * and makes production the branch that runs no code at all.
+ * environment is derived from it here. Production runs none of it.
  */
 
 /** The origin baked into index.html; every other environment substitutes its own. */
@@ -21,9 +20,8 @@ const ICON_HREF = /(<link\b[^>]*\brel="icon"[^>]*\bhref="\/[\w-]+)(\.(?:png|ico)
 type Substitution = readonly [pattern: RegExp, replacement: string];
 
 /**
- * A silently unapplied substitution ships an unbadged non-production site,
- * which is the exact confusion this is meant to prevent, so an index.html edit
- * that moves one of these out from under us fails the build instead.
+ * A silently unapplied substitution ships an unbadged non-production site, so an
+ * index.html edit that moves one out from under us fails the build instead.
  */
 function substitute(html: string, [pattern, replacement]: Substitution): string {
   const branded = html.replace(pattern, replacement);
@@ -42,7 +40,7 @@ function brandOrigin(html: string, origin: string): string {
   return substitute(html, [new RegExp(PRODUCTION_ORIGIN, 'g'), origin]);
 }
 
-/** Marks the tab as non-production: badged icons, bracketed titles, own chrome. */
+/** Marks the document as non-production, wherever the badge reaches. */
 function brandBadge(html: string, environment: Environment): string {
   const { badge } = environment;
   if (badge === null) return html;

@@ -10,12 +10,12 @@ import { defineConfig } from 'vitest/config';
 // contrast test takes the stylesheet as injected text.
 const themeCss = readFileSync(fileURLToPath(new URL('./src/index.css', import.meta.url)), 'utf8');
 
-// Same reason, plus jsdom leaves `import.meta.url` on a non-file scheme, so the
-// branding test cannot reach the document it brands without this.
+// jsdom leaves `import.meta.url` on a non-file scheme, so the branding test
+// cannot otherwise read the document it brands.
 const indexHtml = readFileSync(fileURLToPath(new URL('./index.html', import.meta.url)), 'utf8');
 
-// Lets the branding test hold every environment's icon and preview URLs to a
-// file scripts/generate-brand-assets.py actually wrote.
+// Lets the branding test hold every environment's asset URLs to a file that
+// exists.
 const publicFiles = readdirSync(fileURLToPath(new URL('./public', import.meta.url)));
 
 export default defineConfig({

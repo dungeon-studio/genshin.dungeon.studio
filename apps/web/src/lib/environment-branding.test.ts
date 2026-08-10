@@ -6,9 +6,8 @@ import { describe, expect, it } from 'vitest';
 import { brandIndexHtml, PRODUCTION_ORIGIN } from './environment-branding';
 import { ENVIRONMENT_NAMES, ENVIRONMENTS } from './environments';
 
-// The real document, injected by vitest.config.ts, so an index.html edit that
-// moves a branded element out from under the substitutions fails here rather
-// than on a deployed site.
+// The real document, so an index.html edit that moves a branded element out
+// from under the substitutions fails here rather than on a deployed site.
 const INDEX_HTML = __INDEX_HTML__;
 
 const DEV_ORIGIN = 'https://develop.genshin.dungeon.studio';

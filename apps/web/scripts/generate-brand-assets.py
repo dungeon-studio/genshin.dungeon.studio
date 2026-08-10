@@ -8,15 +8,14 @@
 
 """Derive the committed brand assets from the two source marks in public/.
 
-Run with `uv run apps/web/scripts/generate-brand-assets.py` after changing a
-source mark or adding an environment, then commit what it writes.
+Run with `uv run`, then commit what it writes. See public/icon-source.md.
 
 Python rather than the workspace's own toolchain because the favicon is a
 multi-resolution .ico, which Pillow writes directly and the Node imaging
 libraries do not.
 
-Keep BADGES and BRAND_TEAL in step with src/lib/environments.ts; the branding
-test fails if a variant this script did not write is referenced.
+BADGES duplicates the environment table in src/lib/environments.ts and nothing
+checks the colors agree, so change the two together.
 """
 
 from __future__ import annotations

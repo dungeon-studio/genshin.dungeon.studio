@@ -70,14 +70,10 @@ Non-production deployments overlay a colored disc carrying the environment's
 Greek letter, so you can tell a browser tab apart at a glance. The disc survives
 a 16×16 tab, where color carries the signal the letter can't.
 
-| File                           | Environment | Badge |
-| ------------------------------ | ----------- | ----- |
-| `favicon-alpha.ico`            | dev         | α     |
-| `favicon-32x32-alpha.png`      | dev         | α     |
-| `favicon-32x32-dark-alpha.png` | dev         | α     |
-| `favicon-beta.ico`             | staging     | β     |
-| `favicon-32x32-beta.png`       | staging     | β     |
-| `favicon-32x32-dark-beta.png`  | staging     | β     |
+Each tab icon gains one variant per non-production environment, named by
+inserting the environment's suffix before the extension: `favicon.ico` becomes
+`favicon-alpha.ico`. The home-screen and web app icons keep the plain mark,
+since they never sit beside another environment and the header carries a label.
 
 ## Social preview
 
@@ -86,12 +82,10 @@ document's `og:url` and `og:image` point at whichever origin serves them.
 
 ## Regenerating
 
-Both sets come from `scripts/generate-brand-assets.py`, which reads the source
-marks and writes every variant:
-
 ```shell
 uv run apps/web/scripts/generate-brand-assets.py
 ```
 
-Rerun it after changing a source mark or adding an environment, and commit the
-result. The badge colors track `src/lib/environments.ts`.
+Rerun after changing a source mark or adding an environment, and commit the
+result. Badge suffixes and colors come from `src/lib/environments.ts`, which
+the script duplicates. Nothing checks that the colors still agree.

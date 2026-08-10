@@ -6,7 +6,7 @@ import type { JSX } from 'react';
 import { resolveEnvironment } from '@/lib/environments';
 import { cn } from '@/lib/utils';
 
-/** Names the deployment on every environment but production, which renders nothing. */
+/** The header's environment marker. Production renders nothing. */
 export function EnvironmentBadge(): JSX.Element | null {
   const { badge } = resolveEnvironment(import.meta.env.VITE_APP_ENV);
 
