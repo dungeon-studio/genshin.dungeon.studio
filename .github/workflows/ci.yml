@@ -81,13 +81,13 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           VITE_API_BASE_URL: https://api.invalid
+          VITE_SITE_ORIGIN: https://ci.invalid
           VITE_FIREBASE_API_KEY: ci
           VITE_FIREBASE_AUTH_DOMAIN: ci.invalid
           VITE_FIREBASE_PROJECT_ID: ci
           VITE_FIREBASE_STORAGE_BUCKET: ci.invalid
           VITE_FIREBASE_MESSAGING_SENDER_ID: ci
           VITE_FIREBASE_APP_ID: ci
-          VITE_APP_ORIGIN: https://ci.invalid
         run: pnpm turbo run build --continue
 
       - name: Verify Build Artifacts
@@ -99,13 +99,13 @@ jobs:
       - name: Verify bundle stats
         env:
           VITE_API_BASE_URL: https://api.invalid
+          VITE_SITE_ORIGIN: https://ci.invalid
           VITE_FIREBASE_API_KEY: ci
           VITE_FIREBASE_AUTH_DOMAIN: ci.invalid
           VITE_FIREBASE_PROJECT_ID: ci
           VITE_FIREBASE_STORAGE_BUCKET: ci.invalid
           VITE_FIREBASE_MESSAGING_SENDER_ID: ci
           VITE_FIREBASE_APP_ID: ci
-          VITE_APP_ORIGIN: https://ci.invalid
         run: pnpm --filter @genshin/web verify:bundle-stats
 
       - name: Upload coverage and test results to Codecov

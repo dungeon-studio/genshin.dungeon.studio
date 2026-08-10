@@ -7,6 +7,7 @@
       "inputs": [
         "src/**",
         "public/**",
+        "scripts/**",
         "package.json",
         "vite.config.*",
         "index.html",
@@ -26,7 +27,14 @@
     },
     "test": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**", "package.json", "vite.config.*", "vitest.config.*", "tsconfig*.json"],
+      "inputs": [
+        "src/**",
+        "scripts/**",
+        "package.json",
+        "vite.config.*",
+        "vitest.config.*",
+        "tsconfig*.json"
+      ],
       "env": ["FAST_CHECK_SEED"]
     },
     "test:integration": {
@@ -47,6 +55,7 @@
       "inputs": [
         "src/**/*.{ts,tsx}",
         "specs/**/*.ts",
+        "scripts/**/*.ts",
         "package.json",
         "vite.config.*",
         "playwright.config.*",

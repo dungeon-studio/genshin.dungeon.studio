@@ -9,6 +9,7 @@ import { codecovVitePlugin } from '@codecov/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig, type Plugin } from 'vite';
 
+import { siteFilesPlugin } from './scripts/site-files-plugin';
 import { brandIndexHtml } from './src/lib/environment-branding.ts';
 import {
   ENVIRONMENT_NAMES,
@@ -24,7 +25,7 @@ const requiredEnvVars: readonly string[] = [
   'VITE_FIREBASE_MESSAGING_SENDER_ID',
   'VITE_FIREBASE_APP_ID',
   'VITE_API_BASE_URL',
-  'VITE_APP_ORIGIN',
+  'VITE_SITE_ORIGIN',
 ];
 
 function packageVersion(): string {
@@ -103,7 +104,7 @@ function environmentBranding(): Plugin {
     name: 'environment-branding',
     configResolved(config) {
       appEnv = readEnv(config.env, 'VITE_APP_ENV');
-      origin = readEnv(config.env, 'VITE_APP_ORIGIN') ?? devServerOrigin;
+      origin = readEnv(config.env, 'VITE_SITE_ORIGIN') ?? devServerOrigin;
     },
     transformIndexHtml: {
       order: 'post',
@@ -129,6 +130,7 @@ export default defineConfig({
     }),
     validateEnv(),
     environmentBranding(),
+    siteFilesPlugin(),
     {
       name: 'generate-version',
       closeBundle() {
