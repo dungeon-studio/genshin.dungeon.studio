@@ -63,3 +63,35 @@ SPDX-License-Identifier: MIT
 
 All derived files generated with ImageMagick `magick -resize` from the
 original 2048x2048 Gemini outputs.
+
+## Environment variants
+
+Non-production deployments overlay a colored disc carrying the environment's
+Greek letter, so you can tell a browser tab apart at a glance. The disc survives
+a 16×16 tab, where color carries the signal the letter can't.
+
+| File                           | Environment | Badge |
+| ------------------------------ | ----------- | ----- |
+| `favicon-alpha.ico`            | dev         | α     |
+| `favicon-32x32-alpha.png`      | dev         | α     |
+| `favicon-32x32-dark-alpha.png` | dev         | α     |
+| `favicon-beta.ico`             | staging     | β     |
+| `favicon-32x32-beta.png`       | staging     | β     |
+| `favicon-32x32-dark-beta.png`  | staging     | β     |
+
+## Social preview
+
+Every environment shares one 1200×630 link preview, `og-image.png`. The
+document's `og:url` and `og:image` point at whichever origin serves them.
+
+## Regenerating
+
+Both sets come from `scripts/generate-brand-assets.py`, which reads the source
+marks and writes every variant:
+
+```shell
+uv run apps/web/scripts/generate-brand-assets.py
+```
+
+Rerun it after changing a source mark or adding an environment, and commit the
+result. The badge colors track `src/lib/environments.ts`.
