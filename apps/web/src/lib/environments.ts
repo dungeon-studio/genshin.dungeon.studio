@@ -14,7 +14,7 @@ export const ENVIRONMENT_NAMES = ['dev', 'staging', 'prod'] as const;
 
 export type EnvironmentName = (typeof ENVIRONMENT_NAMES)[number];
 
-export interface EnvironmentBadge {
+export interface Badge {
   /** Shown in the header pill and prefixed, bracketed, to the document title. */
   label: string;
   /** Overlaid on the favicon by scripts/generate-icons.ts. */
@@ -29,7 +29,7 @@ export interface Environment {
   name: EnvironmentName;
   /** Mobile browser chrome. A literal hex because meta tags cannot read CSS variables. */
   themeColor: string;
-  badge: EnvironmentBadge | null;
+  badge: Badge | null;
 }
 
 /**

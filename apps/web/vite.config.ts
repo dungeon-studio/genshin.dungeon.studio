@@ -7,7 +7,7 @@ import path from 'path';
 
 import { codecovVitePlugin } from '@codecov/vite-plugin';
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 
 import { brandIndexHtml } from './src/lib/environment-branding.ts';
 import {
@@ -50,6 +50,7 @@ const buildSha: string = shortSha();
 const bundleStatsDryRun: boolean = process.env.CODECOV_BUNDLE_DRY_RUN === 'true';
 
 const devServerPort = 5173;
+const devServerOrigin = `http://localhost:${devServerPort}`;
 
 /** Vite types its resolved env as `any` per key; an unset var reads as `''` here. */
 function readEnv(env: Record<string, unknown>, key: string): string | undefined {
@@ -57,10 +58,60 @@ function readEnv(env: Record<string, unknown>, key: string): string | undefined 
   return typeof value === 'string' && value !== '' ? value : undefined;
 }
 
-let branding: { appEnv: string | undefined; origin: string } = {
-  appEnv: undefined,
-  origin: `http://localhost:${devServerPort}`,
-};
+function assertKnownEnvironment(env: Record<string, unknown>): void {
+  // Unset is the documented default, but a typo would otherwise resolve to dev
+  // and quietly badge a production build as alpha.
+  const appEnv = readEnv(env, 'VITE_APP_ENV');
+
+  if (appEnv !== undefined && !isEnvironmentName(appEnv)) {
+    throw new Error(`VITE_APP_ENV must be one of ${ENVIRONMENT_NAMES.join(', ')}; got '${appEnv}'`);
+  }
+}
+
+function assertRequiredEnv(env: Record<string, unknown>): void {
+  const missing = requiredEnvVars.filter((key) => readEnv(env, key) === undefined);
+
+  if (missing.length > 0) {
+    throw new Error(`Missing required environment variables:\n  ${missing.join('\n  ')}`);
+  }
+}
+
+// .github/workflows/deploy.yml injects these for deployed builds. Failing here
+// keeps the dev fallbacks in lib/firebase.ts and lib/api.ts out of any shipped
+// bundle.
+function validateEnv(): Plugin {
+  return {
+    name: 'validate-env',
+    configResolved(config) {
+      assertKnownEnvironment(config.env);
+
+      if (config.command !== 'build') return;
+
+      assertRequiredEnv(config.env);
+    },
+  };
+}
+
+// Runs on the dev server too, so a local tab carries the same markers a
+// deployed one does. `post` so the HTML it rewrites is the final document.
+function environmentBranding(): Plugin {
+  // Held in the closure rather than at module scope: nothing can read these
+  // before configResolved has supplied them.
+  let appEnv: string | undefined;
+  let origin = devServerOrigin;
+
+  return {
+    name: 'environment-branding',
+    configResolved(config) {
+      appEnv = readEnv(config.env, 'VITE_APP_ENV');
+      origin = readEnv(config.env, 'VITE_APP_ORIGIN') ?? devServerOrigin;
+    },
+    transformIndexHtml: {
+      order: 'post',
+      handler: (html: string) => brandIndexHtml(html, resolveEnvironment(appEnv), origin),
+    },
+  };
+}
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -77,46 +128,8 @@ export default defineConfig({
       dryRun: bundleStatsDryRun,
       telemetry: false,
     }),
-    {
-      name: 'validate-env',
-      // .github/workflows/deploy.yml injects these for deployed builds. Failing
-      // here keeps the dev fallbacks in lib/firebase.ts and lib/api.ts out of
-      // any shipped bundle.
-      configResolved(config) {
-        // Unset is the documented default, but a typo would otherwise resolve
-        // to dev and quietly badge a production build as alpha.
-        const appEnv = readEnv(config.env, 'VITE_APP_ENV');
-        if (appEnv !== undefined && !isEnvironmentName(appEnv)) {
-          throw new Error(
-            `VITE_APP_ENV must be one of ${ENVIRONMENT_NAMES.join(', ')}; got '${appEnv}'`,
-          );
-        }
-
-        if (config.command !== 'build') return;
-
-        const missing = requiredEnvVars.filter((key) => !config.env[key]);
-        if (missing.length > 0) {
-          throw new Error(`Missing required environment variables:\n  ${missing.join('\n  ')}`);
-        }
-      },
-    },
-    {
-      // Runs on the dev server too, so a local tab carries the same markers a
-      // deployed one does. `post` so the HTML it rewrites is the final document.
-      name: 'environment-branding',
-      configResolved(config) {
-        branding = {
-          appEnv: readEnv(config.env, 'VITE_APP_ENV'),
-          origin: readEnv(config.env, 'VITE_APP_ORIGIN') ?? `http://localhost:${devServerPort}`,
-        };
-      },
-      transformIndexHtml: {
-        order: 'post',
-        handler(html: string) {
-          return brandIndexHtml(html, resolveEnvironment(branding.appEnv), branding.origin);
-        },
-      },
-    },
+    validateEnv(),
+    environmentBranding(),
     {
       name: 'generate-version',
       closeBundle() {

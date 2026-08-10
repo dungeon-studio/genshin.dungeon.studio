@@ -36,6 +36,11 @@ BRAND_TEAL = "#1f514e"
 ICO_SIZES = [(48, 48), (32, 32), (16, 16)]
 
 OG_SIZE = (1200, 630)
+OG_MARGIN = 100
+OG_MARK_SIDE = 240
+OG_MARK_TOP = 108
+
+FAVICON_SIZE = (32, 32)
 
 
 @dataclass(frozen=True)
@@ -69,14 +74,14 @@ def apply_badge(mark: Image.Image, badge: Badge) -> Image.Image:
     left = size - diameter
     top = size - diameter
 
+    disc = (left, top, size - 1, size - 1)
+    halo = (left - 1, top - 1, size - 1, size - 1)
+
     draw = ImageDraw.Draw(badged)
-    # Punch the disc out of the mark first so the badge never blends with the
+    # Clear a halo behind the disc first, so the badge never blends with the
     # copper it sits on at small sizes.
-    draw.ellipse(
-        (left - 1, top - 1, size - 1, size - 1),
-        fill=(0, 0, 0, 0),
-    )
-    draw.ellipse((left, top, size - 1, size - 1), fill=badge.color)
+    draw.ellipse(halo, fill=(0, 0, 0, 0))
+    draw.ellipse(disc, fill=badge.color)
 
     font = ImageFont.truetype(str(FONT), round(diameter * 0.78))
     draw.text(
@@ -97,7 +102,7 @@ def write_badged_icons() -> None:
     for badge in BADGES:
         badged_light = apply_badge(light, badge)
 
-        badged_light.resize((32, 32), Image.LANCZOS).save(
+        badged_light.resize(FAVICON_SIZE, Image.LANCZOS).save(
             PUBLIC / variant("favicon-32x32.png", badge.suffix)
         )
         badged_light.save(
@@ -120,36 +125,31 @@ def fit_font(draw: ImageDraw.ImageDraw, text: str, size: int, max_width: int) ->
     return ImageFont.truetype(str(FONT), size)
 
 
+def draw_centered_line(
+    draw: ImageDraw.ImageDraw, text: str, baseline: int, size: int, fill: str
+) -> None:
+    """Centered and width-fitted, so no line of the preview can overflow it."""
+    width = OG_SIZE[0]
+    draw.text(
+        (width / 2, baseline),
+        text,
+        font=fit_font(draw, text, size, width - 2 * OG_MARGIN),
+        fill=fill,
+        anchor="mm",
+    )
+
+
 def write_og_image() -> None:
     """A link preview is read at thumbnail size, so it carries mark and name only."""
     canvas = Image.new("RGB", OG_SIZE, BRAND_TEAL)
-    mark = Image.open(PUBLIC / "icon-512x512.png").convert("RGBA")
 
-    side = 240
-    mark = mark.resize((side, side), Image.LANCZOS)
-    canvas.paste(mark, ((OG_SIZE[0] - side) // 2, 108), mark)
+    mark = Image.open(PUBLIC / "icon-512x512.png").convert("RGBA")
+    mark = mark.resize((OG_MARK_SIDE, OG_MARK_SIDE), Image.LANCZOS)
+    canvas.paste(mark, ((OG_SIZE[0] - OG_MARK_SIDE) // 2, OG_MARK_TOP), mark)
 
     draw = ImageDraw.Draw(canvas)
-    centre = OG_SIZE[0] / 2
-    max_width = OG_SIZE[0] - 200
-
-    title = "Genshin Planner"
-    draw.text(
-        (centre, 428),
-        title,
-        font=fit_font(draw, title, 88, max_width),
-        fill="#ffffff",
-        anchor="mm",
-    )
-
-    tagline = "Plan your teams and manage your collection."
-    draw.text(
-        (centre, 518),
-        tagline,
-        font=fit_font(draw, tagline, 36, max_width),
-        fill="#a8d5d1",
-        anchor="mm",
-    )
+    draw_centered_line(draw, "Genshin Planner", 428, 88, "#ffffff")
+    draw_centered_line(draw, "Plan your teams and manage your collection.", 518, 36, "#a8d5d1")
 
     canvas.save(PUBLIC / "og-image.png")
 
