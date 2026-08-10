@@ -9,12 +9,10 @@ import type { Plugin } from 'vite';
 import { isPublicOrigin, siteFiles } from './site-files';
 
 /**
- * Emits the crawler-facing root files, and marks every origin but the public
- * one `noindex`.
+ * Emits the site files and marks non-public origins `noindex`.
  *
- * The origin arrives as `VITE_SITE_ORIGIN`, which Vite resolves from `.env`
- * files as well as the environment, so it is only readable once the config
- * has been resolved.
+ * `VITE_SITE_ORIGIN` comes from `.env` files as well as the environment, so
+ * the origin is only readable once Vite has resolved the config.
  */
 export function siteFilesPlugin(): Plugin {
   let origin: string | undefined;
@@ -37,9 +35,9 @@ export function siteFilesPlugin(): Plugin {
       }
     },
 
-    // robots.txt keeps compliant crawlers off non-public origins entirely;
-    // this catches the ones that fetch anyway, for which a Disallow they
-    // ignored is no barrier to listing the page.
+    // robots.txt already turns compliant crawlers away. This catches the ones
+    // that fetch anyway, for which an ignored Disallow is no barrier to
+    // listing the page.
     transformIndexHtml(html) {
       if (origin === undefined || isPublicOrigin(origin)) return html;
 

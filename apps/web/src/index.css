@@ -6,9 +6,8 @@
 
 @config '../tailwind.config.js';
 
-/* Automatic source detection reaches the whole workspace, so an ordinary
-   identifier in a build script — `contents`, `grid` — ships as a utility
-   nobody wrote. Nothing here renders. */
+/* Automatic source detection reaches the whole workspace, so identifiers in
+   build scripts ship as utilities nobody wrote. Nothing here renders. */
 @source not '../scripts';
 
 :root {

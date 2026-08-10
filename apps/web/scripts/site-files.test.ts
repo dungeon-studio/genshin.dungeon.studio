@@ -68,8 +68,7 @@ describe('sitemapXml', () => {
 });
 
 describe('PUBLIC_ROUTES', () => {
-  // The router is the source of truth; this list is a hand-kept copy of it,
-  // so a route added there without a sitemap entry fails here.
+  // The router is the source of truth; this list is a hand-kept copy of it.
   it('covers every route the router declares', () => {
     const app = readFileSync('src/app.tsx', 'utf8');
     const declared = [...app.matchAll(/<Route path="([^"]+)"/g)]

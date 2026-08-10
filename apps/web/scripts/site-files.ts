@@ -5,8 +5,7 @@
  * The crawler-facing files served from the site root.
  *
  * They name absolute URLs, so they cannot be checked in as static assets:
- * every deployed origin needs its own copy. `site-files-plugin.ts` writes
- * them into the build output.
+ * every deployed origin needs its own copy.
  */
 
 export interface SiteFile {
@@ -17,8 +16,7 @@ export interface SiteFile {
 
 /**
  * The one origin whose content is meant to be indexed. Every other deployment
- * serves the same routes from a different host, so they tell crawlers to stay
- * out rather than compete with it.
+ * serves the same routes from a different host, so it tells crawlers to stay out.
  */
 const PUBLIC_ORIGIN = 'https://genshin.dungeon.studio';
 
@@ -36,9 +34,9 @@ export const PUBLIC_ROUTES: readonly string[] = [
 ];
 
 /**
- * Agents that read the site for a model rather than for a search index. A
- * bare `*` group already binds them; naming each one states the position
- * explicitly, which is what their operators document as the opt-out signal.
+ * Agents that read the site for a model rather than a search index. The `*`
+ * group already binds them; their operators document a named group as the
+ * opt-out, so each is stated outright.
  */
 const AI_USER_AGENTS: readonly string[] = [
   'GPTBot',
@@ -83,7 +81,6 @@ function sitemapXml(origin: string): string {
   ].join('\n');
 }
 
-/** Everything the build has to drop at the root of `origin`. */
 export function siteFiles(origin: string): readonly SiteFile[] {
   return [
     { name: 'robots.txt', contents: robotsTxt(origin) },
