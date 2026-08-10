@@ -8,6 +8,8 @@
  * every deployed origin needs its own copy.
  */
 
+import { PRODUCTION_ORIGIN } from '../src/lib/environments.ts';
+
 export interface SiteFile {
   /** Path relative to the site root. */
   readonly name: string;
@@ -15,13 +17,11 @@ export interface SiteFile {
 }
 
 /**
- * The one origin whose content is meant to be indexed. Every other deployment
- * serves the same routes from a different host, so it tells crawlers to stay out.
+ * Only the real site is meant to be indexed. Every other deployment serves the
+ * same routes from a different host, so it tells crawlers to stay out.
  */
-const PUBLIC_ORIGIN = 'https://genshin.dungeon.studio';
-
 export function isPublicOrigin(origin: string): boolean {
-  return origin === PUBLIC_ORIGIN;
+  return origin === PRODUCTION_ORIGIN;
 }
 
 /** Routes `src/app.tsx` renders, minus the catch-all. */

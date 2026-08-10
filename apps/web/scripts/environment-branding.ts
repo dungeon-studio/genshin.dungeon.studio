@@ -1,15 +1,15 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { Environment } from './environments.ts';
+import { PRODUCTION_ORIGIN, type Environment } from '../src/lib/environments.ts';
 
 /**
  * index.html is authored as the production document, and every other
  * environment is derived from it here. Production runs none of it.
+ *
+ * The origin it names is PRODUCTION_ORIGIN, which is what every other
+ * environment substitutes away.
  */
-
-/** The origin baked into index.html; every other environment substitutes its own. */
-export const PRODUCTION_ORIGIN = 'https://genshin.dungeon.studio';
 
 /** What index.html owes this module. Losing any one of these fails the build. */
 const DOCUMENT_TITLE = /(<title>)/;

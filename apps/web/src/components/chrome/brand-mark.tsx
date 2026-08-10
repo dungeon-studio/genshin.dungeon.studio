@@ -5,6 +5,14 @@ import type { JSX } from 'react';
 
 import { resolveEnvironment } from '@/lib/environments';
 
+/** One mark per colour scheme; CSS shows whichever matches, so both are emitted. */
+const MARKS = [
+  { file: 'favicon-32x32', className: 'dark:hidden' },
+  { file: 'favicon-32x32-dark', className: 'hidden dark:block' },
+] as const;
+
+const SIZE = 32;
+
 /**
  * The app mark, wearing the same badge the browser tab does.
  *
@@ -22,22 +30,17 @@ export function BrandMark(): JSX.Element {
 
   return (
     <>
-      <img
-        src={`/favicon-32x32${suffix}.png`}
-        alt={name}
-        aria-hidden={decorative}
-        width={32}
-        height={32}
-        className="dark:hidden"
-      />
-      <img
-        src={`/favicon-32x32-dark${suffix}.png`}
-        alt={name}
-        aria-hidden={decorative}
-        width={32}
-        height={32}
-        className="hidden dark:block"
-      />
+      {MARKS.map(({ file, className }) => (
+        <img
+          key={file}
+          src={`/${file}${suffix}.png`}
+          alt={name}
+          aria-hidden={decorative}
+          width={SIZE}
+          height={SIZE}
+          className={className}
+        />
+      ))}
     </>
   );
 }

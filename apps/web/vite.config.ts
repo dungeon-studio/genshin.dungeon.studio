@@ -9,8 +9,8 @@ import { codecovVitePlugin } from '@codecov/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig, type Plugin } from 'vite';
 
+import { brandIndexHtml } from './scripts/environment-branding.ts';
 import { siteFilesPlugin } from './scripts/site-files-plugin';
-import { brandIndexHtml } from './src/lib/environment-branding.ts';
 import {
   ENVIRONMENT_NAMES,
   isEnvironmentName,
