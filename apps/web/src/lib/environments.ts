@@ -37,7 +37,7 @@ export const ENVIRONMENTS: Readonly<Record<EnvironmentName, Environment>> = {
     name: 'dev',
     themeColor: '#752f93',
     badge: {
-      label: 'ALPHA',
+      label: 'Alpha',
       glyph: 'α',
       iconSuffix: 'alpha',
     },
@@ -46,7 +46,7 @@ export const ENVIRONMENTS: Readonly<Record<EnvironmentName, Environment>> = {
     name: 'staging',
     themeColor: '#1c5392',
     badge: {
-      label: 'BETA',
+      label: 'Beta',
       glyph: 'β',
       iconSuffix: 'beta',
     },

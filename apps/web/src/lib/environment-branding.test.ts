@@ -20,7 +20,7 @@ describe('brandIndexHtml', () => {
   it('announces the environment in the tab title', () => {
     const branded = brandIndexHtml(INDEX_HTML, ENVIRONMENTS.dev, DEV_ORIGIN);
 
-    expect(branded).toContain('<title>[ALPHA] ');
+    expect(branded).toContain('<title>Alpha · ');
   });
 
   it('points the tab icons at the badged variant', () => {

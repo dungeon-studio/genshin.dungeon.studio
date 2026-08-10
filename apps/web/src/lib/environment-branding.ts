@@ -46,8 +46,8 @@ function brandBadge(html: string, environment: Environment): string {
   if (badge === null) return html;
 
   const substitutions: readonly Substitution[] = [
-    [DOCUMENT_TITLE, `$1[${badge.label}] `],
-    [OG_TITLE, `$1[${badge.label}] `],
+    [DOCUMENT_TITLE, `$1${badge.label} · `],
+    [OG_TITLE, `$1${badge.label} · `],
     [THEME_COLOR, `$1${environment.themeColor}$2`],
     [ICON_HREF, `$1-${badge.iconSuffix}$2`],
   ];
