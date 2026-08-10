@@ -6,6 +6,11 @@
 
 @config '../tailwind.config.js';
 
+/* Automatic source detection reaches the whole workspace, so an ordinary
+   identifier in a build script — `contents`, `grid` — ships as a utility
+   nobody wrote. Nothing here renders. */
+@source not '../scripts';
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
