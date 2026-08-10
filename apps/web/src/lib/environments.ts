@@ -8,11 +8,7 @@
  * top of it. A null `badge` is what makes an environment production.
  */
 
-/**
- * The one origin serving the real site. Everything that has to tell production
- * from the rest — the crawler files, the branding rewriter — compares against
- * this rather than carrying its own copy.
- */
+/** The one origin serving the real site; anything telling production from the rest compares against it. */
 export const PRODUCTION_ORIGIN = 'https://genshin.dungeon.studio';
 
 export const ENVIRONMENT_NAMES = ['dev', 'staging', 'prod'] as const;
@@ -20,7 +16,7 @@ export const ENVIRONMENT_NAMES = ['dev', 'staging', 'prod'] as const;
 export type EnvironmentName = (typeof ENVIRONMENT_NAMES)[number];
 
 export interface Badge {
-  /** Names the environment in the mark's accessible name and the document title. */
+  /** Shown in the document title and the mark's accessible name. */
   label: string;
   /** Overlaid on the favicon by the brand-asset generator. */
   glyph: string;

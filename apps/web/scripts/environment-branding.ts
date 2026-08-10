@@ -7,8 +7,8 @@ import { PRODUCTION_ORIGIN, type Environment } from '../src/lib/environments.ts'
  * index.html is authored as the production document, and every other
  * environment is derived from it here. Production runs none of it.
  *
- * The origin it names is PRODUCTION_ORIGIN, which is what every other
- * environment substitutes away.
+ * The origin written into index.html has to be PRODUCTION_ORIGIN; every other
+ * environment substitutes its own.
  */
 
 /** What index.html owes this module. Losing any one of these fails the build. */

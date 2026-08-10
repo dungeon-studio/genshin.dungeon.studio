@@ -5,7 +5,7 @@ import type { JSX } from 'react';
 
 import { resolveEnvironment } from '@/lib/environments';
 
-/** One mark per colour scheme; CSS shows whichever matches, so both are emitted. */
+/** One mark per color scheme; CSS shows whichever matches, so both are emitted. */
 const MARKS = [
   { file: 'favicon-32x32', className: 'dark:hidden' },
   { file: 'favicon-32x32-dark', className: 'hidden dark:block' },
@@ -16,10 +16,9 @@ const SIZE = 32;
 /**
  * The app mark, wearing the same badge the browser tab does.
  *
- * Decorative in production, where the wordmark beside it already says
- * everything. A badged mark carries information the wordmark does not, so it
- * takes an accessible name — the environment alone, since repeating the app
- * name would say it twice inside one link.
+ * Decorative in production, where the wordmark beside it says everything. A
+ * badge is information the wordmark lacks, so it earns an accessible name: the
+ * environment only, because the wordmark is already inside the same link.
  */
 export function BrandMark(): JSX.Element {
   const { badge } = resolveEnvironment(import.meta.env.VITE_APP_ENV);
