@@ -81,6 +81,7 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           VITE_API_BASE_URL: https://api.invalid
+          VITE_SITE_ORIGIN: https://ci.invalid
           VITE_FIREBASE_API_KEY: ci
           VITE_FIREBASE_AUTH_DOMAIN: ci.invalid
           VITE_FIREBASE_PROJECT_ID: ci
@@ -98,6 +99,7 @@ jobs:
       - name: Verify bundle stats
         env:
           VITE_API_BASE_URL: https://api.invalid
+          VITE_SITE_ORIGIN: https://ci.invalid
           VITE_FIREBASE_API_KEY: ci
           VITE_FIREBASE_AUTH_DOMAIN: ci.invalid
           VITE_FIREBASE_PROJECT_ID: ci

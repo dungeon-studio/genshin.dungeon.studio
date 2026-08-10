@@ -20,3 +20,5 @@ require -d apps/web/dist
 require -f apps/web/dist/index.html
 require -d apps/web/dist/assets
 require -f apps/web/dist/version.json
+require -f apps/web/dist/robots.txt
+require -f apps/web/dist/sitemap.xml

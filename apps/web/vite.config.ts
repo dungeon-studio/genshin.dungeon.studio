@@ -9,6 +9,8 @@ import { codecovVitePlugin } from '@codecov/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
+import { robotsTxt, sitemapXml } from './scripts/site-files';
+
 const requiredEnvVars: readonly string[] = [
   'VITE_FIREBASE_API_KEY',
   'VITE_FIREBASE_AUTH_DOMAIN',
@@ -17,6 +19,7 @@ const requiredEnvVars: readonly string[] = [
   'VITE_FIREBASE_MESSAGING_SENDER_ID',
   'VITE_FIREBASE_APP_ID',
   'VITE_API_BASE_URL',
+  'VITE_SITE_ORIGIN',
 ];
 
 function packageVersion(): string {
@@ -40,6 +43,10 @@ const buildSha: string = shortSha();
 // Writes the report beside the bundle instead of uploading it, which is how
 // scripts/verify-bundle-stats.ts inspects what the plugin collected.
 const bundleStatsDryRun: boolean = process.env.CODECOV_BUNDLE_DRY_RUN === 'true';
+
+// Resolved from `.env` files as well as the environment, so it is only
+// readable once Vite has merged both.
+let siteOrigin: string | undefined;
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -68,6 +75,22 @@ export default defineConfig({
         if (missing.length > 0) {
           throw new Error(`Missing required environment variables:\n  ${missing.join('\n  ')}`);
         }
+      },
+    },
+    {
+      name: 'generate-site-files',
+      // Generated rather than kept in public/ because both files carry
+      // absolute URLs, which differ per deployed origin.
+      configResolved(config) {
+        const env = config.env as Record<string, string | undefined>;
+        siteOrigin = env.VITE_SITE_ORIGIN;
+      },
+      closeBundle() {
+        if (siteOrigin === undefined) return;
+
+        const distPath = path.resolve(__dirname, 'dist');
+        fs.writeFileSync(path.join(distPath, 'robots.txt'), robotsTxt(siteOrigin));
+        fs.writeFileSync(path.join(distPath, 'sitemap.xml'), sitemapXml(siteOrigin));
       },
     },
     {
