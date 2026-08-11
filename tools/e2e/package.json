@@ -18,7 +18,7 @@
     "@genshin/eslint-config": "workspace:*",
     "@types/node": "25.9.5",
     "@typescript/native": "npm:typescript@7.0.2",
-    "eslint": "10.8.0",
+    "eslint": "10.8.1",
     "typescript": "npm:@typescript/typescript6@6.0.2"
   }
 }
