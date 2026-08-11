@@ -11,11 +11,8 @@ export type RequestLogVariables = {
 };
 
 /**
- * Request logging middleware.
- *
- * Binds a child logger carrying the request's method and path to the context,
- * so anything downstream logs with that context without threading it through
- * its own signature, then records how the request finished.
+ * Binds a child logger to the context so downstream code logs the request's
+ * method and path without threading them through its own signature.
  *
  * Register first: everything after it reads `logger` off the context.
  */

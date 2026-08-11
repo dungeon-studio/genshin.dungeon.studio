@@ -12,8 +12,7 @@ import type { ValidatedRequestBodyVariables } from '@/middleware/validate-reques
  * in, content negotiated in both directions, request body already validated.
  *
  * Hono checks a middleware's declared variables against the app mounting it, so
- * a stack this wide is otherwise restated by every route that runs it — and
- * every new variable means editing all of them.
+ * a route declares everything its stack sets, not only what its handlers read.
  */
 export type AuthenticatedRouteVariables = AuthVariables &
   NegotiatedResponseContentVariables &

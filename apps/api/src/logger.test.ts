@@ -6,8 +6,8 @@ import { describe, expect, it } from 'vitest';
 import { createLogger } from './logger.js';
 
 /**
- * The single record the real configuration emits for `bindings`, as a sink
- * would receive it. The suite runs at `silent`, so the level is raised here.
+ * The single record the real configuration emits for `bindings`. The level is
+ * raised because the suite runs at `silent`.
  */
 function emit(bindings: Record<string, unknown>): Record<string, unknown> {
   const lines: string[] = [];

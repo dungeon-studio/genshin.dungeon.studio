@@ -15,9 +15,8 @@ export default defineConfig([
     },
   },
   {
-    // The server logs through `@/logger.js`, whose JSON output Cloud Logging and
-    // Loki read. `scripts/` is outside this: those run in a terminal, where
-    // their console output is the report.
+    // Server code logs through `@/logger.js`. `scripts/` is outside the scope:
+    // those run in a terminal, where console output is the report.
     files: ['src/**/*.ts'],
     rules: {
       'no-console': 'error',

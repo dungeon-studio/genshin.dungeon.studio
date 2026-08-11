@@ -28,8 +28,7 @@ export const app = new Hono<{
   Variables: Partial<AuthVariables> & NegotiatedResponseContentVariables & RequestLogVariables;
 }>();
 
-// Request logging middleware — first, so everything after it can read the
-// request-scoped logger off the context.
+// Must run first; everything after it reads the request logger off the context
 app.use('*', logRequest);
 
 // Must precede CORS, which short-circuits OPTIONS before this could run
