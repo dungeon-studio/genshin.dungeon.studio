@@ -29,10 +29,10 @@ export function Footer(): JSX.Element {
   });
 
   return (
-    <footer className="border-t border-border bg-muted py-8">
-      <Container className="text-center text-sm text-muted-foreground">
+    <footer className="py-8 border-t border-border bg-muted">
+      <Container className="text-sm text-center text-muted-foreground">
         <nav aria-label="Footer">
-          <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+          <ul className="gap-x-6 gap-y-2 flex flex-wrap justify-center">
             <li>
               <a
                 href={reportUrl}

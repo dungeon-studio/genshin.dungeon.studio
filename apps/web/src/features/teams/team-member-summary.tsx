@@ -24,11 +24,11 @@ export function TeamMemberSummary({
 
   return (
     <div className="space-y-1.5">
-      <div className="flex items-center gap-2">
+      <div className="gap-2 flex items-center">
         <CharacterSummary character={character} />
         {collectionCharacter && (
           <span
-            className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-bold tabular-nums text-muted-foreground"
+            className="px-2 py-0.5 text-xs font-bold shrink-0 rounded-full bg-muted text-muted-foreground tabular-nums"
             aria-label={`Constellation level ${collectionCharacter.constellationLevel}`}
           >
             C{collectionCharacter.constellationLevel}
@@ -36,11 +36,11 @@ export function TeamMemberSummary({
         )}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="gap-2 flex items-center">
         <WeaponSummary weapon={weapon} weaponType={character?.weaponType} />
         {weapon && collectionWeapon && (
           <span
-            className="shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-muted-foreground"
+            className="px-1.5 py-0.5 font-bold shrink-0 rounded-full bg-muted text-[10px] text-muted-foreground tabular-nums"
             aria-label={`Refinement rank ${collectionWeapon.refinementLevel}`}
           >
             R{collectionWeapon.refinementLevel}

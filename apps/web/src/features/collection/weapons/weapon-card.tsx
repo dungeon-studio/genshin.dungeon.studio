@@ -28,17 +28,17 @@ export function WeaponCard({
       type="button"
       onClick={() => onClick?.(weapon.id)}
       className={cn(
-        'relative flex w-full items-center gap-3 rounded-lg border border-border border-l-4 bg-card p-3 text-left shadow-sm transition-colors',
+        'gap-3 p-3 shadow-sm relative flex w-full items-center rounded-lg border border-l-4 border-border bg-card text-left transition-colors',
         owned ? (RARITY_BORDER_COLORS[weapon.rarity] ?? 'border-l-border') : 'border-l-border',
         selected && 'ring-2 ring-primary ring-offset-2 ring-offset-background',
-        'cursor-pointer hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        'cursor-pointer hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
       )}
       aria-label={`${weapon.name}, ${instanceCount} owned`}
     >
       <WeaponSummary weapon={weapon} dimmed={!owned} />
 
       {owned && (
-        <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-bold tabular-nums text-muted-foreground">
+        <span className="px-2 py-0.5 text-xs font-bold shrink-0 rounded-full bg-muted text-muted-foreground tabular-nums">
           ×{instanceCount}
         </span>
       )}

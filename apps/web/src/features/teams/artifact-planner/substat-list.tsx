@@ -43,8 +43,8 @@ export function SubstatList({
       {orderedSelected.length > 0 && (
         <ul className="space-y-1" aria-label={label}>
           {orderedSelected.map((affix) => (
-            <li key={affix} className="flex items-center gap-1 rounded-md bg-muted/50 px-2 py-1">
-              <span className="flex-1 text-xs text-card-foreground">{affix}</span>
+            <li key={affix} className="gap-1 px-2 py-1 flex items-center rounded-md bg-muted/50">
+              <span className="text-xs flex-1 text-card-foreground">{affix}</span>
               <button
                 type="button"
                 onClick={() => remove(affix)}
@@ -67,7 +67,7 @@ export function SubstatList({
               e.target.value = '';
             }
           }}
-          className="w-full rounded-md border border-dashed border-border bg-background px-2 py-1.5 text-xs text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="px-2 py-1.5 text-xs w-full rounded-md border border-dashed border-border bg-background text-muted-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
           aria-label={`Add ${label.toLowerCase()}`}
         >
           <option value="">

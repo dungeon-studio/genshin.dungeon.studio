@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 /** The game version the static data in this package covers. */
-export const GAME_DATA_VERSION = 'Luna IV';
+export const GAME_DATA_VERSION = '6.7';
 
 // Luna versions map to [major, minor] tuples in the 6.x series (after 5.x, the last numeric era).
 const LUNA_VERSIONS: Record<string, readonly [number, number]> = {

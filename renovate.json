@@ -7,7 +7,7 @@
     "customManagers:dockerfileVersions"
   ],
   "timezone": "Europe/London",
-  "labels": ["dependencies", "automated"],
+  "labels": ["dependencies"],
   "reviewers": ["alunduil"],
   "rangeStrategy": "pin",
   "minimumReleaseAge": "3 days",

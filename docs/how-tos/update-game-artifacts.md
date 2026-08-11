@@ -42,6 +42,6 @@ record the error names before widening the check in
 
 ## See also
 
-- [Add Genshin Impact Characters](update-game-characters.md)
-- [Regenerate the Genshin Impact Weapon Roster](update-game-weapons.md)
+- [Regenerate Genshin Impact Characters](update-game-characters.md)
+- [Regenerate Genshin Impact Weapons](update-game-weapons.md)
 - [Update Elemental Reactions](update-game-reactions.md)

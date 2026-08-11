@@ -82,7 +82,7 @@ export function CharacterPool({
 
   if (ownedCount === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 py-12">
+      <div className="gap-4 py-12 flex flex-1 flex-col items-center justify-center">
         <Users className="h-10 w-10 text-muted-foreground" aria-hidden="true" focusable={false} />
         <div className="text-center">
           <p className="font-medium">No characters in your collection</p>
@@ -98,7 +98,7 @@ export function CharacterPool({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3">
+    <div className="min-h-0 gap-3 flex flex-1 flex-col">
       <CharacterFilters
         filters={filters}
         onChange={handleFilterChange}
@@ -110,7 +110,7 @@ export function CharacterPool({
       />
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 grid grid-cols-1">
           {filteredCharacters.map((character) => {
             const owned = ownedIds.has(character.id);
             const assignedToCurrentMember = character.id === currentMemberCharacterId;
@@ -172,7 +172,7 @@ function PoolCharacterCard({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'flex w-full items-center gap-3 rounded-lg border border-border border-l-4 bg-card p-3 text-left shadow-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+        'gap-3 p-3 shadow-sm flex w-full items-center rounded-lg border border-l-4 border-border bg-card text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
         ELEMENT_BORDER_COLORS[character.element],
         assignedToCurrentMember && `ring-2 ring-inset ${ELEMENT_SELECTED_RINGS[character.element]}`,
         disabled && 'cursor-not-allowed opacity-40',
@@ -190,7 +190,7 @@ function PoolCharacterCard({
           focusable={false}
         />
       )}
-      <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-bold tabular-nums text-muted-foreground">
+      <span className="px-2 py-0.5 text-xs font-bold shrink-0 rounded-full bg-muted text-muted-foreground tabular-nums">
         C{constellationLevel}
       </span>
     </button>

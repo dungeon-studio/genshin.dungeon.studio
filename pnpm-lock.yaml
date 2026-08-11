@@ -26,12 +26,12 @@ importers:
       prettier:
         specifier: 3.9.6
         version: 3.9.6
+      prettier-plugin-tailwindcss:
+        specifier: 0.8.1
+        version: 0.8.1(prettier@3.9.6)
       stylelint:
         specifier: 17.14.1
         version: 17.14.1(@typescript/typescript6@6.0.2)(supports-color@10.2.2)
-      stylelint-config-standard:
-        specifier: 40.0.0
-        version: 40.0.0(stylelint@17.14.1(@typescript/typescript6@6.0.2)(supports-color@10.2.2))
       syncpack:
         specifier: 15.3.2
         version: 15.3.2
@@ -268,9 +268,6 @@ importers:
       postcss:
         specifier: 8.5.26
         version: 8.5.26
-      prettier-plugin-tailwindcss:
-        specifier: 0.8.1
-        version: 0.8.1(prettier@3.9.6)
       stylelint:
         specifier: 17.14.1
         version: 17.14.1(@typescript/typescript6@6.0.2)(supports-color@10.2.2)

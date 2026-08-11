@@ -25,7 +25,9 @@ export function toKebabCase(name: string): string {
  * both abort generation rather than silently dropping a record. `noun` names
  * the record kind in those errors, e.g. `weapon`.
  */
-export function createIdAssigner(noun: string): (name: string) => string {
+export type IdAssigner = (name: string) => string;
+
+export function createIdAssigner(noun: string): IdAssigner {
   const nameById = new Map<string, string>();
 
   return (name) => {

@@ -33,7 +33,7 @@ export function ArtifactSetSearch({
   const selectedSet = value ? ARTIFACT_SETS.find((set) => set.id === value) : undefined;
 
   return (
-    <div className="flex gap-1">
+    <div className="gap-1 flex">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <button
@@ -44,7 +44,7 @@ export function ArtifactSetSearch({
             aria-expanded={open}
             aria-label={label}
             className={cn(
-              'flex min-w-0 flex-1 items-center justify-between rounded-md border border-border bg-background px-2 py-1.5 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              'min-w-0 px-2 py-1.5 text-xs flex flex-1 items-center justify-between rounded-md border border-border bg-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
               selectedSet ? 'text-foreground' : 'text-muted-foreground',
             )}
           >
@@ -56,7 +56,7 @@ export function ArtifactSetSearch({
             />
           </button>
         </PopoverTrigger>
-        <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+        <PopoverContent className="p-0 w-[--radix-popover-trigger-width]" align="start">
           <Command>
             <CommandInput placeholder="Search artifact set..." className="h-8 text-xs" />
             <CommandList>
@@ -89,7 +89,7 @@ export function ArtifactSetSearch({
         <button
           type="button"
           onClick={onClear}
-          className="shrink-0 rounded-md border border-border px-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+          className="px-1.5 shrink-0 rounded-md border border-border text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
           aria-label="Clear selection"
         >
           <Minus className="h-3 w-3" aria-hidden="true" focusable={false} />
