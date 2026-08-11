@@ -4,9 +4,9 @@
 import type { Rarity, Weapon, WeaponType } from '@genshin/game-data';
 import { compareVersions } from '@genshin/game-data';
 
-type OwnershipFilter = 'all' | 'owned' | 'unowned';
+import type { OwnershipFilter, SortDirection } from '@/lib/collection-filters';
+
 type SortField = 'release' | 'name';
-type SortDirection = 'asc' | 'desc';
 
 export interface WeaponFilterState {
   search: string;

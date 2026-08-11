@@ -14,11 +14,9 @@ import { useId, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import type { OwnershipFilter, SortDirection } from '@/lib/collection-filters';
 import { toggleInSet } from '@/lib/toggle-in-set';
 import { cn } from '@/lib/utils';
-
-type OwnershipFilter = 'all' | 'owned' | 'unowned';
-type SortDirection = 'asc' | 'desc';
 
 /** Fields shared by every collection filter; each concrete state adds its own category set, driven separately via {@link FilterCategoryConfig}. */
 export interface BaseFilterState {

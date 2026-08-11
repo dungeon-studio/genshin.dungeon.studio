@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPut } from '@/lib/api';
 import { invalidateUserQuery } from '@/lib/invalidate-user-query';
+import { userScopedKey } from '@/lib/user-scoped-key';
 
 import type { CharacterCollection } from './use-character-collection-store';
 
@@ -17,9 +18,7 @@ export interface MutationResult {
   entry: CollectionCharacter;
 }
 
-function collectionKey(userId: string): readonly [string, string] {
-  return ['characters', userId] as const;
-}
+const charactersKey = userScopedKey('characters');
 
 function parseCollectionResponse(response: unknown): CharacterCollection {
   assertCollectionDocument(response);
@@ -51,7 +50,7 @@ export function useCharacterCollectionQuery(
   userId: string | undefined,
 ): UseQueryResult<CharacterCollection, Error> {
   return useQuery({
-    queryKey: collectionKey(userId ?? ''),
+    queryKey: charactersKey(userId ?? ''),
     queryFn: async () => {
       const response = await apiGet('/characters');
       return parseCollectionResponse(response);
@@ -72,7 +71,7 @@ export function useAddCharacterMutation(
       });
       return parseSingleCharacterResponse(response);
     },
-    onSuccess: invalidateUserQuery(queryClient, userId, collectionKey),
+    onSuccess: invalidateUserQuery(queryClient, userId, charactersKey),
   });
 }
 
@@ -85,7 +84,7 @@ export function useRemoveCharacterMutation(
     mutationFn: async (characterId: CharacterId) => {
       await apiDelete(`/characters/${encodeURIComponent(characterId)}`);
     },
-    onSuccess: invalidateUserQuery(queryClient, userId, collectionKey),
+    onSuccess: invalidateUserQuery(queryClient, userId, charactersKey),
   });
 }
 
@@ -109,6 +108,6 @@ export function useSetConstellationLevelMutation(
       });
       return parseSingleCharacterResponse(response);
     },
-    onSuccess: invalidateUserQuery(queryClient, userId, collectionKey),
+    onSuccess: invalidateUserQuery(queryClient, userId, charactersKey),
   });
 }
