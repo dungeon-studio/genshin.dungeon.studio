@@ -16,3 +16,30 @@ export function toKebabCase(name: string): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }
+
+/**
+ * Builds an assigner that rejects names it has already seen.
+ *
+ * Ids are slugs of display names, so a collision — or a name that slugifies to
+ * nothing — means upstream data moved in a way the roster can't represent;
+ * both abort generation rather than silently dropping a record. `noun` names
+ * the record kind in those errors, e.g. `weapon`.
+ */
+export type IdAssigner = (name: string) => string;
+
+export function createIdAssigner(noun: string): IdAssigner {
+  const nameById = new Map<string, string>();
+
+  return (name) => {
+    const id = toKebabCase(name);
+    if (!id) throw new Error(`Empty id for ${noun} "${name}"`);
+
+    const collision = nameById.get(id);
+    if (collision) {
+      throw new Error(`Duplicate ${noun} id "${id}" from "${collision}" and "${name}"`);
+    }
+    nameById.set(id, name);
+
+    return id;
+  };
+}
