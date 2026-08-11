@@ -4,6 +4,7 @@
 
 import { Command } from 'commander';
 
+import { generateArtifactSets } from './artifacts.js';
 import { generateWeapons } from './weapons.js';
 
 const program = new Command();
@@ -18,6 +19,14 @@ program
   .action((): void => {
     const count = generateWeapons();
     console.log(`Generated ${count} weapons into @genshin/game-data`);
+  });
+
+program
+  .command('artifacts')
+  .description('Regenerate the artifact set roster in @genshin/game-data/src/artifacts.ts')
+  .action((): void => {
+    const count = generateArtifactSets();
+    console.log(`Generated ${count} artifact sets into @genshin/game-data`);
   });
 
 program.parse();
