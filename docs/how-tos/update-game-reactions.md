@@ -84,6 +84,6 @@ LUNAR_CRYSTALLIZE: {
 
 ## See also
 
-- [Update Genshin Impact Game Characters](update-game-characters.md)
+- [Regenerate Genshin Impact Characters](update-game-characters.md)
 - [Update Genshin Impact Game Weapons](update-game-weapons.md)
 - [Update Genshin Impact Artifact Sets](update-game-artifacts.md)

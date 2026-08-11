@@ -41,6 +41,6 @@ with no mapping. To add one:
 
 ## See also
 
-- [Add Genshin Impact Characters](update-game-characters.md)
+- [Regenerate Genshin Impact Characters](update-game-characters.md)
 - [Update Elemental Reactions](update-game-reactions.md)
 - [Update Genshin Impact Artifact Sets](update-game-artifacts.md)

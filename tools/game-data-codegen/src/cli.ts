@@ -4,6 +4,7 @@
 
 import { Command } from 'commander';
 
+import { generateCharacters } from './characters.js';
 import { generateWeapons } from './weapons.js';
 
 const program = new Command();
@@ -13,8 +14,16 @@ program
   .description('Generate @genshin/game-data sources from the offline genshin-db dataset');
 
 program
+  .command('characters')
+  .description('Regenerate the character roster in @genshin/game-data/src/characters.generated.ts')
+  .action((): void => {
+    const count = generateCharacters();
+    console.log(`Generated ${count} characters into @genshin/game-data`);
+  });
+
+program
   .command('weapons')
-  .description('Regenerate the weapon roster in @genshin/game-data/src/weapons.ts')
+  .description('Regenerate the weapon roster in @genshin/game-data/src/weapons.generated.ts')
   .action((): void => {
     const count = generateWeapons();
     console.log(`Generated ${count} weapons into @genshin/game-data`);

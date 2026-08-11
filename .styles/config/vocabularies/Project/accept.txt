@@ -13,13 +13,14 @@ Genshin
 Genshin Impact
 genshin.dungeon.studio
 
-# Game terms: elements and weapon types
+# Game terms: elements, weapon types, and characters
 Anemo
 Cryo
 Dendro
 Electro
 Geo
 Hydro
+Manekins?
 Polearm
 Pyro
 
