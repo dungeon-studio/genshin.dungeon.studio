@@ -75,7 +75,7 @@ autolabeler:
   - label: 'chore'
     title:
       - '/^(chore|build)(?!\(deps)(\(.+\))?:/i'
-      - '/^(ci|style|refactor|test|perf)(\(.+\))?:/i'
+      - '/^(ci|style|refactor|test|perf|revert)(\(.+\))?:/i'
   - label: 'breaking-change'
     title:
       - '/^\w+(\(.+\))?!:/'
