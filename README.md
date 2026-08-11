@@ -55,3 +55,7 @@ See the [Manual Setup Guide](./docs/how-tos/manual-setup.md) for Node.js 20+ and
 - **Documentation**: Browse [docs/](./docs/) for how-tos, references, and explanations
 - **Planning & Roadmap**: See [GitHub Issues & Milestones](https://github.com/dungeon-studio/genshin.dungeon.studio/milestones) for what's next
 - **License**: [MIT](./LICENSE)
+
+## Not affiliated with HoYoverse
+
+Genshin Planner is an unofficial fan project. It's not affiliated with, endorsed by, or sponsored by HoYoverse. Genshin Impact and all related names, characters, and artwork are trademarks and copyright of COGNOSPHERE PTE. LTD. Game data is presented for reference and may be inaccurate or out of date.
