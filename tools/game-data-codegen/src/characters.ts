@@ -8,6 +8,7 @@ import { dirname, resolve } from 'node:path';
 import { compareVersions, ELEMENTS } from '@genshin/game-data';
 import type { Element, Rarity, WeaponType } from '@genshin/game-data';
 import genshinDb from 'genshin-db';
+import type { Character as DbCharacter } from 'genshin-db';
 
 import { CHARACTER_RELEASE_DATES } from './character-release-dates.js';
 import { toKebabCase } from './slug.js';
@@ -47,64 +48,82 @@ export interface GeneratedCharacter {
   releaseDate: string;
 }
 
+function isRosterMember(record: DbCharacter | undefined): record is DbCharacter {
+  if (!record) return false;
+  // `ELEMENT_NONE` marks the element-borrowing cast — the Traveler and the
+  // Wonderland Manekins — who have no fixed element to file them under.
+  if (record.elementType === 'ELEMENT_NONE') return false;
+  return !EXCLUDED_IDS.has(toKebabCase(record.name));
+}
+
+function toCharacter(record: DbCharacter): GeneratedCharacter {
+  const id = toKebabCase(record.name);
+  if (!id) throw new Error(`Character name "${record.name}" produced an empty id`);
+
+  const element = ELEMENT_BY_GENSHIN_DB[record.elementType];
+  if (!element) throw new Error(`Unknown element "${record.elementType}" for ${record.name}`);
+
+  const weaponType = WEAPON_TYPE_BY_GENSHIN_DB[record.weaponType];
+  if (!weaponType) {
+    throw new Error(`Unknown weapon type "${record.weaponType}" for ${record.name}`);
+  }
+
+  const releaseDate = CHARACTER_RELEASE_DATES[id];
+  if (!releaseDate) {
+    throw new Error(
+      `No release date for "${id}"; add the debut-banner date to CHARACTER_RELEASE_DATES`,
+    );
+  }
+
+  return {
+    id,
+    name: record.name,
+    element,
+    weaponType,
+    rarity: record.rarity,
+    region: record.region || UNKNOWN_REGION,
+    version: record.version,
+    releaseDate,
+  };
+}
+
+/** 5-star first, then version descending (newest first), then name for stability. */
+function byRosterOrder(a: GeneratedCharacter, b: GeneratedCharacter): number {
+  return (
+    b.rarity - a.rarity || compareVersions(b.version, a.version) || a.name.localeCompare(b.name)
+  );
+}
+
+/**
+ * Two characters sharing an id would silently collapse into one roster entry,
+ * and the survivor would depend on emission order.
+ */
+function assertUniqueIds(characters: readonly GeneratedCharacter[]): void {
+  const nameById = new Map<string, string>();
+
+  for (const { id, name } of characters) {
+    const collision = nameById.get(id);
+    if (collision) {
+      throw new Error(`Duplicate character id "${id}" from "${collision}" and "${name}"`);
+    }
+    nameById.set(id, name);
+  }
+}
+
 export function buildCharacters(): GeneratedCharacter[] {
   genshinDb.setOptions({
     queryLanguages: [genshinDb.Language.English],
     resultLanguage: genshinDb.Language.English,
   });
 
-  const names = genshinDb.characters('names', { matchCategories: true });
-  const characters: GeneratedCharacter[] = [];
-  const idToName = new Map<string, string>();
+  const characters = genshinDb
+    .characters('names', { matchCategories: true })
+    .map((name) => genshinDb.characters(name))
+    .filter(isRosterMember)
+    .map(toCharacter)
+    .sort(byRosterOrder);
 
-  for (const name of names) {
-    const record = genshinDb.characters(name);
-    // `ELEMENT_NONE` marks the element-borrowing cast — the Traveler and the
-    // Wonderland Manekins — who have no fixed element to file them under.
-    if (!record || record.elementType === 'ELEMENT_NONE') continue;
-
-    const id = toKebabCase(record.name);
-    if (!id) throw new Error(`Character name "${record.name}" produced an empty id`);
-    if (EXCLUDED_IDS.has(id)) continue;
-
-    const collision = idToName.get(id);
-    if (collision) {
-      throw new Error(`Duplicate character id "${id}" from "${collision}" and "${record.name}"`);
-    }
-    idToName.set(id, record.name);
-
-    const element = ELEMENT_BY_GENSHIN_DB[record.elementType];
-    if (!element) throw new Error(`Unknown element "${record.elementType}" for ${record.name}`);
-
-    const weaponType = WEAPON_TYPE_BY_GENSHIN_DB[record.weaponType];
-    if (!weaponType) {
-      throw new Error(`Unknown weapon type "${record.weaponType}" for ${record.name}`);
-    }
-
-    const releaseDate = CHARACTER_RELEASE_DATES[id];
-    if (!releaseDate) {
-      throw new Error(
-        `No release date for "${id}"; add the debut-banner date to CHARACTER_RELEASE_DATES`,
-      );
-    }
-
-    characters.push({
-      id,
-      name: record.name,
-      element,
-      weaponType,
-      rarity: record.rarity,
-      region: record.region || UNKNOWN_REGION,
-      version: record.version,
-      releaseDate,
-    });
-  }
-
-  // 5-star first, then version descending (newest first), then name for stability.
-  characters.sort(
-    (a, b) =>
-      b.rarity - a.rarity || compareVersions(b.version, a.version) || a.name.localeCompare(b.name),
-  );
+  assertUniqueIds(characters);
 
   return characters;
 }
