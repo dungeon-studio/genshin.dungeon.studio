@@ -11,6 +11,10 @@ on:
     paths:
       - 'apps/web/**'
       - 'apps/api/**'
+      # The apps bundle the workspace packages and resolve their transitive
+      # dependencies through the root lockfile.
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
       - '.github/workflows/deploy.yml'
       - '.github/actions/setup-node-pnpm/**'
       - '.github/actions/setup-playwright/**'
