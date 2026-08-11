@@ -21,7 +21,7 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
     });
 
     return unsubscribe;
-  }, [auth]);
+  }, []);
 
   return <AuthContext value={{ user, loading }}>{children}</AuthContext>;
 }
