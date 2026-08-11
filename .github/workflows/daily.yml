@@ -93,6 +93,9 @@ jobs:
           days-before-issue-close: -1
           days-before-pr-stale: 30
           days-before-pr-close: 14
+          # The action defaults to `Stale`; without this it recreates that
+          # label rather than reusing the repository's lowercase one.
+          stale-pr-label: stale
           # Closing a Renovate pull request tells Renovate the version is
           # unwanted and it will not re-offer it. Renovate labels nothing by
           # default, so this depends on renovate.json applying the label.
