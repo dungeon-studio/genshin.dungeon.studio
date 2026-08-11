@@ -4,7 +4,7 @@
 import type { ProblemDetail } from '@genshin/domain';
 import { GoogleError, Status } from 'google-gax';
 import { HTTPException } from 'hono/http-exception';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 import { ProblemException } from '@/http/problem.js';
 
@@ -17,7 +17,6 @@ function googleError(code: Status): GoogleError {
 }
 
 beforeAll(() => {
-  vi.spyOn(console, 'error').mockImplementation(() => undefined);
   app.get('/__test/resource-exhausted', () => {
     throw googleError(Status.RESOURCE_EXHAUSTED);
   });

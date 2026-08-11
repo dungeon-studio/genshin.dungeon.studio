@@ -7,11 +7,12 @@ import { GoogleError } from 'google-gax';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
-import { logger } from 'hono/logger';
 
 import { ABOUT_BLANK, problemResponse, problemTypeOf } from '@/http/problem.js';
 import { allow } from '@/middleware/allow.js';
 import type { AuthVariables } from '@/middleware/auth.js';
+import type { RequestLogVariables } from '@/middleware/log-request.js';
+import { logRequest } from '@/middleware/log-request.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { firestoreErrorToHttpException } from '@/repositories/firestore-error.js';
 import { alpsProfiles } from '@/routes/alps-profiles.js';
@@ -24,11 +25,11 @@ import { userProfile } from '@/routes/user-profile.js';
 import { weapons } from '@/routes/weapons.js';
 
 export const app = new Hono<{
-  Variables: Partial<AuthVariables> & NegotiatedResponseContentVariables;
+  Variables: Partial<AuthVariables> & NegotiatedResponseContentVariables & RequestLogVariables;
 }>();
 
-// Request logging middleware
-app.use('*', logger());
+// Must run first; everything after it reads the request logger off the context
+app.use('*', logRequest);
 
 // Must precede CORS, which short-circuits OPTIONS before this could run
 app.use('*', allow(app));
@@ -60,7 +61,7 @@ app.onError((err, c) => {
     });
   }
 
-  console.error('Unexpected error:', resolved);
+  c.get('logger').error({ err: resolved }, 'request failed unexpectedly');
   return problemResponse(c, {
     type: ABOUT_BLANK,
     title: 'Internal Server Error',

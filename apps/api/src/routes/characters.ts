@@ -14,23 +14,17 @@ import { HTTPException } from 'hono/http-exception';
 import type { FromSchema } from 'json-schema-to-ts';
 
 import { requireCharacterId } from '@/catalogue.js';
-import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
-import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
-import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
-import type { ValidatedRequestBodyVariables } from '@/middleware/validate-request-body.js';
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { characterItemV1 } from '@/profiles/alps/character/item-v1.js';
 import { characterPutRequestV1 } from '@/profiles/json-schema/characters/put-request-v1.js';
 import * as Characters from '@/repositories/characters/index.js';
+import type { AuthenticatedRouteVariables } from '@/routes/variables.js';
 
 export const characters = new Hono<{
-  Variables: AuthVariables &
-    NegotiatedResponseContentVariables &
-    NegotiatedRequestSchemaVariables &
-    ValidatedRequestBodyVariables;
+  Variables: AuthenticatedRouteVariables;
 }>();
 
 characters.use('*', auth);

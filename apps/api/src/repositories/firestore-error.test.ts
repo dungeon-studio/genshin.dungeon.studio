@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { GoogleError, Status } from 'google-gax';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { firestoreErrorToHttpException } from './firestore-error.js';
 
@@ -14,10 +14,6 @@ function googleError(code?: Status): GoogleError {
   err.code = code;
   return err;
 }
-
-beforeEach(() => {
-  vi.spyOn(console, 'error').mockImplementation(() => undefined);
-});
 
 describe('firestoreErrorToHttpException', () => {
   it('lets a client retry an exhausted quota', () => {

@@ -13,6 +13,8 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    // Error-path suites log by design; silence keeps the run readable.
+    env: { LOG_LEVEL: 'silent' },
     // Spread the defaults: assigning `exclude` replaces them, which would drop
     // node_modules and dist from the ignore list.
     exclude: [...configDefaults.exclude, '**/*.integration.test.ts'],

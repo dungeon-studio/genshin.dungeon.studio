@@ -14,4 +14,12 @@ export default defineConfig([
       globals: globals.node,
     },
   },
+  {
+    // Server code logs through `@/logger.js`. `scripts/` is outside the scope:
+    // those run in a terminal, where console output is the report.
+    files: ['src/**/*.ts'],
+    rules: {
+      'no-console': 'error',
+    },
+  },
 ]);
