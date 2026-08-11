@@ -20,7 +20,7 @@ than Trivy's own defaults.
 ## Prerequisites
 
 Install Trivy following the
-[official instructions](https://aquasecurity.github.io/trivy/latest/getting-started/installation/).
+[official instructions](https://trivy.dev/docs/latest/getting-started/installation/).
 
 ## Scan Terraform
 

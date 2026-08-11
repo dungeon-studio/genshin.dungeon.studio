@@ -239,4 +239,4 @@ Verify deployment via:
 - [dsgep-001-wif-architecture.md](dsgep-001-wif-architecture.md): Related: GCP authentication strategy
 - [Cache Control Headers (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control)
 - [Cloud Storage Static Website Hosting](https://cloud.google.com/storage/docs/hosting-static-website)
-- [SPA Routing in Static Hosting](https://firebase.google.com/docs/hosting/redirect-behavior#spa)
+- [Firebase Hosting Rewrites](https://firebase.google.com/docs/hosting/full-config#rewrites): SPA routing in static hosting
