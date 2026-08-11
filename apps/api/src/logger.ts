@@ -21,45 +21,44 @@ const SEVERITY_BY_LEVEL: Record<string, string> = {
 
 /**
  * Keys whose values never reach a log sink: bearer credentials, and the
- * identifiers that tie a request to a person.
+ * identifiers that tie a request to a person. `user` is one of them because a
+ * decoded Firebase ID token is sensitive whole — uid, email, and the raw claims
+ * it was minted from.
  *
- * The list is deliberately wider than the call sites that exist today —
- * redaction is the net under future logging, not a description of the current
- * one. A leading `*` matches any single ancestor key, so `err.token` and
- * `payload.token` are both covered without naming either.
+ * Deliberately wider than the call sites that exist today: redaction is the net
+ * under future logging, not a description of the current one.
+ */
+const SENSITIVE_KEYS = ['authorization', 'token', 'idToken', 'user', 'uid', 'email'];
+
+/**
+ * Every sensitive key at the top level and one below it — a leading `*` matches
+ * a single ancestor, so `err.token` and `payload.token` are both covered without
+ * naming either. Anything deeper has to be spelled out.
  */
 const REDACTED_PATHS = [
-  'authorization',
-  '*.authorization',
+  ...SENSITIVE_KEYS.flatMap((key) => [key, `*.${key}`]),
   'req.headers.authorization',
-  'token',
-  '*.token',
-  'idToken',
-  '*.idToken',
-  // A decoded Firebase ID token is sensitive whole: uid, email, and the raw
-  // claims it was minted from.
-  'user',
-  '*.user',
-  'uid',
-  '*.uid',
-  'email',
-  '*.email',
 ];
+
+/** The only things a caller may vary; both exist so tests can read the output. */
+interface LoggerSettings {
+  /** Takes precedence over `LOG_LEVEL`. */
+  level?: LoggerOptions['level'];
+  /** Where lines are written. Defaults to stdout. */
+  destination?: DestinationStream;
+}
 
 /**
  * Build a logger emitting single-line JSON that Cloud Logging and Loki both
  * read: `severity` for the level, `message` for the text, ISO-8601 `time`.
  *
- * @param overrides - pino options replacing the defaults; for tests.
- * @param destination - where lines are written, stdout when omitted.
+ * The rest of the configuration is fixed rather than merged from an argument,
+ * so redaction cannot be switched off from a call site.
  */
-export function createLogger(
-  overrides: LoggerOptions = {},
-  destination?: DestinationStream,
-): Logger {
+export function createLogger({ level, destination }: LoggerSettings = {}): Logger {
   return pino(
     {
-      level: process.env.LOG_LEVEL ?? 'info',
+      level: level ?? process.env.LOG_LEVEL ?? 'info',
       messageKey: 'message',
       timestamp: pino.stdTimeFunctions.isoTime,
       formatters: {
@@ -69,7 +68,6 @@ export function createLogger(
         }),
       },
       redact: { paths: REDACTED_PATHS },
-      ...overrides,
     },
     destination,
   );

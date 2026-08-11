@@ -13,27 +13,19 @@ import {
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
-import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
-import type { RequestLogVariables } from '@/middleware/log-request.js';
-import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
-import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
-import type { ValidatedRequestBodyVariables } from '@/middleware/validate-request-body.js';
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { teamItemV1 } from '@/profiles/alps/team/item-v1.js';
 import { teamPutRequestV1 } from '@/profiles/json-schema/teams/put-request-v1.js';
 import * as Characters from '@/repositories/characters/index.js';
 import * as Teams from '@/repositories/teams/index.js';
 import * as Weapons from '@/repositories/weapons/index.js';
+import type { AuthenticatedRouteVariables } from '@/routes/variables.js';
 
 export const teams = new Hono<{
-  Variables: AuthVariables &
-    NegotiatedResponseContentVariables &
-    RequestLogVariables &
-    NegotiatedRequestSchemaVariables &
-    ValidatedRequestBodyVariables;
+  Variables: AuthenticatedRouteVariables;
 }>();
 
 teams.use('*', auth);

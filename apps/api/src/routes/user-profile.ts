@@ -6,29 +6,21 @@ import type { DecodedIdToken } from 'firebase-admin/auth';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
-import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
-import type { RequestLogVariables } from '@/middleware/log-request.js';
-import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
-import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
-import type { ValidatedRequestBodyVariables } from '@/middleware/validate-request-body.js';
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { profileGetResponseV1 } from '@/profiles/json-schema/profile/get-response-v1.js';
 import { profilePatchRequestV1 } from '@/profiles/json-schema/profile/patch-request-v1.js';
 import * as Profile from '@/repositories/profile/index.js';
+import type { AuthenticatedRouteVariables } from '@/routes/variables.js';
 
 function toAuthIdentity({ uid, email, email_verified, picture }: DecodedIdToken): AuthIdentity {
   return { uid, email, emailVerified: email_verified, picture };
 }
 
 export const userProfile = new Hono<{
-  Variables: AuthVariables &
-    NegotiatedResponseContentVariables &
-    RequestLogVariables &
-    NegotiatedRequestSchemaVariables &
-    ValidatedRequestBodyVariables;
+  Variables: AuthenticatedRouteVariables;
 }>();
 
 userProfile.use('*', auth);

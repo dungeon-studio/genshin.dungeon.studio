@@ -13,13 +13,13 @@ import { logger } from '@/logger.js';
 //
 // The emulator ports are hardcoded to match firebase.json at the repository root.
 if (process.env.DEV === 'true') {
-  process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
-  process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8181';
+  const authEmulatorHost = 'localhost:9099';
+  const firestoreEmulatorHost = 'localhost:8181';
+
+  process.env.FIREBASE_AUTH_EMULATOR_HOST = authEmulatorHost;
+  process.env.FIRESTORE_EMULATOR_HOST = firestoreEmulatorHost;
   process.env.GOOGLE_CLOUD_PROJECT = 'demo-dungeon-studio-genshin-dev';
-  logger.info(
-    { authEmulatorHost: 'localhost:9099', firestoreEmulatorHost: 'localhost:8181' },
-    'firebase using local emulators',
-  );
+  logger.info({ authEmulatorHost, firestoreEmulatorHost }, 'firebase using local emulators');
 }
 
 // `||`, not `??`: a blank `GOOGLE_CLOUD_PROJECT` means unset.
