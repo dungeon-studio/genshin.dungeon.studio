@@ -112,6 +112,6 @@ pnpm --filter @genshin/game-data lint
 
 ## See also
 
-- [Add Genshin Impact Characters](update-game-characters.md)
+- [Regenerate Genshin Impact Characters](update-game-characters.md)
 - [Add Genshin Impact Weapons](update-game-weapons.md)
 - [Update Elemental Reactions](update-game-reactions.md)

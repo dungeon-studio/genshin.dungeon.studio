@@ -9,8 +9,10 @@ allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 Follow the conventions in
 [`copilot-instructions.md`](../../.github/copilot-instructions.md).
 
-Add or update game data in `packages/game-data`. Use
-[`characters.ts`](../../packages/game-data/src/characters.ts) as a reference for
+Add or update game data in `packages/game-data`. Characters and weapons are
+generated from `genshin-db`; their how-tos below cover regeneration. For
+hand-maintained data, use
+[`artifacts.ts`](../../packages/game-data/src/artifacts.ts) as a reference for
 data array structure and sort order.
 
 ## Inputs
