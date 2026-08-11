@@ -18,11 +18,11 @@ export function toKebabCase(name: string): string {
 }
 
 /**
- * Builds the id assigner for one roster, remembering the names it has seen.
+ * Builds an assigner that rejects names it has already seen.
  *
- * Ids are slugs of display names, so a collision (or a name that slugifies to
- * nothing) means upstream data moved in a way the roster can't represent.
- * Both abort generation rather than silently dropping a record. `noun` names
+ * Ids are slugs of display names, so a collision — or a name that slugifies to
+ * nothing — means upstream data moved in a way the roster can't represent;
+ * both abort generation rather than silently dropping a record. `noun` names
  * the record kind in those errors, e.g. `weapon`.
  */
 export function createIdAssigner(noun: string): (name: string) => string {

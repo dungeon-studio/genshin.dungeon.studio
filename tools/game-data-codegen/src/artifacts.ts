@@ -29,8 +29,8 @@ export function buildArtifactSets(): GeneratedArtifactSet[] {
     const record = genshinDb.artifacts(name);
     if (!record?.rarityList.includes(ENDGAME_RARITY)) continue;
 
-    // The single-piece circlet sets (Prayers for Illumination and friends) cap
-    // at 4 stars, so anything here without both bonuses is upstream drift.
+    // Only the single-piece circlet sets carry one bonus, and they cap at
+    // 4 stars, so a 5-star set missing either is upstream drift.
     if (!record.effect2Pc || !record.effect4Pc) {
       throw new Error(`Artifact set "${record.name}" is missing a 2- or 4-piece bonus`);
     }
@@ -43,7 +43,7 @@ export function buildArtifactSets(): GeneratedArtifactSet[] {
     });
   }
 
-  // Version descending (newest first), then name for stability.
+  // Newest first; names break ties so regeneration stays deterministic.
   sets.sort((a, b) => compareVersions(b.version, a.version) || a.name.localeCompare(b.name));
 
   return sets;

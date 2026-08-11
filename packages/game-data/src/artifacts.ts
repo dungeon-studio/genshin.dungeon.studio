@@ -34,9 +34,9 @@ export interface ArtifactSet {
 }
 
 /**
- * Artifact sets with 5-star pieces, sorted by version descending (newest first).
+ * Artifact sets with 5-star pieces, newest release first.
  *
- * Lower-rarity sets are levelling fodder and are left out of the roster.
+ * Lower-rarity sets are levelling fodder, so they never enter the roster.
  */
 export const ARTIFACT_SETS: readonly ArtifactSet[] = ARTIFACT_SET_DATA;
 

@@ -4,10 +4,8 @@
 import genshinDb from 'genshin-db';
 
 /**
- * Pins queries and results to English.
- *
- * Ids and display names are derived from the returned strings, so a generator
- * that inherited another language would rewrite every id in its roster.
+ * Ids and display names derive from the strings genshin-db returns, so a
+ * generator that inherited another language would rewrite every id it emits.
  */
 export function queryInEnglish(): void {
   genshinDb.setOptions({

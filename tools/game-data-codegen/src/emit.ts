@@ -16,7 +16,10 @@ export interface GeneratedModule {
   entries: readonly string[];
 }
 
-/** Locates a generated module inside the `@genshin/game-data` workspace package. */
+/**
+ * Generators run from their own `dist/`, so generated modules are located
+ * through the workspace link rather than relative to this file.
+ */
 function resolveGeneratedPath(path: string): string {
   const require = createRequire(import.meta.url);
   const packageJson = require.resolve('@genshin/game-data/package.json');
@@ -44,7 +47,6 @@ function serializeModule({ exportName, command, entries }: GeneratedModule): str
   ].join('\n');
 }
 
-/** Writes one roster into `@genshin/game-data`, overwriting the previous generation. */
 export function writeGeneratedModule(module: GeneratedModule): void {
   writeFileSync(resolveGeneratedPath(module.path), serializeModule(module));
 }
