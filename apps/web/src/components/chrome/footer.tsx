@@ -99,6 +99,10 @@ export function Footer(): JSX.Element {
           Game data current as of {GAME_DATA_VERSION}
         </p>
         <p className="mt-1 text-xs text-muted-foreground/70">© 2026 Dungeon Studio</p>
+        <p className="mt-1 text-xs text-muted-foreground/70">
+          Not affiliated with or endorsed by HoYoverse. Genshin Impact is a trademark of COGNOSPHERE
+          PTE. LTD.
+        </p>
       </Container>
     </footer>
   );
