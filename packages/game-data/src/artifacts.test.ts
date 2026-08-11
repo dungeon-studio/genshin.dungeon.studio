@@ -5,10 +5,20 @@ import { describe, expect, it } from 'vitest';
 
 import {
   ARTIFACT_MINOR_AFFIXES,
+  ARTIFACT_SETS,
   CIRCLET_MAIN_AFFIXES,
   GOBLET_MAIN_AFFIXES,
   SANDS_MAIN_AFFIXES,
 } from './artifacts.js';
+
+describe('ARTIFACT_SETS roster', () => {
+  it('is not empty', () => {
+    // Structural invariants (unique kebab ids, both bonuses, sort order) are
+    // guaranteed by the generator. This only catches a generation that
+    // silently produced nothing.
+    expect(ARTIFACT_SETS.length).toBeGreaterThan(0);
+  });
+});
 
 describe('artifact affix constants', () => {
   it('SANDS_MAIN_AFFIXES has no duplicates', () => {
