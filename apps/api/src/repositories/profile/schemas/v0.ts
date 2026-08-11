@@ -4,7 +4,7 @@
 import { defineVersion } from 'verzod';
 import { z } from 'zod';
 
-export const V0ProfileSchema = z.object({
+const V0ProfileSchema = z.object({
   name: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),

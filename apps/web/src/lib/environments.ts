@@ -15,7 +15,7 @@ export const ENVIRONMENT_NAMES = ['dev', 'staging', 'prod'] as const;
 
 export type EnvironmentName = (typeof ENVIRONMENT_NAMES)[number];
 
-export interface Badge {
+interface Badge {
   /** Shown in the document title and the mark's accessible name. */
   label: string;
   /** Overlaid on the favicon by the brand-asset generator. */

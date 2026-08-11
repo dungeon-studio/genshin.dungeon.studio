@@ -48,7 +48,7 @@ export function CharactersPage(): JSX.Element {
     return (
       <Container className="py-12">
         <h1 className="sr-only">Characters</h1>
-        <div className="flex items-center justify-center py-24">
+        <div className="py-24 flex items-center justify-center">
           <Loader2
             className="h-8 w-8 animate-spin text-muted-foreground"
             aria-hidden="true"
@@ -64,10 +64,10 @@ export function CharactersPage(): JSX.Element {
     <>
       <h1 className="sr-only">Characters</h1>
 
-      <div className="sticky top-0 z-10 bg-background shadow-sm">
+      <div className="top-0 shadow-sm sticky z-10 bg-background">
         <Container className="py-4">
           {error && (
-            <p className="mb-3 rounded-md bg-destructive/10 px-4 py-3 text-center text-sm text-destructive">
+            <p className="mb-3 px-4 py-3 text-sm rounded-md bg-destructive/10 text-center text-destructive">
               Failed to sync collection. Local data is still available.
             </p>
           )}
@@ -84,7 +84,7 @@ export function CharactersPage(): JSX.Element {
       </div>
 
       <Container className="pb-12 pt-4">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 grid grid-cols-1">
           {filteredCharacters.map((character) => {
             const owned = isOwned(character.id);
             const entry = owned ? characters[character.id] : undefined;

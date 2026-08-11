@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPut } from '@/lib/api';
 import { invalidateUserQuery } from '@/lib/invalidate-user-query';
+import { userScopedKey } from '@/lib/user-scoped-key';
 
 export interface SaveTeamPayload {
   slot: TeamSlot;
@@ -17,18 +18,16 @@ export interface SaveTeamPayload {
   description?: string;
 }
 
-export function teamKey(userId: string): readonly [string, string] {
-  return ['teams', userId] as const;
-}
+const teamsKey = userScopedKey('teams');
 
-export function parseTeamsResponse(response: unknown): CollectionTeam[] {
+function parseTeamsResponse(response: unknown): CollectionTeam[] {
   assertCollectionDocument(response);
   return response.collection.items.map((item) => deserialiseTeam(item));
 }
 
 export function useTeamsQuery(userId: string | undefined): UseQueryResult<CollectionTeam[], Error> {
   return useQuery({
-    queryKey: teamKey(userId ?? ''),
+    queryKey: teamsKey(userId ?? ''),
     queryFn: async () => {
       const response = await apiGet('/teams');
       return parseTeamsResponse(response);
@@ -46,7 +45,7 @@ export function useSaveTeamMutation(
     mutationFn: async ({ slot, name, members, description }: SaveTeamPayload) => {
       await apiPut(`/teams/${encodeURIComponent(slot)}`, { name, members, description });
     },
-    onSuccess: invalidateUserQuery(queryClient, userId, teamKey),
+    onSuccess: invalidateUserQuery(queryClient, userId, teamsKey),
   });
 }
 
@@ -59,6 +58,6 @@ export function useDeleteTeamMutation(
     mutationFn: async (slot: TeamSlot) => {
       await apiDelete(`/teams/${encodeURIComponent(slot)}`);
     },
-    onSuccess: invalidateUserQuery(queryClient, userId, teamKey),
+    onSuccess: invalidateUserQuery(queryClient, userId, teamsKey),
   });
 }

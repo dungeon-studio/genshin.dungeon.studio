@@ -7,8 +7,6 @@ import Negotiator from 'negotiator';
 
 import type { ProfileLink } from '@/middleware/profile-link.js';
 
-export type { ProfileLink } from '@/middleware/profile-link.js';
-
 /**
  * A representation the endpoint can produce.
  *

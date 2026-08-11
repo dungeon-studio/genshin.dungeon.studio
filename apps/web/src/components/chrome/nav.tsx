@@ -16,14 +16,14 @@ export function Nav(): JSX.Element {
   return (
     <nav className="border-b border-border bg-muted" aria-label="Main navigation">
       <Container>
-        <div className="flex gap-8">
+        <div className="gap-8 flex">
           {navLinks.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
               end={link.to === '/'}
               className={({ isActive }) =>
-                `inline-block border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
+                `px-1 py-4 text-sm font-medium inline-block border-b-2 transition-colors ${
                   isActive
                     ? 'border-primary text-foreground'
                     : 'border-transparent text-muted-foreground hover:border-primary hover:text-foreground'

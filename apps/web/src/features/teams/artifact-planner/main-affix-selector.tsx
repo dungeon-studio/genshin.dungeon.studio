@@ -15,12 +15,12 @@ export function MainAffixSelector<T extends string>({
   onChange: (value: T | undefined) => void;
 }): JSX.Element {
   return (
-    <label className="block space-y-1">
+    <label className="space-y-1 block">
       <span className="text-xs font-medium text-card-foreground">{label}</span>
       <select
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value === '' ? undefined : (e.target.value as T))}
-        className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-xs text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="px-2 py-1.5 text-xs w-full rounded-md border border-border bg-background text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
       >
         <option value="">Select main stat...</option>
         {options.map((option) => (

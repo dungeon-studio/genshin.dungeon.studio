@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPatch, apiPost } from '@/lib/api';
 import { invalidateUserQuery } from '@/lib/invalidate-user-query';
+import { userScopedKey } from '@/lib/user-scoped-key';
 
 type WeaponRecord = Record<CollectionWeaponId, CollectionWeapon>;
 
@@ -16,11 +17,9 @@ export interface WeaponMutationResult {
   weapon: CollectionWeapon;
 }
 
-export function weaponCollectionKey(userId: string): readonly [string, string] {
-  return ['weapons', userId] as const;
-}
+const weaponsKey = userScopedKey('weapons');
 
-export function parseWeaponCollectionResponse(response: unknown): WeaponRecord {
+function parseWeaponCollectionResponse(response: unknown): WeaponRecord {
   assertCollectionDocument(response);
   const record: WeaponRecord = {};
 
@@ -47,7 +46,7 @@ export function useWeaponCollectionQuery(
   userId: string | undefined,
 ): UseQueryResult<WeaponRecord, Error> {
   return useQuery({
-    queryKey: weaponCollectionKey(userId ?? ''),
+    queryKey: weaponsKey(userId ?? ''),
     queryFn: async () => {
       const response = await apiGet('/weapons');
       return parseWeaponCollectionResponse(response);
@@ -69,7 +68,7 @@ export function useAddWeaponMutation(
       });
       return parseSingleWeaponResponse(response);
     },
-    onSuccess: invalidateUserQuery(queryClient, userId, weaponCollectionKey),
+    onSuccess: invalidateUserQuery(queryClient, userId, weaponsKey),
   });
 }
 
@@ -82,7 +81,7 @@ export function useRemoveWeaponMutation(
     mutationFn: async (collectionWeaponId: CollectionWeaponId) => {
       await apiDelete(`/weapons/${encodeURIComponent(collectionWeaponId)}`);
     },
-    onSuccess: invalidateUserQuery(queryClient, userId, weaponCollectionKey),
+    onSuccess: invalidateUserQuery(queryClient, userId, weaponsKey),
   });
 }
 
@@ -108,6 +107,6 @@ export function useSetRefinementLevelMutation(
       });
       return parseSingleWeaponResponse(response);
     },
-    onSuccess: invalidateUserQuery(queryClient, userId, weaponCollectionKey),
+    onSuccess: invalidateUserQuery(queryClient, userId, weaponsKey),
   });
 }

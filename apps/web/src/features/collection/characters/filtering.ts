@@ -3,9 +3,9 @@
 
 import type { Character, Element, Rarity } from '@genshin/game-data';
 
-export type OwnershipFilter = 'all' | 'owned' | 'unowned';
-export type SortField = 'release' | 'name';
-export type SortDirection = 'asc' | 'desc';
+import type { OwnershipFilter, SortDirection } from '@/lib/collection-filters';
+
+type SortField = 'release' | 'name';
 
 export interface CharacterFilterState {
   search: string;

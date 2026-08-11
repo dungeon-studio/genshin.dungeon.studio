@@ -28,8 +28,8 @@ export function ItemSummary({ icon, item, emptyLabel }: ItemSummaryProps): JSX.E
       <div className="min-w-0 flex-1">
         {item ? (
           <>
-            <p className="truncate text-sm font-semibold text-card-foreground">{item.name}</p>
-            <p className="truncate text-xs text-muted-foreground">
+            <p className="text-sm font-semibold truncate text-card-foreground">{item.name}</p>
+            <p className="text-xs truncate text-muted-foreground">
               <span className="text-geo-dark" aria-hidden="true">
                 {item.rarity}★
               </span>
@@ -38,7 +38,7 @@ export function ItemSummary({ icon, item, emptyLabel }: ItemSummaryProps): JSX.E
             </p>
           </>
         ) : (
-          <p className="truncate text-sm font-semibold text-muted-foreground">{emptyLabel}</p>
+          <p className="text-sm font-semibold truncate text-muted-foreground">{emptyLabel}</p>
         )}
       </div>
     </>

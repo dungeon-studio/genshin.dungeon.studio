@@ -30,7 +30,7 @@ export function ArtifactPlanner({ plan, onChange }: ArtifactPlannerProps): JSX.E
 
   return (
     <div className="space-y-3">
-      <span className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+      <span className="gap-2 text-sm font-medium flex items-center text-muted-foreground">
         <Shield className="h-4 w-4" aria-hidden="true" focusable={false} />
         Artifact Plan
       </span>
