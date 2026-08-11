@@ -7,7 +7,7 @@ import genshinDb from 'genshin-db';
 import type { Character as DbCharacter } from 'genshin-db';
 
 import { CHARACTER_RELEASE_DATES } from './character-release-dates.js';
-import { writeGeneratedModule } from './emit.js';
+import { serializeEntry, writeGeneratedModule } from './emit.js';
 import { queryInEnglish } from './language.js';
 import { createIdAssigner, toKebabCase, type IdAssigner } from './slug.js';
 import { WEAPON_TYPE_BY_GENSHIN_DB } from './weapons.js';
@@ -98,18 +98,16 @@ export function buildCharacters(): GeneratedCharacter[] {
 }
 
 function serializeCharacter(character: GeneratedCharacter): string {
-  return [
-    '  {',
-    `    id: '${character.id}',`,
-    `    name: ${JSON.stringify(character.name)},`,
-    `    element: '${character.element}',`,
-    `    weaponType: '${character.weaponType}',`,
-    `    rarity: ${character.rarity},`,
-    `    region: ${JSON.stringify(character.region)},`,
-    `    version: '${character.version}',`,
-    `    releaseDate: '${character.releaseDate}',`,
-    '  },',
-  ].join('\n');
+  return serializeEntry([
+    `id: '${character.id}',`,
+    `name: ${JSON.stringify(character.name)},`,
+    `element: '${character.element}',`,
+    `weaponType: '${character.weaponType}',`,
+    `rarity: ${character.rarity},`,
+    `region: ${JSON.stringify(character.region)},`,
+    `version: '${character.version}',`,
+    `releaseDate: '${character.releaseDate}',`,
+  ]);
 }
 
 /**

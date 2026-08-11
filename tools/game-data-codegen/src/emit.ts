@@ -26,6 +26,15 @@ export function resolveGeneratedPath(path: string): string {
   return resolve(dirname(packageJson), path);
 }
 
+/**
+ * Wraps one record's fields as an element of the emitted array, owning the
+ * indentation the surrounding module expects. Nested fields indent themselves
+ * two further spaces.
+ */
+export function serializeEntry(fields: readonly string[]): string {
+  return ['  {', ...fields.map((field) => `    ${field}`), '  },'].join('\n');
+}
+
 /** Renders the module text, separately from writing it, so it can be asserted on. */
 export function renderModule({ exportName, command, entries }: GeneratedModule): string {
   // REUSE-IgnoreStart
