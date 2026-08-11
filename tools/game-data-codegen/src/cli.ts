@@ -23,7 +23,7 @@ program
 
 program
   .command('weapons')
-  .description('Regenerate the weapon roster in @genshin/game-data/src/weapons.ts')
+  .description('Regenerate the weapon roster in @genshin/game-data/src/weapons.generated.ts')
   .action((): void => {
     const count = generateWeapons();
     console.log(`Generated ${count} weapons into @genshin/game-data`);

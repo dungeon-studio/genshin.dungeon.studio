@@ -33,23 +33,22 @@ When the roster gains a newer patch than `GAME_DATA_VERSION`, raise that
 constant in `packages/game-data/src/versions.ts` to match. A test fails until
 you do, and the site footer reads it.
 
-## Add a release date the generator demands
+## Add a release date for a new character
 
 `genshin-db` carries no release date, so `generate characters` aborts on any
 character missing from `CHARACTER_RELEASE_DATES` in
 `tools/game-data-codegen/src/character-release-dates.ts`. Add the start of the
-character's debut banner, taken from
-[paimon-moe's `banners.js`](https://github.com/MadeBaruna/paimon-moe/blob/main/src/data/banners.js).
-The wiki blocks automated fetches. Then regenerate.
+character's debut banner from
+[paimon-moe's `banners.js`](https://github.com/MadeBaruna/paimon-moe/blob/main/src/data/banners.js),
+then regenerate. The fandom wiki blocks automated fetches, which is why the
+dates come from paimon-moe.
 
 ## Add a character the generator skips
 
 The generator omits characters with no fixed element --- the Traveler and the
 Wonderland Manekins --- and the ids in `EXCLUDED_IDS` in
-`tools/game-data-codegen/src/characters.ts`, which holds collaboration
-characters obtainable outside the usual banners. Both rules exist because the
-web collection treats a character as one element's worth of a single banner
-pull. Revisit that before widening the roster.
+`tools/game-data-codegen/src/characters.ts`, which holds crossover characters.
+Widening the roster means relaxing one of those two rules.
 
 ## See also
 

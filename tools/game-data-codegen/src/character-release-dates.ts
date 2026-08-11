@@ -9,8 +9,7 @@
  * banner. Launch characters — including standard-pool ones that never had a
  * debut banner — are pinned to release day, 2020-09-28.
  *
- * `generate characters` throws on a character with no entry here, so a new
- * patch's roster can't land with a missing or invented date.
+ * `generate characters` throws rather than emit a character missing from here.
  */
 export const CHARACTER_RELEASE_DATES: Record<string, string> = {
   aino: '2025-09-30',

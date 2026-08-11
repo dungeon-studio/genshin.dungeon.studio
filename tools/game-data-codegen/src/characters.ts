@@ -14,19 +14,12 @@ import { CHARACTER_RELEASE_DATES } from './character-release-dates.js';
 import { toKebabCase } from './slug.js';
 import { WEAPON_TYPE_BY_GENSHIN_DB } from './weapons.js';
 
-/** Stands in for the homeland genshin-db leaves blank on characters who have none. */
+/** genshin-db leaves `region` blank for characters with no established homeland. */
 const UNKNOWN_REGION = 'Unknown';
 
-/**
- * Playable characters the roster deliberately omits. Aloy came from a
- * collaboration and can't be pulled or bought like the rest.
- *
- * The Traveler and the Wonderland Manekins are omitted too, but fall out of
- * the `ELEMENT_NONE` filter rather than needing an entry here.
- */
+/** Crossover characters. */
 const EXCLUDED_IDS = new Set(['aloy']);
 
-/** Maps genshin-db `elementType` enums to `Element` values. */
 const ELEMENT_BY_GENSHIN_DB: Record<string, Element> = {
   ELEMENT_ANEMO: ELEMENTS.ANEMO,
   ELEMENT_CRYO: ELEMENTS.CRYO,
@@ -50,8 +43,8 @@ export interface GeneratedCharacter {
 
 function isRosterMember(record: DbCharacter | undefined): record is DbCharacter {
   if (!record) return false;
-  // `ELEMENT_NONE` marks the element-borrowing cast — the Traveler and the
-  // Wonderland Manekins — who have no fixed element to file them under.
+  // `ELEMENT_NONE` is the Traveler and the Wonderland Manekins, who borrow an
+  // element rather than having one to file them under.
   if (record.elementType === 'ELEMENT_NONE') return false;
   return !EXCLUDED_IDS.has(toKebabCase(record.name));
 }
@@ -87,7 +80,7 @@ function toCharacter(record: DbCharacter): GeneratedCharacter {
   };
 }
 
-/** 5-star first, then version descending (newest first), then name for stability. */
+/** 5-star first, then newest version first; name breaks ties so output is stable. */
 function byRosterOrder(a: GeneratedCharacter, b: GeneratedCharacter): number {
   return (
     b.rarity - a.rarity || compareVersions(b.version, a.version) || a.name.localeCompare(b.name)

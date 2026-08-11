@@ -24,10 +24,8 @@ export interface Character {
 }
 
 /**
- * Every playable character with a fixed element.
- *
- * Excludes the Traveler and the Wonderland Manekins, whose element changes,
- * and Aloy, who came from a collaboration rather than the usual banners.
+ * Playable characters with a fixed element. Absent: the Traveler and the
+ * Wonderland Manekins, who borrow one, and Aloy, a crossover character.
  */
 export const CHARACTERS: readonly Character[] = CHARACTER_DATA;
 
