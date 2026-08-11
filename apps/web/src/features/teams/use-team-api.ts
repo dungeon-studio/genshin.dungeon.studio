@@ -17,11 +17,11 @@ export interface SaveTeamPayload {
   description?: string;
 }
 
-export function teamKey(userId: string): readonly [string, string] {
+function teamKey(userId: string): readonly [string, string] {
   return ['teams', userId] as const;
 }
 
-export function parseTeamsResponse(response: unknown): CollectionTeam[] {
+function parseTeamsResponse(response: unknown): CollectionTeam[] {
   assertCollectionDocument(response);
   return response.collection.items.map((item) => deserialiseTeam(item));
 }

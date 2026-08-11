@@ -17,11 +17,11 @@ export interface MutationResult {
   entry: CollectionCharacter;
 }
 
-export function collectionKey(userId: string): readonly [string, string] {
+function collectionKey(userId: string): readonly [string, string] {
   return ['characters', userId] as const;
 }
 
-export function parseCollectionResponse(response: unknown): CharacterCollection {
+function parseCollectionResponse(response: unknown): CharacterCollection {
   assertCollectionDocument(response);
   const record: CharacterCollection = {};
 

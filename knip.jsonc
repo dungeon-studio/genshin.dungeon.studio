@@ -10,11 +10,12 @@
   "workspaces": {
     ".": {
       // These run at the repo root via pre-commit, which knip can't see:
-      // stylelint (`pnpm exec stylelint`; its config and a workspace-local copy
-      // live in apps/web), syncpack (the syncpack pre-commit hooks), and eslint
-      // (`pnpm exec eslint`; the flat configs live in each workspace, so knip's
-      // eslint plugin doesn't activate at the root to claim the dependency).
-      "ignoreDependencies": ["stylelint", "stylelint-config-standard", "syncpack", "eslint"]
+      // stylelint (`pnpm exec stylelint`; its config lives in apps/web, which is
+      // also where `extends` resolves from, so only the binary is needed here),
+      // syncpack (the syncpack pre-commit hooks), and eslint (`pnpm exec
+      // eslint`; the flat configs live in each workspace, so knip's eslint
+      // plugin doesn't activate at the root to claim the dependency).
+      "ignoreDependencies": ["stylelint", "syncpack", "eslint"]
     },
     "apps/api": {
       // verify-deployment.ts is invoked from deploy.yml, so knip can't see it.
@@ -27,24 +28,10 @@
       }
     },
     "apps/web": {
-      // env.d.ts holds Vite ambient client types referenced via tsconfig, not imports.
-      "ignore": ["src/env.d.ts"],
-      // prettier-plugin-tailwindcss is declared but not yet wired into a prettier
-      // config; tracked for removal/wiring in the export-cleanup follow-up.
-      "ignoreDependencies": ["prettier-plugin-tailwindcss"]
+      // The shadcn kit is vendored with its upstream surface intact, so an
+      // export the app hasn't reached for yet isn't dead code. Entry files keep
+      // their exports unreported while their imports still count.
+      "entry": ["src/components/ui/**"]
     }
-  },
-
-  // Unused exports/types across the existing codebase mix intentional public
-  // surface (versioned `V0*` schemas kept for document migration, the shadcn
-  // components/ui kit) with genuine dead code. Report them without blocking CI
-  // until they're triaged; see the export-cleanup follow-up issue.
-  "rules": {
-    "exports": "warn",
-    "types": "warn",
-    "nsExports": "warn",
-    "nsTypes": "warn",
-    "enumMembers": "warn",
-    "duplicates": "warn"
   }
 }

@@ -16,11 +16,11 @@ export interface WeaponMutationResult {
   weapon: CollectionWeapon;
 }
 
-export function weaponCollectionKey(userId: string): readonly [string, string] {
+function weaponCollectionKey(userId: string): readonly [string, string] {
   return ['weapons', userId] as const;
 }
 
-export function parseWeaponCollectionResponse(response: unknown): WeaponRecord {
+function parseWeaponCollectionResponse(response: unknown): WeaponRecord {
   assertCollectionDocument(response);
   const record: WeaponRecord = {};
 

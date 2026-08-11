@@ -5,7 +5,7 @@ import { MAX_TEAM_MEMBERS } from '@genshin/domain';
 import { defineVersion } from 'verzod';
 import { z } from 'zod';
 
-import { type V0Team, V0MemberSchema } from './v0.js';
+import { type V0Team } from './v0.js';
 
 export const V1MemberSchema = z.object({
   characterId: z.string(),
@@ -83,7 +83,3 @@ export const v1 = defineVersion({
     updatedAt: old.updatedAt,
   }),
 });
-
-// V0MemberSchema re-exported so the map callback type is available without
-// reaching into v0 directly from outside the schemas directory.
-export { V0MemberSchema };

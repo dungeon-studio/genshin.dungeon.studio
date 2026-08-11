@@ -44,7 +44,6 @@
     "prettier": "3.9.6",
     "prettier-plugin-tailwindcss": "0.8.1",
     "stylelint": "17.14.1",
-    "stylelint-config-standard": "40.0.0",
     "syncpack": "15.3.2",
     "tsx": "4.23.11",
     "turbo": "2.10.9",
