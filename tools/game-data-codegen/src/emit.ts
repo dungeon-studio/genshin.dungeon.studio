@@ -20,13 +20,14 @@ export interface GeneratedModule {
  * Generators run from their own `dist/`, so generated modules are located
  * through the workspace link rather than relative to this file.
  */
-function resolveGeneratedPath(path: string): string {
+export function resolveGeneratedPath(path: string): string {
   const require = createRequire(import.meta.url);
   const packageJson = require.resolve('@genshin/game-data/package.json');
   return resolve(dirname(packageJson), path);
 }
 
-function serializeModule({ exportName, command, entries }: GeneratedModule): string {
+/** Renders the module text, separately from writing it, so it can be asserted on. */
+export function renderModule({ exportName, command, entries }: GeneratedModule): string {
   // REUSE-IgnoreStart
   const header = [
     '// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>',
@@ -48,5 +49,5 @@ function serializeModule({ exportName, command, entries }: GeneratedModule): str
 }
 
 export function writeGeneratedModule(module: GeneratedModule): void {
-  writeFileSync(resolveGeneratedPath(module.path), serializeModule(module));
+  writeFileSync(resolveGeneratedPath(module.path), renderModule(module));
 }
