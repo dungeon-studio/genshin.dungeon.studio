@@ -11,7 +11,7 @@ import { generateWeapons } from './weapons.js';
 interface Roster {
   /** Subcommand name, which is also the generated module's basename. */
   command: string;
-  /** Singular record name; pluralised for the count this prints. */
+  /** Singular record name; the printed count appends an `s`. */
   label: string;
   generate: () => number;
 }

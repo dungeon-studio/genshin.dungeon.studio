@@ -9,7 +9,7 @@ import { serializeEntry, writeGeneratedModule } from './emit.js';
 import { queryInEnglish } from './language.js';
 import { createIdAssigner, type IdAssigner } from './slug.js';
 
-/** Only sets with 5-star pieces are tracked; the rest are levelling fodder. */
+/** Only sets with 5-star pieces are tracked; the rest are leveling fodder. */
 const ENDGAME_RARITY = 5;
 
 export interface GeneratedArtifactSet {

@@ -27,9 +27,8 @@ export function resolveGeneratedPath(path: string): string {
 }
 
 /**
- * Wraps one record's fields as an element of the emitted array, owning the
- * indentation the surrounding module expects. Nested fields indent themselves
- * two further spaces.
+ * Indents one record's fields into an element of the emitted array. Nested
+ * fields add two spaces of their own.
  */
 export function serializeEntry(fields: readonly string[]): string {
   return ['  {', ...fields.map((field) => `    ${field}`), '  },'].join('\n');
