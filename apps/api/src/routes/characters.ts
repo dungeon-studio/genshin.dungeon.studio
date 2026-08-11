@@ -16,6 +16,7 @@ import type { FromSchema } from 'json-schema-to-ts';
 import { requireCharacterId } from '@/catalogue.js';
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
+import type { RequestLogVariables } from '@/middleware/log-request.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
@@ -29,6 +30,7 @@ import * as Characters from '@/repositories/characters/index.js';
 export const characters = new Hono<{
   Variables: AuthVariables &
     NegotiatedResponseContentVariables &
+    RequestLogVariables &
     NegotiatedRequestSchemaVariables &
     ValidatedRequestBodyVariables;
 }>();

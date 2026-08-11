@@ -4,6 +4,7 @@
 import { getFirestore } from 'firebase-admin/firestore';
 
 import { app } from '@/firebase/app.js';
+import { logger } from '@/logger.js';
 
 const rawDatabaseId = process.env.FIRESTORE_DATABASE_ID ?? '(default)';
 const databaseId = rawDatabaseId.trim();
@@ -12,6 +13,6 @@ if (databaseId === '') {
   throw new Error('FIRESTORE_DATABASE_ID must not be empty when set.');
 }
 
-console.log(`Firestore: database=${databaseId}`);
+logger.info({ databaseId }, 'connecting to firestore');
 
 export const db = getFirestore(app, databaseId);

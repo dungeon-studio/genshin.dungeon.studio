@@ -6,6 +6,8 @@ import { Status } from 'google-gax';
 import { HTTPException } from 'hono/http-exception';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
 
+import { logger } from '@/logger.js';
+
 // Firestore gRPC errors are internal failures from the user's perspective.
 // Only transient conditions get non-500 status codes to enable client retry.
 const GRPC_TO_HTTP: Partial<Record<Status, ContentfulStatusCode>> = {
@@ -26,7 +28,7 @@ function labelFor(code: Status | undefined): string {
 }
 
 export function firestoreErrorToHttpException(err: GoogleError): HTTPException {
-  console.error(`Firestore error [gRPC ${labelFor(err.code)}]:`, err.message);
+  logger.error({ grpcCode: labelFor(err.code), grpcMessage: err.message }, 'firestore call failed');
   return new HTTPException(httpStatusFor(err.code), {
     message: 'An unexpected error occurred',
   });

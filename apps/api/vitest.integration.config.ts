@@ -19,6 +19,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    env: { LOG_LEVEL: 'silent' },
     include: ['src/**/*.integration.test.ts'],
     setupFiles: ['./src/test/integration-setup.ts'],
     reporters: ['default', 'junit'],

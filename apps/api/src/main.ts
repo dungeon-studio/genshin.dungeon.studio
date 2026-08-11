@@ -4,11 +4,12 @@
 import { serve } from '@hono/node-server';
 
 import { app } from '@/app.js';
+import { logger } from '@/logger.js';
 
 // `||`, not `??`: an empty `PORT` means unset, and `parseInt('')` is `NaN`.
 // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 const port = parseInt(process.env.PORT || '8080', 10);
-console.log(`Server running at http://localhost:${port}`);
+logger.info({ port }, 'starting server');
 
 serve({
   fetch: app.fetch,

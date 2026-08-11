@@ -8,6 +8,7 @@ import { HTTPException } from 'hono/http-exception';
 
 import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
+import type { RequestLogVariables } from '@/middleware/log-request.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
@@ -25,6 +26,7 @@ function toAuthIdentity({ uid, email, email_verified, picture }: DecodedIdToken)
 export const userProfile = new Hono<{
   Variables: AuthVariables &
     NegotiatedResponseContentVariables &
+    RequestLogVariables &
     NegotiatedRequestSchemaVariables &
     ValidatedRequestBodyVariables;
 }>();
