@@ -58,4 +58,4 @@ See the [Manual Setup Guide](./docs/how-tos/manual-setup.md) for Node.js 20+ and
 
 ## Not affiliated with HoYoverse
 
-Genshin Planner is an unofficial fan project. It's not affiliated with, endorsed by, or sponsored by HoYoverse. Genshin Impact and all related names, characters, and artwork are trademarks and copyright of COGNOSPHERE PTE. LTD. Game data is presented for reference and may be inaccurate or out of date.
+Genshin Planner is an unofficial fan project, neither endorsed nor sponsored by HoYoverse. Genshin Impact and all related names, characters, and artwork are trademarks and copyrights of COGNOSPHERE PTE. LTD.
