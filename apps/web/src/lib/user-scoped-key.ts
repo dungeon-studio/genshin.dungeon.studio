@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * Build the TanStack Query key function for a user-scoped collection. Every
- * collection keys its cache by scope then user, so the scope is all that
- * varies, and the result is the `keyFor` that `invalidateUserQuery` wants.
+ * Build the query key function for a user-scoped collection.
+ *
+ * A function rather than a key because `invalidateUserQuery` accepts a
+ * signed-out `userId`, and so has nothing to key until it knows there is one.
  */
 export function userScopedKey(scope: string): (userId: string) => readonly [string, string] {
   return (userId) => [scope, userId] as const;
