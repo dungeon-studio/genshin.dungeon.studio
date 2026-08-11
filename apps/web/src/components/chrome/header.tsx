@@ -14,15 +14,15 @@ export function Header(): JSX.Element {
 
   return (
     <header className="border-b border-border bg-background">
-      <Container className="flex items-center justify-between py-4">
+      <Container className="py-4 flex items-center justify-between">
         <Link
           to="/"
-          className="flex items-center gap-2 text-2xl font-bold text-foreground hover:text-foreground/80"
+          className="gap-2 text-2xl font-bold flex items-center text-foreground hover:text-foreground/80"
         >
           <BrandMark />
           Genshin Planner
         </Link>
-        <div className="flex items-center gap-3">
+        <div className="gap-3 flex items-center">
           {!loading && (user ? <UserMenu user={user} /> : <LoginButton />)}
           <ThemeToggle />
         </div>
@@ -33,7 +33,7 @@ export function Header(): JSX.Element {
 
 function UserMenu({ user }: { user: { displayName: string | null; photoURL: string | null } }) {
   return (
-    <div className="flex items-center gap-3">
+    <div className="gap-3 flex items-center">
       {user.photoURL ? (
         <img
           src={user.photoURL}

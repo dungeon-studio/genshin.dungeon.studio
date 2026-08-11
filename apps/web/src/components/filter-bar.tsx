@@ -88,7 +88,7 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
   return (
     <div className="space-y-1.5">
       {/* Wraps rather than squeezing the search box below its placeholder on ~320px screens. */}
-      <div className="flex flex-wrap items-center gap-1.5">
+      <div className="gap-1.5 flex flex-wrap items-center">
         <SearchField
           value={filters.search}
           onChange={(search) => onChange({ ...filters, search })}
@@ -96,7 +96,7 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
         />
 
         {/* Held together so the slack falls before the pair, not between them. */}
-        <div className="ml-auto flex shrink-0 items-center gap-1.5">
+        <div className="gap-1.5 ml-auto flex shrink-0 items-center">
           <FilterSummary noun={noun} showOwnership={showOwnership} {...counts} />
           <SortControl filters={filters} onChange={onChange} sortFields={sortFields} />
         </div>
@@ -113,7 +113,7 @@ export function FilterBar<F extends BaseFilterState, T extends string>({
         </div>
       )}
 
-      <div id={controlsId} className={cn(collapsible && !expanded && 'hidden sm:block')}>
+      <div id={controlsId} className={cn(collapsible && !expanded && 'sm:block hidden')}>
         <FilterChips
           filters={filters}
           onChange={onChange}
@@ -133,9 +133,9 @@ interface SearchFieldProps {
 
 function SearchField({ value, onChange, label }: SearchFieldProps): JSX.Element {
   return (
-    <div className="relative min-w-28 flex-1 md:max-w-md">
+    <div className="min-w-28 md:max-w-md relative flex-1">
       <Search
-        className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+        className="left-2.5 h-4 w-4 absolute top-1/2 -translate-y-1/2 text-muted-foreground"
         aria-hidden="true"
         focusable={false}
       />
@@ -184,7 +184,7 @@ function SortControl<F extends BaseFilterState>({
         size="sm"
         onClick={toggleDirection}
         aria-label={`Sort ${ascending ? 'ascending' : 'descending'}`}
-        className="-ml-px rounded-l-none px-1.5"
+        className="px-1.5 -ml-px rounded-l-none"
       >
         {ascending ? (
           <ArrowUpNarrowWide className="h-3.5 w-3.5" aria-hidden="true" focusable={false} />
@@ -219,7 +219,7 @@ function FilterChips<F extends BaseFilterState, T extends string>({
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
+    <div className="gap-1.5 flex flex-wrap items-center">
       {showOwnership &&
         (['all', 'owned', 'unowned'] as const).map((value) => (
           <button
@@ -244,7 +244,7 @@ function FilterChips<F extends BaseFilterState, T extends string>({
           key={rarity}
           type="button"
           onClick={() => toggleRarity(rarity)}
-          className={cn(CHIP, filters.rarities.has(rarity) ? 'bg-geo-dark text-white' : CHIP_IDLE)}
+          className={cn(CHIP, filters.rarities.has(rarity) ? 'text-white bg-geo-dark' : CHIP_IDLE)}
           aria-pressed={filters.rarities.has(rarity)}
           aria-label={`Filter by ${rarity}-star`}
         >
@@ -262,7 +262,7 @@ function FilterChips<F extends BaseFilterState, T extends string>({
             onClick={() => category.onToggle(value)}
             className={cn(
               CHIP,
-              'inline-flex items-center gap-1.5',
+              'gap-1.5 inline-flex items-center',
               category.selected.has(value) ? category.activeClassName(value) : CHIP_IDLE,
             )}
             aria-pressed={category.selected.has(value)}
@@ -277,7 +277,7 @@ function FilterChips<F extends BaseFilterState, T extends string>({
             <img
               src={category.iconPath(value, 'dark')}
               alt=""
-              className="hidden h-3.5 w-3.5 dark:block"
+              className="h-3.5 w-3.5 hidden dark:block"
               aria-hidden="true"
             />
             {value}
@@ -321,7 +321,7 @@ function FilterToggle({
       <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" focusable={false} />
       Filters
       {activeCount > 0 && (
-        <span className="rounded-full bg-foreground px-1.5 text-xs font-medium text-background">
+        <span className="px-1.5 text-xs font-medium rounded-full bg-foreground text-background">
           {activeCount}
         </span>
       )}
@@ -340,7 +340,7 @@ interface FilterSummaryProps extends FilterCounts {
 }
 
 function FilterSummary(props: FilterSummaryProps): JSX.Element {
-  return <p className="shrink-0 text-sm text-muted-foreground">{summaryText(props)}</p>;
+  return <p className="text-sm shrink-0 text-muted-foreground">{summaryText(props)}</p>;
 }
 
 function summaryText({

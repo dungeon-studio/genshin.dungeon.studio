@@ -38,22 +38,22 @@ function ConstellationPopover({
         <button
           type="button"
           onClick={(e) => e.stopPropagation()}
-          className="relative z-10 shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-bold tabular-nums text-muted-foreground hover:bg-muted/80"
+          className="px-2 py-0.5 text-xs font-bold relative z-10 shrink-0 rounded-full bg-muted text-muted-foreground tabular-nums hover:bg-muted/80"
           aria-label={`Constellation level ${constellationLevel} for ${character.name}, click to edit`}
         >
           C{constellationLevel}
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-auto p-2"
+        className="p-2 w-auto"
         side="top"
         align="end"
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="mb-1.5 text-center text-xs font-medium text-muted-foreground">
+        <p className="mb-1.5 text-xs font-medium text-center text-muted-foreground">
           Constellation
         </p>
-        <div className="flex gap-1">
+        <div className="gap-1 flex">
           {CONSTELLATION_LEVELS.map((level) => (
             <button
               key={level}
@@ -93,7 +93,7 @@ function RemoveButton({ character, onRemove }: RemoveButtonProps): JSX.Element {
         e.stopPropagation();
         onRemove(character.id);
       }}
-      className="relative z-10 shrink-0 rounded-md p-1 text-destructive opacity-0 transition-opacity group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
+      className="p-1 relative z-10 shrink-0 rounded-md text-destructive opacity-0 transition-opacity group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none"
       aria-label={`Remove ${character.name} from collection`}
     >
       <Trash2 className="h-4 w-4" />
@@ -170,7 +170,7 @@ export function CharacterCard({
       onClick={() => onAdd?.(character.id)}
       className={cn(
         sharedClassName,
-        'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+        'cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
         selected
           ? cn(selectedRingClassName, ELEMENT_FOCUS_RINGS[character.element])
           : 'focus-visible:ring-ring',

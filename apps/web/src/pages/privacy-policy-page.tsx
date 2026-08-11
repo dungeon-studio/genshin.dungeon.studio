@@ -26,7 +26,7 @@ export function PrivacyPolicyPage(): JSX.Element {
         </p>
 
         <h2 className="mt-8 text-xl font-semibold text-foreground">What we collect</h2>
-        <ul className="mt-4 list-disc space-y-2 pl-6 leading-relaxed">
+        <ul className="mt-4 space-y-2 pl-6 leading-relaxed list-disc">
           <li>
             <strong className="font-medium text-foreground">Account information.</strong> When you
             sign in with Google, we receive your name, email address, profile photo, and Google

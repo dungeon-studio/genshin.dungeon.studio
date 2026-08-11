@@ -35,7 +35,7 @@ export function TeamStrip({
   const slots = Array.from({ length: MAX_TEAM_MEMBERS }, (_, i) => members[i]);
 
   return (
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+    <div className="gap-2 sm:grid-cols-4 grid grid-cols-2">
       {slots.map((member, i) => {
         const character = member ? getCharacterById(member.characterId) : undefined;
 
@@ -51,7 +51,7 @@ export function TeamStrip({
             type="button"
             onClick={() => onSelect(i)}
             className={cn(
-              'rounded-lg border border-border border-l-4 p-2 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+              'p-2 rounded-lg border border-l-4 border-border text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
               borderClass,
               'cursor-pointer hover:bg-accent/50',
               selected && 'bg-accent/50',

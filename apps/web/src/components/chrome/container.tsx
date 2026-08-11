@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
  */
 const Container = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('mx-auto max-w-7xl px-4', className)} {...props} />
+    <div ref={ref} className={cn('max-w-7xl px-4 mx-auto', className)} {...props} />
   ),
 );
 Container.displayName = 'Container';

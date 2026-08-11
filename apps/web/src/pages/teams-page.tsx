@@ -161,7 +161,7 @@ export function TeamsPage(): JSX.Element {
       >
         <SheetContent
           side="bottom"
-          className="mx-auto flex w-full max-w-7xl flex-col overflow-hidden rounded-t-xl top-0 sm:top-[124px]"
+          className="max-w-7xl rounded-t-xl top-0 sm:top-[124px] mx-auto flex w-full flex-col overflow-hidden"
         >
           {selectedSlot !== null && selectedTeam && (
             <>
@@ -175,10 +175,10 @@ export function TeamsPage(): JSX.Element {
                 />
               </SheetHeader>
 
-              <nav className="mt-4 flex gap-4 border-b border-border" aria-label="Team editor tabs">
+              <nav className="mt-4 gap-4 flex border-b border-border" aria-label="Team editor tabs">
                 <button
                   type="button"
-                  className={`border-b-2 px-1 pb-2 text-sm font-semibold ${
+                  className={`px-1 pb-2 text-sm font-semibold border-b-2 ${
                     activeTab === 'characters'
                       ? 'border-primary text-foreground'
                       : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -190,7 +190,7 @@ export function TeamsPage(): JSX.Element {
                 </button>
                 <button
                   type="button"
-                  className={`border-b-2 px-1 pb-2 text-sm font-semibold ${
+                  className={`px-1 pb-2 text-sm font-semibold border-b-2 ${
                     activeTab === 'weapons'
                       ? 'border-primary text-foreground'
                       : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -202,7 +202,7 @@ export function TeamsPage(): JSX.Element {
                 </button>
               </nav>
 
-              <div className="mt-3 flex min-h-0 flex-1 flex-col gap-3">
+              <div className="mt-3 min-h-0 gap-3 flex flex-1 flex-col">
                 {editing === null ? (
                   <p className="text-sm text-muted-foreground">
                     Select a team member to choose a{' '}
@@ -211,7 +211,7 @@ export function TeamsPage(): JSX.Element {
                 ) : activeTab === 'characters' ? (
                   <>
                     {pendingWeapon && (
-                      <div className="flex items-center gap-3 rounded-md bg-muted px-3 py-2 text-sm">
+                      <div className="gap-3 px-3 py-2 text-sm flex items-center rounded-md bg-muted">
                         <p className="text-muted-foreground">
                           Showing {pendingWeapon.type} users for{' '}
                           <span className="font-medium text-foreground">{pendingWeapon.name}</span>
