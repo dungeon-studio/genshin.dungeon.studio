@@ -11,6 +11,9 @@ on:
     paths:
       - 'apps/web/**'
       - 'apps/api/**'
+      # The apps bundle the workspace packages at build time, so a change
+      # confined to packages/** still changes what gets deployed.
+      - 'packages/**'
       - '.github/workflows/deploy.yml'
       - '.github/actions/setup-node-pnpm/**'
       - '.github/actions/setup-playwright/**'
