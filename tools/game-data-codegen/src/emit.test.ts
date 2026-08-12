@@ -12,7 +12,7 @@ describe('renderModule', () => {
     path: 'src/weapons.generated.ts',
     exportName: 'WEAPON_DATA',
     command: 'weapons',
-    entries: [serializeEntry('the-catch', ["id: 'the-catch',"])],
+    entries: [serializeEntry('the-catch', ['rarity: 4,'])],
   });
 
   it('opens with the SPDX header the REUSE gate requires', () => {
@@ -28,7 +28,7 @@ describe('renderModule', () => {
 
   it('keys the entries by id in a const assertion, so a duplicate fails typecheck', () => {
     expect(rendered).toContain(
-      "export const WEAPON_DATA = {\n  'the-catch': {\n    id: 'the-catch',\n  },\n} as const;",
+      "export const WEAPON_DATA = {\n  'the-catch': {\n    id: 'the-catch',\n    rarity: 4,\n  },\n} as const;",
     );
   });
 

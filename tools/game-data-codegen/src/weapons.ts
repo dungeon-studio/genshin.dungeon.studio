@@ -41,10 +41,8 @@ export interface GeneratedWeapon {
   rarity: Rarity;
   baseATK: number;
   version: string;
-  subStatType?: WeaponStatType;
-  subStatValue?: number;
-  passiveName?: string;
-  passiveDescription?: string;
+  subStat?: { type: WeaponStatType; value: number };
+  passive?: { name: string; description: string };
 }
 
 function isRosterMember(record: DbWeapon | undefined): record is DbWeapon {
@@ -72,14 +70,12 @@ function toWeapon(record: DbWeapon): GeneratedWeapon {
     if (!subStatType) {
       throw new Error(`Unknown sub-stat "${record.mainStatType}" for ${record.name}`);
     }
-    weapon.subStatType = subStatType;
     // `baseStatText` is the in-game display, e.g. "9.6%" (percent) or "36" (flat EM).
-    weapon.subStatValue = parseFloat(record.baseStatText);
+    weapon.subStat = { type: subStatType, value: parseFloat(record.baseStatText) };
   }
 
   if (record.effectName && record.r1?.description) {
-    weapon.passiveName = record.effectName;
-    weapon.passiveDescription = record.r1.description;
+    weapon.passive = { name: record.effectName, description: record.r1.description };
   }
 
   return weapon;
@@ -105,7 +101,6 @@ export function buildWeapons(): GeneratedWeapon[] {
 
 function serializeWeapon(weapon: GeneratedWeapon): string {
   const fields = [
-    `id: '${weapon.id}',`,
     `name: ${JSON.stringify(weapon.name)},`,
     `type: '${weapon.type}',`,
     `rarity: ${weapon.rarity},`,
@@ -113,18 +108,20 @@ function serializeWeapon(weapon: GeneratedWeapon): string {
     `version: '${weapon.version}',`,
   ];
 
-  if (weapon.subStatType && weapon.subStatValue !== undefined) {
+  if (weapon.subStat) {
     fields.push(
       'subStat: {',
-      `  type: ${JSON.stringify(weapon.subStatType)},`,
-      `  value: ${weapon.subStatValue},`,
+      `  type: ${JSON.stringify(weapon.subStat.type)},`,
+      `  value: ${weapon.subStat.value},`,
       '},',
     );
   }
 
-  if (weapon.passiveName) fields.push(`passiveName: ${JSON.stringify(weapon.passiveName)},`);
-  if (weapon.passiveDescription) {
-    fields.push(`passiveDescription: ${JSON.stringify(weapon.passiveDescription)},`);
+  if (weapon.passive) {
+    fields.push(
+      `passiveName: ${JSON.stringify(weapon.passive.name)},`,
+      `passiveDescription: ${JSON.stringify(weapon.passive.description)},`,
+    );
   }
 
   return serializeEntry(weapon.id, fields);

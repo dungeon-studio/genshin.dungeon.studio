@@ -77,24 +77,3 @@ export const WEAPON_ROSTER: readonly Weapon[] = Object.values(WEAPONS);
 export function getWeaponById(id: string): Weapon | undefined {
   return findById(WEAPONS, id);
 }
-
-/**
- * Helper to filter weapons by type
- */
-export function getWeaponsByType(type: WeaponType): Weapon[] {
-  return WEAPON_ROSTER.filter((weapon) => weapon.type === type);
-}
-
-/**
- * Helper to filter weapons by rarity
- */
-export function getWeaponsByRarity(rarity: Rarity): Weapon[] {
-  return WEAPON_ROSTER.filter((weapon) => weapon.rarity === rarity);
-}
-
-/**
- * Helper to filter weapons by version
- */
-export function getWeaponsByVersion(version: string): Weapon[] {
-  return WEAPON_ROSTER.filter((weapon) => weapon.version === version);
-}

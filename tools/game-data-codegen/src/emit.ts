@@ -31,10 +31,14 @@ export function resolveGeneratedPath(path: string): string {
  * its id. Nested fields add two spaces of their own.
  *
  * Keying by id is what makes a duplicate a `tsc` error (TS1117) rather than a
- * silent last-wins overwrite.
+ * silent last-wins overwrite. The id is also written as the record's first
+ * field, from the same argument as the key, so a record still carries its own
+ * id once a consumer reads it out of the catalogue.
  */
 export function serializeEntry(id: string, fields: readonly string[]): string {
-  return [`  '${id}': {`, ...fields.map((field) => `    ${field}`), '  },'].join('\n');
+  const members = [`id: '${id}',`, ...fields];
+
+  return [`  '${id}': {`, ...members.map((field) => `    ${field}`), '  },'].join('\n');
 }
 
 /** Renders the module text, separately from writing it, so it can be asserted on. */

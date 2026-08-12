@@ -130,10 +130,3 @@ export type ArtifactMainAffix = SandsMainAffix | GobletMainAffix | CircletMainAf
 export function getArtifactSetById(id: string): ArtifactSet | undefined {
   return findById(ARTIFACT_SETS, id);
 }
-
-/**
- * Helper to filter artifact sets by version
- */
-export function getArtifactSetsByVersion(version: string): ArtifactSet[] {
-  return ARTIFACT_SET_ROSTER.filter((set) => set.version === version);
-}

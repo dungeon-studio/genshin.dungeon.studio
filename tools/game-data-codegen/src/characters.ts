@@ -97,7 +97,6 @@ export function buildCharacters(): GeneratedCharacter[] {
 
 function serializeCharacter(character: GeneratedCharacter): string {
   return serializeEntry(character.id, [
-    `id: '${character.id}',`,
     `name: ${JSON.stringify(character.name)},`,
     `element: '${character.element}',`,
     `weaponType: '${character.weaponType}',`,

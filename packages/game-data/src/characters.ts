@@ -47,31 +47,3 @@ export const CHARACTER_ROSTER: readonly Character[] = Object.values(CHARACTERS);
 export function getCharacterById(id: string): Character | undefined {
   return findById(CHARACTERS, id);
 }
-
-/**
- * Helper to filter characters by element
- */
-export function getCharactersByElement(element: Element): Character[] {
-  return CHARACTER_ROSTER.filter((char) => char.element === element);
-}
-
-/**
- * Helper to filter characters by weapon type
- */
-export function getCharactersByWeaponType(weaponType: WeaponType): Character[] {
-  return CHARACTER_ROSTER.filter((char) => char.weaponType === weaponType);
-}
-
-/**
- * Helper to filter characters by rarity
- */
-export function getCharactersByRarity(rarity: Rarity): Character[] {
-  return CHARACTER_ROSTER.filter((char) => char.rarity === rarity);
-}
-
-/**
- * Helper to filter characters by version
- */
-export function getCharactersByVersion(version: string): Character[] {
-  return CHARACTER_ROSTER.filter((char) => char.version === version);
-}
