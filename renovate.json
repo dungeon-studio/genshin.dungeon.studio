@@ -35,6 +35,11 @@
       "minimumReleaseAge": null
     },
     {
+      "description": "Exempt the java-version datasource from the minimum release-age bake, so its renovate/stability-days check can resolve under internalChecksFilter:strict; the Adoptium release_versions endpoint it reads carries no release timestamps",
+      "matchDatasources": ["java-version"],
+      "minimumReleaseAge": null
+    },
+    {
       "description": "Move the Terraform CLI in one pull request across the bootstrap and dev required_version constraints and the TERRAFORM_VERSION pins in four workflows",
       "matchDepNames": ["hashicorp/terraform"],
       "groupName": "terraform cli"
