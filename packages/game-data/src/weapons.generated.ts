@@ -6,6 +6,21 @@
 
 export const WEAPON_DATA = [
   {
+    id: 'a-teaspoon-of-transcendence',
+    name: 'A Teaspoon of Transcendence',
+    type: 'Claymore',
+    rarity: 5,
+    baseATK: 48,
+    version: '6.7',
+    subStat: {
+      type: 'CRIT DMG',
+      value: 9.6,
+    },
+    passiveName: "White Fairy's Queening",
+    passiveDescription:
+      'ATK is increased by 28%.\nAdditionally, each time the equipping character hits an opponent with their Charged Attack, they attain "Transcendence" for a short time: their Stellar-Conduct DMG is increased by 16% for 5s. This effect can stack once every 0.2s, max 3 stacks.',
+  },
+  {
     id: 'angelos-heptades',
     name: "Angelos' Heptades",
     type: 'Catalyst',
@@ -468,7 +483,7 @@ export const WEAPON_DATA = [
     },
     passiveName: 'Golden Blood-Tide',
     passiveDescription:
-      'ATK is increased by 16%. When current HP increases or decreases, Normal Attack DMG will be increased by 16% and Charged Attack DMG will be increased by 14% for 4s. Max 3 stacks. This effect can be triggered once every 0.3s. When the wielder has 3 stacks, ATK SPD will be increased by 8%.',
+      'ATK is increased by 16%. When current HP increases or decreases, Normal Attack DMG is increased by 16%, Charged Attack DMG is increased by 14%, and Stellar-Conduct DMG is increased by 14% for 4s. Max 3 stacks. This effect can be triggered once every 0.3s. When the wielder has 3 stacks, ATK SPD will be increased by 8%.',
   },
   {
     id: 'tome-of-the-eternal-flow',
@@ -663,7 +678,7 @@ export const WEAPON_DATA = [
     },
     passiveName: 'Kagura Dance of the Sacred Sakura',
     passiveDescription:
-      'Gains the Kagura Dance effect when using an Elemental Skill, causing the Elemental Skill DMG of the character wielding this weapon to increase by 12% for 16s. Max 3 stacks. This character will gain 12% All Elemental DMG Bonus when they possess 3 stacks.',
+      "Using an Elemental Skill grants the Kagura Dance effect, increasing the wielding character's Elemental Skill DMG by 12% as well as their Stellar-Conduct DMG by 12% for 24s. Max 3 stacks. This character will gain a 12% All Elemental DMG Bonus when they possess 3 stacks.",
   },
   {
     id: 'calamity-queller',
