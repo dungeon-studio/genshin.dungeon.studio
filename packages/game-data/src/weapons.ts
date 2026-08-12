@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { indexById } from './lookup.js';
+import { findById } from './lookup.js';
 import type { Rarity } from './rarities.js';
 import { WEAPON_DATA } from './weapons.generated.js';
 
@@ -34,7 +34,7 @@ export const WEAPON_STAT_TYPES = {
 
 export type WeaponStatType = (typeof WEAPON_STAT_TYPES)[keyof typeof WEAPON_STAT_TYPES];
 
-export type WeaponId = (typeof WEAPON_DATA)[number]['id'];
+export type WeaponId = keyof typeof WEAPON_DATA;
 
 /**
  * Weapon definition
@@ -54,34 +54,47 @@ export interface Weapon {
   passiveDescription?: string;
 }
 
-export const WEAPONS: readonly Weapon[] = WEAPON_DATA;
+/**
+ * Weapons by ID.
+ *
+ * Keying by ID is what makes the IDs unique: a repeat is a duplicate property
+ * in the generated object literal, which `tsc` rejects (TS1117).
+ */
+export const WEAPONS: Readonly<Record<WeaponId, Weapon>> = WEAPON_DATA;
 
-const WEAPONS_BY_ID = indexById(WEAPONS);
+/**
+ * Weapons in display order: 5-star first, then newest version first.
+ *
+ * The generator writes the catalogue in that order and object keys keep their
+ * insertion order, so this view cannot disagree with `WEAPONS` about which
+ * weapons exist.
+ */
+export const WEAPON_ROSTER: readonly Weapon[] = Object.values(WEAPONS);
 
 /**
  * Helper to find weapon by ID
  */
 export function getWeaponById(id: string): Weapon | undefined {
-  return WEAPONS_BY_ID.get(id);
+  return findById(WEAPONS, id);
 }
 
 /**
  * Helper to filter weapons by type
  */
 export function getWeaponsByType(type: WeaponType): Weapon[] {
-  return WEAPONS.filter((weapon) => weapon.type === type);
+  return WEAPON_ROSTER.filter((weapon) => weapon.type === type);
 }
 
 /**
  * Helper to filter weapons by rarity
  */
 export function getWeaponsByRarity(rarity: Rarity): Weapon[] {
-  return WEAPONS.filter((weapon) => weapon.rarity === rarity);
+  return WEAPON_ROSTER.filter((weapon) => weapon.rarity === rarity);
 }
 
 /**
  * Helper to filter weapons by version
  */
 export function getWeaponsByVersion(version: string): Weapon[] {
-  return WEAPONS.filter((weapon) => weapon.version === version);
+  return WEAPON_ROSTER.filter((weapon) => weapon.version === version);
 }

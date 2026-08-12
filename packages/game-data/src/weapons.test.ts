@@ -3,13 +3,13 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { WEAPONS } from './weapons.js';
+import { WEAPON_ROSTER } from './weapons.js';
 
-describe('WEAPONS roster', () => {
+describe('WEAPON_ROSTER', () => {
   it('is not empty', () => {
     // Structural invariants (unique kebab ids, rarity range, sort order) are
     // guaranteed by the generator. This only catches a generation that
     // silently produced nothing.
-    expect(WEAPONS.length).toBeGreaterThan(0);
+    expect(WEAPON_ROSTER.length).toBeGreaterThan(0);
   });
 });

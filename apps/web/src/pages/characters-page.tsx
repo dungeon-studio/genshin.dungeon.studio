@@ -3,7 +3,7 @@
 
 import type { ConstellationLevel } from '@genshin/domain';
 import type { Character } from '@genshin/game-data';
-import { CHARACTERS } from '@genshin/game-data';
+import { CHARACTER_ROSTER } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
 import type { JSX } from 'react';
 import { useMemo, useState } from 'react';
@@ -33,7 +33,7 @@ export function CharactersPage(): JSX.Element {
   const ownedCount = ownedIds.size;
 
   const { filteredCharacters, filteredOwnedCount } = useMemo(() => {
-    const filtered = filterCharacters(CHARACTERS, filters, ownedIds);
+    const filtered = filterCharacters(CHARACTER_ROSTER, filters, ownedIds);
     return {
       filteredCharacters: filtered,
       filteredOwnedCount: filtered.filter((c) => ownedIds.has(c.id)).length,
@@ -75,7 +75,7 @@ export function CharactersPage(): JSX.Element {
             filters={filters}
             onChange={setFilters}
             filteredCount={filteredCharacters.length}
-            totalCount={CHARACTERS.length}
+            totalCount={CHARACTER_ROSTER.length}
             ownedCount={ownedCount}
             filteredOwnedCount={filteredOwnedCount}
             collapsible

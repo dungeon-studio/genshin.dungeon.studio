@@ -18,28 +18,17 @@ export function toKebabCase(name: string): string {
 }
 
 /**
- * Builds an assigner that rejects names it has already seen.
+ * Slugifies a display name into the id its roster is keyed by.
  *
- * Ids are slugs of display names, so a collision — or a name that slugifies to
- * nothing — means upstream data moved in a way the roster can't represent;
- * both abort generation rather than silently dropping a record. `noun` names
- * the record kind in those errors, e.g. `weapon`.
+ * A name that slugifies to nothing means upstream data moved in a way the
+ * roster can't represent, so generation aborts rather than emitting a record
+ * no consumer can address; `noun` names the record kind in that error, e.g.
+ * `weapon`. Collisions need no check of their own: rosters emit as id-keyed
+ * object literals, where a repeated id is a `tsc` error (TS1117).
  */
-export type IdAssigner = (name: string) => string;
+export function toId(name: string, noun: string): string {
+  const id = toKebabCase(name);
+  if (!id) throw new Error(`Empty id for ${noun} "${name}"`);
 
-export function createIdAssigner(noun: string): IdAssigner {
-  const nameById = new Map<string, string>();
-
-  return (name) => {
-    const id = toKebabCase(name);
-    if (!id) throw new Error(`Empty id for ${noun} "${name}"`);
-
-    const collision = nameById.get(id);
-    if (collision) {
-      throw new Error(`Duplicate ${noun} id "${id}" from "${collision}" and "${name}"`);
-    }
-    nameById.set(id, name);
-
-    return id;
-  };
+  return id;
 }

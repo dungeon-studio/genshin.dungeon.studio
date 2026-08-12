@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { Character, Weapon } from '@genshin/game-data';
-import { CHARACTERS, WEAPONS } from '@genshin/game-data';
+import { CHARACTER_ROSTER, WEAPON_ROSTER } from '@genshin/game-data';
 import type { Page } from '@playwright/test';
 import { test as base, expect } from '@playwright/test';
 
@@ -14,8 +14,8 @@ import { test as base, expect } from '@playwright/test';
  * a roster change cannot strand the suite on a character that no longer exists.
  */
 export function equippablePair(): { character: Character; weapon: Weapon } {
-  for (const character of CHARACTERS) {
-    const weapon = WEAPONS.find((candidate) => candidate.type === character.weaponType);
+  for (const character of CHARACTER_ROSTER) {
+    const weapon = WEAPON_ROSTER.find((candidate) => candidate.type === character.weaponType);
     if (weapon) return { character, weapon };
   }
 

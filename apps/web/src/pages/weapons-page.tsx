@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { WeaponId, WeaponType } from '@genshin/game-data';
-import { WEAPONS, WEAPON_TYPES } from '@genshin/game-data';
+import { WEAPON_ROSTER, WEAPON_TYPES } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
 import type { JSX } from 'react';
 import { useCallback, useMemo, useState } from 'react';
@@ -69,7 +69,7 @@ export function WeaponsPage(): JSX.Element {
   }, [weapons]);
 
   const { filteredWeapons, filteredOwnedCount } = useMemo(() => {
-    const filtered = filterWeapons(WEAPONS, filters, ownedWeaponIds);
+    const filtered = filterWeapons(WEAPON_ROSTER, filters, ownedWeaponIds);
     return {
       filteredWeapons: filtered,
       filteredOwnedCount: filtered.filter((w) => ownedWeaponIds.has(w.id)).length,
@@ -137,7 +137,7 @@ export function WeaponsPage(): JSX.Element {
             filters={filters}
             onChange={setFilters}
             filteredCount={filteredWeapons.length}
-            totalCount={WEAPONS.length}
+            totalCount={WEAPON_ROSTER.length}
             ownedCount={ownedWeaponIds.size}
             filteredOwnedCount={filteredOwnedCount}
             collapsible

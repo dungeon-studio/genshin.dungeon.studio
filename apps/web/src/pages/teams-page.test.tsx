@@ -3,7 +3,7 @@
 
 import type { CollectionWeaponId, ISOTimestamp } from '@genshin/domain';
 import type { Character, Weapon, WeaponType } from '@genshin/game-data';
-import { CHARACTERS, WEAPONS } from '@genshin/game-data';
+import { CHARACTER_ROSTER, WEAPON_ROSTER } from '@genshin/game-data';
 import { act, configure, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
@@ -23,13 +23,13 @@ configure({ asyncUtilTimeout: 10_000 });
 
 // The page draws from real game data, so fixtures have to be real entries.
 function characterWielding(weaponType: WeaponType): Character {
-  const character = CHARACTERS.find((c) => c.weaponType === weaponType);
+  const character = CHARACTER_ROSTER.find((c) => c.weaponType === weaponType);
   if (!character) throw new Error(`no ${weaponType} user in game data`);
   return character;
 }
 
 function weaponOfType(weaponType: WeaponType): Weapon {
-  const weapon = WEAPONS.find((w) => w.type === weaponType);
+  const weapon = WEAPON_ROSTER.find((w) => w.type === weaponType);
   if (!weapon) throw new Error(`no ${weaponType} in game data`);
   return weapon;
 }

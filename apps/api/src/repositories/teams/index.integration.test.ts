@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { TeamSlot } from '@genshin/domain';
-import { CHARACTERS } from '@genshin/game-data';
+import { CHARACTER_ROSTER } from '@genshin/game-data';
 import { describe, expect, it } from 'vitest';
 
 import { documentRef, newUserId } from '@/test/firestore.js';
@@ -10,7 +10,7 @@ import { documentRef, newUserId } from '@/test/firestore.js';
 import { get, list, remove, save } from './index.js';
 
 const SLOT: TeamSlot = 1;
-const CHARACTER = CHARACTERS[0];
+const CHARACTER = CHARACTER_ROSTER[0];
 const TEAM_NAME = 'Vaporise';
 
 const CREATED_AT = '2026-01-01T00:00:00.000Z';

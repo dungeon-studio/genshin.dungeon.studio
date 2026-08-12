@@ -2,14 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * Indexes catalogue records for the `getXById` helpers.
+ * Reads a catalogue record for the `getXById` helpers.
  *
- * The key type stays `string`: those helpers are the runtime gate that turns
- * unvalidated input into a catalogue record, so they must accept IDs the
+ * The key type widens to `string`: those helpers are the runtime gate that
+ * turns unvalidated input into a catalogue record, so they must accept IDs the
  * catalogue does not list.
  */
-export function indexById<T extends { readonly id: string }>(
-  records: readonly T[],
-): ReadonlyMap<string, T> {
-  return new Map<string, T>(records.map((record) => [record.id, record]));
+export function findById<T>(catalogue: Readonly<Record<string, T>>, id: string): T | undefined {
+  return catalogue[id];
 }

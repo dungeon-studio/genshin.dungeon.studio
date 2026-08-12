@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { ARTIFACT_SET_DATA } from './artifacts.generated.js';
-import { indexById } from './lookup.js';
+import { findById } from './lookup.js';
 
 /**
  * Artifact set piece types
@@ -17,6 +17,8 @@ export const ARTIFACT_PIECES = {
 
 export type ArtifactPiece = (typeof ARTIFACT_PIECES)[keyof typeof ARTIFACT_PIECES];
 
+type ArtifactSetId = keyof typeof ARTIFACT_SET_DATA;
+
 /**
  * Artifact set definition
  *
@@ -27,18 +29,29 @@ export type ArtifactPiece = (typeof ARTIFACT_PIECES)[keyof typeof ARTIFACT_PIECE
  * FUTURE: Consider adding obsolescedBy field to track when newer sets replace older ones.
  */
 export interface ArtifactSet {
-  id: string;
+  id: ArtifactSetId;
   name: string;
   version: string; // Release version (e.g., "1.0", "3.0", "4.3")
   bonuses: Record<2 | 4, string>; // 2-piece and 4-piece bonus descriptions
 }
 
 /**
- * Artifact sets with 5-star pieces, newest release first.
+ * Artifact sets with 5-star pieces, by ID.
  *
- * Lower-rarity sets are leveling fodder, so they never enter the roster.
+ * Lower-rarity sets are leveling fodder, so they never enter the catalogue.
+ * Keying by ID is what makes the IDs unique: a repeat is a duplicate property
+ * in the generated object literal, which `tsc` rejects (TS1117).
  */
-export const ARTIFACT_SETS: readonly ArtifactSet[] = ARTIFACT_SET_DATA;
+export const ARTIFACT_SETS: Readonly<Record<ArtifactSetId, ArtifactSet>> = ARTIFACT_SET_DATA;
+
+/**
+ * Artifact sets in display order: newest release first.
+ *
+ * The generator writes the catalogue in that order and object keys keep their
+ * insertion order, so this view cannot disagree with `ARTIFACT_SETS` about
+ * which sets exist.
+ */
+export const ARTIFACT_SET_ROSTER: readonly ArtifactSet[] = Object.values(ARTIFACT_SETS);
 
 /**
  * Valid main affixes for Sands of Eon
@@ -111,18 +124,16 @@ export type ArtifactMinorAffix = (typeof ARTIFACT_MINOR_AFFIXES)[number];
  */
 export type ArtifactMainAffix = SandsMainAffix | GobletMainAffix | CircletMainAffix;
 
-const ARTIFACT_SETS_BY_ID = indexById(ARTIFACT_SETS);
-
 /**
  * Helper to find artifact set by ID
  */
 export function getArtifactSetById(id: string): ArtifactSet | undefined {
-  return ARTIFACT_SETS_BY_ID.get(id);
+  return findById(ARTIFACT_SETS, id);
 }
 
 /**
  * Helper to filter artifact sets by version
  */
 export function getArtifactSetsByVersion(version: string): ArtifactSet[] {
-  return ARTIFACT_SETS.filter((set) => set.version === version);
+  return ARTIFACT_SET_ROSTER.filter((set) => set.version === version);
 }

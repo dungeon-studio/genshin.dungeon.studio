@@ -3,11 +3,11 @@
 
 import { CHARACTER_DATA } from './characters.generated.js';
 import type { Element } from './elements.js';
-import { indexById } from './lookup.js';
+import { findById } from './lookup.js';
 import type { Rarity } from './rarities.js';
 import type { WeaponType } from './weapons.js';
 
-export type CharacterId = (typeof CHARACTER_DATA)[number]['id'];
+export type CharacterId = keyof typeof CHARACTER_DATA;
 
 /**
  * Character definition
@@ -24,44 +24,54 @@ export interface Character {
 }
 
 /**
- * Playable characters with a fixed element. Absent: the Traveler and the
- * Wonderland Manekins, who borrow one, and Aloy, a crossover character.
+ * Playable characters with a fixed element, by ID. Absent: the Traveler and
+ * the Wonderland Manekins, who borrow one, and Aloy, a crossover character.
+ *
+ * Keying by ID is what makes the IDs unique: a repeat is a duplicate property
+ * in the generated object literal, which `tsc` rejects (TS1117).
  */
-export const CHARACTERS: readonly Character[] = CHARACTER_DATA;
+export const CHARACTERS: Readonly<Record<CharacterId, Character>> = CHARACTER_DATA;
 
-const CHARACTERS_BY_ID = indexById(CHARACTERS);
+/**
+ * Characters in display order: 5-star first, then newest version first.
+ *
+ * The generator writes the catalogue in that order and object keys keep their
+ * insertion order, so this view cannot disagree with `CHARACTERS` about which
+ * characters exist.
+ */
+export const CHARACTER_ROSTER: readonly Character[] = Object.values(CHARACTERS);
 
 /**
  * Helper to find character by ID
  */
 export function getCharacterById(id: string): Character | undefined {
-  return CHARACTERS_BY_ID.get(id);
+  return findById(CHARACTERS, id);
 }
 
 /**
  * Helper to filter characters by element
  */
 export function getCharactersByElement(element: Element): Character[] {
-  return CHARACTERS.filter((char) => char.element === element);
+  return CHARACTER_ROSTER.filter((char) => char.element === element);
 }
 
 /**
  * Helper to filter characters by weapon type
  */
 export function getCharactersByWeaponType(weaponType: WeaponType): Character[] {
-  return CHARACTERS.filter((char) => char.weaponType === weaponType);
+  return CHARACTER_ROSTER.filter((char) => char.weaponType === weaponType);
 }
 
 /**
  * Helper to filter characters by rarity
  */
 export function getCharactersByRarity(rarity: Rarity): Character[] {
-  return CHARACTERS.filter((char) => char.rarity === rarity);
+  return CHARACTER_ROSTER.filter((char) => char.rarity === rarity);
 }
 
 /**
  * Helper to filter characters by version
  */
 export function getCharactersByVersion(version: string): Character[] {
-  return CHARACTERS.filter((char) => char.version === version);
+  return CHARACTER_ROSTER.filter((char) => char.version === version);
 }

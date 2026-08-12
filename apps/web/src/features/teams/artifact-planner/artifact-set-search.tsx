@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { ARTIFACT_SETS, type ArtifactSet } from '@genshin/game-data';
+import { ARTIFACT_SET_ROSTER, ARTIFACT_SETS, type ArtifactSet } from '@genshin/game-data';
 import { Check, ChevronsUpDown, Minus } from 'lucide-react';
 import type { JSX } from 'react';
 import { useState } from 'react';
@@ -30,7 +30,7 @@ export function ArtifactSetSearch({
 }): JSX.Element {
   const [open, setOpen] = useState(false);
 
-  const selectedSet = value ? ARTIFACT_SETS.find((set) => set.id === value) : undefined;
+  const selectedSet = value ? ARTIFACT_SETS[value] : undefined;
 
   return (
     <div className="gap-1 flex">
@@ -62,7 +62,7 @@ export function ArtifactSetSearch({
             <CommandList>
               <CommandEmpty className="py-3 text-xs">No sets found.</CommandEmpty>
               <CommandGroup>
-                {ARTIFACT_SETS.map((set) => (
+                {ARTIFACT_SET_ROSTER.map((set) => (
                   <CommandItem
                     key={set.id}
                     value={set.name}

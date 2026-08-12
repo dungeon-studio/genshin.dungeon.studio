@@ -8,7 +8,7 @@ import type { Weapon as DbWeapon } from 'genshin-db';
 
 import { serializeEntry, writeGeneratedModule } from './emit.js';
 import { queryInEnglish } from './language.js';
-import { createIdAssigner, type IdAssigner } from './slug.js';
+import { toId } from './slug.js';
 
 /** Lowest rarity included in the roster; 1–3 star weapons are fodder for team building. */
 const MINIMUM_RARITY = 4;
@@ -54,12 +54,12 @@ function isRosterMember(record: DbWeapon | undefined): record is DbWeapon {
   return record.rarity >= MINIMUM_RARITY;
 }
 
-function toWeapon(record: DbWeapon, assignId: IdAssigner): GeneratedWeapon {
+function toWeapon(record: DbWeapon): GeneratedWeapon {
   const type = WEAPON_TYPE_BY_GENSHIN_DB[record.weaponType];
   if (!type) throw new Error(`Unknown weapon type "${record.weaponType}" for ${record.name}`);
 
   const weapon: GeneratedWeapon = {
-    id: assignId(record.name),
+    id: toId(record.name, 'weapon'),
     name: record.name,
     type,
     rarity: record.rarity,
@@ -95,13 +95,11 @@ function byRosterOrder(a: GeneratedWeapon, b: GeneratedWeapon): number {
 export function buildWeapons(): GeneratedWeapon[] {
   queryInEnglish();
 
-  const assignId = createIdAssigner('weapon');
-
   return genshinDb
     .weapons('names', { matchCategories: true })
     .map((name) => genshinDb.weapons(name))
     .filter(isRosterMember)
-    .map((record) => toWeapon(record, assignId))
+    .map(toWeapon)
     .sort(byRosterOrder);
 }
 
@@ -129,7 +127,7 @@ function serializeWeapon(weapon: GeneratedWeapon): string {
     fields.push(`passiveDescription: ${JSON.stringify(weapon.passiveDescription)},`);
   }
 
-  return serializeEntry(fields);
+  return serializeEntry(weapon.id, fields);
 }
 
 /**
