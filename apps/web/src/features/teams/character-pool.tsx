@@ -4,7 +4,7 @@
 import type { CharacterId, ConstellationLevel, TeamSlot } from '@genshin/domain';
 import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import type { Character, WeaponType } from '@genshin/game-data';
-import { CHARACTERS } from '@genshin/game-data';
+import { CHARACTER_ROSTER } from '@genshin/game-data';
 import { Lock, Users } from 'lucide-react';
 import type { JSX } from 'react';
 import { useMemo, useState } from 'react';
@@ -66,7 +66,8 @@ export function CharacterPool({
   const ownedCount = ownedIds.size;
 
   const eligibleCharacters = useMemo(
-    () => (weaponType ? CHARACTERS.filter((c) => c.weaponType === weaponType) : CHARACTERS),
+    () =>
+      weaponType ? CHARACTER_ROSTER.filter((c) => c.weaponType === weaponType) : CHARACTER_ROSTER,
     [weaponType],
   );
 

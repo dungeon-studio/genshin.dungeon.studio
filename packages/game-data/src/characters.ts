@@ -3,11 +3,10 @@
 
 import { CHARACTER_DATA } from './characters.generated.js';
 import type { Element } from './elements.js';
-import { indexById } from './lookup.js';
 import type { Rarity } from './rarities.js';
 import type { WeaponType } from './weapons.js';
 
-export type CharacterId = (typeof CHARACTER_DATA)[number]['id'];
+export type CharacterId = keyof typeof CHARACTER_DATA;
 
 /**
  * Character definition
@@ -26,42 +25,19 @@ export interface Character {
 /**
  * Playable characters with a fixed element. Absent: the Traveler and the
  * Wonderland Manekins, who borrow one, and Aloy, a crossover character.
+ *
+ * Keyed so a repeated ID is a `tsc` error (TS1117), not a silent overwrite.
  */
-export const CHARACTERS: readonly Character[] = CHARACTER_DATA;
+export const CHARACTERS: Readonly<Record<CharacterId, Character>> = CHARACTER_DATA;
 
-const CHARACTERS_BY_ID = indexById(CHARACTERS);
+/** Display order, as the generator writes it: 5-star first, newest version first. */
+export const CHARACTER_ROSTER: readonly Character[] = Object.values(CHARACTERS);
 
-/**
- * Helper to find character by ID
- */
+/** `hasOwn`, not a bare index: `constructor` and friends sit on every object's prototype. */
+function isCharacterId(id: string): id is CharacterId {
+  return Object.hasOwn(CHARACTERS, id);
+}
+
 export function getCharacterById(id: string): Character | undefined {
-  return CHARACTERS_BY_ID.get(id);
-}
-
-/**
- * Helper to filter characters by element
- */
-export function getCharactersByElement(element: Element): Character[] {
-  return CHARACTERS.filter((char) => char.element === element);
-}
-
-/**
- * Helper to filter characters by weapon type
- */
-export function getCharactersByWeaponType(weaponType: WeaponType): Character[] {
-  return CHARACTERS.filter((char) => char.weaponType === weaponType);
-}
-
-/**
- * Helper to filter characters by rarity
- */
-export function getCharactersByRarity(rarity: Rarity): Character[] {
-  return CHARACTERS.filter((char) => char.rarity === rarity);
-}
-
-/**
- * Helper to filter characters by version
- */
-export function getCharactersByVersion(version: string): Character[] {
-  return CHARACTERS.filter((char) => char.version === version);
+  return isCharacterId(id) ? CHARACTERS[id] : undefined;
 }

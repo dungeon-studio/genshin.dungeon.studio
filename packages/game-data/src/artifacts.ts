@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 import { ARTIFACT_SET_DATA } from './artifacts.generated.js';
-import { indexById } from './lookup.js';
 
 /**
  * Artifact set piece types
@@ -17,6 +16,8 @@ export const ARTIFACT_PIECES = {
 
 export type ArtifactPiece = (typeof ARTIFACT_PIECES)[keyof typeof ARTIFACT_PIECES];
 
+type ArtifactSetId = keyof typeof ARTIFACT_SET_DATA;
+
 /**
  * Artifact set definition
  *
@@ -27,18 +28,22 @@ export type ArtifactPiece = (typeof ARTIFACT_PIECES)[keyof typeof ARTIFACT_PIECE
  * FUTURE: Consider adding obsolescedBy field to track when newer sets replace older ones.
  */
 export interface ArtifactSet {
-  id: string;
+  id: ArtifactSetId;
   name: string;
   version: string; // Release version (e.g., "1.0", "3.0", "4.3")
   bonuses: Record<2 | 4, string>; // 2-piece and 4-piece bonus descriptions
 }
 
 /**
- * Artifact sets with 5-star pieces, newest release first.
+ * Artifact sets with 5-star pieces.
  *
- * Lower-rarity sets are leveling fodder, so they never enter the roster.
+ * Lower-rarity sets are leveling fodder, so they never enter the catalogue.
+ * Keyed so a repeated ID is a `tsc` error (TS1117), not a silent overwrite.
  */
-export const ARTIFACT_SETS: readonly ArtifactSet[] = ARTIFACT_SET_DATA;
+export const ARTIFACT_SETS: Readonly<Record<ArtifactSetId, ArtifactSet>> = ARTIFACT_SET_DATA;
+
+/** Display order, as the generator writes it: newest release first. */
+export const ARTIFACT_SET_ROSTER: readonly ArtifactSet[] = Object.values(ARTIFACT_SETS);
 
 /**
  * Valid main affixes for Sands of Eon
@@ -111,18 +116,11 @@ export type ArtifactMinorAffix = (typeof ARTIFACT_MINOR_AFFIXES)[number];
  */
 export type ArtifactMainAffix = SandsMainAffix | GobletMainAffix | CircletMainAffix;
 
-const ARTIFACT_SETS_BY_ID = indexById(ARTIFACT_SETS);
-
-/**
- * Helper to find artifact set by ID
- */
-export function getArtifactSetById(id: string): ArtifactSet | undefined {
-  return ARTIFACT_SETS_BY_ID.get(id);
+/** `hasOwn`, not a bare index: `constructor` and friends sit on every object's prototype. */
+function isArtifactSetId(id: string): id is ArtifactSetId {
+  return Object.hasOwn(ARTIFACT_SETS, id);
 }
 
-/**
- * Helper to filter artifact sets by version
- */
-export function getArtifactSetsByVersion(version: string): ArtifactSet[] {
-  return ARTIFACT_SETS.filter((set) => set.version === version);
+export function getArtifactSetById(id: string): ArtifactSet | undefined {
+  return isArtifactSetId(id) ? ARTIFACT_SETS[id] : undefined;
 }

@@ -23,12 +23,9 @@ export type { Rarity } from './rarities.js';
 
 // Characters
 export {
+  CHARACTER_ROSTER,
   CHARACTERS,
   getCharacterById,
-  getCharactersByElement,
-  getCharactersByRarity,
-  getCharactersByVersion,
-  getCharactersByWeaponType,
   type Character,
   type CharacterId,
 } from './characters.js';
@@ -36,9 +33,7 @@ export {
 // Weapons
 export {
   getWeaponById,
-  getWeaponsByRarity,
-  getWeaponsByType,
-  getWeaponsByVersion,
+  WEAPON_ROSTER,
   WEAPON_STAT_TYPES,
   WEAPON_TYPES,
   WEAPONS,
@@ -52,10 +47,10 @@ export {
 export {
   ARTIFACT_MINOR_AFFIXES,
   ARTIFACT_PIECES,
+  ARTIFACT_SET_ROSTER,
   ARTIFACT_SETS,
   CIRCLET_MAIN_AFFIXES,
   getArtifactSetById,
-  getArtifactSetsByVersion,
   GOBLET_MAIN_AFFIXES,
   SANDS_MAIN_AFFIXES,
   type ArtifactMainAffix,

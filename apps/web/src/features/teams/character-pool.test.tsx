@@ -3,7 +3,7 @@
 
 import type { ISOTimestamp } from '@genshin/domain';
 import type { Character, WeaponType } from '@genshin/game-data';
-import { CHARACTERS } from '@genshin/game-data';
+import { CHARACTER_ROSTER } from '@genshin/game-data';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -14,7 +14,7 @@ import { useTeamStore } from './use-team-store';
 
 // The pool draws from real game data, so fixtures have to be real characters.
 function characterWielding(weaponType: WeaponType): Character {
-  const character = CHARACTERS.find((c) => c.weaponType === weaponType);
+  const character = CHARACTER_ROSTER.find((c) => c.weaponType === weaponType);
   if (!character) throw new Error(`no ${weaponType} user in game data`);
   return character;
 }

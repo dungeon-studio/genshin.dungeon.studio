@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { createIdAssigner, toKebabCase } from './slug.js';
+import { toId, toKebabCase } from './slug.js';
 
 describe('toKebabCase', () => {
   it('lowercases and hyphenates spaces', () => {
@@ -21,22 +21,8 @@ describe('toKebabCase', () => {
   });
 });
 
-describe('createIdAssigner', () => {
-  it('rejects two names that slugify alike', () => {
-    const assignId = createIdAssigner('weapon');
-    assignId('The Catch');
-
-    expect(() => assignId('The Catch!')).toThrow(/Duplicate weapon id "the-catch"/);
-  });
-
-  it('tracks names per assigner', () => {
-    const assignId = createIdAssigner('weapon');
-    assignId('The Catch');
-
-    expect(createIdAssigner('weapon')('The Catch')).toBe('the-catch');
-  });
-
+describe('toId', () => {
   it('rejects a name with nothing to slugify', () => {
-    expect(() => createIdAssigner('artifact set')('!!')).toThrow(/Empty id for artifact set/);
+    expect(() => toId('!!', 'artifact set')).toThrow(/Empty id for artifact set/);
   });
 });

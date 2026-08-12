@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { CHARACTERS } from './characters.js';
+import { CHARACTER_ROSTER } from './characters.js';
 import { compareVersions, GAME_DATA_VERSION } from './versions.js';
 
 describe('compareVersions', () => {
@@ -56,10 +56,10 @@ describe('compareVersions', () => {
       expect(() => compareVersions(GAME_DATA_VERSION, '1.0')).not.toThrow();
     });
 
-    it('is >= the latest version in CHARACTERS', () => {
-      const maxCharacterVersion = CHARACTERS.reduce(
+    it('is >= the latest version in the character roster', () => {
+      const maxCharacterVersion = CHARACTER_ROSTER.reduce(
         (max, c) => (compareVersions(c.version, max) > 0 ? c.version : max),
-        CHARACTERS[0].version,
+        CHARACTER_ROSTER[0].version,
       );
       expect(compareVersions(GAME_DATA_VERSION, maxCharacterVersion)).toBeGreaterThanOrEqual(0);
     });

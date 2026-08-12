@@ -8,7 +8,7 @@ import type {
   TeamSlot,
 } from '@genshin/domain';
 import type { Weapon, WeaponType } from '@genshin/game-data';
-import { getWeaponById, WEAPONS } from '@genshin/game-data';
+import { getWeaponById, WEAPON_ROSTER } from '@genshin/game-data';
 import { Lock, Swords } from 'lucide-react';
 import type { JSX } from 'react';
 import { useMemo, useState } from 'react';
@@ -91,7 +91,7 @@ export function WeaponPool({
   const { filteredWeapons, filteredOwnedCount } = useMemo(() => {
     if (ownedWeaponIds.size === 0 || !hasWeaponsOfType)
       return { filteredWeapons: [] as Weapon[], filteredOwnedCount: 0 };
-    const filtered = filterWeapons(WEAPONS, filters, ownedWeaponIds);
+    const filtered = filterWeapons(WEAPON_ROSTER, filters, ownedWeaponIds);
     return {
       filteredWeapons: filtered,
       filteredOwnedCount: filtered.filter((w) => ownedWeaponIds.has(w.id)).length,
@@ -148,7 +148,7 @@ export function WeaponPool({
         filters={filters}
         onChange={handleFilterChange}
         filteredCount={filteredWeapons.length}
-        totalCount={WEAPONS.length}
+        totalCount={WEAPON_ROSTER.length}
         ownedCount={ownedCount}
         filteredOwnedCount={filteredOwnedCount}
         showOwnership={false}

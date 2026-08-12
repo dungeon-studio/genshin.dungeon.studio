@@ -8,7 +8,7 @@ import type { Weapon as DbWeapon } from 'genshin-db';
 
 import { serializeEntry, writeGeneratedModule } from './emit.js';
 import { queryInEnglish } from './language.js';
-import { createIdAssigner, type IdAssigner } from './slug.js';
+import { toId } from './slug.js';
 
 /** Lowest rarity included in the roster; 1–3 star weapons are fodder for team building. */
 const MINIMUM_RARITY = 4;
@@ -41,10 +41,8 @@ export interface GeneratedWeapon {
   rarity: Rarity;
   baseATK: number;
   version: string;
-  subStatType?: WeaponStatType;
-  subStatValue?: number;
-  passiveName?: string;
-  passiveDescription?: string;
+  subStat?: { type: WeaponStatType; value: number };
+  passive?: { name: string; description: string };
 }
 
 function isRosterMember(record: DbWeapon | undefined): record is DbWeapon {
@@ -54,12 +52,12 @@ function isRosterMember(record: DbWeapon | undefined): record is DbWeapon {
   return record.rarity >= MINIMUM_RARITY;
 }
 
-function toWeapon(record: DbWeapon, assignId: IdAssigner): GeneratedWeapon {
+function toWeapon(record: DbWeapon): GeneratedWeapon {
   const type = WEAPON_TYPE_BY_GENSHIN_DB[record.weaponType];
   if (!type) throw new Error(`Unknown weapon type "${record.weaponType}" for ${record.name}`);
 
   const weapon: GeneratedWeapon = {
-    id: assignId(record.name),
+    id: toId(record.name, 'weapon'),
     name: record.name,
     type,
     rarity: record.rarity,
@@ -72,14 +70,12 @@ function toWeapon(record: DbWeapon, assignId: IdAssigner): GeneratedWeapon {
     if (!subStatType) {
       throw new Error(`Unknown sub-stat "${record.mainStatType}" for ${record.name}`);
     }
-    weapon.subStatType = subStatType;
     // `baseStatText` is the in-game display, e.g. "9.6%" (percent) or "36" (flat EM).
-    weapon.subStatValue = parseFloat(record.baseStatText);
+    weapon.subStat = { type: subStatType, value: parseFloat(record.baseStatText) };
   }
 
   if (record.effectName && record.r1?.description) {
-    weapon.passiveName = record.effectName;
-    weapon.passiveDescription = record.r1.description;
+    weapon.passive = { name: record.effectName, description: record.r1.description };
   }
 
   return weapon;
@@ -95,19 +91,16 @@ function byRosterOrder(a: GeneratedWeapon, b: GeneratedWeapon): number {
 export function buildWeapons(): GeneratedWeapon[] {
   queryInEnglish();
 
-  const assignId = createIdAssigner('weapon');
-
   return genshinDb
     .weapons('names', { matchCategories: true })
     .map((name) => genshinDb.weapons(name))
     .filter(isRosterMember)
-    .map((record) => toWeapon(record, assignId))
+    .map(toWeapon)
     .sort(byRosterOrder);
 }
 
 function serializeWeapon(weapon: GeneratedWeapon): string {
   const fields = [
-    `id: '${weapon.id}',`,
     `name: ${JSON.stringify(weapon.name)},`,
     `type: '${weapon.type}',`,
     `rarity: ${weapon.rarity},`,
@@ -115,21 +108,23 @@ function serializeWeapon(weapon: GeneratedWeapon): string {
     `version: '${weapon.version}',`,
   ];
 
-  if (weapon.subStatType && weapon.subStatValue !== undefined) {
+  if (weapon.subStat) {
     fields.push(
       'subStat: {',
-      `  type: ${JSON.stringify(weapon.subStatType)},`,
-      `  value: ${weapon.subStatValue},`,
+      `  type: ${JSON.stringify(weapon.subStat.type)},`,
+      `  value: ${weapon.subStat.value},`,
       '},',
     );
   }
 
-  if (weapon.passiveName) fields.push(`passiveName: ${JSON.stringify(weapon.passiveName)},`);
-  if (weapon.passiveDescription) {
-    fields.push(`passiveDescription: ${JSON.stringify(weapon.passiveDescription)},`);
+  if (weapon.passive) {
+    fields.push(
+      `passiveName: ${JSON.stringify(weapon.passive.name)},`,
+      `passiveDescription: ${JSON.stringify(weapon.passive.description)},`,
+    );
   }
 
-  return serializeEntry(fields);
+  return serializeEntry(weapon.id, fields);
 }
 
 /**

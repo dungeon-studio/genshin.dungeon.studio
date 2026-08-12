@@ -7,7 +7,7 @@ import type { Artifact as DbArtifact } from 'genshin-db';
 
 import { serializeEntry, writeGeneratedModule } from './emit.js';
 import { queryInEnglish } from './language.js';
-import { createIdAssigner, type IdAssigner } from './slug.js';
+import { toId } from './slug.js';
 
 /** Only sets with 5-star pieces are tracked; the rest are leveling fodder. */
 const ENDGAME_RARITY = 5;
@@ -23,7 +23,7 @@ function isEndgameSet(record: DbArtifact | undefined): record is DbArtifact {
   return record?.rarityList.includes(ENDGAME_RARITY) ?? false;
 }
 
-function toArtifactSet(record: DbArtifact, assignId: IdAssigner): GeneratedArtifactSet {
+function toArtifactSet(record: DbArtifact): GeneratedArtifactSet {
   // Only the single-piece circlet sets carry one bonus, and they cap at
   // 4 stars, so a 5-star set missing either is upstream drift.
   if (!record.effect2Pc || !record.effect4Pc) {
@@ -31,7 +31,7 @@ function toArtifactSet(record: DbArtifact, assignId: IdAssigner): GeneratedArtif
   }
 
   return {
-    id: assignId(record.name),
+    id: toId(record.name, 'artifact set'),
     name: record.name,
     version: record.version,
     bonuses: { 2: record.effect2Pc, 4: record.effect4Pc },
@@ -46,19 +46,16 @@ function byRosterOrder(a: GeneratedArtifactSet, b: GeneratedArtifactSet): number
 export function buildArtifactSets(): GeneratedArtifactSet[] {
   queryInEnglish();
 
-  const assignId = createIdAssigner('artifact set');
-
   return genshinDb
     .artifacts('names', { matchCategories: true })
     .map((name) => genshinDb.artifacts(name))
     .filter(isEndgameSet)
-    .map((record) => toArtifactSet(record, assignId))
+    .map(toArtifactSet)
     .sort(byRosterOrder);
 }
 
 function serializeArtifactSet(set: GeneratedArtifactSet): string {
-  return serializeEntry([
-    `id: '${set.id}',`,
+  return serializeEntry(set.id, [
     `name: ${JSON.stringify(set.name)},`,
     `version: '${set.version}',`,
     'bonuses: {',

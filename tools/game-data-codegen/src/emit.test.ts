@@ -5,14 +5,14 @@ import { existsSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-import { renderModule, resolveGeneratedPath } from './emit.js';
+import { renderModule, resolveGeneratedPath, serializeEntry } from './emit.js';
 
 describe('renderModule', () => {
   const rendered = renderModule({
     path: 'src/weapons.generated.ts',
     exportName: 'WEAPON_DATA',
     command: 'weapons',
-    entries: ["  { id: 'the-catch' },"],
+    entries: [serializeEntry('the-catch', ['rarity: 4,'])],
   });
 
   it('opens with the SPDX header the REUSE gate requires', () => {
@@ -26,8 +26,10 @@ describe('renderModule', () => {
     expect(rendered).toContain('generate weapons');
   });
 
-  it('wraps the entries in a const assertion', () => {
-    expect(rendered).toContain("export const WEAPON_DATA = [\n  { id: 'the-catch' },\n] as const;");
+  it('keys the entries by id in a const assertion, so a duplicate fails typecheck', () => {
+    expect(rendered).toContain(
+      "export const WEAPON_DATA = {\n  'the-catch': {\n    id: 'the-catch',\n    rarity: 4,\n  },\n} as const;",
+    );
   });
 
   it('ends with a newline, so regeneration leaves nothing for the formatter', () => {

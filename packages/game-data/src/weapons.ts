@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { indexById } from './lookup.js';
 import type { Rarity } from './rarities.js';
 import { WEAPON_DATA } from './weapons.generated.js';
 
@@ -34,7 +33,7 @@ export const WEAPON_STAT_TYPES = {
 
 export type WeaponStatType = (typeof WEAPON_STAT_TYPES)[keyof typeof WEAPON_STAT_TYPES];
 
-export type WeaponId = (typeof WEAPON_DATA)[number]['id'];
+export type WeaponId = keyof typeof WEAPON_DATA;
 
 /**
  * Weapon definition
@@ -54,34 +53,17 @@ export interface Weapon {
   passiveDescription?: string;
 }
 
-export const WEAPONS: readonly Weapon[] = WEAPON_DATA;
+/** Keyed so a repeated ID is a `tsc` error (TS1117), not a silent overwrite. */
+export const WEAPONS: Readonly<Record<WeaponId, Weapon>> = WEAPON_DATA;
 
-const WEAPONS_BY_ID = indexById(WEAPONS);
+/** Display order, as the generator writes it: 5-star first, newest version first. */
+export const WEAPON_ROSTER: readonly Weapon[] = Object.values(WEAPONS);
 
-/**
- * Helper to find weapon by ID
- */
+/** `hasOwn`, not a bare index: `constructor` and friends sit on every object's prototype. */
+function isWeaponId(id: string): id is WeaponId {
+  return Object.hasOwn(WEAPONS, id);
+}
+
 export function getWeaponById(id: string): Weapon | undefined {
-  return WEAPONS_BY_ID.get(id);
-}
-
-/**
- * Helper to filter weapons by type
- */
-export function getWeaponsByType(type: WeaponType): Weapon[] {
-  return WEAPONS.filter((weapon) => weapon.type === type);
-}
-
-/**
- * Helper to filter weapons by rarity
- */
-export function getWeaponsByRarity(rarity: Rarity): Weapon[] {
-  return WEAPONS.filter((weapon) => weapon.rarity === rarity);
-}
-
-/**
- * Helper to filter weapons by version
- */
-export function getWeaponsByVersion(version: string): Weapon[] {
-  return WEAPONS.filter((weapon) => weapon.version === version);
+  return isWeaponId(id) ? WEAPONS[id] : undefined;
 }

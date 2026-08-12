@@ -9,7 +9,7 @@ import type { Character as DbCharacter } from 'genshin-db';
 import { CHARACTER_RELEASE_DATES } from './character-release-dates.js';
 import { serializeEntry, writeGeneratedModule } from './emit.js';
 import { queryInEnglish } from './language.js';
-import { createIdAssigner, toKebabCase, type IdAssigner } from './slug.js';
+import { toId, toKebabCase } from './slug.js';
 import { WEAPON_TYPE_BY_GENSHIN_DB } from './weapons.js';
 
 /** genshin-db leaves `region` blank for characters with no established homeland. */
@@ -47,8 +47,8 @@ function isRosterMember(record: DbCharacter | undefined): record is DbCharacter 
   return !EXCLUDED_IDS.has(toKebabCase(record.name));
 }
 
-function toCharacter(record: DbCharacter, assignId: IdAssigner): GeneratedCharacter {
-  const id = assignId(record.name);
+function toCharacter(record: DbCharacter): GeneratedCharacter {
+  const id = toId(record.name, 'character');
 
   const element = ELEMENT_BY_GENSHIN_DB[record.elementType];
   if (!element) throw new Error(`Unknown element "${record.elementType}" for ${record.name}`);
@@ -87,19 +87,16 @@ function byRosterOrder(a: GeneratedCharacter, b: GeneratedCharacter): number {
 export function buildCharacters(): GeneratedCharacter[] {
   queryInEnglish();
 
-  const assignId = createIdAssigner('character');
-
   return genshinDb
     .characters('names', { matchCategories: true })
     .map((name) => genshinDb.characters(name))
     .filter(isRosterMember)
-    .map((record) => toCharacter(record, assignId))
+    .map(toCharacter)
     .sort(byRosterOrder);
 }
 
 function serializeCharacter(character: GeneratedCharacter): string {
-  return serializeEntry([
-    `id: '${character.id}',`,
+  return serializeEntry(character.id, [
     `name: ${JSON.stringify(character.name)},`,
     `element: '${character.element}',`,
     `weaponType: '${character.weaponType}',`,
