@@ -157,7 +157,7 @@ jobs:
 
     env:
       # renovate: datasource=java-version depName=java
-      JAVA_VERSION: '21'
+      JAVA_VERSION: '21.0.12+8.0.LTS'
 
     steps:
       - name: Checkout repository
@@ -190,7 +190,7 @@ jobs:
 
     env:
       # renovate: datasource=java-version depName=java
-      JAVA_VERSION: '21'
+      JAVA_VERSION: '21.0.12+8.0.LTS'
 
     steps:
       - name: Checkout repository
@@ -240,7 +240,7 @@ jobs:
 
     env:
       # renovate: datasource=java-version depName=java
-      JAVA_VERSION: '21'
+      JAVA_VERSION: '21.0.12+8.0.LTS'
 
     steps:
       - name: Checkout repository
