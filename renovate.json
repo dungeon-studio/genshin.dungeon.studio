@@ -35,7 +35,7 @@
       "minimumReleaseAge": null
     },
     {
-      "description": "Exempt the java-version datasource from the minimum release-age bake, so its renovate/stability-days check can resolve under internalChecksFilter:strict; the Adoptium release_versions endpoint it reads carries no release timestamps",
+      "description": "The release_versions endpoint Renovate reads carries no release timestamps, so a release-age bake here would never resolve its renovate/stability-days check under internalChecksFilter:strict",
       "matchDatasources": ["java-version"],
       "minimumReleaseAge": null
     },
