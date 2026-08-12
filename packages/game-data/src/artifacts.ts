@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 import { ARTIFACT_SET_DATA } from './artifacts.generated.js';
-import { findById } from './lookup.js';
 
 /**
  * Artifact set piece types
@@ -117,6 +116,11 @@ export type ArtifactMinorAffix = (typeof ARTIFACT_MINOR_AFFIXES)[number];
  */
 export type ArtifactMainAffix = SandsMainAffix | GobletMainAffix | CircletMainAffix;
 
+/** `hasOwn`, not a bare index: `constructor` and friends sit on every object's prototype. */
+function isArtifactSetId(id: string): id is ArtifactSetId {
+  return Object.hasOwn(ARTIFACT_SETS, id);
+}
+
 export function getArtifactSetById(id: string): ArtifactSet | undefined {
-  return findById(ARTIFACT_SETS, id);
+  return isArtifactSetId(id) ? ARTIFACT_SETS[id] : undefined;
 }

@@ -3,7 +3,6 @@
 
 import { CHARACTER_DATA } from './characters.generated.js';
 import type { Element } from './elements.js';
-import { findById } from './lookup.js';
 import type { Rarity } from './rarities.js';
 import type { WeaponType } from './weapons.js';
 
@@ -34,6 +33,11 @@ export const CHARACTERS: Readonly<Record<CharacterId, Character>> = CHARACTER_DA
 /** Display order, as the generator writes it: 5-star first, newest version first. */
 export const CHARACTER_ROSTER: readonly Character[] = Object.values(CHARACTERS);
 
+/** `hasOwn`, not a bare index: `constructor` and friends sit on every object's prototype. */
+function isCharacterId(id: string): id is CharacterId {
+  return Object.hasOwn(CHARACTERS, id);
+}
+
 export function getCharacterById(id: string): Character | undefined {
-  return findById(CHARACTERS, id);
+  return isCharacterId(id) ? CHARACTERS[id] : undefined;
 }

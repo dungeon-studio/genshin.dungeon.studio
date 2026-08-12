@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { findById } from './lookup.js';
 import type { Rarity } from './rarities.js';
 import { WEAPON_DATA } from './weapons.generated.js';
 
@@ -60,6 +59,11 @@ export const WEAPONS: Readonly<Record<WeaponId, Weapon>> = WEAPON_DATA;
 /** Display order, as the generator writes it: 5-star first, newest version first. */
 export const WEAPON_ROSTER: readonly Weapon[] = Object.values(WEAPONS);
 
+/** `hasOwn`, not a bare index: `constructor` and friends sit on every object's prototype. */
+function isWeaponId(id: string): id is WeaponId {
+  return Object.hasOwn(WEAPONS, id);
+}
+
 export function getWeaponById(id: string): Weapon | undefined {
-  return findById(WEAPONS, id);
+  return isWeaponId(id) ? WEAPONS[id] : undefined;
 }
