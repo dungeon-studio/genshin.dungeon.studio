@@ -23,7 +23,9 @@ describe('buildCharacters', () => {
 
   it('produces unique, nonempty ids', () => {
     const ids = characters.map((character) => character.id);
-    expect(new Set(ids).size).toBe(ids.length);
+    // Naming the repeat matters: the roster's keyed literal reports a collision
+    // as a TS1117 line number, without saying which id it landed on.
+    expect(ids.filter((id, index) => ids.indexOf(id) !== index)).toEqual([]);
     expect(ids.every((id) => id.length > 0)).toBe(true);
   });
 
