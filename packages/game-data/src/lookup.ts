@@ -2,11 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * Reads a catalogue record for the `getXById` helpers.
- *
- * The key type widens to `string`: those helpers are the runtime gate that
- * turns unvalidated input into a catalogue record, so they must accept IDs the
- * catalogue does not list.
+ * The key type widens to `string` because the `getXById` helpers are the
+ * runtime gate that turns unvalidated input into a catalogue record: they must
+ * accept IDs the catalogue does not list.
  */
 export function findById<T>(catalogue: Readonly<Record<string, T>>, id: string): T | undefined {
   return catalogue[id];

@@ -7,9 +7,9 @@ import { WEAPON_ROSTER } from './weapons.js';
 
 describe('WEAPON_ROSTER', () => {
   it('is not empty', () => {
-    // Structural invariants (unique kebab ids, rarity range, sort order) are
-    // guaranteed by the generator. This only catches a generation that
-    // silently produced nothing.
+    // The generator guarantees rarity range and sort order, the record type
+    // unique ids. This only catches a generation that silently produced
+    // nothing.
     expect(WEAPON_ROSTER.length).toBeGreaterThan(0);
   });
 });

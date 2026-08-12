@@ -24,26 +24,16 @@ export interface Character {
 }
 
 /**
- * Playable characters with a fixed element, by ID. Absent: the Traveler and
- * the Wonderland Manekins, who borrow one, and Aloy, a crossover character.
+ * Playable characters with a fixed element. Absent: the Traveler and the
+ * Wonderland Manekins, who borrow one, and Aloy, a crossover character.
  *
- * Keying by ID is what makes the IDs unique: a repeat is a duplicate property
- * in the generated object literal, which `tsc` rejects (TS1117).
+ * Keyed so a repeated ID is a `tsc` error (TS1117), not a silent overwrite.
  */
 export const CHARACTERS: Readonly<Record<CharacterId, Character>> = CHARACTER_DATA;
 
-/**
- * Characters in display order: 5-star first, then newest version first.
- *
- * The generator writes the catalogue in that order and object keys keep their
- * insertion order, so this view cannot disagree with `CHARACTERS` about which
- * characters exist.
- */
+/** Display order, as the generator writes it: 5-star first, newest version first. */
 export const CHARACTER_ROSTER: readonly Character[] = Object.values(CHARACTERS);
 
-/**
- * Helper to find character by ID
- */
 export function getCharacterById(id: string): Character | undefined {
   return findById(CHARACTERS, id);
 }

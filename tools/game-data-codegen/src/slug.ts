@@ -22,9 +22,7 @@ export function toKebabCase(name: string): string {
  *
  * A name that slugifies to nothing means upstream data moved in a way the
  * roster can't represent, so generation aborts rather than emitting a record
- * no consumer can address; `noun` names the record kind in that error, e.g.
- * `weapon`. Collisions need no check of their own: rosters emit as id-keyed
- * object literals, where a repeated id is a `tsc` error (TS1117).
+ * no consumer can address. `noun` names the record kind in that error.
  */
 export function toId(name: string, noun: string): string {
   const id = toKebabCase(name);

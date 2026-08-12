@@ -36,21 +36,14 @@ export interface ArtifactSet {
 }
 
 /**
- * Artifact sets with 5-star pieces, by ID.
+ * Artifact sets with 5-star pieces.
  *
  * Lower-rarity sets are leveling fodder, so they never enter the catalogue.
- * Keying by ID is what makes the IDs unique: a repeat is a duplicate property
- * in the generated object literal, which `tsc` rejects (TS1117).
+ * Keyed so a repeated ID is a `tsc` error (TS1117), not a silent overwrite.
  */
 export const ARTIFACT_SETS: Readonly<Record<ArtifactSetId, ArtifactSet>> = ARTIFACT_SET_DATA;
 
-/**
- * Artifact sets in display order: newest release first.
- *
- * The generator writes the catalogue in that order and object keys keep their
- * insertion order, so this view cannot disagree with `ARTIFACT_SETS` about
- * which sets exist.
- */
+/** Display order, as the generator writes it: newest release first. */
 export const ARTIFACT_SET_ROSTER: readonly ArtifactSet[] = Object.values(ARTIFACT_SETS);
 
 /**
@@ -124,9 +117,6 @@ export type ArtifactMinorAffix = (typeof ARTIFACT_MINOR_AFFIXES)[number];
  */
 export type ArtifactMainAffix = SandsMainAffix | GobletMainAffix | CircletMainAffix;
 
-/**
- * Helper to find artifact set by ID
- */
 export function getArtifactSetById(id: string): ArtifactSet | undefined {
   return findById(ARTIFACT_SETS, id);
 }

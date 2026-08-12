@@ -54,26 +54,12 @@ export interface Weapon {
   passiveDescription?: string;
 }
 
-/**
- * Weapons by ID.
- *
- * Keying by ID is what makes the IDs unique: a repeat is a duplicate property
- * in the generated object literal, which `tsc` rejects (TS1117).
- */
+/** Keyed so a repeated ID is a `tsc` error (TS1117), not a silent overwrite. */
 export const WEAPONS: Readonly<Record<WeaponId, Weapon>> = WEAPON_DATA;
 
-/**
- * Weapons in display order: 5-star first, then newest version first.
- *
- * The generator writes the catalogue in that order and object keys keep their
- * insertion order, so this view cannot disagree with `WEAPONS` about which
- * weapons exist.
- */
+/** Display order, as the generator writes it: 5-star first, newest version first. */
 export const WEAPON_ROSTER: readonly Weapon[] = Object.values(WEAPONS);
 
-/**
- * Helper to find weapon by ID
- */
 export function getWeaponById(id: string): Weapon | undefined {
   return findById(WEAPONS, id);
 }

@@ -13,9 +13,9 @@ import {
 
 describe('ARTIFACT_SET_ROSTER', () => {
   it('is not empty', () => {
-    // Structural invariants (unique kebab ids, both bonuses, sort order) are
-    // guaranteed by the generator. This only catches a generation that
-    // silently produced nothing.
+    // The generator guarantees both bonuses and sort order, the record type
+    // unique ids. This only catches a generation that silently produced
+    // nothing.
     expect(ARTIFACT_SET_ROSTER.length).toBeGreaterThan(0);
   });
 });

@@ -27,13 +27,12 @@ export function resolveGeneratedPath(path: string): string {
 }
 
 /**
- * Indents one record's fields into a member of the emitted object, keyed by
- * its id. Nested fields add two spaces of their own.
+ * Indents one record's fields into a member of the emitted object. Nested
+ * fields add two spaces of their own.
  *
  * Keying by id is what makes a duplicate a `tsc` error (TS1117) rather than a
- * silent last-wins overwrite. The id is also written as the record's first
- * field, from the same argument as the key, so a record still carries its own
- * id once a consumer reads it out of the catalogue.
+ * silent last-wins overwrite. The id is written as a field too, so a record
+ * still carries it once read out of the catalogue.
  */
 export function serializeEntry(id: string, fields: readonly string[]): string {
   const members = [`id: '${id}',`, ...fields];
