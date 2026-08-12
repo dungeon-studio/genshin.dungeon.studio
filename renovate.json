@@ -35,6 +35,11 @@
       "minimumReleaseAge": null
     },
     {
+      "description": "The release_versions endpoint Renovate reads carries no release timestamps, so a release-age bake here would never resolve its renovate/stability-days check under internalChecksFilter:strict",
+      "matchDatasources": ["java-version"],
+      "minimumReleaseAge": null
+    },
+    {
       "description": "Move the Terraform CLI in one pull request across the bootstrap and dev required_version constraints and the TERRAFORM_VERSION pins in four workflows",
       "matchDepNames": ["hashicorp/terraform"],
       "groupName": "terraform cli"
