@@ -45,7 +45,7 @@
     "prettier-plugin-tailwindcss": "0.8.1",
     "stylelint": "17.14.1",
     "syncpack": "15.3.3",
-    "tsx": "4.23.11",
+    "tsx": "4.23.12",
     "turbo": "2.10.9",
     "typescript": "npm:@typescript/typescript6@6.0.2",
     "vitest": "4.1.10"
