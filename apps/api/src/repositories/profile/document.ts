@@ -4,6 +4,8 @@
 import type { ISOTimestamp, UserProfile } from '@genshin/domain';
 import { assertUserProfile } from '@genshin/domain';
 
+import { observeMigration } from '@/repositories/schema-version.js';
+
 import { entity, CURRENT_VERSION, type V1Profile, type V0Profile } from './schemas/index.js';
 
 export { CURRENT_VERSION, type V1Profile, type V0Profile };
@@ -13,6 +15,7 @@ export function fromDocument(raw: Record<string, unknown>): UserProfile {
   if (result.type !== 'ok') {
     throw new TypeError(`Invalid profile document: ${result.error.type}`);
   }
+  observeMigration('profile', raw, CURRENT_VERSION);
   const data = result.value;
   const profile = {
     name: data.name,

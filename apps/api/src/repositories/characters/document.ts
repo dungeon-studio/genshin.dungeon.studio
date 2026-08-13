@@ -4,6 +4,8 @@
 import type { CollectionCharacter, ISOTimestamp } from '@genshin/domain';
 import { assertCollectionCharacter } from '@genshin/domain';
 
+import { observeMigration } from '@/repositories/schema-version.js';
+
 import { entity, CURRENT_VERSION, type V1Character, type V0Character } from './schemas/index.js';
 
 export { CURRENT_VERSION, type V1Character, type V0Character };
@@ -16,6 +18,7 @@ export function fromDocument(
   if (result.type !== 'ok') {
     throw new TypeError(`Invalid character document: ${result.error.type}`);
   }
+  observeMigration('characters', raw, CURRENT_VERSION);
   const data = result.value;
   const character = {
     characterId,

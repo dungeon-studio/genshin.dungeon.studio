@@ -4,6 +4,8 @@
 import type { CollectionWeapon, ISOTimestamp, UUID } from '@genshin/domain';
 import { assertCollectionWeapon } from '@genshin/domain';
 
+import { observeMigration } from '@/repositories/schema-version.js';
+
 import { entity, CURRENT_VERSION, type V1Weapon, type V0Weapon } from './schemas/index.js';
 
 export { CURRENT_VERSION, type V1Weapon, type V0Weapon };
@@ -16,6 +18,7 @@ export function fromDocument(
   if (result.type !== 'ok') {
     throw new TypeError(`Invalid weapon document: ${result.error.type}`);
   }
+  observeMigration('weapons', raw, CURRENT_VERSION);
   const data = result.value;
   const weapon = {
     weaponInstanceId,

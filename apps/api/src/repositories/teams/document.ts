@@ -10,6 +10,8 @@ import type {
 } from '@genshin/domain';
 import { assertCollectionTeam } from '@genshin/domain';
 
+import { observeMigration } from '@/repositories/schema-version.js';
+
 import {
   entity,
   CURRENT_VERSION,
@@ -41,6 +43,7 @@ export function fromDocument(slot: TeamSlot, raw: Record<string, unknown>): Coll
   if (result.type !== 'ok') {
     throw new TypeError(`Invalid team document: ${result.error.type}`);
   }
+  observeMigration('teams', raw, CURRENT_VERSION);
   const data = result.value;
   const mapped = data.members.map((m) => (m === null ? null : memberFromDocument(m)));
   const team = {
