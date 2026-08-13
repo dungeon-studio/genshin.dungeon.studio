@@ -29,11 +29,7 @@ const weapons = await import('./weapons/document.js');
 const TIMESTAMP = '2024-01-15T12:00:00.000Z';
 const WEAPON_INSTANCE_ID = '11111111-1111-1111-1111-111111111111' as UUID;
 
-/**
- * Each repository at its initial version, alongside the read that parses it.
- * A document reaches the current version by gaining `schemaVersion`; the fields
- * are the ones every version so far has had in common.
- */
+/** Each repository's document at its initial version, with the read that parses it. */
 const REPOSITORIES = [
   {
     repository: 'characters',

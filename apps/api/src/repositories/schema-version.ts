@@ -7,7 +7,7 @@ import { logger } from '@/logger.js';
 
 type Repository = 'characters' | 'profile' | 'teams' | 'weapons';
 
-/** The part of a versioned entity a repository reads a stored document through. */
+/** verzod's own entity type cannot be named without `any` in its generics. */
 interface VersionedDocument<T> {
   safeParse(data: unknown): ParseResult<T>;
 }
@@ -17,9 +17,8 @@ interface VersionedDocument<T> {
  * no `schemaVersion`, so its absence means 0; a non-numeric one belongs to no
  * version an entity can route.
  *
- * Every repository routes with this and {@link parseDocument} reads it back, so
- * the version a document is parsed as and the version reported as migrated
- * cannot drift apart.
+ * Routing and {@link parseDocument} both take a version from here, so the
+ * version a document parses as and the version reported as migrated agree.
  */
 export function documentVersion(data: unknown): number | null {
   if (typeof data !== 'object' || data === null) return null;
@@ -28,13 +27,13 @@ export function documentVersion(data: unknown): number | null {
 }
 
 /**
- * Parse a stored document, migrating it to `toVersion`, and record a migration
- * that had to happen — so the population still on a legacy version can be
- * watched until it drains and that version's parse branch can be deleted.
+ * Parse a stored document, migrating it to `toVersion`.
  *
- * Only version numbers are logged; the document itself is the user's.
+ * A migration logs its version pair, so the documents left on a legacy version
+ * can be watched until none remain and that version's parse branch can go. The
+ * line carries no document content; that belongs to the user.
  *
- * @throws TypeError when the document matches no version this entity knows.
+ * @throws TypeError when no known version's schema accepts the document.
  */
 export function parseDocument<T>(
   repository: Repository,
@@ -47,8 +46,8 @@ export function parseDocument<T>(
     throw new TypeError(`Invalid ${repository} document: ${result.error.type}`);
   }
 
-  // verzod routed on `documentVersion`, so a document without one is already
-  // out through the throw above. The result itself carries no source version.
+  // The parse result reports no source version, so it is taken again here.
+  // A document carrying none failed the routing above and never reaches this.
   const fromVersion = documentVersion(raw);
   if (fromVersion !== null && fromVersion < toVersion) {
     logger.info({ repository, fromVersion, toVersion }, 'migrated document on read');
