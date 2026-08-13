@@ -4,16 +4,14 @@
 import type { ISOTimestamp, UserProfile } from '@genshin/domain';
 import { assertUserProfile } from '@genshin/domain';
 
+import { parseDocument } from '@/repositories/schema-version.js';
+
 import { entity, CURRENT_VERSION, type V1Profile, type V0Profile } from './schemas/index.js';
 
 export { CURRENT_VERSION, type V1Profile, type V0Profile };
 
 export function fromDocument(raw: Record<string, unknown>): UserProfile {
-  const result = entity.safeParse(raw);
-  if (result.type !== 'ok') {
-    throw new TypeError(`Invalid profile document: ${result.error.type}`);
-  }
-  const data = result.value;
+  const data = parseDocument('profile', entity, raw, CURRENT_VERSION);
   const profile = {
     name: data.name,
     createdAt: data.createdAt as ISOTimestamp,

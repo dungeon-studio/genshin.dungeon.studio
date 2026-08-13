@@ -10,6 +10,8 @@ import type {
 } from '@genshin/domain';
 import { assertCollectionTeam } from '@genshin/domain';
 
+import { parseDocument } from '@/repositories/schema-version.js';
+
 import {
   entity,
   CURRENT_VERSION,
@@ -37,11 +39,7 @@ function memberToDocument(m: CollectionTeamMember): V1Member {
 }
 
 export function fromDocument(slot: TeamSlot, raw: Record<string, unknown>): CollectionTeam {
-  const result = entity.safeParse(raw);
-  if (result.type !== 'ok') {
-    throw new TypeError(`Invalid team document: ${result.error.type}`);
-  }
-  const data = result.value;
+  const data = parseDocument('teams', entity, raw, CURRENT_VERSION);
   const mapped = data.members.map((m) => (m === null ? null : memberFromDocument(m)));
   const team = {
     slot,

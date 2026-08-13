@@ -4,6 +4,8 @@
 import type { CollectionWeapon, ISOTimestamp, UUID } from '@genshin/domain';
 import { assertCollectionWeapon } from '@genshin/domain';
 
+import { parseDocument } from '@/repositories/schema-version.js';
+
 import { entity, CURRENT_VERSION, type V1Weapon, type V0Weapon } from './schemas/index.js';
 
 export { CURRENT_VERSION, type V1Weapon, type V0Weapon };
@@ -12,11 +14,7 @@ export function fromDocument(
   weaponInstanceId: UUID,
   raw: Record<string, unknown>,
 ): CollectionWeapon {
-  const result = entity.safeParse(raw);
-  if (result.type !== 'ok') {
-    throw new TypeError(`Invalid weapon document: ${result.error.type}`);
-  }
-  const data = result.value;
+  const data = parseDocument('weapons', entity, raw, CURRENT_VERSION);
   const weapon = {
     weaponInstanceId,
     weaponId: data.weaponId,
