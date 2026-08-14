@@ -398,7 +398,7 @@ jobs:
           persist-credentials: false
 
       - name: Scan Terraform
-        uses: aquasecurity/trivy-action@2736533278103862a861f4a35ebac3e97854d956 # master
+        uses: aquasecurity/trivy-action@d2a0b60797ff03db6132bd4e2b293f9b37081297 # master
         with:
           scan-type: config
           scan-ref: infrastructure/terraform
@@ -428,7 +428,7 @@ jobs:
           persist-credentials: false
 
       - name: Scan Dockerfile
-        uses: aquasecurity/trivy-action@2736533278103862a861f4a35ebac3e97854d956 # master
+        uses: aquasecurity/trivy-action@d2a0b60797ff03db6132bd4e2b293f9b37081297 # master
         with:
           scan-type: config
           scan-ref: apps/api
@@ -460,7 +460,7 @@ jobs:
       # The lockfile resolves every workspace; scanning the directory would
       # also walk build output and fixtures.
       - name: Scan dependencies
-        uses: aquasecurity/trivy-action@2736533278103862a861f4a35ebac3e97854d956 # master
+        uses: aquasecurity/trivy-action@d2a0b60797ff03db6132bd4e2b293f9b37081297 # master
         with:
           scan-type: fs
           scan-ref: pnpm-lock.yaml
@@ -500,7 +500,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Scan Container Image
-        uses: aquasecurity/trivy-action@2736533278103862a861f4a35ebac3e97854d956 # master
+        uses: aquasecurity/trivy-action@d2a0b60797ff03db6132bd4e2b293f9b37081297 # master
         with:
           image-ref: api:ci
           format: sarif
