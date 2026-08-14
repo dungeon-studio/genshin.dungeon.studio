@@ -4,6 +4,7 @@
 import type { CollectionTeam, ISOTimestamp, TeamSlot } from '@genshin/domain';
 
 import { db } from '@/firebase/firestore.js';
+import { readSnapshot } from '@/repositories/snapshot.js';
 
 import { fromDocument, toDocument } from './document.js';
 
@@ -20,18 +21,9 @@ export async function list(userId: string): Promise<CollectionTeam[]> {
 }
 
 export async function get(userId: string, slot: TeamSlot): Promise<CollectionTeam | null> {
-  const doc = await collectionRef(userId).doc(String(slot)).get();
+  const snapshot = await collectionRef(userId).doc(String(slot)).get();
 
-  if (!doc.exists) {
-    return null;
-  }
-
-  const data = doc.data();
-  if (data === undefined) {
-    return null;
-  }
-
-  return fromDocument(slot, data);
+  return readSnapshot(snapshot, (data) => fromDocument(slot, data));
 }
 
 export interface SaveResult {
@@ -52,8 +44,7 @@ export async function save(
   const existing = await docRef.get();
   const now = new Date().toISOString() as ISOTimestamp;
 
-  const existingData = existing.exists ? existing.data() : undefined;
-  const existingTeam = existingData ? fromDocument(slot, existingData) : null;
+  const existingTeam = readSnapshot(existing, (data) => fromDocument(slot, data));
 
   const team: CollectionTeam = {
     slot,

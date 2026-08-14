@@ -7,21 +7,14 @@ import type {
   ConstellationLevel,
   ISOTimestamp,
 } from '@genshin/domain';
-import type { DocumentSnapshot } from 'firebase-admin/firestore';
 
 import { db } from '@/firebase/firestore.js';
+import { readSnapshot } from '@/repositories/snapshot.js';
 
 import { fromDocument, toDocument } from './document.js';
 
 function collectionRef(userId: string) {
   return db.collection('users').doc(userId).collection('characters');
-}
-
-// `data()` returns undefined exactly when the document does not exist.
-function fromSnapshot(characterId: string, snapshot: DocumentSnapshot): CollectionCharacter | null {
-  const data = snapshot.data();
-
-  return data === undefined ? null : fromDocument(characterId, data);
 }
 
 export async function list(userId: string): Promise<CollectionCharacter[]> {
@@ -34,7 +27,9 @@ export async function get(
   userId: string,
   characterId: string,
 ): Promise<CollectionCharacter | null> {
-  return fromSnapshot(characterId, await collectionRef(userId).doc(characterId).get());
+  const snapshot = await collectionRef(userId).doc(characterId).get();
+
+  return readSnapshot(snapshot, (data) => fromDocument(characterId, data));
 }
 
 export interface SaveResult {
@@ -51,7 +46,7 @@ export async function save(
 
   return db.runTransaction(async (transaction) => {
     const snapshot = await transaction.get(docRef);
-    const existing = fromSnapshot(characterId, snapshot);
+    const existing = readSnapshot(snapshot, (data) => fromDocument(characterId, data));
     const now = new Date().toISOString() as ISOTimestamp;
 
     const character: CollectionCharacter = {
