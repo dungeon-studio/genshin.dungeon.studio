@@ -7,9 +7,7 @@
     "rootDir": "./src",
     "types": ["node"],
     "resolveJsonModule": true,
-    // Path aliases eliminate relative imports and clarify module organization.
-    // Single @/* pattern handles all imports (e.g., @/middleware/auth → ./src/middleware/auth).
-    // tsc-alias rewrites these in compiled JS during build for runtime compatibility.
+    // tsc-alias rewrites these in the emitted JavaScript so Node can resolve them.
     "paths": {
       "@/*": ["./src/*"]
     }

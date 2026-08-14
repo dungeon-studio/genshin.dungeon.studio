@@ -1,6 +1,5 @@
 {
-  // Type-checked only: a bundler or test runner performs the transform, so tsc
-  // never writes output and TypeScript extensions stay in import specifiers.
+  // Another tool transforms these sources, so tsc only checks them.
   "extends": "./base.json",
   "compilerOptions": {
     "module": "ESNext",

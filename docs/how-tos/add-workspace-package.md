@@ -65,9 +65,7 @@ closest template.
 - [ ] `tsconfig.json`: extends `@genshin/tsconfig/library.json` and adds only
       `outDir`, `rootDir`, and `include`. TypeScript resolves those three
       relative to the file declaring them, so the shared config can't carry
-      them. A package reaching for Node APIs also adds `"types": ["node"]`.
-      Skip `exclude`: with `include` naming `src`, the compiler already leaves
-      `node_modules` and the output directory out.
+      them. A package that uses Node APIs also adds `"types": ["node"]`.
 - [ ] `tsconfig.build.json`: extends `./tsconfig.json` and adds
       `"exclude": ["src/**/*.test.ts"]`. The `build` script points here so test
       files stay out of `dist`.

@@ -1,6 +1,6 @@
 {
-  // Path-relative options (outDir, rootDir, paths, include, exclude) resolve
-  // against the file that declares them, so they stay in each workspace.
+  // TypeScript resolves outDir, rootDir, paths, and include relative to the
+  // file declaring them, so each workspace keeps its own.
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2022"],

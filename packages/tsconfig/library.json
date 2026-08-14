@@ -1,6 +1,4 @@
 {
-  // Workspace libraries: ESM consumed through a bundler-style resolver, with
-  // declarations emitted so dependents typecheck against `dist`.
   "extends": "./base.json",
   "compilerOptions": {
     "module": "ES2022",
