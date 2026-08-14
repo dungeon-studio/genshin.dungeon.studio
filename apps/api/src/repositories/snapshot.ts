@@ -6,10 +6,8 @@ import type { DocumentSnapshot } from 'firebase-admin/firestore';
 /**
  * Deserialize a document that may not be there.
  *
- * `data()` returns undefined exactly when the document does not exist, so
- * absence is the one case `parse` never sees. That keeps a `fromDocument` total
- * over the documents that do exist, free to throw on a malformed one without
- * confusing it for a missing one.
+ * `data()` returns undefined exactly when the document does not exist, so a
+ * `parse` that throws is reporting a malformed document, never a missing one.
  */
 export function readSnapshot<T>(
   snapshot: DocumentSnapshot,
