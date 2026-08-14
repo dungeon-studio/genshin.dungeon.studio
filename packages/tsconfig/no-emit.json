@@ -1,0 +1,10 @@
+{
+  // Another tool transforms these sources, so tsc only checks them.
+  "extends": "./base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  }
+}

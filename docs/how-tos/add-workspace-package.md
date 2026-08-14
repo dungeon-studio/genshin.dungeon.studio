@@ -46,6 +46,7 @@ closest template.
     },
     "devDependencies": {
       "@genshin/eslint-config": "workspace:*",
+      "@genshin/tsconfig": "workspace:*",
       "@typescript/native": "npm:typescript@7.0.2",
       "eslint": "10.4.0",
       "typescript": "npm:@typescript/typescript6@6.0.2"
@@ -61,8 +62,10 @@ closest template.
   Add `test` only once tests exist, along with the `vitest` and
   `@vitest/coverage-v8` dev dependencies and a `vitest.config.ts`.
 
-- [ ] `tsconfig.json`: compiler options plus `include: ["src/**/*"]` (no shared
-      base to extend).
+- [ ] `tsconfig.json`: extends `@genshin/tsconfig/library.json` and adds only
+      `outDir`, `rootDir`, and `include`. TypeScript resolves those three
+      relative to the file declaring them, so the shared config can't carry
+      them. A package that uses Node APIs also adds `"types": ["node"]`.
 - [ ] `tsconfig.build.json`: extends `./tsconfig.json` and adds
       `"exclude": ["src/**/*.test.ts"]`. The `build` script points here so test
       files stay out of `dist`.

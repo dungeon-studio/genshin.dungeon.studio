@@ -1,0 +1,17 @@
+{
+  "name": "@genshin/tsconfig",
+  "version": "0.0.0",
+  "description": "Shared TypeScript compiler baseline for the monorepo",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./base.json": "./base.json",
+    "./library.json": "./library.json",
+    "./no-emit.json": "./no-emit.json"
+  },
+  "files": [
+    "base.json",
+    "library.json",
+    "no-emit.json"
+  ]
+}
