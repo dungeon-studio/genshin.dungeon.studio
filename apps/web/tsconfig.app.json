@@ -1,14 +1,9 @@
 {
-  "extends": "@genshin/tsconfig/base.json",
+  "extends": "@genshin/tsconfig/no-emit.json",
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
     "types": ["vite/client"],
-    "useDefineForClassFields": true,
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["./src/*"]

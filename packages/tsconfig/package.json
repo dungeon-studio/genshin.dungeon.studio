@@ -6,10 +6,12 @@
   "type": "module",
   "exports": {
     "./base.json": "./base.json",
-    "./library.json": "./library.json"
+    "./library.json": "./library.json",
+    "./no-emit.json": "./no-emit.json"
   },
   "files": [
     "base.json",
-    "library.json"
+    "library.json",
+    "no-emit.json"
   ]
 }

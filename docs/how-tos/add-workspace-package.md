@@ -63,9 +63,11 @@ closest template.
   `@vitest/coverage-v8` dev dependencies and a `vitest.config.ts`.
 
 - [ ] `tsconfig.json`: extends `@genshin/tsconfig/library.json` and adds only
-      `outDir`, `rootDir`, `include`, and `exclude`. TypeScript resolves those
-      four relative to the file declaring them, so the shared config can't carry
+      `outDir`, `rootDir`, and `include`. TypeScript resolves those three
+      relative to the file declaring them, so the shared config can't carry
       them. A package reaching for Node APIs also adds `"types": ["node"]`.
+      Skip `exclude`: with `include` naming `src`, the compiler already leaves
+      `node_modules` and the output directory out.
 - [ ] `tsconfig.build.json`: extends `./tsconfig.json` and adds
       `"exclude": ["src/**/*.test.ts"]`. The `build` script points here so test
       files stay out of `dist`.

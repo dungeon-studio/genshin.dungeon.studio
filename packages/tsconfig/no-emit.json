@@ -1,0 +1,11 @@
+{
+  // Type-checked only: a bundler or test runner performs the transform, so tsc
+  // never writes output and TypeScript extensions stay in import specifiers.
+  "extends": "./base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  }
+}
