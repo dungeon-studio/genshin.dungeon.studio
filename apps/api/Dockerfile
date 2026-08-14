@@ -27,6 +27,7 @@ COPY apps/api/package.json ./apps/api/
 COPY packages/collection-json/package.json ./packages/collection-json/
 COPY packages/domain/package.json ./packages/domain/
 COPY packages/game-data/package.json ./packages/game-data/
+COPY packages/tsconfig/package.json ./packages/tsconfig/
 COPY packages/validation/package.json ./packages/validation/
 
 RUN pnpm install --frozen-lockfile

@@ -47,6 +47,7 @@ per-repository instruction file either tool loads.
 ## Build and CI rules
 
 - Always use `pnpm turbo run <task>` for `build`, `typecheck`, and `test` in CI, Docker, and deploy workflows. Never use raw `pnpm --filter <pkg> <task>` for these because pnpm doesn't automatically build workspace dependencies first; turbo handles dependency ordering via `^build` in `turbo.json`.
+- Every workspace `tsconfig.json` extends `@genshin/tsconfig` and keeps only what genuinely differs: the path-relative options TypeScript resolves against the declaring file (`outDir`, `rootDir`, `paths`, `include`, `exclude`) and the platform axis (`module`, `moduleResolution`, `lib`, `types`, `jsx`). Strictness flags belong in the shared config, so a workspace never re-declares them.
 - The API uses `tsconfig.json` (includes tests) for typechecking and `tsconfig.build.json` (excludes tests) for emit. The build config extends `tsconfig.json`, so compiler options stay in sync automatically; only the exclude patterns differ.
 - When `tsconfig.json` uses project references, type-check with `tsc -b --noEmit`. Plain `tsc --noEmit` won't follow references.
 - A new project-wide check belongs in `.pre-commit-config.yaml`, which `ci.yml` runs over the whole tree. The `runCmd` chain in `devcontainer.yml` exercises the built image's toolchain instead, so it takes a command only when nothing else in the chain runs that tool.

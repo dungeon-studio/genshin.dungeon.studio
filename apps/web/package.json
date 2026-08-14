@@ -40,6 +40,7 @@
     "@codecov/vite-plugin": "2.0.1",
     "@eslint-react/eslint-plugin": "5.18.3",
     "@genshin/eslint-config": "workspace:*",
+    "@genshin/tsconfig": "workspace:*",
     "@tailwindcss/postcss": "4.3.3",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.2",
