@@ -23,7 +23,7 @@ const UPDATED_AT = '2026-01-02T00:00:00.000Z';
 
 const teamRef = (userId: string, documentId: string) => documentRef(userId, 'teams', documentId);
 
-/** A user whose slot already holds a team, alongside that team as first saved. */
+/** A user whose slot already holds a team, and that team as first saved. */
 async function userWithTeam(updates: Parameters<typeof save>[2]) {
   const userId = newUserId();
   const { team } = await save(userId, SLOT, updates);
@@ -79,8 +79,8 @@ describe('save', () => {
     expect(stored).toMatchObject({ name: TEAM_NAME, members: NO_MEMBERS });
   });
 
-  // An omitted description keeps the stored one, so blanking it is the only way
-  // to take a description back.
+  // An omitted description keeps the stored one, so a blank string is the only
+  // way to remove one.
   it('takes an empty description as the new description', async () => {
     const { userId } = await userWithTeam({ name: TEAM_NAME, description: DESCRIPTION });
 
