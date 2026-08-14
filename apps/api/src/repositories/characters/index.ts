@@ -45,8 +45,9 @@ export async function save(
   const docRef = collectionRef(userId).doc(characterId);
 
   return db.runTransaction(async (transaction) => {
-    const snapshot = await transaction.get(docRef);
-    const existing = readSnapshot(snapshot, (data) => fromDocument(characterId, data));
+    const existing = readSnapshot(await transaction.get(docRef), (data) =>
+      fromDocument(characterId, data),
+    );
     const now = new Date().toISOString() as ISOTimestamp;
 
     const character: CollectionCharacter = {
@@ -58,7 +59,7 @@ export async function save(
 
     transaction.set(docRef, toDocument(character));
 
-    return { character, created: !snapshot.exists };
+    return { character, created: existing === null };
   });
 }
 

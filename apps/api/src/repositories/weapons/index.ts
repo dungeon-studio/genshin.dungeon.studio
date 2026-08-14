@@ -60,10 +60,9 @@ export async function update(
   refinementLevel: number,
 ): Promise<CollectionWeapon | null> {
   const docRef = collectionRef(userId).doc(weaponInstanceId);
-  const existing = await docRef.get();
-  const existingWeapon = readSnapshot(existing, (data) => fromDocument(weaponInstanceId, data));
+  const existing = readSnapshot(await docRef.get(), (data) => fromDocument(weaponInstanceId, data));
 
-  if (existingWeapon === null) {
+  if (existing === null) {
     return null;
   }
 
@@ -71,9 +70,9 @@ export async function update(
 
   const weapon: CollectionWeapon = {
     weaponInstanceId,
-    weaponId: existingWeapon.weaponId,
+    weaponId: existing.weaponId,
     refinementLevel,
-    createdAt: existingWeapon.createdAt,
+    createdAt: existing.createdAt,
     updatedAt: now,
   };
 

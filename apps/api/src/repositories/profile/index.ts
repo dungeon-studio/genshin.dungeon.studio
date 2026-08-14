@@ -20,10 +20,10 @@ export async function get(userId: string): Promise<UserProfile | null> {
 
 export async function update(userId: string, fields: ProfileUpdate): Promise<UserProfile> {
   const ref = docRef(userId);
-  const current = readSnapshot(await ref.get(), fromDocument);
+  const existing = readSnapshot(await ref.get(), fromDocument);
   const now = new Date().toISOString() as ISOTimestamp;
 
-  if (current === null) {
+  if (existing === null) {
     const profile: UserProfile = {
       name: fields.name ?? '',
       createdAt: now,
@@ -35,11 +35,11 @@ export async function update(userId: string, fields: ProfileUpdate): Promise<Use
   }
 
   const updated: UserProfile = {
-    ...current,
+    ...existing,
     ...fields,
     updatedAt: now,
   };
 
-  await ref.update({ ...toDocument(updated) });
+  await ref.update(toDocument(updated));
   return updated;
 }

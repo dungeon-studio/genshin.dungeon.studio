@@ -41,27 +41,23 @@ export async function save(
   },
 ): Promise<SaveResult> {
   const docRef = collectionRef(userId).doc(String(slot));
-  const existing = await docRef.get();
+  const existing = readSnapshot(await docRef.get(), (data) => fromDocument(slot, data));
   const now = new Date().toISOString() as ISOTimestamp;
 
-  const existingTeam = readSnapshot(existing, (data) => fromDocument(slot, data));
+  const description = updates.description ?? existing?.description;
 
   const team: CollectionTeam = {
     slot,
-    name: updates.name ?? existingTeam?.name ?? `Team ${slot}`,
-    members: updates.members ?? existingTeam?.members ?? [null, null, null, null],
-    ...(updates.description !== undefined
-      ? { description: updates.description }
-      : existingTeam?.description !== undefined
-        ? { description: existingTeam.description }
-        : {}),
-    createdAt: existingTeam ? existingTeam.createdAt : now,
+    name: updates.name ?? existing?.name ?? `Team ${slot}`,
+    members: updates.members ?? existing?.members ?? [null, null, null, null],
+    ...(description !== undefined ? { description } : {}),
+    createdAt: existing?.createdAt ?? now,
     updatedAt: now,
   };
 
   await docRef.set(toDocument(team));
 
-  return { team, created: !existing.exists };
+  return { team, created: existing === null };
 }
 
 export async function remove(userId: string, slot: TeamSlot): Promise<void> {
