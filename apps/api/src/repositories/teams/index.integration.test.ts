@@ -23,8 +23,16 @@ const UPDATED_AT = '2026-01-02T00:00:00.000Z';
 
 const teamRef = (userId: string, documentId: string) => documentRef(userId, 'teams', documentId);
 
+/** A user whose slot already holds a team, alongside that team as first saved. */
+async function userWithTeam(updates: Parameters<typeof save>[2]) {
+  const userId = newUserId();
+  const { team } = await save(userId, SLOT, updates);
+
+  return { userId, team };
+}
+
 describe('save', () => {
-  it('names a slot the user never saved after that slot and leaves its positions open', async () => {
+  it('defaults the name and leaves every position open for an unsaved slot', async () => {
     const userId = newUserId();
 
     const { team } = await save(userId, SLOT, {});
@@ -43,8 +51,7 @@ describe('save', () => {
   });
 
   it('leaves the fields an update omits as they were', async () => {
-    const userId = newUserId();
-    const { team: original } = await save(userId, SLOT, {
+    const { userId, team: original } = await userWithTeam({
       name: TEAM_NAME,
       members: MEMBERS,
       description: DESCRIPTION,
@@ -52,7 +59,9 @@ describe('save', () => {
 
     await save(userId, SLOT, { name: RENAMED });
 
-    expect(await get(userId, SLOT)).toMatchObject({
+    const stored = await get(userId, SLOT);
+
+    expect(stored).toMatchObject({
       name: RENAMED,
       members: MEMBERS,
       description: DESCRIPTION,
@@ -61,30 +70,31 @@ describe('save', () => {
   });
 
   it('empties every position an update clears', async () => {
-    const userId = newUserId();
-    await save(userId, SLOT, { name: TEAM_NAME, members: MEMBERS });
+    const { userId } = await userWithTeam({ name: TEAM_NAME, members: MEMBERS });
 
     await save(userId, SLOT, { members: NO_MEMBERS });
 
-    expect(await get(userId, SLOT)).toMatchObject({ name: TEAM_NAME, members: NO_MEMBERS });
+    const stored = await get(userId, SLOT);
+
+    expect(stored).toMatchObject({ name: TEAM_NAME, members: NO_MEMBERS });
   });
 
   // An omitted description keeps the stored one, so blanking it is the only way
   // to take a description back.
   it('takes an empty description as the new description', async () => {
-    const userId = newUserId();
-    await save(userId, SLOT, { name: TEAM_NAME, description: DESCRIPTION });
+    const { userId } = await userWithTeam({ name: TEAM_NAME, description: DESCRIPTION });
 
     await save(userId, SLOT, { description: '' });
 
-    expect((await get(userId, SLOT))?.description).toBe('');
+    const stored = await get(userId, SLOT);
+
+    expect(stored?.description).toBe('');
   });
 });
 
 describe('get', () => {
   it('returns the team saved in that slot', async () => {
-    const userId = newUserId();
-    await save(userId, SLOT, { name: TEAM_NAME });
+    const { userId } = await userWithTeam({ name: TEAM_NAME });
 
     const team = await get(userId, SLOT);
 
@@ -98,8 +108,7 @@ describe('get', () => {
 
 describe('remove', () => {
   it('leaves nothing to get', async () => {
-    const userId = newUserId();
-    await save(userId, SLOT, { name: TEAM_NAME });
+    const { userId } = await userWithTeam({ name: TEAM_NAME });
 
     await remove(userId, SLOT);
 
@@ -112,8 +121,7 @@ describe('list', () => {
   // Reading such a document back as a team would hand `fromDocument` a slot the
   // domain rejects.
   it('skips documents whose id is not a slot', async () => {
-    const userId = newUserId();
-    await save(userId, SLOT, { name: TEAM_NAME });
+    const { userId } = await userWithTeam({ name: TEAM_NAME });
     await teamRef(userId, '9').set({
       schemaVersion: 1,
       name: 'Out of range',
