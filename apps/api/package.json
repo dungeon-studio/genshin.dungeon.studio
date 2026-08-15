@@ -38,7 +38,7 @@
     "@vitest/coverage-v8": "4.1.10",
     "eslint": "10.8.1",
     "fast-check": "4.9.0",
-    "globals": "17.9.0",
+    "globals": "17.10.0",
     "json-schema-to-ts": "3.1.1",
     "jsoncompat": "0.4.2",
     "tsc-alias": "1.9.1",
