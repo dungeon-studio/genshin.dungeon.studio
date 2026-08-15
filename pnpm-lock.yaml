@@ -72,8 +72,8 @@ importers:
         specifier: 14.2.0
         version: 14.2.0(@firebase/app-compat@0.5.16)(@firebase/app@0.16.0)(supports-color@10.2.2)
       google-gax:
-        specifier: 6.0.1
-        version: 6.0.1(supports-color@10.2.2)
+        specifier: 6.0.2
+        version: 6.0.2(supports-color@10.2.2)
       hono:
         specifier: 4.13.1
         version: 4.13.1
@@ -4354,8 +4354,8 @@ packages:
     resolution: {integrity: sha512-M4vpZcXQIC1gqIVGQ7eaU3jXQA6zecStyTXu514TYfThlgSurYJOxHZo9fzU6hAgwPWvuEynAVHWyaIk80VeEA==}
     engines: {node: '>=18'}
 
-  google-gax@6.0.1:
-    resolution: {integrity: sha512-alzECOlNct1KTBeL9PQ6GIxJHvUQAp1MtffaSMx5+8f4hGRoDaET9oIWbHUtzfrFXRUsf6lnznum09yAKhU7AA==}
+  google-gax@6.0.2:
+    resolution: {integrity: sha512-9O+aJyiZrGcEggeG9FoA1R3HRQEUi32ydPSvE42lFbh+D8KwQS57CgMsZ0JPpGCM1LFwEWe+yr2h/53xmgHnQA==}
     engines: {node: '>=22'}
 
   google-logging-utils@0.0.2:
@@ -11400,7 +11400,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  google-gax@6.0.1(supports-color@10.2.2):
+  google-gax@6.0.2(supports-color@10.2.2):
     dependencies:
       '@grpc/grpc-js': 1.14.4
       '@grpc/proto-loader': 0.8.1
