@@ -46,7 +46,7 @@
     "stylelint": "17.14.1",
     "syncpack": "15.3.3",
     "tsx": "4.23.12",
-    "turbo": "2.10.9",
+    "turbo": "2.10.10",
     "typescript": "npm:@typescript/typescript6@6.0.2",
     "vitest": "4.1.10"
   },
