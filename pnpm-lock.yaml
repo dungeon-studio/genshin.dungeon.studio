@@ -18,8 +18,8 @@ importers:
         specifier: 10.8.1
         version: 10.8.1(jiti@2.7.0)(supports-color@10.2.2)
       firebase-tools:
-        specifier: 15.26.0
-        version: 15.26.0(@types/node@25.9.5)(supports-color@10.2.2)
+        specifier: 15.27.0
+        version: 15.27.0(@types/node@25.9.5)(supports-color@10.2.2)
       knip:
         specifier: 6.32.2
         version: 6.32.2
@@ -4111,8 +4111,8 @@ packages:
     resolution: {integrity: sha512-zfs5PdccEgjX479bbMmz95Rqc7ttQ4LV3qkGFlPiqOaOu/suBZc3fG52Qzn2hQjiSHkBM4NP2AZV5r2NvAt0TQ==}
     engines: {node: '>=22'}
 
-  firebase-tools@15.26.0:
-    resolution: {integrity: sha512-5GlK9O7/FffndJ3XFk6fBPTBJH4lNWCxQDP9YoKFWDO85YiGOOpmYyr4lqSyCTkTeQpj1KI1vhPnd9aO6E73ww==}
+  firebase-tools@15.27.0:
+    resolution: {integrity: sha512-gQMMPkv20hAuCUy596Z/GPA0YiwJEr6xEwvJnc+BeZnMlJVYZcl4OL8vvPNqDDcQmrXlNRNAP/qpyVc+5jkxTw==}
     engines: {node: '>=20.0.0 || >=22.0.0 || >=24.0.0'}
     hasBin: true
 
@@ -10943,7 +10943,7 @@ snapshots:
       - encoding
       - supports-color
 
-  firebase-tools@15.26.0(@types/node@25.9.5)(supports-color@10.2.2):
+  firebase-tools@15.27.0(@types/node@25.9.5)(supports-color@10.2.2):
     dependencies:
       '@apphosting/common': 0.0.8
       '@electric-sql/pglite': 0.3.16
