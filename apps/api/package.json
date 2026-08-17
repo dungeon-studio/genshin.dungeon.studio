@@ -18,7 +18,7 @@
     "@genshin/collection-json": "workspace:*",
     "@genshin/domain": "workspace:*",
     "@genshin/game-data": "workspace:*",
-    "@hono/node-server": "2.1.0",
+    "@hono/node-server": "2.1.1",
     "ajv": "8.20.0",
     "content-type": "2.0.0",
     "firebase-admin": "14.2.0",
