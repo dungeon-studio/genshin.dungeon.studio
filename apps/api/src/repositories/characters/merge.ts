@@ -8,7 +8,6 @@ import type {
   ISOTimestamp,
 } from '@genshin/domain';
 
-/** The character a save leaves behind, collected once and re-dated after. */
 export function nextCharacter(
   characterId: CharacterId,
   constellationLevel: ConstellationLevel,

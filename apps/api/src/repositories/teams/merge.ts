@@ -9,13 +9,7 @@ export interface TeamUpdates {
   description?: string;
 }
 
-/**
- * The team a save leaves behind: a field the save omits falls back to the
- * stored team, and one neither supplies takes a default.
- *
- * `??` and not `||`, so an empty-string name or description is a value and does
- * not fall through to the stored one.
- */
+/** `??` throughout: an empty name or description is a value, not an omission. */
 export function nextTeam(
   slot: TeamSlot,
   updates: TeamUpdates,
