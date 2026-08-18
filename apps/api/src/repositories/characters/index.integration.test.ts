@@ -18,14 +18,16 @@ const UPDATED_AT = '2026-01-02T00:00:00.000Z';
 const characterRef = (userId: string) => documentRef(userId, 'characters', CHARACTER.id);
 
 describe('save', () => {
-  it('keeps the original createdAt when the character is already collected', async () => {
+  it('merges a later save into the character already collected', async () => {
     const userId = newUserId();
-
     const first = await save(userId, CHARACTER.id, 1);
-    const second = await save(userId, CHARACTER.id, 4);
 
-    expect(second.character.createdAt).toBe(first.character.createdAt);
-    expect(second.character.constellationLevel).toBe(4);
+    await save(userId, CHARACTER.id, 4);
+
+    expect(await get(userId, CHARACTER.id)).toMatchObject({
+      constellationLevel: 4,
+      createdAt: first.character.createdAt,
+    });
   });
 
   it('reports the first save as a creation and later ones as updates', async () => {

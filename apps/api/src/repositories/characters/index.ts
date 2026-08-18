@@ -12,6 +12,7 @@ import { db } from '@/firebase/firestore.js';
 import { readSnapshot } from '@/repositories/snapshot.js';
 
 import { fromDocument, toDocument } from './document.js';
+import { nextCharacter } from './merge.js';
 
 function collectionRef(userId: string) {
   return db.collection('users').doc(userId).collection('characters');
@@ -50,12 +51,7 @@ export async function save(
     );
     const now = new Date().toISOString() as ISOTimestamp;
 
-    const character: CollectionCharacter = {
-      characterId,
-      constellationLevel,
-      createdAt: existing?.createdAt ?? now,
-      updatedAt: now,
-    };
+    const character = nextCharacter(characterId, constellationLevel, existing, now);
 
     transaction.set(docRef, toDocument(character));
 

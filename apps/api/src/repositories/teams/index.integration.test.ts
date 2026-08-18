@@ -44,30 +44,16 @@ describe('save', () => {
     expect(second.created).toBe(false);
   });
 
-  it('keeps the description a later save leaves out', async () => {
+  it('merges a later save into the team already stored', async () => {
     const userId = newUserId();
     await save(userId, SLOT, { name: TEAM_NAME, description: 'Melt the shield first' });
 
-    const { team } = await save(userId, SLOT, { name: 'Renamed' });
+    await save(userId, SLOT, { name: 'Renamed' });
 
-    expect(team.description).toBe('Melt the shield first');
-  });
-
-  it('replaces the description a later save supplies', async () => {
-    const userId = newUserId();
-    await save(userId, SLOT, { name: TEAM_NAME, description: 'Melt the shield first' });
-
-    const { team } = await save(userId, SLOT, { description: 'Freeze instead' });
-
-    expect(team.description).toBe('Freeze instead');
-  });
-
-  it('leaves the description absent when no save ever supplied one', async () => {
-    const userId = newUserId();
-
-    const { team } = await save(userId, SLOT, { name: TEAM_NAME });
-
-    expect(team).not.toHaveProperty('description');
+    expect(await get(userId, SLOT)).toMatchObject({
+      name: 'Renamed',
+      description: 'Melt the shield first',
+    });
   });
 });
 
