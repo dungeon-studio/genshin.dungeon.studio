@@ -4,6 +4,7 @@
 import type { ISOTimestamp, ProfileUpdate, UserProfile } from '@genshin/domain';
 
 import { db } from '@/firebase/firestore.js';
+import { readSnapshot } from '@/repositories/snapshot.js';
 
 import { fromDocument, toDocument } from './document.js';
 
@@ -12,26 +13,17 @@ function docRef(userId: string) {
 }
 
 export async function get(userId: string): Promise<UserProfile | null> {
-  const doc = await docRef(userId).get();
+  const snapshot = await docRef(userId).get();
 
-  if (!doc.exists) {
-    return null;
-  }
-
-  const data = doc.data();
-  if (data === undefined) {
-    return null;
-  }
-
-  return fromDocument(data);
+  return readSnapshot(snapshot, fromDocument);
 }
 
 export async function update(userId: string, fields: ProfileUpdate): Promise<UserProfile> {
   const ref = docRef(userId);
-  const existing = await ref.get();
+  const existing = readSnapshot(await ref.get(), fromDocument);
   const now = new Date().toISOString() as ISOTimestamp;
 
-  if (!existing.exists) {
+  if (existing === null) {
     const profile: UserProfile = {
       name: fields.name ?? '',
       createdAt: now,
@@ -42,18 +34,12 @@ export async function update(userId: string, fields: ProfileUpdate): Promise<Use
     return profile;
   }
 
-  const existingData = existing.data();
-  if (existingData === undefined) {
-    throw new Error('Profile document exists but has no data');
-  }
-
-  const current = fromDocument(existingData);
   const updated: UserProfile = {
-    ...current,
+    ...existing,
     ...fields,
     updatedAt: now,
   };
 
-  await ref.update({ ...toDocument(updated) });
+  await ref.update(toDocument(updated));
   return updated;
 }

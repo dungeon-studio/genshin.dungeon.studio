@@ -7,21 +7,15 @@ import type {
   ConstellationLevel,
   ISOTimestamp,
 } from '@genshin/domain';
-import type { DocumentSnapshot } from 'firebase-admin/firestore';
 
 import { db } from '@/firebase/firestore.js';
+import { readSnapshot } from '@/repositories/snapshot.js';
 
 import { fromDocument, toDocument } from './document.js';
+import { nextCharacter } from './merge.js';
 
 function collectionRef(userId: string) {
   return db.collection('users').doc(userId).collection('characters');
-}
-
-// `data()` returns undefined exactly when the document does not exist.
-function fromSnapshot(characterId: string, snapshot: DocumentSnapshot): CollectionCharacter | null {
-  const data = snapshot.data();
-
-  return data === undefined ? null : fromDocument(characterId, data);
 }
 
 export async function list(userId: string): Promise<CollectionCharacter[]> {
@@ -34,7 +28,9 @@ export async function get(
   userId: string,
   characterId: string,
 ): Promise<CollectionCharacter | null> {
-  return fromSnapshot(characterId, await collectionRef(userId).doc(characterId).get());
+  const snapshot = await collectionRef(userId).doc(characterId).get();
+
+  return readSnapshot(snapshot, (data) => fromDocument(characterId, data));
 }
 
 export interface SaveResult {
@@ -50,20 +46,16 @@ export async function save(
   const docRef = collectionRef(userId).doc(characterId);
 
   return db.runTransaction(async (transaction) => {
-    const snapshot = await transaction.get(docRef);
-    const existing = fromSnapshot(characterId, snapshot);
+    const existing = readSnapshot(await transaction.get(docRef), (data) =>
+      fromDocument(characterId, data),
+    );
     const now = new Date().toISOString() as ISOTimestamp;
 
-    const character: CollectionCharacter = {
-      characterId,
-      constellationLevel,
-      createdAt: existing?.createdAt ?? now,
-      updatedAt: now,
-    };
+    const character = nextCharacter(characterId, constellationLevel, existing, now);
 
     transaction.set(docRef, toDocument(character));
 
-    return { character, created: !snapshot.exists };
+    return { character, created: existing === null };
   });
 }
 
