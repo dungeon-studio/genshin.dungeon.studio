@@ -5,10 +5,20 @@ import { describe, expect, it } from 'vitest';
 
 import {
   ARTIFACT_MINOR_AFFIXES,
+  ARTIFACT_SET_ROSTER,
   CIRCLET_MAIN_AFFIXES,
   GOBLET_MAIN_AFFIXES,
   SANDS_MAIN_AFFIXES,
 } from './artifacts.js';
+
+describe('ARTIFACT_SET_ROSTER', () => {
+  it('is not empty', () => {
+    // The generator guarantees both bonuses and sort order, the record type
+    // unique ids. This only catches a generation that silently produced
+    // nothing.
+    expect(ARTIFACT_SET_ROSTER.length).toBeGreaterThan(0);
+  });
+});
 
 describe('artifact affix constants', () => {
   it('SANDS_MAIN_AFFIXES has no duplicates', () => {

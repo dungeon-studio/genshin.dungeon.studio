@@ -2,27 +2,30 @@
 # SPDX-License-Identifier: MIT
 
 terraform {
-  required_version = ">= 1.0"
+  required_version = "1.15.8"
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 7.19"
+      version = "7.44.0"
     }
     google-beta = {
       source  = "hashicorp/google-beta"
-      version = "~> 7.19"
+      version = "7.44.0"
     }
   }
 }
 
 provider "google" {
-  project = var.gcp_dev_project_id
+  project = var.project_id
 }
 
 provider "google-beta" {
-  project = var.gcp_dev_project_id
+  project = var.project_id
 }
 
-data "google_project" "dev" {
-  project_id = var.gcp_dev_project_id
+# Identity Platform must trust the registrable domain for sign-in redirects no
+# matter which environment serves, so it stays separate from the hostname.
+locals {
+  base_domain = "genshin.dungeon.studio"
+  web_domain  = "develop.${local.base_domain}"
 }

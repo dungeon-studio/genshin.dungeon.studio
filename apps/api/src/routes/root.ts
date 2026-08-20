@@ -3,16 +3,16 @@
 
 import type { Env, Hono as HonoApp } from 'hono';
 import { Hono } from 'hono';
-import { findTargetHandler, isMiddleware } from 'hono/utils/handler';
 
-import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
+import { isRouteHandler } from '@/http/route-table.js';
+import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { rootGetResponseV1 } from '@/profiles/json-schema/root/get-response-v1.js';
 
 /**
  * Discover top-level resource paths from the app's registered routes.
  * Returns GET-accessible paths that have a discrete handler (e.g.
- * `/api/characters`, `/health`).
+ * `/characters`, `/health`).
  *
  * Excludes the root path itself, wildcard catch-all routes (like
  * `/profiles/json-schema/*` and `/profiles/alps/*`), and sub-resource
@@ -24,7 +24,7 @@ function discoverLinks<E extends Env>(app: HonoApp<E>): Record<string, { href: s
 
   for (const route of app.routes) {
     if (route.method !== 'GET') continue;
-    if (isMiddleware(findTargetHandler(route.handler))) continue;
+    if (!isRouteHandler(route.handler)) continue;
 
     const path = route.path;
 
@@ -33,7 +33,6 @@ function discoverLinks<E extends Env>(app: HonoApp<E>): Record<string, { href: s
     if (seen.has(path)) continue;
     seen.add(path);
 
-    // Derive a name from the last path segment: /api/characters → characters
     const segments = path.split('/').filter(Boolean);
     const name = segments[segments.length - 1];
     links[name] = { href: path };
@@ -44,9 +43,9 @@ function discoverLinks<E extends Env>(app: HonoApp<E>): Record<string, { href: s
 
 export function root<E extends Env>(
   app: HonoApp<E>,
-): Hono<{ Variables: NegotiatedContentVariables }> {
+): Hono<{ Variables: NegotiatedResponseContentVariables }> {
   const links = discoverLinks(app);
-  const router = new Hono<{ Variables: NegotiatedContentVariables }>();
+  const router = new Hono<{ Variables: NegotiatedResponseContentVariables }>();
 
   router.get(
     '/',

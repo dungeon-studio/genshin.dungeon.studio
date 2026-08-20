@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { ISOTimestamp } from '@genshin/domain';
-import { CHARACTERS, WEAPONS } from '@genshin/game-data';
+import { CHARACTER_ROSTER, WEAPON_ROSTER } from '@genshin/game-data';
 import fc from 'fast-check';
 
 // Bound to 4-digit calendar years because that is exactly what isISOTimestamp
@@ -17,6 +17,6 @@ export const arbTimestamp = fc
   })
   .map((value) => value.toISOString() as ISOTimestamp);
 
-export const arbCharacterId = fc.constantFrom(...CHARACTERS.map((character) => character.id));
+export const arbCharacterId = fc.constantFrom(...CHARACTER_ROSTER.map((character) => character.id));
 
-export const arbWeaponId = fc.constantFrom(...WEAPONS.map((weapon) => weapon.id));
+export const arbWeaponId = fc.constantFrom(...WEAPON_ROSTER.map((weapon) => weapon.id));

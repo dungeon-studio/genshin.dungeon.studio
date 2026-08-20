@@ -57,6 +57,7 @@ out/
 
 # Coverage reports
 coverage/
+coverage-integration/
 
 # Test results
 test-results/
@@ -99,15 +100,10 @@ vite.config.ts.timestamp-*
 service-account*.json
 
 # ===================================
-# Claude Code / Claustre
+# Claude Code
 # ===================================
 
-# Claustre session identifier (generated per worktree session)
-.claustre_session_id
-
-# Claude Code local settings and hooks (claustre-injected, session-specific)
 .claude/settings.local.json
-.claude/hooks/
 
 # ===================================
 # Temporary Files

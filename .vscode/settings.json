@@ -32,10 +32,15 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.wordWrap": "on"
   },
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+
+  // Shell scripts
+  // Keep in step with the shfmt pre-commit hook's flags.
+  "shellformat.flag": "-i 2 -ci",
 
   // TypeScript
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.preferences.importModuleSpecifier": "shortest",
   "typescript.updateImportsOnFileMove.enabled": "always",
 
@@ -71,30 +76,16 @@
   // Prettier (redundant with .prettierrc but explicit for clarity)
   "prettier.requireConfig": true,
 
-  // GitHub Copilot - task-specific instructions
-  "github.copilot.chat.codeGeneration.instructions": [
-    { "file": ".github/copilot/code-generation.instructions.md" }
-  ],
-  "github.copilot.chat.testGeneration.instructions": [
-    { "file": ".github/copilot/test-generation.instructions.md" }
-  ],
-  "github.copilot.chat.commitMessageGeneration.instructions": [
-    { "file": ".github/copilot/commit-message.instructions.md" }
-  ],
-  "github.copilot.chat.reviewSelection.instructions": [
-    { "file": ".github/copilot/review.instructions.md" }
-  ],
-
   // CSS/Tailwind - DISABLED until Issue #20 is implemented
-  "css.validate": true
+  "css.validate": true,
   // Uncomment when Tailwind is installed:
   // "tailwindCSS.experimental.classRegex": [
   //   ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
   //   ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
   // ]
 
-  // Testing - DISABLED until Vitest is installed (Phase 4)
-  // Uncomment these settings when Vitest is added to package.json
-  // "vitest.enable": true,
-  // "vitest.commandLine": "pnpm test"
+  // Testing
+  // Without this, the extension's default search pattern also picks up
+  // apps/web/vite.config.ts, which has no `test` block.
+  "vitest.rootConfig": "./vitest.config.ts"
 }

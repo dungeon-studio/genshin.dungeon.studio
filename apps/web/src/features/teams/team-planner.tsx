@@ -3,6 +3,7 @@
 
 import type {
   ArtifactPlan,
+  CharacterId,
   CollectionCharacter,
   CollectionTeam,
   CollectionWeapon,
@@ -22,7 +23,7 @@ interface TeamPlannerProps {
   slot: TeamSlot;
   name: string;
   members: CollectionTeam['members'];
-  getCharacter: (characterId: string) => CollectionCharacter | undefined;
+  getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
   getCollectionWeapon: (collectionWeaponId: CollectionWeaponId) => CollectionWeapon | undefined;
   selectedMemberIndex?: number | null;
   onMemberSelect?: (memberIndex: number) => void;
@@ -58,16 +59,13 @@ export function TeamPlanner({
   }
 
   function commitEdit() {
-    const trimmed = editValue.trim();
-    if (trimmed) {
-      onNameChange(trimmed);
-    }
+    onNameChange(editValue);
     setEditing(false);
   }
 
   return (
     <div>
-      <div className="mb-3 flex items-center gap-2">
+      <div className="mb-3 gap-2 flex items-center">
         <h2 className="text-xl font-semibold text-foreground">
           {editing ? (
             <Input
@@ -86,7 +84,7 @@ export function TeamPlanner({
             <button
               type="button"
               onClick={startEditing}
-              className="group flex items-center gap-1.5 hover:text-primary"
+              className="group gap-1.5 flex items-center hover:text-primary"
               aria-label={`Edit name of ${name}`}
             >
               {name}
@@ -103,7 +101,7 @@ export function TeamPlanner({
           <button
             type="button"
             onClick={onEdit}
-            className="ml-auto hidden rounded-md bg-muted px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground sm:block"
+            className="px-3 py-1 text-xs font-medium sm:block ml-auto hidden rounded-md bg-muted text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
             aria-label={`Edit ${name}`}
           >
             Edit
@@ -111,9 +109,12 @@ export function TeamPlanner({
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="gap-4 sm:grid-cols-4 grid grid-cols-2">
         {slots.map((member, i) => (
           <TeamMemberPlanner
+            // Team slots are positional and fixed in number, so the index is a
+            // stable identity.
+            // eslint-disable-next-line @eslint-react/no-array-index-key
             key={i}
             member={member}
             collectionCharacter={member ? getCharacter(member.characterId) : undefined}

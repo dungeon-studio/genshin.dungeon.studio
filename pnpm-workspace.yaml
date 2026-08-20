@@ -10,6 +10,7 @@ packages:
 allowBuilds:
   '@firebase/util': true
   esbuild: true
+  msw: false
   protobufjs: true
   re2: true
   unrs-resolver: true
@@ -17,6 +18,12 @@ allowBuilds:
 # Ensure pnpm version compatibility
 engines:
   pnpm: '>=9.15.4'
+
+# pnpm 11's minimumReleaseAge verification pass retains per-package registry
+# metadata for every locked entry, OOMing installs on a lockfile this size
+# (notably Renovate's --lockfile-only regen on Mend's 3GB runner). Trust
+# already-locked entries; newly resolved versions are still age-checked.
+trustLockfile: true
 
 minimumReleaseAgeExclude:
   - firebase-tools@15.22.3

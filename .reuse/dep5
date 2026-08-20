@@ -65,14 +65,14 @@ Files: apps/web/public/weapon-types/*.png
 Copyright: 2026 Alex Brandt <alunduil@gmail.com>
 License: MIT
 
-# Generated app icon images (binary files, no inline SPDX headers)
+# Generated app icon and social images (binary files, no inline SPDX headers)
 
-Files: apps/web/public/favicon.ico apps/web/public/favicon-32x32.png apps/web/public/favicon-32x32-dark.png apps/web/public/apple-touch-icon.png apps/web/public/icon-192x192.png apps/web/public/icon-512x512.png
+Files: apps/web/public/*.ico apps/web/public/*.png
 Copyright: 2026 Alex Brandt <alunduil@gmail.com>
 License: MIT
 
-# Copilot prompt files (frontmatter must be first line, no room for SPDX)
+# Claude Code slash commands (frontmatter must be first line, no room for SPDX)
 
-Files: .github/copilot/*.prompt.md
+Files: .claude/commands/*.md
 Copyright: 2026 Alex Brandt <alunduil@gmail.com>
 License: MIT

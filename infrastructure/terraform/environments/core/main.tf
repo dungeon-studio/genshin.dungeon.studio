@@ -2,20 +2,16 @@
 # SPDX-License-Identifier: MIT
 
 terraform {
-  required_version = ">= 1.0"
+  required_version = "1.15.8"
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 7.19"
+      version = "7.44.0"
     }
   }
 }
 
 provider "google" {
-  project = var.gcp_core_project_id
+  project = var.project_id
   region  = "europe-west1"
-}
-
-data "google_project" "core" {
-  project_id = var.gcp_core_project_id
 }

@@ -7,14 +7,12 @@ import Negotiator from 'negotiator';
 
 import type { ProfileLink } from '@/middleware/profile-link.js';
 
-export type { ProfileLink } from '@/middleware/profile-link.js';
-
 /**
  * A representation the endpoint can produce.
  *
  * @example
  * // JSON with a profile link (e.g. a JSON Schema or ALPS document)
- * { mediaType: 'application/json', profile: profileGetResponseV1 }
+ * { mediaType: 'application/json', profile: healthGetResponseV1 }
  *
  * // Plain JSON without a profile
  * { mediaType: 'application/json' }
@@ -25,7 +23,7 @@ export interface SupportedRepresentation {
   profile?: ProfileLink;
 }
 
-export type NegotiatedContentVariables = {
+export type NegotiatedResponseContentVariables = {
   negotiatedMediaType: string;
 };
 

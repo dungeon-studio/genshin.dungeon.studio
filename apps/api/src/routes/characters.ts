@@ -2,39 +2,42 @@
 // SPDX-License-Identifier: MIT
 
 import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
-import { characterItemHref, characterRepresentation, serialiseCharacter } from '@genshin/domain';
-import { getCharacterById } from '@genshin/game-data';
+import type { ConstellationLevel } from '@genshin/domain';
+import {
+  characterCollectionHref,
+  characterItemHref,
+  characterRepresentation,
+  serialiseCharacter,
+} from '@genshin/domain';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import type { FromSchema } from 'json-schema-to-ts';
 
-import type { AuthVariables } from '@/middleware/auth.js';
+import { requireCharacterId } from '@/catalogue.js';
 import { auth } from '@/middleware/auth.js';
-import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
-import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
-import type { ValidatedRequestBodyVariables } from '@/middleware/validate-request-body.js';
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { characterItemV1 } from '@/profiles/alps/character/item-v1.js';
 import { characterPutRequestV1 } from '@/profiles/json-schema/characters/put-request-v1.js';
 import * as Characters from '@/repositories/characters/index.js';
+import type { AuthenticatedRouteVariables } from '@/routes/variables.js';
 
 export const characters = new Hono<{
-  Variables: AuthVariables &
-    NegotiatedContentVariables &
-    NegotiatedRequestSchemaVariables &
-    ValidatedRequestBodyVariables;
+  Variables: AuthenticatedRouteVariables;
 }>();
 
 characters.use('*', auth);
 
 characters.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: characterItemV1 }]));
 
-interface SaveCharacterBody {
-  constellationLevel: number;
-}
+// FromSchema widens the schema's integer bounds to `number`; request validation
+// has already enforced them, so the intersection puts the range back.
+type SaveCharacterBody = FromSchema<typeof characterPutRequestV1.schema> & {
+  constellationLevel: ConstellationLevel;
+};
 
-// GET /api/characters — List user's character collection
+// GET /characters — List user's character collection
 characters.get('/', async (c) => {
   const userId = c.get('user').uid;
   const items = await Characters.list(userId);
@@ -44,7 +47,7 @@ characters.get('/', async (c) => {
     JSON.stringify(
       serialiseCollection(
         characterRepresentation,
-        `${baseUrl}/api/characters`,
+        characterCollectionHref(baseUrl),
         items.map((item) => serialiseCharacter(item, baseUrl)),
       ),
     ),
@@ -54,7 +57,7 @@ characters.get('/', async (c) => {
   );
 });
 
-// GET /api/characters/:characterId — Get specific character record
+// GET /characters/:characterId — Get specific character record
 characters.get('/:characterId', async (c) => {
   const userId = c.get('user').uid;
   const { characterId } = c.req.param();
@@ -79,7 +82,7 @@ characters.get('/:characterId', async (c) => {
   );
 });
 
-// PUT /api/characters/:characterId — Save/update character (idempotent upsert)
+// PUT /characters/:characterId — Save/update character (idempotent upsert)
 characters.put(
   '/:characterId',
   negotiateRequestSchema([characterPutRequestV1]),
@@ -88,12 +91,9 @@ characters.put(
     const userId = c.get('user').uid;
     const { characterId } = c.req.param();
 
-    if (!getCharacterById(characterId)) {
-      throw new HTTPException(400, { message: `Unknown character: ${characterId}` });
-    }
-
+    const knownId = requireCharacterId(characterId);
     const { constellationLevel } = c.get('validatedBody') as SaveCharacterBody;
-    const { character, created } = await Characters.save(userId, characterId, constellationLevel);
+    const { character, created } = await Characters.save(userId, knownId, constellationLevel);
     const baseUrl = new URL(c.req.url).origin;
 
     return c.body(
@@ -110,7 +110,7 @@ characters.put(
   },
 );
 
-// DELETE /api/characters/:characterId — Remove from collection
+// DELETE /characters/:characterId — Remove from collection
 characters.delete('/:characterId', async (c) => {
   const userId = c.get('user').uid;
   const { characterId } = c.req.param();

@@ -6,8 +6,9 @@
 
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers-extra/features/act:1": {},
     "ghcr.io/devcontainers/features/node:2": {
-      "version": "24.18.0"
+      "version": "24.19.0"
     },
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       "moby": false
@@ -35,6 +36,10 @@
 
         // TypeScript enhancements
         "yoavbls.pretty-ts-errors",
+
+        // Shell scripts
+        "timonwong.shellcheck",
+        "foxundermoon.shell-format",
 
         // Documentation
         "chrischinchilla.vale-vscode",

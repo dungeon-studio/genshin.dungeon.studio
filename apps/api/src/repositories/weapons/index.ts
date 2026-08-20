@@ -4,8 +4,10 @@
 import { randomUUID } from 'node:crypto';
 
 import type { CollectionWeapon, ISOTimestamp, UUID } from '@genshin/domain';
+import type { WeaponId } from '@genshin/game-data';
 
-import { db } from '@/lib/firebase/firestore.js';
+import { db } from '@/firebase/firestore.js';
+import { readSnapshot } from '@/repositories/snapshot.js';
 
 import { fromDocument, toDocument } from './document.js';
 
@@ -26,23 +28,14 @@ export async function get(
   userId: string,
   weaponInstanceId: UUID,
 ): Promise<CollectionWeapon | null> {
-  const doc = await collectionRef(userId).doc(weaponInstanceId).get();
+  const snapshot = await collectionRef(userId).doc(weaponInstanceId).get();
 
-  if (!doc.exists) {
-    return null;
-  }
-
-  const data = doc.data();
-  if (data === undefined) {
-    return null;
-  }
-
-  return fromDocument(weaponInstanceId, data);
+  return readSnapshot(snapshot, (data) => fromDocument(weaponInstanceId, data));
 }
 
 export async function create(
   userId: string,
-  weaponId: string,
+  weaponId: WeaponId,
   refinementLevel: number,
 ): Promise<CollectionWeapon> {
   const weaponInstanceId = randomUUID() as UUID;
@@ -67,25 +60,19 @@ export async function update(
   refinementLevel: number,
 ): Promise<CollectionWeapon | null> {
   const docRef = collectionRef(userId).doc(weaponInstanceId);
-  const existing = await docRef.get();
+  const existing = readSnapshot(await docRef.get(), (data) => fromDocument(weaponInstanceId, data));
 
-  if (!existing.exists) {
+  if (existing === null) {
     return null;
   }
 
-  const existingData = existing.data();
-  if (existingData === undefined) {
-    return null;
-  }
-
-  const existingWeapon = fromDocument(weaponInstanceId, existingData);
   const now = new Date().toISOString() as ISOTimestamp;
 
   const weapon: CollectionWeapon = {
     weaponInstanceId,
-    weaponId: existingWeapon.weaponId,
+    weaponId: existing.weaponId,
     refinementLevel,
-    createdAt: existingWeapon.createdAt,
+    createdAt: existing.createdAt,
     updatedAt: now,
   };
 

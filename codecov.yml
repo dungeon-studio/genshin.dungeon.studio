@@ -1,13 +1,9 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 ---
-# Repository index.ts files are thin Firestore I/O adapters, exercised only
-# through route tests that mock them (`vi.mock('@/repositories/.../index.js')`),
-# so they carry no direct unit coverage by design. document.ts (the
-# fromDocument/toDocument logic) stays covered. teams.save merge logic is
-# tracked for real tests separately.
+# Inert and awaiting deletion in #879, so no tests are written for it.
 ignore:
-  - 'apps/api/src/repositories/*/index.ts'
+  - 'apps/api/src/repositories/profile/index.ts'
 
 coverage:
   status:
@@ -25,10 +21,22 @@ comment:
   behavior: default
   require_changes: false
 
+# apps/web only, uploaded from inside `vite build` rather than by a CI step; see
+# its vite.config.ts. Compares each commit against its base, like the coverage
+# statuses above.
+bundle_analysis:
+  warning_threshold: '5%'
+  status: true
+
 flag_management:
   default_rules:
     carryforward: true
   individual_flags:
+    # Carries the end-to-end suite's test results. It reports no coverage, so
+    # there are no paths, and carryforward stays off to keep an absent report
+    # from being republished as coverage.
+    - name: e2e
+      carryforward: false
     - name: api
       paths:
         - apps/api/src/**
@@ -80,7 +88,7 @@ component_management:
     - component_id: api-firebase
       name: 'API: Firebase'
       paths:
-        - apps/api/src/lib/firebase/**
+        - apps/api/src/firebase/**
       flag_regexes:
         - api
     - component_id: game-data-versions

@@ -2,4 +2,4 @@
 # SPDX-License-Identifier: MIT
 # Non-sensitive values for core environment
 
-gcp_core_project_id = "dungeon-studio-genshin-core"
+project_id = "dungeon-studio-genshin-core"

@@ -31,8 +31,8 @@ describe('GET /', () => {
     const body = (await res.json()) as { links: Record<string, { href: string }> };
     expect(body.links).toEqual(
       expect.objectContaining({
-        characters: { href: '/api/characters' },
-        weapons: { href: '/api/weapons' },
+        characters: { href: '/characters' },
+        weapons: { href: '/weapons' },
         health: { href: '/health' },
       }),
     );

@@ -2,15 +2,15 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-name: devcontainer
+name: Devcontainer
 
+# A cold devcontainer build is expensive, hence the path gate. The anchor keeps
+# both triggers on one list, which two copies would let drift.
 on:
   pull_request:
-    paths:
+    paths: &paths
       - '.devcontainer/**'
-      - '.vscode/extensions.json'
       - 'scripts/install-reuse.sh'
-      - 'scripts/validate-workspace.ts'
       - '.github/workflows/devcontainer.yml'
       - 'package.json'
       - 'pnpm-lock.yaml'
@@ -18,32 +18,33 @@ on:
     branches:
       - develop
       - main
+      - 'release/**'
+      - 'hotfix/**'
+    paths: *paths
 
 permissions:
   contents: read
 
 jobs:
-  validate:
-    name: Validate
+  toolchain:
+    name: Verify toolchain
     runs-on: ubuntu-latest
+    # Headroom for a cold build, which has no cache to fall back on.
     timeout-minutes: 30
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - name: Build devcontainer and run pnpm validate
-        uses: devcontainers/ci@v0.3
+      - name: Build the image and run the checks inside it
+        uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
         with:
           imageName: genshin-planner-devcontainer
           push: never
-          runCmd: pnpm validate
-
-# ---------------------------------------------------------------------------
-# Maintenance notes
-# - Cold devcontainer build (no cache) is the slow path. The job ceiling
-#   leaves headroom for first-time builds without retries.
-# - Runs pnpm validate (lint + typecheck + reuse + workspace consistency)
-#   inside the built image so devcontainer drift surfaces here, not in
-#   contributor terminals.
-# ---------------------------------------------------------------------------
+          # Repeats ci.yml's checks on purpose: there they gate the code, here
+          # they prove the built image can still run them. Add a command only
+          # when it exercises a tool the others leave untouched; project-wide
+          # checks belong in .pre-commit-config.yaml.
+          runCmd: pnpm lint && pnpm typecheck && pnpm knip && pnpm reuse:check

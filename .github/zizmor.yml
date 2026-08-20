@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+rules:
+  ref-version-mismatch:
+    # SHA pins carry a major-version comment (# v6) by house convention; this
+    # audit wants the exact patch tag (# v6.0.2), which Renovate rewrites on the
+    # next bump. Comment hygiene, not a security signal, so opt out repo-wide.
+    disable: true
+
+  cache-poisoning:
+    # ci.yml publishes nothing: it builds to prove the workspace compiles and
+    # discards the output, and deploy.yml owns every artifact that leaves the
+    # repository. GitHub scopes cache writes to the writing branch, so a pull
+    # request cannot write into the scope a develop or main run restores from.
+    ignore:
+      - ci.yml
+
+  secrets-inherit:
+    # Environment secrets cannot be passed by name: only the reusable declares
+    # `environment:`, so the caller has no handle on them and must inherit.
+    ignore:
+      - terraform-apply.yml

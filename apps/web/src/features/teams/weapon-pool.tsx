@@ -8,16 +8,17 @@ import type {
   TeamSlot,
 } from '@genshin/domain';
 import type { Weapon, WeaponType } from '@genshin/game-data';
-import { getWeaponById, WEAPONS } from '@genshin/game-data';
+import { getWeaponById, WEAPON_ROSTER } from '@genshin/game-data';
 import { Lock, Swords } from 'lucide-react';
 import type { JSX } from 'react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { WeaponSummary } from '@/components/summaries/weapon-summary';
 import { Button } from '@/components/ui/button';
-import { WeaponSummary } from '@/components/weapon-summary';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
+import { weaponIdsOf } from '@/features/collection/weapons/use-weapon-collection-store';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
 import { useTeamStore } from '@/features/teams/use-team-store';
 import { RARITY_BORDER_COLORS, RARITY_SELECTED_RINGS } from '@/lib/rarity-styles';
@@ -37,13 +38,18 @@ function buildEquippedWeapons(
   return map;
 }
 
-function poolFilterState(weaponType: WeaponType): WeaponFilterState {
-  return { ...initialFilterState(), ownership: 'owned', weaponTypes: new Set([weaponType]) };
+function poolFilterState(weaponType: WeaponType | undefined): WeaponFilterState {
+  return {
+    ...initialFilterState(),
+    ownership: 'owned',
+    weaponTypes: weaponType ? new Set([weaponType]) : new Set(),
+  };
 }
 
 interface WeaponPoolProps {
   collectionWeapons: CollectionWeapon[];
-  weaponType: WeaponType;
+  /** Undefined on a member with no character, where the whole owned pool is offered. */
+  weaponType?: WeaponType;
   selectedCollectionWeaponId?: CollectionWeaponId;
   slot: TeamSlot;
   memberIndex: number;
@@ -69,17 +75,12 @@ export function WeaponPool({
     setFilters({ ...next, ownership: 'owned' });
   }
 
-  const ownedWeaponIds = useMemo(() => {
-    const ids = new Set<string>();
-    for (const cw of collectionWeapons) {
-      ids.add(cw.weaponId);
-    }
-    return ids;
-  }, [collectionWeapons]);
+  const ownedWeaponIds = useMemo(() => weaponIdsOf(collectionWeapons), [collectionWeapons]);
 
   const ownedCount = ownedWeaponIds.size;
 
   const hasWeaponsOfType = useMemo(() => {
+    if (!weaponType) return true;
     for (const id of ownedWeaponIds) {
       const weapon = getWeaponById(id);
       if (weapon?.type === weaponType) return true;
@@ -90,7 +91,7 @@ export function WeaponPool({
   const { filteredWeapons, filteredOwnedCount } = useMemo(() => {
     if (ownedWeaponIds.size === 0 || !hasWeaponsOfType)
       return { filteredWeapons: [] as Weapon[], filteredOwnedCount: 0 };
-    const filtered = filterWeapons(WEAPONS, filters, ownedWeaponIds);
+    const filtered = filterWeapons(WEAPON_ROSTER, filters, ownedWeaponIds);
     return {
       filteredWeapons: filtered,
       filteredOwnedCount: filtered.filter((w) => ownedWeaponIds.has(w.id)).length,
@@ -109,7 +110,7 @@ export function WeaponPool({
 
   if (ownedCount === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 py-12">
+      <div className="gap-4 py-12 flex flex-1 flex-col items-center justify-center">
         <Swords className="h-10 w-10 text-muted-foreground" aria-hidden="true" focusable={false} />
         <div className="text-center">
           <p className="font-medium">No weapons in your collection</p>
@@ -124,9 +125,9 @@ export function WeaponPool({
     );
   }
 
-  if (!hasWeaponsOfType) {
+  if (weaponType && !hasWeaponsOfType) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 py-12">
+      <div className="gap-4 py-12 flex flex-1 flex-col items-center justify-center">
         <Swords className="h-10 w-10 text-muted-foreground" aria-hidden="true" focusable={false} />
         <div className="text-center">
           <p className="font-medium">No {weaponType} weapons in your collection</p>
@@ -142,20 +143,20 @@ export function WeaponPool({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3">
+    <div className="min-h-0 gap-3 flex flex-1 flex-col">
       <WeaponFilters
         filters={filters}
         onChange={handleFilterChange}
         filteredCount={filteredWeapons.length}
-        totalCount={WEAPONS.length}
+        totalCount={WEAPON_ROSTER.length}
         ownedCount={ownedCount}
         filteredOwnedCount={filteredOwnedCount}
         showOwnership={false}
-        showWeaponTypes={false}
+        showWeaponTypes={weaponType === undefined}
       />
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 grid grid-cols-1">
           {filteredWeapons.flatMap((weapon) => {
             const instances = instancesByWeaponId.get(weapon.id) ?? [];
             return instances.map((instance) => {
@@ -216,7 +217,7 @@ function PoolWeaponCard({
       onClick={equipped ? undefined : onClick}
       disabled={equipped}
       className={cn(
-        'flex w-full items-center gap-3 rounded-lg border border-border border-l-4 bg-card p-3 text-left shadow-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+        'gap-3 p-3 shadow-sm flex w-full items-center rounded-lg border border-l-4 border-border bg-card text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
         RARITY_BORDER_COLORS[weapon.rarity] ?? 'border-l-border',
         selected && `ring-2 ring-inset ${RARITY_SELECTED_RINGS[weapon.rarity] ?? 'ring-border'}`,
         equipped ? 'cursor-not-allowed opacity-40' : 'cursor-pointer hover:bg-accent/50',
@@ -233,7 +234,7 @@ function PoolWeaponCard({
           focusable={false}
         />
       )}
-      <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-bold tabular-nums text-muted-foreground">
+      <span className="px-2 py-0.5 text-xs font-bold shrink-0 rounded-full bg-muted text-muted-foreground tabular-nums">
         R{refinementLevel}
       </span>
     </button>

@@ -1,0 +1,9 @@
+{
+  "extends": "@genshin/tsconfig/no-emit.json",
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["node"]
+  },
+  "include": ["specs/**/*.ts", "playwright.config.ts"]
+}

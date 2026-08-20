@@ -4,7 +4,7 @@
 import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
 import { isValidRefinementLevel } from '@genshin/domain';
 import type { Weapon } from '@genshin/game-data';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
 import { useAuth } from '@/features/auth/use-auth';
@@ -21,6 +21,7 @@ import { useWeaponCollectionStore } from './use-weapon-collection-store';
 export interface UseWeaponCollectionResult {
   weapons: Record<CollectionWeaponId, CollectionWeapon>;
   isAuthenticated: boolean;
+  ensureWeapon: (weaponId: Weapon['id']) => void;
   addWeapon: (weaponId: Weapon['id']) => void;
   removeWeapon: (collectionWeaponId: CollectionWeaponId) => void;
   setRefinementLevel: (collectionWeaponId: CollectionWeaponId, level: number) => void;
@@ -68,18 +69,48 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     storeSetWeapons(apiWeapons);
   }, [apiWeapons, storeSetWeapons]);
 
-  const addWeapon = useCallback(
-    (weaponId: Weapon['id']) => {
-      if (!isAuthenticated) return;
-
+  const runAdd = useCallback(
+    (weaponId: Weapon['id'], onSettled?: () => void) => {
       addWeaponApi(weaponId, {
         onSuccess: applyMutationResult,
         onError: () => {
           toast.error('Failed to add weapon.');
         },
+        onSettled,
       });
     },
-    [isAuthenticated, addWeaponApi, applyMutationResult],
+    [addWeaponApi, applyMutationResult],
+  );
+
+  // Additive: every call creates a new instance. Contrast ensureWeapon.
+  const addWeapon = useCallback(
+    (weaponId: Weapon['id']) => {
+      if (!isAuthenticated) return;
+      runAdd(weaponId);
+    },
+    [isAuthenticated, runAdd],
+  );
+
+  // Weapon instances carry a server-generated id, so an add can't reach the
+  // store until the POST resolves. Tracking in-flight adds per weapon id closes
+  // the window where rapid clicks would each auto-create an instance.
+  const pendingEnsures = useRef<Set<Weapon['id']>>(new Set());
+
+  const ensureWeapon = useCallback(
+    (weaponId: Weapon['id']) => {
+      if (!isAuthenticated) return;
+
+      const alreadyOwned = Object.values(useWeaponCollectionStore.getState().weapons).some(
+        (w) => w.weaponId === weaponId,
+      );
+      if (alreadyOwned || pendingEnsures.current.has(weaponId)) return;
+
+      pendingEnsures.current.add(weaponId);
+      runAdd(weaponId, () => {
+        pendingEnsures.current.delete(weaponId);
+      });
+    },
+    [isAuthenticated, runAdd],
   );
 
   const removeWeapon = useCallback(
@@ -146,6 +177,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   return {
     weapons,
     isAuthenticated,
+    ensureWeapon,
     addWeapon,
     removeWeapon,
     setRefinementLevel,

@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 # Understanding SPDX compliance: Headers vs `.reuse/dep5`
 
-This project uses the [REUSE Specification v3.3](https://reuse.software/spec-3.3.0/) to make copyright and licensing information machine-readable and comply with open source best practices. Both SPDX headers and the `.reuse/dep5` file serve the same goal through different mechanisms, each suited to different file types.
+This project uses the [REUSE Specification v3.3](https://reuse.software/spec-3.3/) to make copyright and licensing information machine-readable and comply with open source best practices. Both SPDX headers and the `.reuse/dep5` file serve the same goal through different mechanisms, each suited to different file types.
 
 ---
 
@@ -71,5 +71,5 @@ License: MIT
 ## See also
 
 - [How to add SPDX headers to new files](../how-tos/add-spdx-headers.md): practical steps for adding headers and troubleshooting
-- [REUSE Specification v3.3](https://reuse.software/spec-3.3.0/)
+- [REUSE Specification v3.3](https://reuse.software/spec-3.3/)
 - [Debian copyright format documentation](https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/)

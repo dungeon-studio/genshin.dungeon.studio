@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 # Non-sensitive values for dev environment
 
-gcp_dev_project_id = "dungeon-studio-genshin-dev"
+project_id = "dungeon-studio-genshin-dev"
 
 common_labels = {
   environment = "dev"

@@ -20,7 +20,7 @@ step() {
 verify() {
   local label="$1"
   shift
-  if "$@" > /dev/null 2>&1; then
+  if "$@" >/dev/null 2>&1; then
     echo "  [ok] ${label}"
   else
     echo "  [FAIL] ${label}"
@@ -36,59 +36,73 @@ print_version() {
   echo "  ${label}: ${version}"
 }
 
+# The lifecycle scripts run under `set -x`, which drowns these reports in trace
+# output. `shopt -po` prints the command that restores the caller's setting,
+# whatever it was.
+quietly() {
+  local restore
+  restore="$(shopt -po xtrace 2>/dev/null)" || true
+  { set +x; } 2>/dev/null
+  "$@"
+  eval "${restore}"
+}
+
+# Verification and the version summary have to cover the same tools; one list
+# is what stops them drifting apart. It spans everything the container
+# provisions, feature-installed or script-installed.
+for_each_tool() {
+  local action="$1"
+  "${action}" "node" node --version
+  "${action}" "pnpm" pnpm --version
+  "${action}" "docker" docker --version
+  "${action}" "gh" gh --version
+  "${action}" "gcloud" gcloud --version
+  "${action}" "terraform" terraform version
+  "${action}" "java" java -version
+  "${action}" "pre-commit" pre-commit --version
+  "${action}" "reuse" reuse --version
+  "${action}" "vale" vale --version
+  "${action}" "lychee" lychee --version
+  "${action}" "firebase" firebase --version
+  "${action}" "playwright" pnpm --filter @genshin/e2e exec playwright --version
+}
+
 # ---------------------------------------------------------------------------
 # Verification
 # ---------------------------------------------------------------------------
 
-run_verification() {
-  local _xtrace
-  _xtrace="$(shopt -po xtrace 2>/dev/null)" || true
-  { set +x; } 2>/dev/null
+check_tools() {
   step "Verifying installed tools"
 
-  verify "node"                 node --version
-  verify "pnpm"                 pnpm --version
-  verify "gcloud"               gcloud --version
-  verify "pre-commit"           pre-commit --version
-  verify "reuse"                reuse --version
-  verify "hadolint"             hadolint --version
-  verify "lychee"               lychee --version
-  verify "firebase"             firebase --version
-  verify "playwright-cli"       npx --yes playwright --version
-  verify "playwright-browsers"  npx --yes playwright install --list
-  eval "${_xtrace}"
+  for_each_tool verify
+  # The browsers install separately from the CLI and report no version, so
+  # only an install check can see them.
+  verify "playwright-browsers" pnpm --filter @genshin/e2e exec playwright install --list
+}
+
+run_verification() {
+  quietly check_tools
 }
 
 # ---------------------------------------------------------------------------
 # Version summary
 # ---------------------------------------------------------------------------
 
-run_version_summary() {
-  local _xtrace
-  _xtrace="$(shopt -po xtrace 2>/dev/null)" || true
-  { set +x; } 2>/dev/null
+show_versions() {
   step "Environment versions"
 
-  print_version "node"       node --version
-  print_version "pnpm"       pnpm --version
-  print_version "gcloud"     gcloud --version
-  print_version "pre-commit" pre-commit --version
-  print_version "reuse"      reuse --version
-  print_version "hadolint"   hadolint --version
-  print_version "lychee"     lychee --version
-  print_version "firebase"   firebase --version
-  print_version "playwright" npx --yes playwright --version
-  eval "${_xtrace}"
+  for_each_tool print_version
+}
+
+run_version_summary() {
+  quietly show_versions
 }
 
 # ---------------------------------------------------------------------------
 # Final status
 # ---------------------------------------------------------------------------
 
-run_status() {
-  local _xtrace
-  _xtrace="$(shopt -po xtrace 2>/dev/null)" || true
-  { set +x; } 2>/dev/null
+show_status() {
   echo ""
   if [[ ${#FAILURES[@]} -gt 0 ]]; then
     echo "Setup completed with failures:"
@@ -101,5 +115,8 @@ run_status() {
   fi
 
   echo "Setup complete — all tools verified."
-  eval "${_xtrace}"
+}
+
+run_status() {
+  quietly show_status
 }

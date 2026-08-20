@@ -7,28 +7,65 @@
       "inputs": [
         "src/**",
         "public/**",
+        "scripts/**",
         "package.json",
         "vite.config.*",
         "index.html",
         "tsconfig*.json"
       ],
-      "outputs": ["dist/**", ".next/**", "build/**"]
+      "outputs": ["dist/**", ".next/**", "build/**"],
+      "passThroughEnv": ["CODECOV_TOKEN"]
     },
     "dev": {
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
     "lint": {
-      "inputs": ["**/*.{ts,tsx}", "package.json", "eslint.config.*"]
+      "dependsOn": ["^build"],
+      "inputs": ["**/*.{ts,tsx,js,mjs,cjs}", "package.json", "tsconfig*.json"]
     },
     "test": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**", "package.json", "vite.config.*", "vitest.config.*", "tsconfig*.json"],
+      "inputs": [
+        "src/**",
+        "scripts/**",
+        "package.json",
+        "vite.config.*",
+        "vitest.config.*",
+        "tsconfig*.json"
+      ],
       "env": ["FAST_CHECK_SEED"]
+    },
+    "test:integration": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "test:e2e": {
+      "dependsOn": ["^build", "@genshin/api#build"],
+      "cache": false
+    },
+    "test:deployed": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "env": ["E2E_BASE_URL"]
     },
     "typecheck": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**/*.{ts,tsx}", "package.json", "vite.config.*", "tsconfig*.json"]
+      "inputs": [
+        "src/**/*.{ts,tsx}",
+        "specs/**/*.ts",
+        "scripts/**/*.ts",
+        "package.json",
+        "vite.config.*",
+        "playwright.config.*",
+        "tsconfig*.json"
+      ]
+    },
+    "schemas:export": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/schemas/**", "scripts/export-schemas.ts", "scripts/schema-registry.ts"],
+      "outputs": ["schema-snapshots/**"]
     },
     "clean": {
       "cache": false

@@ -7,6 +7,8 @@ SPDX-License-Identifier: MIT
 
 This guide explains how to add a new infrastructure environment such as `staging` to this repository.
 
+For how branches map to environments and Terraform actions, see [Infrastructure branch flow](../reference/infrastructure-branch-flow.md).
+
 ---
 
 ## 1) Add bootstrap configuration
@@ -15,7 +17,9 @@ Copy `infrastructure/terraform/bootstrap/dev.tf` to `infrastructure/terraform/bo
 
 - Rename module blocks and resource names from `dev` to `<environment>`
 - Set `environment`, `project_id`, and `project_name`
-- Keep the same `github_oidc_bindings_<environment>` pattern
+- Keep the same `github_oidc_bindings_<environment>` pattern, and set its
+  `github_environment` to the GitHub Actions environment name the apply job
+  runs in (it must match exactly, or RW Workload Identity auth fails closed)
 - Keep cross-project viewer access to `module.core` for RO and RW service accounts
 - Keep any environment-scoped IAM needed for plan/apply
 
@@ -71,7 +75,7 @@ Don't commit `.terraform/` directories.
 ## 5) Align GitHub workflows
 
 - In `.github/workflows/terraform-plan.yml`, copy one matrix entry and set `<environment>` + RO secret.
-- In `.github/workflows/terraform-apply.yml`, copy one job and set job id, `with.environment`, and RW secret.
+- In `.github/workflows/terraform-apply.yml`, copy one job and set job id, `with.environment`, and RW secret. Match the routing in [Infrastructure branch flow](../reference/infrastructure-branch-flow.md).
 - Keep `.github/workflows/terraform-apply-reusable.yml` unchanged.
 
 ---

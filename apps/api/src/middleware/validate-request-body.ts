@@ -6,9 +6,50 @@ import { Ajv2020 } from 'ajv/dist/2020.js';
 import type { MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
+import type { ProblemOptions } from '@/http/problem.js';
+import { ProblemException } from '@/http/problem.js';
 import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
 
 const ajv = new Ajv2020({ allErrors: true });
+
+/** Parent type for a validation failure carrying no narrower classification. */
+const VALIDATION = '/problems/validation';
+const MISSING_PROPERTY = `${VALIDATION}/missing-property`;
+const INVALID_TYPE = `${VALIDATION}/invalid-type`;
+const OUT_OF_RANGE = `${VALIDATION}/out-of-range`;
+const ADDITIONAL_PROPERTIES = `${VALIDATION}/additional-properties`;
+
+// The failure mode a client branches on, keyed by the ajv keyword that
+// rejected the body.
+const PROBLEM_TYPE_BY_KEYWORD: Record<string, string> = {
+  additionalProperties: ADDITIONAL_PROPERTIES,
+  exclusiveMaximum: OUT_OF_RANGE,
+  exclusiveMinimum: OUT_OF_RANGE,
+  maxItems: OUT_OF_RANGE,
+  maxLength: OUT_OF_RANGE,
+  maxProperties: OUT_OF_RANGE,
+  maximum: OUT_OF_RANGE,
+  minItems: OUT_OF_RANGE,
+  minLength: OUT_OF_RANGE,
+  minProperties: OUT_OF_RANGE,
+  minimum: OUT_OF_RANGE,
+  multipleOf: OUT_OF_RANGE,
+  required: MISSING_PROPERTY,
+  type: INVALID_TYPE,
+  unevaluatedProperties: ADDITIONAL_PROPERTIES,
+};
+
+function validationProblem(errors: ErrorObject[]): ProblemOptions {
+  const types = new Set(errors.map((e) => PROBLEM_TYPE_BY_KEYWORD[e.keyword] ?? VALIDATION));
+  const [only] = types;
+  // A response carries one type, so a body failing several categories widens to
+  // the parent rather than claiming one that covers only part of it.
+  const type = types.size === 1 && only ? only : VALIDATION;
+
+  const detail = errors.map((e) => `${e.instancePath || '/'}: ${e.message}`).join('; ');
+
+  return { type, message: detail || 'Request body validation failed' };
+}
 
 export type ValidatedRequestBodyVariables = {
   /** The parsed and validated request body. */
@@ -50,16 +91,7 @@ export function validateRequestBody(schemas: JsonSchemaProfile[]): MiddlewareHan
     }
 
     if (!entry.validate(body)) {
-      const detail = entry.validate.errors
-        ?.map((e: ErrorObject) => {
-          const path = e.instancePath || '/';
-          return `${path}: ${e.message}`;
-        })
-        .join('; ');
-
-      throw new HTTPException(422, {
-        message: detail ?? 'Request body validation failed',
-      });
+      throw new ProblemException(422, validationProblem(entry.validate.errors ?? []));
     }
 
     c.set('validatedBody', body);

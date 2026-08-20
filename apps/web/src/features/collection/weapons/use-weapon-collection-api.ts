@@ -8,6 +8,8 @@ import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPatch, apiPost } from '@/lib/api';
+import { invalidateUserQuery } from '@/lib/invalidate-user-query';
+import { userScopedKey } from '@/lib/user-scoped-key';
 
 type WeaponRecord = Record<CollectionWeaponId, CollectionWeapon>;
 
@@ -15,11 +17,9 @@ export interface WeaponMutationResult {
   weapon: CollectionWeapon;
 }
 
-export function weaponCollectionKey(userId: string): readonly [string, string] {
-  return ['weapons', userId] as const;
-}
+const weaponsKey = userScopedKey('weapons');
 
-export function parseWeaponCollectionResponse(response: unknown): WeaponRecord {
+function parseWeaponCollectionResponse(response: unknown): WeaponRecord {
   assertCollectionDocument(response);
   const record: WeaponRecord = {};
 
@@ -46,9 +46,9 @@ export function useWeaponCollectionQuery(
   userId: string | undefined,
 ): UseQueryResult<WeaponRecord, Error> {
   return useQuery({
-    queryKey: weaponCollectionKey(userId ?? ''),
+    queryKey: weaponsKey(userId ?? ''),
     queryFn: async () => {
-      const response = await apiGet('/api/weapons');
+      const response = await apiGet('/weapons');
       return parseWeaponCollectionResponse(response);
     },
     enabled: userId !== undefined,
@@ -62,16 +62,13 @@ export function useAddWeaponMutation(
 
   return useMutation({
     mutationFn: async (weaponId: string): Promise<WeaponMutationResult> => {
-      const response = await apiPost('/api/weapons', {
+      const response = await apiPost('/weapons', {
         weaponId,
         refinementLevel: MIN_REFINEMENT_LEVEL,
       });
       return parseSingleWeaponResponse(response);
     },
-    onSuccess: () => {
-      if (userId !== undefined)
-        queryClient.invalidateQueries({ queryKey: weaponCollectionKey(userId) });
-    },
+    onSuccess: invalidateUserQuery(queryClient, userId, weaponsKey),
   });
 }
 
@@ -82,12 +79,9 @@ export function useRemoveWeaponMutation(
 
   return useMutation({
     mutationFn: async (collectionWeaponId: CollectionWeaponId) => {
-      await apiDelete(`/api/weapons/${encodeURIComponent(collectionWeaponId)}`);
+      await apiDelete(`/weapons/${encodeURIComponent(collectionWeaponId)}`);
     },
-    onSuccess: () => {
-      if (userId !== undefined)
-        queryClient.invalidateQueries({ queryKey: weaponCollectionKey(userId) });
-    },
+    onSuccess: invalidateUserQuery(queryClient, userId, weaponsKey),
   });
 }
 
@@ -108,14 +102,11 @@ export function useSetRefinementLevelMutation(
       collectionWeaponId: CollectionWeaponId;
       level: number;
     }): Promise<WeaponMutationResult> => {
-      const response = await apiPatch(`/api/weapons/${encodeURIComponent(collectionWeaponId)}`, {
+      const response = await apiPatch(`/weapons/${encodeURIComponent(collectionWeaponId)}`, {
         refinementLevel: level,
       });
       return parseSingleWeaponResponse(response);
     },
-    onSuccess: () => {
-      if (userId !== undefined)
-        queryClient.invalidateQueries({ queryKey: weaponCollectionKey(userId) });
-    },
+    onSuccess: invalidateUserQuery(queryClient, userId, weaponsKey),
   });
 }

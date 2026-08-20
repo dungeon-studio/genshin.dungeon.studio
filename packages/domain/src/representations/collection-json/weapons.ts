@@ -16,12 +16,12 @@ import {
   type Template,
 } from '@genshin/collection-json';
 
-import type { CollectionWeapon } from '../../collection-weapon.js';
+import type { CollectionWeapon } from '../../weapon/collection-weapon.js';
 import {
   assertCollectionWeapon,
   MAX_REFINEMENT_LEVEL,
   MIN_REFINEMENT_LEVEL,
-} from '../../collection-weapon.js';
+} from '../../weapon/collection-weapon.js';
 
 const WEAPON_TEMPLATE: Template = {
   data: [
@@ -32,15 +32,21 @@ const WEAPON_TEMPLATE: Template = {
   ],
 };
 
+export function weaponCollectionHref(baseUrl: string, weaponId?: string): string {
+  const collection = `${baseUrl}/weapons`;
+  if (weaponId === undefined) return collection;
+  return `${collection}?weaponId=${encodeURIComponent(weaponId)}`;
+}
+
 export function weaponItemHref(baseUrl: string, weapon: CollectionWeapon): string {
-  return `${baseUrl}/api/weapons/${weapon.weaponInstanceId}`;
+  return `${weaponCollectionHref(baseUrl)}/${weapon.weaponInstanceId}`;
 }
 
 export function serialiseWeapon(weapon: CollectionWeapon, baseUrl: string): Item {
   const links: Link[] = [
     {
       rel: 'collection',
-      href: `${baseUrl}/api/weapons?weaponId=${encodeURIComponent(weapon.weaponId)}`,
+      href: weaponCollectionHref(baseUrl, weapon.weaponId),
       prompt: `All instances of ${weapon.weaponId}`,
     },
   ];

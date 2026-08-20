@@ -13,25 +13,19 @@ import {
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
-import type { AuthVariables } from '@/middleware/auth.js';
 import { auth } from '@/middleware/auth.js';
-import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
-import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
-import type { ValidatedRequestBodyVariables } from '@/middleware/validate-request-body.js';
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { teamItemV1 } from '@/profiles/alps/team/item-v1.js';
 import { teamPutRequestV1 } from '@/profiles/json-schema/teams/put-request-v1.js';
 import * as Characters from '@/repositories/characters/index.js';
 import * as Teams from '@/repositories/teams/index.js';
 import * as Weapons from '@/repositories/weapons/index.js';
+import type { AuthenticatedRouteVariables } from '@/routes/variables.js';
 
 export const teams = new Hono<{
-  Variables: AuthVariables &
-    NegotiatedContentVariables &
-    NegotiatedRequestSchemaVariables &
-    ValidatedRequestBodyVariables;
+  Variables: AuthenticatedRouteVariables;
 }>();
 
 teams.use('*', auth);
@@ -54,7 +48,7 @@ function parseSlot(param: string): TeamSlot {
   return slot;
 }
 
-// GET /api/teams — List user's teams
+// GET /teams — List user's teams
 teams.get('/', async (c) => {
   const userId = c.get('user').uid;
   const items = await Teams.list(userId);
@@ -65,7 +59,7 @@ teams.get('/', async (c) => {
   });
 });
 
-// GET /api/teams/:slot — Get specific team
+// GET /teams/:slot — Get specific team
 teams.get('/:slot', async (c) => {
   const userId = c.get('user').uid;
   const slot = parseSlot(c.req.param('slot'));
@@ -83,7 +77,7 @@ teams.get('/:slot', async (c) => {
   });
 });
 
-// PUT /api/teams/:slot — Create or update team composition (idempotent upsert)
+// PUT /teams/:slot — Create or update team composition (idempotent upsert)
 teams.put(
   '/:slot',
   negotiateRequestSchema([teamPutRequestV1]),
@@ -123,7 +117,7 @@ teams.put(
   },
 );
 
-// DELETE /api/teams/:slot — Remove team
+// DELETE /teams/:slot — Remove team
 teams.delete('/:slot', async (c) => {
   const userId = c.get('user').uid;
   const slot = parseSlot(c.req.param('slot'));

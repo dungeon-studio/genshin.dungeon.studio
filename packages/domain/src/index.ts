@@ -2,19 +2,22 @@
 // SPDX-License-Identifier: MIT
 
 export { issue, isValid, prefixPaths, type ValidationIssue } from '@genshin/validation';
-export { type ArtifactPlan } from './artifact-plan.js';
-export { validateArtifactPlan } from './artifact-plan-validation.js';
+export { type ArtifactPlan } from './artifact/artifact-plan.js';
+export { validateArtifactPlan } from './artifact/artifact-plan-validation.js';
 export {
   assertCollectionCharacter,
+  CONSTELLATION_LEVELS,
   isValidConstellationLevel,
   MAX_CONSTELLATION_LEVEL,
   MIN_CONSTELLATION_LEVEL,
   type CharacterId,
   type CollectionCharacter,
-} from './collection-character.js';
+  type ConstellationLevel,
+} from './character/collection-character.js';
 export {
   assertCollectionTeam,
   createEmptyTeam,
+  defaultTeamName,
   initialTeams,
   isValidMemberIndex,
   isValidTeamSlot,
@@ -25,8 +28,8 @@ export {
   type CollectionTeam,
   type CollectionTeamMembers,
   type TeamSlot,
-} from './collection-team.js';
-export { type CollectionTeamMember } from './collection-team-member.js';
+} from './team/collection-team.js';
+export { type CollectionTeamMember } from './team/collection-team-member.js';
 export {
   assertCollectionWeapon,
   isValidRefinementLevel,
@@ -34,10 +37,11 @@ export {
   MIN_REFINEMENT_LEVEL,
   type CollectionWeapon,
   type CollectionWeaponId,
-} from './collection-weapon.js';
+} from './weapon/collection-weapon.js';
 export { isISOTimestamp, nowTimestamp, type ISOTimestamp } from './iso-timestamp.js';
 export type { ProblemDetail } from './problem-detail.js';
 export {
+  characterCollectionHref,
   characterItemHref,
   characterRepresentation,
   deserialiseCharacter,
@@ -46,6 +50,7 @@ export {
 export {
   deserialiseTeam,
   serialiseTeam,
+  teamCollectionHref,
   teamItemDocument,
   teamItemHref,
   teamListDocument,
@@ -54,8 +59,9 @@ export {
 export {
   deserialiseWeapon,
   serialiseWeapon,
+  weaponCollectionHref,
   weaponItemHref,
   weaponRepresentation,
 } from './representations/collection-json/weapons.js';
-export { validateTeam, validateTeams, type TeamValidationContext } from './team-validation.js';
+export { validateTeam, validateTeams, type TeamValidationContext } from './team/team-validation.js';
 export type { UUID } from './uuid.js';

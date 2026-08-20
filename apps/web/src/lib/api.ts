@@ -7,10 +7,9 @@ import { auth } from '@/lib/firebase';
 
 export type { ProblemDetail };
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-if (!API_BASE_URL) {
-  throw new Error('Missing required environment variable: VITE_API_BASE_URL');
-}
+// `pnpm dev` needs no .env file; vite.config.ts fails deployed builds on a
+// missing variable.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 export class ApiError extends Error {
   readonly problem: ProblemDetail;
@@ -36,7 +35,9 @@ async function handleResponse(response: Response): Promise<unknown> {
   if (!response.ok) {
     const contentType = response.headers.get('content-type') ?? '';
     if (contentType.includes('application/problem+json')) {
-      const problem: ProblemDetail = await response.json();
+      // Trusted on the content type alone. Success bodies stay `unknown` for
+      // callers to validate; error bodies are not validated at all.
+      const problem = (await response.json()) as ProblemDetail;
       throw new ApiError(problem);
     }
 

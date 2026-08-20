@@ -10,16 +10,17 @@
 
 set -euo pipefail
 
+# renovate: datasource=github-releases depName=fsfe/reuse-tool extractVersion=^v(?<version>.+)$
 REUSE_VERSION="${REUSE_VERSION:-6.2.0}"
 
-if command -v reuse > /dev/null 2>&1; then
+if command -v reuse >/dev/null 2>&1; then
   installed="$(reuse --version 2>/dev/null | awk '{print $NF}')"
   if [[ "${installed}" == "${REUSE_VERSION}" ]]; then
     echo "reuse ${REUSE_VERSION} already installed; skipping."
     exit 0
   fi
   echo "reuse ${installed} present; replacing with ${REUSE_VERSION}."
-  pipx uninstall reuse > /dev/null
+  pipx uninstall reuse >/dev/null
 fi
 
 pipx install "reuse==${REUSE_VERSION}"

@@ -3,7 +3,7 @@
 
 import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
 import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
-import type { Weapon } from '@genshin/game-data';
+import type { Weapon, WeaponId } from '@genshin/game-data';
 import { getWeaponById } from '@genshin/game-data';
 import { Plus, Trash2 } from 'lucide-react';
 import type { JSX } from 'react';
@@ -24,10 +24,10 @@ const REFINEMENT_LEVELS = Array.from(
 );
 
 interface WeaponInstanceSidebarProps {
-  weaponId: string | null;
+  weaponId: WeaponId | null;
   instances: CollectionWeapon[];
   onClose: () => void;
-  onAdd: (weaponId: string) => void;
+  onAdd: (weaponId: WeaponId) => void;
   onRemove: (collectionWeaponId: CollectionWeaponId) => void;
   onRefinementChange: (collectionWeaponId: CollectionWeaponId, level: number) => void;
 }
@@ -46,13 +46,13 @@ export function WeaponInstanceSidebar({
     <Sheet open={weaponId !== null} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
         side="right"
-        className="flex w-full flex-col overflow-y-auto sm:w-1/2 sm:max-w-none"
+        className="sm:w-1/2 sm:max-w-none flex w-full flex-col overflow-y-auto"
       >
         <SheetHeader>
-          <div className="flex items-start justify-between gap-3 pr-6">
-            <div className="flex items-start gap-3">
+          <div className="gap-3 pr-6 flex items-start justify-between">
+            <div className="gap-3 flex items-start">
               {weapon && (
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-bold text-muted-foreground">
+                <div className="h-10 w-10 text-xs font-bold flex shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
                   {weapon.type.slice(0, 3)}
                 </div>
               )}
@@ -89,9 +89,9 @@ export function WeaponInstanceSidebar({
           </div>
         </SheetHeader>
 
-        <div className="flex-1 space-y-3">
+        <div className="space-y-3 flex-1">
           {instances.length === 0 && (
-            <p className="py-4 text-center text-sm text-muted-foreground">
+            <p className="py-4 text-sm text-center text-muted-foreground">
               No instances yet. Add one to start your collection.
             </p>
           )}
@@ -101,15 +101,15 @@ export function WeaponInstanceSidebar({
             .map((instance, index) => (
               <div
                 key={instance.weaponInstanceId}
-                className="flex items-center gap-3 rounded-lg border border-border bg-card p-3"
+                className="gap-3 p-3 flex items-center rounded-lg border border-border bg-card"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold tabular-nums text-card-foreground">
+                  <p className="text-sm font-bold text-card-foreground tabular-nums">
                     R{instance.refinementLevel}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-1">
+                <div className="gap-1 flex items-center">
                   {REFINEMENT_LEVELS.map((level) => (
                     <button
                       key={level}
@@ -132,7 +132,7 @@ export function WeaponInstanceSidebar({
                 <button
                   type="button"
                   onClick={() => onRemove(instance.weaponInstanceId)}
-                  className="shrink-0 rounded-md p-1 text-destructive transition-opacity hover:bg-destructive hover:text-destructive-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
+                  className="p-1 shrink-0 rounded-md text-destructive transition-opacity hover:bg-destructive hover:text-destructive-foreground focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none"
                   aria-label={`Remove instance ${index + 1}`}
                 >
                   <Trash2 className="h-4 w-4" aria-hidden="true" focusable={false} />
@@ -142,7 +142,7 @@ export function WeaponInstanceSidebar({
         </div>
 
         {weaponId && (
-          <div className="sticky bottom-0 border-t border-border bg-background pt-3 sm:hidden">
+          <div className="bottom-0 pt-3 sm:hidden sticky border-t border-border bg-background">
             <Button variant="outline" className="w-full" onClick={() => onAdd(weaponId)}>
               <Plus className="mr-2 h-4 w-4" aria-hidden="true" focusable={false} />
               Add instance

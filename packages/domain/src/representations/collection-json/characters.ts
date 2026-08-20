@@ -15,12 +15,12 @@ import {
   type Template,
 } from '@genshin/collection-json';
 
-import type { CollectionCharacter } from '../../collection-character.js';
+import type { CollectionCharacter } from '../../character/collection-character.js';
 import {
   assertCollectionCharacter,
   MAX_CONSTELLATION_LEVEL,
   MIN_CONSTELLATION_LEVEL,
-} from '../../collection-character.js';
+} from '../../character/collection-character.js';
 
 const CHARACTER_TEMPLATE: Template = {
   data: [
@@ -31,8 +31,12 @@ const CHARACTER_TEMPLATE: Template = {
   ],
 };
 
+export function characterCollectionHref(baseUrl: string): string {
+  return `${baseUrl}/characters`;
+}
+
 export function characterItemHref(baseUrl: string, character: CollectionCharacter): string {
-  return `${baseUrl}/api/characters/${character.characterId}`;
+  return `${characterCollectionHref(baseUrl)}/${character.characterId}`;
 }
 
 export function serialiseCharacter(character: CollectionCharacter, baseUrl: string): Item {

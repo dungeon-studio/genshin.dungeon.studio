@@ -8,13 +8,13 @@ import { getCharacterById } from '@genshin/game-data';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '@/app.js';
-import { verifyToken } from '@/lib/firebase/auth.js';
+import { verifyToken } from '@/firebase/auth.js';
 import { toMediaTypeString } from '@/middleware/negotiate-content.js';
 import { characterItemV1 } from '@/profiles/alps/character/item-v1.js';
 import * as Characters from '@/repositories/characters/index.js';
 import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
 
-vi.mock('@/lib/firebase/auth.js', () => ({
+vi.mock('@/firebase/auth.js', () => ({
   verifyToken: vi.fn(),
 }));
 
@@ -52,13 +52,13 @@ describe('Character routes', () => {
 
   describe('authentication', () => {
     it('returns 401 without Authorization header', async () => {
-      const res = await app.request('/api/characters');
+      const res = await app.request('/characters');
 
       expect(res.status).toBe(401);
     });
 
     it('returns 401 with malformed Authorization header', async () => {
-      const res = await app.request('/api/characters', {
+      const res = await app.request('/characters', {
         headers: { Authorization: 'NotBearer token' },
       });
 
@@ -68,7 +68,7 @@ describe('Character routes', () => {
     it('returns 401 when token is expired', async () => {
       vi.mocked(verifyToken).mockRejectedValue({ code: 'auth/id-token-expired' });
 
-      const res = await app.request(authedRequest('GET', '/api/characters'));
+      const res = await app.request(authedRequest('GET', '/characters'));
 
       expect(res.status).toBe(401);
       const body = (await res.json()) as { detail: string };
@@ -76,13 +76,13 @@ describe('Character routes', () => {
     });
   });
 
-  describe('GET /api/characters', () => {
+  describe('GET /characters', () => {
     let res: Response;
     let body: CollectionDocument;
 
     beforeEach(async () => {
       vi.mocked(Characters.list).mockResolvedValue([FAKE_CHARACTER]);
-      res = await app.request(authedRequest('GET', '/api/characters'));
+      res = await app.request(authedRequest('GET', '/characters'));
       body = (await res.json()) as CollectionDocument;
     });
 
@@ -110,7 +110,7 @@ describe('Character routes', () => {
     it('returns empty items when no characters exist', async () => {
       vi.mocked(Characters.list).mockResolvedValue([]);
 
-      const res = await app.request(authedRequest('GET', '/api/characters'));
+      const res = await app.request(authedRequest('GET', '/characters'));
 
       const body = (await res.json()) as CollectionDocument;
       expect(body.collection.items).toEqual([]);
@@ -119,7 +119,7 @@ describe('Character routes', () => {
     it('returns 500 when repository throws', async () => {
       vi.mocked(Characters.list).mockRejectedValue(new Error('Firestore unavailable'));
 
-      const res = await app.request(authedRequest('GET', '/api/characters'));
+      const res = await app.request(authedRequest('GET', '/characters'));
 
       expect(res.status).toBe(500);
       const body = (await res.json()) as { detail: string };
@@ -127,13 +127,13 @@ describe('Character routes', () => {
     });
   });
 
-  describe('GET /api/characters/:characterId', () => {
+  describe('GET /characters/:characterId', () => {
     let res: Response;
     let body: CollectionDocument;
 
     beforeEach(async () => {
       vi.mocked(Characters.get).mockResolvedValue(FAKE_CHARACTER);
-      res = await app.request(authedRequest('GET', '/api/characters/albedo'));
+      res = await app.request(authedRequest('GET', '/characters/albedo'));
       body = (await res.json()) as CollectionDocument;
     });
 
@@ -161,7 +161,7 @@ describe('Character routes', () => {
     it('returns 404 when character not in collection', async () => {
       vi.mocked(Characters.get).mockResolvedValue(null);
 
-      const res = await app.request(authedRequest('GET', '/api/characters/albedo'));
+      const res = await app.request(authedRequest('GET', '/characters/albedo'));
 
       expect(res.status).toBe(404);
       const body = (await res.json()) as { detail: string };
@@ -169,7 +169,7 @@ describe('Character routes', () => {
     });
   });
 
-  describe('PUT /api/characters/:characterId', () => {
+  describe('PUT /characters/:characterId', () => {
     beforeEach(() => {
       vi.mocked(getCharacterById).mockReturnValue({
         id: 'albedo',
@@ -186,7 +186,7 @@ describe('Character routes', () => {
         created: true,
       });
       res = await app.request(
-        authedRequest('PUT', '/api/characters/albedo', { constellationLevel: 2 }),
+        authedRequest('PUT', '/characters/albedo', { constellationLevel: 2 }),
       );
       body = (await res.json()) as CollectionDocument;
     });
@@ -219,7 +219,7 @@ describe('Character routes', () => {
       });
 
       const res = await app.request(
-        authedRequest('PUT', '/api/characters/albedo', { constellationLevel: 2 }),
+        authedRequest('PUT', '/characters/albedo', { constellationLevel: 2 }),
       );
 
       expect(res.status).toBe(200);
@@ -229,7 +229,7 @@ describe('Character routes', () => {
       vi.mocked(getCharacterById).mockReturnValue(undefined);
 
       const res = await app.request(
-        authedRequest('PUT', '/api/characters/not-a-character', { constellationLevel: 0 }),
+        authedRequest('PUT', '/characters/not-a-character', { constellationLevel: 0 }),
       );
 
       expect(res.status).toBe(400);
@@ -239,7 +239,7 @@ describe('Character routes', () => {
 
     it('returns 400 when body is not valid JSON', async () => {
       const res = await app.request(
-        new Request('http://localhost/api/characters/albedo', {
+        new Request('http://localhost/characters/albedo', {
           method: 'PUT',
           headers: { Authorization: 'Bearer valid-token', 'Content-Type': 'application/json' },
           body: 'not-json',
@@ -250,14 +250,14 @@ describe('Character routes', () => {
     });
 
     it('returns 422 when constellationLevel is missing', async () => {
-      const res = await app.request(authedRequest('PUT', '/api/characters/albedo', {}));
+      const res = await app.request(authedRequest('PUT', '/characters/albedo', {}));
 
       expect(res.status).toBe(422);
     });
 
     it('returns 422 when constellationLevel is not a number', async () => {
       const res = await app.request(
-        authedRequest('PUT', '/api/characters/albedo', { constellationLevel: 'high' }),
+        authedRequest('PUT', '/characters/albedo', { constellationLevel: 'high' }),
       );
 
       expect(res.status).toBe(422);
@@ -265,7 +265,7 @@ describe('Character routes', () => {
 
     it('returns 422 when constellationLevel is below minimum', async () => {
       const res = await app.request(
-        authedRequest('PUT', '/api/characters/albedo', {
+        authedRequest('PUT', '/characters/albedo', {
           constellationLevel: MIN_CONSTELLATION_LEVEL - 1,
         }),
       );
@@ -275,7 +275,7 @@ describe('Character routes', () => {
 
     it('returns 422 when constellationLevel is above maximum', async () => {
       const res = await app.request(
-        authedRequest('PUT', '/api/characters/albedo', {
+        authedRequest('PUT', '/characters/albedo', {
           constellationLevel: MAX_CONSTELLATION_LEVEL + 1,
         }),
       );
@@ -285,7 +285,7 @@ describe('Character routes', () => {
 
     it('returns 422 when constellationLevel is not an integer', async () => {
       const res = await app.request(
-        authedRequest('PUT', '/api/characters/albedo', { constellationLevel: 2.5 }),
+        authedRequest('PUT', '/characters/albedo', { constellationLevel: 2.5 }),
       );
 
       expect(res.status).toBe(422);
@@ -293,7 +293,7 @@ describe('Character routes', () => {
 
     it('returns 422 when body contains extra properties', async () => {
       const res = await app.request(
-        authedRequest('PUT', '/api/characters/albedo', { constellationLevel: 2, extra: true }),
+        authedRequest('PUT', '/characters/albedo', { constellationLevel: 2, extra: true }),
       );
 
       expect(res.status).toBe(422);
@@ -306,7 +306,7 @@ describe('Character routes', () => {
       });
 
       const res = await app.request(
-        authedRequest('PUT', '/api/characters/albedo', {
+        authedRequest('PUT', '/characters/albedo', {
           constellationLevel: MIN_CONSTELLATION_LEVEL,
         }),
       );
@@ -321,7 +321,7 @@ describe('Character routes', () => {
       });
 
       const res = await app.request(
-        authedRequest('PUT', '/api/characters/albedo', {
+        authedRequest('PUT', '/characters/albedo', {
           constellationLevel: MAX_CONSTELLATION_LEVEL,
         }),
       );
@@ -330,11 +330,11 @@ describe('Character routes', () => {
     });
   });
 
-  describe('DELETE /api/characters/:characterId', () => {
+  describe('DELETE /characters/:characterId', () => {
     it('returns 204 with no body', async () => {
       vi.mocked(Characters.remove).mockResolvedValue();
 
-      const res = await app.request(authedRequest('DELETE', '/api/characters/albedo'));
+      const res = await app.request(authedRequest('DELETE', '/characters/albedo'));
 
       expect(res.status).toBe(204);
       expect(await res.text()).toBe('');
@@ -343,7 +343,7 @@ describe('Character routes', () => {
     it('returns 204 when character does not exist', async () => {
       vi.mocked(Characters.remove).mockResolvedValue();
 
-      const res = await app.request(authedRequest('DELETE', '/api/characters/nonexistent'));
+      const res = await app.request(authedRequest('DELETE', '/characters/nonexistent'));
 
       expect(res.status).toBe(204);
     });

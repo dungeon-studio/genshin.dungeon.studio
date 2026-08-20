@@ -17,32 +17,6 @@ exclude: |
     pnpm-lock\.yaml         # Package lockfile
   )
 
-ci:
-  # NOTE: This 'skip' list ONLY affects pre-commit.ci (hosted CI service).
-  # pre-commit.ci is authoritative for hooks it can run in its environment.
-  #
-  # GitHub Actions runs hooks via a dedicated local-hooks workflow to avoid
-  # duplicating hook execution across systems:
-  # 1. pre-commit.yml (hooks that cannot run in pre-commit.ci)
-  # 2. ci.yml (typecheck + build)
-  # Skip hooks here that are handled by pre-commit.yml or other workflows.
-  # Keep this list in sync with workflow ownership documented in CONTRIBUTING.md.
-  skip:
-    - eslint
-    - prettier
-    - stylelint
-    - typescript-check
-    - knip
-    - terraform_fmt
-    - terraform_trivy
-    - renovate-config-validator
-    - hadolint
-    - ls-lint
-    - syncpack
-    # lychee is a binary not installable in pre-commit.ci; its CI coverage
-    # lives in link-check.yml, not pre-commit.yml.
-    - lychee
-
 repos:
   # Basic file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -75,7 +49,7 @@ repos:
 
   # Markdown linting
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.22.1
+    rev: v0.23.2
     hooks:
       - id: markdownlint-cli2
         args: [--fix]
@@ -87,9 +61,28 @@ repos:
       - id: yamllint
         args: [--strict]
 
+  # Shell script linting
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
+      - id: shellcheck
+        # Without -x, the .devcontainer entrypoints report lib.sh as
+        # unresolvable instead of checking against it.
+        args: [-x]
+
+  # Shell script formatting
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.13.1-1
+    hooks:
+      - id: shfmt
+        # Keep --write. It is one of the hook's default args, and pre-commit
+        # replaces those wholesale rather than appending; without it shfmt
+        # writes to stdout and exits 0 on files it would have rewritten.
+        args: [--write, -i, '2', -ci]
+
   # Vale - Prose linting
   - repo: https://github.com/errata-ai/vale
-    rev: v3.14.2
+    rev: v3.17.1
     hooks:
       - id: vale
         args: [--config=.vale.ini]
@@ -97,11 +90,13 @@ repos:
 
   # Terraform - Infrastructure as Code
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.105.0
+    rev: v1.108.1
     hooks:
       - id: terraform_fmt
         args: [--args=-recursive]
       - id: terraform_trivy
+        args:
+          - --args=--severity=HIGH,CRITICAL
 
   # REUSE - SPDX license compliance
   - repo: https://github.com/fsfe/reuse-tool
@@ -110,15 +105,23 @@ repos:
       - id: reuse
         always_run: true
 
-  # Secrets detection
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.5.0
+  # GitHub Actions static analysis. Offline gate here; online supply-chain
+  # audits need a token and run in ci.yml's workflows job.
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.29.0
     hooks:
-      - id: detect-secrets
+      - id: zizmor
+        args: [--no-progress, --offline]
+
+  # Dockerfile linting
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.15.1
+    hooks:
+      - id: hadolint-docker
 
   # Renovate config validation
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 43.150.0
+    rev: 44.32.1
     hooks:
       - id: renovate-config-validator
         args: [--strict, --no-global]
@@ -156,9 +159,8 @@ repos:
         pass_filenames: false
         stages: [manual]
 
-      # knip analyzes the whole workspace graph, so it can't be file-scoped;
-      # it runs on every commit (always_run) like ls-lint. Fast enough (~1s)
-      # to gate commits. CI runs it via the same hook in pre-commit.yml.
+      # knip analyzes the whole workspace graph, so it can't be file-scoped and
+      # runs on every commit.
       - id: knip
         name: knip (unused files, dependencies, exports)
         entry: pnpm exec knip
@@ -166,18 +168,20 @@ repos:
         pass_filenames: false
         always_run: true
 
-      - id: hadolint
-        name: hadolint
-        entry: hadolint
-        language: system
-        types: [dockerfile]
-
+      # Offline resolves on-disk paths and makes no network request, so it
+      # gates every commit and every pull request. The weekly external sweep
+      # stays an action for its issue reporting. Upstream's auto-installing
+      # hook is unusable here: cargo-binstall fetches a glibc build that needs
+      # GLIBC_2.38, newer than some contributor machines.
       - id: lychee
         name: lychee (internal links)
         entry: lychee --offline --no-progress
         language: system
         types: [markdown]
 
+      # ls-lint's ignore list filters its findings but does not prune its walk,
+      # so it traverses node_modules to validate the tracked files and takes
+      # seconds rather than milliseconds.
       - id: ls-lint
         name: file naming conventions
         entry: pnpm exec ls-lint
@@ -185,9 +189,27 @@ repos:
         pass_filenames: false
         always_run: true
 
+      - id: vscode-extensions
+        name: devcontainer and editor extensions in sync
+        entry: pnpm vscode-extensions:check
+        language: system
+        files: ^(\.vscode/extensions\.json|\.devcontainer/devcontainer\.json)$
+        pass_filenames: false
+
       - id: syncpack
         name: exact dependency versions
         entry: pnpm exec syncpack lint
         language: system
         files: (^|/)package\.json$
+        pass_filenames: false
+
+      # Keeps the committed JSON Schema snapshots faithful to their Zod source — a
+      # pure function of the working tree, unlike the base-branch compatibility
+      # proof, which is a PR-level check in ci.yml. Runs through turbo so the
+      # workspace packages the schemas import build first.
+      - id: schema-snapshots
+        name: schema snapshots (regenerate from Zod)
+        entry: pnpm exec turbo run schemas:export
+        language: system
+        files: ^apps/[^/]+/(src/.+/schemas/|schema-snapshots/)
         pass_filenames: false

@@ -101,7 +101,7 @@ export function serialiseCollection<T>(
  * array. Individual item shapes are left to domain-level deserialisers.
  */
 export function assertCollectionDocument(value: unknown): asserts value is CollectionDocument {
-  const doc = value as Record<string, unknown>;
+  const doc = value as Record<string, unknown> | null | undefined;
   const collection = doc?.collection as Record<string, unknown> | undefined;
   if (!collection || !Array.isArray(collection.items)) {
     throw new TypeError('Expected a Collection+JSON document with collection.items array');

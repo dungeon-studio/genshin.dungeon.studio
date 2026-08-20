@@ -2,27 +2,27 @@
 // SPDX-License-Identifier: MIT
 
 import { assertCollectionDocument } from '@genshin/collection-json';
-import type { CharacterId, CollectionCharacter } from '@genshin/domain';
+import type { CharacterId, CollectionCharacter, ConstellationLevel } from '@genshin/domain';
 import { deserialiseCharacter, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPut } from '@/lib/api';
+import { invalidateUserQuery } from '@/lib/invalidate-user-query';
+import { userScopedKey } from '@/lib/user-scoped-key';
 
-type CharacterRecord = Record<CharacterId, CollectionCharacter>;
+import type { CharacterCollection } from './use-character-collection-store';
 
 export interface MutationResult {
   characterId: CharacterId;
   entry: CollectionCharacter;
 }
 
-export function collectionKey(userId: string): readonly [string, string] {
-  return ['characters', userId] as const;
-}
+const charactersKey = userScopedKey('characters');
 
-export function parseCollectionResponse(response: unknown): CharacterRecord {
+function parseCollectionResponse(response: unknown): CharacterCollection {
   assertCollectionDocument(response);
-  const record: CharacterRecord = {};
+  const record: CharacterCollection = {};
 
   for (const item of response.collection.items) {
     const character = deserialiseCharacter(item);
@@ -48,11 +48,11 @@ function parseSingleCharacterResponse(response: unknown): MutationResult {
 
 export function useCharacterCollectionQuery(
   userId: string | undefined,
-): UseQueryResult<CharacterRecord, Error> {
+): UseQueryResult<CharacterCollection, Error> {
   return useQuery({
-    queryKey: collectionKey(userId ?? ''),
+    queryKey: charactersKey(userId ?? ''),
     queryFn: async () => {
-      const response = await apiGet('/api/characters');
+      const response = await apiGet('/characters');
       return parseCollectionResponse(response);
     },
     enabled: userId !== undefined,
@@ -66,14 +66,12 @@ export function useAddCharacterMutation(
 
   return useMutation({
     mutationFn: async (characterId: CharacterId): Promise<MutationResult> => {
-      const response = await apiPut(`/api/characters/${encodeURIComponent(characterId)}`, {
+      const response = await apiPut(`/characters/${encodeURIComponent(characterId)}`, {
         constellationLevel: MIN_CONSTELLATION_LEVEL,
       });
       return parseSingleCharacterResponse(response);
     },
-    onSuccess: () => {
-      if (userId !== undefined) queryClient.invalidateQueries({ queryKey: collectionKey(userId) });
-    },
+    onSuccess: invalidateUserQuery(queryClient, userId, charactersKey),
   });
 }
 
@@ -84,34 +82,32 @@ export function useRemoveCharacterMutation(
 
   return useMutation({
     mutationFn: async (characterId: CharacterId) => {
-      await apiDelete(`/api/characters/${encodeURIComponent(characterId)}`);
+      await apiDelete(`/characters/${encodeURIComponent(characterId)}`);
     },
-    onSuccess: () => {
-      if (userId !== undefined) queryClient.invalidateQueries({ queryKey: collectionKey(userId) });
-    },
+    onSuccess: invalidateUserQuery(queryClient, userId, charactersKey),
   });
+}
+
+export interface SetConstellationLevelVariables {
+  characterId: CharacterId;
+  level: ConstellationLevel;
 }
 
 export function useSetConstellationLevelMutation(
   userId: string | undefined,
-): UseMutationResult<MutationResult, Error, { characterId: CharacterId; level: number }> {
+): UseMutationResult<MutationResult, Error, SetConstellationLevelVariables> {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({
       characterId,
       level,
-    }: {
-      characterId: CharacterId;
-      level: number;
-    }): Promise<MutationResult> => {
-      const response = await apiPut(`/api/characters/${encodeURIComponent(characterId)}`, {
+    }: SetConstellationLevelVariables): Promise<MutationResult> => {
+      const response = await apiPut(`/characters/${encodeURIComponent(characterId)}`, {
         constellationLevel: level,
       });
       return parseSingleCharacterResponse(response);
     },
-    onSuccess: () => {
-      if (userId !== undefined) queryClient.invalidateQueries({ queryKey: collectionKey(userId) });
-    },
+    onSuccess: invalidateUserQuery(queryClient, userId, charactersKey),
   });
 }

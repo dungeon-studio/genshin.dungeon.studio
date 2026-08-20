@@ -3,11 +3,11 @@
 # Bootstrap environment: creates GCP projects with foundational setup
 
 terraform {
-  required_version = ">= 1.0"
+  required_version = "1.15.8"
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 7.19"
+      version = "7.44.0"
     }
   }
 }

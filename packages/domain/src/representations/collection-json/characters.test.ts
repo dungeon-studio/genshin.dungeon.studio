@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { deserialiseCharacter, serialiseCharacter } from './characters.js';
-import type { CollectionCharacter } from '../../collection-character.js';
+import type { CollectionCharacter } from '../../character/collection-character.js';
 import type { ISOTimestamp } from '../../iso-timestamp.js';
 
 const BASE_URL = 'http://localhost:8080';
@@ -26,7 +26,7 @@ describe('character serialisation round-trip', () => {
 
   it('serialises with the correct href', () => {
     const item = serialiseCharacter(VALID_CHARACTER, BASE_URL);
-    expect(item.href).toBe(`${BASE_URL}/api/characters/columbina`);
+    expect(item.href).toBe(`${BASE_URL}/characters/columbina`);
   });
 
   it('preserves constellation level through round-trip', () => {

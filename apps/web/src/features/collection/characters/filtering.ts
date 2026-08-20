@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import type { Character, Element, Rarity } from '@genshin/game-data';
-import { compareVersions } from '@genshin/game-data';
 
-export type OwnershipFilter = 'all' | 'owned' | 'unowned';
-export type SortField = 'release' | 'name';
-export type SortDirection = 'asc' | 'desc';
+import type { OwnershipFilter, SortDirection } from '@/lib/collection-filters';
+
+type SortField = 'release' | 'name';
 
 export interface CharacterFilterState {
   search: string;
@@ -31,7 +30,7 @@ export function initialFilterState(): CharacterFilterState {
 export function filterCharacters(
   characters: readonly Character[],
   filters: CharacterFilterState,
-  ownedIds: Set<Character['id']>,
+  ownedIds: ReadonlySet<string>,
 ): Character[] {
   const searchLower = filters.search.toLowerCase();
 
@@ -48,7 +47,7 @@ export function filterCharacters(
     let cmp = 0;
     switch (filters.sortField) {
       case 'release':
-        cmp = compareVersions(a.version, b.version);
+        cmp = a.releaseDate.localeCompare(b.releaseDate);
         if (cmp === 0) {
           cmp = a.name.localeCompare(b.name) || a.id.localeCompare(b.id);
         }

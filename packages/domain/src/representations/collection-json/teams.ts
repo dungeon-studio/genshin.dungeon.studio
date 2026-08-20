@@ -21,10 +21,10 @@ import {
   type Template,
 } from '@genshin/collection-json';
 
-import type { ArtifactPlan } from '../../artifact-plan.js';
-import type { CollectionTeamMember } from '../../collection-team-member.js';
-import type { CollectionTeam, CollectionTeamMembers } from '../../collection-team.js';
-import { assertCollectionTeam, MAX_TEAM_MEMBERS } from '../../collection-team.js';
+import type { ArtifactPlan } from '../../artifact/artifact-plan.js';
+import type { CollectionTeamMember } from '../../team/collection-team-member.js';
+import type { CollectionTeam, CollectionTeamMembers } from '../../team/collection-team.js';
+import { assertCollectionTeam, MAX_TEAM_MEMBERS } from '../../team/collection-team.js';
 
 const TEAM_TEMPLATE: Template = {
   data: [
@@ -37,8 +37,12 @@ const TEAM_TEMPLATE: Template = {
   ],
 };
 
+export function teamCollectionHref(baseUrl: string): string {
+  return `${baseUrl}/teams`;
+}
+
 export function teamItemHref(baseUrl: string, team: CollectionTeam): string {
-  return `${baseUrl}/api/teams/${team.slot}`;
+  return `${teamCollectionHref(baseUrl)}/${team.slot}`;
 }
 
 export function serialiseTeam(team: CollectionTeam, baseUrl: string): Item {
@@ -54,15 +58,47 @@ export function serialiseTeam(team: CollectionTeam, baseUrl: string): Item {
 
 export function teamListDocument(teams: CollectionTeam[], baseUrl: string): CollectionDocument {
   return buildCollection(
-    `${baseUrl}/api/teams`,
+    teamCollectionHref(baseUrl),
     teams.map((t) => serialiseTeam(t, baseUrl)),
     { template: TEAM_TEMPLATE },
   );
 }
 
 export function teamItemDocument(team: CollectionTeam, baseUrl: string): CollectionDocument {
-  return buildCollection(`${baseUrl}/api/teams/${team.slot}`, [serialiseTeam(team, baseUrl)], {
+  return buildCollection(teamItemHref(baseUrl, team), [serialiseTeam(team, baseUrl)], {
     template: TEAM_TEMPLATE,
+  });
+}
+
+function assertString(plan: Record<string, unknown>, field: string): void {
+  if (typeof plan[field] !== 'string') {
+    throw new TypeError(
+      `artifactPlan.${field} must be a string, got: ${JSON.stringify(plan[field])}`,
+    );
+  }
+}
+
+function assertStringArray(
+  plan: Record<string, unknown>,
+  field: string,
+  min: number,
+  max: number,
+): void {
+  const arr = plan[field];
+  if (!Array.isArray(arr)) {
+    throw new TypeError(`artifactPlan.${field} must be an array, got: ${JSON.stringify(arr)}`);
+  }
+  if (arr.length < min || arr.length > max) {
+    throw new TypeError(
+      `artifactPlan.${field} must have between ${min} and ${max} elements, got: ${arr.length}`,
+    );
+  }
+  arr.forEach((element, index) => {
+    if (typeof element !== 'string') {
+      throw new TypeError(
+        `artifactPlan.${field}[${index}] must be a string, got: ${JSON.stringify(element)}`,
+      );
+    }
   });
 }
 
@@ -71,21 +107,20 @@ function deserialiseArtifactPlan(value: unknown): ArtifactPlan {
     throw new TypeError(`artifactPlan must be a non-null object, got: ${JSON.stringify(value)}`);
   }
   const plan = value as Record<string, unknown>;
-  for (const field of ['sands', 'goblet', 'circlet'] as const) {
-    if (typeof plan[field] !== 'string') {
-      throw new TypeError(
-        `artifactPlan.${field} must be a string, got: ${JSON.stringify(plan[field])}`,
-      );
-    }
-  }
-  for (const field of ['sets', 'priorityMinorAffixes', 'secondaryMinorAffixes'] as const) {
-    if (!Array.isArray(plan[field])) {
-      throw new TypeError(
-        `artifactPlan.${field} must be an array, got: ${JSON.stringify(plan[field])}`,
-      );
-    }
-  }
-  return value as ArtifactPlan;
+  assertString(plan, 'sands');
+  assertString(plan, 'goblet');
+  assertString(plan, 'circlet');
+  assertStringArray(plan, 'sets', 1, 2);
+  assertStringArray(plan, 'priorityMinorAffixes', 0, 3);
+  assertStringArray(plan, 'secondaryMinorAffixes', 0, 3);
+  return {
+    sands: plan.sands as ArtifactPlan['sands'],
+    goblet: plan.goblet as ArtifactPlan['goblet'],
+    circlet: plan.circlet as ArtifactPlan['circlet'],
+    sets: plan.sets as ArtifactPlan['sets'],
+    priorityMinorAffixes: plan.priorityMinorAffixes as ArtifactPlan['priorityMinorAffixes'],
+    secondaryMinorAffixes: plan.secondaryMinorAffixes as ArtifactPlan['secondaryMinorAffixes'],
+  };
 }
 
 function deserialiseCollectionTeamMember(value: unknown, index: number): CollectionTeamMember {
@@ -105,10 +140,16 @@ function deserialiseCollectionTeamMember(value: unknown, index: number): Collect
       `members[${index}].weaponInstanceId must be a string, got: ${JSON.stringify(raw.weaponInstanceId)}`,
     );
   }
-  if (raw.artifactPlan !== undefined) {
-    deserialiseArtifactPlan(raw.artifactPlan);
+  const member: CollectionTeamMember = {
+    characterId: raw.characterId as CollectionTeamMember['characterId'],
+  };
+  if (raw.weaponInstanceId !== undefined) {
+    member.weaponInstanceId = raw.weaponInstanceId;
   }
-  return value as CollectionTeamMember;
+  if (raw.artifactPlan !== undefined) {
+    member.artifactPlan = deserialiseArtifactPlan(raw.artifactPlan);
+  }
+  return member;
 }
 
 export function deserialiseTeam(item: Item): CollectionTeam {

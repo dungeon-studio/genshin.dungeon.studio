@@ -3,45 +3,39 @@
 
 import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
 import type { UUID } from '@genshin/domain';
-import { serialiseWeapon, weaponItemHref, weaponRepresentation } from '@genshin/domain';
-import { getWeaponById } from '@genshin/game-data';
+import {
+  serialiseWeapon,
+  weaponCollectionHref,
+  weaponItemHref,
+  weaponRepresentation,
+} from '@genshin/domain';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import type { FromSchema } from 'json-schema-to-ts';
 
-import type { AuthVariables } from '@/middleware/auth.js';
+import { requireWeaponId } from '@/catalogue.js';
 import { auth } from '@/middleware/auth.js';
-import type { NegotiatedContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
-import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
-import type { ValidatedRequestBodyVariables } from '@/middleware/validate-request-body.js';
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { weaponItemV1 } from '@/profiles/alps/weapon/item-v1.js';
 import { weaponPatchRequestV1 } from '@/profiles/json-schema/weapons/patch-request-v1.js';
 import { weaponPostRequestV1 } from '@/profiles/json-schema/weapons/post-request-v1.js';
 import * as Weapons from '@/repositories/weapons/index.js';
+import type { AuthenticatedRouteVariables } from '@/routes/variables.js';
 
 export const weapons = new Hono<{
-  Variables: AuthVariables &
-    NegotiatedContentVariables &
-    NegotiatedRequestSchemaVariables &
-    ValidatedRequestBodyVariables;
+  Variables: AuthenticatedRouteVariables;
 }>();
 
 weapons.use('*', auth);
 
 weapons.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: weaponItemV1 }]));
 
-interface CreateWeaponBody {
-  weaponId: string;
-  refinementLevel: number;
-}
+type CreateWeaponBody = FromSchema<typeof weaponPostRequestV1.schema>;
+type UpdateWeaponBody = FromSchema<typeof weaponPatchRequestV1.schema>;
 
-interface UpdateWeaponBody {
-  refinementLevel: number;
-}
-
-// GET /api/weapons — List all weapon instances, optionally filtered by weaponId
+// GET /weapons — List all weapon instances, optionally filtered by weaponId
 weapons.get('/', async (c) => {
   const userId = c.get('user').uid;
   const weaponId = c.req.query('weaponId');
@@ -52,17 +46,13 @@ weapons.get('/', async (c) => {
       throw new HTTPException(400, { message: 'weaponId query parameter must not be empty' });
     }
 
-    if (!getWeaponById(weaponId)) {
-      throw new HTTPException(400, { message: `Unknown weapon: ${weaponId}` });
-    }
-
-    const instances = await Weapons.list(userId, weaponId);
+    const instances = await Weapons.list(userId, requireWeaponId(weaponId));
 
     return c.body(
       JSON.stringify(
         serialiseCollection(
           weaponRepresentation,
-          `${baseUrl}/api/weapons?weaponId=${encodeURIComponent(weaponId)}`,
+          weaponCollectionHref(baseUrl, weaponId),
           instances.map((w) => serialiseWeapon(w, baseUrl)),
         ),
       ),
@@ -78,7 +68,7 @@ weapons.get('/', async (c) => {
     JSON.stringify(
       serialiseCollection(
         weaponRepresentation,
-        `${baseUrl}/api/weapons`,
+        weaponCollectionHref(baseUrl),
         items.map((w) => serialiseWeapon(w, baseUrl)),
       ),
     ),
@@ -88,7 +78,7 @@ weapons.get('/', async (c) => {
   );
 });
 
-// POST /api/weapons — Create new weapon instance
+// POST /weapons — Create new weapon instance
 weapons.post(
   '/',
   negotiateRequestSchema([weaponPostRequestV1]),
@@ -97,16 +87,12 @@ weapons.post(
     const userId = c.get('user').uid;
     const { weaponId, refinementLevel } = c.get('validatedBody') as CreateWeaponBody;
 
-    if (!getWeaponById(weaponId)) {
-      throw new HTTPException(400, { message: `Unknown weapon: ${weaponId}` });
-    }
-
-    const weapon = await Weapons.create(userId, weaponId, refinementLevel);
+    const weapon = await Weapons.create(userId, requireWeaponId(weaponId), refinementLevel);
     const baseUrl = new URL(c.req.url).origin;
 
     return c.body(
       JSON.stringify(
-        serialiseCollection(weaponRepresentation, `${baseUrl}/api/weapons`, [
+        serialiseCollection(weaponRepresentation, weaponCollectionHref(baseUrl), [
           serialiseWeapon(weapon, baseUrl),
         ]),
       ),
@@ -121,7 +107,7 @@ weapons.post(
   },
 );
 
-// GET /api/weapons/:weaponInstanceId — Get single weapon instance
+// GET /weapons/:weaponInstanceId — Get single weapon instance
 weapons.get('/:weaponInstanceId', async (c) => {
   const userId = c.get('user').uid;
   const weaponInstanceId = c.req.param('weaponInstanceId') as UUID;
@@ -146,7 +132,7 @@ weapons.get('/:weaponInstanceId', async (c) => {
   );
 });
 
-// PATCH /api/weapons/:weaponInstanceId — Update weapon instance
+// PATCH /weapons/:weaponInstanceId — Update weapon instance
 weapons.patch(
   '/:weaponInstanceId',
   negotiateRequestSchema([weaponPatchRequestV1]),
@@ -178,7 +164,7 @@ weapons.patch(
   },
 );
 
-// DELETE /api/weapons/:weaponInstanceId — Delete weapon instance
+// DELETE /weapons/:weaponInstanceId — Delete weapon instance
 weapons.delete('/:weaponInstanceId', async (c) => {
   const userId = c.get('user').uid;
   const weaponInstanceId = c.req.param('weaponInstanceId') as UUID;

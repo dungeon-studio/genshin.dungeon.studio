@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { toKebabCase } from './slug.js';
+import { toId, toKebabCase } from './slug.js';
 
 describe('toKebabCase', () => {
   it('lowercases and hyphenates spaces', () => {
@@ -18,5 +18,11 @@ describe('toKebabCase', () => {
   it('collapses runs of punctuation and trims edges', () => {
     expect(toKebabCase('  The Catch!! ')).toBe('the-catch');
     expect(toKebabCase('Wine & Song')).toBe('wine-song');
+  });
+});
+
+describe('toId', () => {
+  it('rejects a name with nothing to slugify', () => {
+    expect(() => toId('!!', 'artifact set')).toThrow(/Empty id for artifact set/);
   });
 });

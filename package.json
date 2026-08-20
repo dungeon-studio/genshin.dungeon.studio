@@ -2,6 +2,7 @@
   "name": "genshin-dungeon-studio",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "Team building companion for Genshin Impact",
   "keywords": [
     "genshin-impact",
@@ -22,7 +23,7 @@
     "url": "https://github.com/dungeon-studio/genshin.dungeon.studio/issues"
   },
   "scripts": {
-    "dev": "concurrently --kill-others \"firebase emulators:start --only auth,firestore --project demo-dungeon-studio-genshin-dev\" \"turbo run dev\"",
+    "dev": "firebase emulators:exec --only auth,firestore --ui --project demo-dungeon-studio-genshin-dev \"turbo run dev\"",
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",
@@ -32,26 +33,25 @@
     "typecheck": "turbo run typecheck",
     "clean": "turbo run clean",
     "reuse:check": "reuse lint",
-    "validate:workspace": "tsx scripts/validate-workspace.ts",
-    "validate": "pnpm lint && pnpm typecheck && pnpm knip && pnpm reuse:check && pnpm validate:workspace"
+    "vscode-extensions:check": "tsx scripts/check-vscode-extensions.ts"
   },
   "devDependencies": {
     "@ls-lint/ls-lint": "2.3.1",
-    "@types/node": "25.9.1",
-    "concurrently": "9.2.1",
-    "eslint": "10.4.0",
-    "firebase-tools": "15.22.3",
-    "knip": "6.16.1",
-    "prettier": "3.8.3",
-    "stylelint": "17.12.0",
-    "stylelint-config-standard": "40.0.0",
-    "syncpack": "15.3.1",
-    "tsx": "4.22.3",
-    "turbo": "2.9.14",
-    "typescript": "6.0.3"
+    "@types/node": "25.9.5",
+    "eslint": "10.8.1",
+    "firebase-tools": "15.27.0",
+    "knip": "6.32.2",
+    "prettier": "3.9.6",
+    "prettier-plugin-tailwindcss": "0.8.1",
+    "stylelint": "17.14.1",
+    "syncpack": "15.3.3",
+    "tsx": "4.23.12",
+    "turbo": "2.10.10",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
+    "vitest": "4.1.10"
   },
-  "packageManager": "pnpm@11.3.0",
+  "packageManager": "pnpm@11.21.0",
   "engines": {
-    "node": ">=20.0.0"
+    "node": "26.7.0"
   }
 }

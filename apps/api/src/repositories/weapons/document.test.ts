@@ -70,17 +70,14 @@ describe('toDocument', () => {
   it('round-trips a weapon through toDocument then fromDocument', () => {
     const weapon = fromDocument(WEAPON_INSTANCE_ID, makeV1Document());
     const doc = toDocument(weapon);
-    const restored = fromDocument(WEAPON_INSTANCE_ID, doc as unknown as Record<string, unknown>);
+    const restored = fromDocument(WEAPON_INSTANCE_ID, doc);
     expect(restored).toEqual(weapon);
   });
 
   it('round-trips any valid weapon (property)', () => {
     fc.assert(
       fc.property(arbWeapon, (weapon) => {
-        const restored = fromDocument(
-          weapon.weaponInstanceId,
-          toDocument(weapon) as unknown as Record<string, unknown>,
-        );
+        const restored = fromDocument(weapon.weaponInstanceId, toDocument(weapon));
         expect(restored).toEqual(weapon);
       }),
     );

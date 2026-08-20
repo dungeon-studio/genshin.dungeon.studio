@@ -1,0 +1,39 @@
+// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+// SPDX-License-Identifier: MIT
+
+import type { Env, Hono, MiddlewareHandler } from 'hono';
+
+import { routedMethods } from '@/http/route-table.js';
+
+/** The methods to advertise at `path`, empty when nothing is routed there. */
+function allowedMethods<E extends Env>(app: Hono<E>, path: string): string[] {
+  const methods = routedMethods(app, path);
+  if (methods.length === 0) return [];
+
+  // Hono answers HEAD by dispatching the GET route, so it is never registered.
+  if (methods.includes('GET')) methods.push('HEAD');
+  methods.push('OPTIONS');
+
+  return methods.sort();
+}
+
+/**
+ * `Allow` header middleware — RFC 9110 §10.2.1.
+ *
+ * Answers `OPTIONS` with the methods the requested resource supports, taken
+ * from the routing table rather than a list to maintain.
+ *
+ * Register before the CORS middleware, which short-circuits `OPTIONS` into a
+ * 204 built from the headers prepared so far. A header set after it never
+ * reaches the response.
+ */
+export function allow<E extends Env>(app: Hono<E>): MiddlewareHandler {
+  return async (c, next) => {
+    if (c.req.method === 'OPTIONS') {
+      const methods = allowedMethods(app, c.req.path);
+      if (methods.length > 0) c.header('Allow', methods.join(', '));
+    }
+
+    await next();
+  };
+}

@@ -107,7 +107,7 @@ describe('API methods (unauthenticated)', () => {
     );
 
     await expect(apiGet('/missing')).rejects.toThrow(ApiError);
-    await vi.restoreAllMocks();
+    vi.restoreAllMocks();
 
     vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
       new Response(JSON.stringify(problem), {
@@ -117,6 +117,8 @@ describe('API methods (unauthenticated)', () => {
     );
 
     await expect(apiGet('/missing')).rejects.toMatchObject({
+      // `expect.objectContaining` is typed `any` by vitest.
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       problem: expect.objectContaining({ status: 404, detail: 'Resource not found' }),
     });
   });

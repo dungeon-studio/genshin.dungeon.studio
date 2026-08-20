@@ -9,33 +9,32 @@ AI-powered team building companion for Genshin Impact.
 
 ## Stack
 
-Turborepo + pnpm monorepo. TypeScript 6.0 strict mode throughout.
+Turborepo + pnpm monorepo. TypeScript strict mode throughout. Versions live
+in `package.json` files.
 
-- **Web**: React 19, Vite, Tailwind, shadcn/ui, zustand, TanStack Query, react-router-dom
+- **Web**: React, Vite, Tailwind, shadcn/ui, zustand, TanStack Query, react-router-dom
 - **API**: Hono + Node.js, Firestore, Firebase Auth, Vitest
-- **Packages**: `domain`, `game-data`, `collection-json`, `validation`
 
 ## Repository structure
 
-- `apps/web/` --- Frontend app (Vite dev server on port 5173)
-- `apps/api/` --- API server (Hono on port 8080)
+- `apps/web/` --- Frontend (Vite dev server, port 5173)
+- `apps/api/` --- API server (Hono, port 8080)
 - `packages/domain/` --- Shared domain model and branded types
 - `packages/game-data/` --- Static game data; use exported helpers, never hard-code
-- `packages/collection-json/` --- Collection+JSON media type
-- `packages/validation/` --- Validation utilities
-- `tools/game-data-codegen/` --- CLI that generates `game-data` sources from `genshin-db`
+- `packages/collection-json/`, `packages/validation/`
+- `tools/game-data-codegen/` --- generates `game-data` sources from `genshin-db`
 - `infrastructure/` --- Terraform IaC
-- `docs/` --- How-tos, references, and explanations following Diátaxis
+- `docs/` --- Diátaxis-organized how-tos, references, explanations
 
 ## Commands
 
 ```bash
 pnpm dev          # Start all dev servers + Firebase emulators
-pnpm build        # Build all packages via turbo
-pnpm typecheck    # TypeScript type checking (not in pre-commit; run manually)
-pnpm test         # Run all tests
-pnpm lint         # Lint all packages
-pnpm format       # Format with Prettier
+pnpm build
+pnpm typecheck    # not in pre-commit; run manually
+pnpm test
+pnpm lint
+pnpm format
 pnpm reuse:check  # SPDX license compliance check
 ```
 
@@ -47,11 +46,20 @@ workspace dependencies first. Turbo handles dependency ordering via `^build`.
 
 - Every source file needs SPDX headers. See `docs/how-tos/add-spdx-headers.md`.
   For files without comment syntax, declare them in `.reuse/dep5`.
-- Conventional commits: `feat:`, `fix:`, `docs:`, `test:`, `refactor:`,
-  `style:`, `chore:`.
+- Conventional commits, gated on the PR title only: `feat:`, `fix:`, `docs:`,
+  `style:`, `refactor:`, `perf:`, `test:`, `build:`, `ci:`, `chore:`,
+  `revert:`; subject lowercase, no trailing period.
 - Never bypass pre-commit with `--no-verify`; fix root causes.
 - Never use `git commit --amend` or `git push --force`.
 - Fixes after hook failures should be new commits; squash merge handles cleanup.
+- At session start, check `git status` for pre-existing `M` files outside your
+  task's scope; don't attribute their breakage to your changes.
+- After changing `pnpm-lock.yaml`, run `pnpm install` and restart any running
+  dev server. Vite caches module resolution at startup, so a stale server throws
+  misleading `Cannot find module` errors.
+- Sessions run on the host, not in the project's container, so pnpm, Firebase
+  CLI, pre-commit, Vale, REUSE, and Playwright may be absent. Check availability
+  before relying on a tool; note it as missing rather than failing.
 - Run `pre-commit run vale --all-files` for Vale, not `vale .`. Vale has no
   directory-ignore and scans `node_modules`.
 - API error responses use RFC 9457 Problem Details, `application/problem+json`.
@@ -63,18 +71,3 @@ workspace dependencies first. Turbo handles dependency ordering via `^build`.
 
 See `.github/copilot-instructions.md` for comprehensive conventions covering API
 design, frontend patterns, schema modules, infrastructure, Docker, and more.
-
-## Claustre sessions
-
-This project uses Claustre to orchestrate parallel Claude Code sessions in git
-worktrees. If running in a Claustre-managed session:
-
-- The working directory is a git worktree under `~/.claustre/worktrees/`, not
-  the main repository clone.
-- `.claustre_session_id` identifies the current session.
-- Claude Code hooks in `.claude/settings.local.json` report status back to
-  Claustre automatically. Don't modify these.
-- Commit and push normally. Claustre tracks PR status via the stop hook.
-- DevContainers tools like pnpm, Firebase CLI, pre-commit, Vale, REUSE, and
-  Playwright may not be available on the host. Check tool availability before
-  relying on them. If a tool is missing, note it rather than failing.

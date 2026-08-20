@@ -4,7 +4,7 @@
 import type { JSX } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Container } from '@/components/container';
+import { Container } from '@/components/chrome/container';
 
 export function NotFoundPage(): JSX.Element {
   return (
@@ -17,7 +17,7 @@ export function NotFoundPage(): JSX.Element {
         </p>
         <Link
           to="/"
-          className="mt-6 inline-block rounded-md bg-primary px-6 py-3 text-primary-foreground transition hover:bg-primary/90"
+          className="mt-6 px-6 py-3 inline-block rounded-md bg-primary text-primary-foreground transition hover:bg-primary/90"
         >
           Back to Teams
         </Link>

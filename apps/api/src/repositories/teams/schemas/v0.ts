@@ -5,7 +5,7 @@ import { MAX_TEAM_MEMBERS } from '@genshin/domain';
 import { defineVersion } from 'verzod';
 import { z } from 'zod';
 
-export const V0MemberSchema = z.object({
+const V0MemberSchema = z.object({
   characterId: z.string(),
   weaponInstanceId: z.string().optional(),
   artifactPlan: z

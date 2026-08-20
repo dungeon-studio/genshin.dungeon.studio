@@ -5,7 +5,7 @@ name-template: 'v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
 
 # Collect notes from PRs merged into develop. The tag is retargeted to main at
-# publish time (git flow); see .github/workflows/release-drafter.yml.
+# publish time (git flow); see .github/workflows/release-notes.yml.
 commitish: refs/heads/develop
 
 categories:
@@ -24,19 +24,12 @@ categories:
   - title: '⬆️ Dependencies'
     labels:
       - 'dependencies'
-      - 'automated'
   - title: '🧰 Chores'
     labels:
       - 'chore'
 
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&'
-
-# Keep triage-only pull requests out of the notes.
-exclude-labels:
-  - 'duplicate'
-  - 'invalid'
-  - 'wontfix'
 
 # Strip the conventional-commit prefix from each bullet; the category heading
 # already conveys the type, so 'feat: add X' reads as 'add X'.
@@ -57,7 +50,6 @@ version-resolver:
       - 'security'
       - 'documentation'
       - 'dependencies'
-      - 'automated'
       - 'chore'
   default: patch
 
@@ -83,7 +75,7 @@ autolabeler:
   - label: 'chore'
     title:
       - '/^(chore|build)(?!\(deps)(\(.+\))?:/i'
-      - '/^(ci|style|refactor|test|perf)(\(.+\))?:/i'
+      - '/^(ci|style|refactor|test|perf|revert)(\(.+\))?:/i'
   - label: 'breaking-change'
     title:
       - '/^\w+(\(.+\))?!:/'
@@ -106,7 +98,7 @@ autolabeler:
     files:
       - 'docs/**'
       - '*.md'
-  - label: 'types'
+  - label: 'domain'
     files:
       - 'packages/domain/**'
   - label: 'game-data'

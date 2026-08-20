@@ -1,21 +1,13 @@
 {
+  "extends": "@genshin/tsconfig/base.json",
   "compilerOptions": {
-    "target": "ES2022",
     "module": "nodenext",
-    "lib": ["ES2022"],
     "moduleResolution": "nodenext",
     "outDir": "./dist",
     "rootDir": "./src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
     "types": ["node"],
-    "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "verbatimModuleSyntax": true,
-    // Path aliases eliminate relative imports and clarify module organization.
-    // Single @/* pattern handles all imports (e.g., @/middleware/auth → ./src/middleware/auth).
-    // tsc-alias rewrites these in compiled JS during build for runtime compatibility.
+    // tsc-alias rewrites these in the emitted JavaScript so Node can resolve them.
     "paths": {
       "@/*": ["./src/*"]
     }

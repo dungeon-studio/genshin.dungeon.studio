@@ -50,6 +50,18 @@ describe('isISOTimestamp', () => {
     expect(isISOTimestamp('2024-13-01T00:00:00Z')).toBe(false);
   });
 
+  it('rejects a day the month does not have', () => {
+    expect(isISOTimestamp('2024-02-30T00:00:00Z')).toBe(false);
+  });
+
+  it('rejects a leap day in a non-leap year', () => {
+    expect(isISOTimestamp('2023-02-29T00:00:00Z')).toBe(false);
+  });
+
+  it('accepts a leap day in a leap year', () => {
+    expect(isISOTimestamp('2024-02-29T00:00:00Z')).toBe(true);
+  });
+
   it('rejects a random string', () => {
     expect(isISOTimestamp('not-a-timestamp')).toBe(false);
   });

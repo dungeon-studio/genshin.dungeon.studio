@@ -3,7 +3,7 @@
 
 import type { CollectionTeam, CollectionWeaponId, ISOTimestamp, TeamSlot } from '@genshin/domain';
 import { initialTeams } from '@genshin/domain';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useTeamStore } from './use-team-store';
 
@@ -61,6 +61,17 @@ describe('useTeamStore', () => {
 
       const team2 = useTeamStore.getState().teams[2];
       expect(team2.members[0]?.weaponInstanceId).toBe(weaponId);
+    });
+
+    it('prefers an explicit weapon over the one auto-populated from another team', () => {
+      const autoWeaponId = 'weapon-instance-1' as CollectionWeaponId;
+      const chosenWeaponId = 'weapon-instance-2' as CollectionWeaponId;
+      useTeamStore.getState().assignCharacter(1, 0, 'amber');
+      useTeamStore.getState().assignWeapon(1, 0, autoWeaponId);
+
+      useTeamStore.getState().assignCharacter(2, 0, 'amber', chosenWeaponId);
+
+      expect(useTeamStore.getState().teams[2].members[0]?.weaponInstanceId).toBe(chosenWeaponId);
     });
   });
 
@@ -125,6 +136,25 @@ describe('useTeamStore', () => {
 
       expect(useTeamStore.getState().teams[1].name).toBe('National Team');
     });
+
+    it('trims surrounding whitespace', () => {
+      useTeamStore.getState().setTeamName(1, '  National Team  ');
+
+      expect(useTeamStore.getState().teams[1].name).toBe('National Team');
+    });
+
+    it('falls back to the default name when cleared', () => {
+      useTeamStore.getState().setTeamName(2, 'Freeze');
+      useTeamStore.getState().setTeamName(2, '');
+
+      expect(useTeamStore.getState().teams[2].name).toBe('Team 2');
+    });
+
+    it('falls back to the default name for a whitespace-only name', () => {
+      useTeamStore.getState().setTeamName(3, '   ');
+
+      expect(useTeamStore.getState().teams[3].name).toBe('Team 3');
+    });
   });
 
   describe('setTeams', () => {
@@ -183,6 +213,68 @@ describe('useTeamStore', () => {
       useTeamStore.getState().setArtifactPlan(1, 0, undefined);
 
       expect(useTeamStore.getState().teams[1].members[0]?.artifactPlan).toBeUndefined();
+    });
+  });
+
+  describe('updatedAt', () => {
+    const weaponId = 'weapon-1' as CollectionWeaponId;
+
+    const cases: { name: string; setup?: () => void; mutate: () => void }[] = [
+      {
+        name: 'assignCharacter',
+        mutate: () => useTeamStore.getState().assignCharacter(1, 0, 'amber'),
+      },
+      {
+        name: 'removeCharacter',
+        setup: () => useTeamStore.getState().assignCharacter(1, 0, 'amber'),
+        mutate: () => useTeamStore.getState().removeCharacter(1, 0),
+      },
+      {
+        name: 'assignWeapon',
+        setup: () => useTeamStore.getState().assignCharacter(1, 0, 'amber'),
+        mutate: () => useTeamStore.getState().assignWeapon(1, 0, weaponId),
+      },
+      {
+        name: 'removeWeapon',
+        setup: () => {
+          useTeamStore.getState().assignCharacter(1, 0, 'amber');
+          useTeamStore.getState().assignWeapon(1, 0, weaponId);
+        },
+        mutate: () => useTeamStore.getState().removeWeapon(1, 0),
+      },
+      {
+        name: 'setArtifactPlan',
+        setup: () => useTeamStore.getState().assignCharacter(1, 0, 'amber'),
+        mutate: () => useTeamStore.getState().setArtifactPlan(1, 0, { sands: 'ATK Percentage' }),
+      },
+      {
+        name: 'clearTeam',
+        setup: () => useTeamStore.getState().assignCharacter(1, 0, 'amber'),
+        mutate: () => useTeamStore.getState().clearTeam(1),
+      },
+      { name: 'setTeamName', mutate: () => useTeamStore.getState().setTeamName(1, 'National') },
+    ];
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-01-01T00:00:00.000Z'));
+      useTeamStore.getState().resetTeams();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it.each(cases)('$name bumps updatedAt to the mutation time', ({ setup, mutate }) => {
+      setup?.();
+      const { createdAt } = useTeamStore.getState().teams[1];
+
+      vi.advanceTimersByTime(1000);
+      mutate();
+
+      const { updatedAt } = useTeamStore.getState().teams[1];
+      expect(updatedAt).not.toBe(createdAt);
+      expect(updatedAt).toBe('2026-01-01T00:00:01.000Z');
     });
   });
 

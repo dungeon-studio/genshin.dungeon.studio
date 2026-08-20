@@ -1,19 +1,22 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CharacterId, CollectionCharacter, TeamSlot } from '@genshin/domain';
-import type { Character } from '@genshin/game-data';
-import { CHARACTERS } from '@genshin/game-data';
+import type { CharacterId, ConstellationLevel, TeamSlot } from '@genshin/domain';
+import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import type { Character, WeaponType } from '@genshin/game-data';
+import { CHARACTER_ROSTER } from '@genshin/game-data';
 import { Lock, Users } from 'lucide-react';
 import type { JSX } from 'react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { CharacterSummary } from '@/components/character-summary';
+import { CharacterSummary } from '@/components/summaries/character-summary';
 import { Button } from '@/components/ui/button';
 import { CharacterFilters } from '@/features/collection/characters/character-filters';
 import type { CharacterFilterState } from '@/features/collection/characters/filtering';
 import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
+import type { CharacterCollection } from '@/features/collection/characters/use-character-collection-store';
+import { ownedCharacterIds } from '@/features/collection/characters/use-character-collection-store';
 import { useTeamStore } from '@/features/teams/use-team-store';
 import { ELEMENT_BORDER_COLORS, ELEMENT_SELECTED_RINGS } from '@/lib/element-styles';
 import { cn } from '@/lib/utils';
@@ -23,16 +26,23 @@ function poolFilterState(): CharacterFilterState {
 }
 
 interface CharacterPoolProps {
-  characters: Record<CharacterId, CollectionCharacter>;
+  characters: CharacterCollection;
   slot: TeamSlot;
   memberIndex: number;
-  onAssign: (characterId: string) => void;
+  /**
+   * Restricts the pool to characters wielding this type. Deliberately not a filter-bar
+   * facet: it constrains which character is valid, so the user must not be able to
+   * clear it and pick one that cannot equip the weapon.
+   */
+  weaponType?: WeaponType;
+  onAssign: (characterId: CharacterId) => void;
 }
 
 export function CharacterPool({
   characters,
   slot,
   memberIndex,
+  weaponType,
   onAssign,
 }: CharacterPoolProps): JSX.Element {
   const members = useTeamStore((s) => s.teams[slot].members);
@@ -52,22 +62,28 @@ export function CharacterPool({
     setFilters({ ...next, ownership: 'owned' });
   }
 
-  const ownedIds = useMemo(() => new Set(Object.keys(characters)), [characters]);
+  const ownedIds = useMemo(() => ownedCharacterIds(characters), [characters]);
   const ownedCount = ownedIds.size;
+
+  const eligibleCharacters = useMemo(
+    () =>
+      weaponType ? CHARACTER_ROSTER.filter((c) => c.weaponType === weaponType) : CHARACTER_ROSTER,
+    [weaponType],
+  );
 
   const { filteredCharacters, filteredOwnedCount } = useMemo(() => {
     if (ownedIds.size === 0)
       return { filteredCharacters: [] as Character[], filteredOwnedCount: 0 };
-    const filtered = filterCharacters(CHARACTERS, filters, ownedIds);
+    const filtered = filterCharacters(eligibleCharacters, filters, ownedIds);
     return {
       filteredCharacters: filtered,
       filteredOwnedCount: filtered.filter((c) => ownedIds.has(c.id)).length,
     };
-  }, [filters, ownedIds]);
+  }, [filters, ownedIds, eligibleCharacters]);
 
   if (ownedCount === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 py-12">
+      <div className="gap-4 py-12 flex flex-1 flex-col items-center justify-center">
         <Users className="h-10 w-10 text-muted-foreground" aria-hidden="true" focusable={false} />
         <div className="text-center">
           <p className="font-medium">No characters in your collection</p>
@@ -83,19 +99,19 @@ export function CharacterPool({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3">
+    <div className="min-h-0 gap-3 flex flex-1 flex-col">
       <CharacterFilters
         filters={filters}
         onChange={handleFilterChange}
         filteredCount={filteredCharacters.length}
-        totalCount={CHARACTERS.length}
+        totalCount={eligibleCharacters.length}
         ownedCount={ownedCount}
         filteredOwnedCount={filteredOwnedCount}
         showOwnership={false}
       />
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 grid grid-cols-1">
           {filteredCharacters.map((character) => {
             const owned = ownedIds.has(character.id);
             const assignedToCurrentMember = character.id === currentMemberCharacterId;
@@ -108,7 +124,7 @@ export function CharacterPool({
               <PoolCharacterCard
                 key={character.id}
                 character={character}
-                constellationLevel={entry?.constellationLevel ?? 0}
+                constellationLevel={entry?.constellationLevel ?? MIN_CONSTELLATION_LEVEL}
                 assignedToCurrentMember={assignedToCurrentMember}
                 assignedToOtherMember={assignedToOtherMember}
                 disabled={!clickable}
@@ -120,7 +136,9 @@ export function CharacterPool({
 
         {filteredCharacters.length === 0 && (
           <p className="py-8 text-center text-muted-foreground">
-            No characters match your filters.
+            {weaponType
+              ? `No ${weaponType} users in your collection match your filters.`
+              : 'No characters match your filters.'}
           </p>
         )}
       </div>
@@ -130,7 +148,7 @@ export function CharacterPool({
 
 interface PoolCharacterCardProps {
   character: Character;
-  constellationLevel: number;
+  constellationLevel: ConstellationLevel;
   assignedToCurrentMember: boolean;
   assignedToOtherMember: boolean;
   disabled: boolean;
@@ -155,7 +173,7 @@ function PoolCharacterCard({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'flex w-full items-center gap-3 rounded-lg border border-border border-l-4 bg-card p-3 text-left shadow-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+        'gap-3 p-3 shadow-sm flex w-full items-center rounded-lg border border-l-4 border-border bg-card text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
         ELEMENT_BORDER_COLORS[character.element],
         assignedToCurrentMember && `ring-2 ring-inset ${ELEMENT_SELECTED_RINGS[character.element]}`,
         disabled && 'cursor-not-allowed opacity-40',
@@ -173,7 +191,7 @@ function PoolCharacterCard({
           focusable={false}
         />
       )}
-      <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-bold tabular-nums text-muted-foreground">
+      <span className="px-2 py-0.5 text-xs font-bold shrink-0 rounded-full bg-muted text-muted-foreground tabular-nums">
         C{constellationLevel}
       </span>
     </button>
