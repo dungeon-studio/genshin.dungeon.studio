@@ -21,7 +21,6 @@ import { health } from '@/routes/health.js';
 import { jsonSchemaProfiles } from '@/routes/json-schema-profiles.js';
 import { root } from '@/routes/root.js';
 import { teams } from '@/routes/teams.js';
-import { userProfile } from '@/routes/user-profile.js';
 import { weapons } from '@/routes/weapons.js';
 
 export const app = new Hono<{
@@ -85,7 +84,6 @@ app.route('/health', health);
 app.route('/profiles/json-schema', jsonSchemaProfiles);
 app.route('/profiles/alps', alpsProfiles);
 app.route('/characters', characters);
-app.route('/profile', userProfile);
 app.route('/teams', teams);
 app.route('/weapons', weapons);
 

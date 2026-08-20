@@ -20,12 +20,7 @@ interface RepositorySchemas {
   readonly currentVersion: number;
 }
 
-/**
- * Every Firestore document repository whose schema evolution is gated.
- *
- * The user-profile repository is intentionally absent: it is slated for removal
- * (see PR #879) and has no surviving consumer to protect.
- */
+/** Every Firestore document repository whose schema evolution is gated. */
 export const SCHEMA_REGISTRY: Record<string, RepositorySchemas> = {
   characters: {
     versions: [V0CharacterSchema, V1CharacterSchema],

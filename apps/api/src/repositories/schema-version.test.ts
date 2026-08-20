@@ -22,7 +22,6 @@ vi.mock('@/logger.js', async (importOriginal) => {
 });
 
 const characters = await import('./characters/document.js');
-const profile = await import('./profile/document.js');
 const teams = await import('./teams/document.js');
 const weapons = await import('./weapons/document.js');
 
@@ -36,12 +35,6 @@ const REPOSITORIES = [
     currentVersion: characters.CURRENT_VERSION,
     fields: { constellationLevel: 0, createdAt: TIMESTAMP, updatedAt: TIMESTAMP },
     read: (document: Record<string, unknown>) => characters.fromDocument('columbina', document),
-  },
-  {
-    repository: 'profile',
-    currentVersion: profile.CURRENT_VERSION,
-    fields: { name: 'Traveler', createdAt: TIMESTAMP, updatedAt: TIMESTAMP },
-    read: (document: Record<string, unknown>) => profile.fromDocument(document),
   },
   {
     repository: 'teams',

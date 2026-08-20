@@ -38,11 +38,11 @@ See [JSONSchema2020-12]: <https://json-schema.org/draft/2020-12>
 Clients select a representation version with the `profile` parameter on `Accept`, naming the schema URI they expect. The API echoes the schema it used in the response `Content-Type`:
 
 ```http
-GET /profile HTTP/1.1
-Accept: application/json; profile="https://api.genshin.dungeon.studio/profiles/json-schema/profile/get-response-v1.json"
+GET /health HTTP/1.1
+Accept: application/json; profile="https://api.genshin.dungeon.studio/profiles/json-schema/health/get-response-v1.json"
 
 HTTP/1.1 200 OK
-Content-Type: application/json; profile="https://api.genshin.dungeon.studio/profiles/json-schema/profile/get-response-v1.json"
+Content-Type: application/json; profile="https://api.genshin.dungeon.studio/profiles/json-schema/health/get-response-v1.json"
 ```
 
 Negotiation rules:
@@ -119,7 +119,6 @@ The API root (`GET /`) is a hypermedia entry point (HATEOAS) advertising availab
 {
   "links": {
     "characters": { "href": "/characters" },
-    "profile": { "href": "/profile" },
     "teams": { "href": "/teams" },
     "weapons": { "href": "/weapons" },
     "health": { "href": "/health" }
