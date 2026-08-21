@@ -36,7 +36,7 @@ const VALID_PLAN = {
   sands: 'ATK Percentage',
   goblet: 'Hydro DMG Bonus',
   circlet: 'CRIT Rate',
-  sets: ['aubade-of-morningstar-and-moon'],
+  primarySetId: 'aubade-of-morningstar-and-moon',
   priorityMinorAffixes: ['CRIT Rate', 'CRIT DMG'],
   secondaryMinorAffixes: ['ATK Percentage'],
 };
@@ -224,9 +224,9 @@ describe('assertCollectionTeam', () => {
   it('throws for a malformed artifact plan on a later member', () => {
     expect(() =>
       assertCollectionTeam(
-        teamWithMember({ characterId: 'durin', artifactPlan: { sets: 'not-an-array' } }, 2),
+        teamWithMember({ characterId: 'durin', artifactPlan: { primarySetId: 42 } }, 2),
       ),
-    ).toThrow(/members\[2\]\.artifactPlan\.sets must be an array/);
+    ).toThrow(/members\[2\]\.artifactPlan\.primarySetId must be a string/);
   });
 
   it('throws for invalid createdAt', () => {

@@ -27,16 +27,16 @@ export interface ArtifactPlan {
   goblet?: GobletMainAffix;
   /** Desired main affix for Circlet of Logos */
   circlet?: CircletMainAffix;
-  /** 1–2 artifact set IDs from game-data */
-  sets?: [ArtifactSet['id']] | [ArtifactSet['id'], ArtifactSet['id']];
+  /** Primary artifact set: a 4-piece bonus, or the first half of a 2+2 split */
+  primarySetId?: ArtifactSet['id'];
+  /** Second 2-piece set of a 2+2 split; only meaningful alongside primarySetId */
+  secondarySetId?: ArtifactSet['id'];
   /** 0–3 priority minor affixes to prioritize */
   priorityMinorAffixes?: ArtifactMinorAffix[];
   /** 0–3 secondary minor affixes (must be disjoint from priorityMinorAffixes) */
   secondaryMinorAffixes?: ArtifactMinorAffix[];
 }
 
-const MIN_SETS = 1;
-const MAX_SETS = 2;
 const MIN_MINOR_AFFIXES = 0;
 const MAX_MINOR_AFFIXES = 3;
 
@@ -56,7 +56,13 @@ export function assertArtifactPlan(
   assertOptionalString(plan.sands, `${path}.sands`);
   assertOptionalString(plan.goblet, `${path}.goblet`);
   assertOptionalString(plan.circlet, `${path}.circlet`);
-  assertOptionalStringArray(plan.sets, `${path}.sets`, MIN_SETS, MAX_SETS);
+  assertOptionalString(plan.primarySetId, `${path}.primarySetId`);
+  assertOptionalString(plan.secondarySetId, `${path}.secondarySetId`);
+  // The retired `sets` tuple made a lone second set unrepresentable; two
+  // independent fields do not, so the pairing is asserted explicitly.
+  if (plan.secondarySetId !== undefined && plan.primarySetId === undefined) {
+    throw new TypeError(`${path}.secondarySetId requires ${path}.primarySetId`);
+  }
   assertOptionalStringArray(
     plan.priorityMinorAffixes,
     `${path}.priorityMinorAffixes`,

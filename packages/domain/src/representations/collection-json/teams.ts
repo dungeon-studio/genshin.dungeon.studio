@@ -78,6 +78,10 @@ function assertString(plan: Record<string, unknown>, field: string): void {
   }
 }
 
+function assertOptionalString(plan: Record<string, unknown>, field: string): void {
+  if (plan[field] !== undefined) assertString(plan, field);
+}
+
 function assertStringArray(
   plan: Record<string, unknown>,
   field: string,
@@ -110,14 +114,18 @@ function deserialiseArtifactPlan(value: unknown): ArtifactPlan {
   assertString(plan, 'sands');
   assertString(plan, 'goblet');
   assertString(plan, 'circlet');
-  assertStringArray(plan, 'sets', 1, 2);
+  assertString(plan, 'primarySetId');
+  assertOptionalString(plan, 'secondarySetId');
   assertStringArray(plan, 'priorityMinorAffixes', 0, 3);
   assertStringArray(plan, 'secondaryMinorAffixes', 0, 3);
   return {
     sands: plan.sands as ArtifactPlan['sands'],
     goblet: plan.goblet as ArtifactPlan['goblet'],
     circlet: plan.circlet as ArtifactPlan['circlet'],
-    sets: plan.sets as ArtifactPlan['sets'],
+    primarySetId: plan.primarySetId as ArtifactPlan['primarySetId'],
+    ...(plan.secondarySetId !== undefined
+      ? { secondarySetId: plan.secondarySetId as ArtifactPlan['secondarySetId'] }
+      : {}),
     priorityMinorAffixes: plan.priorityMinorAffixes as ArtifactPlan['priorityMinorAffixes'],
     secondaryMinorAffixes: plan.secondaryMinorAffixes as ArtifactPlan['secondaryMinorAffixes'],
   };

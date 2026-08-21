@@ -5,7 +5,7 @@
  * Field-level assertion primitives shared by the `assertCollection*` guards.
  *
  * Passing the path in is what lets a guard over a nested structure report the
- * position that failed, such as `CollectionTeam.members[0].artifactPlan.sets`,
+ * position that failed, such as `CollectionTeam.members[0].artifactPlan.sands`,
  * rather than the outermost type.
  */
 

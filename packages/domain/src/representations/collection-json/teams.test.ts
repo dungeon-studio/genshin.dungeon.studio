@@ -71,7 +71,8 @@ describe('team serialisation round-trip', () => {
             sands: 'ATK Percentage',
             goblet: 'Hydro DMG Bonus',
             circlet: 'CRIT Rate',
-            sets: ['aubade-of-morningstar-and-moon'],
+            primarySetId: 'aubade-of-morningstar-and-moon',
+            secondarySetId: 'a-day-carved-from-rising-winds',
             priorityMinorAffixes: ['CRIT Rate', 'CRIT DMG'],
             secondaryMinorAffixes: ['ATK Percentage'],
           },
@@ -92,7 +93,7 @@ describe('deserialiseTeam artifact plan validation', () => {
     sands: 'ATK Percentage',
     goblet: 'Hydro DMG Bonus',
     circlet: 'CRIT Rate',
-    sets: ['aubade-of-morningstar-and-moon'],
+    primarySetId: 'aubade-of-morningstar-and-moon',
     priorityMinorAffixes: ['CRIT Rate'],
     secondaryMinorAffixes: ['ATK Percentage'],
   };
@@ -121,14 +122,11 @@ describe('deserialiseTeam artifact plan validation', () => {
     expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sands must be a string/);
   });
 
-  it('rejects a set field that is not an array', () => {
-    const item = itemWithArtifactPlan({ ...VALID_PLAN, sets: 'aubade-of-morningstar-and-moon' });
-    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sets must be an array/);
-  });
-
-  it('rejects a non-string element in sets', () => {
-    const item = itemWithArtifactPlan({ ...VALID_PLAN, sets: [42] });
-    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sets\[0\] must be a string/);
+  it.each(['primarySetId', 'secondarySetId'])('rejects a non-string %s', (field) => {
+    const item = itemWithArtifactPlan({ ...VALID_PLAN, [field]: 42 });
+    expect(() => deserialiseTeam(item)).toThrow(
+      new RegExp(`artifactPlan\\.${field} must be a string`),
+    );
   });
 
   it('rejects a non-string element in a minor affix array', () => {
@@ -138,14 +136,13 @@ describe('deserialiseTeam artifact plan validation', () => {
     );
   });
 
-  it('rejects sets with fewer than 1 element', () => {
-    const item = itemWithArtifactPlan({ ...VALID_PLAN, sets: [] });
-    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sets must have between 1 and 2/);
-  });
-
-  it('rejects sets with more than 2 elements', () => {
-    const item = itemWithArtifactPlan({ ...VALID_PLAN, sets: ['a', 'b', 'c'] });
-    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.sets must have between 1 and 2/);
+  it('rejects a secondary set without a primary set', () => {
+    const { primarySetId: _omitted, ...rest } = VALID_PLAN;
+    const item = itemWithArtifactPlan({
+      ...rest,
+      secondarySetId: 'a-day-carved-from-rising-winds',
+    });
+    expect(() => deserialiseTeam(item)).toThrow(/artifactPlan\.primarySetId must be a string/);
   });
 
   it('rejects a minor affix array with more than 3 elements', () => {
@@ -193,7 +190,7 @@ describe('deserialiseTeam member sanitisation', () => {
           sands: 'ATK Percentage',
           goblet: 'Hydro DMG Bonus',
           circlet: 'CRIT Rate',
-          sets: ['aubade-of-morningstar-and-moon'],
+          primarySetId: 'aubade-of-morningstar-and-moon',
           priorityMinorAffixes: [],
           secondaryMinorAffixes: [],
           injected: 'evil',

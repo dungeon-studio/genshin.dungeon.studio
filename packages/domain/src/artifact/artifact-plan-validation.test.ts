@@ -16,7 +16,8 @@ describe('validateArtifactPlan', () => {
       sands: 'ATK Percentage',
       goblet: 'Pyro DMG Bonus',
       circlet: 'CRIT Rate',
-      sets: ['aubade-of-morningstar-and-moon'],
+      primarySetId: 'aubade-of-morningstar-and-moon',
+      secondarySetId: 'a-day-carved-from-rising-winds',
       priorityMinorAffixes: ['CRIT Rate', 'CRIT DMG'],
       secondaryMinorAffixes: ['ATK Percentage'],
     });
@@ -41,28 +42,24 @@ describe('validateArtifactPlan', () => {
     expect(issues.some((i) => i.path === 'circlet')).toBe(true);
   });
 
-  it('rejects zero sets', () => {
-    const issues = validateArtifactPlan({ sets: [] });
+  it('rejects an unknown primary artifact set ID', () => {
+    const issues = validateArtifactPlan({ primarySetId: 'nonexistent-set' });
     expect(issues.length).toBeGreaterThan(0);
-    expect(issues.some((i) => i.path === 'sets')).toBe(true);
+    expect(issues.some((i) => i.path === 'primarySetId')).toBe(true);
   });
 
-  it('rejects more than 2 sets', () => {
+  it('rejects an unknown secondary artifact set ID', () => {
     const issues = validateArtifactPlan({
-      sets: [
-        'aubade-of-morningstar-and-moon',
-        'a-day-carved-from-rising-winds',
-        'silken-moons-serenade',
-      ],
+      primarySetId: 'aubade-of-morningstar-and-moon',
+      secondarySetId: 'nonexistent-set',
     });
     expect(issues.length).toBeGreaterThan(0);
-    expect(issues.some((i) => i.path === 'sets')).toBe(true);
+    expect(issues.some((i) => i.path === 'secondarySetId')).toBe(true);
   });
 
-  it('rejects an unknown artifact set ID', () => {
-    const issues = validateArtifactPlan({ sets: ['nonexistent-set'] });
-    expect(issues.length).toBeGreaterThan(0);
-    expect(issues.some((i) => i.path === 'sets[0]')).toBe(true);
+  it('rejects a secondary artifact set without a primary set', () => {
+    const issues = validateArtifactPlan({ secondarySetId: 'aubade-of-morningstar-and-moon' });
+    expect(issues.some((i) => i.path === 'secondarySetId')).toBe(true);
   });
 
   it('rejects more than 3 priority minor affixes', () => {
