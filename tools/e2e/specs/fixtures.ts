@@ -100,15 +100,19 @@ async function signIn(page: Page): Promise<void> {
   await popup.waitForLoadState('load');
   await popup.getByRole('button', { name: 'Add new account' }).click();
 
+  const displayName = `E2E Traveler ${account}`;
+
   const email = popup.locator('#email-input');
   await expect(email).toBeVisible();
   await email.fill(`e2e.${account}@example.com`);
-  await popup.locator('#display-name-input').fill(`E2E Traveler ${account}`);
+  await popup.locator('#display-name-input').fill(displayName);
   await popup.locator('#sign-in').click();
 
   // The header switching over is the signal that the credential reached the
   // app; waiting on the popup closing races the message it still has to send.
-  await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible();
+  // The account menu is named for whoever it belongs to, so this also confirms
+  // the app took the identity it was handed.
+  await expect(page.getByRole('button', { name: displayName })).toBeVisible();
 }
 
 /** Put a character in the signed-in collection via the UI, server write included. */
