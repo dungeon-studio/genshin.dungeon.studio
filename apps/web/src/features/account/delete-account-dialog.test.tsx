@@ -5,6 +5,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { signOut } from 'firebase/auth';
 import { http, HttpResponse } from 'msw';
+import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { server } from '@/test/msw/server';
@@ -88,6 +89,32 @@ describe('DeleteAccountDialog', () => {
 
     await waitFor(() => {
       expect(deleteButton()).toBeEnabled();
+    });
+    expect(signOut).not.toHaveBeenCalled();
+  });
+
+  it('reports why the erasure failed', async () => {
+    erasureFails();
+    renderDialog();
+
+    await userEvent.type(screen.getByRole('textbox'), 'delete');
+    await userEvent.click(deleteButton());
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('An unexpected error'));
+    });
+  });
+
+  // A request that never arrives carries no problem document to quote.
+  it('still says something when the request never reaches the server', async () => {
+    server.use(http.delete(ACCOUNT_URL, () => HttpResponse.error()));
+    renderDialog();
+
+    await userEvent.type(screen.getByRole('textbox'), 'delete');
+    await userEvent.click(deleteButton());
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalled();
     });
     expect(signOut).not.toHaveBeenCalled();
   });
