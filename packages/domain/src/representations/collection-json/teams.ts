@@ -74,7 +74,7 @@ export function teamItemDocument(team: CollectionTeam, baseUrl: string): Collect
 const MIN_MINOR_AFFIXES = 0;
 const MAX_MINOR_AFFIXES = 3;
 
-/** Every field carried across the wire; anything else is dropped on receipt. */
+/** Allow-list for deserialisation: any other property on the wire is dropped. */
 const ARTIFACT_PLAN_FIELDS = [
   'sands',
   'goblet',
@@ -85,11 +85,7 @@ const ARTIFACT_PLAN_FIELDS = [
   'secondaryMinorAffixes',
 ] as const;
 
-/**
- * The wire format spells an absent list as `[]`, so unlike the domain guard
- * these arrays must be present.
- */
-function assertStringArray(value: unknown, path: string, min: number, max: number): void {
+function assertRequiredStringArray(value: unknown, path: string, min: number, max: number): void {
   if (value === undefined) {
     throw new TypeError(`${path} must be an array, got: undefined`);
   }
@@ -107,7 +103,12 @@ function deserialiseArtifactPlan(value: unknown): ArtifactPlan {
   assertString(plan.primarySetId, 'artifactPlan.primarySetId');
   assertOptionalString(plan.secondarySetId, 'artifactPlan.secondarySetId');
   for (const field of ['priorityMinorAffixes', 'secondaryMinorAffixes'] as const) {
-    assertStringArray(plan[field], `artifactPlan.${field}`, MIN_MINOR_AFFIXES, MAX_MINOR_AFFIXES);
+    assertRequiredStringArray(
+      plan[field],
+      `artifactPlan.${field}`,
+      MIN_MINOR_AFFIXES,
+      MAX_MINOR_AFFIXES,
+    );
   }
   return Object.fromEntries(
     ARTIFACT_PLAN_FIELDS.filter((field) => plan[field] !== undefined).map((field) => [

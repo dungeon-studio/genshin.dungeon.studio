@@ -37,13 +37,11 @@ export const V2TeamSchema = z.object({
 type V1ArtifactPlan = NonNullable<V1Member['artifactPlan']>;
 type V2ArtifactPlan = NonNullable<V2Member['artifactPlan']>;
 
-/** Splits `sets` across the named fields; every other field carries through. */
 function migrateArtifactPlan({ sets, ...carried }: V1ArtifactPlan): V2ArtifactPlan {
   return {
     ...carried,
-    // v1 typed `sets` as an unbounded array, so a hand-edited document can carry
-    // more than the two the domain ever accepted. Anything past the second entry
-    // is dropped rather than failing the read.
+    // Stored `sets` arrays are unbounded, so entries past the second are dropped
+    // rather than failing the read.
     ...(sets?.[0] !== undefined ? { primarySetId: sets[0] } : {}),
     ...(sets?.[1] !== undefined ? { secondarySetId: sets[1] } : {}),
   };

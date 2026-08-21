@@ -40,11 +40,7 @@ export interface ArtifactPlan {
 const MIN_MINOR_AFFIXES = 0;
 const MAX_MINOR_AFFIXES = 3;
 
-/**
- * A second 2-piece set has nothing to pair with on its own. The retired `sets`
- * tuple made the state unrepresentable; two independent fields do not, so every
- * boundary that accepts a plan has to reject it.
- */
+/** A 2-piece set bonus needs a partner set, so a lone secondary is incoherent. */
 export function hasSecondarySetWithoutPrimary(plan: {
   primarySetId?: unknown;
   secondarySetId?: unknown;

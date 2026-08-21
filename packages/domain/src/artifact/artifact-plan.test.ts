@@ -24,8 +24,7 @@ describe('assertArtifactPlan', () => {
     expect(() => assertArtifactPlan({})).not.toThrow();
   });
 
-  // primarySetId is omitted separately: dropping it alone strands secondarySetId,
-  // which is its own rejection case below.
+  // primarySetId is absent from this list: dropping it alone strands secondarySetId.
   it.each([
     'sands',
     'goblet',
