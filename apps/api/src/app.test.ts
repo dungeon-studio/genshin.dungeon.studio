@@ -81,6 +81,9 @@ describe('Allow header', () => {
       '/weapons/8c1a9c4e-1c2e-4a3f-9d5b-6f7a8b9c0d1e',
       ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH'],
     ],
+    // Nothing to fetch, so this is the only way a client learns the resource
+    // supports anything: the root document lists resources it can GET.
+    ['a singleton with no representation', '/account', ['DELETE', 'OPTIONS']],
   ])('advertises the methods of %s', async (_resource, path, methods) => {
     const res = await app.request(path, { method: 'OPTIONS' });
     expect(allowed(res)).toEqual(methods);
