@@ -5,9 +5,9 @@ import { MAX_TEAM_MEMBERS } from '@genshin/domain';
 import { defineVersion } from 'verzod';
 import { z } from 'zod';
 
-import { type V0Team } from './v0.js';
+import { type V1Team } from './v1.js';
 
-export const V1MemberSchema = z.object({
+export const V2MemberSchema = z.object({
   characterId: z.string(),
   weaponInstanceId: z.string().optional(),
   artifactPlan: z
@@ -15,31 +15,32 @@ export const V1MemberSchema = z.object({
       sands: z.string().optional(),
       goblet: z.string().optional(),
       circlet: z.string().optional(),
-      sets: z.array(z.string()).optional(),
+      primarySetId: z.string().optional(),
+      secondarySetId: z.string().optional(),
       priorityMinorAffixes: z.array(z.string()).optional(),
       secondaryMinorAffixes: z.array(z.string()).optional(),
     })
     .optional(),
 });
 
-export type V1Team = z.infer<typeof V1TeamSchema>;
+export type V2Member = z.infer<typeof V2MemberSchema>;
 
-export const V1TeamSchema = z.object({
-  schemaVersion: z.literal(1),
+export const V2TeamSchema = z.object({
+  schemaVersion: z.literal(2),
   name: z.string(),
-  members: z.array(z.union([z.null(), V1MemberSchema])).max(MAX_TEAM_MEMBERS),
+  members: z.array(z.union([z.null(), V2MemberSchema])).max(MAX_TEAM_MEMBERS),
   description: z.string().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
 
-export const v1 = defineVersion({
+export const v2 = defineVersion({
   initial: false,
-  schema: V1TeamSchema,
-  up: (old: V0Team): z.infer<typeof V1TeamSchema> => ({
-    schemaVersion: 1,
+  schema: V2TeamSchema,
+  up: (old: V1Team): z.infer<typeof V2TeamSchema> => ({
+    schemaVersion: 2,
     name: old.name,
-    members: old.members.map((m): z.infer<typeof V1MemberSchema> | null => {
+    members: old.members.map((m): z.infer<typeof V2MemberSchema> | null => {
       if (m === null) return null;
       if (!m.artifactPlan) {
         return {
@@ -47,16 +48,8 @@ export const v1 = defineVersion({
           ...(m.weaponInstanceId !== undefined ? { weaponInstanceId: m.weaponInstanceId } : {}),
         };
       }
-      const {
-        primaryStats,
-        secondaryStats,
-        sands,
-        goblet,
-        circlet,
-        sets,
-        priorityMinorAffixes,
-        secondaryMinorAffixes,
-      } = m.artifactPlan;
+      const { sands, goblet, circlet, sets, priorityMinorAffixes, secondaryMinorAffixes } =
+        m.artifactPlan;
       return {
         characterId: m.characterId,
         ...(m.weaponInstanceId !== undefined ? { weaponInstanceId: m.weaponInstanceId } : {}),
@@ -64,17 +57,13 @@ export const v1 = defineVersion({
           ...(sands !== undefined ? { sands } : {}),
           ...(goblet !== undefined ? { goblet } : {}),
           ...(circlet !== undefined ? { circlet } : {}),
-          ...(sets !== undefined ? { sets } : {}),
-          ...(primaryStats !== undefined
-            ? { priorityMinorAffixes: primaryStats }
-            : priorityMinorAffixes !== undefined
-              ? { priorityMinorAffixes }
-              : {}),
-          ...(secondaryStats !== undefined
-            ? { secondaryMinorAffixes: secondaryStats }
-            : secondaryMinorAffixes !== undefined
-              ? { secondaryMinorAffixes }
-              : {}),
+          // v1 typed `sets` as an unbounded array, so a hand-edited document can
+          // carry more than the two the domain ever accepted. Anything past the
+          // second entry is dropped rather than failing the read.
+          ...(sets?.[0] !== undefined ? { primarySetId: sets[0] } : {}),
+          ...(sets?.[1] !== undefined ? { secondarySetId: sets[1] } : {}),
+          ...(priorityMinorAffixes !== undefined ? { priorityMinorAffixes } : {}),
+          ...(secondaryMinorAffixes !== undefined ? { secondaryMinorAffixes } : {}),
         },
       };
     }),

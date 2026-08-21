@@ -15,14 +15,15 @@ import { parseDocument } from '@/repositories/schema-version.js';
 import {
   entity,
   CURRENT_VERSION,
+  type V2Team,
   type V1Team,
   type V0Team,
-  type V1Member,
+  type V2Member,
 } from './schemas/index.js';
 
-export { CURRENT_VERSION, type V1Team, type V0Team };
+export { CURRENT_VERSION, type V2Team, type V1Team, type V0Team };
 
-function memberFromDocument(m: V1Member): CollectionTeamMember {
+function memberFromDocument(m: V2Member): CollectionTeamMember {
   return {
     characterId: m.characterId,
     ...(m.weaponInstanceId !== undefined ? { weaponInstanceId: m.weaponInstanceId } : {}),
@@ -30,7 +31,7 @@ function memberFromDocument(m: V1Member): CollectionTeamMember {
   } as CollectionTeamMember;
 }
 
-function memberToDocument(m: CollectionTeamMember): V1Member {
+function memberToDocument(m: CollectionTeamMember): V2Member {
   return {
     characterId: m.characterId,
     ...(m.weaponInstanceId !== undefined ? { weaponInstanceId: m.weaponInstanceId } : {}),
@@ -58,7 +59,7 @@ export function fromDocument(slot: TeamSlot, raw: Record<string, unknown>): Coll
   return team;
 }
 
-export function toDocument(team: CollectionTeam): V1Team {
+export function toDocument(team: CollectionTeam): V2Team {
   return {
     schemaVersion: CURRENT_VERSION,
     name: team.name,
