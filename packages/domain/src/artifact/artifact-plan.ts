@@ -41,6 +41,18 @@ const MIN_MINOR_AFFIXES = 0;
 const MAX_MINOR_AFFIXES = 3;
 
 /**
+ * A second 2-piece set has nothing to pair with on its own. The retired `sets`
+ * tuple made the state unrepresentable; two independent fields do not, so every
+ * boundary that accepts a plan has to reject it.
+ */
+export function hasSecondarySetWithoutPrimary(plan: {
+  primarySetId?: unknown;
+  secondarySetId?: unknown;
+}): boolean {
+  return plan.secondarySetId !== undefined && plan.primarySetId === undefined;
+}
+
+/**
  * Structural check only. Affix names and set IDs are validated against
  * game-data by `validateArtifactPlan`, which collects every problem instead of
  * throwing on the first.
@@ -58,9 +70,7 @@ export function assertArtifactPlan(
   assertOptionalString(plan.circlet, `${path}.circlet`);
   assertOptionalString(plan.primarySetId, `${path}.primarySetId`);
   assertOptionalString(plan.secondarySetId, `${path}.secondarySetId`);
-  // The retired `sets` tuple made a lone second set unrepresentable; two
-  // independent fields do not, so the pairing is asserted explicitly.
-  if (plan.secondarySetId !== undefined && plan.primarySetId === undefined) {
+  if (hasSecondarySetWithoutPrimary(plan)) {
     throw new TypeError(`${path}.secondarySetId requires ${path}.primarySetId`);
   }
   assertOptionalStringArray(

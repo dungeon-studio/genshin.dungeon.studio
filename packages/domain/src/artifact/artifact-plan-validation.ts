@@ -18,6 +18,8 @@ import {
 import type { ValidationIssue } from '@genshin/validation';
 import { issue } from '@genshin/validation';
 
+import { hasSecondarySetWithoutPrimary } from './artifact-plan.js';
+
 // Intentionally uses loose string types instead of ArtifactPlan's branded types
 // (SandsMainAffix, etc.). The validator's job is to check raw input *before* it
 // becomes a domain object. Accepting ArtifactPlan would make the call circular.
@@ -58,13 +60,12 @@ export function validateArtifactPlan(plan: {
     issues.push(issue(`Unknown artifact set: ${plan.primarySetId}`, 'primarySetId'));
   }
 
-  if (plan.secondarySetId !== undefined) {
-    if (plan.primarySetId === undefined) {
-      issues.push(issue('A secondary artifact set requires a primary set', 'secondarySetId'));
-    }
-    if (!getArtifactSetById(plan.secondarySetId)) {
-      issues.push(issue(`Unknown artifact set: ${plan.secondarySetId}`, 'secondarySetId'));
-    }
+  if (hasSecondarySetWithoutPrimary(plan)) {
+    issues.push(issue('A secondary artifact set requires a primary set', 'secondarySetId'));
+  }
+
+  if (plan.secondarySetId !== undefined && !getArtifactSetById(plan.secondarySetId)) {
+    issues.push(issue(`Unknown artifact set: ${plan.secondarySetId}`, 'secondarySetId'));
   }
 
   // Minor affixes ------------------------------------------------------

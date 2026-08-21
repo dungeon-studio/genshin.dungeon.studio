@@ -22,6 +22,7 @@ export const V1MemberSchema = z.object({
     .optional(),
 });
 
+export type V1Member = z.infer<typeof V1MemberSchema>;
 export type V1Team = z.infer<typeof V1TeamSchema>;
 
 export const V1TeamSchema = z.object({

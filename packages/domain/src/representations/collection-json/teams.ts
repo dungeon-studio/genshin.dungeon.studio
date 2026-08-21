@@ -22,6 +22,7 @@ import {
 } from '@genshin/collection-json';
 
 import type { ArtifactPlan } from '../../artifact/artifact-plan.js';
+import { assertOptionalString, assertOptionalStringArray, assertString } from '../../assertions.js';
 import type { CollectionTeamMember } from '../../team/collection-team-member.js';
 import type { CollectionTeam, CollectionTeamMembers } from '../../team/collection-team.js';
 import { assertCollectionTeam, MAX_TEAM_MEMBERS } from '../../team/collection-team.js';
@@ -70,40 +71,29 @@ export function teamItemDocument(team: CollectionTeam, baseUrl: string): Collect
   });
 }
 
-function assertString(plan: Record<string, unknown>, field: string): void {
-  if (typeof plan[field] !== 'string') {
-    throw new TypeError(
-      `artifactPlan.${field} must be a string, got: ${JSON.stringify(plan[field])}`,
-    );
-  }
-}
+const MIN_MINOR_AFFIXES = 0;
+const MAX_MINOR_AFFIXES = 3;
 
-function assertOptionalString(plan: Record<string, unknown>, field: string): void {
-  if (plan[field] !== undefined) assertString(plan, field);
-}
+/** Every field carried across the wire; anything else is dropped on receipt. */
+const ARTIFACT_PLAN_FIELDS = [
+  'sands',
+  'goblet',
+  'circlet',
+  'primarySetId',
+  'secondarySetId',
+  'priorityMinorAffixes',
+  'secondaryMinorAffixes',
+] as const;
 
-function assertStringArray(
-  plan: Record<string, unknown>,
-  field: string,
-  min: number,
-  max: number,
-): void {
-  const arr = plan[field];
-  if (!Array.isArray(arr)) {
-    throw new TypeError(`artifactPlan.${field} must be an array, got: ${JSON.stringify(arr)}`);
+/**
+ * The wire format spells an absent list as `[]`, so unlike the domain guard
+ * these arrays must be present.
+ */
+function assertStringArray(value: unknown, path: string, min: number, max: number): void {
+  if (value === undefined) {
+    throw new TypeError(`${path} must be an array, got: undefined`);
   }
-  if (arr.length < min || arr.length > max) {
-    throw new TypeError(
-      `artifactPlan.${field} must have between ${min} and ${max} elements, got: ${arr.length}`,
-    );
-  }
-  arr.forEach((element, index) => {
-    if (typeof element !== 'string') {
-      throw new TypeError(
-        `artifactPlan.${field}[${index}] must be a string, got: ${JSON.stringify(element)}`,
-      );
-    }
-  });
+  assertOptionalStringArray(value, path, min, max);
 }
 
 function deserialiseArtifactPlan(value: unknown): ArtifactPlan {
@@ -111,24 +101,20 @@ function deserialiseArtifactPlan(value: unknown): ArtifactPlan {
     throw new TypeError(`artifactPlan must be a non-null object, got: ${JSON.stringify(value)}`);
   }
   const plan = value as Record<string, unknown>;
-  assertString(plan, 'sands');
-  assertString(plan, 'goblet');
-  assertString(plan, 'circlet');
-  assertString(plan, 'primarySetId');
-  assertOptionalString(plan, 'secondarySetId');
-  assertStringArray(plan, 'priorityMinorAffixes', 0, 3);
-  assertStringArray(plan, 'secondaryMinorAffixes', 0, 3);
-  return {
-    sands: plan.sands as ArtifactPlan['sands'],
-    goblet: plan.goblet as ArtifactPlan['goblet'],
-    circlet: plan.circlet as ArtifactPlan['circlet'],
-    primarySetId: plan.primarySetId as ArtifactPlan['primarySetId'],
-    ...(plan.secondarySetId !== undefined
-      ? { secondarySetId: plan.secondarySetId as ArtifactPlan['secondarySetId'] }
-      : {}),
-    priorityMinorAffixes: plan.priorityMinorAffixes as ArtifactPlan['priorityMinorAffixes'],
-    secondaryMinorAffixes: plan.secondaryMinorAffixes as ArtifactPlan['secondaryMinorAffixes'],
-  };
+  assertString(plan.sands, 'artifactPlan.sands');
+  assertString(plan.goblet, 'artifactPlan.goblet');
+  assertString(plan.circlet, 'artifactPlan.circlet');
+  assertString(plan.primarySetId, 'artifactPlan.primarySetId');
+  assertOptionalString(plan.secondarySetId, 'artifactPlan.secondarySetId');
+  for (const field of ['priorityMinorAffixes', 'secondaryMinorAffixes'] as const) {
+    assertStringArray(plan[field], `artifactPlan.${field}`, MIN_MINOR_AFFIXES, MAX_MINOR_AFFIXES);
+  }
+  return Object.fromEntries(
+    ARTIFACT_PLAN_FIELDS.filter((field) => plan[field] !== undefined).map((field) => [
+      field,
+      plan[field],
+    ]),
+  ) as ArtifactPlan;
 }
 
 function deserialiseCollectionTeamMember(value: unknown, index: number): CollectionTeamMember {

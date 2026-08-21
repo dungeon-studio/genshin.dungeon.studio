@@ -18,23 +18,16 @@ export function SetConfiguration({
   secondarySetId: ArtifactPlan['secondarySetId'];
   onChange: (fields: SetFields) => void;
 }): JSX.Element {
-  const handlePrimaryChange = (setId: ArtifactSet['id']) => {
-    onChange({ primarySetId: setId, secondarySetId });
+  const update = (fields: Partial<SetFields>) => {
+    onChange({ primarySetId, secondarySetId, ...fields });
   };
 
-  const handleSecondaryChange = (setId: ArtifactSet['id']) => {
-    onChange({ primarySetId, secondarySetId: setId });
-  };
+  const handlePrimaryChange = (setId: ArtifactSet['id']) => update({ primarySetId: setId });
+  const handleSecondaryChange = (setId: ArtifactSet['id']) => update({ secondarySetId: setId });
+  const handleClearSecondary = () => update({ secondarySetId: undefined });
 
-  // A second 2-piece has nothing to pair with once the primary is gone, so
-  // clearing the primary clears both.
-  const handleClearPrimary = () => {
-    onChange({ primarySetId: undefined, secondarySetId: undefined });
-  };
-
-  const handleClearSecondary = () => {
-    onChange({ primarySetId, secondarySetId: undefined });
-  };
+  // A second 2-piece has nothing to pair with once the primary is gone.
+  const handleClearPrimary = () => update({ primarySetId: undefined, secondarySetId: undefined });
 
   return (
     <div className="space-y-2">
