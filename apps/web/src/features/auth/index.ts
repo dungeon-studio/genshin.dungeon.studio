@@ -3,6 +3,5 @@
 
 export { AuthProvider } from './auth-provider';
 export { LoginButton } from './login-button';
-export { LogoutButton } from './logout-button';
 export { signInWithGoogle } from './sign-in';
 export { useAuth } from './use-auth';

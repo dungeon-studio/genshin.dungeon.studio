@@ -15,6 +15,8 @@ Representational state transfer (REST) conventions for `apps/api` routes, so beh
 
 Model endpoints as plural resource nouns on stable, hierarchical paths. No action verbs in path segments.
 
+A resource with exactly one instance per caller takes a singular noun and no identifier, because the verified token already names the instance. `/account` is one.
+
 ### 2. Method semantics
 
 Use each method by its HTTP intent: `GET` retrieves, `POST` creates, `PUT` replaces in full, `PATCH` updates in part, `DELETE` removes.
@@ -128,7 +130,7 @@ The API root (`GET /`) is a hypermedia entry point (HATEOAS) advertising availab
 
 - **Link shape**: plain `href` strings keyed by the last path segment.
 - **Population**: derived at startup, so new resource endpoints appear without manual maintenance.
-- **Visibility**: every resource, authenticated or not; each enforces its own authorization.
+- **Visibility**: every resource with a representation to fetch, authenticated or not; each enforces its own authorization. A resource that answers no `GET`, such as `/account`, is absent from the table and discoverable only by `OPTIONS`.
 - **Version**: carried by `/health` alongside operational metadata such as `status` and `sha`.
 
 ### 13. Retry-After on 429 and 503 responses
