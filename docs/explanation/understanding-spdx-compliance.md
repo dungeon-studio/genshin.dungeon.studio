@@ -40,7 +40,7 @@ export function myFunction() { ... }
 
 ### 2. `REUSE.toml` for files without comment support
 
-[`REUSE.toml`](https://reuse.software/spec-3.3/#reusetoml) allows declaring copyright/license for files that **can't have comment syntax**.
+`REUSE.toml` declares copyright and license for files that **can't have comment syntax**.
 
 **Where used:**
 
