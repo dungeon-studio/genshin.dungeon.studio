@@ -103,14 +103,14 @@ Broken external URLs are the one exception: a weekly run files them as a GitHub 
 Pre-commit hooks automatically enforce key checks, including:
 
 - **Prettier** - Code formatting
-- **ESLint** - JavaScript/TypeScript linting across every workspace. The hook reports rather than rewrites. Run `pnpm lint -- --fix` to apply the fixes ESLint can make for you
+- **ESLint** - JavaScript/TypeScript linting across every workspace. It reports rather than rewrites. `pnpm lint -- --fix` applies the fixes it can make
 - CSS linting with Tailwind directives
 - Documentation and config linting for Markdown, YAML, and prose
 - Safety and repository hygiene checks for merge conflict markers, large files, trailing whitespace, line endings, and YAML/JSON validation
 - Exact dependency versions via [syncpack](https://jamiemason.github.io/syncpack/): `package.json` dependencies stay pinned with no `^` or `~` ranges. Run `pnpm exec syncpack fix` to pin offenders
 - SPDX license headers via [REUSE](https://reuse.software/): every source file needs one—see [Add SPDX headers](docs/how-tos/add-spdx-headers.md)
 
-A commit touching TypeScript type checks the whole workspace before it lands, and [ci.yml](.github/workflows/ci.yml) checks it again. Both go through Turborepo, so a check whose inputs haven't changed replays from cache. To see the result without committing:
+Every commit type checks the whole workspace, and [ci.yml](.github/workflows/ci.yml) checks it again. Turborepo caches both, so an unchanged check replays instead of rerunning. To see the result without committing:
 
 ```bash
 pnpm typecheck
