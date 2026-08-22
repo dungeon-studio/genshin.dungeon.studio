@@ -44,8 +44,8 @@ export function DeleteAccountDialog({ open, onOpenChange }: DeleteAccountDialogP
         <DialogHeader>
           <DialogTitle>Delete your account?</DialogTitle>
           <DialogDescription>
-            This erases your characters, weapons, and teams along with your sign-in, and cannot be
-            undone.
+            This erases your characters, weapons, and teams along with your sign-in. We cannot
+            recover them.
           </DialogDescription>
         </DialogHeader>
 
