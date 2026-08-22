@@ -45,7 +45,7 @@ workspace dependencies first. Turbo handles dependency ordering via `^build`.
 ## Key rules
 
 - Every source file needs SPDX headers. See `docs/how-tos/add-spdx-headers.md`.
-  For files without comment syntax, declare them in `.reuse/dep5`.
+  For files without comment syntax, declare them in `REUSE.toml`.
 - Conventional commits, gated on the PR title only: `feat:`, `fix:`, `docs:`,
   `style:`, `refactor:`, `perf:`, `test:`, `build:`, `ci:`, `chore:`,
   `revert:`; subject lowercase, no trailing period.

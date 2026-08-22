@@ -3,9 +3,9 @@ SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 SPDX-License-Identifier: MIT
 -->
 
-# Understanding SPDX compliance: Headers vs `.reuse/dep5`
+# Understanding SPDX compliance: Headers vs `REUSE.toml`
 
-This project uses the [REUSE Specification v3.3](https://reuse.software/spec-3.3/) to make copyright and licensing information machine-readable and comply with open source best practices. Both SPDX headers and the `.reuse/dep5` file serve the same goal through different mechanisms, each suited to different file types.
+This project uses the [REUSE Specification v3.3](https://reuse.software/spec-3.3/) to make copyright and licensing information machine-readable and comply with open source best practices. Both SPDX headers and the `REUSE.toml` file serve the same goal through different mechanisms, each suited to different file types.
 
 ---
 
@@ -38,9 +38,9 @@ export function myFunction() { ... }
 
 ---
 
-### 2. `.reuse/dep5` for files without comment support
+### 2. `REUSE.toml` for files without comment support
 
-The [Debian machine-readable copyright format](https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/) allows declaring copyright/license for files that **can't have comment syntax**.
+`REUSE.toml` declares copyright and license for files that **can't have comment syntax**.
 
 **Where used:**
 
@@ -51,19 +51,20 @@ The [Debian machine-readable copyright format](https://www.debian.org/doc/packag
 
 **Note** that files that support JSON-with-comments (JSONC), such as `.vscode/*.json` and `.devcontainer/devcontainer.json`, can have SPDX headers directly using `//` comment syntax.
 
-**Example entry in `.reuse/dep5`:**
+**Example entry in `REUSE.toml`:**
 
-```text
-Files: *.json .prettierrc
-Copyright: 2026 Alex Brandt <alunduil@gmail.com>
-License: MIT
+```toml
+[[annotations]]
+path = ["**.json", ".prettierrc"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
+SPDX-License-Identifier = "MIT"
 ```
 
 **Why this approach:**
 
 - Avoids breaking JSON syntax by injecting comments
 - Centralizes declarations for multiple files with identical copyright
-- Standard format recognized by the Debian community
 - Reduces noise in auto generated/vendor files
 
 ---
@@ -72,4 +73,3 @@ License: MIT
 
 - [How to add SPDX headers to new files](../how-tos/add-spdx-headers.md): practical steps for adding headers and troubleshooting
 - [REUSE Specification v3.3](https://reuse.software/spec-3.3/)
-- [Debian copyright format documentation](https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/)

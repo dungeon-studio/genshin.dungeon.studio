@@ -65,10 +65,6 @@ pnpm dev
 > [Configure Firestore credentials](docs/how-tos/configure-firestore-credentials.md)
 > for setup instructions.
 
-### Quality checks overview
-
-Pre-commit enforces formatting, linting, documentation, and hygiene checks on every commit and on pull requests. If checks fail, fix the issues—see [Code quality](#code-quality).
-
 ### What your pull request has to pass
 
 - Every pre-commit hook. Run `pre-commit install` once, and the same hooks run on each commit that CI runs over the whole tree—so a clean commit is a clean build. The first commit afterward builds each hook's environment and can take several minutes. `pre-commit run --all-files` reproduces CI exactly.
@@ -100,18 +96,15 @@ Broken external URLs are the one exception: a weekly run files them as a GitHub 
 
 ## Code quality
 
-The checks live in [.pre-commit-config.yaml](.pre-commit-config.yaml), and `pre-commit run --all-files` runs them and names each one. Some repair what they find and fail the commit so you can restage the result. Others only report.
+[`.pre-commit-config.yaml`](.pre-commit-config.yaml) is the source of truth for which checks run. Two of them enforce project rules:
 
-Two report findings they could repair, so each has a command:
+- `package.json` dependencies stay pinned exactly, with no `^` or `~` ranges. Run `pnpm exec syncpack fix` to pin offenders.
+- Every source file carries an SPDX license header—see [Add SPDX headers](docs/how-tos/add-spdx-headers.md).
 
-- ESLint: `pnpm lint -- --fix`
-- [syncpack](https://jamiemason.github.io/syncpack/), which keeps `package.json` dependencies pinned with no `^` or `~` ranges: `pnpm exec syncpack fix`
-
-Every source file needs an SPDX header—see [Add SPDX headers](docs/how-tos/add-spdx-headers.md).
-
-Every commit type checks the whole workspace, and [ci.yml](.github/workflows/ci.yml) checks it again. Turborepo caches both, so an unchanged check replays instead of rerunning. To see the result without committing:
+Every commit lints and type checks the whole workspace, and [ci.yml](.github/workflows/ci.yml) checks both again. Turborepo caches them, so an unchanged check replays instead of rerunning. The lint hook reports without rewriting, so `pnpm lint -- --fix` is what applies the fixes it can make. To see either result without committing:
 
 ```bash
+pnpm lint
 pnpm typecheck
 ```
 
