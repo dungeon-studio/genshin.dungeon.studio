@@ -81,20 +81,16 @@ naming convention.
 ## Compatibility gate
 
 Two automated checks hold the versioning rules. Both read the committed JSON
-Schema snapshots, which `z.toJSONSchema()` renders from the Zod source.
+Schema snapshots, which `schemas:export` generates from the Zod schemas.
 
 | Check              | Where it runs                                        | Command                                    | Fails when                                                     |
 | ------------------ | ---------------------------------------------------- | ------------------------------------------ | -------------------------------------------------------------- |
 | `schema-snapshots` | `pre-commit`, on any change under a schema directory | `pnpm turbo run schemas:export`            | A committed snapshot differs from its Zod source               |
 | `schema-compat`    | `ci.yml`, pull requests only                         | `pnpm --filter @genshin/api schemas:check` | A version the base branch shipped stops accepting its own data |
 
-`schemas:export` also refuses to write when `CURRENT_VERSION` doesn't point at
-the newest defined version.
-
-`schema-compat` reads its base branch from `SCHEMA_COMPAT_BASE`, which the job
-sets to the pull request's target. Run locally, the script defaults to
-`origin/develop`. It falls back to `HEAD` when that ref is absent, which
-compares the branch with itself and proves nothing.
+Run locally, `schema-compat` compares against `origin/develop`, or against
+`HEAD` when that ref is absent—which compares the branch with itself and proves
+nothing. Set `SCHEMA_COMPAT_BASE` to pick a different base.
 
 ### Snapshot roots
 
@@ -109,9 +105,9 @@ blob—see
 
 ### What fails the gate
 
-`schema-compat` asks jsoncompat whether each base-branch snapshot is
-deserializer-compatible with its counterpart on the branch: the branch's schema
-must still accept everything the base's did. Two changes fail it.
+`schema-compat` compares each snapshot on the base branch with its counterpart
+on the branch: the branch's schema must still accept everything the base's did.
+Two changes break that.
 
 **Narrowing a released version.** Editing `v{n}.ts` so its snapshot rejects a
 payload the base branch accepted. Widen it back, or add `v{n+1}` with a

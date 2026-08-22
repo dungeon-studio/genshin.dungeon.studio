@@ -40,8 +40,8 @@ and that the serializer stamps `CURRENT_VERSION`.
 Run `pnpm turbo run schemas:export` and commit the `v{n}.json` it writes under
 the boundary's
 [snapshot root](../reference/schema-versioning.md#snapshot-roots). The
-`schema-snapshots` pre-commit hook runs the same command, so a commit that omits
-the snapshot fails until you stage what the hook writes.
+`schema-snapshots` pre-commit hook runs the same command, so committing without
+the snapshot fails until you stage what the hook wrote.
 
 Leave the earlier `v{n-1}.json` untouched. The
 [compatibility gate](../reference/schema-versioning.md#what-fails-the-gate)

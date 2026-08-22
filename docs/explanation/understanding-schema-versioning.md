@@ -50,39 +50,35 @@ were valid when they were written. Every narrowing gets a new version.
 
 ## Why a checker holds the rules
 
-The narrowing rule is invisible to review. The `exclusiveMaximum` diff type-checks
-and passes every test written against the current shape; the payloads it breaks
-are the ones already sitting in the medium, and nothing in the change points at
-them. No reviewer catches that reliably across a schema of any size, so a
-subsumption checker decides it instead. The
+The narrowing rule is invisible to review. The `exclusiveMaximum` diff
+type-checks and passes every test written against the current shape. The
+payloads it breaks are already in the medium, and nothing in the change points
+at them. No reviewer catches that reliably across a schema of any size, so the
 [compatibility gate](../reference/schema-versioning.md#compatibility-gate)
-compares JSON Schema renderings of each version with `jsoncompat` and fails the
-pull request when a released version stops accepting its own data.
+decides it instead.
 
 The comparison runs between the branch and its base, version by version. The
-alternative—asking whether v0 subsumes v1—tests a property this repository
-doesn't want: consecutive versions are free to be unrelated, because the `up()`
-migration bridges them. What must hold is that each released version still
-accepts the payloads written under it, and the last-shipped copy of that
-version is the only honest statement of what those payloads look like.
+alternative—asking whether v0 subsumes v1—tests the wrong property: consecutive
+versions are free to differ, because the `up()` migration bridges them. What
+must hold is that each released version still accepts the payloads written
+under it. The base branch's copy of that version is the only record of what
+those payloads look like.
 
-That framing also decides where the gate runs. A base-branch comparison needs a
-merge target, which a commit doesn't have, so the proof is a pull request job
-rather than a pre-commit hook. Only the drift check—do the committed snapshots
-still match their Zod source?—is a pure function of the working tree, and that
-one is a hook.
+The two checks run in different places because they need different inputs. A
+base-branch comparison needs a merge target, which a commit doesn't have, so
+the compatibility proof is a pull request job. The drift check reads only the
+working tree, so it's a pre-commit hook.
 
 ---
 
 ## Why the snapshots hold one record
 
 `jsoncompat` reasons about named properties. A `Record` renders as
-`additionalProperties`, and the checker treats the value schema underneath it
-as opaque, so a gate pointed at a whole-store blob would report compatibility
-while every field inside the records went unchecked. A snapshot of the entry
-puts the fields that actually change back under the checker. The Firestore side
-lands in the same place for the same reason: the snapshot is one document, not
-the collection.
+`additionalProperties`, and the checker treats the value schema underneath as
+opaque. A gate pointed at a whole-store blob would report compatibility while
+every field inside the records went unchecked. A snapshot of one entry puts
+those fields back under the checker. Firestore snapshots one document rather
+than the collection for the same reason.
 
 ---
 
@@ -97,10 +93,10 @@ breaks on the deployment that drops its version.
 Only a medium that expires its own contents, such as a cache TTL or a drained
 queue, reaches that state by itself. Stored payloads have to be rewritten.
 
-No version has needed retiring here yet, so the gate
-[refuses to drop one](../reference/schema-versioning.md#what-fails-the-gate)
-without exception. The first real retirement gets to design that exception,
-along with the evidence it has to carry.
+The gate
+[refuses to drop a released version](../reference/schema-versioning.md#what-fails-the-gate)
+regardless of what the medium shows, so a retirement means changing the gate
+too.
 
 ---
 
