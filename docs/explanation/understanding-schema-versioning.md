@@ -10,7 +10,8 @@ not the same as compatible.** This applies to Firestore documents, REST bodies,
 queue payloads, cache entries, and any future wire format.
 
 For the boundaries, file layouts, and naming this repository uses, see
-[Schema versioning conventions](../reference/schema-versioning.md).
+[Schema versioning conventions](../reference/schema-versioning.md). To ship a
+version, see [Add a schema version](../how-tos/add-schema-version.md).
 
 ---
 
@@ -36,7 +37,7 @@ impossible states become routine. Every new shape gets its own version.
 
 **Don't remove a schema version while payloads at that version still live in
 the shared medium.** Dropping a version makes those payloads unreadable at the
-next deployment. See _Retiring old versions_.
+next deployment. See [Retiring old versions](#retiring-old-versions).
 
 **Don't widen the serializer's return type to cover older shapes.** The writer
 must be as strict as the current schema, not a superset of all historical ones.
@@ -46,13 +47,12 @@ must be as strict as the current schema, not a superset of all historical ones.
 ## Retiring old versions
 
 A version is safe to retire when no payload in the shared medium carries its
-stamp. Lifecycle:
+stamp. The count of reads at that version is the signal, not the time elapsed
+since the new version shipped—how long the medium takes to drain is a property
+of the medium, not of the deployment that stopped writing to it.
 
-1. Ship the new version. Writers emit it immediately; readers accept both.
-2. Measure reads from the old-version branch.
-3. Rewrite or wait for the medium to drain.
-4. When the old-version read count reaches zero, delete `v{n-1}.ts`, remove it
-   from `versionMap`, and remove the re-export.
+For the steps, see
+[Retire a schema version](../how-tos/retire-a-schema-version.md).
 
 ---
 
