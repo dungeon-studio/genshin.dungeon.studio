@@ -131,12 +131,21 @@ repos:
   # and aren't perturbed by pre-commit autoupdate.
   - repo: local
     hooks:
+      # eslint is only correct with the consuming workspace as its working
+      # directory and that workspace's dependencies built. From the root, `@/*`
+      # aliases go unresolved and unbuilt sibling `dist/` leaves type-aware
+      # rules seeing `any`, so it invents findings `eslint .` never reports.
+      # Turbo arranges both, and caches on inputs, which is why `--fix` cannot
+      # live here: a cache hit replays the log without rewriting anything.
+      #
+      # No file matcher: turbo.json decides staleness, and its `lint` inputs
+      # reach past the module extensions.
       - id: eslint
-        name: eslint
-        entry: pnpm exec eslint
+        name: eslint (all workspaces)
+        entry: pnpm exec turbo run lint
         language: system
-        types: [javascript, jsx, ts, tsx]
-        args: [--fix, --max-warnings=0]
+        pass_filenames: false
+        always_run: true
 
       - id: prettier
         name: prettier
@@ -151,13 +160,14 @@ repos:
         types: [css]
         args: [--fix]
 
+      # No file matcher: turbo.json decides staleness, and its `typecheck`
+      # inputs reach past the module extensions.
       - id: typescript-check
-        name: typescript type check
+        name: typescript type check (all workspaces)
         entry: pnpm exec turbo run typecheck
         language: system
-        types: [ts, tsx]
         pass_filenames: false
-        stages: [manual]
+        always_run: true
 
       # knip analyzes the whole workspace graph, so it can't be file-scoped and
       # runs on every commit.

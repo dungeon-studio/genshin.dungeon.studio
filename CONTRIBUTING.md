@@ -101,9 +101,10 @@ Broken external URLs are the one exception: a weekly run files them as a GitHub 
 - `package.json` dependencies stay pinned exactly, with no `^` or `~` ranges. Run `pnpm exec syncpack fix` to pin offenders.
 - Every source file carries an SPDX license header—see [Add SPDX headers](docs/how-tos/add-spdx-headers.md).
 
-Pull requests must pass type checks in [ci.yml](.github/workflows/ci.yml). Run type checks locally before committing when your change affects TypeScript code:
+Every commit lints and type checks the whole workspace, and [ci.yml](.github/workflows/ci.yml) checks both again. Turborepo caches them, so an unchanged check replays instead of rerunning. The lint hook reports without rewriting, so `pnpm lint -- --fix` is what applies the fixes it can make. To see either result without committing:
 
 ```bash
+pnpm lint
 pnpm typecheck
 ```
 
