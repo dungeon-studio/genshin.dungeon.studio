@@ -1,11 +1,7 @@
 <!-- SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> -->
 <!-- SPDX-License-Identifier: MIT -->
 
-<!-- vale Microsoft.Headings = NO -->
-
 # GitHub Copilot instructions for genshin.dungeon.studio
-
-<!-- vale Microsoft.Headings = YES -->
 
 AI decision rules. Human contribution guidance lives in
 [`CONTRIBUTING.md`](../CONTRIBUTING.md) and
