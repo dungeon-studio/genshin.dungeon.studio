@@ -15,6 +15,7 @@ import type { RequestLogVariables } from '@/middleware/log-request.js';
 import { logRequest } from '@/middleware/log-request.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { firestoreErrorToHttpException } from '@/repositories/firestore-error.js';
+import { account } from '@/routes/account.js';
 import { alpsProfiles } from '@/routes/alps-profiles.js';
 import { characters } from '@/routes/characters.js';
 import { health } from '@/routes/health.js';
@@ -83,6 +84,7 @@ app.notFound((c) =>
 app.route('/health', health);
 app.route('/profiles/json-schema', jsonSchemaProfiles);
 app.route('/profiles/alps', alpsProfiles);
+app.route('/account', account);
 app.route('/characters', characters);
 app.route('/teams', teams);
 app.route('/weapons', weapons);

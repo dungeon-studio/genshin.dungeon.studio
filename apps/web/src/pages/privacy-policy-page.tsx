@@ -73,9 +73,9 @@ export function PrivacyPolicyPage(): JSX.Element {
 
         <h2 className="mt-8 text-xl font-semibold text-foreground">Your choices and rights</h2>
         <p className="mt-4 leading-relaxed">
-          Signing out clears your collection from your browser. To access, correct, or delete the
-          data associated with your account, or to ask any question about your privacy, reach us
-          through our{' '}
+          Signing out clears your collection from your browser. Deleting your account erases your
+          characters, weapons, and teams along with your sign-in. We cannot undo it. To access or
+          correct your data, or to ask any question about your privacy, reach us through our{' '}
           <a
             href={`${GITHUB_REPO}/issues/new/choose`}
             target="_blank"
