@@ -83,10 +83,18 @@ naming convention.
 Two automated checks hold the versioning rules. Both read the committed JSON
 Schema snapshots, which `z.toJSONSchema()` renders from the Zod source.
 
-| Check              | Where it runs                                        | What it proves                                                               |
-| ------------------ | ---------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `schema-snapshots` | `pre-commit`, on any change under a schema directory | The committed snapshots match their Zod source                               |
-| `schema-compat`    | `ci.yml` job, pull requests only                     | Every version the base branch shipped still accepts the data stored under it |
+| Check              | Where it runs                                        | Command                                    | Fails when                                                     |
+| ------------------ | ---------------------------------------------------- | ------------------------------------------ | -------------------------------------------------------------- |
+| `schema-snapshots` | `pre-commit`, on any change under a schema directory | `pnpm turbo run schemas:export`            | A committed snapshot differs from its Zod source               |
+| `schema-compat`    | `ci.yml`, pull requests only                         | `pnpm --filter @genshin/api schemas:check` | A version the base branch shipped stops accepting its own data |
+
+`schemas:export` also refuses to write when `CURRENT_VERSION` doesn't point at
+the newest defined version.
+
+`schema-compat` reads its base branch from `SCHEMA_COMPAT_BASE`, which the job
+sets to the pull request's target. Run locally, the script defaults to
+`origin/develop`. It falls back to `HEAD` when that ref is absent, which
+compares the branch with itself and proves nothing.
 
 ### Snapshot roots
 
@@ -95,14 +103,9 @@ Schema snapshots, which `z.toJSONSchema()` renders from the Zod source.
 | `apps/api/schema-snapshots/{repository}/v{n}.json` | One Firestore document     |
 | `apps/web/schema-snapshots/{store}/v{n}.json`      | One `persist` store record |
 
-Each root is keyed by the repository or `persist` store name. Both capture a
-single record rather than the collection or the whole-store blob—see
+Each captures a single record rather than the collection or the whole-store
+blob—see
 [Why the snapshots hold one record](../explanation/understanding-schema-versioning.md#why-the-snapshots-hold-one-record).
-
-Regenerate with `pnpm turbo run schemas:export`. The `schema-snapshots` hook
-runs the same command and fails when the result differs from what's committed.
-The export also refuses to write when `CURRENT_VERSION` doesn't point at the
-newest defined version.
 
 ### What fails the gate
 
@@ -120,7 +123,3 @@ version and re-export.
 
 Versions the branch adds beyond the base carry no constraint—a new version is
 free to be as strict as its domain model demands.
-
-The job passes the pull request's base branch as `SCHEMA_COMPAT_BASE`. Run
-locally, the script defaults to `origin/develop`. It falls back to `HEAD` when
-that ref is absent, which compares the branch with itself and proves nothing.

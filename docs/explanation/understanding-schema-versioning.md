@@ -50,7 +50,7 @@ were valid when they were written. Every narrowing gets a new version.
 
 ## Why a checker holds the rules
 
-That last rule is invisible to review. The `exclusiveMaximum` diff type-checks
+The narrowing rule is invisible to review. The `exclusiveMaximum` diff type-checks
 and passes every test written against the current shape; the payloads it breaks
 are the ones already sitting in the medium, and nothing in the change points at
 them. No reviewer catches that reliably across a schema of any size, so a
@@ -97,9 +97,10 @@ breaks on the deployment that drops its version.
 Only a medium that expires its own contents, such as a cache TTL or a drained
 queue, reaches that state by itself. Stored payloads have to be rewritten.
 
-The gate offers no way to record that conclusion: deleting a snapshot the base
-branch shipped always fails the pull request. No version has needed retiring
-yet, so no exemption exists and the first real retirement designs it.
+No version has needed retiring here yet, so the gate
+[refuses to drop one](../reference/schema-versioning.md#what-fails-the-gate)
+without exception. The first real retirement gets to design that exception,
+along with the evidence it has to carry.
 
 ---
 
