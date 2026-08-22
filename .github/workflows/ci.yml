@@ -58,9 +58,7 @@ jobs:
       - name: Derive fast-check seed
         env:
           SEED_SOURCE: ${{ github.event.pull_request.head.sha || github.sha }}
-        # SEED_SOURCE is a commit SHA (trusted, hex), not attacker-controlled;
-        # low-confidence finding tracked for recheck in #910.
-        run: echo "FAST_CHECK_SEED=$((16#${SEED_SOURCE:0:8}))" >> "$GITHUB_ENV" # zizmor: ignore[github-env]
+        run: echo "FAST_CHECK_SEED=$((16#${SEED_SOURCE:0:8}))" >> "$GITHUB_ENV"
 
       # --continue reports every package rather than stopping at the first
       # failure.
