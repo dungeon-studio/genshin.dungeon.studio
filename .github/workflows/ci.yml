@@ -51,21 +51,24 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
 
-      # Seed property-based tests from the commit under test: a re-run of the same
-      # commit replays identical inputs (so a failure reproduces), while a new
-      # commit or PR draws fresh inputs (so the generators keep exploring). The
-      # first 8 hex digits of the SHA become a 32-bit integer seed.
-      - name: Derive fast-check seed
-        env:
-          SEED_SOURCE: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: echo "FAST_CHECK_SEED=$((16#${SEED_SOURCE:0:8}))" >> "$GITHUB_ENV"
-
       # --continue reports every package rather than stopping at the first
       # failure.
       - name: Typecheck
         run: pnpm turbo run typecheck --continue
 
+      # Seed property-based tests from the commit under test: a re-run of the same
+      # commit replays identical inputs (so a failure reproduces), while a new
+      # commit or PR draws fresh inputs (so the generators keep exploring). The
+      # first 8 hex digits of the SHA become a 32-bit integer seed.
+      - name: Derive fast-check seed
+        id: fast-check
+        env:
+          SEED_SOURCE: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: echo "seed=$((16#${SEED_SOURCE:0:8}))" >> "$GITHUB_OUTPUT"
+
       - name: Test
+        env:
+          FAST_CHECK_SEED: ${{ steps.fast-check.outputs.seed }}
         run: pnpm turbo run test --continue -- --coverage
 
       # apps/web fails the build when its Firebase config is missing, so that a
