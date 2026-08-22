@@ -51,9 +51,13 @@ were valid when they were written. Every narrowing gets a new version.
 ## Retiring old versions
 
 A version is safe to retire when no payload in the shared medium carries its
-stamp. Each medium drains on its own schedule, so the count of reads at that
-version is the signal to act on rather than the time since the new version
-shipped.
+stamp. Establishing that means examining the medium itself. Read volume at a
+version falls to zero as soon as those payloads go cold, which happens long
+before the payloads are gone—a document nobody opens is still a document that
+breaks on the deployment that drops its version.
+
+Only a medium that expires its own contents, such as a cache TTL or a drained
+queue, reaches that state by itself. Stored payloads have to be rewritten.
 
 For the steps, see
 [Retire a schema version](../how-tos/retire-a-schema-version.md).

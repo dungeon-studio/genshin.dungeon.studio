@@ -13,9 +13,18 @@ unreadable at the next deployment; for the safety criterion, see
 1. Ship the new version by following
    [Add a schema version](add-schema-version.md). Writers emit the new stamp
    immediately; readers accept both.
-2. Watch for reads still arriving at the old version. Firestore repositories
-   log a `fromVersion`/`toVersion` pair on every migrated read, so a window
-   with no line naming the old version means nothing reads it any more.
-3. Rewrite or wait for the medium to drain.
-4. When the old-version read count reaches zero, delete `v{n-1}.ts`, remove it
-   from `versionMap`, and remove the re-export.
+2. Rewrite every document still at the old version. Reading one and writing it
+   back stamps it at the current version, so a pass over the collection drives
+   the count to zero. Nothing in Firestore expires on its own, so waiting
+   doesn't.
+3. Confirm none remains by enumerating the collection. When retiring version 0,
+   filtering on `schemaVersion` misses the documents you want. They predate the
+   field, and a query skips documents lacking the field it filters on.
+4. Delete `v{n-1}.ts`, remove it from `versionMap`, and remove the re-export.
+
+---
+
+The migrated-read log (`fromVersion`/`toVersion`) tracks the rewrite's
+progress, not its completion. A document nobody reads never logs a line, so a
+quiet window says only that nothing arrived during it. Step 3 is what settles
+the question.
