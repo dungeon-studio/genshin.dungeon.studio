@@ -78,7 +78,7 @@ closest template.
   ```
 
 - [ ] SPDX headers on every source file. For files without comment syntax,
-      declare them in `.reuse/dep5`. See [Add SPDX headers](./add-spdx-headers.md).
+      declare them in `REUSE.toml`. See [Add SPDX headers](./add-spdx-headers.md).
 
 ## 2) Wire it into the workspace
 
