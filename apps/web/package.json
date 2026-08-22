@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "schemas:export": "tsx scripts/export-schemas.ts",
     "test": "vitest run",
-    "verify:bundle-stats": "tsx scripts/verify-bundle-stats.ts",
+    "verify": "bash scripts/verify-build-output.sh && tsx scripts/verify-bundle-stats.ts",
     "typecheck": "tsc -b --noEmit && tsc --project tsconfig.scripts.json --noEmit"
   },
   "dependencies": {
