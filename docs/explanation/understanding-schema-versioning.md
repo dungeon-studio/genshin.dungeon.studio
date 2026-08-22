@@ -64,22 +64,6 @@ must hold is that each released version still accepts the payloads written
 under it. The base branch's copy of that version is the only record of what
 those payloads look like.
 
-The two checks run in different places because they need different inputs. A
-base-branch comparison needs a merge target, which a commit doesn't have, so
-the compatibility proof is a pull request job. The drift check reads only the
-working tree, so it's a pre-commit hook.
-
----
-
-## Why the snapshots hold one record
-
-`jsoncompat` reasons about named properties. A `Record` renders as
-`additionalProperties`, and the checker treats the value schema underneath as
-opaque. A gate pointed at a whole-store blob would report compatibility while
-every field inside the records went unchecked. A snapshot of one entry puts
-those fields back under the checker. Firestore snapshots one document rather
-than the collection for the same reason.
-
 ---
 
 ## Retiring old versions
@@ -93,10 +77,10 @@ breaks on the deployment that drops its version.
 Only a medium that expires its own contents, such as a cache TTL or a drained
 queue, reaches that state by itself. Stored payloads have to be rewritten.
 
-The gate
-[refuses to drop a released version](../reference/schema-versioning.md#what-fails-the-gate)
-regardless of what the medium shows, so a retirement means changing the gate
-too.
+The
+[compatibility gate](../reference/schema-versioning.md#compatibility-gate)
+refuses to drop a released version regardless of what the medium shows, so a
+retirement means changing the gate too.
 
 ---
 

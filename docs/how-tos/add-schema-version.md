@@ -37,14 +37,12 @@ and that the serializer stamps `CURRENT_VERSION`.
 
 ## 5) Regenerate and commit the snapshot
 
-Run `pnpm turbo run schemas:export` and commit the `v{n}.json` it writes under
-the boundary's
-[snapshot root](../reference/schema-versioning.md#snapshot-roots). The
+Run `pnpm turbo run schemas:export` and commit the `v{n}.json` it writes. The
 `schema-snapshots` pre-commit hook runs the same command, so committing without
 the snapshot fails until you stage what the hook wrote.
 
 Leave the earlier `v{n-1}.json` untouched. The
-[compatibility gate](../reference/schema-versioning.md#what-fails-the-gate)
+[compatibility gate](../reference/schema-versioning.md#compatibility-gate)
 fails the pull request if an already-released snapshot narrows or disappears.
 
 ---

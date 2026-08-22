@@ -80,42 +80,26 @@ naming convention.
 
 ## Compatibility gate
 
-Two automated checks hold the versioning rules. Both read the committed JSON
-Schema snapshots, which `schemas:export` generates from the Zod schemas.
+Two checks hold the versioning rules. `schema-snapshots` runs on every commit
+and keeps the committed JSON Schema snapshots faithful to their Zod source.
+`schema-compat` runs on every pull request and proves that each version the base
+branch shipped still accepts the data stored under it.
 
-| Check              | Where it runs                                        | Command                                    | Fails when                                                     |
-| ------------------ | ---------------------------------------------------- | ------------------------------------------ | -------------------------------------------------------------- |
-| `schema-snapshots` | `pre-commit`, on any change under a schema directory | `pnpm turbo run schemas:export`            | A committed snapshot differs from its Zod source               |
-| `schema-compat`    | `ci.yml`, pull requests only                         | `pnpm --filter @genshin/api schemas:check` | A version the base branch shipped stops accepting its own data |
+A released version's schema may only widen. Two changes fail the gate.
 
-Run locally, `schema-compat` compares against `origin/develop`, or against
-`HEAD` when that ref is absent—which compares the branch with itself and proves
-nothing. Set `SCHEMA_COMPAT_BASE` to pick a different base.
+**Narrowing a released version.** Add `v{n+1}` with a migration instead of
+editing `v{n}`.
 
-### Snapshot roots
-
-| Root                                               | Captures                   |
-| -------------------------------------------------- | -------------------------- |
-| `apps/api/schema-snapshots/{repository}/v{n}.json` | One Firestore document     |
-| `apps/web/schema-snapshots/{store}/v{n}.json`      | One `persist` store record |
-
-Each captures a single record rather than the collection or the whole-store
-blob—see
-[Why the snapshots hold one record](../explanation/understanding-schema-versioning.md#why-the-snapshots-hold-one-record).
-
-### What fails the gate
-
-`schema-compat` compares each snapshot on the base branch with its counterpart
-on the branch: the branch's schema must still accept everything the base's did.
-Two changes break that.
-
-**Narrowing a released version.** Editing `v{n}.ts` so its snapshot rejects a
-payload the base branch accepted. Widen it back, or add `v{n+1}` with a
-migration and leave `v{n}` alone.
-
-**Dropping a released version.** Deleting a snapshot the base branch shipped
-orphans data still stored under it. There is no exemption list; restore the
-version and re-export.
+**Dropping a released version.** Deleting a version orphans the data still
+stored under it. No exemption exists.
 
 Versions the branch adds beyond the base carry no constraint—a new version is
 free to be as strict as its domain model demands.
+
+Without `origin/develop` present, a local `schema-compat` run compares the
+branch with itself and proves nothing.
+
+The wiring—snapshot roots, commands, base-ref resolution—lives in
+`.pre-commit-config.yaml` and `apps/api/scripts/check-schema-compat.ts`. Each
+app's `scripts/schema-registry.ts` lists the gated schemas and records why a
+snapshot captures one entry rather than the whole collection.
