@@ -96,9 +96,9 @@ Broken external URLs are the one exception: a weekly run files them as a GitHub 
 
 ## Code quality
 
-Pre-commit runs the formatting, linting, documentation, and hygiene checks. [`.pre-commit-config.yaml`](.pre-commit-config.yaml) is the source of truth for which ones. Two of them enforce conventions you can't read off the tool:
+[`.pre-commit-config.yaml`](.pre-commit-config.yaml) is the source of truth for which checks run. Two of them enforce project rules:
 
-- Dependency versions stay exact: `package.json` dependencies carry no `^` or `~` ranges. Run `pnpm exec syncpack fix` to pin offenders.
+- `package.json` dependencies stay pinned exactly, with no `^` or `~` ranges. Run `pnpm exec syncpack fix` to pin offenders.
 - Every source file carries an SPDX license header—see [Add SPDX headers](docs/how-tos/add-spdx-headers.md).
 
 Pull requests must pass type checks in [ci.yml](.github/workflows/ci.yml). Run type checks locally before committing when your change affects TypeScript code:
