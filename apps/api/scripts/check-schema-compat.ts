@@ -57,7 +57,8 @@ function git(args: string[]): string {
 /**
  * The git ref holding the last-shipped schemas. Defaults to `origin/develop`
  * (the merge target) when available, falling back to `HEAD` for local runs
- * before the branch is pushed. Override with `SCHEMA_COMPAT_BASE`.
+ * before the branch is pushed — which compares the branch with itself and so
+ * proves nothing. Override with `SCHEMA_COMPAT_BASE`.
  */
 function resolveBaseRef(): string {
   const override = process.env.SCHEMA_COMPAT_BASE;

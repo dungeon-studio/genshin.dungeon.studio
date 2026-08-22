@@ -3,8 +3,8 @@
 
 # Schema versioning conventions
 
-Boundaries, file layouts, naming, and the automated compatibility gate for
-versioned serialisation in this repository. For why versioning works this way, see
+Boundaries, file layouts, and naming for versioned serialisation in this
+repository. For why versioning works this way, see
 [Understanding schema versioning](../explanation/understanding-schema-versioning.md).
 For the steps, see [Add a schema version](../how-tos/add-schema-version.md).
 
@@ -75,31 +75,3 @@ When those boundaries are introduced: stamp every payload with a `version`
 field, keep one `schemas/v{n}.ts` file per version, write a strict serializer
 and a union deserializer, use the same `V{n}ConceptSchema` / `V{n}Concept`
 naming convention.
-
----
-
-## Compatibility gate
-
-Two checks hold the versioning rules. `schema-snapshots` runs on every commit
-and keeps the committed JSON Schema snapshots faithful to their Zod source.
-`schema-compat` runs on every pull request and proves that each version the base
-branch shipped still accepts the data stored under it.
-
-A released version's schema may only widen. Two changes fail the gate.
-
-**Narrowing a released version.** Add `v{n+1}` with a migration instead of
-editing `v{n}`.
-
-**Dropping a released version.** Deleting a version orphans the data still
-stored under it. No exemption exists.
-
-Versions the branch adds beyond the base carry no constraint—a new version is
-free to be as strict as its domain model demands.
-
-Without `origin/develop` present, a local `schema-compat` run compares the
-branch with itself and proves nothing.
-
-The wiring—snapshot roots, commands, base-ref resolution—lives in
-`.pre-commit-config.yaml` and `apps/api/scripts/check-schema-compat.ts`. Each
-app's `scripts/schema-registry.ts` lists the gated schemas and records why a
-snapshot captures one entry rather than the whole collection.
