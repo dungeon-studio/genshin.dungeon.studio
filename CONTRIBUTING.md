@@ -65,10 +65,6 @@ pnpm dev
 > [Configure Firestore credentials](docs/how-tos/configure-firestore-credentials.md)
 > for setup instructions.
 
-### Quality checks overview
-
-Pre-commit enforces formatting, linting, documentation, and hygiene checks on every commit and on pull requests. If checks fail, fix the issues—see [Code quality](#code-quality) for the tools involved.
-
 ### What your pull request has to pass
 
 - Every pre-commit hook. Run `pre-commit install` once, and the same hooks run on each commit that CI runs over the whole tree—so a clean commit is a clean build. The first commit afterward builds each hook's environment and can take several minutes. `pre-commit run --all-files` reproduces CI exactly.
@@ -100,15 +96,10 @@ Broken external URLs are the one exception: a weekly run files them as a GitHub 
 
 ## Code quality
 
-Pre-commit hooks automatically enforce key checks, including:
+[`.pre-commit-config.yaml`](.pre-commit-config.yaml) is the source of truth for which checks run. Two of them enforce project rules:
 
-- **Prettier** - Code formatting
-- **ESLint** - JavaScript/TypeScript linting with automatic fixes when possible
-- CSS linting with Tailwind directives
-- Documentation and config linting for Markdown, YAML, and prose
-- Safety and repository hygiene checks for merge conflict markers, large files, trailing whitespace, line endings, and YAML/JSON validation
-- Exact dependency versions via [syncpack](https://jamiemason.github.io/syncpack/): `package.json` dependencies stay pinned with no `^` or `~` ranges. Run `pnpm exec syncpack fix` to pin offenders
-- SPDX license headers via [REUSE](https://reuse.software/): every source file needs one—see [Add SPDX headers](docs/how-tos/add-spdx-headers.md)
+- `package.json` dependencies stay pinned exactly, with no `^` or `~` ranges. Run `pnpm exec syncpack fix` to pin offenders.
+- Every source file carries an SPDX license header—see [Add SPDX headers](docs/how-tos/add-spdx-headers.md).
 
 Pull requests must pass type checks in [ci.yml](.github/workflows/ci.yml). Run type checks locally before committing when your change affects TypeScript code:
 
