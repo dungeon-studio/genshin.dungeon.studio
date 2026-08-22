@@ -14,7 +14,7 @@ import * as Account from '@/repositories/account/index.js';
  * stores for it. One per caller, so the path is singular and carries no
  * identifier — the verified token names the account.
  *
- * It has no representation to fetch, only a lifecycle to end.
+ * It answers no `GET`; there is nothing to fetch.
  */
 export const account = new Hono<{
   Variables: AuthVariables & RequestLogVariables;
@@ -27,8 +27,7 @@ account.delete('/', async (c) => {
   const userId = c.get('user').uid;
 
   // Stored data first: a failure between the two leaves a signed-in user who
-  // can ask again, where deleting the identity first would strand the data
-  // with nobody left to request its erasure.
+  // can ask again, where the reverse strands data with nobody left to ask.
   await Account.eraseStoredData(userId);
   await deleteUser(userId);
 

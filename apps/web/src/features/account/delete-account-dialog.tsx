@@ -25,12 +25,7 @@ export interface DeleteAccountDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-/**
- * Confirm an erasure that cannot be undone.
- *
- * The control that opens this sits directly under "Sign out" in the same menu,
- * so a misclick has to survive typing a word before anything is deleted.
- */
+/** Confirm an erasure that cannot be undone. */
 export function DeleteAccountDialog({ open, onOpenChange }: DeleteAccountDialogProps): JSX.Element {
   const [confirmation, setConfirmation] = useState('');
   const { deleteAccount, isDeleting } = useDeleteAccount();

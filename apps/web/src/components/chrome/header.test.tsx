@@ -9,8 +9,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { AuthContext } from '@/features/auth/auth-context';
 
-// Reads `window.matchMedia`, which jsdom doesn't implement, and which side of
-// the session the header shows is what this file is about.
+// ThemeToggle reads `window.matchMedia`, which jsdom doesn't implement.
 vi.mock('@/components/chrome/theme-toggle', () => ({ ThemeToggle: () => null }));
 vi.mock('@/features/account', () => ({ AccountMenu: () => <div>account menu</div> }));
 

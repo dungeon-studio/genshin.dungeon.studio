@@ -21,10 +21,9 @@ function describeFailure(error: unknown): string {
 /**
  * Erase the signed-in account, then end the session it belonged to.
  *
- * The server deletes the identity, so the credentials this app holds outlive
- * the account they name. Signing out is what stops the app acting as somebody
- * who no longer exists, and clearing the cache is what stops it showing data
- * the user asked to have erased.
+ * The credentials this app holds outlive the identity the server deletes, so
+ * signing out is what stops it acting as somebody who no longer exists. The
+ * cache is cleared because it still holds data the user asked to have erased.
  */
 export function useDeleteAccount(): UseDeleteAccountResult {
   const queryClient = useQueryClient();

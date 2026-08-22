@@ -4,15 +4,13 @@
 import { db } from '@/firebase/firestore.js';
 
 /**
- * Erase every document the service stores for a user. The identity itself
- * survives this — erasing an account is this plus `deleteUser`.
+ * Erase every document the service stores for a user. The identity survives
+ * this; erasing an account is this plus `deleteUser`.
  *
- * Everything written on a user's behalf lives under `users/{userId}`, which is
- * what lets one recursive delete stay complete as features arrive: a
- * subcollection added after this was written is still covered. Data that
- * cannot live under that document — held in another service, or readable by
- * other users — is out of this subtree's reach and has to be erased here
- * explicitly.
+ * Everything written on a user's behalf lives under `users/{userId}`, so one
+ * recursive delete covers subcollections added after this was written. Data
+ * that cannot live under that document — held in another service, or readable
+ * by other users — is out of reach here and has to be erased explicitly.
  *
  * Neither atomic nor transactional. A failure part-way leaves some documents
  * deleted, so callers retry rather than compensate; erasing twice is

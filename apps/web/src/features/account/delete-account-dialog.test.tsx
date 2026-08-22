@@ -44,7 +44,6 @@ function renderDialog() {
 
 const deleteButton = () => screen.getByRole('button', { name: 'Delete account' });
 
-/** Type the confirmation the dialog asks for, then ask it to delete. */
 async function confirmDeletion(): Promise<void> {
   await userEvent.type(screen.getByRole('textbox'), 'delete');
   await userEvent.click(deleteButton());
@@ -108,7 +107,6 @@ describe('DeleteAccountDialog', () => {
     });
   });
 
-  // A request that never arrives carries no problem document to quote.
   it('still says something when the request never reaches the server', async () => {
     server.use(http.delete(ACCOUNT_URL, () => HttpResponse.error()));
     renderDialog();

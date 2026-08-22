@@ -110,8 +110,6 @@ async function signIn(page: Page): Promise<void> {
 
   // The header switching over is the signal that the credential reached the
   // app; waiting on the popup closing races the message it still has to send.
-  // The account menu is named for whoever it belongs to, so this also confirms
-  // the app took the identity it was handed.
   await expect(page.getByRole('button', { name: displayName })).toBeVisible();
 }
 

@@ -46,8 +46,6 @@ describe('DELETE /account', () => {
     expect(await res.text()).toBe('');
   });
 
-  // The caller names no account: whoever the token verified as is the only one
-  // this can erase.
   it('erases the account the token verified as', async () => {
     await deleteAccount();
 

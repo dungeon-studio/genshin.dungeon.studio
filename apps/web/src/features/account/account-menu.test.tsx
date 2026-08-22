@@ -43,8 +43,8 @@ describe('AccountMenu', () => {
     expect(signOut).toHaveBeenCalled();
   });
 
-  // Deleting is one item below signing out, so the confirmation standing
-  // between the two is the whole safety story.
+  // Deleting sits one item below signing out, so the confirmation is the only
+  // thing separating them.
   it('asks for confirmation before deleting the account', async () => {
     renderMenu();
     await openMenu();
