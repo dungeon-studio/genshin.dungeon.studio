@@ -6,8 +6,7 @@
 Boundaries, file layouts, and naming for versioned serialisation in this
 repository. For why versioning works this way, see
 [Understanding schema versioning](../explanation/understanding-schema-versioning.md).
-For the steps, see [Add a schema version](../how-tos/add-schema-version.md) and
-[Retire a schema version](../how-tos/retire-a-schema-version.md).
+For the steps, see [Add a schema version](../how-tos/add-schema-version.md).
 
 ---
 

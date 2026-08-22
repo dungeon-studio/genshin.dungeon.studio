@@ -59,9 +59,6 @@ breaks on the deployment that drops its version.
 Only a medium that expires its own contents, such as a cache TTL or a drained
 queue, reaches that state by itself. Stored payloads have to be rewritten.
 
-For the steps, see
-[Retire a schema version](../how-tos/retire-a-schema-version.md).
-
 ---
 
 ## Further reading
