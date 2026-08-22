@@ -58,8 +58,10 @@ jobs:
 
       # Seed property-based tests from the commit under test: a re-run of the same
       # commit replays identical inputs (so a failure reproduces), while a new
-      # commit or PR draws fresh inputs (so the generators keep exploring). The
-      # first 8 hex digits of the SHA become a 32-bit integer seed.
+      # commit or PR draws fresh inputs (so the generators keep exploring).
+      # Eight digits, not more: bash wraps a longer slice modulo 2^64. The
+      # integer check in apps/api/src/test/setup.ts accepts the negative result,
+      # so a wider slice fails silently.
       - name: Derive fast-check seed
         id: fast-check
         env:
