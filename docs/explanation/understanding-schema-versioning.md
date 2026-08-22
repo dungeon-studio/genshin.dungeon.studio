@@ -42,29 +42,21 @@ next deployment. See [Retiring old versions](#retiring-old-versions).
 **Don't widen the serializer's return type to cover older shapes.** The writer
 must be as strict as the current schema, not a superset of all historical ones.
 
+**Don't tighten a version's schema after it ships.** A one-keyword
+change—`maximum` → `exclusiveMaximum`—still parses but rejects payloads that
+were valid when they were written. Every narrowing gets a new version.
+
 ---
 
 ## Retiring old versions
 
 A version is safe to retire when no payload in the shared medium carries its
-stamp. The count of reads at that version is the signal, not the time elapsed
-since the new version shipped—how long the medium takes to drain is a property
-of the medium, not of the deployment that stopped writing to it.
+stamp. Each medium drains on its own schedule, so the count of reads at that
+version is the signal to act on rather than the time since the new version
+shipped.
 
 For the steps, see
 [Retire a schema version](../how-tos/retire-a-schema-version.md).
-
----
-
-## Missing CI checks
-
-- **Subsumption check.** No automated check verifies read-direction compatibility
-  (`V{n-1}Schema` values still accepted after migration to `V{n}Schema`). A
-  one-keyword tightening—`maximum` → `exclusiveMaximum`—silently breaks old
-  payloads. Tool: `jsoncompat` (Ostrow, SRECon Americas 2026).
-
-- **Old-version read metrics.** No instrumentation counts traversals of `up()`
-  paths, so retiring a version safely requires a manual audit of the medium.
 
 ---
 

@@ -25,7 +25,7 @@ The skew window determines how many old writer versions the reader must tolerate
 
 ---
 
-## Implementation: Firestore (current)
+## Implementation: Firestore
 
 Firestore repositories in `apps/api/src/repositories/` use Verzod.
 

@@ -3,9 +3,9 @@
 
 # Add a schema version
 
-This guide explains how to ship a new version of a versioned serialisation
-schema. Follow it whenever the shape at a boundary changes, rather than
-loosening the existing version.
+This guide explains how to ship a new schema version at a serialisation
+boundary. Follow it whenever the shape changes, rather than loosening the
+version already in use.
 
 For the file layouts and naming this repository uses, see
 [Schema versioning conventions](../reference/schema-versioning.md). For why a
