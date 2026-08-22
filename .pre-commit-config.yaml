@@ -141,7 +141,7 @@ repos:
       # outputs, so a cache hit would replay the log without rewriting
       # anything. Run `pnpm lint -- --fix` to apply the autofixes.
       - id: eslint
-        name: eslint
+        name: eslint (all workspaces)
         entry: pnpm exec turbo run lint
         language: system
         types_or: [javascript, jsx, ts, tsx]
@@ -161,7 +161,7 @@ repos:
         args: [--fix]
 
       - id: typescript-check
-        name: typescript type check
+        name: typescript type check (all workspaces)
         entry: pnpm exec turbo run typecheck
         language: system
         types_or: [ts, tsx]
