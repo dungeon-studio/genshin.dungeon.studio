@@ -77,7 +77,13 @@ jobs:
       # the separate build step in deploy.yml, which injects the real config.
       # apps/web's Codecov bundle report uploads from inside `vite build`, so the
       # token is consumed here rather than by the upload step below.
-      - name: Build
+      #
+      # `verify` is whatever a package checks about its own build; a package that
+      # defines none is passed over, so nothing package-specific belongs in this
+      # job. It runs in the same turbo invocation as `build` because these VITE_*
+      # values are part of the build task's hash — a second step without them
+      # would miss the cache and rebuild into the gate above.
+      - name: Build and verify
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           VITE_API_BASE_URL: https://api.invalid
@@ -88,25 +94,7 @@ jobs:
           VITE_FIREBASE_STORAGE_BUCKET: ci.invalid
           VITE_FIREBASE_MESSAGING_SENDER_ID: ci
           VITE_FIREBASE_APP_ID: ci
-        run: pnpm turbo run build --continue
-
-      - name: Verify Build Artifacts
-        run: bash apps/web/scripts/verify-build-output.sh
-
-      # Rebuilds apps/web to inspect what the bundle plugin collected; the
-      # uploading build above leaves nothing on disk. See the script for the
-      # failure it guards.
-      - name: Verify bundle stats
-        env:
-          VITE_API_BASE_URL: https://api.invalid
-          VITE_SITE_ORIGIN: https://ci.invalid
-          VITE_FIREBASE_API_KEY: ci
-          VITE_FIREBASE_AUTH_DOMAIN: ci.invalid
-          VITE_FIREBASE_PROJECT_ID: ci
-          VITE_FIREBASE_STORAGE_BUCKET: ci.invalid
-          VITE_FIREBASE_MESSAGING_SENDER_ID: ci
-          VITE_FIREBASE_APP_ID: ci
-        run: pnpm --filter @genshin/web verify:bundle-stats
+        run: pnpm turbo run build verify --continue
 
       - name: Upload coverage and test results to Codecov
         if: ${{ !cancelled() }}
@@ -117,8 +105,8 @@ jobs:
   # Proves the PR's persisted-data schemas stay backward-compatible with the ones
   # on its base branch — Firestore documents (apps/api) and localStorage snapshots
   # written by zustand `persist` (apps/web). A branch-vs-base invariant, so it's
-  # its own PR-only job with the base ref in hand — not a step in the per-package
-  # matrix above. It diffs committed JSON snapshots, so it needs the install but
+  # its own PR-only job with the base ref in hand rather than a `verify` task in
+  # the job above. It diffs committed JSON snapshots, so it needs the install but
   # no workspace build.
   schema-compat:
     name: Check schema compatibility
