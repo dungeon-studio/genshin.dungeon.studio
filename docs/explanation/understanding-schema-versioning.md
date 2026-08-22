@@ -48,6 +48,24 @@ were valid when they were written. Every narrowing gets a new version.
 
 ---
 
+## Why a checker holds the rules
+
+The narrowing rule is invisible to review. The `exclusiveMaximum` diff
+type-checks and passes every test written against the current shape. The
+payloads it breaks are already in the medium, and nothing in the change points
+at them. No reviewer catches that reliably across a schema of any size, so a
+subsumption checker decides it instead: `schema-compat` fails the pull request
+when a released version stops accepting its own data.
+
+The comparison runs between the branch and its base, version by version. The
+alternative—asking whether v0 subsumes v1—tests the wrong property: consecutive
+versions are free to differ, because the `up()` migration bridges them. What
+must hold is that each released version still accepts the payloads written
+under it. The base branch's copy of that version is the only record of what
+those payloads look like.
+
+---
+
 ## Retiring old versions
 
 A version is safe to retire when no payload in the shared medium carries its
@@ -58,6 +76,9 @@ breaks on the deployment that drops its version.
 
 Only a medium that expires its own contents, such as a cache TTL or a drained
 queue, reaches that state by itself. Stored payloads have to be rewritten.
+
+`schema-compat` refuses to drop a released version regardless of what the
+medium shows, so a retirement means changing the check too.
 
 ---
 
