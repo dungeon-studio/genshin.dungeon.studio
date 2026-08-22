@@ -67,7 +67,7 @@ pnpm dev
 
 ### Quality checks overview
 
-Pre-commit enforces formatting, linting, documentation, and hygiene checks on every commit and on pull requests. If checks fail, fix the issues—see [Code quality](#code-quality) for the tools involved.
+Pre-commit enforces formatting, linting, documentation, and hygiene checks on every commit and on pull requests. If checks fail, fix the issues—see [Code quality](#code-quality).
 
 ### What your pull request has to pass
 
@@ -100,15 +100,14 @@ Broken external URLs are the one exception: a weekly run files them as a GitHub 
 
 ## Code quality
 
-Pre-commit hooks automatically enforce key checks, including:
+The checks live in [.pre-commit-config.yaml](.pre-commit-config.yaml), and `pre-commit run --all-files` runs them and names each one. Some repair what they find and fail the commit so you can restage the result. Others only report.
 
-- **Prettier** - Code formatting
-- **ESLint** - JavaScript/TypeScript linting across every workspace. It reports rather than rewrites. `pnpm lint -- --fix` applies the fixes it can make
-- CSS linting with Tailwind directives
-- Documentation and config linting for Markdown, YAML, and prose
-- Safety and repository hygiene checks for merge conflict markers, large files, trailing whitespace, line endings, and YAML/JSON validation
-- Exact dependency versions via [syncpack](https://jamiemason.github.io/syncpack/): `package.json` dependencies stay pinned with no `^` or `~` ranges. Run `pnpm exec syncpack fix` to pin offenders
-- SPDX license headers via [REUSE](https://reuse.software/): every source file needs one—see [Add SPDX headers](docs/how-tos/add-spdx-headers.md)
+Two report findings they could repair, so each has a command:
+
+- ESLint: `pnpm lint -- --fix`
+- [syncpack](https://jamiemason.github.io/syncpack/), which keeps `package.json` dependencies pinned with no `^` or `~` ranges: `pnpm exec syncpack fix`
+
+Every source file needs an SPDX header—see [Add SPDX headers](docs/how-tos/add-spdx-headers.md).
 
 Every commit type checks the whole workspace, and [ci.yml](.github/workflows/ci.yml) checks it again. Turborepo caches both, so an unchanged check replays instead of rerunning. To see the result without committing:
 
