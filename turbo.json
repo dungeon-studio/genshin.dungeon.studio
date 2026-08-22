@@ -62,6 +62,10 @@
         "tsconfig*.json"
       ]
     },
+    "verify": {
+      "dependsOn": ["build"],
+      "cache": false
+    },
     "schemas:export": {
       "dependsOn": ["^build"],
       "inputs": ["src/**/schemas/**", "scripts/export-schemas.ts", "scripts/schema-registry.ts"],
