@@ -1,0 +1,80 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+# Copyright and licensing for files that cannot carry inline SPDX headers.
+
+version = 1
+SPDX-PackageName = "genshin.dungeon.studio"
+SPDX-PackageSupplier = "Alex Brandt <alunduil@gmail.com>"
+SPDX-PackageDownloadLocation = "https://github.com/dungeon-studio/genshin.dungeon.studio"
+
+[[annotations]]
+path = [
+  "pnpm-lock.yaml",
+  ".turbo",
+  ".turbo/**",
+  "dist",
+  "dist/**",
+  "node_modules",
+  "node_modules/**",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = "**/.terraform.lock.hcl"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
+SPDX-License-Identifier = "MIT"
+
+# Vendored from errata-ai:
+# https://github.com/errata-ai/Google
+# https://github.com/errata-ai/Microsoft
+# https://github.com/errata-ai/readability
+
+[[annotations]]
+path = [
+  ".styles/Google",
+  ".styles/Google/**",
+  ".styles/Microsoft",
+  ".styles/Microsoft/**",
+  ".styles/Readability",
+  ".styles/Readability/**",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Joseph Kato and contributors"
+SPDX-License-Identifier = "MIT"
+
+# Vendored from https://github.com/get-alex/alex
+
+[[annotations]]
+path = [".styles/alex", ".styles/alex/**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2015 Titus Wormer and contributors"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = ["**.json", ".prettierrc", ".nvmrc"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = [
+  "apps/web/public/elements/**.png",
+  "apps/web/public/weapon-types/**.png",
+  "apps/web/public/**.ico",
+  "apps/web/public/**.png",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
+SPDX-License-Identifier = "MIT"
+
+# Frontmatter must be the first line, leaving no room for a header.
+
+[[annotations]]
+path = ".claude/commands/**.md"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
+SPDX-License-Identifier = "MIT"
