@@ -78,11 +78,11 @@ jobs:
       # apps/web's Codecov bundle report uploads from inside `vite build`, so the
       # token is consumed here rather than by the upload step below.
       #
-      # `verify` is whatever a package checks about its own build; a package that
-      # defines none is passed over, so nothing package-specific belongs in this
-      # job. It runs in the same turbo invocation as `build` because these VITE_*
-      # values are part of the build task's hash — a second step without them
-      # would miss the cache and rebuild into the gate above.
+      # A package's `verify` task checks its own build output. Turbo passes over
+      # a package that defines none, so this job needs no package-specific step.
+      # `verify` shares one invocation with `build` because the VITE_* values are
+      # part of the build task's hash: a separate step without them misses the
+      # cache and rebuilds without the config this step supplies.
       - name: Build and verify
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
