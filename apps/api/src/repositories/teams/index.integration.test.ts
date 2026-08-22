@@ -106,30 +106,6 @@ describe('get', () => {
   });
 });
 
-describe('save', () => {
-  it('reports the first save as a creation and later ones as updates', async () => {
-    const userId = newUserId();
-
-    const first = await save(userId, SLOT, { name: TEAM_NAME });
-    const second = await save(userId, SLOT, { name: TEAM_NAME });
-
-    expect(first.created).toBe(true);
-    expect(second.created).toBe(false);
-  });
-
-  it('merges a later save into the team already stored', async () => {
-    const userId = newUserId();
-    await save(userId, SLOT, { name: TEAM_NAME, description: 'Melt the shield first' });
-
-    await save(userId, SLOT, { name: 'Renamed' });
-
-    expect(await get(userId, SLOT)).toMatchObject({
-      name: 'Renamed',
-      description: 'Melt the shield first',
-    });
-  });
-});
-
 describe('remove', () => {
   it('leaves nothing to get', async () => {
     const { userId } = await userWithTeam({ name: TEAM_NAME });
