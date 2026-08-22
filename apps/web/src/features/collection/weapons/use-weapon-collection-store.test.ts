@@ -9,8 +9,8 @@ import { makeWeapon } from '@/test/fixtures';
 
 import { useWeaponCollectionStore } from './use-weapon-collection-store';
 
-// Two distinct weapons, so a filtered read has something to leave out. Taken
-// from game data, so a roster change cannot strand the suite.
+// Two weapons from game data, so a filtered read has something to leave out
+// and a roster change cannot strand the suite.
 const [WEAPON, OTHER_WEAPON] = WEAPON_ROSTER;
 
 function storedWeapon(weaponInstanceId: CollectionWeaponId): CollectionWeapon | undefined {

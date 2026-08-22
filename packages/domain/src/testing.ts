@@ -4,13 +4,9 @@
 /**
  * Literal test objects for the collection domain types, shared by API and web.
  *
- * Example and contract tests want stable, named values, so these are builders
- * rather than fast-check arbitraries: `fc.sample` is non-deterministic without
- * a fixed seed, and a test asserting on a value would have to override the
- * generated field anyway. Property-based suites keep their own arbitraries.
- *
- * Reachable from `@genshin/domain/testing` so a field added to a collection
- * type is answered here rather than in every suite that builds one.
+ * Example and contract tests assert on the values they build, so these hand
+ * back stable ones. Suites wanting generated values keep their own fast-check
+ * arbitraries.
  */
 
 import {
@@ -81,9 +77,8 @@ export function makeTeam(slot: TeamSlot, overrides: Partial<CollectionTeam> = {}
 /**
  * Wrap entities in the collection envelope the routes serve.
  *
- * Goes through `serialiseCollection` rather than `buildCollection` so a fixture
- * carries the representation's template. A hand-rolled envelope omits it, and
- * the suites then parse a document the API never sends.
+ * The envelope carries the representation's template, without which the suites
+ * assert against a document the API never sends.
  */
 function collectionDocument<T>(
   representation: CollectionJsonRepresentation<T>,
