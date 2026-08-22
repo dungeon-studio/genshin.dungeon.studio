@@ -131,21 +131,25 @@ repos:
   # and aren't perturbed by pre-commit autoupdate.
   - repo: local
     hooks:
-      # Delegated to turbo rather than handed the staged files, because eslint
-      # is only correct with the consuming workspace as its working directory
-      # and its dependencies built. From the root it resolves neither: the
-      # `@/*` aliases in a workspace tsconfig go unresolved, and unbuilt
-      # sibling `dist/` leaves type-aware rules seeing `any`. Both report
-      # findings that `eslint .` in the workspace does not. That rules out
-      # `--fix` as well — turbo caches on inputs and `lint` declares no
+      # Delegated to turbo rather than handed the staged files: eslint is only
+      # correct with the consuming workspace as its working directory and its
+      # dependencies built. From the root a workspace's `@/*` aliases go
+      # unresolved and unbuilt sibling `dist/` leaves type-aware rules seeing
+      # `any`, so it reports findings `eslint .` does not. That rules out
+      # `--fix` too, since turbo caches on inputs while `lint` declares no
       # outputs, so a cache hit would replay the log without rewriting
-      # anything. Run `pnpm lint -- --fix` to apply the autofixes.
+      # anything. Run `pnpm lint -- --fix` to apply them.
+      #
+      # Unfiltered because turbo already knows what is stale, and saying it
+      # again here can only disagree: the `lint` inputs include `package.json`
+      # and `tsconfig*.json`, so a matcher naming just the module extensions
+      # skips a tsconfig edit that flips a workspace from clean to failing.
       - id: eslint
         name: eslint (all workspaces)
         entry: pnpm exec turbo run lint
         language: system
-        types_or: [javascript, jsx, ts, tsx]
         pass_filenames: false
+        always_run: true
 
       - id: prettier
         name: prettier
@@ -160,12 +164,15 @@ repos:
         types: [css]
         args: [--fix]
 
+      # Unfiltered for the reason given above eslint: turbo's `typecheck`
+      # inputs reach past the module extensions to `package.json`,
+      # `tsconfig*.json`, and the vite and playwright configs.
       - id: typescript-check
         name: typescript type check (all workspaces)
         entry: pnpm exec turbo run typecheck
         language: system
-        types_or: [ts, tsx]
         pass_filenames: false
+        always_run: true
 
       # knip analyzes the whole workspace graph, so it can't be file-scoped and
       # runs on every commit.
