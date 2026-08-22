@@ -2,12 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
-import type {
-  CollectionCharacter,
-  CollectionTeam,
-  CollectionTeamMember,
-  CollectionWeapon,
-} from '@genshin/domain';
+import type { CollectionTeam, CollectionTeamMember } from '@genshin/domain';
+import { makeCharacter, makeTeam, makeWeapon } from '@genshin/domain/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '@/app.js';
@@ -42,26 +38,16 @@ function soloMembers(member: CollectionTeamMember): CollectionTeam['members'] {
   return [member, null, null, null];
 }
 
-const FAKE_TEAM: CollectionTeam = {
-  slot: 1,
-  name: 'Team 1',
+const FAKE_TEAM = makeTeam(1, {
   members: [
     { characterId: 'hu-tao', weaponInstanceId: 'uuid-1' },
     { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
     { characterId: 'zhongli', weaponInstanceId: 'uuid-3' },
     { characterId: 'albedo', weaponInstanceId: 'uuid-4' },
   ],
-  createdAt: '2026-01-01T00:00:00.000Z' as CollectionTeam['createdAt'],
-  updatedAt: '2026-03-13T00:00:00.000Z' as CollectionTeam['updatedAt'],
-};
+});
 
-const FAKE_EMPTY_TEAM: CollectionTeam = {
-  slot: 2,
-  name: 'Team 2',
-  members: [null, null, null, null],
-  createdAt: '2026-01-01T00:00:00.000Z' as CollectionTeam['createdAt'],
-  updatedAt: '2026-03-13T00:00:00.000Z' as CollectionTeam['updatedAt'],
-};
+const FAKE_EMPTY_TEAM = makeTeam(2);
 
 const EXPECTED_CONTENT_TYPE = toMediaTypeString(
   { mediaType: COLLECTION_JSON, profile: teamItemV1 },
@@ -69,22 +55,11 @@ const EXPECTED_CONTENT_TYPE = toMediaTypeString(
 );
 
 function mockCharacterOwned() {
-  vi.mocked(Characters.get).mockResolvedValue({
-    characterId: 'hu-tao',
-    constellationLevel: 0,
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
-  } as CollectionCharacter);
+  vi.mocked(Characters.get).mockResolvedValue(makeCharacter('hu-tao'));
 }
 
 function mockWeaponOwned() {
-  vi.mocked(Weapons.get).mockResolvedValue({
-    weaponInstanceId: 'uuid-1',
-    weaponId: 'staff-of-homa',
-    refinementLevel: 1,
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
-  } as CollectionWeapon);
+  vi.mocked(Weapons.get).mockResolvedValue(makeWeapon('uuid-1', 'staff-of-homa'));
 }
 
 describe('Team routes', () => {

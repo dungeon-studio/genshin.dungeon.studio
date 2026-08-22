@@ -1,13 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { ISOTimestamp } from '@genshin/domain';
 import type { Character, WeaponType } from '@genshin/game-data';
 import { CHARACTER_ROSTER } from '@genshin/game-data';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { CharacterCollection } from '@/features/collection/characters/use-character-collection-store';
+import { makeCharacter } from '@/test/fixtures';
 
 import { CharacterPool } from './character-pool';
 import { useTeamStore } from './use-team-store';
@@ -23,17 +23,7 @@ const BOW_USER = characterWielding('Bow');
 const CLAYMORE_USER = characterWielding('Claymore');
 
 function owned(...characters: Character[]): CharacterCollection {
-  return Object.fromEntries(
-    characters.map((c) => [
-      c.id,
-      {
-        characterId: c.id,
-        constellationLevel: 0,
-        createdAt: '2026-01-01T00:00:00.000Z' as ISOTimestamp,
-        updatedAt: '2026-01-01T00:00:00.000Z' as ISOTimestamp,
-      },
-    ]),
-  );
+  return Object.fromEntries(characters.map((c) => [c.id, makeCharacter(c.id)]));
 }
 
 describe('CharacterPool', () => {

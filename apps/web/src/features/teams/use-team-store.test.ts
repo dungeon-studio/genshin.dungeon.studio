@@ -1,9 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionTeam, CollectionWeaponId, ISOTimestamp, TeamSlot } from '@genshin/domain';
+import type { CollectionWeaponId, TeamSlot } from '@genshin/domain';
 import { initialTeams } from '@genshin/domain';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { makeTeam } from '@/test/fixtures';
 
 import { useTeamStore } from './use-team-store';
 
@@ -280,13 +282,10 @@ describe('useTeamStore', () => {
 
   describe('setTeam', () => {
     it('replaces a single team', () => {
-      const custom: CollectionTeam = {
-        slot: 3,
+      const custom = makeTeam(3, {
         name: 'Freeze',
         members: [{ characterId: 'ganyu' }, null, null, null],
-        createdAt: '2026-01-01T00:00:00.000Z' as ISOTimestamp,
-        updatedAt: '2026-01-01T00:00:00.000Z' as ISOTimestamp,
-      };
+      });
       useTeamStore.getState().setTeam(3, custom);
 
       expect(useTeamStore.getState().teams[3]).toEqual(custom);
