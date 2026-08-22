@@ -65,10 +65,6 @@ pnpm dev
 > [Configure Firestore credentials](docs/how-tos/configure-firestore-credentials.md)
 > for setup instructions.
 
-### Quality checks overview
-
-Pre-commit enforces formatting, linting, documentation, and hygiene checks on every commit and on pull requests. If checks fail, fix the issues—[`.pre-commit-config.yaml`](.pre-commit-config.yaml) names the tool behind each one.
-
 ### What your pull request has to pass
 
 - Every pre-commit hook. Run `pre-commit install` once, and the same hooks run on each commit that CI runs over the whole tree—so a clean commit is a clean build. The first commit afterward builds each hook's environment and can take several minutes. `pre-commit run --all-files` reproduces CI exactly.
@@ -100,7 +96,7 @@ Broken external URLs are the one exception: a weekly run files them as a GitHub 
 
 ## Code quality
 
-Pre-commit runs the formatting, linting, and hygiene checks. [`.pre-commit-config.yaml`](.pre-commit-config.yaml) is the source of truth for which ones. Two of them enforce conventions you can't read off the tool:
+Pre-commit runs the formatting, linting, documentation, and hygiene checks. [`.pre-commit-config.yaml`](.pre-commit-config.yaml) is the source of truth for which ones. Two of them enforce conventions you can't read off the tool:
 
 - Dependency versions stay exact: `package.json` dependencies carry no `^` or `~` ranges. Run `pnpm exec syncpack fix` to pin offenders.
 - Every source file carries an SPDX license header—see [Add SPDX headers](docs/how-tos/add-spdx-headers.md).
