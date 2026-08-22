@@ -35,6 +35,17 @@ Update imports and re-exports. Update the serializer's return type to
 Add a `makeV{n}Payload()` fixture. Verify migration from every prior version
 and that the serializer stamps `CURRENT_VERSION`.
 
+## 5) Regenerate and commit the snapshot
+
+Run `pnpm turbo run schemas:export` and commit the new
+`schema-snapshots/{name}/v{n}.json`. The `schema-snapshots` pre-commit hook runs
+the same command, so a commit that omits the snapshot fails until you stage what
+the hook writes.
+
+Leave the earlier `v{n-1}.json` untouched. The
+[compatibility gate](../reference/schema-versioning.md#compatibility-gate)
+fails the pull request if an already-released snapshot narrows or disappears.
+
 ---
 
 The deserializer doesn't change; Verzod handles the new version automatically

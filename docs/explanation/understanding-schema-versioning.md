@@ -48,6 +48,44 @@ were valid when they were written. Every narrowing gets a new version.
 
 ---
 
+## Why a checker holds the rules
+
+That last rule is invisible to review. The `exclusiveMaximum` diff type-checks
+and passes every test written against the current shape; the payloads it breaks
+are the ones already sitting in the medium, and nothing in the change points at
+them. No reviewer catches that reliably across a schema of any size, so a
+subsumption checker decides it instead. The
+[compatibility gate](../reference/schema-versioning.md#compatibility-gate)
+compares JSON Schema renderings of each version with `jsoncompat` and fails the
+pull request when a released version stops accepting its own data.
+
+The comparison runs between the branch and its base, version by version. The
+alternative—asking whether v0 subsumes v1—tests a property this repository
+doesn't want: consecutive versions are free to be unrelated, because the `up()`
+migration bridges them. What must hold is that each released version still
+accepts the payloads written under it, and the last-shipped copy of that
+version is the only honest statement of what those payloads look like.
+
+That framing also decides where the gate runs. A base-branch comparison needs a
+merge target, which a commit doesn't have, so the proof is a pull request job
+rather than a pre-commit hook. Only the drift check—do the committed snapshots
+still match their Zod source?—is a pure function of the working tree, and that
+one is a hook.
+
+---
+
+## Why the snapshots hold one record
+
+`jsoncompat` reasons about named properties. A `Record` renders as
+`additionalProperties`, and the checker treats the value schema underneath it
+as opaque, so a gate pointed at a whole-store blob would report compatibility
+while every field inside the records went unchecked. A snapshot of the entry
+puts the fields that actually change back under the checker. The Firestore side
+lands in the same place for the same reason: the snapshot is one document, not
+the collection.
+
+---
+
 ## Retiring old versions
 
 A version is safe to retire when no payload in the shared medium carries its
@@ -58,6 +96,10 @@ breaks on the deployment that drops its version.
 
 Only a medium that expires its own contents, such as a cache TTL or a drained
 queue, reaches that state by itself. Stored payloads have to be rewritten.
+
+The gate offers no way to record that conclusion: deleting a snapshot the base
+branch shipped always fails the pull request. No version has needed retiring
+yet, so no exemption exists and the first real retirement designs it.
 
 ---
 

@@ -3,8 +3,8 @@
 
 # Schema versioning conventions
 
-Boundaries, file layouts, and naming for versioned serialisation in this
-repository. For why versioning works this way, see
+Boundaries, file layouts, naming, and the automated compatibility gate for
+versioned serialisation in this repository. For why versioning works this way, see
 [Understanding schema versioning](../explanation/understanding-schema-versioning.md).
 For the steps, see [Add a schema version](../how-tos/add-schema-version.md).
 
@@ -66,18 +66,6 @@ store keeps a Zod schema per version under
 user re-merges from the server afterward, so a dropped local record is never a
 real loss.
 
-The committed snapshots live under `apps/web/schema-snapshots/{store}/v{n}.json`,
-keyed by the `persist` store name. Each captures the **per-record entry**, not
-the whole-store blob: jsoncompat can't see into a `Record` value
-(`additionalProperties`), so gating the wrapper would leave the entry fields
-unchecked. This matches the Firestore side, which snapshots one document rather
-than the collection.
-
-The snapshots regenerate from their Zod source through the `schemas:export` drift
-hook. The base-branch widening check (`apps/api/scripts/check-schema-compat.ts`,
-run in CI) scans the Firestore and local-storage snapshot roots alike: a released
-version's schema may only widen.
-
 ---
 
 ## Implementation: Other boundaries
@@ -87,3 +75,52 @@ When those boundaries are introduced: stamp every payload with a `version`
 field, keep one `schemas/v{n}.ts` file per version, write a strict serializer
 and a union deserializer, use the same `V{n}ConceptSchema` / `V{n}Concept`
 naming convention.
+
+---
+
+## Compatibility gate
+
+Two automated checks hold the versioning rules. Both read the committed JSON
+Schema snapshots, which `z.toJSONSchema()` renders from the Zod source.
+
+| Check              | Where it runs                                        | What it proves                                                               |
+| ------------------ | ---------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `schema-snapshots` | `pre-commit`, on any change under a schema directory | The committed snapshots match their Zod source                               |
+| `schema-compat`    | `ci.yml` job, pull requests only                     | Every version the base branch shipped still accepts the data stored under it |
+
+### Snapshot roots
+
+| Root                                               | Captures                   |
+| -------------------------------------------------- | -------------------------- |
+| `apps/api/schema-snapshots/{repository}/v{n}.json` | One Firestore document     |
+| `apps/web/schema-snapshots/{store}/v{n}.json`      | One `persist` store record |
+
+Each root is keyed by the repository or `persist` store name. Both capture a
+single record rather than the collection or the whole-store blob—see
+[Why the snapshots hold one record](../explanation/understanding-schema-versioning.md#why-the-snapshots-hold-one-record).
+
+Regenerate with `pnpm turbo run schemas:export`. The `schema-snapshots` hook
+runs the same command and fails when the result differs from what's committed.
+The export also refuses to write when `CURRENT_VERSION` doesn't point at the
+newest defined version.
+
+### What fails the gate
+
+`schema-compat` asks jsoncompat whether each base-branch snapshot is
+deserializer-compatible with its counterpart on the branch: the branch's schema
+must still accept everything the base's did. Two changes fail it.
+
+**Narrowing a released version.** Editing `v{n}.ts` so its snapshot rejects a
+payload the base branch accepted. Widen it back, or add `v{n+1}` with a
+migration and leave `v{n}` alone.
+
+**Dropping a released version.** Deleting a snapshot the base branch shipped
+orphans data still stored under it. There is no exemption list; restore the
+version and re-export.
+
+Versions the branch adds beyond the base carry no constraint—a new version is
+free to be as strict as its domain model demands.
+
+The job passes the pull request's base branch as `SCHEMA_COMPAT_BASE`. Run
+locally, the script defaults to `origin/develop`. It falls back to `HEAD` when
+that ref is absent, which compares the branch with itself and proves nothing.
