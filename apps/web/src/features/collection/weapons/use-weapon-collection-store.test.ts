@@ -1,25 +1,17 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionWeapon, CollectionWeaponId, ISOTimestamp } from '@genshin/domain';
-import type { Weapon } from '@genshin/game-data';
+import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
+import { WEAPON_ROSTER } from '@genshin/game-data';
 import { beforeEach, describe, expect, it } from 'vitest';
+
+import { makeWeapon } from '@/test/fixtures';
 
 import { useWeaponCollectionStore } from './use-weapon-collection-store';
 
-function makeWeapon(
-  weaponInstanceId: string,
-  weaponId: string,
-  refinementLevel = 1,
-): CollectionWeapon {
-  return {
-    weaponInstanceId,
-    weaponId: weaponId as Weapon['id'],
-    refinementLevel,
-    createdAt: '2026-01-01T00:00:00.000Z' as ISOTimestamp,
-    updatedAt: '2026-01-01T00:00:00.000Z' as ISOTimestamp,
-  };
-}
+// Two weapons from game data, so a filtered read has something to leave out
+// and a roster change cannot strand the suite.
+const [WEAPON, OTHER_WEAPON] = WEAPON_ROSTER;
 
 function storedWeapon(weaponInstanceId: CollectionWeaponId): CollectionWeapon | undefined {
   return useWeaponCollectionStore.getState().weapons[weaponInstanceId];
@@ -32,7 +24,7 @@ describe('useWeaponCollectionStore', () => {
 
   describe('addWeapon', () => {
     it('adds a weapon to the collection', () => {
-      const weapon = makeWeapon('inst-1', 'sword-1');
+      const weapon = makeWeapon('inst-1', WEAPON.id);
       useWeaponCollectionStore.getState().addWeapon(weapon);
 
       expect(storedWeapon('inst-1')).toEqual(weapon);
@@ -41,7 +33,7 @@ describe('useWeaponCollectionStore', () => {
 
   describe('removeWeapon', () => {
     it('removes a weapon by instance id', () => {
-      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', 'sword-1'));
+      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', WEAPON.id));
       useWeaponCollectionStore.getState().removeWeapon('inst-1');
 
       expect(storedWeapon('inst-1')).toBeUndefined();
@@ -50,14 +42,14 @@ describe('useWeaponCollectionStore', () => {
 
   describe('setRefinementLevel', () => {
     it('updates the refinement level', () => {
-      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', 'sword-1'));
+      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', WEAPON.id));
       useWeaponCollectionStore.getState().setRefinementLevel('inst-1', 3);
 
       expect(storedWeapon('inst-1')?.refinementLevel).toBe(3);
     });
 
     it('ignores invalid refinement levels', () => {
-      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', 'sword-1'));
+      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', WEAPON.id));
       useWeaponCollectionStore.getState().setRefinementLevel('inst-1', 0);
       useWeaponCollectionStore.getState().setRefinementLevel('inst-1', 6);
 
@@ -73,21 +65,17 @@ describe('useWeaponCollectionStore', () => {
 
   describe('getWeaponsByWeaponId', () => {
     it('returns all instances of a specific weapon', () => {
-      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', 'sword-1'));
-      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-2', 'sword-1'));
-      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-3', 'bow-1'));
+      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', WEAPON.id));
+      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-2', WEAPON.id));
+      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-3', OTHER_WEAPON.id));
 
-      const swords = useWeaponCollectionStore
-        .getState()
-        .getWeaponsByWeaponId('sword-1' as Weapon['id']);
+      const instances = useWeaponCollectionStore.getState().getWeaponsByWeaponId(WEAPON.id);
 
-      expect(swords).toHaveLength(2);
+      expect(instances).toHaveLength(2);
     });
 
     it('returns empty array when no instances exist', () => {
-      const result = useWeaponCollectionStore
-        .getState()
-        .getWeaponsByWeaponId('missing' as Weapon['id']);
+      const result = useWeaponCollectionStore.getState().getWeaponsByWeaponId(OTHER_WEAPON.id);
 
       expect(result).toEqual([]);
     });
@@ -95,10 +83,10 @@ describe('useWeaponCollectionStore', () => {
 
   describe('setWeapons', () => {
     it('replaces the entire collection', () => {
-      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', 'sword-1'));
+      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', WEAPON.id));
 
       const newWeapons = {
-        'inst-2': makeWeapon('inst-2', 'bow-1'),
+        'inst-2': makeWeapon('inst-2', OTHER_WEAPON.id),
       };
       useWeaponCollectionStore.getState().setWeapons(newWeapons);
 
@@ -109,8 +97,8 @@ describe('useWeaponCollectionStore', () => {
 
   describe('clearWeapons', () => {
     it('empties the collection', () => {
-      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', 'sword-1'));
-      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-2', 'bow-1'));
+      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', WEAPON.id));
+      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-2', OTHER_WEAPON.id));
       useWeaponCollectionStore.getState().clearWeapons();
 
       expect(Object.keys(useWeaponCollectionStore.getState().weapons)).toHaveLength(0);

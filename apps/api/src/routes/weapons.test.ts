@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
-import type { CollectionWeapon } from '@genshin/domain';
 import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
+import { makeWeapon } from '@genshin/domain/testing';
 import { getWeaponById } from '@genshin/game-data';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -30,20 +30,14 @@ vi.mock('@genshin/game-data', () => ({
   getWeaponById: vi.fn(),
 }));
 
-const FAKE_WEAPON: CollectionWeapon = {
-  weaponInstanceId: 'instance-uuid-1',
-  weaponId: 'mistsplitter-reforged',
-  refinementLevel: 1,
-  createdAt: '2026-01-01T00:00:00.000Z' as CollectionWeapon['createdAt'],
-  updatedAt: '2026-03-13T00:00:00.000Z' as CollectionWeapon['updatedAt'],
-};
+const FAKE_WEAPON = makeWeapon('instance-uuid-1', 'mistsplitter-reforged');
 
 const FAKE_WEAPON_ITEM_DATA = [
-  { name: 'weaponInstanceId', value: 'instance-uuid-1' },
-  { name: 'weaponId', value: 'mistsplitter-reforged' },
-  { name: 'refinementLevel', value: 1 },
-  { name: 'createdAt', value: '2026-01-01T00:00:00.000Z' },
-  { name: 'updatedAt', value: '2026-03-13T00:00:00.000Z' },
+  { name: 'weaponInstanceId', value: FAKE_WEAPON.weaponInstanceId },
+  { name: 'weaponId', value: FAKE_WEAPON.weaponId },
+  { name: 'refinementLevel', value: FAKE_WEAPON.refinementLevel },
+  { name: 'createdAt', value: FAKE_WEAPON.createdAt },
+  { name: 'updatedAt', value: FAKE_WEAPON.updatedAt },
 ];
 
 const EXPECTED_CONTENT_TYPE = toMediaTypeString(

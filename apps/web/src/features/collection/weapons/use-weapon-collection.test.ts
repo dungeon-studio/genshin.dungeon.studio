@@ -39,7 +39,9 @@ describe('useWeaponCollection', () => {
       server.use(
         http.get('http://localhost:8080/weapons', () => HttpResponse.json(serverWeapons)),
         http.post('http://localhost:8080/weapons', () => {
-          serverWeapons = weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 1)]);
+          serverWeapons = weaponsDocument([
+            makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 }),
+          ]);
           return HttpResponse.json(serverWeapons);
         }),
       );
@@ -57,10 +59,14 @@ describe('useWeaponCollection', () => {
     it('creates another instance even when the weapon is already owned', async () => {
       server.use(
         http.get('http://localhost:8080/weapons', () =>
-          HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 1)])),
+          HttpResponse.json(
+            weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 })]),
+          ),
         ),
         http.post('http://localhost:8080/weapons', () =>
-          HttpResponse.json(weaponsDocument([makeWeapon(SECOND_INSTANCE_ID, WEAPON_ID, 1)])),
+          HttpResponse.json(
+            weaponsDocument([makeWeapon(SECOND_INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 })]),
+          ),
         ),
       );
 
@@ -84,7 +90,9 @@ describe('useWeaponCollection', () => {
         http.get('http://localhost:8080/weapons', () => HttpResponse.json(serverWeapons)),
         http.post('http://localhost:8080/weapons', () => {
           posts += 1;
-          serverWeapons = weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 1)]);
+          serverWeapons = weaponsDocument([
+            makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 }),
+          ]);
           return HttpResponse.json(serverWeapons);
         }),
       );
@@ -106,11 +114,15 @@ describe('useWeaponCollection', () => {
       let posts = 0;
       server.use(
         http.get('http://localhost:8080/weapons', () =>
-          HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 1)])),
+          HttpResponse.json(
+            weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 })]),
+          ),
         ),
         http.post('http://localhost:8080/weapons', () => {
           posts += 1;
-          return HttpResponse.json(weaponsDocument([makeWeapon(SECOND_INSTANCE_ID, WEAPON_ID, 1)]));
+          return HttpResponse.json(
+            weaponsDocument([makeWeapon(SECOND_INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 })]),
+          );
         }),
       );
 
@@ -129,7 +141,9 @@ describe('useWeaponCollection', () => {
     it('restores a removed weapon when the delete fails', async () => {
       server.use(
         http.get('http://localhost:8080/weapons', () =>
-          HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 2)])),
+          HttpResponse.json(
+            weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 2 })]),
+          ),
         ),
         http.delete(
           'http://localhost:8080/weapons/weapon-instance-1',
@@ -155,7 +169,9 @@ describe('useWeaponCollection', () => {
     it('reverts a refinement change when the update fails', async () => {
       server.use(
         http.get('http://localhost:8080/weapons', () =>
-          HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 2)])),
+          HttpResponse.json(
+            weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 2 })]),
+          ),
         ),
         http.patch(
           'http://localhost:8080/weapons/weapon-instance-1',

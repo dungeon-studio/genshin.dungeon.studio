@@ -114,8 +114,8 @@ describe('mergeCollections', () => {
   });
 
   it('keeps the higher constellation level on conflict', () => {
-    const local = { amber: makeCharacter('amber', 3) };
-    const server = { amber: makeCharacter('amber', 1) };
+    const local = { amber: makeCharacter('amber', { constellationLevel: 3 }) };
+    const server = { amber: makeCharacter('amber', { constellationLevel: 1 }) };
 
     const merged = mergeCollections(local, server);
 
@@ -123,8 +123,8 @@ describe('mergeCollections', () => {
   });
 
   it('keeps server value when server constellation is higher', () => {
-    const local = { amber: makeCharacter('amber', 1) };
-    const server = { amber: makeCharacter('amber', 5) };
+    const local = { amber: makeCharacter('amber', { constellationLevel: 1 }) };
+    const server = { amber: makeCharacter('amber', { constellationLevel: 5 }) };
 
     const merged = mergeCollections(local, server);
 
@@ -132,7 +132,7 @@ describe('mergeCollections', () => {
   });
 
   it('returns server collection when local is empty', () => {
-    const server = { amber: makeCharacter('amber', 2) };
+    const server = { amber: makeCharacter('amber', { constellationLevel: 2 }) };
 
     const merged = mergeCollections({}, server);
 

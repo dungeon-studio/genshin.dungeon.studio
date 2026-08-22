@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
-import type { CollectionCharacter } from '@genshin/domain';
 import { MAX_CONSTELLATION_LEVEL, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import { makeCharacter } from '@genshin/domain/testing';
 import { getCharacterById } from '@genshin/game-data';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -29,12 +29,7 @@ vi.mock('@genshin/game-data', () => ({
   getCharacterById: vi.fn(),
 }));
 
-const FAKE_CHARACTER: CollectionCharacter = {
-  characterId: 'albedo',
-  constellationLevel: 2,
-  createdAt: '2026-01-01T00:00:00.000Z' as CollectionCharacter['createdAt'],
-  updatedAt: '2026-03-13T00:00:00.000Z' as CollectionCharacter['updatedAt'],
-};
+const FAKE_CHARACTER = makeCharacter('albedo', { constellationLevel: 2 });
 
 const EXPECTED_CONTENT_TYPE = toMediaTypeString(
   { mediaType: COLLECTION_JSON, profile: characterItemV1 },

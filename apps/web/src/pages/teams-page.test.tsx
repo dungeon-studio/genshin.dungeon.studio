@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionWeaponId, ISOTimestamp } from '@genshin/domain';
+import type { CollectionWeaponId } from '@genshin/domain';
 import type { Character, Weapon, WeaponType } from '@genshin/game-data';
 import { CHARACTER_ROSTER, WEAPON_ROSTER } from '@genshin/game-data';
 import { act, configure, render, screen, within } from '@testing-library/react';
@@ -12,6 +12,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { useCollectionStore } from '@/features/collection/characters/use-character-collection-store';
 import { useWeaponCollectionStore } from '@/features/collection/weapons/use-weapon-collection-store';
 import { useTeamStore } from '@/features/teams/use-team-store';
+import { makeCharacter, makeWeapon } from '@/test/fixtures';
 import { createWrapper } from '@/test/render';
 
 import { TeamsPage } from './teams-page';
@@ -41,8 +42,6 @@ const BOW_USER = characterWielding('Bow');
 const CLAYMORE_INSTANCE = 'claymore-instance' as CollectionWeaponId;
 const BOW_INSTANCE = 'bow-instance' as CollectionWeaponId;
 
-const TIMESTAMP = '2026-01-01T00:00:00.000Z' as ISOTimestamp;
-
 function renderTeamsPage() {
   const view = render(
     <MemoryRouter>
@@ -53,34 +52,14 @@ function renderTeamsPage() {
 
   // Seeded after mount: the hooks clear their stores on finding no signed-in user.
   act(() => {
-    useCollectionStore.getState().replaceCharacters(
-      Object.fromEntries(
-        [CLAYMORE_USER, BOW_USER].map((c) => [
-          c.id,
-          {
-            characterId: c.id,
-            constellationLevel: 0,
-            createdAt: TIMESTAMP,
-            updatedAt: TIMESTAMP,
-          },
-        ]),
-      ),
-    );
+    useCollectionStore
+      .getState()
+      .replaceCharacters(
+        Object.fromEntries([CLAYMORE_USER, BOW_USER].map((c) => [c.id, makeCharacter(c.id)])),
+      );
     useWeaponCollectionStore.getState().setWeapons({
-      [CLAYMORE_INSTANCE]: {
-        weaponInstanceId: CLAYMORE_INSTANCE,
-        weaponId: CLAYMORE.id,
-        refinementLevel: 1,
-        createdAt: TIMESTAMP,
-        updatedAt: TIMESTAMP,
-      },
-      [BOW_INSTANCE]: {
-        weaponInstanceId: BOW_INSTANCE,
-        weaponId: BOW_WEAPON.id,
-        refinementLevel: 1,
-        createdAt: TIMESTAMP,
-        updatedAt: TIMESTAMP,
-      },
+      [CLAYMORE_INSTANCE]: makeWeapon(CLAYMORE_INSTANCE, CLAYMORE.id),
+      [BOW_INSTANCE]: makeWeapon(BOW_INSTANCE, BOW_WEAPON.id),
     });
   });
 
