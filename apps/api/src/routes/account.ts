@@ -29,7 +29,7 @@ account.delete('/', async (c) => {
   // Stored data first: a failure between the two leaves a signed-in user who
   // can ask again, where deleting the identity first would strand the data
   // with nobody left to request its erasure.
-  await Account.erase(userId);
+  await Account.eraseStoredData(userId);
   await deleteUser(userId);
 
   return c.body(null, 204);

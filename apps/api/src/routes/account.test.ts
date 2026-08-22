@@ -14,7 +14,7 @@ vi.mock('@/firebase/auth.js', () => ({
 }));
 
 vi.mock('@/repositories/account/index.js', () => ({
-  erase: vi.fn(),
+  eraseStoredData: vi.fn(),
 }));
 
 const deleteAccount = async (): Promise<Response> =>
@@ -26,7 +26,7 @@ describe('DELETE /account', () => {
     // call never happened.
     vi.clearAllMocks();
     vi.mocked(verifyToken).mockResolvedValue(FAKE_TOKEN);
-    vi.mocked(Account.erase).mockResolvedValue(undefined);
+    vi.mocked(Account.eraseStoredData).mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -51,7 +51,7 @@ describe('DELETE /account', () => {
   it('erases the account the token verified as', async () => {
     await deleteAccount();
 
-    expect(Account.erase).toHaveBeenCalledWith(FAKE_TOKEN.uid);
+    expect(Account.eraseStoredData).toHaveBeenCalledWith(FAKE_TOKEN.uid);
   });
 
   it('erases the identity as well as the stored data', async () => {
@@ -62,7 +62,7 @@ describe('DELETE /account', () => {
 
   describe('when erasing the stored data fails', () => {
     beforeEach(() => {
-      vi.mocked(Account.erase).mockRejectedValue(new Error('firestore blew up'));
+      vi.mocked(Account.eraseStoredData).mockRejectedValue(new Error('firestore blew up'));
     });
 
     it('leaves the identity intact, so the user can ask again', async () => {

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import { documentRef, newUserId } from '@/test/firestore.js';
 
-import { erase } from './index.js';
+import { eraseStoredData } from './index.js';
 
 const STORED = {
   characters: { schemaVersion: 1, constellationLevel: 3 },
@@ -35,12 +35,12 @@ async function remaining(userId: string): Promise<Subcollection[]> {
   return present.filter((subcollection) => subcollection !== null);
 }
 
-describe('erase', () => {
+describe('eraseStoredData', () => {
   it('leaves nothing the user stored, whichever subcollection held it', async () => {
     const userId = newUserId();
     await plant(userId);
 
-    await erase(userId);
+    await eraseStoredData(userId);
 
     expect(await remaining(userId)).toEqual([]);
   });
@@ -51,7 +51,7 @@ describe('erase', () => {
     await plant(userId);
     await plant(bystander);
 
-    await erase(userId);
+    await eraseStoredData(userId);
 
     expect(await remaining(bystander)).toEqual(SUBCOLLECTIONS);
   });
@@ -59,6 +59,6 @@ describe('erase', () => {
   // A retry after a part-way failure erases what the first attempt missed and
   // must not fault on what it already removed.
   it('succeeds against an account that stored nothing', async () => {
-    await expect(erase(newUserId())).resolves.toBeUndefined();
+    await expect(eraseStoredData(newUserId())).resolves.toBeUndefined();
   });
 });

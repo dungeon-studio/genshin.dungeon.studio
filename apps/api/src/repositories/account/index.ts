@@ -4,7 +4,8 @@
 import { db } from '@/firebase/firestore.js';
 
 /**
- * Erase every document the service stores for a user.
+ * Erase every document the service stores for a user. The identity itself
+ * survives this — erasing an account is this plus `deleteUser`.
  *
  * Everything written on a user's behalf lives under `users/{userId}`, which is
  * what lets one recursive delete stay complete as features arrive: a
@@ -17,6 +18,6 @@ import { db } from '@/firebase/firestore.js';
  * deleted, so callers retry rather than compensate; erasing twice is
  * indistinguishable from erasing once.
  */
-export async function erase(userId: string): Promise<void> {
+export async function eraseStoredData(userId: string): Promise<void> {
   await db.recursiveDelete(db.collection('users').doc(userId));
 }

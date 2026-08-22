@@ -44,6 +44,12 @@ function renderDialog() {
 
 const deleteButton = () => screen.getByRole('button', { name: 'Delete account' });
 
+/** Type the confirmation the dialog asks for, then ask it to delete. */
+async function confirmDeletion(): Promise<void> {
+  await userEvent.type(screen.getByRole('textbox'), 'delete');
+  await userEvent.click(deleteButton());
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
 });
@@ -71,8 +77,7 @@ describe('DeleteAccountDialog', () => {
     erasureSucceeds();
     renderDialog();
 
-    await userEvent.type(screen.getByRole('textbox'), 'delete');
-    await userEvent.click(deleteButton());
+    await confirmDeletion();
 
     await waitFor(() => {
       expect(signOut).toHaveBeenCalled();
@@ -84,8 +89,7 @@ describe('DeleteAccountDialog', () => {
     erasureFails();
     renderDialog();
 
-    await userEvent.type(screen.getByRole('textbox'), 'delete');
-    await userEvent.click(deleteButton());
+    await confirmDeletion();
 
     await waitFor(() => {
       expect(deleteButton()).toBeEnabled();
@@ -97,8 +101,7 @@ describe('DeleteAccountDialog', () => {
     erasureFails();
     renderDialog();
 
-    await userEvent.type(screen.getByRole('textbox'), 'delete');
-    await userEvent.click(deleteButton());
+    await confirmDeletion();
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('An unexpected error'));
@@ -110,8 +113,7 @@ describe('DeleteAccountDialog', () => {
     server.use(http.delete(ACCOUNT_URL, () => HttpResponse.error()));
     renderDialog();
 
-    await userEvent.type(screen.getByRole('textbox'), 'delete');
-    await userEvent.click(deleteButton());
+    await confirmDeletion();
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalled();

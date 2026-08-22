@@ -13,6 +13,11 @@ export interface UseDeleteAccountResult {
   isDeleting: boolean;
 }
 
+/** A request that never reached the server carries no problem document to quote. */
+function describeFailure(error: unknown): string {
+  return error instanceof ApiError ? error.problem.detail : 'Something went wrong deleting it.';
+}
+
 /**
  * Erase the signed-in account, then end the session it belonged to.
  *
@@ -32,9 +37,7 @@ export function useDeleteAccount(): UseDeleteAccountResult {
       toast.success('Your account and its data have been deleted.');
     },
     onError: (error: unknown) => {
-      const detail =
-        error instanceof ApiError ? error.problem.detail : 'Something went wrong deleting it.';
-      toast.error(`Could not delete your account. ${detail}`);
+      toast.error(`Could not delete your account. ${describeFailure(error)}`);
     },
   });
 
