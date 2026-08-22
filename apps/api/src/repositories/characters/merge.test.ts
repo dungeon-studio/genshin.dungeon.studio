@@ -11,7 +11,7 @@ import { nextCharacter } from './merge.js';
 const CHARACTER = CHARACTER_ROSTER[0];
 const NOW = '2026-01-02T00:00:00.000Z' as ISOTimestamp;
 
-const stored = makeCharacter(CHARACTER.id, 1);
+const stored = makeCharacter(CHARACTER.id, { constellationLevel: 1 });
 
 describe('nextCharacter', () => {
   it('dates a character nothing ever collected to the save', () => {

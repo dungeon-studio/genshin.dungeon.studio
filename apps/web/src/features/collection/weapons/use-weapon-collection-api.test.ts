@@ -25,7 +25,9 @@ describe('useWeaponCollectionQuery', () => {
   it('returns the deserialised weapons keyed by instance id', async () => {
     server.use(
       http.get('http://localhost:8080/weapons', () =>
-        HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 3)])),
+        HttpResponse.json(
+          weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 3 })]),
+        ),
       ),
     );
 
@@ -46,7 +48,9 @@ describe('useAddWeaponMutation', () => {
     server.use(
       http.post('http://localhost:8080/weapons', async ({ request }) => {
         postBody = await request.json();
-        return HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 1)]));
+        return HttpResponse.json(
+          weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 })]),
+        );
       }),
     );
 
@@ -71,7 +75,9 @@ describe('useAddWeaponMutation', () => {
         return HttpResponse.json(weaponsDocument([]));
       }),
       http.post('http://localhost:8080/weapons', () =>
-        HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 1)])),
+        HttpResponse.json(
+          weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 })]),
+        ),
       ),
     );
 
@@ -97,7 +103,9 @@ describe('useSetRefinementLevelMutation', () => {
     server.use(
       http.patch('http://localhost:8080/weapons/weapon-instance-1', async ({ request }) => {
         patchBody = await request.json();
-        return HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, 5)]));
+        return HttpResponse.json(
+          weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 5 })]),
+        );
       }),
     );
 

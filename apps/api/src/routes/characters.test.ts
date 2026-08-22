@@ -29,7 +29,7 @@ vi.mock('@genshin/game-data', () => ({
   getCharacterById: vi.fn(),
 }));
 
-const FAKE_CHARACTER = makeCharacter('albedo', 2);
+const FAKE_CHARACTER = makeCharacter('albedo', { constellationLevel: 2 });
 
 const EXPECTED_CONTENT_TYPE = toMediaTypeString(
   { mediaType: COLLECTION_JSON, profile: characterItemV1 },

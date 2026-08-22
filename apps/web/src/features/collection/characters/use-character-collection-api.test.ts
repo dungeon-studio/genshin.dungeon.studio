@@ -24,7 +24,9 @@ describe('useCharacterCollectionQuery', () => {
   it('returns the deserialised characters keyed by id', async () => {
     server.use(
       http.get('http://localhost:8080/characters', () =>
-        HttpResponse.json(charactersDocument([makeCharacter(CHARACTER, 2)])),
+        HttpResponse.json(
+          charactersDocument([makeCharacter(CHARACTER, { constellationLevel: 2 })]),
+        ),
       ),
     );
 
@@ -45,7 +47,9 @@ describe('useAddCharacterMutation', () => {
     server.use(
       http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
         putBody = await request.json();
-        return HttpResponse.json(charactersDocument([makeCharacter(CHARACTER, 0)]));
+        return HttpResponse.json(
+          charactersDocument([makeCharacter(CHARACTER, { constellationLevel: 0 })]),
+        );
       }),
     );
 
@@ -75,7 +79,9 @@ describe('useAddCharacterMutation', () => {
         return HttpResponse.json(charactersDocument([]));
       }),
       http.put('http://localhost:8080/characters/skirk', () =>
-        HttpResponse.json(charactersDocument([makeCharacter(CHARACTER, 0)])),
+        HttpResponse.json(
+          charactersDocument([makeCharacter(CHARACTER, { constellationLevel: 0 })]),
+        ),
       ),
     );
 
@@ -104,7 +110,9 @@ describe('useSetConstellationLevelMutation', () => {
     server.use(
       http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
         putBody = await request.json();
-        return HttpResponse.json(charactersDocument([makeCharacter(CHARACTER, 4)]));
+        return HttpResponse.json(
+          charactersDocument([makeCharacter(CHARACTER, { constellationLevel: 4 })]),
+        );
       }),
     );
 

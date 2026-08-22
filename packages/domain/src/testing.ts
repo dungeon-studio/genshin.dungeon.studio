@@ -13,22 +13,22 @@
  * type is answered here rather than in every suite that builds one.
  */
 
-import { buildCollection, type CollectionDocument } from '@genshin/collection-json';
+import {
+  type CollectionDocument,
+  type CollectionJsonRepresentation,
+  serialiseCollection,
+} from '@genshin/collection-json';
 
-import type {
-  CharacterId,
-  CollectionCharacter,
-  ConstellationLevel,
-} from './character/collection-character.js';
+import type { CharacterId, CollectionCharacter } from './character/collection-character.js';
 import type { ISOTimestamp } from './iso-timestamp.js';
 import {
-  serialiseCharacter,
   characterCollectionHref,
+  characterRepresentation,
 } from './representations/collection-json/characters.js';
-import { serialiseTeam, teamCollectionHref } from './representations/collection-json/teams.js';
+import { teamCollectionHref, teamRepresentation } from './representations/collection-json/teams.js';
 import {
-  serialiseWeapon,
   weaponCollectionHref,
+  weaponRepresentation,
 } from './representations/collection-json/weapons.js';
 import type { CollectionTeam, TeamSlot } from './team/collection-team.js';
 import { createEmptyTeam } from './team/collection-team.js';
@@ -43,27 +43,29 @@ const UPDATED_AT = '2026-03-13T00:00:00.000Z' as ISOTimestamp;
 
 export function makeCharacter(
   characterId: CharacterId,
-  constellationLevel: ConstellationLevel = 0,
+  overrides: Partial<CollectionCharacter> = {},
 ): CollectionCharacter {
   return {
     characterId,
-    constellationLevel,
+    constellationLevel: 0,
     createdAt: CREATED_AT,
     updatedAt: UPDATED_AT,
+    ...overrides,
   };
 }
 
 export function makeWeapon(
   weaponInstanceId: CollectionWeaponId,
   weaponId: CollectionWeapon['weaponId'],
-  refinementLevel = 1,
+  overrides: Partial<CollectionWeapon> = {},
 ): CollectionWeapon {
   return {
     weaponInstanceId,
     weaponId,
-    refinementLevel,
+    refinementLevel: 1,
     createdAt: CREATED_AT,
     updatedAt: UPDATED_AT,
+    ...overrides,
   };
 }
 
@@ -76,26 +78,37 @@ export function makeTeam(slot: TeamSlot, overrides: Partial<CollectionTeam> = {}
   };
 }
 
+/**
+ * Wrap entities in the collection envelope the routes serve.
+ *
+ * Goes through `serialiseCollection` rather than `buildCollection` so a fixture
+ * carries the representation's template. A hand-rolled envelope omits it, and
+ * the suites then parse a document the API never sends.
+ */
+function collectionDocument<T>(
+  representation: CollectionJsonRepresentation<T>,
+  collectionHref: (baseUrl: string) => string,
+  entities: T[],
+  baseUrl: string,
+): CollectionDocument {
+  return serialiseCollection(
+    representation,
+    collectionHref(baseUrl),
+    entities.map((entity) => representation.serialise(entity, baseUrl)),
+  );
+}
+
 export function charactersDocument(
   characters: CollectionCharacter[],
   baseUrl: string,
 ): CollectionDocument {
-  return buildCollection(
-    characterCollectionHref(baseUrl),
-    characters.map((character) => serialiseCharacter(character, baseUrl)),
-  );
+  return collectionDocument(characterRepresentation, characterCollectionHref, characters, baseUrl);
 }
 
 export function weaponsDocument(weapons: CollectionWeapon[], baseUrl: string): CollectionDocument {
-  return buildCollection(
-    weaponCollectionHref(baseUrl),
-    weapons.map((weapon) => serialiseWeapon(weapon, baseUrl)),
-  );
+  return collectionDocument(weaponRepresentation, weaponCollectionHref, weapons, baseUrl);
 }
 
 export function teamsDocument(teams: CollectionTeam[], baseUrl: string): CollectionDocument {
-  return buildCollection(
-    teamCollectionHref(baseUrl),
-    teams.map((team) => serialiseTeam(team, baseUrl)),
-  );
+  return collectionDocument(teamRepresentation, teamCollectionHref, teams, baseUrl);
 }

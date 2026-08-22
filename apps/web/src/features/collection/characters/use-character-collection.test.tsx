@@ -39,7 +39,9 @@ describe('useCollection merge-on-first-login', () => {
       http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
       http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
         putBodies.push(await request.json());
-        return HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 3)]));
+        return HttpResponse.json(
+          charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })]),
+        );
       }),
     );
 
@@ -65,7 +67,9 @@ describe('useCollection merge-on-first-login', () => {
       }),
       http.put('http://localhost:8080/characters/skirk', () => {
         putCount += 1;
-        return HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 3)]));
+        return HttpResponse.json(
+          charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })]),
+        );
       }),
     );
 
@@ -89,7 +93,7 @@ describe('useCollection merge-on-first-login', () => {
     server.use(
       http.get('http://localhost:8080/characters', () => HttpResponse.json(serverCharacters)),
       http.put('http://localhost:8080/characters/skirk', () =>
-        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 3)])),
+        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })])),
       ),
     );
 
@@ -110,7 +114,7 @@ describe('useCollection merge-on-first-login', () => {
     await waitFor(() => expect(result.current.getCharacter(SKIRK)).toBeDefined());
 
     // A second account signs in.
-    serverCharacters = charactersDocument([makeCharacter(ESCOFFIER, 2)]);
+    serverCharacters = charactersDocument([makeCharacter(ESCOFFIER, { constellationLevel: 2 })]);
     authUser = null;
     rerender();
     await waitFor(() => expect(result.current.getCharacter(SKIRK)).toBeUndefined());
@@ -127,7 +131,7 @@ describe('useCollection mutations', () => {
   it('restores a removed character when the delete fails', async () => {
     server.use(
       http.get('http://localhost:8080/characters', () =>
-        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, 3)])),
+        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })])),
       ),
       http.delete(
         'http://localhost:8080/characters/skirk',
