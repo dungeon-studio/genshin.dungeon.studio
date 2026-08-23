@@ -7,7 +7,7 @@ allowed-tools: Read, Bash, Grep, Glob
 # New GitHub issue
 
 Follow the workflow guardrails in
-[`copilot-instructions.md`](../../.github/copilot-instructions.md).
+[`AGENTS.md`](../../AGENTS.md).
 
 Input: **$ARGUMENTS**
 
