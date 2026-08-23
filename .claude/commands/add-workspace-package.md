@@ -6,11 +6,8 @@ allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 
 # Add workspace package
 
-Work the how-to top to bottom:
-[`add-workspace-package.md`](../../docs/how-tos/add-workspace-package.md). It's
-the source of truth for every integration point (scaffolding, workspace wiring,
-the CI matrix, the Codecov flag and component, and the `apps/api` Dockerfile
-copies).
+Run the generator, then work the residual from
+[`add-workspace-package.md`](../../docs/how-tos/add-workspace-package.md).
 
 ## Inputs
 
@@ -18,8 +15,13 @@ copies).
 
 ## Requirements
 
-1. Don't skip the Dockerfile section when the package is a runtime dependency
-   of `apps/api`. A missed COPY fails the Docker workflow build that runs on
-   every PR, with an opaque module-resolution error rather than a clear cause.
-2. Copy `packages/validation/` as the closest scaffolding template.
-3. Run the how-to's Verify section before opening a PR.
+1. Run `pnpm exec turbo gen package`. It writes the package, the Codecov flag,
+   component, and upload steps, and the `apps/api/Dockerfile` COPY lines.
+   Answer the tests and `apps/api` runtime dependency prompts from what the
+   package is actually for; both gate injections that fail silently or
+   opaquely when wrong.
+2. Ask the user for the description and the human-readable name rather than
+   inventing them.
+3. The generator leaves `pnpm install`, wiring the package into its consuming
+   packages, the `src/index.ts` stub, and the first test. Work those.
+4. Run the how-to's Verify section before opening a pull request.
