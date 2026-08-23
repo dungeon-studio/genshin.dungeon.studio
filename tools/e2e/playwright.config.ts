@@ -9,7 +9,7 @@ import { defineConfig, devices } from '@playwright/test';
 const repoRoot = path.resolve(import.meta.dirname, '../..');
 
 // Artifacts land outside the workspace so no gitignore entry has to keep pace
-// with them; see .github/copilot-instructions.md.
+// with them; see AGENTS.md.
 const artifactRoot = '/tmp/genshin-e2e';
 
 // Ports match apps/api/src/main.ts and vite.config.ts. The host has to be

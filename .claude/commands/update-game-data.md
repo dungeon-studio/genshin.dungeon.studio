@@ -7,7 +7,7 @@ allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 # Update game data
 
 Follow the conventions in
-[`copilot-instructions.md`](../../.github/copilot-instructions.md).
+[`AGENTS.md`](../../AGENTS.md).
 
 Add or update game data in `packages/game-data`. Characters and weapons are
 generated from `genshin-db`; their how-tos below cover regeneration. For
