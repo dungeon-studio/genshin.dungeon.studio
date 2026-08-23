@@ -1,6 +1,17 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+/**
+ * The weapon collection's TanStack Query layer, wrapping the raw HTTP calls.
+ *
+ * Query keys are scoped by user ID, so signing in as someone else never serves
+ * the previous account's cached instances. Every mutation invalidates that key
+ * rather than writing into the cache, because the server mints the instance
+ * identifier and decides the stored timestamps.
+ *
+ * `useWeaponCollection` is what a component reaches for; these are its parts.
+ */
+
 import { assertCollectionDocument } from '@genshin/collection-json';
 import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
 import { deserialiseWeapon, MIN_REFINEMENT_LEVEL } from '@genshin/domain';

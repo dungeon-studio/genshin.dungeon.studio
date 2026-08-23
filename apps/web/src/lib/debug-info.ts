@@ -1,6 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+/**
+ * What a bug report says about the reporter's build and browser.
+ *
+ * Every field ends up in a public issue, so nothing identifying belongs here:
+ * `authenticated` records that someone was signed in, never who.
+ */
 export interface DebugInfo {
   appVersion: string;
   buildSha: string;

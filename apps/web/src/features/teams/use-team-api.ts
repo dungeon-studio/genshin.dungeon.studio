@@ -1,6 +1,17 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+/**
+ * The team resource's TanStack Query layer, wrapping the raw HTTP calls.
+ *
+ * Query keys are scoped by user ID, so signing in as someone else never serves
+ * the previous account's cached teams. Every mutation invalidates that key
+ * rather than writing into the cache, because the server decides the stored
+ * timestamps.
+ *
+ * `useTeams` is what a component reaches for; these are its parts.
+ */
+
 import { assertCollectionDocument } from '@genshin/collection-json';
 import type { CollectionTeam, CollectionTeamMembers, TeamSlot } from '@genshin/domain';
 import { deserialiseTeam } from '@genshin/domain';

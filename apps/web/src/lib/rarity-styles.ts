@@ -1,6 +1,15 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+/**
+ * Tailwind classes for each star rating, one map per role a component needs.
+ *
+ * Written out rather than built from a template, on the same reasoning as the
+ * element styles. Only 5- and 4-star are distinguished, because nothing below
+ * that reaches a catalogue; the rest share a neutral so a future addition
+ * renders rather than crashing.
+ */
+
 import type { Rarity } from '@genshin/game-data';
 
 export const RARITY_BORDER_COLORS: Record<Rarity, string> = {

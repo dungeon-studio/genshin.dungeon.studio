@@ -1,6 +1,17 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+/**
+ * The character collection's TanStack Query layer, wrapping the raw HTTP calls.
+ *
+ * Query keys are scoped by user ID, so signing in as someone else never serves
+ * the previous account's cached collection. Every mutation invalidates that key
+ * rather than writing into the cache, because the server decides the stored
+ * timestamps.
+ *
+ * `useCollection` is what a component reaches for; these are its parts.
+ */
+
 import { assertCollectionDocument } from '@genshin/collection-json';
 import type { CharacterId, CollectionCharacter, ConstellationLevel } from '@genshin/domain';
 import { deserialiseCharacter, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';

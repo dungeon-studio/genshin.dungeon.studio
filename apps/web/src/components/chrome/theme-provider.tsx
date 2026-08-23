@@ -32,6 +32,15 @@ function writeStoredTheme(theme: Theme): void {
   }
 }
 
+/**
+ * Supplies the light or dark choice, remembering an explicit one and otherwise
+ * following the operating system.
+ *
+ * "System" is the absence of a stored value rather than a stored word, so a
+ * browser that blocks storage, such as a private window, behaves as if the user
+ * had never chosen: the toggle still works for the session and forgets on
+ * reload.
+ */
 export function ThemeProvider({ children }: { children: ReactNode }): JSX.Element {
   const [theme, setTheme] = useState<Theme>(readStoredTheme);
   const [systemPrefersDark, setSystemPrefersDark] = useState<boolean>(

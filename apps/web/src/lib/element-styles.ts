@@ -1,6 +1,14 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+/**
+ * Tailwind classes for each element, one map per role a component needs.
+ *
+ * Written out rather than built from a template because Tailwind scans source
+ * for complete class names: a `` `border-l-${element}` `` would produce no CSS.
+ * Adding an element means adding a row to every map here.
+ */
+
 import type { Element } from '@genshin/game-data';
 
 export const ELEMENT_BORDER_COLORS: Record<Element, string> = {
@@ -53,6 +61,7 @@ export const ELEMENT_BG_COLORS: Record<Element, string> = {
   Dendro: 'bg-dendro-dark text-white',
 };
 
+/** The dashed neutral border, rather than no border, when there's no element. */
 export function elementBorderClass(element?: Element): string {
   return element ? ELEMENT_BORDER_COLORS[element] : 'border-dashed border-muted-foreground/30';
 }

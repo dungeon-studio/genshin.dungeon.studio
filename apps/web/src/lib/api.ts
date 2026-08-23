@@ -1,6 +1,18 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+/**
+ * The one way this app reaches its API.
+ *
+ * Every call attaches the signed-in user's token when there is one and sends
+ * nothing when there isn't, so an unauthenticated call still goes out and comes
+ * back 401 rather than failing here. Every failure arrives as an
+ * {@link ApiError}.
+ *
+ * Bodies come back as `unknown` on purpose: this layer knows nothing about what
+ * a route returns, so the caller deserialises. A 204 yields `undefined`.
+ */
+
 import type { ProblemDetail } from '@genshin/domain';
 
 import { auth } from '@/lib/firebase';
@@ -11,6 +23,14 @@ export type { ProblemDetail };
 // missing variable.
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
+/**
+ * Any failed request, carrying a problem document.
+ *
+ * `problem` is always populated: a response that isn't
+ * `application/problem+json` gets one synthesised from its status, so a caller
+ * branches on `problem.status` or `problem.type` without first checking whether
+ * the server sent a document.
+ */
 export class ApiError extends Error {
   readonly problem: ProblemDetail;
 

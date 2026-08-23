@@ -56,6 +56,18 @@ function teamToSavePayload(team: CollectionTeam): SaveTeamPayload {
   };
 }
 
+/**
+ * The team planner's whole interface: the four teams, the actions that change
+ * them, and the state of the save behind them.
+ *
+ * Every action writes to the local store first and then saves, so the UI never
+ * waits on the network. A failed save rolls the slot back only when the store
+ * still holds the value that request sent; if the user has since changed the
+ * same slot again, their newer edit stands and they get an error toast instead.
+ *
+ * Signed out, the actions still work and nothing is persisted, so a visitor can
+ * plan a team before deciding to sign in. Signing out discards it.
+ */
 export function useTeams(): UseTeamsResult {
   const { user, loading: authLoading } = useAuth();
   const isAuthenticated = user !== null;
