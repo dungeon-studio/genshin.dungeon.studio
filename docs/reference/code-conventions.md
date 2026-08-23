@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 # Code conventions
 
-Conventions for how code in this repository is named, organized, and documented. Everything here is a judgment no tool can make. What a tool can decide lives in that tool's configuration, and this page points there. For the contribution workflow itself, see [CONTRIBUTING.md](../../CONTRIBUTING.md).
+Conventions for how code in this repository is named, organized, and documented. Everything here is a judgment no tool can make. What a tool can decide lives in that tool's configuration, not on this page. For the contribution workflow and the checks a pull request has to pass, see [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
 ---
 
@@ -44,7 +44,7 @@ A rule holding for more than one tool belongs in `AGENTS.md`.
 
 ## Naming conventions
 
-Use descriptive, specific names for files and modules. Avoid generic names like "helpers." For example, name a shared test auth module `auth-requests.ts`, not `helpers.ts`. [`.ls-lint.yml`](../../.ls-lint.yml) settles casing.
+Use descriptive, specific names for files and modules. Avoid generic names like "helpers." For example, name a shared test auth module `auth-requests.ts`, not `helpers.ts`.
 
 ## Shared types
 
@@ -53,8 +53,6 @@ Branded types in `packages/domain/` each get their own file (for example, `uuid.
 Rules about whether a value is legal, rather than whether it's well-formed, go in a sibling `*-validation.ts`.
 
 ## React components
-
-[`apps/web/eslint.config.js`](../../apps/web/eslint.config.js) settles how a component is declared.
 
 Colocate a small helper component in the same file as its only caller, as a private function that isn't exported. Promote it to its own file when a second caller appears.
 
@@ -71,8 +69,6 @@ Structure:
 Component tests query the way a user finds things—by accessible role or label (`screen.getByRole('heading')`, `screen.getByLabelText('Email')`). Reach for a test ID only when no accessible query works.
 
 Mock network calls at the fetch or adapter boundary, not inside library internals.
-
-[`packages/eslint-config`](../../packages/eslint-config/index.js) and [`apps/web/eslint.config.js`](../../apps/web/eslint.config.js) settle the mechanics: which function declares a test, which API drives an interaction, which assertions to avoid.
 
 For what to assert, see the testing principles in [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
