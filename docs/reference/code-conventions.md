@@ -38,6 +38,8 @@ Prose carries most of what a documentation string says. A TSDoc tag earns its pl
 - `@example`: for an interface whose shape alone doesn't convey the correct call, such as one with a construction order.
 - `@see`: for the specification, issue, or upstream document the behavior follows.
 
+Every other tag in the TSDoc standard set is available and answers to the same test.
+
 ## Documentation strategy
 
 When documenting decisions or conventions, prefer the highest-priority location that fits:
