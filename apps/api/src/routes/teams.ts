@@ -4,6 +4,7 @@
 import { COLLECTION_JSON } from '@genshin/collection-json';
 import type { CollectionTeamMember, TeamSlot, UUID } from '@genshin/domain';
 import {
+  deserialiseCollectionTeamMembers,
   isValidTeamSlot,
   teamItemDocument,
   teamListDocument,
@@ -12,16 +13,14 @@ import {
 } from '@genshin/domain';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import type { FromSchema } from 'json-schema-to-ts';
 
 import { auth } from '@/middleware/auth.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { teamItemV1 } from '@/profiles/alps/team/item-v1.js';
-import {
-  deserialiseTeamPutRequest,
-  teamPutRequestV1,
-} from '@/profiles/json-schema/teams/put-request-v1.js';
+import { teamPutRequestV1 } from '@/profiles/json-schema/teams/put-request-v1.js';
 import * as Characters from '@/repositories/characters/index.js';
 import * as Teams from '@/repositories/teams/index.js';
 import * as Weapons from '@/repositories/weapons/index.js';
@@ -34,6 +33,8 @@ export const teams = new Hono<{
 teams.use('*', auth);
 
 teams.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: teamItemV1 }]));
+
+type UpdateTeamBody = FromSchema<typeof teamPutRequestV1.schema>;
 
 function parseSlot(param: string): TeamSlot {
   const slot = Number(param);
@@ -82,24 +83,27 @@ teams.put(
   async (c) => {
     const userId = c.get('user').uid;
     const slot = parseSlot(c.req.param('slot'));
-    const body = deserialiseTeamPutRequest(c.get('validatedBody'));
+    const body = c.get('validatedBody') as UpdateTeamBody;
+    // The schema pins members to four entries; FromSchema can't say so, and the
+    // domain won't take anything looser.
+    const members = body.members && deserialiseCollectionTeamMembers(body.members);
 
-    if (body.members) {
-      const nonNullMembers = body.members.filter((m): m is CollectionTeamMember => m !== null);
+    if (members) {
+      const nonNullMembers = members.filter((m): m is CollectionTeamMember => m !== null);
       if (nonNullMembers.length > 0) {
         await validateMembers(userId, nonNullMembers);
 
         // Cross-team weapon uniqueness: a weapon instance can only be equipped
         // by one character at a time across all teams (#635).
         const allTeams = await Teams.list(userId);
-        const crossTeamIssues = validateTeams(slot, body.members, allTeams);
+        const crossTeamIssues = validateTeams(slot, members, allTeams);
         if (crossTeamIssues.length > 0) {
           throw new HTTPException(400, { message: crossTeamIssues[0].message });
         }
       }
     }
 
-    const { team, created } = await Teams.save(userId, slot, body);
+    const { team, created } = await Teams.save(userId, slot, { ...body, members });
 
     const baseUrl = new URL(c.req.url).origin;
 

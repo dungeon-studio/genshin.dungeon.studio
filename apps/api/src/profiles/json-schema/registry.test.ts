@@ -11,18 +11,14 @@ import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profi
 import { jsonSchemaRegistry } from '@/profiles/json-schema/registry.js';
 
 const schemasDir = fileURLToPath(new URL('.', import.meta.url));
-const infraFiles = new Set(['registry.ts', 'json-schema-profile.ts']);
+const infraFiles = new Set(['registry.ts', 'registry.test.ts', 'json-schema-profile.ts']);
 
 function findSchemaFiles(dir: string): string[] {
   const results: string[] = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (entry.isDirectory()) {
       results.push(...findSchemaFiles(join(dir, entry.name)));
-    } else if (
-      entry.name.endsWith('.ts') &&
-      !entry.name.endsWith('.test.ts') &&
-      !infraFiles.has(entry.name)
-    ) {
+    } else if (entry.name.endsWith('.ts') && !infraFiles.has(entry.name)) {
       results.push(join(dir, entry.name));
     }
   }

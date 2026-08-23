@@ -9,6 +9,7 @@ import type { CollectionTeamMembers, TeamSlot } from './collection-team.js';
 import {
   assertCollectionTeam,
   createEmptyTeam,
+  deserialiseCollectionTeamMembers,
   isValidMemberIndex,
   isValidTeamSlot,
   MAX_TEAM_MEMBERS,
@@ -239,5 +240,39 @@ describe('assertCollectionTeam', () => {
     expect(() => assertCollectionTeam({ ...VALID_TEAM, updatedAt: 'bad-date' })).toThrow(
       /updatedAt/,
     );
+  });
+});
+
+describe('deserialiseCollectionTeamMembers', () => {
+  it('keeps empty positions, so a member stays in the slot it arrived in', () => {
+    const members = deserialiseCollectionTeamMembers([null, { characterId: 'durin' }, null, null]);
+
+    expect(members).toEqual([null, { characterId: 'durin' }, null, null]);
+  });
+
+  it('rejects an array that is not a full team', () => {
+    expect(() => deserialiseCollectionTeamMembers([null, null])).toThrow(/exactly 4/);
+  });
+
+  it('carries a partially filled artifact plan, which the collection accepts', () => {
+    const [member] = deserialiseCollectionTeamMembers([
+      { characterId: 'columbina', artifactPlan: { sands: 'ATK Percentage' } },
+      null,
+      null,
+      null,
+    ]);
+
+    expect(member?.artifactPlan).toEqual({ sands: 'ATK Percentage' });
+  });
+
+  it('drops properties the member does not declare', () => {
+    const [member] = deserialiseCollectionTeamMembers([
+      { characterId: 'columbina', injected: 'evil' },
+      null,
+      null,
+      null,
+    ]);
+
+    expect(member).not.toHaveProperty('injected');
   });
 });

@@ -1,10 +1,6 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionTeamMembers } from '@genshin/domain';
-import { deserialiseCollectionTeamMembers } from '@genshin/domain';
-import type { FromSchema } from 'json-schema-to-ts';
-
 import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
 
 export const teamPutRequestV1 = {
@@ -99,46 +95,3 @@ export const teamPutRequestV1 = {
     },
   },
 } as const satisfies JsonSchemaProfile;
-
-/**
- * A team PUT body in domain types.
- *
- * Every field the schema can express is derived from it, so renaming or
- * retyping one there breaks {@link deserialiseTeamPutRequest} at compile time.
- * `members` is the exception: `FromSchema` ignores the `minItems`/`maxItems`
- * that pin the tuple length, so it is rebuilt at runtime instead.
- */
-export interface TeamPutRequest extends Omit<
-  FromSchema<typeof teamPutRequestV1.schema>,
-  'members'
-> {
-  members?: CollectionTeamMembers;
-}
-
-/**
- * Converts a body already validated against {@link teamPutRequestV1} into
- * domain types.
- *
- * Validation has already rejected anything malformed, so a throw here means the
- * schema and the domain model have drifted apart.
- */
-export function deserialiseTeamPutRequest(value: unknown): TeamPutRequest {
-  if (typeof value !== 'object' || value === null) {
-    throw new TypeError(`team PUT body must be a non-null object, got: ${JSON.stringify(value)}`);
-  }
-
-  const { name, description, members } = value as Record<string, unknown>;
-
-  if (name !== undefined && typeof name !== 'string') {
-    throw new TypeError(`name must be a string, got: ${JSON.stringify(name)}`);
-  }
-  if (description !== undefined && typeof description !== 'string') {
-    throw new TypeError(`description must be a string, got: ${JSON.stringify(description)}`);
-  }
-
-  return {
-    ...(name !== undefined ? { name } : {}),
-    ...(description !== undefined ? { description } : {}),
-    ...(members !== undefined ? { members: deserialiseCollectionTeamMembers(members) } : {}),
-  };
-}
