@@ -32,8 +32,7 @@ changes with it. A stored payload carries it in band, because the medium holds
 nothing but the payload. HTTP carries it out of band, in a media type
 parameter, because the protocol already negotiates representations and an
 inline schema reference would mix data with metadata—see
-[DSGEP-003](dsgep-003-json-schema-strategy.md). Which boundary does which is in
-[Schema versioning conventions](../reference/schema-versioning.md).
+[DSGEP-003](dsgep-003-json-schema-strategy.md).
 
 ---
 
