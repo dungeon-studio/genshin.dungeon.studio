@@ -4,7 +4,7 @@
 import { GoogleError, Status } from 'google-gax';
 import { describe, expect, it } from 'vitest';
 
-import { firestoreErrorToHttpException } from './firestore-error.js';
+import { firestoreErrorToHttpException } from './error.js';
 
 // The emulator cannot be made to exhaust a quota or go unavailable on demand,
 // so the transient codes arrive here as constructed errors rather than through

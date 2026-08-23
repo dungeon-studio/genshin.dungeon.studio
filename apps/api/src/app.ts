@@ -14,7 +14,7 @@ import type { AuthVariables } from '@/middleware/auth.js';
 import type { RequestLogVariables } from '@/middleware/log-request.js';
 import { logRequest } from '@/middleware/log-request.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
-import { firestoreErrorToHttpException } from '@/repositories/firestore-error.js';
+import { firestoreErrorToHttpException } from '@/repositories/firestore/error.js';
 import { account } from '@/routes/account.js';
 import { alpsProfiles } from '@/routes/alps-profiles.js';
 import { characters } from '@/routes/characters.js';
