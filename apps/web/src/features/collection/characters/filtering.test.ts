@@ -5,6 +5,7 @@ import type { Character } from '@genshin/game-data';
 import { CHARACTERS } from '@genshin/game-data';
 import { describe, expect, it } from 'vitest';
 
+import type { CharacterFilterState } from './filtering';
 import { filterCharacters, initialFilterState } from './filtering';
 
 // Indexing the roster keys the sample to real game data, so a field added to
@@ -19,106 +20,78 @@ const {
   zhongli: ZHONGLI,
 } = CHARACTERS;
 
-// Two Pyro, two 5-star, two owned: every filter under test splits it in half.
+// Two Pyro, two 5-star, two owned, and no two of those groups hold the same
+// pair: each filter halves the sample, and the combined case can still tell an
+// `and` from an `or`.
 const SAMPLE = [AMBER, GANYU, XIANGLING, ZHONGLI];
+const OWNED_IDS = new Set([AMBER.id, GANYU.id]);
 
 function idsOf(characters: readonly Character[]): string[] {
   return characters.map((c) => c.id);
 }
 
+/** Membership, for the filter cases; ordering is the sort cases' concern. */
+function idSetOf(characters: readonly Character[]): Set<string> {
+  return new Set(idsOf(characters));
+}
+
+function filtered(overrides: Partial<CharacterFilterState> = {}): Character[] {
+  return filterCharacters(SAMPLE, { ...initialFilterState(), ...overrides }, OWNED_IDS);
+}
+
 describe('filterCharacters', () => {
-  const ownedIds = new Set([AMBER.id, XIANGLING.id]);
-
   it('returns all characters with default filters', () => {
-    const result = filterCharacters(SAMPLE, initialFilterState(), ownedIds);
-
-    expect(result).toHaveLength(SAMPLE.length);
+    expect(idSetOf(filtered())).toEqual(idSetOf(SAMPLE));
   });
 
   it('filters by search text (case-insensitive)', () => {
-    const filters = { ...initialFilterState(), search: GANYU.name.slice(0, 3).toUpperCase() };
-
-    const result = filterCharacters(SAMPLE, filters, ownedIds);
+    const result = filtered({ search: GANYU.name.slice(0, 3).toUpperCase() });
 
     expect(idsOf(result)).toEqual([GANYU.id]);
   });
 
   it('filters by element', () => {
-    const filters = { ...initialFilterState(), elements: new Set([AMBER.element]) };
+    const result = filtered({ elements: new Set([AMBER.element]) });
 
-    const result = filterCharacters(SAMPLE, filters, ownedIds);
-
-    expect(result).toHaveLength(2);
-    expect(result.every((c) => c.element === AMBER.element)).toBe(true);
+    expect(idSetOf(result)).toEqual(idSetOf([AMBER, XIANGLING]));
   });
 
   it('filters by rarity', () => {
-    const filters = { ...initialFilterState(), rarities: new Set([GANYU.rarity]) };
+    const result = filtered({ rarities: new Set([GANYU.rarity]) });
 
-    const result = filterCharacters(SAMPLE, filters, ownedIds);
-
-    expect(result).toHaveLength(2);
-    expect(result.every((c) => c.rarity === GANYU.rarity)).toBe(true);
+    expect(idSetOf(result)).toEqual(idSetOf([GANYU, ZHONGLI]));
   });
 
   it('filters by ownership: owned', () => {
-    const filters = { ...initialFilterState(), ownership: 'owned' as const };
+    const result = filtered({ ownership: 'owned' });
 
-    const result = filterCharacters(SAMPLE, filters, ownedIds);
-
-    expect(result).toHaveLength(2);
-    expect(result.every((c) => ownedIds.has(c.id))).toBe(true);
+    expect(idSetOf(result)).toEqual(OWNED_IDS);
   });
 
   it('filters by ownership: unowned', () => {
-    const filters = { ...initialFilterState(), ownership: 'unowned' as const };
+    const result = filtered({ ownership: 'unowned' });
 
-    const result = filterCharacters(SAMPLE, filters, ownedIds);
-
-    expect(result).toHaveLength(2);
-    expect(result.every((c) => !ownedIds.has(c.id))).toBe(true);
+    expect(idSetOf(result)).toEqual(idSetOf([XIANGLING, ZHONGLI]));
   });
 
   it('combines multiple filters', () => {
-    const filters = {
-      ...initialFilterState(),
-      elements: new Set([AMBER.element]),
-      ownership: 'owned' as const,
-    };
+    const result = filtered({ elements: new Set([AMBER.element]), ownership: 'owned' });
 
-    const result = filterCharacters(SAMPLE, filters, ownedIds);
-
-    expect(result).toHaveLength(2);
+    expect(idSetOf(result)).toEqual(idSetOf([AMBER]));
   });
 
   it('sorts by name ascending', () => {
-    const filters = {
-      ...initialFilterState(),
-      sortField: 'name' as const,
-      sortDirection: 'asc' as const,
-    };
+    const result = filtered({ sortField: 'name', sortDirection: 'asc' });
 
-    const result = filterCharacters(SAMPLE, filters, ownedIds);
-
-    expect(result.map((c) => c.name)).toEqual(
-      [AMBER, GANYU, XIANGLING, ZHONGLI].map((c) => c.name),
-    );
+    expect(idsOf(result)).toEqual(idsOf([AMBER, GANYU, XIANGLING, ZHONGLI]));
   });
 
   it('sorts by release descending (default)', () => {
-    const result = filterCharacters(SAMPLE, initialFilterState(), ownedIds);
-
-    expect(idsOf(result)).toEqual(idsOf([GANYU, ZHONGLI, XIANGLING, AMBER]));
+    expect(idsOf(filtered())).toEqual(idsOf([GANYU, ZHONGLI, XIANGLING, AMBER]));
   });
 
   it('sorts by release ascending', () => {
-    const filters = {
-      ...initialFilterState(),
-      sortField: 'release' as const,
-      sortDirection: 'asc' as const,
-    };
-
-    const result = filterCharacters(SAMPLE, filters, ownedIds);
+    const result = filtered({ sortField: 'release', sortDirection: 'asc' });
 
     expect(idsOf(result)).toEqual(idsOf([AMBER, XIANGLING, ZHONGLI, GANYU]));
   });
@@ -126,13 +99,13 @@ describe('filterCharacters', () => {
   it('orders same-version characters by their release date', () => {
     // The pair only exercises the date comparison while it shares a version.
     expect(NEUVILLETTE.version).toBe(WRIOTHESLEY.version);
-    const filters = {
-      ...initialFilterState(),
-      sortField: 'release' as const,
-      sortDirection: 'asc' as const,
-    };
 
-    const result = filterCharacters([WRIOTHESLEY, NEUVILLETTE], filters, new Set<string>());
+    // The one case off the shared sample: its own pair, nothing owned.
+    const result = filterCharacters(
+      [WRIOTHESLEY, NEUVILLETTE],
+      { ...initialFilterState(), sortField: 'release', sortDirection: 'asc' },
+      new Set<string>(),
+    );
 
     expect(idsOf(result)).toEqual(idsOf([NEUVILLETTE, WRIOTHESLEY]));
   });
