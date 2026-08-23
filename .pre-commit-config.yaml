@@ -137,9 +137,9 @@ repos:
       # rules seeing `any`, so it invents findings `eslint .` never reports.
       # Turbo arranges both, and caches on inputs, which is why `--fix` cannot
       # live here: a cache hit replays the log without rewriting anything.
-      # `--max-warnings=0` belongs in each workspace's `lint` script for the
-      # same reason: flags added here reach only the commit gate, not the
-      # `turbo run lint` a contributor or CI job runs directly.
+      # `--max-warnings=0` lives in each workspace's `lint` script instead: a
+      # flag here reaches the commit gate but not the `turbo run lint` a
+      # contributor or CI job runs directly.
       #
       # No file matcher: turbo.json decides staleness, and its `lint` inputs
       # reach past the module extensions.

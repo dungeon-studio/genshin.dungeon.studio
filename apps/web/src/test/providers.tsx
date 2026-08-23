@@ -18,9 +18,8 @@ interface TestProvidersProps {
 /**
  * The TanStack Query and auth context the collection and team hooks need.
  *
- * Auth arrives as props rather than bound at wrapper-construction time so a
- * test can sign a different user in between `rerender()` calls. `createWrapper`
- * binds them for the tests that never do.
+ * Auth arrives as props so a test can sign a different user in between
+ * `rerender()` calls.
  */
 export function TestProviders({
   children,
