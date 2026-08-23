@@ -16,17 +16,14 @@ SLEEP_SECONDS="${SLEEP_SECONDS:-3}"
 VERSION_URL="$DOMAIN/version.json"
 CURRENT_SHA=$(git -C "$REPO_ROOT" rev-parse --short HEAD)
 
-# Empty when the edge answers with no SHA at all. Mid-propagation a request can
-# 404, which is a stale edge rather than a failed deploy, so it has to compare
-# unequal and be retried instead of aborting the script.
+# A 404 mid-propagation is a stale edge, not a failed deploy. Answering empty
+# keeps it in the retry loop.
 deployed_sha() {
   curl -fsSL "$VERSION_URL" | jq -r '.sha' || true
 }
 
 # Firebase reports a release complete before every CDN edge serves it, so the
-# first read of version.json can still carry the previous deploy's SHA. Poll
-# until the expected SHA appears rather than calling propagation lag a failed
-# deploy.
+# first read can still carry the previous deploy's SHA.
 for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
   [ "$attempt" -eq 1 ] || sleep "$SLEEP_SECONDS"
 
