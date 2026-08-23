@@ -49,6 +49,9 @@ const DEV_DEPENDENCY_FILES = [
 const VITEST_CONVENTIONS = {
   files: VITEST_FILES,
   extends: [vitest.configs.recommended],
+  rules: {
+    'vitest/consistent-test-it': ['error', { fn: 'it' }],
+  },
 };
 
 /**

@@ -110,6 +110,16 @@ export default defineConfig([
       // A `renderHook` wrapper closes over per-test state and never remounts on
       // a parent re-render, so the rule's premise does not hold.
       '@eslint-react/no-nested-component-definitions': 'off',
+      'testing-library/prefer-user-event': 'error',
+      // A snapshot passes on whatever the component rendered, so it detects
+      // change rather than asserting behavior.
+      'vitest/no-restricted-matchers': [
+        'error',
+        {
+          toMatchSnapshot: 'Assert on behavior and accessible roles instead.',
+          toMatchInlineSnapshot: 'Assert on behavior and accessible roles instead.',
+        },
+      ],
     },
   },
 ]);
