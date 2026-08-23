@@ -66,6 +66,12 @@ export function teamListDocument(teams: CollectionTeam[], baseUrl: string): Coll
   );
 }
 
+/**
+ * One team as a whole document, for a response addressing a single slot.
+ *
+ * Collection+JSON has no single-item media type, so the document is a
+ * collection holding one item, with the item's own URL as the collection href.
+ */
 export function teamItemDocument(team: CollectionTeam, baseUrl: string): CollectionDocument {
   return buildCollection(teamItemHref(baseUrl, team), [serialiseTeam(team, baseUrl)], {
     template: TEAM_TEMPLATE,
@@ -89,6 +95,15 @@ function parseMembers(item: Item): unknown {
   }
 }
 
+/**
+ * Reads a team back out of a Collection+JSON item, parsing `members` from its
+ * transported JSON string.
+ *
+ * An item with no `members` entry fails the fixed-length check rather than
+ * yielding an empty team, so a partial write can't quietly clear the roster.
+ *
+ * @throws TypeError naming the field that failed.
+ */
 export function deserialiseTeam(item: Item): CollectionTeam {
   const data: Record<string, unknown> = Object.fromEntries(
     item.data.filter((d) => d.name !== 'members').map((d) => [d.name, d.value]),
@@ -98,6 +113,7 @@ export function deserialiseTeam(item: Item): CollectionTeam {
   return data;
 }
 
+/** The pair plus the write template, for a caller driving the format generically. */
 export const teamRepresentation = {
   serialise: serialiseTeam,
   deserialise: deserialiseTeam,

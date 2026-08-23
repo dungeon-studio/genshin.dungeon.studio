@@ -2,14 +2,14 @@
 /* SPDX-License-Identifier: MIT */
 
 /**
- * Team composition validators for issue #52.
+ * The rules a team has to satisfy beyond its shape, which
+ * `assertCollectionTeam` covers.
  *
- * These return {@link ValidationIssue}[] instead of throwing, so callers
- * can display all issues at once (inline messages).
- *
- * Pure functions — no I/O. Ownership checks require a
- * {@link TeamValidationContext} built by the caller from either the
- * local zustand store (web) or Firestore queries (API).
+ * Collects issues rather than throwing on the first, because the caller is a
+ * form that shows every field's message at once. Nothing here reads storage: a
+ * check that needs to know what the user owns takes a
+ * {@link TeamValidationContext} the caller has already populated, from the
+ * zustand store on the web or from Firestore in the API.
  */
 
 import type { ValidationIssue } from '@genshin/validation';
@@ -36,10 +36,15 @@ export interface TeamValidationContext {
 // ---------------------------------------------------------------------------
 
 /**
- * Validate a team composition against game rules and optional ownership data.
+ * Checks one team in isolation: no character or weapon instance appears twice
+ * in it, and every member's artifact plan holds up.
  *
- * When `context` is omitted, ownership checks are skipped (useful for
- * offline / anonymous validation on the web).
+ * Sees only the team handed to it, so a weapon another team already equips
+ * passes here. `validateTeams` is the check that catches that.
+ *
+ * @param context - what the user owns. Omitting it skips the ownership checks,
+ * which is how the web validates before it knows the collection.
+ * @returns every issue found, empty when the team is valid.
  */
 export function validateTeam(
   team: { name: string; members: CollectionTeamMembers; description?: string },
@@ -114,15 +119,17 @@ export function validateTeam(
 // ---------------------------------------------------------------------------
 
 /**
- * Validate cross-team invariants for the team being saved.
+ * Checks one team against the user's others, which `validateTeam` can't see.
  *
- * Currently checks weapon uniqueness: a weapon instance can only be equipped
- * by one character at a time across all teams. The same character carrying
- * the same weapon on multiple teams is allowed (Genshin Impact semantics).
+ * A weapon instance is a single physical item, so only one character may hold
+ * it. The game allows the same character to carry it across several teams,
+ * though, so the conflict is between two different characters rather than
+ * between two teams.
  *
- * @param slot - The team slot being saved.
- * @param currentMembers - Members of the team being saved.
- * @param allTeams - All persisted teams for the user (may include the team being saved).
+ * @param slot - the team being saved, skipped when scanning the others so its
+ * own stored version doesn't conflict with itself.
+ * @param allTeams - the user's persisted teams, which may include `slot`.
+ * @returns every issue found, empty when nothing conflicts.
  */
 export function validateTeams(
   slot: TeamSlot,

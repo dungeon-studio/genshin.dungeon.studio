@@ -32,6 +32,13 @@ const WEAPON_TEMPLATE: Template = {
   ],
 };
 
+/**
+ * The URL of the weapon collection, or of the instances of one weapon within
+ * it.
+ *
+ * @param weaponId - narrows the URL to that weapon's instances. Omitting it
+ * addresses every instance the user owns.
+ */
 export function weaponCollectionHref(baseUrl: string, weaponId?: string): string {
   const collection = `${baseUrl}/weapons`;
   if (weaponId === undefined) return collection;
@@ -42,6 +49,13 @@ export function weaponItemHref(baseUrl: string, weapon: CollectionWeapon): strin
   return `${weaponCollectionHref(baseUrl)}/${weapon.weaponInstanceId}`;
 }
 
+/**
+ * Writes one owned weapon as a Collection+JSON item.
+ *
+ * Carries a `collection` link to the user's other copies of the same weapon,
+ * so a client comparing refinements follows the link instead of filtering the
+ * full list itself.
+ */
 export function serialiseWeapon(weapon: CollectionWeapon, baseUrl: string): Item {
   const links: Link[] = [
     {
@@ -64,12 +78,21 @@ export function serialiseWeapon(weapon: CollectionWeapon, baseUrl: string): Item
   );
 }
 
+/**
+ * Reads one owned weapon back out of a Collection+JSON item.
+ *
+ * Takes the identifier from the item's data rather than parsing its `href`, so
+ * an item whose URL and payload disagree resolves to the payload.
+ *
+ * @throws TypeError naming the field that failed.
+ */
 export function deserialiseWeapon(item: Item): CollectionWeapon {
   const data = Object.fromEntries(item.data.map((d) => [d.name, d.value]));
   assertCollectionWeapon(data);
   return data;
 }
 
+/** The pair plus the write template, for a caller driving the format generically. */
 export const weaponRepresentation = {
   serialise: serialiseWeapon,
   deserialise: deserialiseWeapon,

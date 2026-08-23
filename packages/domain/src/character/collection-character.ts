@@ -18,6 +18,14 @@ export const CONSTELLATION_LEVELS: readonly ConstellationLevel[] = Array.from(
   (_, i) => (MIN_CONSTELLATION_LEVEL + i) as ConstellationLevel,
 );
 
+/**
+ * A character a user owns, as stored and as served.
+ *
+ * Carries only what the user's collection decides. Everything intrinsic to the
+ * character, such as element, rarity, and weapon type, is looked up from
+ * `@genshin/game-data` by `characterId` rather than copied here, so a roster
+ * correction reaches every reader without a migration.
+ */
 export interface CollectionCharacter {
   characterId: Character['id'];
   constellationLevel: ConstellationLevel;
@@ -36,6 +44,16 @@ export function isValidConstellationLevel(value: unknown): value is Constellatio
   );
 }
 
+/**
+ * Asserts a value read from storage or a request body is a `CollectionCharacter`.
+ *
+ * `characterId` is checked against the shipped roster, not just for being a
+ * string, so a record naming a character `@genshin/game-data` hasn't shipped
+ * fails here. A stored record can therefore start failing after a roster
+ * change alone.
+ *
+ * @throws TypeError naming the field that failed.
+ */
 export function assertCollectionCharacter(value: unknown): asserts value is CollectionCharacter {
   if (typeof value !== 'object' || value === null) {
     throw new TypeError(

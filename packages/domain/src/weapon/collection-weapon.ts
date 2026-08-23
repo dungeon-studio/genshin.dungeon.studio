@@ -19,6 +19,14 @@ export const MAX_REFINEMENT_LEVEL = 5;
  */
 export type CollectionWeaponId = string;
 
+/**
+ * One weapon instance a user owns, as stored and as served.
+ *
+ * A user can own several copies of the same weapon at different refinements,
+ * so `weaponInstanceId` rather than `weaponId` identifies the record.
+ * Everything intrinsic to the weapon is looked up from `@genshin/game-data` by
+ * `weaponId` rather than copied here.
+ */
 export interface CollectionWeapon {
   weaponInstanceId: CollectionWeaponId;
   weaponId: Weapon['id'];
@@ -27,6 +35,13 @@ export interface CollectionWeapon {
   updatedAt: ISOTimestamp;
 }
 
+/**
+ * Whether a value is a refinement a weapon can hold, which is an integer from
+ * `MIN_REFINEMENT_LEVEL` to `MAX_REFINEMENT_LEVEL`.
+ *
+ * The predicate narrows only to `number`; no type records the range, so a
+ * caller holding a checked value can still hand it somewhere unchecked.
+ */
 export function isValidRefinementLevel(value: unknown): value is number {
   return (
     typeof value === 'number' &&
@@ -36,6 +51,16 @@ export function isValidRefinementLevel(value: unknown): value is number {
   );
 }
 
+/**
+ * Asserts a value read from storage or a request body is a `CollectionWeapon`.
+ *
+ * `weaponId` is checked against the shipped catalogue, not just for being a
+ * string, so a record naming a weapon `@genshin/game-data` hasn't shipped
+ * fails here. A stored record can therefore start failing after a catalogue
+ * change alone.
+ *
+ * @throws TypeError naming the field that failed.
+ */
 export function assertCollectionWeapon(value: unknown): asserts value is CollectionWeapon {
   if (typeof value !== 'object' || value === null) {
     throw new TypeError(
