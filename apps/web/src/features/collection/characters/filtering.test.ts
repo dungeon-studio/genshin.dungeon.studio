@@ -2,93 +2,69 @@
 // SPDX-License-Identifier: MIT
 
 import type { Character } from '@genshin/game-data';
+import { CHARACTERS } from '@genshin/game-data';
 import { describe, expect, it } from 'vitest';
 
 import { filterCharacters, initialFilterState } from './filtering';
 
-const CHARACTERS: Character[] = [
-  {
-    id: 'amber',
-    name: 'Amber',
-    element: 'Pyro',
-    weaponType: 'Bow',
-    rarity: 4,
-    region: 'Mondstadt',
-    version: '1.0',
-    releaseDate: '2020-09-28',
-  },
-  {
-    id: 'ganyu',
-    name: 'Ganyu',
-    element: 'Cryo',
-    weaponType: 'Bow',
-    rarity: 5,
-    region: 'Liyue',
-    version: '1.2',
-    releaseDate: '2021-01-12',
-  },
-  {
-    id: 'xiangling',
-    name: 'Xiangling',
-    element: 'Pyro',
-    weaponType: 'Polearm',
-    rarity: 4,
-    region: 'Liyue',
-    version: '1.0',
-    releaseDate: '2020-09-28',
-  },
-  {
-    id: 'zhongli',
-    name: 'Zhongli',
-    element: 'Geo',
-    weaponType: 'Polearm',
-    rarity: 5,
-    region: 'Liyue',
-    version: '1.1',
-    releaseDate: '2020-12-01',
-  },
-];
+// Indexing the roster keys the sample to real game data, so a field added to
+// `Character` reaches these tests without an edit. A missing ID is a `tsc`
+// error, unlike `getCharacterById`, which answers `undefined`.
+const {
+  amber: AMBER,
+  ganyu: GANYU,
+  neuvillette: NEUVILLETTE,
+  wriothesley: WRIOTHESLEY,
+  xiangling: XIANGLING,
+  zhongli: ZHONGLI,
+} = CHARACTERS;
+
+// Two Pyro, two 5-star, two owned: every filter under test splits it in half.
+const SAMPLE = [AMBER, GANYU, XIANGLING, ZHONGLI];
+
+function idsOf(characters: readonly Character[]): string[] {
+  return characters.map((c) => c.id);
+}
 
 describe('filterCharacters', () => {
-  const ownedIds = new Set(['amber', 'xiangling']);
+  const ownedIds = new Set([AMBER.id, XIANGLING.id]);
 
   it('returns all characters with default filters', () => {
-    const result = filterCharacters(CHARACTERS, initialFilterState(), ownedIds);
+    const result = filterCharacters(SAMPLE, initialFilterState(), ownedIds);
 
-    expect(result).toHaveLength(4);
+    expect(result).toHaveLength(SAMPLE.length);
   });
 
   it('filters by search text (case-insensitive)', () => {
-    const filters = { ...initialFilterState(), search: 'gan' };
+    const filters = { ...initialFilterState(), search: GANYU.name.slice(0, 3).toUpperCase() };
 
-    const result = filterCharacters(CHARACTERS, filters, ownedIds);
+    const result = filterCharacters(SAMPLE, filters, ownedIds);
 
-    expect(result).toHaveLength(1);
-    expect(result[0].id).toBe('ganyu');
+    expect(idsOf(result)).toEqual([GANYU.id]);
   });
 
   it('filters by element', () => {
-    const filters = { ...initialFilterState(), elements: new Set<Character['element']>(['Pyro']) };
+    const filters = { ...initialFilterState(), elements: new Set([AMBER.element]) };
 
-    const result = filterCharacters(CHARACTERS, filters, ownedIds);
+    const result = filterCharacters(SAMPLE, filters, ownedIds);
 
     expect(result).toHaveLength(2);
-    expect(result.every((c) => c.element === 'Pyro')).toBe(true);
+    expect(result.every((c) => c.element === AMBER.element)).toBe(true);
   });
 
   it('filters by rarity', () => {
-    const filters = { ...initialFilterState(), rarities: new Set<Character['rarity']>([5]) };
+    const filters = { ...initialFilterState(), rarities: new Set([GANYU.rarity]) };
 
-    const result = filterCharacters(CHARACTERS, filters, ownedIds);
+    const result = filterCharacters(SAMPLE, filters, ownedIds);
 
     expect(result).toHaveLength(2);
-    expect(result.every((c) => c.rarity === 5)).toBe(true);
+    expect(result.every((c) => c.rarity === GANYU.rarity)).toBe(true);
   });
 
   it('filters by ownership: owned', () => {
     const filters = { ...initialFilterState(), ownership: 'owned' as const };
 
-    const result = filterCharacters(CHARACTERS, filters, ownedIds);
+    const result = filterCharacters(SAMPLE, filters, ownedIds);
 
     expect(result).toHaveLength(2);
     expect(result.every((c) => ownedIds.has(c.id))).toBe(true);
@@ -97,7 +73,7 @@ describe('filterCharacters', () => {
   it('filters by ownership: unowned', () => {
     const filters = { ...initialFilterState(), ownership: 'unowned' as const };
 
-    const result = filterCharacters(CHARACTERS, filters, ownedIds);
+    const result = filterCharacters(SAMPLE, filters, ownedIds);
 
     expect(result).toHaveLength(2);
     expect(result.every((c) => !ownedIds.has(c.id))).toBe(true);
@@ -106,11 +82,11 @@ describe('filterCharacters', () => {
   it('combines multiple filters', () => {
     const filters = {
       ...initialFilterState(),
-      elements: new Set<Character['element']>(['Pyro']),
+      elements: new Set([AMBER.element]),
       ownership: 'owned' as const,
     };
 
-    const result = filterCharacters(CHARACTERS, filters, ownedIds);
+    const result = filterCharacters(SAMPLE, filters, ownedIds);
 
     expect(result).toHaveLength(2);
   });
@@ -122,17 +98,17 @@ describe('filterCharacters', () => {
       sortDirection: 'asc' as const,
     };
 
-    const result = filterCharacters(CHARACTERS, filters, ownedIds);
+    const result = filterCharacters(SAMPLE, filters, ownedIds);
 
-    expect(result[0].name).toBe('Amber');
-    expect(result[result.length - 1].name).toBe('Zhongli');
+    expect(result.map((c) => c.name)).toEqual(
+      [AMBER, GANYU, XIANGLING, ZHONGLI].map((c) => c.name),
+    );
   });
 
   it('sorts by release descending (default)', () => {
-    const result = filterCharacters(CHARACTERS, initialFilterState(), ownedIds);
+    const result = filterCharacters(SAMPLE, initialFilterState(), ownedIds);
 
-    // Version 1.2 should come first in desc order
-    expect(result[0].id).toBe('ganyu');
+    expect(idsOf(result)).toEqual(idsOf([GANYU, ZHONGLI, XIANGLING, AMBER]));
   });
 
   it('sorts by release ascending', () => {
@@ -142,43 +118,22 @@ describe('filterCharacters', () => {
       sortDirection: 'asc' as const,
     };
 
-    const result = filterCharacters(CHARACTERS, filters, ownedIds);
+    const result = filterCharacters(SAMPLE, filters, ownedIds);
 
-    // Version 1.0 characters should come first
-    expect(result[0].version).toBe('1.0');
+    expect(idsOf(result)).toEqual(idsOf([AMBER, XIANGLING, ZHONGLI, GANYU]));
   });
 
   it('orders same-version characters by their release date', () => {
-    const sameVersion: Character[] = [
-      {
-        id: 'wriothesley',
-        name: 'Wriothesley',
-        element: 'Cryo',
-        weaponType: 'Catalyst',
-        rarity: 5,
-        region: 'Fontaine',
-        version: '4.1',
-        releaseDate: '2023-10-17',
-      },
-      {
-        id: 'neuvillette',
-        name: 'Neuvillette',
-        element: 'Hydro',
-        weaponType: 'Catalyst',
-        rarity: 5,
-        region: 'Fontaine',
-        version: '4.1',
-        releaseDate: '2023-09-27',
-      },
-    ];
+    // The pair only exercises the date comparison while it shares a version.
+    expect(NEUVILLETTE.version).toBe(WRIOTHESLEY.version);
     const filters = {
       ...initialFilterState(),
       sortField: 'release' as const,
       sortDirection: 'asc' as const,
     };
 
-    const result = filterCharacters(sameVersion, filters, new Set<string>());
+    const result = filterCharacters([WRIOTHESLEY, NEUVILLETTE], filters, new Set<string>());
 
-    expect(result.map((c) => c.id)).toEqual(['neuvillette', 'wriothesley']);
+    expect(idsOf(result)).toEqual(idsOf([NEUVILLETTE, WRIOTHESLEY]));
   });
 });

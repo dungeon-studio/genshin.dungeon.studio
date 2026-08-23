@@ -2,74 +2,70 @@
 // SPDX-License-Identifier: MIT
 
 import type { Weapon } from '@genshin/game-data';
+import { WEAPONS } from '@genshin/game-data';
 import { describe, expect, it } from 'vitest';
 
 import { filterWeapons, initialFilterState } from './filtering';
 
-const WEAPONS: Weapon[] = [
-  {
-    id: 'favonius-sword',
-    name: 'Favonius Sword',
-    type: 'Sword',
-    rarity: 4,
-    baseATK: 41,
-    version: '1.0',
-  },
-  { id: 'amos-bow', name: "Amos' Bow", type: 'Bow', rarity: 5, baseATK: 46, version: '1.0' },
-  {
-    id: 'staff-of-homa',
-    name: 'Staff of Homa',
-    type: 'Polearm',
-    rarity: 5,
-    baseATK: 46,
-    version: '1.3',
-  },
-  { id: 'the-catch', name: 'The Catch', type: 'Polearm', rarity: 4, baseATK: 42, version: '2.1' },
-];
+// Indexing the roster keys the sample to real game data, so a field added to
+// `Weapon` reaches these tests without an edit. A missing ID is a `tsc` error,
+// unlike `getWeaponById`, which answers `undefined`.
+const {
+  'amos-bow': AMOS_BOW,
+  'favonius-sword': FAVONIUS_SWORD,
+  'staff-of-homa': STAFF_OF_HOMA,
+  'the-catch': THE_CATCH,
+} = WEAPONS;
+
+// Two Polearms, two 5-star, two owned: every filter under test splits it in half.
+const SAMPLE = [FAVONIUS_SWORD, AMOS_BOW, STAFF_OF_HOMA, THE_CATCH];
+
+function idsOf(weapons: readonly Weapon[]): string[] {
+  return weapons.map((w) => w.id);
+}
 
 describe('filterWeapons', () => {
-  const ownedIds = new Set(['amos-bow', 'the-catch']);
+  const ownedIds = new Set([AMOS_BOW.id, THE_CATCH.id]);
 
   it('returns all weapons with default filters', () => {
-    const result = filterWeapons(WEAPONS, initialFilterState(), ownedIds);
+    const result = filterWeapons(SAMPLE, initialFilterState(), ownedIds);
 
-    expect(result).toHaveLength(4);
+    expect(result).toHaveLength(SAMPLE.length);
   });
 
   it('filters by search text (case-insensitive)', () => {
-    const filters = { ...initialFilterState(), search: 'homa' };
+    const filters = {
+      ...initialFilterState(),
+      search: STAFF_OF_HOMA.name.slice(0, 3).toUpperCase(),
+    };
 
-    const result = filterWeapons(WEAPONS, filters, ownedIds);
+    const result = filterWeapons(SAMPLE, filters, ownedIds);
 
-    expect(result).toHaveLength(1);
-    expect(result[0].id).toBe('staff-of-homa');
+    expect(idsOf(result)).toEqual([STAFF_OF_HOMA.id]);
   });
 
   it('filters by weapon type', () => {
-    const filters = {
-      ...initialFilterState(),
-      weaponTypes: new Set<Weapon['type']>(['Polearm']),
-    };
+    const filters = { ...initialFilterState(), weaponTypes: new Set([THE_CATCH.type]) };
 
-    const result = filterWeapons(WEAPONS, filters, ownedIds);
+    const result = filterWeapons(SAMPLE, filters, ownedIds);
 
     expect(result).toHaveLength(2);
-    expect(result.every((w) => w.type === 'Polearm')).toBe(true);
+    expect(result.every((w) => w.type === THE_CATCH.type)).toBe(true);
   });
 
   it('filters by rarity', () => {
-    const filters = { ...initialFilterState(), rarities: new Set<Weapon['rarity']>([5]) };
+    const filters = { ...initialFilterState(), rarities: new Set([AMOS_BOW.rarity]) };
 
-    const result = filterWeapons(WEAPONS, filters, ownedIds);
+    const result = filterWeapons(SAMPLE, filters, ownedIds);
 
     expect(result).toHaveLength(2);
-    expect(result.every((w) => w.rarity === 5)).toBe(true);
+    expect(result.every((w) => w.rarity === AMOS_BOW.rarity)).toBe(true);
   });
 
   it('filters by ownership: owned', () => {
     const filters = { ...initialFilterState(), ownership: 'owned' as const };
 
-    const result = filterWeapons(WEAPONS, filters, ownedIds);
+    const result = filterWeapons(SAMPLE, filters, ownedIds);
 
     expect(result).toHaveLength(2);
     expect(result.every((w) => ownedIds.has(w.id))).toBe(true);
@@ -78,7 +74,7 @@ describe('filterWeapons', () => {
   it('filters by ownership: unowned', () => {
     const filters = { ...initialFilterState(), ownership: 'unowned' as const };
 
-    const result = filterWeapons(WEAPONS, filters, ownedIds);
+    const result = filterWeapons(SAMPLE, filters, ownedIds);
 
     expect(result).toHaveLength(2);
     expect(result.every((w) => !ownedIds.has(w.id))).toBe(true);
@@ -91,16 +87,18 @@ describe('filterWeapons', () => {
       sortDirection: 'asc' as const,
     };
 
-    const result = filterWeapons(WEAPONS, filters, ownedIds);
+    const result = filterWeapons(SAMPLE, filters, ownedIds);
 
-    expect(result[0].name).toBe("Amos' Bow");
-    expect(result[result.length - 1].name).toBe('The Catch');
+    // `The Catch` leads because its canonical name carries the quotation marks
+    // the game prints around it, and `localeCompare` orders those before letters.
+    expect(result.map((w) => w.name)).toEqual(
+      [THE_CATCH, AMOS_BOW, FAVONIUS_SWORD, STAFF_OF_HOMA].map((w) => w.name),
+    );
   });
 
   it('sorts by release descending (default)', () => {
-    const result = filterWeapons(WEAPONS, initialFilterState(), ownedIds);
+    const result = filterWeapons(SAMPLE, initialFilterState(), ownedIds);
 
-    // Version 2.1 should come first
-    expect(result[0].id).toBe('the-catch');
+    expect(idsOf(result)).toEqual(idsOf([THE_CATCH, STAFF_OF_HOMA, FAVONIUS_SWORD, AMOS_BOW]));
   });
 });

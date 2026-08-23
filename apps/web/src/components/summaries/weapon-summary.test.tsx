@@ -1,21 +1,14 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { Weapon } from '@genshin/game-data';
+import { WEAPONS } from '@genshin/game-data';
 import { render, screen } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { WeaponSummary } from './weapon-summary';
 
-const AMOS_BOW = {
-  id: 'amos-bow',
-  name: "Amos' Bow",
-  type: 'Bow',
-  rarity: 5,
-  baseATK: 46,
-  version: '1.0',
-} satisfies Weapon;
+const { 'amos-bow': AMOS_BOW } = WEAPONS;
 
 /**
  * The type icons restate the name beside them, so they render `alt=""`. That
@@ -40,6 +33,8 @@ describe('WeaponSummary', () => {
     const images = typeIconsFor(<WeaponSummary weapon={AMOS_BOW} />);
 
     expect(images).toHaveLength(2);
+    // Spelled out rather than read back from `getWeaponTypeIconPath`: these two
+    // assertions are the only coverage of the type-to-file mapping.
     expect(images[0]).toHaveAttribute('src', '/weapon-types/bow-light.png');
     expect(images[1]).toHaveAttribute('src', '/weapon-types/bow-dark.png');
   });
