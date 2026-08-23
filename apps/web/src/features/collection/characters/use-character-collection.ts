@@ -39,7 +39,7 @@ function entriesAheadOfServer(
 
 export interface UseCollectionResult {
   characters: CharacterCollection;
-  addCharacter: (characterId: CharacterId) => void;
+  ensureCharacter: (characterId: CharacterId) => void;
   removeCharacter: (characterId: CharacterId) => void;
   setConstellationLevel: (characterId: CharacterId, level: ConstellationLevel) => void;
   isOwned: (characterId: CharacterId) => boolean;
@@ -133,7 +133,7 @@ export function useCollection(): UseCollectionResult {
   // against races from rapid user interactions). Errors are surfaced via toast
   // side-effects — no retry is attempted.
 
-  const addCharacter = useCallback(
+  const ensureCharacter = useCallback(
     (id: CharacterId) => {
       const alreadyOwned = id in useCollectionStore.getState().characters;
       if (alreadyOwned) return;
@@ -227,7 +227,7 @@ export function useCollection(): UseCollectionResult {
 
   return {
     characters,
-    addCharacter,
+    ensureCharacter,
     removeCharacter,
     setConstellationLevel,
     isOwned,
