@@ -130,6 +130,8 @@ SRECon
 [Pp]arseable
 [Pp]rerelease
 [Pp]rereleases
+[Rr]ebase
+[Rr]ebasing
 [Rr]epo
 [Rr]ollouts
 [Rr]uleset
