@@ -15,6 +15,12 @@ import globals from 'globals';
 const SHADCN_SCAFFOLDS = ['src/components/ui/**/*.{ts,tsx}'];
 
 /**
+ * A snapshot passes on whatever the component rendered, so it detects change
+ * rather than asserting behavior.
+ */
+const SNAPSHOT_REFUSAL = 'Assert on behavior and accessible roles instead.';
+
+/**
  * `@eslint-react` and `eslint-plugin-react-hooks` both implement these.
  * react-hooks is first-party and compiler-backed, so it keeps them; enabling
  * both reports every hook violation twice.
@@ -111,14 +117,9 @@ export default defineConfig([
       // a parent re-render, so the rule's premise does not hold.
       '@eslint-react/no-nested-component-definitions': 'off',
       'testing-library/prefer-user-event': 'error',
-      // A snapshot passes on whatever the component rendered, so it detects
-      // change rather than asserting behavior.
       'vitest/no-restricted-matchers': [
         'error',
-        {
-          toMatchSnapshot: 'Assert on behavior and accessible roles instead.',
-          toMatchInlineSnapshot: 'Assert on behavior and accessible roles instead.',
-        },
+        { toMatchSnapshot: SNAPSHOT_REFUSAL, toMatchInlineSnapshot: SNAPSHOT_REFUSAL },
       ],
     },
   },

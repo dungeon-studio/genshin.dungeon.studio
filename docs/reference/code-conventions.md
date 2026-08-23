@@ -44,7 +44,7 @@ A rule holding for more than one tool belongs in `AGENTS.md`.
 
 ## Naming conventions
 
-Use descriptive, specific names for files and modules. Avoid generic names like "helpers." For example, name a shared test auth module `auth-requests.ts`, not `helpers.ts`. Casing is mechanical: [`.ls-lint.yml`](../../.ls-lint.yml) holds the pattern each extension has to match.
+Use descriptive, specific names for files and modules. Avoid generic names like "helpers." For example, name a shared test auth module `auth-requests.ts`, not `helpers.ts`. [`.ls-lint.yml`](../../.ls-lint.yml) settles casing, one pattern per extension.
 
 ## Shared types
 
@@ -72,15 +72,13 @@ Component tests query the way a user finds things—by accessible role or label 
 
 Mock network calls at the fetch or adapter boundary, not inside library internals.
 
-The mechanical half of these conventions—`it` over `test`, `userEvent` over `fireEvent`, no component snapshots, awaited async queries—comes from the Vitest, testing-library, and jest-dom rule sets in [`packages/eslint-config`](../../packages/eslint-config/index.js) and [`apps/web/eslint.config.js`](../../apps/web/eslint.config.js).
+The Vitest, testing-library, and jest-dom rule sets in [`packages/eslint-config`](../../packages/eslint-config/index.js) and [`apps/web/eslint.config.js`](../../apps/web/eslint.config.js) settle which test function to call, which event API to drive, and which assertions to avoid.
 
 For what to assert, see the testing principles in [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
 ## Test utilities
 
-Shared API test utilities live in `apps/api/src/test/` with descriptive file names. The path is load-bearing, not decorative: [`apps/api/tsconfig.build.json`](../../apps/api/tsconfig.build.json) excludes the directory from the build, and the shared ESLint config keys its test-file rules and its `devDependencies` allowance off the same `test/` segment.
-
----
+Shared API test utilities live in `apps/api/src/test/` with descriptive file names. The path is load-bearing: [`apps/api/tsconfig.build.json`](../../apps/api/tsconfig.build.json) excludes the directory from the build, and the shared ESLint config keys its test-file rules and its `devDependencies` allowance off the same `test/` segment.
 
 ## Platform compatibility
 
