@@ -36,7 +36,7 @@ Topic branches use `feature/`, `fix/`, `chore/`, and `docs/` prefixes, and every
 
 The `develop` ruleset carries `required_linear_history` alongside `pull_request`, `deletion`, `non_fast_forward`, `code_scanning`, and `code_quality`. Its condition targets `~DEFAULT_BRANCH`, so no other branch inherits those rules.
 
-Terraform routing already follows the model. A push to `develop` applies `core` then `dev`, a push to `release/*` applies `core` then `staging`, and pull requests to `develop`, `main`, and `release/*` run plan checks. Only the `dev` environment has ever taken an apply: `staging` is a bare shell, and no run has yet applied the production configuration.
+Terraform routing already follows the model, trigger by trigger, in [`infrastructure-branch-flow.md`](../reference/infrastructure-branch-flow.md). Only the `dev` environment has ever taken an apply: `staging` is a bare shell, and no run has yet applied the production configuration.
 
 Application deploys run on `develop` alone. A path-gated push builds the web bundle and the API image, deploys both to dev, and then runs the deployed verification suite on them.
 
@@ -55,9 +55,9 @@ Every workspace package sets `private: true` and none of them ships to a registr
 | `main`      | Stable release target                     | production  | `release/*`, `hotfix/*` |
 | `hotfix/*`  | Urgent production fix, cut from `main`    | none        | topic-level commits     |
 
-A release branch takes its name from the root `package.json` version plus the release date and short hash, as in `release/0.1.0-20260221.d24af0f`.
-
 A `hotfix/*` branch deploys no infrastructure. Hotfixes carry application changes only. An infrastructure change travels the normal train.
+
+[`infrastructure-branch-flow.md`](../reference/infrastructure-branch-flow.md) holds the naming rule for a release branch and the Terraform action each trigger takes.
 
 ### Merge strategy per edge
 

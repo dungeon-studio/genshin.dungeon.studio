@@ -14,7 +14,7 @@ The long-lived branches follow a [git-flow](https://nvie.com/posts/a-successful-
 - `develop`: integration branch
 - `release/*`: release-train branches cut from `develop`
 - `main`: long-term release target branch, used when production flow is active
-- `hotfix/*`: urgent production fixes cut from `main`, carrying no infrastructure change
+- `hotfix/*`: urgent production fixes cut from `main`
 
 ## Terraform workflow routing
 
@@ -22,6 +22,7 @@ The long-lived branches follow a [git-flow](https://nvie.com/posts/a-successful-
 | --------------------------------------------------- | ----------------------------- |
 | push to `develop`                                   | applies `core` then `dev`     |
 | push to `release/*`                                 | applies `core` then `staging` |
+| push to `hotfix/*`                                  | applies nothing               |
 | pull requests to `develop`, `release/*`, and `main` | run Terraform plan checks     |
 
 ## Release-branch naming
