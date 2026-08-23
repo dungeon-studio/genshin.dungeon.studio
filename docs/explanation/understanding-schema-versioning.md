@@ -27,12 +27,13 @@ shape. Old payloads stay readable without weakening the write type.
 
 The strict write type and the union read type are distinct—don't share them.
 
-How the version reaches the reader is the boundary's choice. A stored payload
-carries it in band, as a field the reader looks at first. HTTP carries it out
-of band, in the `profile` media type parameter, and the acceptor set is the
-list of versions each route negotiates over—see
-[DSGEP-003](dsgep-003-json-schema-strategy.md) for why the body holds no
-metadata. Both are the same two roles.
+How the version reaches the reader is the boundary's choice, and neither role
+changes with it. A stored payload carries it in band, because the medium holds
+nothing but the payload. HTTP carries it out of band, in a media type
+parameter, because the protocol already negotiates representations and an
+inline schema reference would mix data with metadata—see
+[DSGEP-003](dsgep-003-json-schema-strategy.md). Which boundary does which is in
+[Schema versioning conventions](../reference/schema-versioning.md).
 
 ---
 

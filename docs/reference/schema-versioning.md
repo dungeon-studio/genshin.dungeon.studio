@@ -12,20 +12,17 @@ For the steps, see [Add a schema version](../how-tos/add-schema-version.md).
 
 ## Boundary taxonomy
 
-| Boundary            | Shared medium          | Skew window                                     |
-| ------------------- | ---------------------- | ----------------------------------------------- |
-| Firestore documents | Database collection    | Until all documents are backfilled              |
-| Local storage       | Browser origin storage | Until the user clears it or a build migrates it |
-| REST API            | HTTP                   | Until all clients are updated                   |
-| Queue / event bus   | Message broker         | Until all consumers drain the queue             |
-| Cache               | Redis / Memcache / CDN | Until TTL expires or cache is flushed           |
+| Boundary            | Shared medium          | Version travels                             | Skew window                                     |
+| ------------------- | ---------------------- | ------------------------------------------- | ----------------------------------------------- |
+| Firestore documents | Database collection    | In band, `version` field                    | Until all documents are backfilled              |
+| Local storage       | Browser origin storage | In band, `persist` version                  | Until the user clears it or a build migrates it |
+| REST API            | HTTP                   | Out of band, `profile` media type parameter | Until all clients are updated                   |
+| Queue / event bus   | Message broker         | In band, `version` field                    | Until all consumers drain the queue             |
+| Cache               | Redis / Memcache / CDN | In band, `version` field                    | Until TTL expires or cache is flushed           |
 
-The skew window determines how many old writer versions the reader must tolerate.
-
-Where the version travels differs by boundary. Firestore documents, local
-storage, queue payloads, and cache entries stamp it in the payload. REST
-carries it out of band, in the `profile` media type parameter, because HTTP
-already has a negotiation mechanism and the body stays free of metadata.
+The skew window determines how many old writer versions the reader must
+tolerate. For why REST alone versions out of band, see
+[Understanding schema versioning](../explanation/understanding-schema-versioning.md#the-two-role-model).
 
 ---
 
@@ -75,29 +72,27 @@ real loss.
 
 ## Implementation: REST API
 
-REST bodies carry no `version` field. The version travels out of band, in the
-`profile` media type parameter on `Content-Type` and `Accept`, naming a JSON
-Schema served at its own URL. See
-[DSGEP-003](../explanation/dsgep-003-json-schema-strategy.md) for the
-discovery mechanism and the rationale for keeping metadata out of the body,
-and [DSGEP-005](../explanation/dsgep-005-schema-direction-segment.md) for the
-`{method}-{direction}-v{n}` schema path convention.
+The `profile` media type parameter on `Content-Type` and `Accept` carries the
+version, naming a JSON Schema served at its own URL.
+[DSGEP-003](../explanation/dsgep-003-json-schema-strategy.md) decides that
+mechanism; [DSGEP-005](../explanation/dsgep-005-schema-direction-segment.md)
+decides the `{method}-{direction}-v{n}` schema paths under
+`apps/api/src/profiles/json-schema/{module}/`.
 
-The acceptor set is declared per route, as the profile list passed to
+A route declares its **acceptor set** as the profile list passed to
 `negotiateContent([...])` for responses and `negotiateRequestSchema([...])`
-for request bodies. Adding a version to a list widens what that route accepts;
-removing one narrows it. A client that sends no `profile` gets the first entry,
-so the current version leads the list.
+for request bodies. Adding a version to that list widens what the route
+accepts; removing one narrows it. A client that names no `profile` gets the
+first entry, so the current version leads the list.
 
-The strict-write / union-read split holds at the handler types.
-`validateRequestBody()` validates the body against whichever version the
-client negotiated, so a handler's body type is the union over the versions its
-route accepts. Serialisation emits the current version alone—a response shape
-is never a superset assembled from several versions.
+The strict write type and the union read type land on the handler.
+`validateRequestBody()` validates against whichever version the client
+negotiated, so a handler's body type is the union over its route's acceptor
+set. Serialisation emits the current version alone.
 
-Retiring a version means withdrawing it from the route's list and from the
-schema endpoints, which is the major version transition process in
-[DSGEP-003](../explanation/dsgep-003-json-schema-strategy.md#major-version-transition-process).
+Retiring a version withdraws it from every acceptor set and from the schema
+endpoints, following DSGEP-003's [major version transition
+process](../explanation/dsgep-003-json-schema-strategy.md#major-version-transition-process).
 
 ---
 
