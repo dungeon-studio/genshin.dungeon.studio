@@ -154,6 +154,7 @@ This DSGEP formalizes the convention already implemented in the codebase. Issue 
 ## References
 
 - [DSGEP-003: JSON Schema presentation and discovery strategy](dsgep-003-json-schema-strategy.md): The base decision this DSGEP amends
+- [`schema-versioning.md`](../reference/schema-versioning.md): How `v{n}` in these paths relates to the repository's wider versioning model
 - [Issue #479](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/479): Schema paths include request/response direction segment
 - [PR #478 discussion](https://github.com/dungeon-studio/genshin.dungeon.studio/pull/478#discussion_r2935894001): Where the ambiguity was identified
 

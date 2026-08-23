@@ -18,14 +18,21 @@ version, see [Add a schema version](../how-tos/add-schema-version.md).
 ## The two-role model
 
 **Writers are strict.** Emit only the current schema version. Never emit a
-superset shaped by historical compatibility. Every payload carries a version
-stamp; if the shape changes, the stamp changes.
+superset shaped by historical compatibility. Every payload declares its
+version; if the shape changes, the declared version changes.
 
-**Readers accept the union of all supported writers.** Detect the stamped
+**Readers accept the union of all supported writers.** Determine the payload's
 version, validate against that version's schema, and migrate to the current
 shape. Old payloads stay readable without weakening the write type.
 
 The strict write type and the union read type are distinct—don't share them.
+
+How the version reaches the reader is the boundary's choice, and neither role
+changes with it. A stored payload carries it in band, because the medium holds
+nothing but the payload. HTTP carries it out of band, in a media type
+parameter, because the protocol already negotiates representations and an
+inline schema reference would mix data with metadata—see
+[DSGEP-003](dsgep-003-json-schema-strategy.md).
 
 ---
 
