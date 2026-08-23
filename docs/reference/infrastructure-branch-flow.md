@@ -9,11 +9,13 @@ How infrastructure automation maps branches to environments and Terraform action
 
 ## Branch strategy
 
-The long-lived branches follow a [git-flow](https://nvie.com/posts/a-successful-git-branching-model/)-style release model; how each maps to an environment deployment is specific to this project. [DSGEP-006](../explanation/dsgep-006-branching-model.md) records why.
+The branches follow a [git-flow](https://nvie.com/posts/a-successful-git-branching-model/)-style release model. How each maps to an environment deployment is specific to this project, and [DSGEP-006](../explanation/dsgep-006-branching-model.md) records why.
+
+`develop` and `main` are permanent. A `release/*` or `hotfix/*` branch lives from its cut until it merges.
 
 - `develop`: integration branch
 - `release/*`: release-train branches cut from `develop`
-- `main`: long-term release target branch, used when production flow is active
+- `main`: release target branch, used when production flow is active
 - `hotfix/*`: urgent production fixes cut from `main`
 
 ## Terraform workflow routing

@@ -14,11 +14,11 @@
 
 ## Abstract
 
-This Dungeon Studio Genshin Enhancement Proposal (DSGEP) records the repository's branching model and what it implies for deployment. The model has three long-lived branches, `develop`, `release/*`, and `main`, plus a `hotfix/*` class for urgent production fixes. Each branch maps to an environment, and each merge edge carries its own strategy. The model resembles [git flow](https://nvie.com/posts/a-successful-git-branching-model/) and diverges from it in three deliberate places. Pull requests into `develop` squash instead of taking a merge commit, changes travel from `main` back to `develop` as cherry-picks instead of back-merges, and topic branches carry conventional-commit type names. Only the `develop` leg runs today.
+This Dungeon Studio Genshin Enhancement Proposal (DSGEP) records the repository's branching model and what it implies for deployment. The model keeps git flow's split: `develop` and `main` are permanent, while a `release/*` or `hotfix/*` branch lives only from its cut until it merges. Each branch maps to an environment, and each merge edge carries its own strategy. The model resembles [git flow](https://nvie.com/posts/a-successful-git-branching-model/) and diverges from it in three deliberate places. Pull requests into `develop` squash instead of taking a merge commit, changes travel from `main` back to `develop` as cherry-picks instead of back-merges, and topic branches carry conventional-commit type names. Only the `develop` leg runs today.
 
 ## Problem statement
 
-The branching model lives in the repository as reference facts with no recorded reasoning. [`infrastructure-branch-flow.md`](../reference/infrastructure-branch-flow.md) lists the long-lived branches and the Terraform routing, [`CONTRIBUTING.md`](../../CONTRIBUTING.md) names the topic branches and the squash strategy, and [`workflow-conventions.md`](../reference/workflow-conventions.md) explains which branches get push runs. None of them says why the model looks the way it does, which leaves three problems.
+The branching model lives in the repository as reference facts with no recorded reasoning. [`infrastructure-branch-flow.md`](../reference/infrastructure-branch-flow.md) lists the branches and the Terraform routing, [`CONTRIBUTING.md`](../../CONTRIBUTING.md) names the topic branches and the squash strategy, and [`workflow-conventions.md`](../reference/workflow-conventions.md) explains which branches get push runs. None of them says why the model looks the way it does, which leaves three problems.
 
 Divergences from git flow read as accidents. A contributor who knows git flow finds squash merges where `--no-ff` belongs and no `hotfix/*` in the topic branch list, with nothing to say whether either was a choice.
 
@@ -30,7 +30,7 @@ Downstream work assumes the model. [#327](https://github.com/dungeon-studio/gens
 
 The model runs one leg of three.
 
-`develop` is the default branch and the only long-lived branch that exists. Neither `main` nor `release/*` exists yet.
+`develop` is the default branch and the only branch of the model that exists. Neither `main` nor a `release/*` branch has been cut yet.
 
 Topic branches use `feature/`, `fix/`, `chore/`, and `docs/` prefixes, and every pull request squashes into `develop`. The pull request title becomes the commit message and carries the conventional-commit format, so `develop` holds exactly one conventional commit per pull request.
 
@@ -46,7 +46,7 @@ The repository carries a single version, in the root `package.json`.
 
 ## Decision
 
-### Long-lived branches and their environments
+### Branches and their environments
 
 | Branch      | Role                                      | Environment | Merges from             |
 | ----------- | ----------------------------------------- | ----------- | ----------------------- |
@@ -54,6 +54,8 @@ The repository carries a single version, in the root `package.json`.
 | `release/*` | Stabilisation branch cut from `develop`   | staging     | fixes found in it       |
 | `main`      | Stable release target                     | production  | `release/*`, `hotfix/*` |
 | `hotfix/*`  | Urgent production fix, cut from `main`    | none        | the fix commits         |
+
+`develop` and `main` are permanent. A `release/*` or `hotfix/*` branch lives from its cut until it merges.
 
 A `hotfix/*` branch deploys no infrastructure. Hotfixes carry application changes only. An infrastructure change travels the normal train.
 
@@ -124,7 +126,7 @@ A release-please Release PR competes with the release branch for the role of "th
 - **Cherry-picks duplicate commits.** The same change reaches `develop` under a different hash, so changelog generation and release diffs need to tolerate seeing it twice.
 - **A hotfix skips staging.** It merges to `main` without ever deploying to an environment, so review and the CI sensors are the only gates in front of production.
 - **A feature waits for a train.** Work that lands on `develop` after the release cut ships in the next release, not the current one.
-- **Branch protection is deployment protection.** A push to a long-lived branch deploys, so a weak ruleset on that branch is a weak gate on the environment behind it.
+- **Branch protection is deployment protection.** A push to `develop`, `release/*`, or `main` deploys, so a weak ruleset on that branch is a weak gate on the environment behind it.
 
 ## Alternatives considered
 
