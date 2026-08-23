@@ -35,12 +35,11 @@ const SUB_STAT_BY_GENSHIN_DB: Record<string, WeaponStatType> = {
 };
 
 /**
- * One record as it will be emitted, mirroring `Weapon` in
- * `@genshin/game-data`.
+ * One record on its way to being emitted, which is not the consumer's `Weapon`.
  *
- * Nothing here enforces the match. The consumer assigns the generated object to
- * its own typed record, so a drift surfaces as a `tsc` error in that package
- * rather than a failure in this one.
+ * `passive` is one object here and two flat fields once serialised, so unlike
+ * the character and artifact shapes this one can't be the consumer's type with
+ * `id` widened. It has to be kept in step with `Weapon` by hand.
  */
 export interface GeneratedWeapon {
   id: string;

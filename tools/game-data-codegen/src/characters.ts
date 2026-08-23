@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { compareVersions, ELEMENTS } from '@genshin/game-data';
-import type { Element, Rarity, WeaponType } from '@genshin/game-data';
+import type { Character, Element } from '@genshin/game-data';
 import genshinDb from 'genshin-db';
 import type { Character as DbCharacter } from 'genshin-db';
 
@@ -29,23 +29,14 @@ const ELEMENT_BY_GENSHIN_DB: Record<string, Element> = {
 };
 
 /**
- * One record as it will be emitted, mirroring `Character` in
- * `@genshin/game-data`.
+ * One record as it will be emitted.
  *
- * Nothing here enforces the match. The consumer assigns the generated object to
- * its own typed record, so a drift surfaces as a `tsc` error in that package
- * rather than a failure in this one.
+ * The consumer's `Character` with only `id` widened, rather than a second
+ * declaration of the same shape kept in step by hand. The consumer narrows `id`
+ * to the union of ids the last generation produced, which is the thing this
+ * run replaces.
  */
-export interface GeneratedCharacter {
-  id: string;
-  name: string;
-  element: Element;
-  weaponType: WeaponType;
-  rarity: Rarity;
-  region: string;
-  version: string;
-  releaseDate: string;
-}
+export type GeneratedCharacter = Omit<Character, 'id'> & { id: string };
 
 function isRosterMember(record: DbCharacter | undefined): record is DbCharacter {
   if (!record) return false;

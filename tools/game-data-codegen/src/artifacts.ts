@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { ArtifactSet } from '@genshin/game-data';
 import { compareVersions } from '@genshin/game-data';
 import genshinDb from 'genshin-db';
 import type { Artifact as DbArtifact } from 'genshin-db';
@@ -13,19 +14,14 @@ import { toId } from './slug.js';
 const ENDGAME_RARITY = 5;
 
 /**
- * One record as it will be emitted, mirroring `ArtifactSet` in
- * `@genshin/game-data`.
+ * One record as it will be emitted.
  *
- * Nothing here enforces the match. The consumer assigns the generated object to
- * its own typed record, so a drift surfaces as a `tsc` error in that package
- * rather than a failure in this one.
+ * The consumer's `ArtifactSet` with only `id` widened, rather than a second
+ * declaration of the same shape kept in step by hand. The consumer narrows `id`
+ * to the union of ids the last generation produced, which is the thing this
+ * run replaces.
  */
-export interface GeneratedArtifactSet {
-  id: string;
-  name: string;
-  version: string;
-  bonuses: Record<2 | 4, string>;
-}
+export type GeneratedArtifactSet = Omit<ArtifactSet, 'id'> & { id: string };
 
 function isEndgameSet(record: DbArtifact | undefined): record is DbArtifact {
   return record?.rarityList.includes(ENDGAME_RARITY) ?? false;
