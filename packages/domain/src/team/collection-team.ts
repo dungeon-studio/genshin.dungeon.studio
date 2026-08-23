@@ -5,7 +5,10 @@ import { assertOptionalString, assertString } from '../assertions.js';
 import type { ISOTimestamp } from '../iso-timestamp.js';
 import { isISOTimestamp, nowTimestamp } from '../iso-timestamp.js';
 import type { CollectionTeamMember } from './collection-team-member.js';
-import { assertCollectionTeamMember } from './collection-team-member.js';
+import {
+  assertCollectionTeamMember,
+  deserialiseCollectionTeamMember,
+} from './collection-team-member.js';
 
 export const MIN_TEAM_SLOT = 1;
 export const MAX_TEAM_SLOT = 4;
@@ -38,6 +41,27 @@ export type CollectionTeamMembers = [
   CollectionTeamMember | null,
   CollectionTeamMember | null,
 ];
+
+/** A type derived from a wire schema can't express the fixed length. */
+export function deserialiseCollectionTeamMembers(
+  value: unknown,
+  path = 'members',
+): CollectionTeamMembers {
+  if (!Array.isArray(value)) {
+    throw new TypeError(`${path} must be an array, got: ${JSON.stringify(value)}`);
+  }
+  if (value.length !== MAX_TEAM_MEMBERS) {
+    throw new TypeError(
+      `${path} must have exactly ${MAX_TEAM_MEMBERS} elements, got: ${value.length}`,
+    );
+  }
+
+  const [first, second, third, fourth] = value.map((member: unknown, index: number) =>
+    member === null ? null : deserialiseCollectionTeamMember(member, `${path}[${index}]`),
+  );
+
+  return [first, second, third, fourth];
+}
 
 /**
  * CollectionTeam is a user's team composition in their collection.

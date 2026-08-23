@@ -70,3 +70,21 @@ export function assertArtifactPlan(
     MAX_MINOR_AFFIXES,
   );
 }
+
+/** Undeclared properties don't survive. */
+export function deserialiseArtifactPlan(value: unknown, path = 'artifactPlan'): ArtifactPlan {
+  assertArtifactPlan(value, path);
+
+  return {
+    ...(value.sands !== undefined ? { sands: value.sands } : {}),
+    ...(value.goblet !== undefined ? { goblet: value.goblet } : {}),
+    ...(value.circlet !== undefined ? { circlet: value.circlet } : {}),
+    ...(value.sets !== undefined ? { sets: value.sets } : {}),
+    ...(value.priorityMinorAffixes !== undefined
+      ? { priorityMinorAffixes: value.priorityMinorAffixes }
+      : {}),
+    ...(value.secondaryMinorAffixes !== undefined
+      ? { secondaryMinorAffixes: value.secondaryMinorAffixes }
+      : {}),
+  };
+}

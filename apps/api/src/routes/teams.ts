@@ -4,6 +4,7 @@
 import { COLLECTION_JSON } from '@genshin/collection-json';
 import type { CollectionTeamMember, CollectionTeamMembers, TeamSlot, UUID } from '@genshin/domain';
 import {
+  deserialiseCollectionTeamMembers,
   isValidTeamSlot,
   teamItemDocument,
   teamListDocument,
@@ -12,6 +13,7 @@ import {
 } from '@genshin/domain';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import type { FromSchema } from 'json-schema-to-ts';
 
 import { auth } from '@/middleware/auth.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
@@ -32,11 +34,7 @@ teams.use('*', auth);
 
 teams.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: teamItemV1 }]));
 
-interface UpdateTeamBody {
-  name?: string;
-  description?: string;
-  members?: CollectionTeamMembers;
-}
+type UpdateTeamBody = FromSchema<typeof teamPutRequestV1.schema>;
 
 function parseSlot(param: string): TeamSlot {
   const slot = Number(param);
@@ -86,27 +84,13 @@ teams.put(
     const userId = c.get('user').uid;
     const slot = parseSlot(c.req.param('slot'));
     const body = c.get('validatedBody') as UpdateTeamBody;
+    const members = body.members && deserialiseCollectionTeamMembers(body.members);
 
-    if (body.members) {
-      const nonNullMembers = body.members.filter((m): m is CollectionTeamMember => m !== null);
-      if (nonNullMembers.length > 0) {
-        await validateMembers(userId, nonNullMembers);
-
-        // Cross-team weapon uniqueness: a weapon instance can only be equipped
-        // by one character at a time across all teams (#635).
-        const allTeams = await Teams.list(userId);
-        const crossTeamIssues = validateTeams(slot, body.members, allTeams);
-        if (crossTeamIssues.length > 0) {
-          throw new HTTPException(400, { message: crossTeamIssues[0].message });
-        }
-      }
+    if (members) {
+      await validateComposition(userId, slot, members);
     }
 
-    const { team, created } = await Teams.save(userId, slot, {
-      name: body.name,
-      members: body.members,
-      description: body.description,
-    });
+    const { team, created } = await Teams.save(userId, slot, { ...body, members });
 
     const baseUrl = new URL(c.req.url).origin;
 
@@ -126,6 +110,28 @@ teams.delete('/:slot', async (c) => {
 
   return c.body(null, 204);
 });
+
+async function validateComposition(
+  userId: string,
+  slot: TeamSlot,
+  members: CollectionTeamMembers,
+): Promise<void> {
+  const occupied = members.filter((m): m is CollectionTeamMember => m !== null);
+
+  if (occupied.length === 0) {
+    return;
+  }
+
+  await validateMembers(userId, occupied);
+
+  // Cross-team weapon uniqueness: a weapon instance can only be equipped by one
+  // character at a time across all teams (#635).
+  const issues = validateTeams(slot, members, await Teams.list(userId));
+
+  if (issues.length > 0) {
+    throw new HTTPException(400, { message: issues[0].message });
+  }
+}
 
 async function validateMembers(userId: string, members: CollectionTeamMember[]): Promise<void> {
   // No duplicate character IDs

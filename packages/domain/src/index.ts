@@ -18,6 +18,7 @@ export {
   assertCollectionTeam,
   createEmptyTeam,
   defaultTeamName,
+  deserialiseCollectionTeamMembers,
   initialTeams,
   isValidMemberIndex,
   isValidTeamSlot,
