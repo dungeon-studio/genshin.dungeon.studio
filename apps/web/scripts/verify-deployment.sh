@@ -10,7 +10,7 @@ REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)"
 
 DOMAIN="${1:?Error: domain URL is required as first argument}"
 
-MAX_ATTEMPTS="${MAX_ATTEMPTS:-20}"
+MAX_ATTEMPTS="${MAX_ATTEMPTS:-10}"
 SLEEP_SECONDS="${SLEEP_SECONDS:-3}"
 
 VERSION_URL="$DOMAIN/version.json"
