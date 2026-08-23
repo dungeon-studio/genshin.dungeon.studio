@@ -8,6 +8,14 @@ import type {
   ISOTimestamp,
 } from '@genshin/domain';
 
+/**
+ * The character record to store, from a full replacement and whatever was
+ * already there.
+ *
+ * Unlike a team, a character has one mutable field, so the caller supplies it
+ * outright rather than as an optional update. Only the timestamps merge:
+ * `createdAt` survives while `updatedAt` always moves.
+ */
 export function nextCharacter(
   characterId: CharacterId,
   constellationLevel: ConstellationLevel,

@@ -14,6 +14,17 @@ export type AuthVariables = {
 
 const MALFORMED_AUTH_MESSAGE = 'Missing or malformed Authorization header';
 
+/**
+ * Requires a Firebase ID token and puts the caller on the context as `user`.
+ *
+ * Anything the client could have got right is 401, including a token Firebase
+ * itself rejects. A verification failure Firebase doesn't attribute to the
+ * token is a 500 instead, because reporting it as 401 would tell a caller to
+ * re-authenticate against an outage.
+ *
+ * Register after `logRequest`: the unexpected path logs through the context
+ * logger.
+ */
 export const auth = createMiddleware<{ Variables: AuthVariables & RequestLogVariables }>(
   async (c, next) => {
     const header = c.req.header('Authorization');

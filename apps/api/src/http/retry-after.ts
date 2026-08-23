@@ -12,8 +12,14 @@ const RETRY_AFTER_SECONDS: Partial<Record<ContentfulStatusCode, number>> = {
   503: 5,
 };
 
-// Retry-After value for an error response, keyed on its status alone, or
-// undefined when the status carries no retry semantics.
+/**
+ * How long a client should wait before retrying, for the RFC 9110
+ * `Retry-After` header.
+ *
+ * Keyed on the status alone, so the answer says nothing about the particular
+ * failure. `undefined` means the status carries no retry semantics and the
+ * header is omitted rather than sent with a zero.
+ */
 export function retryAfterSeconds(status: ContentfulStatusCode): number | undefined {
   return RETRY_AFTER_SECONDS[status];
 }

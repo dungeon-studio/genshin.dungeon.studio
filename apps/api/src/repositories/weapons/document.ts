@@ -10,6 +10,18 @@ import { entity, CURRENT_VERSION, type V1Weapon, type V0Weapon } from './schemas
 
 export { CURRENT_VERSION, type V1Weapon, type V0Weapon };
 
+/**
+ * Reads a stored weapon instance, migrating it forward from whatever version it
+ * was written in.
+ *
+ * The identity is the document key, so the caller passes it in rather than the
+ * payload carrying it. Domain invariants are asserted after the migration, so a
+ * document that parses but names a weapon no longer in the catalogue fails
+ * here.
+ *
+ * @throws TypeError when no known version accepts the document, or when the
+ * migrated result breaks a domain invariant.
+ */
 export function fromDocument(
   weaponInstanceId: UUID,
   raw: Record<string, unknown>,
@@ -26,6 +38,13 @@ export function fromDocument(
   return weapon;
 }
 
+/**
+ * Writes a weapon instance in the current version, leaving the identity to the
+ * document key.
+ *
+ * Always stamps `CURRENT_VERSION`, so any read-modify-write upgrades a document
+ * that was stored under an older one.
+ */
 export function toDocument(weapon: CollectionWeapon): V1Weapon {
   return {
     schemaVersion: CURRENT_VERSION,

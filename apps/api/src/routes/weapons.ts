@@ -24,6 +24,14 @@ import { weaponPostRequestV1 } from '@/profiles/json-schema/weapons/post-request
 import * as Weapons from '@/repositories/weapons/index.js';
 import type { AuthenticatedRouteVariables } from '@/routes/variables.js';
 
+/**
+ * The signed-in caller's owned weapon instances, addressed by an identifier the
+ * server mints.
+ *
+ * A user can own several copies of one weapon at different refinements, so
+ * creation is `POST` and the response carries `Location`. The collection takes
+ * a `weaponId` query to narrow to one weapon's copies.
+ */
 export const weapons = new Hono<{
   Variables: AuthenticatedRouteVariables;
 }>();

@@ -26,6 +26,17 @@ import * as Teams from '@/repositories/teams/index.js';
 import * as Weapons from '@/repositories/weapons/index.js';
 import type { AuthenticatedRouteVariables } from '@/routes/variables.js';
 
+/**
+ * The signed-in caller's four team loadouts, addressed by slot.
+ *
+ * The slots are fixed, so `PUT` to one is an upsert and `DELETE` clears it back
+ * to unsaved rather than removing an addressable resource. A slot outside 1 to
+ * 4 is 404, not 400: it names no resource.
+ *
+ * A save is checked against the caller's other teams as well as its own
+ * contents, so a weapon another character already equips is rejected here even
+ * though the body itself is valid.
+ */
 export const teams = new Hono<{
   Variables: AuthenticatedRouteVariables;
 }>();

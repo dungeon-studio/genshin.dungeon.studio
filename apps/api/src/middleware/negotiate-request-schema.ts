@@ -29,16 +29,18 @@ export type NegotiatedRequestSchemaVariables = {
 };
 
 /**
- * Request schema negotiation middleware.
+ * Picks which version of a request schema to validate against, from the
+ * `Content-Type` header's `profile` parameter.
  *
- * Parses the `Content-Type` header's `profile` parameter to select the
- * appropriate schema version from the provided profiles.
- *
- * - No profile parameter → select the first (latest) profile.
+ * - No profile parameter → select the first profile, so list the latest first.
  * - Profile matches a supported path → select that profile.
  * - Profile doesn't match any supported path → 415 Unsupported Media Type.
+ * - Malformed `Content-Type` → 400.
  *
- * Sets `negotiatedSchema` on the context.
+ * Sets `negotiatedSchema` on the context, which `validateRequestBody` reads, so
+ * register this one first.
+ *
+ * @throws Error at registration, not per request, when `profiles` is empty.
  */
 export function negotiateRequestSchema(profiles: ProfileLink[]): MiddlewareHandler {
   if (profiles.length === 0) {

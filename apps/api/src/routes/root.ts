@@ -41,6 +41,13 @@ function discoverLinks<E extends Env>(app: HonoApp<E>): Record<string, { href: s
   return links;
 }
 
+/**
+ * The entry point document, linking to every top-level resource the app serves.
+ *
+ * Reads the routing table once, when this is called, so it has to be registered
+ * after every other route. Registering it earlier yields a document linking to
+ * only the routes that existed at that moment, which fails silently.
+ */
 export function root<E extends Env>(
   app: HonoApp<E>,
 ): Hono<{ Variables: NegotiatedResponseContentVariables }> {

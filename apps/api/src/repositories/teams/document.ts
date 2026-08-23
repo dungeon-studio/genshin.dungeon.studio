@@ -38,6 +38,18 @@ function memberToDocument(m: CollectionTeamMember): V1Member {
   };
 }
 
+/**
+ * Reads a stored team, migrating it forward from whatever version it was
+ * written in.
+ *
+ * The slot is the document key, so the caller passes it in rather than the
+ * payload carrying it. The stored schemas cap `members` at four without
+ * requiring four, so a shorter array is padded with empty positions to reach
+ * the fixed-length tuple the domain type demands.
+ *
+ * @throws TypeError when no known version accepts the document, or when the
+ * migrated result breaks a domain invariant.
+ */
 export function fromDocument(slot: TeamSlot, raw: Record<string, unknown>): CollectionTeam {
   const data = parseDocument('teams', entity, raw, CURRENT_VERSION);
   const mapped = data.members.map((m) => (m === null ? null : memberFromDocument(m)));
@@ -58,6 +70,12 @@ export function fromDocument(slot: TeamSlot, raw: Record<string, unknown>): Coll
   return team;
 }
 
+/**
+ * Writes a team in the current version, leaving the slot to the document key.
+ *
+ * Always stamps `CURRENT_VERSION`, so any read-modify-write upgrades a document
+ * that was stored under an older one.
+ */
 export function toDocument(team: CollectionTeam): V1Team {
   return {
     schemaVersion: CURRENT_VERSION,

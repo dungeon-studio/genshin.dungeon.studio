@@ -57,12 +57,18 @@ export type ValidatedRequestBodyVariables = {
 };
 
 /**
- * Request body validation middleware.
+ * Rejects a request body the negotiated schema doesn't accept, and sets
+ * `validatedBody` on the context when it does.
  *
- * Reads `negotiatedSchema` from the context (set by `negotiateRequestSchema`),
- * finds the matching schema, parses the JSON request body, and validates it.
+ * Splits the two failures a client handles differently: a body that isn't JSON
+ * is 400, and one that parses but breaks the schema is 422 with a problem type
+ * naming the category, or the parent type when several categories failed at
+ * once.
  *
- * Sets `validatedBody` on the context.
+ * Schemas compile once at registration, so a malformed one surfaces at startup.
+ *
+ * @throws Error when `negotiateRequestSchema` hasn't run, or when it negotiated
+ * a path this list has no schema for.
  */
 export function validateRequestBody(schemas: JsonSchemaProfile[]): MiddlewareHandler {
   const entries = schemas.map((s) => ({
