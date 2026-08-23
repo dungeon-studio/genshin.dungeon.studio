@@ -7,7 +7,7 @@
     "dev": "DEV=true tsx watch src/main.ts",
     "build": "tsc --project tsconfig.build.json && tsc-alias --project tsconfig.build.json && cp -r src/profiles dist/",
     "start": "node dist/main.js",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "test": "vitest run",
     "test:integration": "firebase emulators:exec --only firestore --project demo-dungeon-studio-genshin-dev \"vitest run --coverage --config vitest.integration.config.ts\"",
     "typecheck": "tsc --noEmit && tsc --project tsconfig.scripts.json --noEmit",

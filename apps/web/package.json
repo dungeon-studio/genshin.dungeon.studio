@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "lint:css": "stylelint 'src/**/*.css' --fix",
+    "lint": "eslint . --max-warnings=0",
+    "lint:css": "stylelint 'src/**/*.css' --fix --max-warnings 0",
     "preview": "vite preview",
     "schemas:export": "tsx scripts/export-schemas.ts",
     "test": "vitest run",

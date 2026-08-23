@@ -94,9 +94,11 @@ export default defineConfig([
   {
     files: SHADCN_SCAFFOLDS,
     rules: {
-      // Upstream scaffolds are `const X = React.forwardRef(...)`, not function
-      // declarations; rewriting them would fight every regeneration.
+      // Both trip on the `React.forwardRef` wrapper in the vendored kit, which
+      // a regeneration from upstream removes. Fixes applied here do not survive
+      // that regeneration.
       'react/function-component-definition': 'off',
+      '@eslint-react/no-forward-ref': 'off',
       // `CardTitle` spreads children into its `<h3>`, so content lives at the call site.
       'jsx-a11y-x/heading-has-content': 'off',
     },
