@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { COLLECTION_JSON } from '@genshin/collection-json';
-import type { CollectionTeamMember, TeamSlot, UUID } from '@genshin/domain';
+import type { CollectionTeamMember, CollectionTeamMembers, TeamSlot, UUID } from '@genshin/domain';
 import {
   deserialiseCollectionTeamMembers,
   isValidTeamSlot,
@@ -89,18 +89,7 @@ teams.put(
     const members = body.members && deserialiseCollectionTeamMembers(body.members);
 
     if (members) {
-      const nonNullMembers = members.filter((m): m is CollectionTeamMember => m !== null);
-      if (nonNullMembers.length > 0) {
-        await validateMembers(userId, nonNullMembers);
-
-        // Cross-team weapon uniqueness: a weapon instance can only be equipped
-        // by one character at a time across all teams (#635).
-        const allTeams = await Teams.list(userId);
-        const crossTeamIssues = validateTeams(slot, members, allTeams);
-        if (crossTeamIssues.length > 0) {
-          throw new HTTPException(400, { message: crossTeamIssues[0].message });
-        }
-      }
+      await validateComposition(userId, slot, members);
     }
 
     const { team, created } = await Teams.save(userId, slot, { ...body, members });
@@ -123,6 +112,28 @@ teams.delete('/:slot', async (c) => {
 
   return c.body(null, 204);
 });
+
+async function validateComposition(
+  userId: string,
+  slot: TeamSlot,
+  members: CollectionTeamMembers,
+): Promise<void> {
+  const occupied = members.filter((m): m is CollectionTeamMember => m !== null);
+
+  if (occupied.length === 0) {
+    return;
+  }
+
+  await validateMembers(userId, occupied);
+
+  // Cross-team weapon uniqueness: a weapon instance can only be equipped by one
+  // character at a time across all teams (#635).
+  const issues = validateTeams(slot, members, await Teams.list(userId));
+
+  if (issues.length > 0) {
+    throw new HTTPException(400, { message: issues[0].message });
+  }
+}
 
 async function validateMembers(userId: string, members: CollectionTeamMember[]): Promise<void> {
   // No duplicate character IDs
