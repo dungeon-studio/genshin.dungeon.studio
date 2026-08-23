@@ -66,5 +66,9 @@ export {
   weaponItemHref,
   weaponRepresentation,
 } from './representations/collection-json/weapons.js';
-export { validateTeam, validateTeams, type TeamValidationContext } from './team/team-validation.js';
+export {
+  validateTeam,
+  validateAcrossTeams,
+  type TeamValidationContext,
+} from './team/team-validation.js';
 export type { UUID } from './uuid.js';

@@ -31,16 +31,9 @@ export interface TeamValidationContext {
   ownedWeaponInstanceIds: ReadonlySet<string>;
 }
 
-// ---------------------------------------------------------------------------
-// validateTeam
-// ---------------------------------------------------------------------------
-
 /**
  * Checks one team in isolation: no character or weapon instance appears twice
  * in it, and every member's artifact plan holds up.
- *
- * Sees only the team handed to it, so a weapon another team already equips
- * passes here. `validateTeams` is the check that catches that.
  *
  * @param context - what the user owns. Omitting it skips the ownership checks,
  * which is how the web validates before it knows the collection.
@@ -114,13 +107,7 @@ export function validateTeam(
   return issues;
 }
 
-// ---------------------------------------------------------------------------
-// validateTeams
-// ---------------------------------------------------------------------------
-
 /**
- * Checks one team against the user's others, which `validateTeam` can't see.
- *
  * A weapon instance is a single physical item, so only one character may hold
  * it. The game allows the same character to carry it across several teams,
  * though, so the conflict is between two different characters rather than
@@ -131,7 +118,7 @@ export function validateTeam(
  * @param allTeams - the user's persisted teams, which may include `slot`.
  * @returns every issue found, empty when nothing conflicts.
  */
-export function validateTeams(
+export function validateAcrossTeams(
   slot: TeamSlot,
   currentMembers: CollectionTeamMembers,
   allTeams: { slot: TeamSlot; members: CollectionTeamMembers }[],

@@ -9,7 +9,7 @@ import {
   teamItemDocument,
   teamListDocument,
   validateArtifactPlan,
-  validateTeams,
+  validateAcrossTeams,
 } from '@genshin/domain';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -137,7 +137,7 @@ async function validateComposition(
 
   // Cross-team weapon uniqueness: a weapon instance can only be equipped by one
   // character at a time across all teams (#635).
-  const issues = validateTeams(slot, members, await Teams.list(userId));
+  const issues = validateAcrossTeams(slot, members, await Teams.list(userId));
 
   if (issues.length > 0) {
     throw new HTTPException(400, { message: issues[0].message });
