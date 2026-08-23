@@ -12,10 +12,8 @@ import { retryAfterSeconds } from './retry-after.js';
 export const ABOUT_BLANK = 'about:blank';
 
 /**
- * The `detail` for a failure the client can neither act on nor see inside.
- *
- * Every internal failure reads identically to a client, whatever raised it, so
- * that a response never discloses which subsystem broke or how.
+ * The `detail` for any failure a client cannot act on, uniform across origins
+ * so a response never discloses which subsystem broke.
  */
 export const INTERNAL_ERROR_DETAIL = 'An unexpected error occurred';
 

@@ -30,10 +30,9 @@ function labelFor(code: Status | undefined): string {
 /**
  * Whether a thrown value came back from Firestore.
  *
- * Answers `false` for every real Firestore rejection today: two copies of
- * google-gax resolve, so the class this tests is not the class the rejection
- * was built from. #1427 tracks keying on the gRPC status code instead, and
- * this is the one function that has to change to fix it.
+ * False for every real rejection: two copies of google-gax resolve, so the
+ * class tested here is never the class the rejection was built from. #1427
+ * tracks the fix.
  */
 export function isFirestoreError(err: unknown): err is GoogleError {
   return err instanceof GoogleError;
