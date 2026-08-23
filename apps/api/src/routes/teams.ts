@@ -84,8 +84,6 @@ teams.put(
     const userId = c.get('user').uid;
     const slot = parseSlot(c.req.param('slot'));
     const body = c.get('validatedBody') as UpdateTeamBody;
-    // The schema pins members to four entries; FromSchema can't say so, and the
-    // domain won't take anything looser.
     const members = body.members && deserialiseCollectionTeamMembers(body.members);
 
     if (members) {

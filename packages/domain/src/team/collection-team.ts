@@ -42,10 +42,7 @@ export type CollectionTeamMembers = [
   CollectionTeamMember | null,
 ];
 
-/**
- * A type derived from a wire schema can't express the fixed length, so callers
- * holding members as a plain array reach the tuple through here.
- */
+/** A type derived from a wire schema can't express the fixed length. */
 export function deserialiseCollectionTeamMembers(
   value: unknown,
   path = 'members',

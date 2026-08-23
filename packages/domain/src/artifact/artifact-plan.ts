@@ -71,7 +71,7 @@ export function assertArtifactPlan(
   );
 }
 
-/** Rebuilds rather than returns the input, so undeclared properties don't survive. */
+/** Undeclared properties don't survive. */
 export function deserialiseArtifactPlan(value: unknown, path = 'artifactPlan'): ArtifactPlan {
   assertArtifactPlan(value, path);
 

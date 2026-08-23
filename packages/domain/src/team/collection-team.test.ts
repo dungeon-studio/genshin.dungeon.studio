@@ -254,7 +254,7 @@ describe('deserialiseCollectionTeamMembers', () => {
     expect(() => deserialiseCollectionTeamMembers([null, null])).toThrow(/exactly 4/);
   });
 
-  it('carries a partially filled artifact plan, which the collection accepts', () => {
+  it('carries a partially filled artifact plan', () => {
     const [member] = deserialiseCollectionTeamMembers([
       { characterId: 'columbina', artifactPlan: { sands: 'ATK Percentage' } },
       null,
