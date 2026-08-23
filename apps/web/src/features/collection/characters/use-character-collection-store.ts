@@ -30,7 +30,16 @@ function preferHigherConstellation(
   return { ...server, constellationLevel: local.constellationLevel, updatedAt: nowTimestamp() };
 }
 
-// Additive merge: union of both sets.
+/**
+ * Reconciles what this browser recorded with what the server holds, keeping
+ * everything from both.
+ *
+ * Additive on purpose: a character present on only one side stays, and a
+ * disagreement over constellation resolves to the higher level. Nothing here
+ * can remove a character, because the two sides are indistinguishable from a
+ * device that recorded an addition offline, so a deliberate removal has to
+ * reach the server through its own request.
+ */
 export function mergeCollections(
   local: CharacterCollection,
   server: CharacterCollection,
@@ -56,6 +65,16 @@ interface CollectionState {
   clearCharacters: () => void;
 }
 
+/**
+ * The characters this browser knows the user owns, surviving a reload.
+ *
+ * Components reach for `useCollection` instead, which wraps this with the
+ * server sync. This store is for that hook and for tests.
+ *
+ * Persisted, unlike the team store, so a signed-out visitor's collection is
+ * still here next visit and merges into their account when they sign in. That
+ * makes the persisted shape a stored schema with its own versioned migration.
+ */
 export const useCollectionStore = create<CollectionState>()(
   persist(
     (set, get) => ({

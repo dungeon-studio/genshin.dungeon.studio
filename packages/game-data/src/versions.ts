@@ -36,8 +36,15 @@ function versionTuple(version: string): readonly [number, number] {
 }
 
 /**
- * Compare two version strings for sorting.
- * Returns negative if a comes before b, positive if after, zero if equal.
+ * Orders game versions written either way.
+ *
+ * The game brands its 6.x releases `Luna I` onward while this package's data
+ * records them as `6.0` onward, so a caller may hold a version in either form
+ * and a plain string sort would misplace the named ones. Only the Luna names
+ * the table maps are understood, so a new one has to be added there.
+ *
+ * @throws Error on a string that is neither a mapped Luna name nor `major` or
+ * `major.minor`.
  */
 export function compareVersions(a: string, b: string): number {
   const [aMajor, aMinor] = versionTuple(a);

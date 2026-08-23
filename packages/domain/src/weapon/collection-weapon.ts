@@ -10,6 +10,14 @@ import { isISOTimestamp } from '../iso-timestamp.js';
 export const MIN_REFINEMENT_LEVEL = 1;
 export const MAX_REFINEMENT_LEVEL = 5;
 
+/** Refinement of one weapon instance, one rank per duplicate copy consumed. */
+export type RefinementLevel = 1 | 2 | 3 | 4 | 5;
+
+export const REFINEMENT_LEVELS: readonly RefinementLevel[] = Array.from(
+  { length: MAX_REFINEMENT_LEVEL - MIN_REFINEMENT_LEVEL + 1 },
+  (_, i) => (MIN_REFINEMENT_LEVEL + i) as RefinementLevel,
+);
+
 /**
  * Identifier for one weapon instance in a user's collection.
  *
@@ -19,15 +27,23 @@ export const MAX_REFINEMENT_LEVEL = 5;
  */
 export type CollectionWeaponId = string;
 
+/**
+ * One weapon instance a user owns, as stored and as served.
+ *
+ * A user can own several copies of the same weapon at different refinements,
+ * so `weaponInstanceId` rather than `weaponId` identifies the record.
+ * Everything intrinsic to the weapon is looked up from `@genshin/game-data` by
+ * `weaponId` rather than copied here.
+ */
 export interface CollectionWeapon {
   weaponInstanceId: CollectionWeaponId;
   weaponId: Weapon['id'];
-  refinementLevel: number;
+  refinementLevel: RefinementLevel;
   createdAt: ISOTimestamp;
   updatedAt: ISOTimestamp;
 }
 
-export function isValidRefinementLevel(value: unknown): value is number {
+export function isValidRefinementLevel(value: unknown): value is RefinementLevel {
   return (
     typeof value === 'number' &&
     Number.isInteger(value) &&
@@ -36,6 +52,16 @@ export function isValidRefinementLevel(value: unknown): value is number {
   );
 }
 
+/**
+ * Asserts a value read from storage or a request body is a `CollectionWeapon`.
+ *
+ * `weaponId` is checked against the shipped catalogue, not just for being a
+ * string, so a record naming a weapon `@genshin/game-data` hasn't shipped
+ * fails here. A stored record can therefore start failing after a catalogue
+ * change alone.
+ *
+ * @throws TypeError naming the field that failed.
+ */
 export function assertCollectionWeapon(value: unknown): asserts value is CollectionWeapon {
   if (typeof value !== 'object' || value === null) {
     throw new TypeError(

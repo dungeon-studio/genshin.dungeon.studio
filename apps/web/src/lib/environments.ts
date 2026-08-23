@@ -20,7 +20,7 @@ interface Badge {
   label: string;
   /** Overlaid on the favicon by the brand-asset generator. */
   glyph: string;
-  /** Names the favicon variant: `favicon-32x32.png` -> `favicon-32x32-alpha.png`. */
+  /** Names the favicon variant: `favicon-32x32.png` becomes `favicon-32x32-alpha.png`. */
   iconSuffix: string;
 }
 

@@ -38,6 +38,13 @@ export interface SaveResult {
   created: boolean;
 }
 
+/**
+ * Upserts a character, reporting whether the record was new so the route can
+ * answer 201 rather than 200.
+ *
+ * Reads and writes in one transaction: two concurrent saves would otherwise
+ * both see no existing record and the later one would overwrite `createdAt`.
+ */
 export async function save(
   userId: string,
   characterId: CharacterId,
@@ -59,6 +66,7 @@ export async function save(
   });
 }
 
+/** Succeeds whether or not the record was there, so absence isn't reported. */
 export async function remove(userId: string, characterId: string): Promise<void> {
   await collectionRef(userId).doc(characterId).delete();
 }

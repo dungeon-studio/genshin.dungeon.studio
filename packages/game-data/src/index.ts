@@ -2,10 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * @genshin/game-data
- *
- * Structured game data for Genshin Impact including characters, weapons,
- * elements, and artifact sets.
+ * Structured game data for Genshin Impact: characters, weapons, elements, and
+ * artifact sets.
  */
 
 // Elements

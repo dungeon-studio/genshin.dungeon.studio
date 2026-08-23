@@ -20,6 +20,17 @@ export function weaponIdsOf(instances: Iterable<CollectionWeapon>): ReadonlySet<
   return new Set(Array.from(instances, (instance) => instance.weaponId));
 }
 
+/**
+ * The weapon instances this browser knows the user owns, for the current
+ * session only.
+ *
+ * Components reach for `useWeaponCollection` instead, which wraps this with the
+ * server sync. This store is for that hook and for tests.
+ *
+ * Not persisted, unlike the character collection: an instance identifier is
+ * minted by the server, so a copy recorded offline could never be reconciled
+ * with the account's own records.
+ */
 export const useWeaponCollectionStore = create<WeaponCollectionState>()((set, get) => ({
   weapons: {},
 

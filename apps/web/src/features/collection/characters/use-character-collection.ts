@@ -48,6 +48,16 @@ export interface UseCollectionResult {
   error: Error | null;
 }
 
+/**
+ * The character collection page's whole interface: what the user owns, the
+ * actions that change it, and the state of the sync behind it.
+ *
+ * Reads always come from the local store, so the page renders before the
+ * network answers and keeps working signed out. Signing in merges what this
+ * browser recorded with the account's own collection and pushes anything the
+ * server hasn't seen, which is how a visitor's offline work survives their
+ * first sign-in.
+ */
 export function useCollection(): UseCollectionResult {
   const { user, loading: authLoading } = useAuth();
   const isAuthenticated = user !== null;

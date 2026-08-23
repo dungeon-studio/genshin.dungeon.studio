@@ -19,6 +19,14 @@ export function assertOptionalString(value: unknown, path: string): void {
   if (value !== undefined) assertString(value, path);
 }
 
+/**
+ * Asserts an absent value, or an array of strings whose length falls within an
+ * inclusive range.
+ *
+ * An absent value skips the range entirely, so a caller wanting to require the
+ * field has to check for it separately. A failure reports the index that broke,
+ * not the array.
+ */
 export function assertOptionalStringArray(
   value: unknown,
   path: string,

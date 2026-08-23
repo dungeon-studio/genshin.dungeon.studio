@@ -36,8 +36,10 @@ export {
   isValidRefinementLevel,
   MAX_REFINEMENT_LEVEL,
   MIN_REFINEMENT_LEVEL,
+  REFINEMENT_LEVELS,
   type CollectionWeapon,
   type CollectionWeaponId,
+  type RefinementLevel,
 } from './weapon/collection-weapon.js';
 export { isISOTimestamp, nowTimestamp, type ISOTimestamp } from './iso-timestamp.js';
 export type { ProblemDetail } from './problem-detail.js';
@@ -63,6 +65,11 @@ export {
   weaponCollectionHref,
   weaponItemHref,
   weaponRepresentation,
+  weaponsOfHref,
 } from './representations/collection-json/weapons.js';
-export { validateTeam, validateTeams, type TeamValidationContext } from './team/team-validation.js';
+export {
+  validateTeam,
+  validateAcrossTeams,
+  type TeamValidationContext,
+} from './team/team-validation.js';
 export type { UUID } from './uuid.js';

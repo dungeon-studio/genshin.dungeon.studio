@@ -8,6 +8,7 @@ import vitest from '@vitest/eslint-plugin';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 import importX from 'eslint-plugin-import-x';
+import tsdoc from 'eslint-plugin-tsdoc';
 import unusedImports from 'eslint-plugin-unused-imports';
 import tseslint from 'typescript-eslint';
 
@@ -111,6 +112,20 @@ const TYPESCRIPT_STRICTNESS = {
   },
 };
 
+/**
+ * TSDoc grammar in documentation strings.
+ *
+ * Only the syntax: a misspelled `@return` or an unclosed `{@link}` renders as
+ * nothing and reports nothing, so it is the half of the documentation string
+ * convention a reader can't be asked to catch. What a documentation string
+ * should say stays a judgment, in the code conventions.
+ */
+const TSDOC_SYNTAX = {
+  files: TYPESCRIPT_FILES,
+  plugins: { tsdoc },
+  rules: { 'tsdoc/syntax': 'error' },
+};
+
 /** Import rules that need no workspace context. */
 const IMPORT_DISCIPLINE = {
   files: LINTED_FILES,
@@ -193,6 +208,7 @@ export default function genshinConfig(packageDir) {
     tseslint.configs.recommended,
     typeAwareRules(packageDir),
     TYPESCRIPT_STRICTNESS,
+    TSDOC_SYNTAX,
     IMPORT_DISCIPLINE,
     declaredDependencies(packageDir),
     VITEST_CONVENTIONS,

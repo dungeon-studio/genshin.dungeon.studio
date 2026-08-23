@@ -15,6 +15,11 @@ import { create } from 'zustand';
 interface TeamStoreState {
   teams: Record<TeamSlot, CollectionTeam>;
 
+  /**
+   * Ignored when the character already sits in this team. With no weapon
+   * given, carries over the one this character holds on another team, so
+   * adding a character somewhere else doesn't lose their loadout.
+   */
   assignCharacter: (
     slot: TeamSlot,
     memberIndex: number,
@@ -29,7 +34,9 @@ interface TeamStoreState {
   ) => void;
   removeWeapon: (slot: TeamSlot, memberIndex: number) => void;
   setArtifactPlan: (slot: TeamSlot, memberIndex: number, plan: ArtifactPlan | undefined) => void;
+  /** The name survives; only the positions are emptied. */
   clearTeam: (slot: TeamSlot) => void;
+  /** A blank or whitespace-only name reverts to the slot's default. */
   setTeamName: (slot: TeamSlot, name: string) => void;
   setTeam: (slot: TeamSlot, team: CollectionTeam) => void;
   setTeams: (teams: Record<TeamSlot, CollectionTeam>) => void;
@@ -39,6 +46,20 @@ interface TeamStoreState {
   isCharacterInTeam: (slot: TeamSlot, characterId: string) => boolean;
 }
 
+/**
+ * The four teams as the UI currently shows them, with no knowledge of the API.
+ *
+ * Components reach for `useTeams` instead, which wraps this with loading and
+ * saving. This store is for that hook and for tests.
+ *
+ * Every mutation is a silent no-op when it can't apply, such as an index
+ * outside a team or a weapon assigned to an empty position, so a caller gets no
+ * signal that nothing happened.
+ *
+ * `setTeam` and `setTeams` are the exception to the `updatedAt` stamping. They
+ * replace state wholesale, which is how a server response lands without looking
+ * like a user edit.
+ */
 export const useTeamStore = create<TeamStoreState>()((set, get) => ({
   teams: initialTeams(),
 

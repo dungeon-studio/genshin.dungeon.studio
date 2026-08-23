@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
-import type { UUID } from '@genshin/domain';
+import type { RefinementLevel, UUID } from '@genshin/domain';
 import {
   serialiseWeapon,
   weaponCollectionHref,
   weaponItemHref,
+  weaponsOfHref,
   weaponRepresentation,
 } from '@genshin/domain';
 import { Hono } from 'hono';
@@ -24,6 +25,14 @@ import { weaponPostRequestV1 } from '@/profiles/json-schema/weapons/post-request
 import * as Weapons from '@/repositories/weapons/index.js';
 import type { AuthenticatedRouteVariables } from '@/routes/variables.js';
 
+/**
+ * The signed-in caller's owned weapon instances, addressed by an identifier the
+ * server mints.
+ *
+ * A user can own several copies of one weapon at different refinements, so
+ * creation is `POST` and the response carries `Location`. The collection takes
+ * a `weaponId` query to narrow to one weapon's copies.
+ */
 export const weapons = new Hono<{
   Variables: AuthenticatedRouteVariables;
 }>();
@@ -32,8 +41,14 @@ weapons.use('*', auth);
 
 weapons.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: weaponItemV1 }]));
 
-type CreateWeaponBody = FromSchema<typeof weaponPostRequestV1.schema>;
-type UpdateWeaponBody = FromSchema<typeof weaponPatchRequestV1.schema>;
+// FromSchema widens the schema's integer bounds to `number`; request validation
+// has already enforced them, so the intersection puts the range back.
+type CreateWeaponBody = FromSchema<typeof weaponPostRequestV1.schema> & {
+  refinementLevel: RefinementLevel;
+};
+type UpdateWeaponBody = FromSchema<typeof weaponPatchRequestV1.schema> & {
+  refinementLevel: RefinementLevel;
+};
 
 // GET /weapons — List all weapon instances, optionally filtered by weaponId
 weapons.get('/', async (c) => {
@@ -52,7 +67,7 @@ weapons.get('/', async (c) => {
       JSON.stringify(
         serialiseCollection(
           weaponRepresentation,
-          weaponCollectionHref(baseUrl, weaponId),
+          weaponsOfHref(baseUrl, weaponId),
           instances.map((w) => serialiseWeapon(w, baseUrl)),
         ),
       ),

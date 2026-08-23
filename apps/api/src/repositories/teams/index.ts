@@ -13,6 +13,13 @@ function collectionRef(userId: string) {
   return db.collection('users').doc(userId).collection('teams');
 }
 
+/**
+ * The teams the user has saved, which is fewer than four until they've saved
+ * all four.
+ *
+ * Skips any document whose ID isn't a slot number, so a stray write under the
+ * collection can't break a read.
+ */
 export async function list(userId: string): Promise<CollectionTeam[]> {
   const snapshot = await collectionRef(userId).get();
 
@@ -32,6 +39,13 @@ export interface SaveResult {
   created: boolean;
 }
 
+/**
+ * Merges an update into a slot, reporting whether the record was new so the
+ * route can answer 201 rather than 200.
+ *
+ * Reads then writes without a transaction, so two concurrent saves to one slot
+ * resolve last-writer-wins rather than merging.
+ */
 export async function save(
   userId: string,
   slot: TeamSlot,
@@ -48,6 +62,7 @@ export async function save(
   return { team, created: existing === null };
 }
 
+/** Succeeds whether or not the slot was saved, so absence isn't reported. */
 export async function remove(userId: string, slot: TeamSlot): Promise<void> {
   await collectionRef(userId).doc(String(slot)).delete();
 }

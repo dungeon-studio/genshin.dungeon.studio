@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { CollectionTeamMembers, TeamSlot } from './collection-team.js';
 import type { TeamValidationContext } from './team-validation.js';
-import { validateTeam, validateTeams } from './team-validation.js';
+import { validateTeam, validateAcrossTeams } from './team-validation.js';
 import type { ArtifactPlan } from '../artifact/artifact-plan.js';
 
 const EMPTY_MEMBERS: CollectionTeamMembers = [null, null, null, null];
@@ -107,9 +107,9 @@ describe('validateTeam', () => {
   });
 });
 
-describe('validateTeams', () => {
+describe('validateAcrossTeams', () => {
   it('returns no issues when no weapon conflicts exist', () => {
-    const issues = validateTeams(1, EMPTY_MEMBERS, [{ slot: 2, members: EMPTY_MEMBERS }]);
+    const issues = validateAcrossTeams(1, EMPTY_MEMBERS, [{ slot: 2, members: EMPTY_MEMBERS }]);
     expect(issues).toEqual([]);
   });
 
@@ -120,7 +120,7 @@ describe('validateTeams', () => {
       null,
       null,
     ];
-    const issues = validateTeams(1, members, [{ slot: 2, members }]);
+    const issues = validateAcrossTeams(1, members, [{ slot: 2, members }]);
     expect(issues).toEqual([]);
   });
 
@@ -135,7 +135,7 @@ describe('validateTeams', () => {
       slot: 2,
       members: [{ characterId: 'durin', weaponInstanceId: 'weapon-1' }, null, null, null],
     };
-    const issues = validateTeams(1, current, [otherTeam]);
+    const issues = validateAcrossTeams(1, current, [otherTeam]);
     expect(issues.length).toBeGreaterThan(0);
     expect(issues[0].message).toMatch(/already equipped/i);
   });
@@ -147,7 +147,7 @@ describe('validateTeams', () => {
       null,
       null,
     ];
-    const issues = validateTeams(1, members, [{ slot: 1, members }]);
+    const issues = validateAcrossTeams(1, members, [{ slot: 1, members }]);
     expect(issues).toEqual([]);
   });
 });

@@ -28,6 +28,14 @@ export function initialFilterState(): WeaponFilterState {
   };
 }
 
+/**
+ * The weapon catalogue narrowed and ordered for display.
+ *
+ * An empty type or rarity set means no constraint rather than no matches.
+ *
+ * Weapons carry no release date, so ordering by release uses the version.
+ * Everything from one version ties and falls back to name and then ID.
+ */
 export function filterWeapons(
   weapons: readonly Weapon[],
   filters: WeaponFilterState,

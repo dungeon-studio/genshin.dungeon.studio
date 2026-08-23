@@ -3,13 +3,23 @@
 
 import type { CollectionTeam, ISOTimestamp, TeamSlot } from '@genshin/domain';
 
+/** What a save is changing. An absent field leaves the stored value alone. */
 export interface TeamUpdates {
   name?: string;
   members?: CollectionTeam['members'];
   description?: string;
 }
 
-/** `??` throughout: an empty name or description is a value, not an omission. */
+/**
+ * The team to store, from an update and whatever was already there.
+ *
+ * `createdAt` survives from the existing record while `updatedAt` always moves,
+ * so a save that changes nothing still stamps a new modification time. A slot
+ * with nothing stored yields a complete default team rather than a partial one.
+ *
+ * @remarks
+ * `??` throughout: an empty name or description is a value, not an omission.
+ */
 export function nextTeam(
   slot: TeamSlot,
   updates: TeamUpdates,

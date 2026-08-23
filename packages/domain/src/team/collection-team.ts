@@ -22,14 +22,18 @@ export const MAX_TEAM_MEMBERS = 4;
  */
 export type TeamSlot = 1 | 2 | 3 | 4;
 
-/**
- * All valid team loadout slot values.
- */
+/** Every loadout slot in ascending order, for a caller rendering all four. */
 export const TEAM_SLOTS: readonly TeamSlot[] = Array.from(
   { length: MAX_TEAM_SLOT - MIN_TEAM_SLOT + 1 },
   (_, i) => (MIN_TEAM_SLOT + i) as TeamSlot,
 );
 
+/**
+ * Whether an index addresses a position within a team.
+ *
+ * Positions are 0-indexed, unlike `TeamSlot`, which numbers the loadouts
+ * themselves from 1. Both range over four values, so a mix-up type-checks.
+ */
 export function isValidMemberIndex(index: number): boolean {
   return Number.isInteger(index) && index >= 0 && index < MAX_TEAM_MEMBERS;
 }
@@ -42,7 +46,15 @@ export type CollectionTeamMembers = [
   CollectionTeamMember | null,
 ];
 
-/** A type derived from a wire schema can't express the fixed length. */
+/**
+ * Builds the fixed-length member tuple from untrusted input.
+ *
+ * Exists because a type derived from a wire schema can't express the fixed
+ * length. A shorter or longer array fails rather than being padded, since a
+ * missing element would silently shift every position after it.
+ *
+ * @throws TypeError naming the position that failed.
+ */
 export function deserialiseCollectionTeamMembers(
   value: unknown,
   path = 'members',
@@ -64,11 +76,12 @@ export function deserialiseCollectionTeamMembers(
 }
 
 /**
- * CollectionTeam is a user's team composition in their collection.
+ * One of a user's four team loadouts.
  *
- * Each user has up to 4 team loadout slots (1–4). Members is a fixed-length
- * 4-tuple where `null` represents an empty position, preserving positional
- * information across API round-trips.
+ * `slot` is the identity, not a position in a growing list, so storage keys the
+ * record by it and a save is an upsert. `members` holds `null` for an empty
+ * position rather than omitting it, which is what carries position through a
+ * round trip.
  */
 export interface CollectionTeam {
   slot: TeamSlot;
@@ -88,6 +101,14 @@ export function isValidTeamSlot(value: unknown): value is TeamSlot {
   );
 }
 
+/**
+ * Asserts a value read from storage or a request body is a `CollectionTeam`.
+ *
+ * Shape only. Whether the characters and weapons its members name exist, and
+ * whether the user owns them, is `validateTeam`'s job.
+ *
+ * @throws TypeError naming the field that failed.
+ */
 export function assertCollectionTeam(value: unknown): asserts value is CollectionTeam {
   if (typeof value !== 'object' || value === null) {
     throw new TypeError(`CollectionTeam must be a non-null object, got: ${JSON.stringify(value)}`);
@@ -131,6 +152,12 @@ export function defaultTeamName(slot: TeamSlot): string {
   return `Team ${slot}`;
 }
 
+/**
+ * An unsaved team with every position empty and the default name.
+ *
+ * Stamps both timestamps with the current instant, so a team that has never
+ * been saved still satisfies `CollectionTeam` and reads as freshly created.
+ */
 export function createEmptyTeam(slot: TeamSlot): CollectionTeam {
   const now = nowTimestamp();
   return {
@@ -142,6 +169,13 @@ export function createEmptyTeam(slot: TeamSlot): CollectionTeam {
   };
 }
 
+/**
+ * All four slots filled with empty teams, keyed by slot.
+ *
+ * The baseline a client overlays saved teams onto. Storage holds a record only
+ * for a slot the user has saved, so a client that rendered the stored list
+ * directly would show fewer than four.
+ */
 export function initialTeams(): Record<TeamSlot, CollectionTeam> {
   return Object.fromEntries(TEAM_SLOTS.map((slot) => [slot, createEmptyTeam(slot)])) as Record<
     TeamSlot,

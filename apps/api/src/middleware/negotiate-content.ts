@@ -28,7 +28,7 @@ export function toMediaTypeString(representation: SupportedRepresentation, origi
 }
 
 /**
- * Content negotiation middleware.
+ * Picks the representation to serve, in declaration order of preference.
  *
  * Declare the representations the endpoint can produce. The middleware uses
  * negotiator to match the client's Accept header (including quality values,

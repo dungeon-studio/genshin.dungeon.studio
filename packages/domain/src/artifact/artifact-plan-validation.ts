@@ -2,10 +2,11 @@
 /* SPDX-License-Identifier: MIT */
 
 /**
- * Artifact plan validators.
+ * The value half of artifact plan checking, paired with `assertArtifactPlan`'s
+ * structural half.
  *
- * Returns {@link ValidationIssue}[] instead of throwing, so callers
- * can display all issues at once (inline messages).
+ * Collects issues rather than throwing on the first, because the caller is a
+ * form that shows every field's message at once.
  */
 
 import {
@@ -18,6 +19,13 @@ import {
 import type { ValidationIssue } from '@genshin/validation';
 import { issue } from '@genshin/validation';
 
+/**
+ * Checks a plan's affix names and set IDs against game data, plus the rules no
+ * type expresses: at most three minor affixes per list, no duplicates within a
+ * list, and no affix in both.
+ *
+ * @returns every issue found, empty when the plan is valid.
+ */
 // Intentionally uses loose string types instead of ArtifactPlan's branded types
 // (SandsMainAffix, etc.). The validator's job is to check raw input *before* it
 // becomes a domain object. Accepting ArtifactPlan would make the call circular.

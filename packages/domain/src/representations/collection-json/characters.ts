@@ -35,6 +35,13 @@ export function characterCollectionHref(baseUrl: string): string {
   return `${baseUrl}/characters`;
 }
 
+/**
+ * The URL of one owned character.
+ *
+ * Addressed by `characterId`, so a user holds at most one record per character.
+ * Owning several copies raises the constellation level rather than adding a
+ * record, which is why no instance identifier appears here.
+ */
 export function characterItemHref(baseUrl: string, character: CollectionCharacter): string {
   return `${characterCollectionHref(baseUrl)}/${character.characterId}`;
 }
@@ -48,12 +55,21 @@ export function serialiseCharacter(character: CollectionCharacter, baseUrl: stri
   ]);
 }
 
+/**
+ * Reads an owned character back out of a Collection+JSON item.
+ *
+ * Takes the identifier from the item's data rather than parsing its `href`, so
+ * an item whose URL and payload disagree resolves to the payload.
+ *
+ * @throws TypeError naming the field that failed.
+ */
 export function deserialiseCharacter(item: Item): CollectionCharacter {
   const data = Object.fromEntries(item.data.map((d) => [d.name, d.value]));
   assertCollectionCharacter(data);
   return data;
 }
 
+/** What the generic collection helpers consume for this resource. */
 export const characterRepresentation = {
   serialise: serialiseCharacter,
   deserialise: deserialiseCharacter,

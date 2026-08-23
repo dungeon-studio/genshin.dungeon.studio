@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { ArtifactSet } from '@genshin/game-data';
 import { compareVersions } from '@genshin/game-data';
 import genshinDb from 'genshin-db';
 import type { Artifact as DbArtifact } from 'genshin-db';
@@ -12,12 +13,15 @@ import { toId } from './slug.js';
 /** Only sets with 5-star pieces are tracked; the rest are leveling fodder. */
 const ENDGAME_RARITY = 5;
 
-export interface GeneratedArtifactSet {
-  id: string;
-  name: string;
-  version: string;
-  bonuses: Record<2 | 4, string>;
-}
+/**
+ * One record as it will be emitted.
+ *
+ * The consumer's `ArtifactSet` with only `id` widened, rather than a second
+ * declaration of the same shape kept in step by hand. The consumer narrows `id`
+ * to the union of ids the last generation produced, which is the thing this
+ * run replaces.
+ */
+export type GeneratedArtifactSet = Omit<ArtifactSet, 'id'> & { id: string };
 
 function isEndgameSet(record: DbArtifact | undefined): record is DbArtifact {
   return record?.rarityList.includes(ENDGAME_RARITY) ?? false;
@@ -43,6 +47,15 @@ function byRosterOrder(a: GeneratedArtifactSet, b: GeneratedArtifactSet): number
   return compareVersions(b.version, a.version) || a.name.localeCompare(b.name);
 }
 
+/**
+ * The artifact roster in emission order, without writing anything.
+ *
+ * Split from `generateArtifactSets` so tests can assert on the records rather
+ * than on a file. Aborts on upstream drift, such as a 5-star set missing a
+ * bonus, rather than emitting a partial record.
+ *
+ * @throws Error naming the set that couldn't be built.
+ */
 export function buildArtifactSets(): GeneratedArtifactSet[] {
   queryInEnglish();
 

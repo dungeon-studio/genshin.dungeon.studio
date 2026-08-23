@@ -13,6 +13,14 @@ const { version: apiVersion } = JSON.parse(
   readFileSync(new URL('../../package.json', import.meta.url), 'utf-8'),
 ) as { version: string };
 
+/**
+ * Liveness plus the identity of what is running, for a deployment check that
+ * has no credentials.
+ *
+ * Unauthenticated on purpose. It reports the package version and the build's
+ * git SHA without probing dependencies, so a green response says nothing about
+ * whether storage is reachable.
+ */
 export const health = new Hono<{ Variables: NegotiatedResponseContentVariables }>();
 
 health.get(

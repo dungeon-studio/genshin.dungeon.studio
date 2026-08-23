@@ -32,21 +32,32 @@ const WEAPON_TEMPLATE: Template = {
   ],
 };
 
-export function weaponCollectionHref(baseUrl: string, weaponId?: string): string {
-  const collection = `${baseUrl}/weapons`;
-  if (weaponId === undefined) return collection;
-  return `${collection}?weaponId=${encodeURIComponent(weaponId)}`;
+/** The URL of every weapon instance the user owns. */
+export function weaponCollectionHref(baseUrl: string): string {
+  return `${baseUrl}/weapons`;
+}
+
+/** The URL of the user's copies of one weapon, a filtered view of the collection. */
+export function weaponsOfHref(baseUrl: string, weaponId: string): string {
+  return `${weaponCollectionHref(baseUrl)}?weaponId=${encodeURIComponent(weaponId)}`;
 }
 
 export function weaponItemHref(baseUrl: string, weapon: CollectionWeapon): string {
   return `${weaponCollectionHref(baseUrl)}/${weapon.weaponInstanceId}`;
 }
 
+/**
+ * Writes one owned weapon as a Collection+JSON item.
+ *
+ * Carries a `collection` link to the user's other copies of the same weapon,
+ * so a client comparing refinements follows the link instead of filtering the
+ * full list itself.
+ */
 export function serialiseWeapon(weapon: CollectionWeapon, baseUrl: string): Item {
   const links: Link[] = [
     {
       rel: 'collection',
-      href: weaponCollectionHref(baseUrl, weapon.weaponId),
+      href: weaponsOfHref(baseUrl, weapon.weaponId),
       prompt: `All instances of ${weapon.weaponId}`,
     },
   ];
@@ -64,12 +75,21 @@ export function serialiseWeapon(weapon: CollectionWeapon, baseUrl: string): Item
   );
 }
 
+/**
+ * Reads one owned weapon back out of a Collection+JSON item.
+ *
+ * Takes the identifier from the item's data rather than parsing its `href`, so
+ * an item whose URL and payload disagree resolves to the payload.
+ *
+ * @throws TypeError naming the field that failed.
+ */
 export function deserialiseWeapon(item: Item): CollectionWeapon {
   const data = Object.fromEntries(item.data.map((d) => [d.name, d.value]));
   assertCollectionWeapon(data);
   return data;
 }
 
+/** What the generic collection helpers consume for this resource. */
 export const weaponRepresentation = {
   serialise: serialiseWeapon,
   deserialise: deserialiseWeapon,

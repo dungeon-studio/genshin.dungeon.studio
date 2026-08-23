@@ -61,6 +61,16 @@ interface FilterBarProps<F extends BaseFilterState, T extends string> extends Fi
 
 const RARITY_VALUES: Rarity[] = [5, 4];
 
+/**
+ * The search, filter, and sort row every collection page shares.
+ *
+ * Generic over both the filter state and the one category that differs between
+ * collections, which is what lets characters filter by element and weapons by
+ * type through the same component. A new collection supplies a
+ * {@link FilterCategoryConfig} rather than a new bar.
+ *
+ * Controlled: it holds no filter state and hands a whole new `F` to `onChange`.
+ */
 export function FilterBar<F extends BaseFilterState, T extends string>({
   filters,
   onChange,

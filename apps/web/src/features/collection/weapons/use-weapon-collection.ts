@@ -1,8 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
-import { isValidRefinementLevel } from '@genshin/domain';
+import type { CollectionWeapon, CollectionWeaponId, RefinementLevel } from '@genshin/domain';
 import type { Weapon } from '@genshin/game-data';
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
@@ -21,15 +20,30 @@ import { useWeaponCollectionStore } from './use-weapon-collection-store';
 export interface UseWeaponCollectionResult {
   weapons: Record<CollectionWeaponId, CollectionWeapon>;
   isAuthenticated: boolean;
+  /**
+   * Adds a first copy only if the user has none, ignoring repeat calls while
+   * one is in flight. For a caller that needs the weapon to exist, such as
+   * equipping it on a team, rather than one recording another copy.
+   */
   ensureWeapon: (weaponId: Weapon['id']) => void;
+  /** Adds a copy unconditionally, since a user may own several. */
   addWeapon: (weaponId: Weapon['id']) => void;
   removeWeapon: (collectionWeaponId: CollectionWeaponId) => void;
-  setRefinementLevel: (collectionWeaponId: CollectionWeaponId, level: number) => void;
+  setRefinementLevel: (collectionWeaponId: CollectionWeaponId, level: RefinementLevel) => void;
   getWeaponsByWeaponId: (weaponId: Weapon['id']) => CollectionWeapon[];
   isLoading: boolean;
   error: Error | null;
 }
 
+/**
+ * The weapon collection's whole interface: the instances the user owns, the
+ * actions that change them, and the state of the sync behind them.
+ *
+ * Every action is a no-op while signed out, unlike the character collection: an
+ * instance identifier comes from the server, so there is nothing to record
+ * locally first. Callers show `isAuthenticated` rather than offering an action
+ * that will silently do nothing.
+ */
 export function useWeaponCollection(): UseWeaponCollectionResult {
   const { user, loading: authLoading } = useAuth();
   const isAuthenticated = user !== null;
@@ -137,9 +151,8 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   );
 
   const setRefinementLevel = useCallback(
-    (collectionWeaponId: CollectionWeaponId, level: number) => {
+    (collectionWeaponId: CollectionWeaponId, level: RefinementLevel) => {
       if (!isAuthenticated) return;
-      if (!isValidRefinementLevel(level)) return;
 
       const previous = useWeaponCollectionStore.getState().weapons[collectionWeaponId];
       if (!previous || previous.refinementLevel === level) return;

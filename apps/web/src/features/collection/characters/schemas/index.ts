@@ -6,15 +6,26 @@ import { assertCollectionCharacter } from '@genshin/domain';
 
 import { V1PersistedCollectionSchema } from './v1.js';
 
-// The version zustand `persist` stamps onto every write. Bump this and add a
-// `schemas/v{n}.ts` whenever the persisted shape changes; the compatibility gate
-// (apps/api/scripts/check-schema-compat.ts) then forces the change to only widen.
+/**
+ * The version zustand `persist` stamps onto every write.
+ *
+ * Bump this and add a `schemas/v{n}.ts` whenever the persisted shape changes;
+ * the compatibility gate (`apps/api/scripts/check-schema-compat.ts`) then
+ * forces the change to only widen.
+ */
 export const CURRENT_VERSION = 1 as const;
 
-// Rehydration guard for the `genshin-collection` store: an invalid blob is
-// discarded whole and a single malformed or unknown-character entry is dropped,
-// so one bad record can't poison the collection. Signed-in users re-merge from
-// the server afterward, so a discard is never a real loss.
+/**
+ * Reads the `genshin-collection` store back out of browser storage, dropping
+ * whatever no longer holds up.
+ *
+ * Two levels of tolerance, because this runs against data written by an older
+ * build on someone else's machine: a blob that doesn't parse is discarded
+ * whole, and within one that does, a malformed or unknown-character entry is
+ * skipped so a single bad record can't cost the user their collection. A
+ * signed-in user re-merges from the server afterwards, so a discard is rarely a
+ * real loss.
+ */
 export function migratePersistedCollection(persisted: unknown): {
   characters: Record<string, CollectionCharacter>;
 } {

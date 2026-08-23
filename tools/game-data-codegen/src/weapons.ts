@@ -34,6 +34,13 @@ const SUB_STAT_BY_GENSHIN_DB: Record<string, WeaponStatType> = {
   FIGHT_PROP_DEFENSE_PERCENT: WEAPON_STAT_TYPES.DEF_PERCENT,
 };
 
+/**
+ * One record on its way to being emitted, which is not the consumer's `Weapon`.
+ *
+ * `passive` is one object here and two flat fields once serialised, so unlike
+ * the character and artifact shapes this one can't be the consumer's type with
+ * `id` widened. It has to be kept in step with `Weapon` by hand.
+ */
 export interface GeneratedWeapon {
   id: string;
   name: string;
@@ -88,6 +95,15 @@ function byRosterOrder(a: GeneratedWeapon, b: GeneratedWeapon): number {
   );
 }
 
+/**
+ * The weapon roster in emission order, without writing anything.
+ *
+ * Split from `generateWeapons` so tests can assert on the records rather than
+ * on a file. Aborts on upstream drift, such as a stat this tool has no mapping
+ * for, rather than emitting a partial record.
+ *
+ * @throws Error naming the weapon that couldn't be built.
+ */
 export function buildWeapons(): GeneratedWeapon[] {
   queryInEnglish();
 

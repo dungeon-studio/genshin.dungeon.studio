@@ -1,9 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-/**
- * Genshin Impact element types
- */
+/** The seven elements, keyed for code and valued with the name players see. */
 export const ELEMENTS = {
   PYRO: 'Pyro',
   HYDRO: 'Hydro',
@@ -17,7 +15,11 @@ export const ELEMENTS = {
 export type Element = (typeof ELEMENTS)[keyof typeof ELEMENTS];
 
 /**
- * Elemental reaction type categories
+ * The damage model a reaction follows.
+ *
+ * Reactions in one category share that model, so a caller grouping or
+ * explaining reactions branches on this rather than on the reaction name.
+ * `ELEMENT_REACTION_TYPES` holds the reactions themselves.
  */
 export const REACTION_TYPES = {
   AMPLIFYING: 'AMPLIFYING',
@@ -31,11 +33,11 @@ export const REACTION_TYPES = {
 export type ReactionType = (typeof REACTION_TYPES)[keyof typeof REACTION_TYPES];
 
 /**
- * Elemental reaction definitions
+ * What one reaction is, as this package records it.
  *
- * MAINTENANCE NOTE: Update this file when new reactions are added to the game.
- * Last updated: Version 5.1 (added Lunar reactions)
- * Reference: https://genshin-impact.fandom.com/wiki/Elemental_Reaction
+ * `elements` is absent for a reaction no pair of elements triggers, such as
+ * Shatter, and `version` is the version that introduced it rather than a
+ * version it is still current in.
  */
 interface ReactionInfo {
   type: ReactionType;
@@ -45,6 +47,15 @@ interface ReactionInfo {
   version: string; // Release version when reaction was introduced or significantly changed
 }
 
+/**
+ * Every elemental reaction, hand-maintained rather than generated.
+ *
+ * The codegen tool covers characters, weapons, and artifacts but not reactions,
+ * so a game update that adds one reaches this package only by someone editing
+ * this table.
+ *
+ * @see https://genshin-impact.fandom.com/wiki/Elemental_Reaction
+ */
 export const ELEMENT_REACTION_TYPES: Record<string, ReactionInfo> = {
   // Amplifying Reactions (damage multipliers) - version 1.0
   VAPORIZE: {
@@ -147,7 +158,11 @@ export const ELEMENT_REACTION_TYPES: Record<string, ReactionInfo> = {
 } as const;
 
 /**
- * Helper to get all reactions for a specific version
+ * The reactions a given game version introduced.
+ *
+ * Not the reactions available at that version: an exact match on the recorded
+ * version, so asking for `'3.0'` returns Burning, Aggravate, Spread, and the
+ * Dendro Core reactions, and nothing from 1.0.
  */
 export function getReactionsByVersion(version: string): Record<string, ReactionInfo> {
   return Object.fromEntries(

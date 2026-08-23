@@ -18,6 +18,13 @@ export const COLLECTION_JSON = 'application/vnd.collection+json';
 
 export type DatumValue = string | number | boolean | null;
 
+/**
+ * One name-value pair, in an item's data or in a write template.
+ *
+ * `value` is optional because a template datum names a field the client may
+ * write and carries no value of its own. The same type serves both positions,
+ * so a reader of an item's data still has to allow for an absent value.
+ */
 export interface Datum {
   name: string;
   value?: DatumValue;
@@ -59,6 +66,13 @@ export interface Collection {
   template?: Template;
 }
 
+/**
+ * A whole Collection+JSON response body.
+ *
+ * The media type puts everything under a single `collection` key, so this
+ * wrapper is the thing that goes on the wire and `Collection` never appears at
+ * the top level on its own.
+ */
 export interface CollectionDocument {
   collection: Collection;
 }
@@ -99,6 +113,8 @@ export function serialiseCollection<T>(
  *
  * Validates that `value` has a `collection` object whose `items` property is an
  * array. Individual item shapes are left to domain-level deserialisers.
+ *
+ * @throws TypeError when the envelope is missing or malformed.
  */
 export function assertCollectionDocument(value: unknown): asserts value is CollectionDocument {
   const doc = value as Record<string, unknown> | null | undefined;
@@ -110,6 +126,12 @@ export function assertCollectionDocument(value: unknown): asserts value is Colle
 
 // --- Builders ---
 
+/**
+ * Assembles one item, leaving out an empty `links` rather than emitting `[]`.
+ *
+ * An empty array and an absent key mean the same thing to a client, so omitting
+ * it keeps a document diff to the fields that actually changed.
+ */
 export function buildItem(href: string, data: Datum[], links?: Link[]): Item {
   const item: Item = { href, data };
   if (links && links.length > 0) {
@@ -118,6 +140,13 @@ export function buildItem(href: string, data: Datum[], links?: Link[]): Item {
   return item;
 }
 
+/**
+ * Assembles the envelope, stamping the media type's version.
+ *
+ * Each optional part is left out when empty, on the same reasoning as
+ * `buildItem`. Reach for `serialiseCollection` instead when a representation
+ * already carries the template.
+ */
 export function buildCollection(
   href: string,
   items: Item[],

@@ -95,6 +95,7 @@ SARIF
 semver
 SPA
 SPDX
+TSDoc
 URI
 URIs
 UTC

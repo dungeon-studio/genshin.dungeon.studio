@@ -23,6 +23,14 @@ import { characterPutRequestV1 } from '@/profiles/json-schema/characters/put-req
 import * as Characters from '@/repositories/characters/index.js';
 import type { AuthenticatedRouteVariables } from '@/routes/variables.js';
 
+/**
+ * The signed-in caller's owned characters, addressed by the character's own ID.
+ *
+ * `PUT` rather than `POST` because the client already knows the identifier and
+ * a character is owned at most once, which makes the write an idempotent
+ * upsert. Contrast weapons, where the server mints an instance identifier and
+ * a user may own several copies.
+ */
 export const characters = new Hono<{
   Variables: AuthenticatedRouteVariables;
 }>();

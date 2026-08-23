@@ -12,26 +12,28 @@ import type {
 import { assertOptionalString, assertOptionalStringArray } from '../assertions.js';
 
 /**
- * Artifact plan configuration for a team member.
+ * What a team member intends to equip.
  *
- * All fields are optional to support incremental planning. Users can fill in
- * whichever aspects they know (e.g. main stats only) and leave the rest for
- * later refinement or AI-assisted optimisation.
+ * Every field is optional because planning is incremental: a user who knows the
+ * main affixes but not the sets records only those, and later refinement or
+ * AI-assisted optimisation fills the rest. An empty plan is therefore valid.
  *
- * Artifact sets reference IDs from @genshin/game-data.
+ * The flower and plume carry fixed main affixes, so only the three pieces a
+ * user chooses appear here. Set and affix identifiers come from
+ * `@genshin/game-data`, and nothing on this type checks them.
  */
 export interface ArtifactPlan {
-  /** Desired main affix for Sands of Eon */
+  /** Main affix for the Sands of Eon. */
   sands?: SandsMainAffix;
-  /** Desired main affix for Goblet of Eonothem */
+  /** Main affix for the Goblet of Eonothem. */
   goblet?: GobletMainAffix;
-  /** Desired main affix for Circlet of Logos */
+  /** Main affix for the Circlet of Logos. */
   circlet?: CircletMainAffix;
-  /** 1–2 artifact set IDs from game-data */
+  /** One set worn as a four-piece bonus, or two worn as two-piece bonuses. */
   sets?: [ArtifactSet['id']] | [ArtifactSet['id'], ArtifactSet['id']];
-  /** 0–3 priority minor affixes to prioritize */
+  /** Minor affixes to roll for first, at most three and without duplicates. */
   priorityMinorAffixes?: ArtifactMinorAffix[];
-  /** 0–3 secondary minor affixes (must be disjoint from priorityMinorAffixes) */
+  /** Minor affixes worth keeping after the priorities, disjoint from them. */
   secondaryMinorAffixes?: ArtifactMinorAffix[];
 }
 
@@ -44,6 +46,10 @@ const MAX_MINOR_AFFIXES = 3;
  * Structural check only. Affix names and set IDs are validated against
  * game-data by `validateArtifactPlan`, which collects every problem instead of
  * throwing on the first.
+ *
+ * @param path - prefix for the field names in a failure, so a guard over an
+ * enclosing structure reports the position that broke.
+ * @throws TypeError naming the field that failed.
  */
 export function assertArtifactPlan(
   value: unknown,
@@ -71,7 +77,16 @@ export function assertArtifactPlan(
   );
 }
 
-/** Undeclared properties don't survive. */
+/**
+ * Builds an `ArtifactPlan` from untrusted input, keeping only the declared
+ * properties.
+ *
+ * Asserting the shape leaves undeclared properties in place, which would carry
+ * a request body's extra fields into storage. Rebuilding the object field by
+ * field is what stops them.
+ *
+ * @throws TypeError naming the field that failed.
+ */
 export function deserialiseArtifactPlan(value: unknown, path = 'artifactPlan'): ArtifactPlan {
   assertArtifactPlan(value, path);
 

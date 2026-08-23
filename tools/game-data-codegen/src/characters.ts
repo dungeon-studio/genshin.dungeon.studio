@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { compareVersions, ELEMENTS } from '@genshin/game-data';
-import type { Element, Rarity, WeaponType } from '@genshin/game-data';
+import type { Character, Element } from '@genshin/game-data';
 import genshinDb from 'genshin-db';
 import type { Character as DbCharacter } from 'genshin-db';
 
@@ -28,16 +28,15 @@ const ELEMENT_BY_GENSHIN_DB: Record<string, Element> = {
   ELEMENT_PYRO: ELEMENTS.PYRO,
 };
 
-export interface GeneratedCharacter {
-  id: string;
-  name: string;
-  element: Element;
-  weaponType: WeaponType;
-  rarity: Rarity;
-  region: string;
-  version: string;
-  releaseDate: string;
-}
+/**
+ * One record as it will be emitted.
+ *
+ * The consumer's `Character` with only `id` widened, rather than a second
+ * declaration of the same shape kept in step by hand. The consumer narrows `id`
+ * to the union of ids the last generation produced, which is the thing this
+ * run replaces.
+ */
+export type GeneratedCharacter = Omit<Character, 'id'> & { id: string };
 
 function isRosterMember(record: DbCharacter | undefined): record is DbCharacter {
   if (!record) return false;
@@ -84,6 +83,16 @@ function byRosterOrder(a: GeneratedCharacter, b: GeneratedCharacter): number {
   );
 }
 
+/**
+ * The character roster in emission order, without writing anything.
+ *
+ * Split from `generateCharacters` so tests can assert on the records rather
+ * than on a file. Aborts on a character absent from
+ * {@link CHARACTER_RELEASE_DATES}, which is how a new debut is caught rather
+ * than emitted with a missing date.
+ *
+ * @throws Error naming the character that couldn't be built.
+ */
 export function buildCharacters(): GeneratedCharacter[] {
   queryInEnglish();
 

@@ -5,6 +5,14 @@ import { Hono } from 'hono';
 
 import { jsonSchemaRegistry } from '@/profiles/json-schema/registry.js';
 
+/**
+ * Serves the JSON Schema profiles clients negotiate against, one route per
+ * registry entry.
+ *
+ * `$id` is stamped from the request's own origin rather than declared in the
+ * schema module, so the same build serves a self-consistent `$id` from every
+ * environment it is deployed to.
+ */
 export const jsonSchemaProfiles = new Hono();
 
 for (const entry of jsonSchemaRegistry) {

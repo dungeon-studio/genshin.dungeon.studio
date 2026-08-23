@@ -38,6 +38,16 @@ export function isFirestoreError(err: unknown): err is GoogleError {
   return err instanceof GoogleError;
 }
 
+/**
+ * Turns a Firestore gRPC failure into the response a client should see, and
+ * logs what actually happened.
+ *
+ * The returned detail is deliberately the same for every code: the gRPC status
+ * describes our storage layer, and naming it would tell a caller about
+ * infrastructure they can't act on. The distinction a caller can act on is the
+ * status code, where a transient condition is 429 or 503 and everything else is
+ * 500.
+ */
 export function toHttpException(err: GoogleError): HTTPException {
   logger.error({ grpcCode: labelFor(err.code), grpcMessage: err.message }, 'firestore call failed');
   return new HTTPException(httpStatusFor(err.code), { message: INTERNAL_ERROR_DETAIL });
