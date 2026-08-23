@@ -4,7 +4,11 @@
 import { ARTIFACT_SET_DATA } from './artifacts.generated.js';
 
 /**
- * Artifact set piece types
+ * The five slots a set fills, keyed for code and valued with the name players
+ * see.
+ *
+ * Only the sands, goblet, and circlet have main affix lists here. The flower
+ * and plume always roll flat HP and flat ATK, so nothing chooses theirs.
  */
 export const ARTIFACT_PIECES = {
   FLOWER: 'Flower of Life',
@@ -19,7 +23,7 @@ export type ArtifactPiece = (typeof ARTIFACT_PIECES)[keyof typeof ARTIFACT_PIECE
 type ArtifactSetId = keyof typeof ARTIFACT_SET_DATA;
 
 /**
- * Artifact set definition
+ * One artifact set as the game defines it, independent of any user.
  *
  * This is a straight inventory of game data only.
  * Analysis (stat recommendations, playstyle pairings, etc.) is deferred to
@@ -93,9 +97,7 @@ export const CIRCLET_MAIN_AFFIXES = [
 
 export type CircletMainAffix = (typeof CIRCLET_MAIN_AFFIXES)[number];
 
-/**
- * Valid artifact minor affixes
- */
+/** The same ten on every piece, unlike main affixes, which vary by slot. */
 export const ARTIFACT_MINOR_AFFIXES = [
   'HP',
   'HP Percentage',
@@ -112,7 +114,10 @@ export const ARTIFACT_MINOR_AFFIXES = [
 export type ArtifactMinorAffix = (typeof ARTIFACT_MINOR_AFFIXES)[number];
 
 /**
- * Union of all artifact main affix types
+ * Any main affix, for code that handles a piece it doesn't know the slot of.
+ *
+ * Reach for the per-slot type wherever the slot is known: this union accepts a
+ * CRIT Rate sands, which no artifact can roll.
  */
 export type ArtifactMainAffix = SandsMainAffix | GobletMainAffix | CircletMainAffix;
 
@@ -121,6 +126,14 @@ function isArtifactSetId(id: string): id is ArtifactSetId {
   return Object.hasOwn(ARTIFACT_SETS, id);
 }
 
+/**
+ * Looks a set up by ID, taking a plain string so a caller can hand over stored
+ * or user input directly.
+ *
+ * `undefined` means the ID is outside this package's snapshot, which a set the
+ * game has since added also produces. A caller reading a saved plan has to
+ * treat that as data it can't render yet rather than as invalid input.
+ */
 export function getArtifactSetById(id: string): ArtifactSet | undefined {
   return isArtifactSetId(id) ? ARTIFACT_SETS[id] : undefined;
 }
