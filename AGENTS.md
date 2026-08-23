@@ -1,15 +1,16 @@
 <!-- SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> -->
 <!-- SPDX-License-Identifier: MIT -->
 
-# GitHub Copilot instructions for genshin.dungeon.studio
+# Agent instructions for genshin.dungeon.studio
 
-AI decision rules. Human contribution guidance lives in
-[`CONTRIBUTING.md`](../CONTRIBUTING.md) and
-[`docs/reference/`](../docs/reference/); linters cover everything else.
+AI decision rules, canonical for every coding agent. Human contribution
+guidance lives in [`CONTRIBUTING.md`](CONTRIBUTING.md) and
+[`docs/reference/`](docs/reference/); linters cover everything else.
 
-Keep this filename. GitHub Copilot reads this exact path, and root
-[`CLAUDE.md`](../CLAUDE.md) points here for detailed conventions. It's the only
-per-repository instruction file either tool loads.
+Keep this filename: it's the path coding agents look for. Claude Code is the
+exception and reads [`CLAUDE.md`](CLAUDE.md), which imports this file. Adding a
+config for another tool follows the pattern in
+[Code conventions](docs/reference/code-conventions.md).
 
 ## Snapshot
 
@@ -22,11 +23,27 @@ per-repository instruction file either tool loads.
 
 ## Repository map
 
-- `apps/web`: Frontend app.
-- `apps/api`: API server.
+- `apps/web`: Frontend app. Vite dev server on port 5173.
+- `apps/api`: API server. Hono on port 8080.
 - `packages/game-data`: Source of truth for static game data; use exported helpers, never hard-code.
 - `packages/domain`: Shared domain model: types, invariants, and wire format representations.
+- `packages/collection-json`, `packages/validation`: Wire format and schema validation.
 - `tools/game-data-codegen`: CLI that generates `game-data` sources like `weapons.generated.ts` from `genshin-db`. Never hand-edit generated files.
+- `tools/e2e`: Playwright end-to-end specs.
+- `infrastructure`: Terraform.
+- `docs`: Diátaxis-organized how-tos, references, and explanations.
+
+## Commands
+
+```bash
+pnpm dev          # Start all dev servers + Firebase emulators
+pnpm build
+pnpm typecheck
+pnpm test
+pnpm lint
+pnpm format
+pnpm reuse:check  # SPDX license compliance check
+```
 
 ## Core coding rules
 
@@ -38,7 +55,12 @@ per-repository instruction file either tool loads.
 - Use ISO 8601 strings for timestamps such as `createdAt` and `updatedAt`, not `Date` objects.
 - Never leave `console.log` in production code; use structured logging or remove it.
 - Use zustand for UI state, TanStack Query for server state, and `@genshin/game-data` helpers for static game data. Don't put async or fetch logic in a zustand store.
-- For comments, documentation strings, naming, React components, and test structure, follow [Code conventions](../docs/reference/code-conventions.md).
+- For comments, documentation strings, naming, React components, and test structure, follow [Code conventions](docs/reference/code-conventions.md).
+
+## Secrets
+
+Never hard-code a secret anywhere in the repository — source, shell script,
+Terraform, or workflow. Read it from an environment variable.
 
 ## Build and CI rules
 
@@ -50,7 +72,7 @@ per-repository instruction file either tool loads.
 
 ## API design rules
 
-- Use the [REST API conventions reference](../docs/reference/rest-api-conventions.md) for route shape, methods, status codes, error format, pagination, and auth handling.
+- Use the [REST API conventions reference](docs/reference/rest-api-conventions.md) for route shape, methods, status codes, error format, pagination, and auth handling.
 - All error responses use RFC 9457 Problem Details (`application/problem+json`) via `apps/api/src/http/problem.ts`. Always include a `detail` field, even for generic errors, to keep a stable schema for clients.
 - List endpoints use cursor-based pagination (`limit` and `cursor`).
 - Prefer explicit types over type munging. For example, define `ProfileUpdate` rather than using `Partial<Pick<UserProfile, 'name'>>` inline.
@@ -60,15 +82,15 @@ per-repository instruction file either tool loads.
 
 - Define each JSON Schema as a typed TypeScript module in `apps/api/src/profiles/json-schema/{module}/`, not a `.json` file.
 - Export a single `const` using `as const satisfies JsonSchemaProfile` from `@/profiles/json-schema/json-schema-profile.js`.
-- Name files `{method}-{direction}-v{n}.ts` (for example, `get-response-v1.ts`, `put-request-v1.ts`). `{method}` is the lowercase HTTP method and `{direction}` is `request` or `response`. The serving path mirrors the filename: `/profiles/json-schema/{module}/{method}-{direction}-v{n}.json`. See [DSGEP-005](../docs/explanation/dsgep-005-schema-direction-segment.md).
+- Name files `{method}-{direction}-v{n}.ts` (for example, `get-response-v1.ts`, `put-request-v1.ts`). `{method}` is the lowercase HTTP method and `{direction}` is `request` or `response`. The serving path mirrors the filename: `/profiles/json-schema/{module}/{method}-{direction}-v{n}.json`. See [DSGEP-005](docs/explanation/dsgep-005-schema-direction-segment.md).
 - Register every schema module in `apps/api/src/profiles/json-schema/registry.ts`. The registry completeness test discovers files on disk and asserts the registry contains each one.
 - The schema route stamps `$id` from the request origin at serve time. Don't declare `$id` in schema modules.
 
 ## Testing
 
 Test alongside code. What to assert is in the testing principles in
-[`CONTRIBUTING.md`](../CONTRIBUTING.md); how to shape a test is in
-[Code conventions](../docs/reference/code-conventions.md). Read both before
+[`CONTRIBUTING.md`](CONTRIBUTING.md); how to shape a test is in
+[Code conventions](docs/reference/code-conventions.md). Read both before
 writing tests.
 
 ## Frontend rules
@@ -90,15 +112,15 @@ writing tests.
 - Declare every direct import explicitly, even when the same package exists at the root. Enforced by `import-x/no-extraneous-dependencies` in every workspace `eslint.config.js`; `devDependencies` may appear in test files (`*.test.ts`, `**/test/**`) and tooling configs (`eslint.config.js`, `*.config.{ts,js}`) but never in production source.
 - Classify packages correctly: `dependencies` for runtime code shipped to production, `devDependencies` for build tools, plugins, type definitions, and local tooling.
 - `pnpm-workspace.yaml` declares workspace package globs and engine constraints only; don't use it for version overrides.
-- Run `pnpm install` and commit `pnpm-lock.yaml` after dependency changes. Use `pnpm why <package>` to detect duplicate transitive versions.
+- Run `pnpm install` and commit `pnpm-lock.yaml` after dependency changes. Use `pnpm why <package>` to detect duplicate transitive versions. Restart any running dev server too: Vite caches module resolution at startup, so a stale server throws misleading `Cannot find module` errors.
 - New workspace packages should match the root `package.json` metadata fields (`description`, `keywords`, `author`, `homepage`, `bugs`, `license`).
 - ESLint uses flat config via workspace-local `eslint.config.js` files; configure ignore patterns with `ignores`, not `.eslintignore`.
 
 ## Documentation rules
 
-- Place guidance at the highest-priority location that fits, following the documentation strategy in [Code conventions](../docs/reference/code-conventions.md). Don't duplicate guidance across files; link to the canonical source.
+- Place guidance at the highest-priority location that fits, following the documentation strategy in [Code conventions](docs/reference/code-conventions.md). Don't duplicate guidance across files; link to the canonical source.
 - Keep docs accurate to `HEAD`: verify dependencies, command availability, and feature status. State plans explicitly as planned or not yet implemented.
-- Every source file needs SPDX headers. For files without comment syntax, declare them in `REUSE.toml`; see [How to add SPDX headers to new files](../docs/how-tos/add-spdx-headers.md).
+- Every source file needs SPDX headers. For files without comment syntax, declare them in `REUSE.toml`; see [How to add SPDX headers to new files](docs/how-tos/add-spdx-headers.md).
 - Wrap file and directory paths in backticks in prose and YAML metadata (for example, `apps/web`, `packages/game-data/src/index.ts`). Markdown link targets don't need backticks.
 - When adding features, keep these descriptions in sync: `package.json` `description`, `README.md` tagline or summary, and `CONTRIBUTING.md` references to commands or scripts.
 
@@ -115,19 +137,18 @@ writing tests.
   - Case corrections and preference enforcement (`firebase` to `Firebase`, `npm` to `pnpm`): add to `reject.txt` as substitution rules.
 - Don't modify third-party Vale styles generated under `.styles/`, except `.styles/config/`.
 
-## Changelog rules
+## Changelog
 
-- `CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), with sections relative to the previous release rather than the previous commit.
-- Write entries from the user's perspective: what someone using the app can see or do. One bullet per user-visible change.
-- Leave out infrastructure, CI/CD, developer tooling, dependency updates, refactors, and internal package changes. Those are invisible to users.
-- Don't name technology choices such as "zustand store" or "TanStack Query" unless the user interacts with that technology directly.
-- Before the first release, only **Added** applies; the other sections need a released baseline to compare against.
+Which changes earn an entry, and how to word one, is in the changelog section
+of [`CONTRIBUTING.md`](CONTRIBUTING.md). The [`CHANGELOG.md`](CHANGELOG.md)
+header describes the layout they sit in. Read both before adding a line.
 
 ## Workflow guardrails
 
 - Never bypass pre-commit with `--no-verify`; fix root causes.
-- Run `pnpm typecheck` manually because it's not part of local pre-commit hooks.
 - Never use `git commit --amend` or `git push --force`.
+- At session start, check `git status` for pre-existing modified files outside the task's scope; don't attribute their breakage to the current change.
+- Commit message format is in [`CONTRIBUTING.md`](CONTRIBUTING.md); the pull request title carries it, since squash merge makes that title the commit.
 - Fixes after hook failures should be new commits; squash merge handles cleanup.
 - Track issue dependencies only with native GitHub issue relationships (`blocked by` and `is blocking`), not issue body text or comments.
 - Prefer filing follow-up issues for out-of-scope concerns over expanding a pull request.
@@ -138,7 +159,6 @@ writing tests.
 
 - Start Bash scripts with `set -euo pipefail` and `set -x`.
 - Use `curl -fsSL` for network fetches.
-- Never hard-code secrets; use environment variables.
 - Quote `${{ inputs.* }}` expansions in GitHub Actions composite action `run` steps to prevent shell word-splitting.
 
 ## DevContainer rules
@@ -159,7 +179,7 @@ is configured in `.vscode/mcp.json`.
 - Apply environment labels on creation with `gcloud alpha projects update --update-labels=environment=VALUE`.
 - Enable Google Cloud APIs on demand when required by active work.
 - The Terraform version is set once per workflow as the `TERRAFORM_VERSION` environment variable. When changing it, keep every workflow that declares it aligned.
-- Terraform files need SPDX headers using `#` comment syntax. Never hard-code secrets; use environment variables.
+- Terraform files need SPDX headers using `#` comment syntax.
 
 ## Docker rules
 

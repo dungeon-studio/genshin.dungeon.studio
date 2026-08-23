@@ -64,5 +64,6 @@ ignore:
   - CHANGELOG.md
   - LICENSE
   - CONTRIBUTING.md
+  - AGENTS.md
   - CLAUDE.md
   - pnpm-lock.yaml

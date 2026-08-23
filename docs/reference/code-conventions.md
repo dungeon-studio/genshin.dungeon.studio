@@ -32,9 +32,15 @@ When documenting decisions or conventions, prefer the highest-priority location 
 2. **Documentation strings**: explain module or function purpose when the name isn't sufficient.
 3. **`docs/`**: task-specific how-tos, references, and explanations following the [Diátaxis](https://diataxis.fr/) framework.
 4. **`CONTRIBUTING.md`**: high-level human workflow guidance and project conventions.
-5. **`.github/copilot-instructions.md`**: AI-specific decision rules.
+5. **`AGENTS.md`**: AI-specific decision rules.
 
 Avoid duplicating the same guidance across multiple locations. Place it once at the most appropriate level and link to it from others.
+
+### AI tool configuration files
+
+`AGENTS.md` holds the AI decision rules. A tool that reads `AGENTS.md` needs no file of its own. A tool that reads only its own path gets a file pointing at `AGENTS.md`, carrying nothing but behavior specific to that tool. Claude Code is the second case today: [`CLAUDE.md`](../../CLAUDE.md) imports `AGENTS.md` and adds only rules that are false for every other agent.
+
+A rule holding for more than one tool belongs in `AGENTS.md`.
 
 ## Naming conventions
 
