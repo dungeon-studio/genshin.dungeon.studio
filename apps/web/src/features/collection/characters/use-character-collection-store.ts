@@ -47,7 +47,7 @@ export function mergeCollections(
 
 interface CollectionState {
   characters: CharacterCollection;
-  addCharacter: (characterId: CharacterId) => void;
+  ensureCharacter: (characterId: CharacterId) => void;
   removeCharacter: (characterId: CharacterId) => void;
   setConstellationLevel: (characterId: CharacterId, level: ConstellationLevel) => void;
   isOwned: (characterId: CharacterId) => boolean;
@@ -61,7 +61,7 @@ export const useCollectionStore = create<CollectionState>()(
     (set, get) => ({
       characters: {},
 
-      addCharacter: (characterId) => {
+      ensureCharacter: (characterId) => {
         if (get().characters[characterId]) return;
 
         const now = nowTimestamp();

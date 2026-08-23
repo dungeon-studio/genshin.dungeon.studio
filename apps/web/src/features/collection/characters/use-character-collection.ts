@@ -54,7 +54,7 @@ export function useCollection(): UseCollectionResult {
 
   // Zustand store — always the read layer
   const characters = useCollectionStore((s) => s.characters);
-  const storeAddCharacter = useCollectionStore((s) => s.addCharacter);
+  const storeEnsureCharacter = useCollectionStore((s) => s.ensureCharacter);
   const storeRemoveCharacter = useCollectionStore((s) => s.removeCharacter);
   const storeSetConstellationLevel = useCollectionStore((s) => s.setConstellationLevel);
   const replaceCharacters = useCollectionStore((s) => s.replaceCharacters);
@@ -138,7 +138,7 @@ export function useCollection(): UseCollectionResult {
       const alreadyOwned = id in useCollectionStore.getState().characters;
       if (alreadyOwned) return;
 
-      storeAddCharacter(id);
+      storeEnsureCharacter(id);
       if (isAuthenticated) {
         addCharacterApi(id, {
           onSuccess: applyMutationResult,
@@ -157,7 +157,7 @@ export function useCollection(): UseCollectionResult {
     [
       isAuthenticated,
       addCharacterApi,
-      storeAddCharacter,
+      storeEnsureCharacter,
       storeRemoveCharacter,
       applyMutationResult,
     ],
@@ -174,7 +174,7 @@ export function useCollection(): UseCollectionResult {
           onError: () => {
             const stillAbsent = !(id in useCollectionStore.getState().characters);
             if (stillAbsent) {
-              storeAddCharacter(id);
+              storeEnsureCharacter(id);
               storeSetConstellationLevel(id, current.constellationLevel);
               toast.error('Failed to remove character. Change has been reverted.');
             } else {
@@ -188,7 +188,7 @@ export function useCollection(): UseCollectionResult {
       isAuthenticated,
       removeCharacterApi,
       storeRemoveCharacter,
-      storeAddCharacter,
+      storeEnsureCharacter,
       storeSetConstellationLevel,
     ],
   );
