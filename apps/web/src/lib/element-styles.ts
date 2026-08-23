@@ -5,7 +5,7 @@
  * Tailwind classes for each element, one map per role a component needs.
  *
  * Written out rather than built from a template because Tailwind scans source
- * for complete class names: a `` `border-l-${element}` `` would produce no CSS.
+ * for complete class names, and `border-l-${element}` would produce none.
  * Adding an element means adding a row to every map here.
  */
 
