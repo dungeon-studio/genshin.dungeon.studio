@@ -29,6 +29,7 @@ same shape — point here, then carry nothing but its own specifics.
 - `packages/domain`: Shared domain model: types, invariants, and wire format representations.
 - `packages/collection-json`, `packages/validation`: Wire format and schema validation.
 - `tools/game-data-codegen`: CLI that generates `game-data` sources like `weapons.generated.ts` from `genshin-db`. Never hand-edit generated files.
+- `tools/e2e`: Playwright end-to-end specs.
 - `infrastructure`: Terraform.
 - `docs`: Diátaxis-organized how-tos, references, and explanations.
 
@@ -55,6 +56,11 @@ pnpm reuse:check  # SPDX license compliance check
 - Never leave `console.log` in production code; use structured logging or remove it.
 - Use zustand for UI state, TanStack Query for server state, and `@genshin/game-data` helpers for static game data. Don't put async or fetch logic in a zustand store.
 - For comments, documentation strings, naming, React components, and test structure, follow [Code conventions](docs/reference/code-conventions.md).
+
+## Secrets
+
+Never hard-code a secret anywhere in the repository — source, shell script,
+Terraform, or workflow. Read it from an environment variable.
 
 ## Build and CI rules
 
@@ -131,18 +137,16 @@ writing tests.
   - Case corrections and preference enforcement (`firebase` to `Firebase`, `npm` to `pnpm`): add to `reject.txt` as substitution rules.
 - Don't modify third-party Vale styles generated under `.styles/`, except `.styles/config/`.
 
-## Changelog rules
+## Changelog
 
-- `CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), with sections relative to the previous release rather than the previous commit.
-- Write entries from the user's perspective: what someone using the app can see or do. One bullet per user-visible change.
-- Leave out infrastructure, CI/CD, developer tooling, dependency updates, refactors, and internal package changes. Those are invisible to users.
-- Don't name technology choices such as "zustand store" or "TanStack Query" unless the user interacts with that technology directly.
-- Before the first release, only **Added** applies; the other sections need a released baseline to compare against.
+Which changes earn an entry, and how to word one, is in the changelog section
+of [`CONTRIBUTING.md`](CONTRIBUTING.md); the layout the entries sit in is
+described by the [`CHANGELOG.md`](CHANGELOG.md) header itself. Read both before
+adding a line.
 
 ## Workflow guardrails
 
 - Never bypass pre-commit with `--no-verify`; fix root causes.
-- Run `pnpm typecheck` manually because it's not part of local pre-commit hooks.
 - Never use `git commit --amend` or `git push --force`.
 - At session start, check `git status` for pre-existing modified files outside the task's scope; don't attribute their breakage to the current change.
 - Commit message format is in [`CONTRIBUTING.md`](CONTRIBUTING.md); the pull request title carries it, since squash merge makes that title the commit.
@@ -156,7 +160,6 @@ writing tests.
 
 - Start Bash scripts with `set -euo pipefail` and `set -x`.
 - Use `curl -fsSL` for network fetches.
-- Never hard-code secrets; use environment variables.
 - Quote `${{ inputs.* }}` expansions in GitHub Actions composite action `run` steps to prevent shell word-splitting.
 
 ## DevContainer rules
@@ -177,7 +180,7 @@ is configured in `.vscode/mcp.json`.
 - Apply environment labels on creation with `gcloud alpha projects update --update-labels=environment=VALUE`.
 - Enable Google Cloud APIs on demand when required by active work.
 - The Terraform version is set once per workflow as the `TERRAFORM_VERSION` environment variable. When changing it, keep every workflow that declares it aligned.
-- Terraform files need SPDX headers using `#` comment syntax. Never hard-code secrets; use environment variables.
+- Terraform files need SPDX headers using `#` comment syntax.
 
 ## Docker rules
 
