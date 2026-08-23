@@ -9,6 +9,8 @@
 
   "workspaces": {
     ".": {
+      // `turbo gen` discovers its generator by path, so knip sees no importer.
+      "entry": ["turbo/generators/config.ts"],
       // These run at the repo root via pre-commit, which knip can't see. eslint
       // hides from knip's eslint plugin too: the flat configs live in each
       // workspace, so the plugin never activates at the root to claim it.

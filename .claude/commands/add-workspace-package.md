@@ -6,20 +6,10 @@ allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 
 # Add workspace package
 
-Work the how-to top to bottom:
-[`add-workspace-package.md`](../../docs/how-tos/add-workspace-package.md). It's
-the source of truth for every integration point (scaffolding, workspace wiring,
-the CI matrix, the Codecov flag and component, and the `apps/api` Dockerfile
-copies).
+Work [`add-workspace-package.md`](../../docs/how-tos/add-workspace-package.md)
+top to bottom for **$1**, the `@genshin/<name>` short name.
 
-## Inputs
-
-- Package name: **$1** (the `@genshin/<name>` short name)
-
-## Requirements
-
-1. Don't skip the Dockerfile section when the package is a runtime dependency
-   of `apps/api`. A missed COPY fails the Docker workflow build that runs on
-   every PR, with an opaque module-resolution error rather than a clear cause.
-2. Copy `packages/validation/` as the closest scaffolding template.
-3. Run the how-to's Verify section before opening a PR.
+`turbo gen package` prompts for a description, a human-readable name, and two
+answers that gate injections: whether the package has tests, and whether
+`apps/api` depends on it at runtime. Ask the user for all four. Inventing them
+produces a package wired for something it isn't.

@@ -11,6 +11,9 @@ importers:
       '@ls-lint/ls-lint':
         specifier: 2.3.1
         version: 2.3.1
+      '@turbo/gen':
+        specifier: 2.10.11
+        version: 2.10.11(@types/node@25.9.5)
       '@types/node':
         specifier: 25.9.5
         version: 25.9.5
@@ -2490,6 +2493,10 @@ packages:
     resolution: {integrity: sha512-R0a0CvGAeYYsBgPIgFNB3agGXh6qukjduNhFlwVVX1Ss2IdBJLXmgjytNGmo084bLKS0B6UdLRwKhXMHKKaObQ==}
     cpu: [arm64]
     os: [darwin]
+
+  '@turbo/gen@2.10.11':
+    resolution: {integrity: sha512-tVpy0jNGNOkOyQ8ykUPFlT+x1/eSTbY34fB3oU5pAyhtNUB0bsS7weCrSASn6kMZu8huVUiKQaErWsrCVnlcjA==}
+    hasBin: true
 
   '@turbo/linux-64@2.10.11':
     resolution: {integrity: sha512-dGlY2vg7jpsLjGS1bf9sD/cw1sGMAYbeHGQKGRFxd5Zaj+Ufbj8cNXl/vIit8ueCU97zhL/znn60ZV5iSfZAxw==}
@@ -9164,6 +9171,13 @@ snapshots:
 
   '@turbo/darwin-arm64@2.10.11':
     optional: true
+
+  '@turbo/gen@2.10.11(@types/node@25.9.5)':
+    dependencies:
+      '@inquirer/prompts': 7.10.1(@types/node@25.9.5)
+      esbuild: 0.28.2
+    transitivePeerDependencies:
+      - '@types/node'
 
   '@turbo/linux-64@2.10.11':
     optional: true

@@ -78,3 +78,13 @@ path = ".claude/commands/**.md"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
 SPDX-License-Identifier = "MIT"
+
+# A template's own header belongs to the file it generates. Overriding rather
+# than aggregating keeps the interpolated `{{ currentYear }}` out of the
+# copyright holders reuse reports.
+
+[[annotations]]
+path = "turbo/generators/templates/**"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
+SPDX-License-Identifier = "MIT"
