@@ -9,10 +9,8 @@ import type { PlopTypes } from '@turbo/gen';
 const SCOPE = '@genshin';
 const PACKAGES_DIRECTORY = 'packages';
 
-// packages/validation is the template docs/how-tos/add-workspace-package.md
-// names. Reading its manifest rather than literalising versions here keeps a
-// generated package on whatever Renovate and syncpack currently hold, which a
-// template checked into this directory would not track.
+// Read at run time rather than literalised in a template: neither Renovate nor
+// syncpack reaches into a .hbs, so a pinned version here would start rotting.
 const REFERENCE_PACKAGE = 'validation';
 
 const TEST_ONLY_DEV_DEPENDENCIES = ['vitest', '@vitest/coverage-v8'];
@@ -29,7 +27,6 @@ interface Answers {
   apiRuntimeDependency: boolean;
 }
 
-/** One occurrence of an anchor pattern, and where it sits in the file. */
 interface Entry {
   text: string;
   start: number;
@@ -48,14 +45,9 @@ const packageDirectory = (name: string): string => join(PACKAGES_DIRECTORY, name
 const splice = (source: string, at: number, text: string): string =>
   `${source.slice(0, at)}${text}${source.slice(at)}`;
 
-/**
- * Every occurrence of `pattern` in `source`, or a thrown error naming what
- * stopped matching.
- *
- * Plop's own `modify` action delegates to `String.replace`, which no-ops
- * silently on a stale pattern — the exact omission this generator exists to
- * prevent, hidden one level deeper.
- */
+// Plop's own `modify` action delegates to `String.replace`, which no-ops
+// silently on a stale pattern. Throwing is what keeps a missed injection from
+// reporting itself as a success.
 function anchorsIn(source: string, pattern: RegExp, context: string): Anchors {
   const all = [...source.matchAll(pattern)].map((match) => ({
     text: match[0],
@@ -72,12 +64,10 @@ function anchorsIn(source: string, pattern: RegExp, context: string): Anchors {
   return { all, last };
 }
 
-/** Insert `block` immediately after the last entry matching `pattern`. */
 function insertAfterLast(source: string, pattern: RegExp, block: string, context: string): string {
   return splice(source, anchorsIn(source, pattern, context).last.end, block);
 }
 
-/** Insert `line` among the lines matching `pattern`, preserving their order. */
 function insertSorted(source: string, pattern: RegExp, line: string, context: string): string {
   const { all, last } = anchorsIn(source, pattern, context);
   const successor = all.find((entry) => entry.text > line);
@@ -85,7 +75,7 @@ function insertSorted(source: string, pattern: RegExp, line: string, context: st
   return splice(source, successor ? successor.start : last.end + 1, `${line}\n`);
 }
 
-/** Rewrite a tracked file in place, returning its path as plop's change log. */
+// Plop prints an action's return value as its change log.
 function rewriteFile(root: string, path: string, change: (source: string) => string): string {
   const absolute = join(root, path);
 
@@ -142,9 +132,7 @@ function writeManifest(root: string, answers: Answers): string {
   return path;
 }
 
-// One upload per flag: Codecov applies a report's whole coverage to every flag
-// it carries, so a shared upload would report this package's coverage as the
-// workspace's. The action's own comment carries the full reasoning.
+// Codecov needs one upload per flag; the action's own comment explains why.
 function addCodecovUploads(root: string, { name }: Answers): string {
   return rewriteFile(root, CODECOV_UPLOAD_ACTION, (source) =>
     insertAfterLast(
@@ -202,8 +190,9 @@ function addCodecovFlagAndComponent(root: string, { name, displayName }: Answers
   });
 }
 
-// A missing COPY fails the image build on every pull request, and reports it as
-// a module-resolution error rather than a missing package.
+// A missing COPY fails the image build on every pull request, reporting a
+// module-resolution error rather than a missing package. Both lists are kept
+// sorted, hence insertSorted over appending.
 function addDockerfileCopies(root: string, { name }: Answers): string {
   return rewriteFile(root, API_DOCKERFILE, (source) => {
     const withManifest = insertSorted(
@@ -257,9 +246,8 @@ function packagePrompts(root: string): PlopTypes.PromptQuestion[] {
       },
     },
     {
-      // Unconditional, though only the Codecov component consumes it: plop
-      // refuses to bypass a conditional prompt, which would cost the generator
-      // its non-interactive `--args` form.
+      // Asked even when nothing consumes it: plop refuses to bypass a
+      // conditional prompt, which would cost the generator its `--args` form.
       type: 'input',
       name: 'displayName',
       message: 'Human-readable name, for its Codecov component:',
@@ -286,7 +274,6 @@ function packagePrompts(root: string): PlopTypes.PromptQuestion[] {
   ];
 }
 
-/** The package's own files, none of which depend on the rest of the repository. */
 function scaffoldActions(root: string, answers: Answers): PlopTypes.ActionType[] {
   const files = [
     'tsconfig.json',
@@ -302,7 +289,6 @@ function scaffoldActions(root: string, answers: Answers): PlopTypes.ActionType[]
   ];
 }
 
-/** The cross-cutting edits, each gated on the answer that makes it necessary. */
 function wiringActions(root: string, answers: Answers): PlopTypes.ActionType[] {
   return [
     ...(answers.tests
@@ -312,7 +298,6 @@ function wiringActions(root: string, answers: Answers): PlopTypes.ActionType[] {
   ];
 }
 
-/** The residual the generator leaves by design; see the how-to. */
 function nextSteps({ name, tests }: Answers): string {
   const steps = [
     'run `pnpm install`',
@@ -325,9 +310,8 @@ function nextSteps({ name, tests }: Answers): string {
 }
 
 export default function generator(plop: PlopTypes.NodePlopAPI): void {
-  // `turbo gen` runs plop with the repository root as its destination base,
-  // whichever workspace the command was invoked from. Unlike the `turbo` object
-  // plop hands to templates, this is already resolved when prompts validate.
+  // `turbo gen` sets the destination base to the repository root, whichever
+  // workspace the command ran from.
   const root = plop.getDestBasePath();
 
   plop.setHelper('currentYear', () => String(new Date().getFullYear()));
