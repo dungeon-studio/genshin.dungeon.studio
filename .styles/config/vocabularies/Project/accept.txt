@@ -120,6 +120,8 @@ SRECon
 [Ff]avicon
 [Ff]ormatters
 [Hh]ardcoded
+[Hh]otfix
+[Hh]otfixes
 [Kk]eyless
 [Mm]iddleware
 [Mm]onorepo
