@@ -97,6 +97,10 @@ export default defineConfig([
       // Upstream scaffolds are `const X = React.forwardRef(...)`, not function
       // declarations; rewriting them would fight every regeneration.
       'react/function-component-definition': 'off',
+      // Same `React.forwardRef` wrapper, seen from the React 19 side. Upstream's
+      // current registry has dropped it, so the fix is to regenerate the kit
+      // rather than hand-edit 27 call sites here.
+      '@eslint-react/no-forward-ref': 'off',
       // `CardTitle` spreads children into its `<h3>`, so content lives at the call site.
       'jsx-a11y-x/heading-has-content': 'off',
     },

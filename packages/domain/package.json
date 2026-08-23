@@ -23,7 +23,7 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc --project tsconfig.build.json",
     "test": "vitest run",
-    "lint": "eslint ."
+    "lint": "eslint . --max-warnings=0"
   },
   "dependencies": {
     "@genshin/collection-json": "workspace:*",

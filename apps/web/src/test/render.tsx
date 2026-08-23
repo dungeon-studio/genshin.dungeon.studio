@@ -37,7 +37,7 @@ export function createWrapper(
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
       <QueryClientProvider client={queryClient}>
-        <AuthContext.Provider value={{ user, loading }}>{children}</AuthContext.Provider>
+        <AuthContext value={{ user, loading }}>{children}</AuthContext>
       </QueryClientProvider>
     );
   };

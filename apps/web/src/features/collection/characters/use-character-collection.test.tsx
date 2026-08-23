@@ -102,9 +102,7 @@ describe('useCollection merge-on-first-login', () => {
     function Wrapper({ children }: { children: ReactNode }) {
       return (
         <QueryClientProvider client={queryClient}>
-          <AuthContext.Provider value={{ user: authUser, loading: false }}>
-            {children}
-          </AuthContext.Provider>
+          <AuthContext value={{ user: authUser, loading: false }}>{children}</AuthContext>
         </QueryClientProvider>
       );
     }
