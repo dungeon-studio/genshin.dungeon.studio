@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/react-query';
 import type { User } from 'firebase/auth';
 import type { ReactNode } from 'react';
 
-import { AuthContext } from '@/features/auth/auth-context';
+import { TestProviders } from '@/test/providers';
 
 // The composite hooks only read `user.uid`; a partial User is sufficient.
 export function fakeUser(uid: string): User {
@@ -28,7 +28,7 @@ interface WrapperOptions {
   queryClient?: QueryClient;
 }
 
-// Provides the TanStack Query and auth context the collection/team hooks need.
+// Binds one set of provider values for the tests that never change them.
 export function createWrapper(
   options: WrapperOptions = {},
 ): (props: { children: ReactNode }) => ReactNode {
@@ -36,9 +36,9 @@ export function createWrapper(
 
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
-      <QueryClientProvider client={queryClient}>
-        <AuthContext value={{ user, loading }}>{children}</AuthContext>
-      </QueryClientProvider>
+      <TestProviders queryClient={queryClient} user={user} loading={loading}>
+        {children}
+      </TestProviders>
     );
   };
 }

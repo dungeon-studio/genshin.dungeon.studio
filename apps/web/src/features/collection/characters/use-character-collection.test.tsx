@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 import type { CharacterId } from '@genshin/domain';
-import { QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { User } from 'firebase/auth';
 import { http, HttpResponse } from 'msw';
@@ -10,9 +9,9 @@ import type { ReactNode } from 'react';
 import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { AuthContext } from '@/features/auth/auth-context';
 import { charactersDocument, makeCharacter } from '@/test/fixtures';
 import { server } from '@/test/msw/server';
+import { TestProviders } from '@/test/providers';
 import { createTestQueryClient, createWrapper, fakeUser } from '@/test/render';
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
@@ -101,9 +100,9 @@ describe('useCollection merge-on-first-login', () => {
     let authUser: User | null = fakeUser('user-1');
     function Wrapper({ children }: { children: ReactNode }) {
       return (
-        <QueryClientProvider client={queryClient}>
-          <AuthContext value={{ user: authUser, loading: false }}>{children}</AuthContext>
-        </QueryClientProvider>
+        <TestProviders queryClient={queryClient} user={authUser}>
+          {children}
+        </TestProviders>
       );
     }
 
