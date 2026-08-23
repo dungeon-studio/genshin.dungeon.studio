@@ -176,7 +176,7 @@ When a commit needs a body, separate it from the subject with a blank line, wrap
 
 When your pull request changes something a user of the deployed app would notice—a new or removed feature, a change to existing behavior, a user-facing bug fix, or a security fix—add a line under `### Added` in the `[Unreleased]` section, one bullet per change. Skip internal refactors, test-only changes, dependency bumps users don't perceive, and documentation fixes. The test is whether a user would notice or care. The [CHANGELOG.md](CHANGELOG.md) header describes the entry layout before and after the first release.
 
-Write the entry from the user's side of the screen. Name a technology—"zustand store," "TanStack Query"—only when the user interacts with that technology directly.
+Name a technology—"zustand store," "TanStack Query"—only when the user interacts with that technology directly.
 
 ---
 

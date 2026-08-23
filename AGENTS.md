@@ -7,10 +7,10 @@ AI decision rules, canonical for every coding agent. Human contribution
 guidance lives in [`CONTRIBUTING.md`](CONTRIBUTING.md) and
 [`docs/reference/`](docs/reference/); linters cover everything else.
 
-Keep this filename. Copilot, Cursor, Codex, and Gemini CLI read `AGENTS.md`
-directly; Claude Code doesn't, so [`CLAUDE.md`](CLAUDE.md) imports this file
-and adds only what's true of Claude Code alone. A new tool config follows the
-same shape — point here, then carry nothing but its own specifics.
+Keep this filename: it's the path coding agents look for. Claude Code is the
+exception and reads [`CLAUDE.md`](CLAUDE.md), which imports this file. Adding a
+config for another tool follows the pattern in
+[Code conventions](docs/reference/code-conventions.md).
 
 ## Snapshot
 
@@ -140,9 +140,8 @@ writing tests.
 ## Changelog
 
 Which changes earn an entry, and how to word one, is in the changelog section
-of [`CONTRIBUTING.md`](CONTRIBUTING.md); the layout the entries sit in is
-described by the [`CHANGELOG.md`](CHANGELOG.md) header itself. Read both before
-adding a line.
+of [`CONTRIBUTING.md`](CONTRIBUTING.md). The [`CHANGELOG.md`](CHANGELOG.md)
+header describes the layout they sit in. Read both before adding a line.
 
 ## Workflow guardrails
 

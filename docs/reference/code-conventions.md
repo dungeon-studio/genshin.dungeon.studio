@@ -38,11 +38,14 @@ Avoid duplicating the same guidance across multiple locations. Place it once at 
 
 ### AI tool configuration files
 
-`AGENTS.md` is the canonical home for AI decision rules, and every tool config reduces to a pointer at it. Copilot, Cursor, Codex, and Gemini CLI read `AGENTS.md` directly, so they need no file of their own. Claude Code reads only `CLAUDE.md`, so [`CLAUDE.md`](../../CLAUDE.md) imports `AGENTS.md` with `@AGENTS.md` and adds nothing beyond what's false for every other agent.
+`AGENTS.md` holds the AI decision rules. A tool that reads `AGENTS.md` needs no file of its own. A tool that reads only its own path gets a file pointing at `AGENTS.md`, carrying nothing but behavior specific to that tool. Claude Code is the second case today: [`CLAUDE.md`](../../CLAUDE.md) imports `AGENTS.md` and adds only rules that are false for every other agent.
 
-Add a config for a new tool the same way: point it at `AGENTS.md` if the tool can't read that path itself, and put only tool-specific behavior in the new file. A rule that holds for more than one tool belongs in `AGENTS.md` instead.
+A rule holding for more than one tool belongs in `AGENTS.md`.
 
-A new root-level instruction file also needs an ignore entry in [`.ls-lint.yml`](../../.ls-lint.yml), which otherwise rejects the upper-case name, and a section entry in [`.vale.ini`](../../.vale.ini) so Vale checks it mechanically rather than for prose voice.
+A new root-level instruction file needs two entries before it passes the gate:
+
+- An ignore in [`.ls-lint.yml`](../../.ls-lint.yml), which otherwise rejects the upper-case name.
+- A section in [`.vale.ini`](../../.vale.ini), so Vale checks it mechanically instead of for prose voice.
 
 ## Naming conventions
 
