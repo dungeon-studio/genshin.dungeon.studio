@@ -9,7 +9,7 @@ import type {
 } from '@genshin/domain';
 
 import { db } from '@/firebase/firestore.js';
-import { readSnapshot } from '@/repositories/snapshot.js';
+import { readSnapshot } from '@/repositories/firestore/snapshot.js';
 
 import { fromDocument, toDocument } from './document.js';
 import { nextCharacter } from './merge.js';

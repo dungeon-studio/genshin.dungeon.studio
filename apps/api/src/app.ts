@@ -3,18 +3,22 @@
 
 import { STATUS_CODES } from 'node:http';
 
-import { GoogleError } from 'google-gax';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 
-import { ABOUT_BLANK, problemResponse, problemTypeOf } from '@/http/problem.js';
+import {
+  ABOUT_BLANK,
+  INTERNAL_ERROR_DETAIL,
+  problemResponse,
+  problemTypeOf,
+} from '@/http/problem.js';
 import { allow } from '@/middleware/allow.js';
 import type { AuthVariables } from '@/middleware/auth.js';
 import type { RequestLogVariables } from '@/middleware/log-request.js';
 import { logRequest } from '@/middleware/log-request.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
-import { firestoreErrorToHttpException } from '@/repositories/firestore-error.js';
+import { isFirestoreError, toHttpException } from '@/repositories/firestore/error.js';
 import { account } from '@/routes/account.js';
 import { alpsProfiles } from '@/routes/alps-profiles.js';
 import { characters } from '@/routes/characters.js';
@@ -50,7 +54,7 @@ app.use(
 
 // Error handling middleware — RFC 9457 Problem Details
 app.onError((err, c) => {
-  const resolved = err instanceof GoogleError ? firestoreErrorToHttpException(err) : err;
+  const resolved = isFirestoreError(err) ? toHttpException(err) : err;
 
   if (resolved instanceof HTTPException) {
     return problemResponse(c, {
@@ -66,7 +70,7 @@ app.onError((err, c) => {
     type: ABOUT_BLANK,
     title: 'Internal Server Error',
     status: 500,
-    detail: 'An unexpected error occurred',
+    detail: INTERNAL_ERROR_DETAIL,
   });
 });
 

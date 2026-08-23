@@ -7,7 +7,7 @@ import type { CollectionWeapon, ISOTimestamp, UUID } from '@genshin/domain';
 import type { WeaponId } from '@genshin/game-data';
 
 import { db } from '@/firebase/firestore.js';
-import { readSnapshot } from '@/repositories/snapshot.js';
+import { readSnapshot } from '@/repositories/firestore/snapshot.js';
 
 import { fromDocument, toDocument } from './document.js';
 
