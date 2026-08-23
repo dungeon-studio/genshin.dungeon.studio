@@ -7,6 +7,7 @@ import {
   serialiseWeapon,
   weaponCollectionHref,
   weaponItemHref,
+  weaponsOfHref,
   weaponRepresentation,
 } from '@genshin/domain';
 import { Hono } from 'hono';
@@ -66,7 +67,7 @@ weapons.get('/', async (c) => {
       JSON.stringify(
         serialiseCollection(
           weaponRepresentation,
-          weaponCollectionHref(baseUrl, weaponId),
+          weaponsOfHref(baseUrl, weaponId),
           instances.map((w) => serialiseWeapon(w, baseUrl)),
         ),
       ),

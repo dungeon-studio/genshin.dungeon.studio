@@ -65,6 +65,7 @@ export {
   weaponCollectionHref,
   weaponItemHref,
   weaponRepresentation,
+  weaponsOfHref,
 } from './representations/collection-json/weapons.js';
 export {
   validateTeam,

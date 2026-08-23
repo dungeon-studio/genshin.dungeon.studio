@@ -32,17 +32,14 @@ const WEAPON_TEMPLATE: Template = {
   ],
 };
 
-/**
- * The URL of the weapon collection, or of the instances of one weapon within
- * it.
- *
- * @param weaponId - narrows the URL to that weapon's instances. Omitting it
- * addresses every instance the user owns.
- */
-export function weaponCollectionHref(baseUrl: string, weaponId?: string): string {
-  const collection = `${baseUrl}/weapons`;
-  if (weaponId === undefined) return collection;
-  return `${collection}?weaponId=${encodeURIComponent(weaponId)}`;
+/** The URL of every weapon instance the user owns. */
+export function weaponCollectionHref(baseUrl: string): string {
+  return `${baseUrl}/weapons`;
+}
+
+/** The URL of the user's copies of one weapon, a filtered view of the collection. */
+export function weaponsOfHref(baseUrl: string, weaponId: string): string {
+  return `${weaponCollectionHref(baseUrl)}?weaponId=${encodeURIComponent(weaponId)}`;
 }
 
 export function weaponItemHref(baseUrl: string, weapon: CollectionWeapon): string {
@@ -60,7 +57,7 @@ export function serialiseWeapon(weapon: CollectionWeapon, baseUrl: string): Item
   const links: Link[] = [
     {
       rel: 'collection',
-      href: weaponCollectionHref(baseUrl, weapon.weaponId),
+      href: weaponsOfHref(baseUrl, weapon.weaponId),
       prompt: `All instances of ${weapon.weaponId}`,
     },
   ];
