@@ -162,11 +162,6 @@ When a commit needs a body, separate it from the subject with a blank line, wrap
 
 1. Address feedback completely
 2. Batch related fixes when possible
-3. Pre-commit hooks verify formatting and linting. For type checking, run:
-
-   ```bash
-   pnpm typecheck
-   ```
 
 ---
 
