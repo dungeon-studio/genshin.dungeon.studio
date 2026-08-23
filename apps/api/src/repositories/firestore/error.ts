@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { GoogleError } from 'google-gax';
-import { Status } from 'google-gax';
+import { GoogleError, Status } from 'google-gax';
 import { HTTPException } from 'hono/http-exception';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
 
+import { INTERNAL_ERROR_DETAIL } from '@/http/problem.js';
 import { logger } from '@/logger.js';
 
 // Firestore gRPC errors are internal failures from the user's perspective.
@@ -27,9 +27,19 @@ function labelFor(code: Status | undefined): string {
   return Status[code] ?? String(code);
 }
 
-export function firestoreErrorToHttpException(err: GoogleError): HTTPException {
+/**
+ * Whether a thrown value came back from Firestore.
+ *
+ * Answers `false` for every real Firestore rejection today: two copies of
+ * google-gax resolve, so the class this tests is not the class the rejection
+ * was built from. #1427 tracks keying on the gRPC status code instead, and
+ * this is the one function that has to change to fix it.
+ */
+export function isFirestoreError(err: unknown): err is GoogleError {
+  return err instanceof GoogleError;
+}
+
+export function toHttpException(err: GoogleError): HTTPException {
   logger.error({ grpcCode: labelFor(err.code), grpcMessage: err.message }, 'firestore call failed');
-  return new HTTPException(httpStatusFor(err.code), {
-    message: 'An unexpected error occurred',
-  });
+  return new HTTPException(httpStatusFor(err.code), { message: INTERNAL_ERROR_DETAIL });
 }
