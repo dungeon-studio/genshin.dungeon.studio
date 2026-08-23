@@ -5,6 +5,7 @@ import { writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 
+/** Everything one emitted module needs, independent of what it holds. */
 export interface GeneratedModule {
   /** Module path relative to the `@genshin/game-data` package root. */
   path: string;
@@ -62,6 +63,12 @@ export function renderModule({ exportName, command, entries }: GeneratedModule):
   ].join('\n');
 }
 
+/**
+ * Overwrites the module in the checked-out `@genshin/game-data`.
+ *
+ * Whole-file, with no merge: a hand edit to a generated module is lost on the
+ * next run, which is why the emitted header says not to make one.
+ */
 export function writeGeneratedModule(module: GeneratedModule): void {
   writeFileSync(resolveGeneratedPath(module.path), renderModule(module));
 }

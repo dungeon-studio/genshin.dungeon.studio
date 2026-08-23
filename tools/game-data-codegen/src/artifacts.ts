@@ -12,6 +12,14 @@ import { toId } from './slug.js';
 /** Only sets with 5-star pieces are tracked; the rest are leveling fodder. */
 const ENDGAME_RARITY = 5;
 
+/**
+ * One record as it will be emitted, mirroring `ArtifactSet` in
+ * `@genshin/game-data`.
+ *
+ * Nothing here enforces the match. The consumer assigns the generated object to
+ * its own typed record, so a drift surfaces as a `tsc` error in that package
+ * rather than a failure in this one.
+ */
 export interface GeneratedArtifactSet {
   id: string;
   name: string;
@@ -43,6 +51,15 @@ function byRosterOrder(a: GeneratedArtifactSet, b: GeneratedArtifactSet): number
   return compareVersions(b.version, a.version) || a.name.localeCompare(b.name);
 }
 
+/**
+ * The artifact roster in emission order, without writing anything.
+ *
+ * Split from `generateArtifactSets` so tests can assert on the records rather
+ * than on a file. Aborts on upstream drift, such as a 5-star set missing a
+ * bonus, rather than emitting a partial record.
+ *
+ * @throws Error naming the set that couldn't be built.
+ */
 export function buildArtifactSets(): GeneratedArtifactSet[] {
   queryInEnglish();
 

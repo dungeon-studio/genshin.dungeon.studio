@@ -34,6 +34,14 @@ const SUB_STAT_BY_GENSHIN_DB: Record<string, WeaponStatType> = {
   FIGHT_PROP_DEFENSE_PERCENT: WEAPON_STAT_TYPES.DEF_PERCENT,
 };
 
+/**
+ * One record as it will be emitted, mirroring `Weapon` in
+ * `@genshin/game-data`.
+ *
+ * Nothing here enforces the match. The consumer assigns the generated object to
+ * its own typed record, so a drift surfaces as a `tsc` error in that package
+ * rather than a failure in this one.
+ */
 export interface GeneratedWeapon {
   id: string;
   name: string;
@@ -88,6 +96,15 @@ function byRosterOrder(a: GeneratedWeapon, b: GeneratedWeapon): number {
   );
 }
 
+/**
+ * The weapon roster in emission order, without writing anything.
+ *
+ * Split from `generateWeapons` so tests can assert on the records rather than
+ * on a file. Aborts on upstream drift, such as a stat this tool has no mapping
+ * for, rather than emitting a partial record.
+ *
+ * @throws Error naming the weapon that couldn't be built.
+ */
 export function buildWeapons(): GeneratedWeapon[] {
   queryInEnglish();
 

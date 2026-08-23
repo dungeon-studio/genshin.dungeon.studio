@@ -28,6 +28,14 @@ const ELEMENT_BY_GENSHIN_DB: Record<string, Element> = {
   ELEMENT_PYRO: ELEMENTS.PYRO,
 };
 
+/**
+ * One record as it will be emitted, mirroring `Character` in
+ * `@genshin/game-data`.
+ *
+ * Nothing here enforces the match. The consumer assigns the generated object to
+ * its own typed record, so a drift surfaces as a `tsc` error in that package
+ * rather than a failure in this one.
+ */
 export interface GeneratedCharacter {
   id: string;
   name: string;
@@ -84,6 +92,16 @@ function byRosterOrder(a: GeneratedCharacter, b: GeneratedCharacter): number {
   );
 }
 
+/**
+ * The character roster in emission order, without writing anything.
+ *
+ * Split from `generateCharacters` so tests can assert on the records rather
+ * than on a file. Aborts on a character absent from
+ * {@link CHARACTER_RELEASE_DATES}, which is how a new debut is caught rather
+ * than emitted with a missing date.
+ *
+ * @throws Error naming the character that couldn't be built.
+ */
 export function buildCharacters(): GeneratedCharacter[] {
   queryInEnglish();
 
