@@ -4,7 +4,7 @@
 import type { Character } from '@genshin/game-data';
 
 import type { ArtifactPlan } from '../artifact/artifact-plan.js';
-import { assertArtifactPlan } from '../artifact/artifact-plan.js';
+import { assertArtifactPlan, deserialiseArtifactPlan } from '../artifact/artifact-plan.js';
 import { assertOptionalString, assertString } from '../assertions.js';
 import type { CollectionWeaponId } from '../weapon/collection-weapon.js';
 
@@ -34,4 +34,25 @@ export function assertCollectionTeamMember(
   if (member.artifactPlan !== undefined) {
     assertArtifactPlan(member.artifactPlan, `${path}.artifactPlan`);
   }
+}
+
+/**
+ * Rebuilds a team member from untrusted input.
+ *
+ * Returns a fresh object rather than the input so unknown properties can't
+ * ride along into whatever the caller stores or forwards.
+ */
+export function deserialiseCollectionTeamMember(
+  value: unknown,
+  path = 'CollectionTeamMember',
+): CollectionTeamMember {
+  assertCollectionTeamMember(value, path);
+
+  return {
+    characterId: value.characterId,
+    ...(value.weaponInstanceId !== undefined ? { weaponInstanceId: value.weaponInstanceId } : {}),
+    ...(value.artifactPlan !== undefined
+      ? { artifactPlan: deserialiseArtifactPlan(value.artifactPlan, `${path}.artifactPlan`) }
+      : {}),
+  };
 }

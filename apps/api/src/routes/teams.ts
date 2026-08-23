@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { COLLECTION_JSON } from '@genshin/collection-json';
-import type { CollectionTeamMember, CollectionTeamMembers, TeamSlot, UUID } from '@genshin/domain';
+import type { CollectionTeamMember, TeamSlot, UUID } from '@genshin/domain';
 import {
   isValidTeamSlot,
   teamItemDocument,
@@ -18,7 +18,10 @@ import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
 import { validateRequestBody } from '@/middleware/validate-request-body.js';
 import { teamItemV1 } from '@/profiles/alps/team/item-v1.js';
-import { teamPutRequestV1 } from '@/profiles/json-schema/teams/put-request-v1.js';
+import {
+  deserialiseTeamPutRequest,
+  teamPutRequestV1,
+} from '@/profiles/json-schema/teams/put-request-v1.js';
 import * as Characters from '@/repositories/characters/index.js';
 import * as Teams from '@/repositories/teams/index.js';
 import * as Weapons from '@/repositories/weapons/index.js';
@@ -31,12 +34,6 @@ export const teams = new Hono<{
 teams.use('*', auth);
 
 teams.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: teamItemV1 }]));
-
-interface UpdateTeamBody {
-  name?: string;
-  description?: string;
-  members?: CollectionTeamMembers;
-}
 
 function parseSlot(param: string): TeamSlot {
   const slot = Number(param);
@@ -85,7 +82,7 @@ teams.put(
   async (c) => {
     const userId = c.get('user').uid;
     const slot = parseSlot(c.req.param('slot'));
-    const body = c.get('validatedBody') as UpdateTeamBody;
+    const body = deserialiseTeamPutRequest(c.get('validatedBody'));
 
     if (body.members) {
       const nonNullMembers = body.members.filter((m): m is CollectionTeamMember => m !== null);
