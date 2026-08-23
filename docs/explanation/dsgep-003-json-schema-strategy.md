@@ -311,6 +311,8 @@ app.get('/schemas/:module/:name.json', async (c) => {
 ## References
 
 - [`rest-api-conventions.md`](../reference/rest-api-conventions.md): Principle 4, predictable representation shapes
+- [`schema-versioning.md`](../reference/schema-versioning.md): Where each boundary carries its version, including this one
+- [Understanding schema versioning](understanding-schema-versioning.md): The two-role model behind them
 - [JSON Schema 2020-12](https://json-schema.org/draft/2020-12): Schema vocabulary
 
 <!-- vale alex.Condescending = NO -->

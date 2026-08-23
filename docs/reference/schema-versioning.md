@@ -12,13 +12,13 @@ For the steps, see [Add a schema version](../how-tos/add-schema-version.md).
 
 ## Boundary taxonomy
 
-| Boundary            | Shared medium          | Skew window                                     |
-| ------------------- | ---------------------- | ----------------------------------------------- |
-| Firestore documents | Database collection    | Until all documents are backfilled              |
-| Local storage       | Browser origin storage | Until the user clears it or a build migrates it |
-| REST API            | HTTP                   | Until all clients are updated                   |
-| Queue / event bus   | Message broker         | Until all consumers drain the queue             |
-| Cache               | Redis / Memcache / CDN | Until TTL expires or cache is flushed           |
+| Boundary            | Shared medium          | Version travels                             | Skew window                                     |
+| ------------------- | ---------------------- | ------------------------------------------- | ----------------------------------------------- |
+| Firestore documents | Database collection    | In band, `version` field                    | Until all documents are backfilled              |
+| Local storage       | Browser origin storage | In band, `persist` version                  | Until the user clears it or a build migrates it |
+| REST API            | HTTP                   | Out of band, `profile` media type parameter | Until all clients are updated                   |
+| Queue / event bus   | Message broker         | In band, `version` field                    | Until all consumers drain the queue             |
+| Cache               | Redis / Memcache / CDN | In band, `version` field                    | Until TTL expires or cache is flushed           |
 
 The skew window determines how many old writer versions the reader must tolerate.
 
@@ -68,10 +68,34 @@ real loss.
 
 ---
 
+## Implementation: REST API
+
+The `profile` media type parameter on `Content-Type` and `Accept` carries the
+version, naming a JSON Schema served at its own URL.
+[DSGEP-003](../explanation/dsgep-003-json-schema-strategy.md) decides that
+mechanism; [DSGEP-005](../explanation/dsgep-005-schema-direction-segment.md)
+decides the schema paths.
+
+A route declares its **acceptor set** as the profile list passed to
+`negotiateContent([...])` for responses and `negotiateRequestSchema([...])`
+for request bodies. Adding a version to that list widens what the route
+accepts; removing one narrows it. Order the list current version first—a
+client that names no `profile` gets the first entry.
+
+The strict write type and the union read type land on the handler: its body
+type is the union over its route's acceptor set, and serialisation emits the
+current version alone.
+
+Retiring a version withdraws it from every acceptor set and from the schema
+endpoints, following DSGEP-003's [major version transition
+process](../explanation/dsgep-003-json-schema-strategy.md#major-version-transition-process).
+
+---
+
 ## Implementation: Other boundaries
 
-REST bodies, queue payloads, and cache entries don't yet use this pattern.
-When those boundaries are introduced: stamp every payload with a `version`
-field, keep one `schemas/v{n}.ts` file per version, write a strict serializer
-and a union deserializer, use the same `V{n}ConceptSchema` / `V{n}Concept`
-naming convention.
+Queue payloads and cache entries don't yet use this pattern. Both are in-band
+boundaries like Firestore: when they're introduced, stamp every payload with a
+`version` field, keep one `schemas/v{n}.ts` file per version, write a strict
+serializer and a union deserializer, use the same `V{n}ConceptSchema` /
+`V{n}Concept` naming convention.
