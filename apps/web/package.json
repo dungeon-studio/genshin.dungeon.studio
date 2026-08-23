@@ -69,7 +69,7 @@
     "tailwindcss-animate": "1.0.7",
     "tsx": "4.23.12",
     "typescript": "npm:@typescript/typescript6@6.0.2",
-    "vite": "8.2.1",
+    "vite": "8.2.2",
     "vitest": "4.1.11"
   }
 }
