@@ -72,22 +72,29 @@ export function teamItemDocument(team: CollectionTeam, baseUrl: string): Collect
   });
 }
 
-export function deserialiseTeam(item: Item): CollectionTeam {
-  let members: unknown;
+/** Members ride as a JSON string, so they parse before the rest of the item. */
+function parseMembers(item: Item): unknown {
+  const raw = item.data.find((d) => d.name === 'members');
+
+  if (raw === undefined) {
+    return [];
+  }
+  if (typeof raw.value !== 'string') {
+    throw new TypeError(`members value must be a JSON string, got: ${typeof raw.value}`);
+  }
+
   try {
-    const raw = item.data.find((d) => d.name === 'members');
-    if (raw && typeof raw.value !== 'string') {
-      throw new TypeError(`members value must be a JSON string, got: ${typeof raw.value}`);
-    }
-    members = raw ? JSON.parse(raw.value as string) : [];
+    return JSON.parse(raw.value);
   } catch (error) {
-    if (error instanceof TypeError) throw error;
     throw new TypeError('members must be valid JSON', { cause: error });
   }
+}
+
+export function deserialiseTeam(item: Item): CollectionTeam {
   const data: Record<string, unknown> = Object.fromEntries(
     item.data.filter((d) => d.name !== 'members').map((d) => [d.name, d.value]),
   );
-  data.members = deserialiseCollectionTeamMembers(members);
+  data.members = deserialiseCollectionTeamMembers(parseMembers(item));
   assertCollectionTeam(data);
   return data;
 }

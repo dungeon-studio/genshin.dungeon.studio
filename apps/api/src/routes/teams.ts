@@ -99,11 +99,7 @@ teams.put(
       }
     }
 
-    const { team, created } = await Teams.save(userId, slot, {
-      name: body.name,
-      members: body.members,
-      description: body.description,
-    });
+    const { team, created } = await Teams.save(userId, slot, body);
 
     const baseUrl = new URL(c.req.url).origin;
 

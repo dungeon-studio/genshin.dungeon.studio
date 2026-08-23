@@ -61,10 +61,10 @@ describe('deserialiseTeamPutRequest', () => {
     expect(members?.[0]?.artifactPlan).toEqual({ sands: 'ATK Percentage' });
   });
 
-  it('omits fields the body left out rather than setting them undefined', () => {
-    const result = deserialiseTeamPutRequest({ name: 'Hydro core' });
+  it('drops properties the schema does not declare', () => {
+    const result = deserialiseTeamPutRequest({ name: 'Hydro core', injected: 'evil' });
 
-    expect(result).toEqual({ name: 'Hydro core' });
+    expect(result).not.toHaveProperty('injected');
   });
 
   it('rejects a member array the schema would have pinned to four entries', () => {
