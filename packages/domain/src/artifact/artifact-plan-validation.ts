@@ -18,6 +18,8 @@ import {
 import type { ValidationIssue } from '@genshin/validation';
 import { issue } from '@genshin/validation';
 
+import { hasSecondarySetWithoutPrimary } from './artifact-plan.js';
+
 // Intentionally uses loose string types instead of ArtifactPlan's branded types
 // (SandsMainAffix, etc.). The validator's job is to check raw input *before* it
 // becomes a domain object. Accepting ArtifactPlan would make the call circular.
@@ -27,7 +29,8 @@ export function validateArtifactPlan(plan: {
   sands?: string;
   goblet?: string;
   circlet?: string;
-  sets?: string[];
+  primarySetId?: string;
+  secondarySetId?: string;
   priorityMinorAffixes?: string[];
   secondaryMinorAffixes?: string[];
 }): ValidationIssue[] {
@@ -53,16 +56,16 @@ export function validateArtifactPlan(plan: {
   }
 
   // Sets ---------------------------------------------------------------
-  if (plan.sets !== undefined) {
-    if (plan.sets.length < 1 || plan.sets.length > 2) {
-      issues.push(issue('Artifact plan must have 1-2 sets', 'sets'));
-    } else {
-      for (const [i, setId] of plan.sets.entries()) {
-        if (!getArtifactSetById(setId)) {
-          issues.push(issue(`Unknown artifact set: ${setId}`, `sets[${i}]`));
-        }
-      }
-    }
+  if (plan.primarySetId !== undefined && !getArtifactSetById(plan.primarySetId)) {
+    issues.push(issue(`Unknown artifact set: ${plan.primarySetId}`, 'primarySetId'));
+  }
+
+  if (hasSecondarySetWithoutPrimary(plan)) {
+    issues.push(issue('A secondary artifact set requires a primary set', 'secondarySetId'));
+  }
+
+  if (plan.secondarySetId !== undefined && !getArtifactSetById(plan.secondarySetId)) {
+    issues.push(issue(`Unknown artifact set: ${plan.secondarySetId}`, 'secondarySetId'));
   }
 
   // Minor affixes ------------------------------------------------------

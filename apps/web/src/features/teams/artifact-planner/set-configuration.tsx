@@ -7,35 +7,27 @@ import type { JSX } from 'react';
 
 import { ArtifactSetSearch } from './artifact-set-search';
 
+type SetFields = Pick<ArtifactPlan, 'primarySetId' | 'secondarySetId'>;
+
 export function SetConfiguration({
-  sets,
+  primarySetId,
+  secondarySetId,
   onChange,
 }: {
-  sets: ArtifactPlan['sets'] | undefined;
-  onChange: (sets: ArtifactPlan['sets'] | undefined) => void;
+  primarySetId: ArtifactPlan['primarySetId'];
+  secondarySetId: ArtifactPlan['secondarySetId'];
+  onChange: (fields: SetFields) => void;
 }): JSX.Element {
-  const handleFirstChange = (setId: ArtifactSet['id']) => {
-    if (sets?.length === 2) {
-      onChange([setId, sets[1]]);
-    } else {
-      onChange([setId]);
-    }
+  const update = (fields: Partial<SetFields>) => {
+    onChange({ primarySetId, secondarySetId, ...fields });
   };
 
-  const handleSecondChange = (setId: ArtifactSet['id']) => {
-    if (sets === undefined) return;
-    onChange([sets[0], setId]);
-  };
+  const handlePrimaryChange = (setId: ArtifactSet['id']) => update({ primarySetId: setId });
+  const handleSecondaryChange = (setId: ArtifactSet['id']) => update({ secondarySetId: setId });
+  const handleClearSecondary = () => update({ secondarySetId: undefined });
 
-  const handleClearSecond = () => {
-    if (sets) {
-      onChange([sets[0]]);
-    }
-  };
-
-  const handleClearFirst = () => {
-    onChange(undefined);
-  };
+  // A second 2-piece has nothing to pair with once the primary is gone.
+  const handleClearPrimary = () => update({ primarySetId: undefined, secondarySetId: undefined });
 
   return (
     <div className="space-y-2">
@@ -43,17 +35,17 @@ export function SetConfiguration({
 
       <ArtifactSetSearch
         label="Search artifact set..."
-        value={sets?.[0]}
-        onChange={handleFirstChange}
-        onClear={sets?.[0] ? handleClearFirst : undefined}
+        value={primarySetId}
+        onChange={handlePrimaryChange}
+        onClear={primarySetId ? handleClearPrimary : undefined}
       />
 
-      {sets && sets.length >= 1 && (
+      {primarySetId && (
         <ArtifactSetSearch
           label="Optional second 2-piece set..."
-          value={sets?.[1]}
-          onChange={handleSecondChange}
-          onClear={sets?.[1] ? handleClearSecond : undefined}
+          value={secondarySetId}
+          onChange={handleSecondaryChange}
+          onClear={secondarySetId ? handleClearSecondary : undefined}
         />
       )}
     </div>

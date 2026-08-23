@@ -55,7 +55,11 @@ export function ArtifactPlanner({ plan, onChange }: ArtifactPlannerProps): JSX.E
           onChange={(value) => updatePlan({ circlet: value })}
         />
 
-        <SetConfiguration sets={plan?.sets} onChange={(sets) => updatePlan({ sets })} />
+        <SetConfiguration
+          primarySetId={plan?.primarySetId}
+          secondarySetId={plan?.secondarySetId}
+          onChange={updatePlan}
+        />
 
         <SubstatList
           label="Priority substats"

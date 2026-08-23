@@ -9,7 +9,8 @@ const VALID_PLAN = {
   sands: 'ATK Percentage',
   goblet: 'Hydro DMG Bonus',
   circlet: 'CRIT Rate',
-  sets: ['aubade-of-morningstar-and-moon'],
+  primarySetId: 'aubade-of-morningstar-and-moon',
+  secondarySetId: 'a-day-carved-from-rising-winds',
   priorityMinorAffixes: ['CRIT Rate', 'CRIT DMG'],
   secondaryMinorAffixes: ['ATK Percentage'],
 };
@@ -23,13 +24,23 @@ describe('assertArtifactPlan', () => {
     expect(() => assertArtifactPlan({})).not.toThrow();
   });
 
-  it.each(['sands', 'goblet', 'circlet', 'sets', 'priorityMinorAffixes', 'secondaryMinorAffixes'])(
-    'accepts a plan omitting %s',
-    (field) => {
-      const { [field]: _omitted, ...rest } = VALID_PLAN as Record<string, unknown>;
-      expect(() => assertArtifactPlan(rest)).not.toThrow();
-    },
-  );
+  // primarySetId is absent from this list: dropping it alone strands secondarySetId.
+  it.each([
+    'sands',
+    'goblet',
+    'circlet',
+    'secondarySetId',
+    'priorityMinorAffixes',
+    'secondaryMinorAffixes',
+  ])('accepts a plan omitting %s', (field) => {
+    const { [field]: _omitted, ...rest } = VALID_PLAN as Record<string, unknown>;
+    expect(() => assertArtifactPlan(rest)).not.toThrow();
+  });
+
+  it('accepts a plan omitting both set IDs', () => {
+    const { primarySetId: _p, secondarySetId: _s, ...rest } = VALID_PLAN;
+    expect(() => assertArtifactPlan(rest)).not.toThrow();
+  });
 
   it('throws for a non-object', () => {
     expect(() => assertArtifactPlan('not-an-object')).toThrow(
@@ -47,27 +58,16 @@ describe('assertArtifactPlan', () => {
     );
   });
 
-  it('throws for sets that is not an array', () => {
-    expect(() => assertArtifactPlan({ ...VALID_PLAN, sets: 'one-set' })).toThrow(
-      /artifactPlan\.sets must be an array/,
+  it.each(['primarySetId', 'secondarySetId'])('throws for a non-string %s', (field) => {
+    expect(() => assertArtifactPlan({ ...VALID_PLAN, [field]: 42 })).toThrow(
+      new RegExp(`artifactPlan\\.${field} must be a string`),
     );
   });
 
-  it('throws for a non-string set entry', () => {
-    expect(() => assertArtifactPlan({ ...VALID_PLAN, sets: [42] })).toThrow(
-      /artifactPlan\.sets\[0\] must be a string/,
-    );
-  });
-
-  it('throws for an empty sets array', () => {
-    expect(() => assertArtifactPlan({ ...VALID_PLAN, sets: [] })).toThrow(
-      /artifactPlan\.sets must have between 1 and 2/,
-    );
-  });
-
-  it('throws for more than two sets', () => {
-    expect(() => assertArtifactPlan({ ...VALID_PLAN, sets: ['a', 'b', 'c'] })).toThrow(
-      /artifactPlan\.sets must have between 1 and 2/,
+  it('throws for a secondary set without a primary set', () => {
+    const { primarySetId: _omitted, ...rest } = VALID_PLAN;
+    expect(() => assertArtifactPlan(rest)).toThrow(
+      /artifactPlan\.secondarySetId requires artifactPlan\.primarySetId/,
     );
   });
 

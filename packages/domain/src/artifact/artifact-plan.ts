@@ -27,18 +27,26 @@ export interface ArtifactPlan {
   goblet?: GobletMainAffix;
   /** Desired main affix for Circlet of Logos */
   circlet?: CircletMainAffix;
-  /** 1–2 artifact set IDs from game-data */
-  sets?: [ArtifactSet['id']] | [ArtifactSet['id'], ArtifactSet['id']];
+  /** Primary artifact set: a 4-piece bonus, or the first half of a 2+2 split */
+  primarySetId?: ArtifactSet['id'];
+  /** Second 2-piece set of a 2+2 split; only meaningful alongside primarySetId */
+  secondarySetId?: ArtifactSet['id'];
   /** 0–3 priority minor affixes to prioritize */
   priorityMinorAffixes?: ArtifactMinorAffix[];
   /** 0–3 secondary minor affixes (must be disjoint from priorityMinorAffixes) */
   secondaryMinorAffixes?: ArtifactMinorAffix[];
 }
 
-const MIN_SETS = 1;
-const MAX_SETS = 2;
 const MIN_MINOR_AFFIXES = 0;
 const MAX_MINOR_AFFIXES = 3;
+
+/** A 2-piece set bonus needs a partner set, so a lone secondary is incoherent. */
+export function hasSecondarySetWithoutPrimary(plan: {
+  primarySetId?: unknown;
+  secondarySetId?: unknown;
+}): boolean {
+  return plan.secondarySetId !== undefined && plan.primarySetId === undefined;
+}
 
 /**
  * Structural check only. Affix names and set IDs are validated against
@@ -56,7 +64,11 @@ export function assertArtifactPlan(
   assertOptionalString(plan.sands, `${path}.sands`);
   assertOptionalString(plan.goblet, `${path}.goblet`);
   assertOptionalString(plan.circlet, `${path}.circlet`);
-  assertOptionalStringArray(plan.sets, `${path}.sets`, MIN_SETS, MAX_SETS);
+  assertOptionalString(plan.primarySetId, `${path}.primarySetId`);
+  assertOptionalString(plan.secondarySetId, `${path}.secondarySetId`);
+  if (hasSecondarySetWithoutPrimary(plan)) {
+    throw new TypeError(`${path}.secondarySetId requires ${path}.primarySetId`);
+  }
   assertOptionalStringArray(
     plan.priorityMinorAffixes,
     `${path}.priorityMinorAffixes`,

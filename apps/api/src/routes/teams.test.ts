@@ -493,7 +493,7 @@ describe('Team routes', () => {
                   sands: 'HP Percentage',
                   goblet: 'Pyro DMG Bonus',
                   circlet: 'CRIT DMG',
-                  sets: ['fake-set'],
+                  primarySetId: 'fake-set',
                   priorityMinorAffixes: ['CRIT Rate'],
                   secondaryMinorAffixes: ['ATK Percentage'],
                 },
@@ -521,7 +521,7 @@ describe('Team routes', () => {
                   sands: 'HP Percentage',
                   goblet: 'Pyro DMG Bonus',
                   circlet: 'CRIT DMG',
-                  sets: ['crimson-witch-of-flames'],
+                  primarySetId: 'crimson-witch-of-flames',
                   priorityMinorAffixes: ['CRIT Rate', 'CRIT DMG'],
                   secondaryMinorAffixes: ['CRIT Rate', 'ATK Percentage'],
                 },
@@ -554,7 +554,7 @@ describe('Team routes', () => {
                   sands: 'HP Percentage',
                   goblet: 'Pyro DMG Bonus',
                   circlet: 'CRIT DMG',
-                  sets: ['crimson-witch-of-flames'],
+                  primarySetId: 'crimson-witch-of-flames',
                   priorityMinorAffixes: ['CRIT Rate', 'CRIT DMG'],
                   secondaryMinorAffixes: ['ATK Percentage', 'HP Percentage'],
                 },
@@ -597,7 +597,7 @@ describe('Team routes', () => {
         expect(res.status).toBe(201);
       });
 
-      it('accepts partial artifact plan with only sets', async () => {
+      it('accepts partial artifact plan with only a set ID', async () => {
         vi.mocked(Teams.save).mockResolvedValue({
           team: FAKE_TEAM,
           created: true,
@@ -610,7 +610,7 @@ describe('Team routes', () => {
                 characterId: 'hu-tao',
                 weaponInstanceId: 'uuid-1',
                 artifactPlan: {
-                  sets: ['crimson-witch-of-flames'],
+                  primarySetId: 'crimson-witch-of-flames',
                 },
               },
               { characterId: 'xingqiu', weaponInstanceId: 'uuid-2' },
