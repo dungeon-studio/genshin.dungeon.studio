@@ -254,6 +254,10 @@ describe('deserialiseCollectionTeamMembers', () => {
     expect(() => deserialiseCollectionTeamMembers([null, null])).toThrow(/exactly 4/);
   });
 
+  it('rejects a payload that is not an array at all', () => {
+    expect(() => deserialiseCollectionTeamMembers('not-an-array')).toThrow(/must be an array/);
+  });
+
   it('carries a partially filled artifact plan', () => {
     const [member] = deserialiseCollectionTeamMembers([
       { characterId: 'columbina', artifactPlan: { sands: 'ATK Percentage' } },

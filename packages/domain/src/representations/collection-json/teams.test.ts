@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { Item } from '@genshin/collection-json';
+import type { DatumValue, Item } from '@genshin/collection-json';
 import { describe, expect, it } from 'vitest';
 
 import { deserialiseTeam, serialiseTeam } from './teams.js';
@@ -156,6 +156,29 @@ describe('deserialiseTeam artifact plan validation', () => {
     expect(() => deserialiseTeam(item)).toThrow(
       /artifactPlan\.secondaryMinorAffixes must have between 0 and 3/,
     );
+  });
+});
+
+describe('deserialiseTeam members payload', () => {
+  function itemWithMembersValue(value: DatumValue): Item {
+    const item = serialiseTeam(VALID_TEAM, BASE_URL);
+    return {
+      ...item,
+      data: item.data.map((d) => (d.name === 'members' ? { ...d, value } : d)),
+    };
+  }
+
+  it('rejects a members value that never held JSON', () => {
+    expect(() => deserialiseTeam(itemWithMembersValue(42))).toThrow(
+      /members value must be a JSON string/,
+    );
+  });
+
+  it('rejects an item carrying no members at all', () => {
+    const item = serialiseTeam(VALID_TEAM, BASE_URL);
+    const stripped = { ...item, data: item.data.filter((d) => d.name !== 'members') };
+
+    expect(() => deserialiseTeam(stripped)).toThrow(/exactly 4/);
   });
 });
 
