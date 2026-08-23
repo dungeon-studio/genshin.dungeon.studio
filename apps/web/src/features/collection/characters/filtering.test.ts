@@ -8,9 +8,8 @@ import { describe, expect, it } from 'vitest';
 import type { CharacterFilterState } from './filtering';
 import { filterCharacters, initialFilterState } from './filtering';
 
-// Indexing the roster keys the sample to real game data, so a field added to
-// `Character` reaches these tests without an edit. A missing ID is a `tsc`
-// error, unlike `getCharacterById`, which answers `undefined`.
+// The sample tracks the generated roster, so a field added to `Character`
+// needs no edit here.
 const {
   amber: AMBER,
   ganyu: GANYU,
@@ -20,9 +19,9 @@ const {
   zhongli: ZHONGLI,
 } = CHARACTERS;
 
-// Two Pyro, two 5-star, two owned, and no two of those groups hold the same
-// pair: each filter halves the sample, and the combined case can still tell an
-// `and` from an `or`.
+// Two Pyro, two 5-star, two owned, and no two of those groups name the same
+// pair. Where they coincide, a filter case passes on another's result and the
+// combined case cannot separate `and` from `or`.
 const SAMPLE = [AMBER, GANYU, XIANGLING, ZHONGLI];
 const OWNED_IDS = new Set([AMBER.id, GANYU.id]);
 
@@ -30,7 +29,6 @@ function idsOf(characters: readonly Character[]): string[] {
   return characters.map((c) => c.id);
 }
 
-/** Membership, for the filter cases; ordering is the sort cases' concern. */
 function idSetOf(characters: readonly Character[]): Set<string> {
   return new Set(idsOf(characters));
 }
@@ -97,10 +95,9 @@ describe('filterCharacters', () => {
   });
 
   it('orders same-version characters by their release date', () => {
-    // The pair only exercises the date comparison while it shares a version.
+    // The pair exercises the date comparison only while it shares a version.
     expect(NEUVILLETTE.version).toBe(WRIOTHESLEY.version);
 
-    // The one case off the shared sample: its own pair, nothing owned.
     const result = filterCharacters(
       [WRIOTHESLEY, NEUVILLETTE],
       { ...initialFilterState(), sortField: 'release', sortDirection: 'asc' },

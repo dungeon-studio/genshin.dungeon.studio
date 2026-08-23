@@ -8,9 +8,8 @@ import { describe, expect, it } from 'vitest';
 import type { WeaponFilterState } from './filtering';
 import { filterWeapons, initialFilterState } from './filtering';
 
-// Indexing the roster keys the sample to real game data, so a field added to
-// `Weapon` reaches these tests without an edit. A missing ID is a `tsc` error,
-// unlike `getWeaponById`, which answers `undefined`.
+// The sample tracks the generated roster, so a field added to `Weapon` needs
+// no edit here.
 const {
   'amos-bow': AMOS_BOW,
   'favonius-sword': FAVONIUS_SWORD,
@@ -18,8 +17,8 @@ const {
   'the-catch': THE_CATCH,
 } = WEAPONS;
 
-// Two Polearms, two 5-star, two owned, and no two of those groups hold the
-// same pair: each filter halves the sample along a different seam.
+// Two Polearms, two 5-star, two owned, and no two of those groups name the
+// same pair. Where they coincide, a filter case passes on another's result.
 const SAMPLE = [FAVONIUS_SWORD, AMOS_BOW, STAFF_OF_HOMA, THE_CATCH];
 const OWNED_IDS = new Set([AMOS_BOW.id, THE_CATCH.id]);
 
@@ -27,7 +26,6 @@ function idsOf(weapons: readonly Weapon[]): string[] {
   return weapons.map((w) => w.id);
 }
 
-/** Membership, for the filter cases; ordering is the sort cases' concern. */
 function idSetOf(weapons: readonly Weapon[]): Set<string> {
   return new Set(idsOf(weapons));
 }
@@ -74,8 +72,8 @@ describe('filterWeapons', () => {
   it('sorts by name ascending', () => {
     const result = filtered({ sortField: 'name', sortDirection: 'asc' });
 
-    // `The Catch` leads because its canonical name carries the quotation marks
-    // the game prints around it, and `localeCompare` orders those before letters.
+    // `The Catch` leads: its canonical name carries the quotation marks the game
+    // prints around it, and `localeCompare` orders those before letters.
     expect(idsOf(result)).toEqual(idsOf([THE_CATCH, AMOS_BOW, FAVONIUS_SWORD, STAFF_OF_HOMA]));
   });
 

@@ -33,8 +33,7 @@ describe('WeaponSummary', () => {
     const images = typeIconsFor(<WeaponSummary weapon={AMOS_BOW} />);
 
     expect(images).toHaveLength(2);
-    // Spelled out rather than read back from `getWeaponTypeIconPath`: these two
-    // assertions are the only coverage of the type-to-file mapping.
+    // The only coverage of the type-to-file mapping, so the paths stay literal.
     expect(images[0]).toHaveAttribute('src', '/weapon-types/bow-light.png');
     expect(images[1]).toHaveAttribute('src', '/weapon-types/bow-dark.png');
   });

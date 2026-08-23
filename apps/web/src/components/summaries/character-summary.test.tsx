@@ -22,8 +22,7 @@ describe('CharacterSummary', () => {
 
     const images = screen.getAllByAltText(AMBER.element);
     expect(images).toHaveLength(2);
-    // Spelled out rather than read back from `getElementIconPath`: these two
-    // assertions are the only coverage of the element-to-file mapping.
+    // The only coverage of the element-to-file mapping, so the paths stay literal.
     expect(images[0]).toHaveAttribute('src', '/elements/pyro-light.png');
     expect(images[1]).toHaveAttribute('src', '/elements/pyro-dark.png');
   });
