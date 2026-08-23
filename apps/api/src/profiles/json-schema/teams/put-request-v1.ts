@@ -105,9 +105,8 @@ export const teamPutRequestV1 = {
  *
  * Every field the schema can express is derived from it, so renaming or
  * retyping one there breaks {@link deserialiseTeamPutRequest} at compile time.
- * `members` is the exception: the schema pins the tuple length in
- * `minItems`/`maxItems`, which `FromSchema` ignores, so it is rebuilt at
- * runtime instead.
+ * `members` is the exception: `FromSchema` ignores the `minItems`/`maxItems`
+ * that pin the tuple length, so it is rebuilt at runtime instead.
  */
 export interface TeamPutRequest extends Omit<
   FromSchema<typeof teamPutRequestV1.schema>,
@@ -120,9 +119,8 @@ export interface TeamPutRequest extends Omit<
  * Converts a body already validated against {@link teamPutRequestV1} into
  * domain types.
  *
- * AJV proves the body matches the schema but hands back `unknown`, so the
- * structural checks here are what let the handler reach domain types without a
- * cast. A throw means the schema and the domain model have drifted apart.
+ * Validation has already rejected anything malformed, so a throw here means the
+ * schema and the domain model have drifted apart.
  */
 export function deserialiseTeamPutRequest(value: unknown): TeamPutRequest {
   if (typeof value !== 'object' || value === null) {

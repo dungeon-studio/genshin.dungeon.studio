@@ -43,12 +43,8 @@ export type CollectionTeamMembers = [
 ];
 
 /**
- * Rebuilds the member tuple from untrusted input.
- *
- * The fixed length is the part a JSON Schema states in `minItems`/`maxItems`
- * but a schema-derived TypeScript type can't express, so every representation
- * carrying members converts through here to reach `CollectionTeamMembers`
- * without a cast.
+ * A type derived from a wire schema can't express the fixed length, so callers
+ * holding members as a plain array reach the tuple through here.
  */
 export function deserialiseCollectionTeamMembers(
   value: unknown,

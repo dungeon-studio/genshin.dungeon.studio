@@ -71,12 +71,7 @@ export function assertArtifactPlan(
   );
 }
 
-/**
- * Rebuilds an artifact plan from untrusted input.
- *
- * Returns a fresh object rather than the input so unknown properties can't
- * ride along into whatever the caller stores or forwards.
- */
+/** Rebuilds rather than returns the input, so undeclared properties don't survive. */
 export function deserialiseArtifactPlan(value: unknown, path = 'artifactPlan'): ArtifactPlan {
   assertArtifactPlan(value, path);
 

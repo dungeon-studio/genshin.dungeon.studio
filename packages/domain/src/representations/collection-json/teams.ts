@@ -72,7 +72,6 @@ export function teamItemDocument(team: CollectionTeam, baseUrl: string): Collect
   });
 }
 
-/** Members ride as a JSON string, so they parse before the rest of the item. */
 function parseMembers(item: Item): unknown {
   const raw = item.data.find((d) => d.name === 'members');
 

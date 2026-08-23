@@ -7,10 +7,7 @@ import { describe, expect, it } from 'vitest';
 import type { teamPutRequestV1 } from './put-request-v1.js';
 import { deserialiseTeamPutRequest } from './put-request-v1.js';
 
-/**
- * Annotated against the schema so a rename or retype there fails this file at
- * compile time, the way it would fail a client sending the old shape.
- */
+/** Annotated against the schema so a rename or retype there fails this file. */
 const VALID_BODY = {
   name: 'Hydro core',
   description: 'Freeze comp',
