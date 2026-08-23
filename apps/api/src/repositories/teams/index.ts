@@ -4,7 +4,7 @@
 import type { CollectionTeam, ISOTimestamp, TeamSlot } from '@genshin/domain';
 
 import { db } from '@/firebase/firestore.js';
-import { readSnapshot } from '@/repositories/snapshot.js';
+import { readSnapshot } from '@/repositories/firestore/snapshot.js';
 
 import { fromDocument, toDocument } from './document.js';
 import { nextTeam, type TeamUpdates } from './merge.js';

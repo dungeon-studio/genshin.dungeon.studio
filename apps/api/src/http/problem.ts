@@ -11,6 +11,12 @@ import { retryAfterSeconds } from './retry-after.js';
 /** RFC 9457's type for a problem with no classification beyond its status. */
 export const ABOUT_BLANK = 'about:blank';
 
+/**
+ * The `detail` for any failure a client cannot act on, uniform across origins
+ * so a response never discloses which subsystem broke.
+ */
+export const INTERNAL_ERROR_DETAIL = 'An unexpected error occurred';
+
 export type ProblemOptions = {
   type: string;
   /** Serialised as the problem document's `detail`. */

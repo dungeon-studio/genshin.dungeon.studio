@@ -9,11 +9,17 @@ How infrastructure automation maps branches to environments and Terraform action
 
 ## Branch strategy
 
-The long-lived branches follow a [git-flow](https://nvie.com/posts/a-successful-git-branching-model/)-style release model; how each maps to an environment deployment is specific to this project.
+The branches follow the [git flow](https://nvie.com/posts/a-successful-git-branching-model/) release model. How each maps to an environment deployment is specific to this project.
+
+`develop` and `main` are permanent. A `release/*` or `hotfix/*` branch lives from its cut until it merges.
 
 - `develop`: integration branch
 - `release/*`: release-train branches cut from `develop`
-- `main`: long-term release target branch, used when production flow is active
+- `main`: release target branch, used when production flow is active
+- `hotfix/*`: urgent production fixes cut from `main`
+
+Hotfixes carry application changes only. An infrastructure change travels the
+normal release train, which is why a `hotfix/*` push applies nothing.
 
 ## Terraform workflow routing
 
@@ -21,6 +27,7 @@ The long-lived branches follow a [git-flow](https://nvie.com/posts/a-successful-
 | --------------------------------------------------- | ----------------------------- |
 | push to `develop`                                   | applies `core` then `dev`     |
 | push to `release/*`                                 | applies `core` then `staging` |
+| push to `hotfix/*`                                  | applies nothing               |
 | pull requests to `develop`, `release/*`, and `main` | run Terraform plan checks     |
 
 ## Release-branch naming

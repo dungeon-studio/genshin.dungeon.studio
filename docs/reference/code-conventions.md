@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 # Code conventions
 
-Conventions for how code in this repository is named, organized, and documented. For the contribution workflow itself, see [CONTRIBUTING.md](../../CONTRIBUTING.md).
+Conventions for how code in this repository is named, organized, and documented. Everything here is a judgment no tool can make. What a tool can decide lives in that tool's configuration, not on this page. For the contribution workflow and the checks a pull request has to pass, see [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
 ---
 
@@ -62,26 +62,25 @@ Use descriptive, specific names for files and modules. Avoid generic names like 
 
 ## Shared types
 
-Branded types in `packages/domain/` each get their own file (for example, `uuid.ts`, `iso-timestamp.ts`). Export both the type and any related validation functions from the same file.
+Branded types in `packages/domain/` each get their own file (for example, `uuid.ts`, `iso-timestamp.ts`). Keep the guard that narrows to the brand in that same file, so the check travels with the type.
+
+Rules about whether a value is legal, rather than whether it's well-formed, go in a sibling `*-validation.ts`.
 
 ## React components
 
-Page and layout components use function declarations (`export function CharactersPage()`). Reserve `const` with `React.forwardRef` for `shadcn/ui` primitives.
-
 Colocate a small helper component in the same file as its only caller, as a private function that isn't exported. Promote it to its own file when a second caller appears.
 
-Apply Tailwind utility classes directly rather than inline `style` objects, and merge conditional class names with `cn()` from `@/lib/utils`.
+Apply Tailwind utility classes directly rather than inline `style` objects, and merge conditional class names with `cn()` from `@/lib/utils`. A value only the browser can compute—a measured offset, a percentage from live data—is the exception.
 
 ## Tests
 
 Structure:
 
 - `describe` blocks mirror the module or component under test.
-- Use `it`, not `test`.
-- Name tests as plain-English sentences starting with a verb: `it('returns characters filtered by element')`.
+- Name tests as plain-English sentences starting with a verb: `it('returns characters filtered by element')`. A title opening on an acronym or a constant keeps its case: `it('PUTs the requested level')`.
 - Follow Arrange, Act, Assert within each test.
 
-Component tests query the way a user finds things—by accessible role or label (`screen.getByRole('heading')`, `screen.getByLabelText('Email')`). Reach for a test ID only when no accessible query works. Drive interactions with `userEvent` rather than `fireEvent`, and avoid snapshot tests for components; assert on behavior and accessible roles instead.
+Component tests query the way a user finds things—by accessible role or label (`screen.getByRole('heading')`, `screen.getByLabelText('Email')`). Reach for a test ID only when no accessible query works.
 
 Mock network calls at the fetch or adapter boundary, not inside library internals.
 
@@ -89,13 +88,11 @@ For what to assert, see the testing principles in [CONTRIBUTING.md](../../CONTRI
 
 ## Test utilities
 
-Shared API test utilities live in `apps/api/src/test/` with descriptive file names. The build excludes this directory via `tsconfig.build.json`.
-
----
+Shared API test utilities live in `apps/api/src/test/` with descriptive file names. The directory name is load-bearing: [`apps/api/tsconfig.build.json`](../../apps/api/tsconfig.build.json) and the shared ESLint config both key off the `test/` segment, so renaming it changes what ships in the build and which rules apply.
 
 ## Platform compatibility
 
-This project runs on Windows, macOS, and Linux.
+This project runs on Windows, macOS, and Linux. CI doesn't: every runner is Linux.
 
 - Use Node.js `path` module for paths, not hardcoded `/` or `\`
 - Use cross-platform approaches for file operations
