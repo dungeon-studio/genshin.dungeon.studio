@@ -1,8 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
-import { isValidRefinementLevel } from '@genshin/domain';
+import type { CollectionWeapon, CollectionWeaponId, RefinementLevel } from '@genshin/domain';
 import type { Weapon } from '@genshin/game-data';
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
@@ -30,7 +29,7 @@ export interface UseWeaponCollectionResult {
   /** Adds a copy unconditionally, since a user may own several. */
   addWeapon: (weaponId: Weapon['id']) => void;
   removeWeapon: (collectionWeaponId: CollectionWeaponId) => void;
-  setRefinementLevel: (collectionWeaponId: CollectionWeaponId, level: number) => void;
+  setRefinementLevel: (collectionWeaponId: CollectionWeaponId, level: RefinementLevel) => void;
   getWeaponsByWeaponId: (weaponId: Weapon['id']) => CollectionWeapon[];
   isLoading: boolean;
   error: Error | null;
@@ -152,9 +151,8 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   );
 
   const setRefinementLevel = useCallback(
-    (collectionWeaponId: CollectionWeaponId, level: number) => {
+    (collectionWeaponId: CollectionWeaponId, level: RefinementLevel) => {
       if (!isAuthenticated) return;
-      if (!isValidRefinementLevel(level)) return;
 
       const previous = useWeaponCollectionStore.getState().weapons[collectionWeaponId];
       if (!previous || previous.refinementLevel === level) return;

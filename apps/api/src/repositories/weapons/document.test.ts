@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL, type UUID } from '@genshin/domain';
+import { REFINEMENT_LEVELS, type UUID } from '@genshin/domain';
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 
@@ -21,7 +21,7 @@ const WEAPON_INSTANCE_ID = '11111111-1111-1111-1111-111111111111' as UUID;
 const arbWeapon = fc.record({
   weaponInstanceId: fc.uuid().map((id) => id as UUID),
   weaponId: arbWeaponId,
-  refinementLevel: fc.integer({ min: MIN_REFINEMENT_LEVEL, max: MAX_REFINEMENT_LEVEL }),
+  refinementLevel: fc.constantFrom(...REFINEMENT_LEVELS),
   createdAt: arbTimestamp,
   updatedAt: arbTimestamp,
 });

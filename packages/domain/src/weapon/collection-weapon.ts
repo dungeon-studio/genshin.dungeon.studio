@@ -10,6 +10,14 @@ import { isISOTimestamp } from '../iso-timestamp.js';
 export const MIN_REFINEMENT_LEVEL = 1;
 export const MAX_REFINEMENT_LEVEL = 5;
 
+/** Refinement of one weapon instance, one rank per duplicate copy consumed. */
+export type RefinementLevel = 1 | 2 | 3 | 4 | 5;
+
+export const REFINEMENT_LEVELS: readonly RefinementLevel[] = Array.from(
+  { length: MAX_REFINEMENT_LEVEL - MIN_REFINEMENT_LEVEL + 1 },
+  (_, i) => (MIN_REFINEMENT_LEVEL + i) as RefinementLevel,
+);
+
 /**
  * Identifier for one weapon instance in a user's collection.
  *
@@ -30,19 +38,12 @@ export type CollectionWeaponId = string;
 export interface CollectionWeapon {
   weaponInstanceId: CollectionWeaponId;
   weaponId: Weapon['id'];
-  refinementLevel: number;
+  refinementLevel: RefinementLevel;
   createdAt: ISOTimestamp;
   updatedAt: ISOTimestamp;
 }
 
-/**
- * Whether a value is a refinement a weapon can hold, which is an integer from
- * `MIN_REFINEMENT_LEVEL` to `MAX_REFINEMENT_LEVEL`.
- *
- * The predicate narrows only to `number`; no type records the range, so a
- * caller holding a checked value can still hand it somewhere unchecked.
- */
-export function isValidRefinementLevel(value: unknown): value is number {
+export function isValidRefinementLevel(value: unknown): value is RefinementLevel {
   return (
     typeof value === 'number' &&
     Number.isInteger(value) &&

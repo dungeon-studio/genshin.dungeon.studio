@@ -3,7 +3,7 @@
 
 import { randomUUID } from 'node:crypto';
 
-import type { CollectionWeapon, ISOTimestamp, UUID } from '@genshin/domain';
+import type { CollectionWeapon, ISOTimestamp, RefinementLevel, UUID } from '@genshin/domain';
 import type { WeaponId } from '@genshin/game-data';
 
 import { db } from '@/firebase/firestore.js';
@@ -43,7 +43,7 @@ export async function get(
 export async function create(
   userId: string,
   weaponId: WeaponId,
-  refinementLevel: number,
+  refinementLevel: RefinementLevel,
 ): Promise<CollectionWeapon> {
   const weaponInstanceId = randomUUID() as UUID;
   const now = new Date().toISOString() as ISOTimestamp;
@@ -72,7 +72,7 @@ export async function create(
 export async function update(
   userId: string,
   weaponInstanceId: UUID,
-  refinementLevel: number,
+  refinementLevel: RefinementLevel,
 ): Promise<CollectionWeapon | null> {
   const docRef = collectionRef(userId).doc(weaponInstanceId);
   const existing = readSnapshot(await docRef.get(), (data) => fromDocument(weaponInstanceId, data));

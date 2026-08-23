@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
-import type { UUID } from '@genshin/domain';
+import type { RefinementLevel, UUID } from '@genshin/domain';
 import {
   serialiseWeapon,
   weaponCollectionHref,
@@ -40,8 +40,14 @@ weapons.use('*', auth);
 
 weapons.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: weaponItemV1 }]));
 
-type CreateWeaponBody = FromSchema<typeof weaponPostRequestV1.schema>;
-type UpdateWeaponBody = FromSchema<typeof weaponPatchRequestV1.schema>;
+// FromSchema widens the schema's integer bounds to `number`; request validation
+// has already enforced them, so the intersection puts the range back.
+type CreateWeaponBody = FromSchema<typeof weaponPostRequestV1.schema> & {
+  refinementLevel: RefinementLevel;
+};
+type UpdateWeaponBody = FromSchema<typeof weaponPatchRequestV1.schema> & {
+  refinementLevel: RefinementLevel;
+};
 
 // GET /weapons — List all weapon instances, optionally filtered by weaponId
 weapons.get('/', async (c) => {
