@@ -113,7 +113,7 @@ export function deserialiseTeam(item: Item): CollectionTeam {
   return data;
 }
 
-/** The pair plus the write template, for a caller driving the format generically. */
+/** What the generic collection helpers consume for this resource. */
 export const teamRepresentation = {
   serialise: serialiseTeam,
   deserialise: deserialiseTeam,

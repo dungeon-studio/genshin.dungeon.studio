@@ -30,10 +30,12 @@ export function initialFilterState(): CharacterFilterState {
 /**
  * The roster narrowed and ordered for display.
  *
- * An empty element or rarity set means no constraint, not no matches, so the
- * default state shows everything. Ordering by release uses each character's
- * release date, which distinguishes characters that shipped in one version,
- * with name and then ID breaking any remaining tie so the order is stable.
+ * An empty element or rarity set means no constraint rather than no matches, so
+ * the default state shows everything.
+ *
+ * Ordering by release uses each character's release date, which separates
+ * characters that shipped in one version. Name and then ID break any remaining
+ * tie, so the order is stable.
  */
 export function filterCharacters(
   characters: readonly Character[],

@@ -60,10 +60,11 @@ export type ValidatedRequestBodyVariables = {
  * Rejects a request body the negotiated schema doesn't accept, and sets
  * `validatedBody` on the context when it does.
  *
- * Splits the two failures a client handles differently: a body that isn't JSON
- * is 400, and one that parses but breaks the schema is 422 with a problem type
- * naming the category, or the parent type when several categories failed at
- * once.
+ * The two failures a client handles differently get different statuses:
+ *
+ * - A body that isn't JSON is 400.
+ * - A body that parses but breaks the schema is 422, with a problem type naming
+ *   the category that failed, or the parent type when several did.
  *
  * Schemas compile once at registration, so a malformed one surfaces at startup.
  *

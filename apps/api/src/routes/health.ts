@@ -18,8 +18,8 @@ const { version: apiVersion } = JSON.parse(
  * has no credentials.
  *
  * Unauthenticated on purpose. It reports the package version and the build's
- * git SHA rather than probing dependencies, so it answers "which version is
- * live here" and not "is the database reachable".
+ * git SHA without probing dependencies, so a green response says nothing about
+ * whether storage is reachable.
  */
 export const health = new Hono<{ Variables: NegotiatedResponseContentVariables }>();
 

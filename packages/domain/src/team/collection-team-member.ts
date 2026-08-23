@@ -11,11 +11,12 @@ import type { CollectionWeaponId } from '../weapon/collection-weapon.js';
 /**
  * One character's position in a team, with what it plans to equip.
  *
- * A plan, not a snapshot: `weaponInstanceId` and `artifactPlan` are both
- * optional so a team can name a character before the user has decided the rest,
- * and `weaponInstanceId` points into the user's own collection rather than
- * naming a weapon, so the refinement it resolves to follows that record.
- * Character details are looked up from `@genshin/game-data` by `characterId`.
+ * `weaponInstanceId` and `artifactPlan` are both optional, so a team can name a
+ * character before the user has decided the rest.
+ *
+ * `weaponInstanceId` points into the user's own collection rather than naming a
+ * weapon, so the refinement it resolves to follows that record. Character
+ * details are looked up from `@genshin/game-data` by `characterId`.
  */
 export interface CollectionTeamMember {
   characterId: Character['id'];

@@ -15,9 +15,9 @@ export const ELEMENTS = {
 export type Element = (typeof ELEMENTS)[keyof typeof ELEMENTS];
 
 /**
- * How a reaction behaves, not which reactions exist.
+ * The damage model a reaction follows.
  *
- * Reactions in the same category share a damage model, so a caller grouping or
+ * Reactions in one category share that model, so a caller grouping or
  * explaining reactions branches on this rather than on the reaction name.
  * `ELEMENT_REACTION_TYPES` holds the reactions themselves.
  */

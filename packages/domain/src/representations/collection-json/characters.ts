@@ -69,7 +69,7 @@ export function deserialiseCharacter(item: Item): CollectionCharacter {
   return data;
 }
 
-/** The pair plus the write template, for a caller driving the format generically. */
+/** What the generic collection helpers consume for this resource. */
 export const characterRepresentation = {
   serialise: serialiseCharacter,
   deserialise: deserialiseCharacter,

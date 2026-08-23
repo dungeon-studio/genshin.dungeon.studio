@@ -31,10 +31,10 @@ export function initialFilterState(): WeaponFilterState {
 /**
  * The weapon catalogue narrowed and ordered for display.
  *
- * An empty type or rarity set means no constraint, not no matches. Ordering by
- * release uses the version rather than a date, because weapons carry no
- * release date, so everything from one version ties and falls back to name and
- * then ID.
+ * An empty type or rarity set means no constraint rather than no matches.
+ *
+ * Weapons carry no release date, so ordering by release uses the version.
+ * Everything from one version ties and falls back to name and then ID.
  */
 export function filterWeapons(
   weapons: readonly Weapon[],

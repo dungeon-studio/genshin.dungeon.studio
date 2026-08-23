@@ -89,7 +89,7 @@ export function deserialiseWeapon(item: Item): CollectionWeapon {
   return data;
 }
 
-/** The pair plus the write template, for a caller driving the format generically. */
+/** What the generic collection helpers consume for this resource. */
 export const weaponRepresentation = {
   serialise: serialiseWeapon,
   deserialise: deserialiseWeapon,

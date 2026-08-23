@@ -24,7 +24,7 @@ Warranted cases:
 
 Reach for a documentation string when a name and signature together can't convey a module, function, or type's contract. Inline comments explain _why_ a line works. A documentation string explains what an interface is for and how to call it correctly. Write it as a TSDoc `/** */` block directly preceding the declaration.
 
-A documentation string earns its place by carrying what the signature can't:
+What it has to carry:
 
 - **Don't restate the code.** A summary the reader could write from the signature earns nothing and rots when the code changes. Over `getCharacterById(id: CharacterId): Character | undefined`, a documentation string reading "returns the character with the given id" says less than the signature already does. What the signature can't say is that `undefined` means the roster hasn't shipped that character yet, so a caller rendering a saved build has to handle it.
 - **Say when a caller reaches for this.** Where two interfaces overlap, each one names the case it serves and points at the other. Choosing between them shouldn't require reading both implementations.

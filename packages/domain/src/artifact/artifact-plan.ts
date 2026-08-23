@@ -12,7 +12,7 @@ import type {
 import { assertOptionalString, assertOptionalStringArray } from '../assertions.js';
 
 /**
- * What a team member intends to equip, rather than what it holds.
+ * What a team member intends to equip.
  *
  * Every field is optional because planning is incremental: a user who knows the
  * main affixes but not the sets records only those, and later refinement or

@@ -34,7 +34,7 @@ interface TeamStoreState {
   ) => void;
   removeWeapon: (slot: TeamSlot, memberIndex: number) => void;
   setArtifactPlan: (slot: TeamSlot, memberIndex: number, plan: ArtifactPlan | undefined) => void;
-  /** Empties every position, keeping the team's name. */
+  /** The name survives; only the positions are emptied. */
   clearTeam: (slot: TeamSlot) => void;
   /** A blank or whitespace-only name reverts to the slot's default. */
   setTeamName: (slot: TeamSlot, name: string) => void;
@@ -54,9 +54,11 @@ interface TeamStoreState {
  *
  * Every mutation is a silent no-op when it can't apply, such as an index
  * outside a team or a weapon assigned to an empty position, so a caller gets no
- * signal that nothing happened. `setTeam` and `setTeams` are the exception to
- * the `updatedAt` stamping: they replace state wholesale and are how a server
- * response lands without looking like a user edit.
+ * signal that nothing happened.
+ *
+ * `setTeam` and `setTeams` are the exception to the `updatedAt` stamping. They
+ * replace state wholesale, which is how a server response lands without looking
+ * like a user edit.
  */
 export const useTeamStore = create<TeamStoreState>()((set, get) => ({
   teams: initialTeams(),
