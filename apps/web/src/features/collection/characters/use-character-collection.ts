@@ -54,11 +54,11 @@ export function useCollection(): UseCollectionResult {
 
   // The store is the read layer for collection data; the query only syncs into it.
   const characters = useCollectionStore((s) => s.characters);
-  const storeEnsureCharacter = useCollectionStore((s) => s.ensureCharacter);
-  const storeRemoveCharacter = useCollectionStore((s) => s.removeCharacter);
-  const storeSetConstellationLevel = useCollectionStore((s) => s.setConstellationLevel);
-  const replaceCharacters = useCollectionStore((s) => s.replaceCharacters);
-  const clearCharacters = useCollectionStore((s) => s.clearCharacters);
+  const ensureCharacterLocally = useCollectionStore((s) => s.ensureCharacter);
+  const removeCharacterLocally = useCollectionStore((s) => s.removeCharacter);
+  const setConstellationLevelLocally = useCollectionStore((s) => s.setConstellationLevel);
+  const replaceCharactersLocally = useCollectionStore((s) => s.replaceCharacters);
+  const clearCharactersLocally = useCollectionStore((s) => s.clearCharacters);
 
   const {
     data: apiCharacters,
@@ -66,15 +66,15 @@ export function useCollection(): UseCollectionResult {
     isLoading: queryLoading,
   } = useCharacterCollectionQuery(user?.uid);
 
-  const { mutate: addCharacterApi } = useAddCharacterMutation(user?.uid);
-  const { mutate: removeCharacterApi } = useRemoveCharacterMutation(user?.uid);
-  const { mutate: setConstellationLevelApi } = useSetConstellationLevelMutation(user?.uid);
+  const { mutate: addCharacterRemotely } = useAddCharacterMutation(user?.uid);
+  const { mutate: removeCharacterRemotely } = useRemoveCharacterMutation(user?.uid);
+  const { mutate: setConstellationLevelRemotely } = useSetConstellationLevelMutation(user?.uid);
 
   const applyMutationResult = useCallback(
     ({ characterId, entry }: MutationResult) => {
-      storeSetConstellationLevel(characterId, entry.constellationLevel);
+      setConstellationLevelLocally(characterId, entry.constellationLevel);
     },
-    [storeSetConstellationLevel],
+    [setConstellationLevelLocally],
   );
 
   // Gates the anonymous-localStorage merge to the first query resolution per user.
@@ -85,9 +85,9 @@ export function useCollection(): UseCollectionResult {
   useEffect(() => {
     if (!user) {
       mergedForUser.current = null;
-      clearCharacters();
+      clearCharactersLocally();
     }
-  }, [user, clearCharacters]);
+  }, [user, clearCharactersLocally]);
 
   useEffect(() => {
     if (!apiCharacters) return;
@@ -95,12 +95,12 @@ export function useCollection(): UseCollectionResult {
     if (user && mergedForUser.current !== user.uid) {
       const localData = useCollectionStore.getState().characters;
       const merged = mergeCollections(localData, apiCharacters);
-      replaceCharacters(merged);
+      replaceCharactersLocally(merged);
 
       const diffs = entriesAheadOfServer(merged, apiCharacters);
 
       for (const diff of diffs) {
-        setConstellationLevelApi(diff, {
+        setConstellationLevelRemotely(diff, {
           onSuccess: applyMutationResult,
           onError: () => {
             toast.error('Failed to sync a merged character to the server.');
@@ -117,9 +117,15 @@ export function useCollection(): UseCollectionResult {
       // Keep refetches additive so in-flight merge mutations aren't overwritten.
       const currentCharacters = useCollectionStore.getState().characters;
       const merged = mergeCollections(currentCharacters, apiCharacters);
-      replaceCharacters(merged);
+      replaceCharactersLocally(merged);
     }
-  }, [apiCharacters, user, replaceCharacters, setConstellationLevelApi, applyMutationResult]);
+  }, [
+    apiCharacters,
+    user,
+    replaceCharactersLocally,
+    setConstellationLevelRemotely,
+    applyMutationResult,
+  ]);
 
   // Each mutation rolls back its optimistic store write only if the store still
   // holds that write, so rapid interactions don't clobber each other. Nothing is
@@ -130,14 +136,14 @@ export function useCollection(): UseCollectionResult {
       const alreadyOwned = id in useCollectionStore.getState().characters;
       if (alreadyOwned) return;
 
-      storeEnsureCharacter(id);
+      ensureCharacterLocally(id);
       if (isAuthenticated) {
-        addCharacterApi(id, {
+        addCharacterRemotely(id, {
           onSuccess: applyMutationResult,
           onError: () => {
             const current = useCollectionStore.getState().characters[id];
             if (current?.constellationLevel === MIN_CONSTELLATION_LEVEL) {
-              storeRemoveCharacter(id);
+              removeCharacterLocally(id);
               toast.error('Failed to add character. Change has been reverted.');
             } else {
               toast.error('Failed to add character.');
@@ -148,9 +154,9 @@ export function useCollection(): UseCollectionResult {
     },
     [
       isAuthenticated,
-      addCharacterApi,
-      storeEnsureCharacter,
-      storeRemoveCharacter,
+      addCharacterRemotely,
+      ensureCharacterLocally,
+      removeCharacterLocally,
       applyMutationResult,
     ],
   );
@@ -160,14 +166,14 @@ export function useCollection(): UseCollectionResult {
       const current = useCollectionStore.getState().characters[id];
       if (!current) return;
 
-      storeRemoveCharacter(id);
+      removeCharacterLocally(id);
       if (isAuthenticated) {
-        removeCharacterApi(id, {
+        removeCharacterRemotely(id, {
           onError: () => {
             const stillAbsent = !(id in useCollectionStore.getState().characters);
             if (stillAbsent) {
-              storeEnsureCharacter(id);
-              storeSetConstellationLevel(id, current.constellationLevel);
+              ensureCharacterLocally(id);
+              setConstellationLevelLocally(id, current.constellationLevel);
               toast.error('Failed to remove character. Change has been reverted.');
             } else {
               toast.error('Failed to remove character.');
@@ -178,10 +184,10 @@ export function useCollection(): UseCollectionResult {
     },
     [
       isAuthenticated,
-      removeCharacterApi,
-      storeRemoveCharacter,
-      storeEnsureCharacter,
-      storeSetConstellationLevel,
+      removeCharacterRemotely,
+      removeCharacterLocally,
+      ensureCharacterLocally,
+      setConstellationLevelLocally,
     ],
   );
 
@@ -190,16 +196,16 @@ export function useCollection(): UseCollectionResult {
       const previousLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
       if (previousLevel === undefined || previousLevel === level) return;
 
-      storeSetConstellationLevel(id, level);
+      setConstellationLevelLocally(id, level);
       if (isAuthenticated) {
-        setConstellationLevelApi(
+        setConstellationLevelRemotely(
           { characterId: id, level },
           {
             onSuccess: applyMutationResult,
             onError: () => {
               const currentLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
               if (previousLevel !== undefined && currentLevel === level) {
-                storeSetConstellationLevel(id, previousLevel);
+                setConstellationLevelLocally(id, previousLevel);
                 toast.error('Failed to update constellation level. Change has been reverted.');
               } else {
                 toast.error('Failed to update constellation level.');
@@ -209,7 +215,12 @@ export function useCollection(): UseCollectionResult {
         );
       }
     },
-    [isAuthenticated, setConstellationLevelApi, storeSetConstellationLevel, applyMutationResult],
+    [
+      isAuthenticated,
+      setConstellationLevelRemotely,
+      setConstellationLevelLocally,
+      applyMutationResult,
+    ],
   );
 
   const isOwned = useCallback((id: CharacterId) => id in characters, [characters]);

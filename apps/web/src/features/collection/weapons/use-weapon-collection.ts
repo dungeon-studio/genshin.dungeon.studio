@@ -35,11 +35,11 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   const isAuthenticated = user !== null;
 
   const weapons = useWeaponCollectionStore((s) => s.weapons);
-  const storeSetWeapons = useWeaponCollectionStore((s) => s.setWeapons);
-  const storeAddWeapon = useWeaponCollectionStore((s) => s.addWeapon);
-  const storeRemoveWeapon = useWeaponCollectionStore((s) => s.removeWeapon);
-  const storeSetRefinementLevel = useWeaponCollectionStore((s) => s.setRefinementLevel);
-  const clearWeapons = useWeaponCollectionStore((s) => s.clearWeapons);
+  const setWeaponsLocally = useWeaponCollectionStore((s) => s.setWeapons);
+  const addWeaponLocally = useWeaponCollectionStore((s) => s.addWeapon);
+  const removeWeaponLocally = useWeaponCollectionStore((s) => s.removeWeapon);
+  const setRefinementLevelLocally = useWeaponCollectionStore((s) => s.setRefinementLevel);
+  const clearWeaponsLocally = useWeaponCollectionStore((s) => s.clearWeapons);
 
   const {
     data: apiWeapons,
@@ -47,31 +47,31 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     isLoading: queryLoading,
   } = useWeaponCollectionQuery(user?.uid);
 
-  const { mutate: addWeaponApi } = useAddWeaponMutation(user?.uid);
-  const { mutate: removeWeaponApi } = useRemoveWeaponMutation(user?.uid);
-  const { mutate: setRefinementLevelApi } = useSetRefinementLevelMutation(user?.uid);
+  const { mutate: addWeaponRemotely } = useAddWeaponMutation(user?.uid);
+  const { mutate: removeWeaponRemotely } = useRemoveWeaponMutation(user?.uid);
+  const { mutate: setRefinementLevelRemotely } = useSetRefinementLevelMutation(user?.uid);
 
   const applyMutationResult = useCallback(
     ({ weapon }: WeaponMutationResult) => {
-      storeAddWeapon(weapon);
+      addWeaponLocally(weapon);
     },
-    [storeAddWeapon],
+    [addWeaponLocally],
   );
 
   useEffect(() => {
     if (!user) {
-      clearWeapons();
+      clearWeaponsLocally();
     }
-  }, [user, clearWeapons]);
+  }, [user, clearWeaponsLocally]);
 
   useEffect(() => {
     if (!apiWeapons) return;
-    storeSetWeapons(apiWeapons);
-  }, [apiWeapons, storeSetWeapons]);
+    setWeaponsLocally(apiWeapons);
+  }, [apiWeapons, setWeaponsLocally]);
 
   const runAdd = useCallback(
     (weaponId: Weapon['id'], onSettled?: () => void) => {
-      addWeaponApi(weaponId, {
+      addWeaponRemotely(weaponId, {
         onSuccess: applyMutationResult,
         onError: () => {
           toast.error('Failed to add weapon.');
@@ -79,7 +79,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
         onSettled,
       });
     },
-    [addWeaponApi, applyMutationResult],
+    [addWeaponRemotely, applyMutationResult],
   );
 
   // Additive: every call creates a new instance. Contrast ensureWeapon.
@@ -120,12 +120,12 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
       const current = useWeaponCollectionStore.getState().weapons[collectionWeaponId];
       if (!current) return;
 
-      storeRemoveWeapon(collectionWeaponId);
-      removeWeaponApi(collectionWeaponId, {
+      removeWeaponLocally(collectionWeaponId);
+      removeWeaponRemotely(collectionWeaponId, {
         onError: () => {
           const stillAbsent = !(collectionWeaponId in useWeaponCollectionStore.getState().weapons);
           if (stillAbsent) {
-            storeAddWeapon(current);
+            addWeaponLocally(current);
             toast.error('Failed to remove weapon. Change has been reverted.');
           } else {
             toast.error('Failed to remove weapon.');
@@ -133,7 +133,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
         },
       });
     },
-    [isAuthenticated, removeWeaponApi, storeRemoveWeapon, storeAddWeapon],
+    [isAuthenticated, removeWeaponRemotely, removeWeaponLocally, addWeaponLocally],
   );
 
   const setRefinementLevel = useCallback(
@@ -144,8 +144,8 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
       const previous = useWeaponCollectionStore.getState().weapons[collectionWeaponId];
       if (!previous || previous.refinementLevel === level) return;
 
-      storeSetRefinementLevel(collectionWeaponId, level);
-      setRefinementLevelApi(
+      setRefinementLevelLocally(collectionWeaponId, level);
+      setRefinementLevelRemotely(
         { collectionWeaponId, level },
         {
           onSuccess: applyMutationResult,
@@ -153,7 +153,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
             const currentLevel =
               useWeaponCollectionStore.getState().weapons[collectionWeaponId]?.refinementLevel;
             if (currentLevel === level) {
-              storeSetRefinementLevel(collectionWeaponId, previous.refinementLevel);
+              setRefinementLevelLocally(collectionWeaponId, previous.refinementLevel);
               toast.error('Failed to update refinement level. Change has been reverted.');
             } else {
               toast.error('Failed to update refinement level.');
@@ -162,7 +162,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
         },
       );
     },
-    [isAuthenticated, setRefinementLevelApi, storeSetRefinementLevel, applyMutationResult],
+    [isAuthenticated, setRefinementLevelRemotely, setRefinementLevelLocally, applyMutationResult],
   );
 
   const getWeaponsByWeaponId = useCallback(
