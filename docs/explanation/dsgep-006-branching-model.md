@@ -14,7 +14,7 @@
 
 ## Abstract
 
-This Dungeon Studio Genshin Enhancement Proposal (DSGEP) records the repository's branching model and what it implies for deployment. The model has three long-lived branches, `develop`, `release/*`, and `main`, plus a `hotfix/*` class for urgent production fixes. Each maps to an environment, each merge edge uses a specific strategy, and each branch produces a different kind of release tag. The model resembles [git flow](https://nvie.com/posts/a-successful-git-branching-model/) and diverges from it in three deliberate places. Pull requests into `develop` squash instead of taking a merge commit, changes travel from `main` back to `develop` as cherry-picks instead of back-merges, and topic branches carry conventional-commit type names. Only the `develop` leg runs today.
+This Dungeon Studio Genshin Enhancement Proposal (DSGEP) records the repository's branching model and what it implies for deployment. The model has three long-lived branches, `develop`, `release/*`, and `main`, plus a `hotfix/*` class for urgent production fixes. Each branch maps to an environment, and each merge edge carries its own strategy. The model resembles [git flow](https://nvie.com/posts/a-successful-git-branching-model/) and diverges from it in three deliberate places. Pull requests into `develop` squash instead of taking a merge commit, changes travel from `main` back to `develop` as cherry-picks instead of back-merges, and topic branches carry conventional-commit type names. Only the `develop` leg runs today.
 
 ## Problem statement
 
@@ -28,21 +28,21 @@ Downstream work assumes the model. [#327](https://github.com/dungeon-studio/gens
 
 ## Context
 
-At the time of writing, the model runs one leg of three.
+The model runs one leg of three.
 
-`develop` is the default branch and the only long-lived branch that exists. Neither `main` nor `release/*` exists yet, and [#1229](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1229) creates `main`.
+`develop` is the default branch and the only long-lived branch that exists. Neither `main` nor `release/*` exists yet.
 
 Topic branches use `feature/`, `fix/`, `chore/`, and `docs/` prefixes, and every pull request squashes into `develop`. The pull request title becomes the commit message and carries the conventional-commit format, so `develop` holds exactly one conventional commit per pull request.
 
-The `develop` ruleset carries `required_linear_history` alongside `pull_request`, `deletion`, `non_fast_forward`, `code_scanning`, and `code_quality`. Its condition targets `~DEFAULT_BRANCH`, so no other branch inherits those rules.
+The `develop` ruleset carries `required_linear_history`, and its condition targets the default branch alone, so no other branch inherits it.
 
 Terraform routing already follows the model, trigger by trigger, in [`infrastructure-branch-flow.md`](../reference/infrastructure-branch-flow.md). Only the `dev` environment has ever taken an apply: `staging` is a bare shell, and no run has yet applied the production configuration.
 
-Application deploys run on `develop` alone. A path-gated push builds the web bundle and the API image, deploys both to dev, and then runs the deployed verification suite on them.
+Application deploys run on `develop` alone, into dev.
 
 Release Drafter keeps a running draft from pull requests merged into `develop`. A draft creates no tag, so publishing and tagging are still manual and unspecified.
 
-Every workspace package sets `private: true` and none of them ships to a registry, so the repository has a single version, held in the root `package.json`.
+The repository carries a single version, in the root `package.json`.
 
 ## Decision
 
@@ -53,7 +53,7 @@ Every workspace package sets `private: true` and none of them ships to a registr
 | `develop`   | Integration branch and the default branch | dev         | topic branches          |
 | `release/*` | Stabilisation branch cut from `develop`   | staging     | fixes found in it       |
 | `main`      | Stable release target                     | production  | `release/*`, `hotfix/*` |
-| `hotfix/*`  | Urgent production fix, cut from `main`    | none        | topic-level commits     |
+| `hotfix/*`  | Urgent production fix, cut from `main`    | none        | the fix commits         |
 
 A `hotfix/*` branch deploys no infrastructure. Hotfixes carry application changes only. An infrastructure change travels the normal train.
 
@@ -68,7 +68,7 @@ A `hotfix/*` branch deploys no infrastructure. Hotfixes carry application change
 | `hotfix/*` → `main`      | Merge commit |
 | `main` → `develop`       | Cherry-pick  |
 
-The strategy is per-branch rather than per-repository. `required_linear_history` stays on the `develop` ruleset and stays off the `main` and `release/**` ruleset, so each branch gets the strategy it needs.
+The strategy is per-branch rather than per-repository. `required_linear_history` stays on the `develop` ruleset and stays off the `main` and `release/**` ruleset.
 
 Changes that land on `main` without passing through `develop`, meaning fixes made during stabilisation and hotfixes, return to `develop` as cherry-picks. There's no back-merge pull request.
 
@@ -88,11 +88,9 @@ The release branch is the staging deployment. Without it, staging has no ref to 
 
 ### Why squash into `develop` but merge commits into `main`
 
-The two edges want opposite things.
-
 Squashing into `develop` produces one conventional commit per pull request. That property is what git-cliff reads, and it's what keeps the history legible: a reader scanning `develop` sees changes, not the review iterations that produced them.
 
-Squashing `release/*` into `main` breaks ancestry. The squash creates a commit on `main` with no link to the `develop` commits it came from, so `main` and `develop` diverge permanently and every later release re-presents already-applied changes as conflicts. It also collapses an entire release into a single commit on `main`, which is why the release notes draft from `develop` rather than from `main` today. A merge commit keeps both branches sharing history and preserves the per-pull-request commits inside the release.
+Squashing `release/*` into `main` breaks ancestry. The squash creates a commit on `main` with no link to the `develop` commits it came from, so `main` and `develop` diverge permanently and every later release re-presents already-applied changes as conflicts. It also collapses an entire release into a single commit on `main`. A merge commit keeps both branches sharing history and preserves the per-pull-request commits inside the release.
 
 ### Why cherry-picks instead of back-merges
 
@@ -100,7 +98,7 @@ A back-merge is a merge commit into `develop`, which `required_linear_history` f
 
 ### Why hotfix branches cut from `main`
 
-An urgent production fix needs to reach production without carrying anything else. Cutting a release branch from `develop` to deliver it would drag every unreleased commit along, which is exactly what the stabilisation window exists to prevent. Cutting from `main` isolates the fix to the code production already runs.
+An urgent production fix needs to reach production without carrying anything else. Cutting a release branch from `develop` to deliver it would drag every unreleased commit along. Cutting from `main` isolates the fix to the code production already runs.
 
 ### Why branches map to environments
 
@@ -108,7 +106,7 @@ The mapping makes the branch the promotion mechanism. A merge is the act of prom
 
 ### Why git-cliff rather than release-please
 
-The choice is structural rather than a comparison of features. A release-please Release PR competes with the release branch for the role of "the thing you merge to release," duplicating what the release train already owns. git-cliff is a pure function over git history and introduces no second release object. Its assumption of a single root version holds here because every workspace package is private and unpublished.
+A release-please Release PR competes with the release branch for the role of "the thing you merge to release," duplicating what the release train already owns. git-cliff is a pure function over git history and introduces no second release object. Its assumption of a single root version holds here because every workspace package is private and unpublished.
 
 ## Consequences
 
@@ -134,7 +132,7 @@ The choice is structural rather than a comparison of features. A release-please 
 
 **Approach**: `--no-ff` merges on every edge, topic branches limited to `feature/` and `hotfix/`, back-merges into `develop` as merge commits.
 
-**Rejected because**: merge commits on every topic branch bury the one-commit-per-pull-request property under review iterations, and the changelog generator reads that property. The divergences this model takes are the two places where git flow's uniformity costs something concrete.
+**Rejected because**: merge commits on every topic branch bury the one-commit-per-pull-request property under review iterations, and the changelog generator reads that property.
 
 ### Trunk-based development
 
@@ -156,7 +154,7 @@ The choice is structural rather than a comparison of features. A release-please 
 
 ### Squash everywhere
 
-**Approach**: the current state, extended. Squash `release/*` into `main` too.
+**Approach**: squash every edge, including `release/*` into `main`.
 
 **Rejected because**: it severs ancestry between `main` and `develop`, as described in the rationale, and collapses a release to one commit.
 
@@ -172,12 +170,10 @@ The `develop` leg runs today. This record settles the other legs, and these issu
 
 - [#1229](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1229) creates `main` and its ruleset.
 - [dungeon-studio-infrastructure#13](https://github.com/dungeon-studio/dungeon-studio-infrastructure/issues/13) permits merge commits, which the `release/*` and `hotfix/*` edges into `main` need.
-- [#327](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/327) automates cutting the release branch and opening the release pull request. Its scope includes a back-merge pull request from `main` to `develop`, and this record replaces that step with cherry-picks.
+- [#327](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/327) automates cutting the release branch and opening the release pull request.
 - [#845](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/845) publishes and tags the per-branch releases.
 - [#1230](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1230) adopts git-cliff and [#1231](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1231) retires Release Drafter.
 - [#780](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/780) adds the production Terraform workspace and [#782](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/782) promotes to it on a push to `main`.
-
-The `hotfix/*` class has push runs in [`ci.yml`](../../.github/workflows/ci.yml) and [`devcontainer.yml`](../../.github/workflows/devcontainer.yml) already. It has no Terraform routing, which matches the decision that hotfixes carry no infrastructure change.
 
 ## References
 
@@ -186,7 +182,3 @@ The `hotfix/*` class has push runs in [`ci.yml`](../../.github/workflows/ci.yml)
 - [`CONTRIBUTING.md`](../../CONTRIBUTING.md): topic branch naming, commit format, and the squash strategy
 - [A successful Git branching model](https://nvie.com/posts/a-successful-git-branching-model/): the git flow model this one adapts
 - [Issue #954](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/954): the request to record this decision
-
-## Revision history
-
-- 2026-08-23: Initial draft (DSGEP-006)

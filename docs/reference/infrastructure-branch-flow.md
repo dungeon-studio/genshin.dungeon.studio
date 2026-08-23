@@ -9,7 +9,7 @@ How infrastructure automation maps branches to environments and Terraform action
 
 ## Branch strategy
 
-The long-lived branches follow a [git-flow](https://nvie.com/posts/a-successful-git-branching-model/)-style release model; how each maps to an environment deployment is specific to this project. [DSGEP-006](../explanation/dsgep-006-branching-model.md) records why the model looks this way, including the merge strategy on each edge and the deployment implications.
+The long-lived branches follow a [git-flow](https://nvie.com/posts/a-successful-git-branching-model/)-style release model; how each maps to an environment deployment is specific to this project. [DSGEP-006](../explanation/dsgep-006-branching-model.md) records why.
 
 - `develop`: integration branch
 - `release/*`: release-train branches cut from `develop`
