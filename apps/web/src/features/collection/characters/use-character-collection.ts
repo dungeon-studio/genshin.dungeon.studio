@@ -52,7 +52,7 @@ export function useCollection(): UseCollectionResult {
   const { user, loading: authLoading } = useAuth();
   const isAuthenticated = user !== null;
 
-  // Zustand store — always the read layer
+  // The store is the read layer for collection data; the query only syncs into it.
   const characters = useCollectionStore((s) => s.characters);
   const storeEnsureCharacter = useCollectionStore((s) => s.ensureCharacter);
   const storeRemoveCharacter = useCollectionStore((s) => s.removeCharacter);
@@ -60,7 +60,6 @@ export function useCollection(): UseCollectionResult {
   const replaceCharacters = useCollectionStore((s) => s.replaceCharacters);
   const clearCharacters = useCollectionStore((s) => s.clearCharacters);
 
-  // TanStack Query — background sync when authenticated
   const {
     data: apiCharacters,
     error: queryError,
@@ -71,7 +70,6 @@ export function useCollection(): UseCollectionResult {
   const { mutate: removeCharacterApi } = useRemoveCharacterMutation(user?.uid);
   const { mutate: setConstellationLevelApi } = useSetConstellationLevelMutation(user?.uid);
 
-  // Patch zustand with confirmed server data
   const applyMutationResult = useCallback(
     ({ characterId, entry }: MutationResult) => {
       storeSetConstellationLevel(characterId, entry.constellationLevel);
@@ -79,14 +77,11 @@ export function useCollection(): UseCollectionResult {
     [storeSetConstellationLevel],
   );
 
-  // Merge anonymous localStorage data with server data on first query resolution
-  // per user session. Subsequent resolutions (refetches) merge additively to
-  // avoid overwriting optimistic state while merge mutations are in flight.
+  // Gates the anonymous-localStorage merge to the first query resolution per user.
   const mergedForUser = useRef<string | null>(null);
 
-  // Reset merge tracking and clear persisted collection on logout so
-  // re-login triggers a fresh merge and a different account cannot
-  // inherit the previous user's local data.
+  // Re-login must trigger a fresh merge, and a different account must not inherit
+  // the previous user's local data.
   useEffect(() => {
     if (!user) {
       mergedForUser.current = null;
@@ -126,12 +121,9 @@ export function useCollection(): UseCollectionResult {
     }
   }, [apiCharacters, user, replaceCharacters, setConstellationLevelApi, applyMutationResult]);
 
-  // Mutation error strategy: optimistic rollback + toast notification.
-  // Each mutation writes to zustand first for instant UI feedback, then fires
-  // the API call. On failure the onError callback rolls back the zustand change
-  // only if the store still reflects this mutation's optimistic value (guards
-  // against races from rapid user interactions). Errors are surfaced via toast
-  // side-effects — no retry is attempted.
+  // Each mutation rolls back its optimistic store write only if the store still
+  // holds that write, so rapid interactions don't clobber each other. Nothing is
+  // retried.
 
   const ensureCharacter = useCallback(
     (id: CharacterId) => {
