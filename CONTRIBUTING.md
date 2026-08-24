@@ -58,6 +58,10 @@ pnpm install
 pnpm dev
 ```
 
+After a `pnpm-lock.yaml` change, restart any dev server that's already running.
+Vite reads module resolution once at startup, so a server left running reports
+`Cannot find module` for the new dependency.
+
 > **Note:** The API starts without Google Cloud credentials. Routes that don't
 > use Firestore (health check, schemas) work immediately. Routes that read or
 > write Firestore (profiles, teams, characters, weapons) return 500 until you

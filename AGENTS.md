@@ -112,7 +112,7 @@ writing tests.
 - Declare every direct import explicitly, even when the same package exists at the root. Enforced by `import-x/no-extraneous-dependencies` in every workspace `eslint.config.js`; `devDependencies` may appear in test files (`*.test.ts`, `**/test/**`) and tooling configs (`eslint.config.js`, `*.config.{ts,js}`) but never in production source.
 - Classify packages correctly: `dependencies` for runtime code shipped to production, `devDependencies` for build tools, plugins, type definitions, and local tooling.
 - `pnpm-workspace.yaml` declares workspace package globs and engine constraints only; don't use it for version overrides.
-- Run `pnpm install` and commit `pnpm-lock.yaml` after dependency changes. Use `pnpm why <package>` to detect duplicate transitive versions. Restart any running dev server too: Vite caches module resolution at startup, so a stale server throws misleading `Cannot find module` errors.
+- Run `pnpm install` and commit `pnpm-lock.yaml` after dependency changes. Use `pnpm why <package>` to detect duplicate transitive versions. Restart any running dev server too, for the reason in [Quick start commands](CONTRIBUTING.md#quick-start-commands).
 - New workspace packages should match the root `package.json` metadata fields (`description`, `keywords`, `author`, `homepage`, `bugs`, `license`).
 - ESLint uses flat config via workspace-local `eslint.config.js` files; configure ignore patterns with `ignores`, not `.eslintignore`.
 
