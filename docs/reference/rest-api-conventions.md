@@ -37,7 +37,7 @@ See [JSONSchema2020-12]: <https://json-schema.org/draft/2020-12>
 
 #### `profile` parameter negotiation
 
-Clients name the schema URI they expect in a `profile` parameter, on `Accept` for the response and on `Content-Type` for a request body. The API echoes the schema it served in the response `Content-Type`:
+Clients name the schema URI they expect in a `profile` parameter: on `Accept` for the response, on `Content-Type` for a request body. A response echoes the schema the API served.
 
 ```http
 GET /health HTTP/1.1
@@ -52,17 +52,15 @@ PUT /characters/amber HTTP/1.1
 Content-Type: application/json; profile="https://api.genshin.dungeon.studio/profiles/json-schema/characters/put-request-v1.json"
 ```
 
-The parameter reads the same way in both headers, and only its failure differs:
+| The parameter                | On `Accept`               | On `Content-Type`                   |
+| ---------------------------- | ------------------------- | ----------------------------------- |
+| Omitted                      | Serves the latest version | Validates against the latest schema |
+| Names a supported version    | Serves that version       | Validates against that schema       |
+| Names an unsupported version | `406 Not Acceptable`      | `415 Unsupported Media Type`        |
 
-| The parameter             | On `Accept`               | On `Content-Type`             |
-| ------------------------- | ------------------------- | ----------------------------- |
-| Omitted                   | Serves the latest version | Validates against the latest  |
-| Names a supported version | Serves that version       | Validates against that schema |
-| Names no supported one    | `406 Not Acceptable`      | `415 Unsupported Media Type`  |
+An `Accept` the API can't satisfy leaves it nothing to send. An unsupported `Content-Type` names a schema the API understood and won't take.
 
-That last split is deliberate. An `Accept` the API can't satisfy leaves it nothing to send, while an unsupported `Content-Type` names a schema it understood and won't take.
-
-Two failures sit outside the parameter. An `Accept` excluding `application/json` and every wildcard draws `406`, and a `Content-Type` that doesn't parse draws `400 Bad Request`.
+Outside the parameter, an `Accept` excluding `application/json` and every wildcard draws `406`, and a `Content-Type` that doesn't parse draws `400 Bad Request`.
 
 ### 5. Consistent error contract
 
@@ -98,15 +96,15 @@ See [RFC6750]: <https://www.rfc-editor.org/rfc/rfc6750>
 
 Encode API timestamps as ISO 8601 UTC strings.
 
-### 9. Server-managed field ownership
+### 9. Server-managed fields
 
 A field the server owns appears in no request schema. Every request schema sets `additionalProperties: false`, so sending one draws `422 Unprocessable Content` with the `/problems/validation/additional-properties` type rather than a silent discard.
 
-`createdAt` and `updatedAt` are server-managed on every resource, as is the owning account, which the verified token names instead of the body.
+`createdAt` and `updatedAt` are server-managed on every resource. So is the owning account, which the verified token names.
 
 ### 10. Field naming
 
-All API response fields are camelCase. Normalize casing at the translation boundary when projecting from an upstream type that uses another convention, rather than letting it reach a response.
+All API response fields are camelCase. Normalize casing at the translation boundary when projecting from an upstream type that uses another convention.
 
 ### 11. Validation status codes
 
