@@ -58,9 +58,8 @@ pnpm install
 pnpm dev
 ```
 
-After a `pnpm-lock.yaml` change, whether yours or one you pulled, run
-`pnpm install` and restart any dev server that's already running. Vite reads
-module resolution once at startup, so a server left running reports
+After a `pnpm-lock.yaml` change, restart any dev server that's already running.
+Vite reads module resolution once at startup, so a server left running reports
 `Cannot find module` for the new dependency.
 
 > **Note:** The API starts without Google Cloud credentials. Routes that don't
