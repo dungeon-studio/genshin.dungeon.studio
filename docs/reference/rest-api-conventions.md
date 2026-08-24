@@ -47,12 +47,26 @@ HTTP/1.1 200 OK
 Content-Type: application/json; profile="https://api.genshin.dungeon.studio/profiles/json-schema/health/get-response-v1.json"
 ```
 
-Negotiation rules:
+Response negotiation rules:
 
 - **Profile omitted**: serves the latest representation version.
 - **Profile matches a supported version**: responds with that representation.
 - **Profile matches no supported version**: responds `406 Not Acceptable` in the RFC 9457 error format.
 - **`Accept` excludes `application/json`** (and any wildcard): responds `406 Not Acceptable`.
+
+A request body carries the same parameter on its `Content-Type`, naming the schema the endpoint validates it against:
+
+```http
+PUT /characters/amber HTTP/1.1
+Content-Type: application/json; profile="https://api.genshin.dungeon.studio/profiles/json-schema/characters/put-request-v1.json"
+```
+
+Request negotiation rules:
+
+- **Profile omitted**: validates against the latest request schema version.
+- **Profile matches a supported version**: validates against that schema.
+- **Profile matches no supported version**: responds `415 Unsupported Media Type`, because the server understood the header and can't honor it.
+- **`Content-Type` doesn't parse**: responds `400 Bad Request`.
 
 ### 5. Consistent error contract
 
@@ -88,21 +102,15 @@ See [RFC6750]: <https://www.rfc-editor.org/rfc/rfc6750>
 
 Encode API timestamps as ISO 8601 UTC strings.
 
-### 9. Profile field ownership
+### 9. Server-managed field ownership
 
-Resources combining data from multiple authorities assign each field to exactly one authority at the type level, and the API enforces that boundary on writes.
+A field the server owns appears in no request schema. Every request schema sets `additionalProperties: false`, so sending one draws `422 Unprocessable Content` with the `/problems/validation/additional-properties` type rather than a silent discard.
 
-| Category       | Authority                        | API behavior                                   | Example fields                  |
-| -------------- | -------------------------------- | ---------------------------------------------- | ------------------------------- |
-| Identity       | Firebase Auth (`DecodedIdToken`) | Read-only; projected from the decoded ID token | `uid`, `email`, `emailVerified` |
-| Profile        | Firestore                        | Mutable via `PATCH`                            | `name`                          |
-| System-managed | Firestore                        | Set automatically; rejected in `PATCH` input   | `createdAt`, `updatedAt`        |
-
-`PATCH` endpoints use `additionalProperties: false` in their JSON Schema to reject fields outside the mutable set.
+`createdAt` and `updatedAt` are server-managed on every resource, as is the owning account, which the verified token names instead of the body.
 
 ### 10. Field naming
 
-All API response fields are camelCase. Normalize casing at the translation boundary when projecting from upstream types that use other conventions (for example, `DecodedIdToken.email_verified`).
+All API response fields are camelCase. Normalize casing at the translation boundary when projecting from an upstream type that uses another convention, rather than letting it reach a response.
 
 ### 11. Validation status codes
 
