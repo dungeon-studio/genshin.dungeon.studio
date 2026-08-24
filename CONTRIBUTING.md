@@ -65,6 +65,11 @@ pnpm dev
 > [Configure Firestore credentials](docs/how-tos/configure-firestore-credentials.md)
 > for setup instructions.
 
+After a `pnpm-lock.yaml` change, whether yours or one you pulled, run
+`pnpm install` and restart any dev server you already have running. Vite reads
+module resolution once at startup, so a running server reports
+`Cannot find module` for the new dependency until you restart it.
+
 ### What your pull request has to pass
 
 - Every pre-commit hook. Run `pre-commit install` once, and the same hooks run on each commit that CI runs over the whole tree—so a clean commit is a clean build. The first commit afterward builds each hook's environment and can take several minutes. `pre-commit run --all-files` reproduces CI exactly.
