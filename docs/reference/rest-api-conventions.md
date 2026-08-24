@@ -37,7 +37,7 @@ See [JSONSchema2020-12]: <https://json-schema.org/draft/2020-12>
 
 #### `profile` parameter negotiation
 
-Clients select a representation version with the `profile` parameter on `Accept`, naming the schema URI they expect. The API echoes the schema it used in the response `Content-Type`:
+Clients name the schema URI they expect in a `profile` parameter: on `Accept` for the response, on `Content-Type` for a request body. A response echoes the schema the API served.
 
 ```http
 GET /health HTTP/1.1
@@ -47,12 +47,20 @@ HTTP/1.1 200 OK
 Content-Type: application/json; profile="https://api.genshin.dungeon.studio/profiles/json-schema/health/get-response-v1.json"
 ```
 
-Negotiation rules:
+```http
+PUT /characters/amber HTTP/1.1
+Content-Type: application/json; profile="https://api.genshin.dungeon.studio/profiles/json-schema/characters/put-request-v1.json"
+```
 
-- **Profile omitted**: serves the latest representation version.
-- **Profile matches a supported version**: responds with that representation.
-- **Profile matches no supported version**: responds `406 Not Acceptable` in the RFC 9457 error format.
-- **`Accept` excludes `application/json`** (and any wildcard): responds `406 Not Acceptable`.
+| The parameter                | On `Accept`               | On `Content-Type`                   |
+| ---------------------------- | ------------------------- | ----------------------------------- |
+| Omitted                      | Serves the latest version | Validates against the latest schema |
+| Names a supported version    | Serves that version       | Validates against that schema       |
+| Names an unsupported version | `406 Not Acceptable`      | `415 Unsupported Media Type`        |
+
+An `Accept` the API can't satisfy leaves it nothing to send. An unsupported `Content-Type` names a schema the API understood and won't take.
+
+Outside the parameter, an `Accept` excluding `application/json` and every wildcard draws `406`, and a `Content-Type` that doesn't parse draws `400 Bad Request`.
 
 ### 5. Consistent error contract
 
@@ -88,21 +96,15 @@ See [RFC6750]: <https://www.rfc-editor.org/rfc/rfc6750>
 
 Encode API timestamps as ISO 8601 UTC strings.
 
-### 9. Profile field ownership
+### 9. Server-managed fields
 
-Resources combining data from multiple authorities assign each field to exactly one authority at the type level, and the API enforces that boundary on writes.
+A field the server owns appears in no request schema. Every request schema sets `additionalProperties: false`, so sending one draws `422 Unprocessable Content` with the `/problems/validation/additional-properties` type rather than a silent discard.
 
-| Category       | Authority                        | API behavior                                   | Example fields                  |
-| -------------- | -------------------------------- | ---------------------------------------------- | ------------------------------- |
-| Identity       | Firebase Auth (`DecodedIdToken`) | Read-only; projected from the decoded ID token | `uid`, `email`, `emailVerified` |
-| Profile        | Firestore                        | Mutable via `PATCH`                            | `name`                          |
-| System-managed | Firestore                        | Set automatically; rejected in `PATCH` input   | `createdAt`, `updatedAt`        |
-
-`PATCH` endpoints use `additionalProperties: false` in their JSON Schema to reject fields outside the mutable set.
+`createdAt` and `updatedAt` are server-managed on every resource. So is the owning account, which the verified token names.
 
 ### 10. Field naming
 
-All API response fields are camelCase. Normalize casing at the translation boundary when projecting from upstream types that use other conventions (for example, `DecodedIdToken.email_verified`).
+All API response fields are camelCase. Normalize casing at the translation boundary when projecting from an upstream type that uses another convention.
 
 ### 11. Validation status codes
 
