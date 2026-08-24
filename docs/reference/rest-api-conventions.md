@@ -37,7 +37,7 @@ See [JSONSchema2020-12]: <https://json-schema.org/draft/2020-12>
 
 #### `profile` parameter negotiation
 
-Clients select a representation version with the `profile` parameter on `Accept`, naming the schema URI they expect. The API echoes the schema it used in the response `Content-Type`:
+Clients name the schema URI they expect in a `profile` parameter, on `Accept` for the response and on `Content-Type` for a request body. The API echoes the schema it served in the response `Content-Type`:
 
 ```http
 GET /health HTTP/1.1
@@ -47,26 +47,22 @@ HTTP/1.1 200 OK
 Content-Type: application/json; profile="https://api.genshin.dungeon.studio/profiles/json-schema/health/get-response-v1.json"
 ```
 
-Response negotiation rules:
-
-- **Profile omitted**: serves the latest representation version.
-- **Profile matches a supported version**: responds with that representation.
-- **Profile matches no supported version**: responds `406 Not Acceptable` in the RFC 9457 error format.
-- **`Accept` excludes `application/json`** (and any wildcard): responds `406 Not Acceptable`.
-
-A request body carries the same parameter on its `Content-Type`, naming the schema the endpoint validates it against:
-
 ```http
 PUT /characters/amber HTTP/1.1
 Content-Type: application/json; profile="https://api.genshin.dungeon.studio/profiles/json-schema/characters/put-request-v1.json"
 ```
 
-Request negotiation rules:
+The parameter reads the same way in both headers, and only its failure differs:
 
-- **Profile omitted**: validates against the latest request schema version.
-- **Profile matches a supported version**: validates against that schema.
-- **Profile matches no supported version**: responds `415 Unsupported Media Type`, because the server understood the header and can't honor it.
-- **`Content-Type` doesn't parse**: responds `400 Bad Request`.
+| The parameter             | On `Accept`               | On `Content-Type`             |
+| ------------------------- | ------------------------- | ----------------------------- |
+| Omitted                   | Serves the latest version | Validates against the latest  |
+| Names a supported version | Serves that version       | Validates against that schema |
+| Names no supported one    | `406 Not Acceptable`      | `415 Unsupported Media Type`  |
+
+That last split is deliberate. An `Accept` the API can't satisfy leaves it nothing to send, while an unsupported `Content-Type` names a schema it understood and won't take.
+
+Two failures sit outside the parameter. An `Accept` excluding `application/json` and every wildcard draws `406`, and a `Content-Type` that doesn't parse draws `400 Bad Request`.
 
 ### 5. Consistent error contract
 
