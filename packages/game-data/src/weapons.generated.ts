@@ -5,6 +5,36 @@
 // Regenerate with: pnpm --filter @genshin/game-data-codegen generate weapons
 
 export const WEAPON_DATA = {
+  'exaiphanes-blade': {
+    id: 'exaiphanes-blade',
+    name: 'Exaiphanes Blade',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 46,
+    version: '7.0',
+    subStat: {
+      type: 'CRIT Rate',
+      value: 7.2,
+    },
+    passiveName: "Traveler's Path",
+    passiveDescription:
+      'When the Traveler equips this, their ATK will increase by 16% for 8s after they hit an opponent. At the same time, they will also regenerate 3 Elemental Energy. This effect can trigger once every 5s. This can be triggered even when the character is not on the field.',
+  },
+  'whitelake-frostfeather': {
+    id: 'whitelake-frostfeather',
+    name: 'Whitelake Frostfeather',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 48,
+    version: '7.0',
+    subStat: {
+      type: 'CRIT Rate',
+      value: 4.8,
+    },
+    passiveName: "Snow Swan's Finale",
+    passiveDescription:
+      'When the equipping character hits an opponent with their Elemental Skill, they gain "Lake-Hued Lament": ATK increases by 8% for 8s. This effect can trigger once every 0.1s. Max 3 stacks, and each stack\'s duration is independent. At 3 stacks, the CRIT DMG of any Stellar Glimmer reaction DMG caused by the equipping character is increased by 50%, and triggering Stellar Glimmer reactions or Stellar Glimmer reaction DMG will also restore 4 Elemental Energy to the character. This Energy recovery effect can trigger once every 3.5s. Can be triggered even when the equipping character is off-field.',
+  },
   'a-teaspoon-of-transcendence': {
     id: 'a-teaspoon-of-transcendence',
     name: 'A Teaspoon of Transcendence',
@@ -18,7 +48,7 @@ export const WEAPON_DATA = {
     },
     passiveName: "White Fairy's Queening",
     passiveDescription:
-      'ATK is increased by 28%.\nAdditionally, each time the equipping character hits an opponent with their Charged Attack, they attain "Transcendence" for a short time: their Stellar-Conduct DMG is increased by 16% for 5s. This effect can stack once every 0.2s, max 3 stacks.',
+      'ATK is increased by 28%.\nAdditionally, each time the equipping character hits an opponent with their Charged Attack, they attain "Transcendence" for a short time: their Stellar-Conduct and Stellar Swirl reaction DMG is increased by 16% for 5s. This effect can stack once every 0.2s, max 3 stacks.',
   },
   'angelos-heptades': {
     id: 'angelos-heptades',
@@ -258,7 +288,7 @@ export const WEAPON_DATA = {
     },
     passiveName: 'Bathhouses, Hawks, and Narukami',
     passiveDescription:
-      "Elemental Mastery increases by 120 for 6s after triggering Swirl. Elemental Mastery increases by 96 for 9s after the wielder's Elemental Skill hits an opponent. Elemental Mastery increases by 32 for 30s after the wielder's Elemental Burst hits an opponent.",
+      "Elemental Mastery increases by 120 for 6s after triggering Swirl or Stellar Swirl. Elemental Mastery increases by 96 for 9s after the wielder's Elemental Skill hits an opponent. Elemental Mastery increases by 32 for 30s after the wielder's Elemental Burst hits an opponent.",
   },
   'a-thousand-blazing-suns': {
     id: 'a-thousand-blazing-suns',
@@ -303,7 +333,7 @@ export const WEAPON_DATA = {
     },
     passiveName: 'The Moonring Sighted',
     passiveDescription:
-      "For 12s after triggering a Swirl reaction, ATK increases by 24%. In addition, when 1/2 or more characters in the party are of a different Elemental Type from the equipping character, the DMG dealt by the equipping character's Charged Attacks is increased by 20%/48% and Elemental Burst DMG dealt is increased by 10%/24%.",
+      "For 12s after triggering a Swirl or Stellar Swirl reaction, ATK increases by 24%. In addition, when 1/2 or more characters in the party are of a different Elemental Type from the equipping character, the DMG dealt by the equipping character's Charged Attacks is increased by 20%/48%, and Elemental Burst DMG dealt is increased by 10%/24%.",
   },
   'peak-patrol-song': {
     id: 'peak-patrol-song',
@@ -1069,6 +1099,156 @@ export const WEAPON_DATA = {
     passiveName: 'Wolfish Tracker',
     passiveDescription:
       "Increases ATK by 20%. On hit, attacks against opponents with less than 30% HP increase all party members' ATK by 40% for 12s. Can only occur once every 30s.",
+  },
+  'blade-of-atonement': {
+    id: 'blade-of-atonement',
+    name: 'Blade of Atonement',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 44,
+    version: '7.0',
+    subStat: {
+      type: 'ATK%',
+      value: 6,
+    },
+    passiveName: 'Repentance and Redemption',
+    passiveDescription:
+      "Triggering an Elemental Reaction increases the equipping character's Elemental Mastery by 64 for 12s, while triggering a Stellar Glimmer reaction increases their ATK by 16% for 12s. The aforementioned effects can trigger even when the character is not on the field.",
+  },
+  'clash-of-kings': {
+    id: 'clash-of-kings',
+    name: 'Clash of Kings',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 42,
+    version: '7.0',
+    subStat: {
+      type: 'CRIT Rate',
+      value: 6,
+    },
+    passiveName: 'Without Heed for Day nor Night',
+    passiveDescription:
+      'Using an Elemental Skill grants the equipping character "Laws of the Board," which increases their ATK by 20% and their Elemental Mastery by 100. This effect lasts 6s and can trigger once every 12s. Does not stack. The duration of this effect will also be extended by 6s if the equipping character hits an opponent with a Charged Attack while it is active. The effect can be extended for max 6s in this way.',
+  },
+  'covenant-of-frost-and-snow': {
+    id: 'covenant-of-frost-and-snow',
+    name: 'Covenant of Frost and Snow',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 42,
+    version: '7.0',
+    subStat: {
+      type: 'DEF%',
+      value: 11.3,
+    },
+    passiveName: "The Law's Equilibrium",
+    passiveDescription:
+      'For 12s after the equipping character uses an Elemental Skill, their Elemental Mastery is increased by 120.',
+  },
+  'echoes-of-the-heart': {
+    id: 'echoes-of-the-heart',
+    name: 'Echoes of the Heart',
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 44,
+    version: '7.0',
+    subStat: {
+      type: 'ATK%',
+      value: 6,
+    },
+    passiveName: 'Echo of a Vow',
+    passiveDescription:
+      "Triggering an Elemental Reaction increases the equipping character's Elemental Mastery by 60 for 12s, while triggering a Stellar Glimmer reaction increases their Stellar Glimmer reaction DMG dealt by 16% for 12s. The aforementioned effects can trigger even when the character is not on the field.",
+  },
+  emberwell: {
+    id: 'emberwell',
+    name: 'Emberwell',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: '7.0',
+    subStat: {
+      type: 'Elemental Mastery',
+      value: 36,
+    },
+    passiveName: 'Starfire Upon the Snowplains',
+    passiveDescription:
+      "Triggering an Elemental Reaction increases the equipping character's ATK by 16% for 12s. Triggering a Stellar Glimmer reaction increases their Stellar Glimmer reaction DMG dealt by 16% for 12s. The aforementioned effects can trigger even when the character is not on the field.",
+  },
+  'forged-by-the-golden-melody': {
+    id: 'forged-by-the-golden-melody',
+    name: 'Forged by the Golden Melody',
+    type: 'Claymore',
+    rarity: 4,
+    baseATK: 42,
+    version: '7.0',
+    subStat: {
+      type: 'CRIT Rate',
+      value: 6,
+    },
+    passiveName: 'Day and Night in Counterpoint',
+    passiveDescription:
+      'Every 10s, the equipping character plays a "Harmonic Movement" of the corresponding type for a boost in the following order: +18% ATK > +120 Elemental Mastery > +28% Stellar Glimmer reaction DMG. Each instance of Harmonic Movement lasts 10s. This effect can trigger even when the equipping character is not on the field.\nTriggering a Stellar Glimmer reaction will also grant an additional 12-second instance of "Harmonic Movement: Contrapuntal" with the same effects as the Harmonic Movement active when Stellar Glimmer is triggered. This effect stacks with the original Harmonic Movement effect, and can trigger once every 12s.',
+  },
+  frostbreath: {
+    id: 'frostbreath',
+    name: 'Frostbreath',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 42,
+    version: '7.0',
+    subStat: {
+      type: 'Energy Recharge',
+      value: 10,
+    },
+    passiveName: 'A Cast Real Far',
+    passiveDescription:
+      "Triggering a Cryo or Hydro-related elemental reaction increases the equipping character's ATK by 20% for the next 15s, as well as regenerates 6 Elemental Energy for other members of their party. This effect can trigger once every 16s.",
+  },
+  'heretics-molten-blade': {
+    id: 'heretics-molten-blade',
+    name: "Heretic's Molten Blade",
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: '7.0',
+    subStat: {
+      type: 'CRIT Rate',
+      value: 6,
+    },
+    passiveName: "Lone Light's Blessing",
+    passiveDescription:
+      'After the equipping character uses their Elemental Skill, they gain "Gleam of First Light." While active, Gleam of First Light tracks their distance traveled. Each second, the equipping character gains an ATK Bonus ranging from 18% to 36% based on the distance traveled during the previous second. Gleam of First Light lasts 14s, can be triggered once every 14s, and is removed when the equipping character leaves the field.',
+  },
+  'jade-vista': {
+    id: 'jade-vista',
+    name: 'Jade Vista',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 42,
+    version: '7.0',
+    subStat: {
+      type: 'CRIT Rate',
+      value: 6,
+    },
+    passiveName: 'A Candle Woven From the Night',
+    passiveDescription:
+      "For every party member other than the equipping character: · Who is of the same Elemental Type as the equipper: The equipping character's Elemental Mastery is increased by 64; · Who is not of the same Elemental Type as the equipper: The equipping character's ATK increases by 12%. The two effects described above can stack up to 3 times in total, with Elemental Mastery buffs applied first.",
+  },
+  'song-of-the-vigil': {
+    id: 'song-of-the-vigil',
+    name: 'Song of the Vigil',
+    type: 'Polearm',
+    rarity: 4,
+    baseATK: 44,
+    version: '7.0',
+    subStat: {
+      type: 'Elemental Mastery',
+      value: 24,
+    },
+    passiveName: 'Cadence of Days Gone By',
+    passiveDescription:
+      'Triggering an Elemental Reaction regenerates 4 Elemental Energy for the equipping character. This effect can trigger once every 9s. On the other hand, triggering a Stellar Glimmer reaction increases their ATK by 20% for 12s. The aforementioned effects can trigger even when the character is not on the field.',
   },
   'rainbow-serpents-rain-bow': {
     id: 'rainbow-serpents-rain-bow',
