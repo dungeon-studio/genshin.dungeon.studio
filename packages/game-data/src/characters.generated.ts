@@ -5,6 +5,16 @@
 // Regenerate with: pnpm --filter @genshin/game-data-codegen generate characters
 
 export const CHARACTER_DATA = {
+  odette: {
+    id: 'odette',
+    name: 'Odette',
+    element: 'Cryo',
+    weaponType: 'Sword',
+    rarity: 5,
+    region: 'Unknown',
+    version: '7.0',
+    releaseDate: '2026-08-12',
+  },
   sandrone: {
     id: 'sandrone',
     name: 'Sandrone',
@@ -654,6 +664,16 @@ export const CHARACTER_DATA = {
     region: 'Mondstadt',
     version: '1.0',
     releaseDate: '2020-09-28',
+  },
+  alyosha: {
+    id: 'alyosha',
+    name: 'Alyosha',
+    element: 'Electro',
+    weaponType: 'Polearm',
+    rarity: 4,
+    region: 'Unknown',
+    version: '7.0',
+    releaseDate: '2026-08-12',
   },
   prune: {
     id: 'prune',

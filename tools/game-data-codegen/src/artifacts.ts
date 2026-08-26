@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 import type { ArtifactSet } from '@genshin/game-data';
-import { compareVersions } from '@genshin/game-data';
 import genshinDb from 'genshin-db';
 import type { Artifact as DbArtifact } from 'genshin-db';
 
 import { serializeEntry, writeGeneratedModule } from './emit.js';
 import { queryInEnglish } from './language.js';
+import { byVersionThenName } from './roster-order.js';
 import { toId } from './slug.js';
 
 /** Only sets with 5-star pieces are tracked; the rest are leveling fodder. */
@@ -42,11 +42,6 @@ function toArtifactSet(record: DbArtifact): GeneratedArtifactSet {
   };
 }
 
-/** Newest first; names break ties so regeneration stays deterministic. */
-function byRosterOrder(a: GeneratedArtifactSet, b: GeneratedArtifactSet): number {
-  return compareVersions(b.version, a.version) || a.name.localeCompare(b.name);
-}
-
 /**
  * The artifact roster in emission order, without writing anything.
  *
@@ -64,7 +59,7 @@ export function buildArtifactSets(): GeneratedArtifactSet[] {
     .map((name) => genshinDb.artifacts(name))
     .filter(isEndgameSet)
     .map(toArtifactSet)
-    .sort(byRosterOrder);
+    .sort(byVersionThenName);
 }
 
 function serializeArtifactSet(set: GeneratedArtifactSet): string {

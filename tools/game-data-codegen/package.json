@@ -17,7 +17,7 @@
   "dependencies": {
     "@genshin/game-data": "workspace:*",
     "commander": "15.0.0",
-    "genshin-db": "5.2.12"
+    "genshin-db": "5.2.13"
   },
   "devDependencies": {
     "@genshin/eslint-config": "workspace:*",
