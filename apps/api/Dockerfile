@@ -5,7 +5,7 @@
 ARG COREPACK_VERSION=0.35.0
 
 # Build stage
-FROM node:24.19.0-slim@sha256:3638d9a6fe4030bd716be989438248074489337ba3275657f93595428be4fc03 AS builder
+FROM node:24.19.0-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df AS builder
 
 ARG COREPACK_VERSION
 
@@ -41,7 +41,7 @@ RUN pnpm turbo run build --filter=@genshin/api && \
     pnpm install --prod --frozen-lockfile
 
 # Production stage
-FROM node:24.19.0-slim@sha256:3638d9a6fe4030bd716be989438248074489337ba3275657f93595428be4fc03
+FROM node:24.19.0-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df
 
 WORKDIR /app
 
