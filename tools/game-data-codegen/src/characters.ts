@@ -1,32 +1,22 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { compareVersions, ELEMENTS } from '@genshin/game-data';
-import type { Character, Element } from '@genshin/game-data';
+import type { Character } from '@genshin/game-data';
 import genshinDb from 'genshin-db';
 import type { Character as DbCharacter } from 'genshin-db';
 
 import { CHARACTER_RELEASE_DATES } from './character-release-dates.js';
 import { serializeEntry, writeGeneratedModule } from './emit.js';
+import { toElement, toWeaponType } from './genshin-db-enums.js';
 import { queryInEnglish } from './language.js';
+import { byVersionThenName } from './roster-order.js';
 import { toId, toKebabCase } from './slug.js';
-import { WEAPON_TYPE_BY_GENSHIN_DB } from './weapons.js';
 
 /** genshin-db leaves `region` blank for characters with no established homeland. */
 const UNKNOWN_REGION = 'Unknown';
 
 /** Crossover characters. */
 const EXCLUDED_IDS = new Set(['aloy']);
-
-const ELEMENT_BY_GENSHIN_DB: Record<string, Element> = {
-  ELEMENT_ANEMO: ELEMENTS.ANEMO,
-  ELEMENT_CRYO: ELEMENTS.CRYO,
-  ELEMENT_DENDRO: ELEMENTS.DENDRO,
-  ELEMENT_ELECTRO: ELEMENTS.ELECTRO,
-  ELEMENT_GEO: ELEMENTS.GEO,
-  ELEMENT_HYDRO: ELEMENTS.HYDRO,
-  ELEMENT_PYRO: ELEMENTS.PYRO,
-};
 
 /**
  * One record as it will be emitted.
@@ -49,14 +39,6 @@ function isRosterMember(record: DbCharacter | undefined): record is DbCharacter 
 function toCharacter(record: DbCharacter): GeneratedCharacter {
   const id = toId(record.name, 'character');
 
-  const element = ELEMENT_BY_GENSHIN_DB[record.elementType];
-  if (!element) throw new Error(`Unknown element "${record.elementType}" for ${record.name}`);
-
-  const weaponType = WEAPON_TYPE_BY_GENSHIN_DB[record.weaponType];
-  if (!weaponType) {
-    throw new Error(`Unknown weapon type "${record.weaponType}" for ${record.name}`);
-  }
-
   const releaseDate = CHARACTER_RELEASE_DATES[id];
   if (!releaseDate) {
     throw new Error(
@@ -67,8 +49,8 @@ function toCharacter(record: DbCharacter): GeneratedCharacter {
   return {
     id,
     name: record.name,
-    element,
-    weaponType,
+    element: toElement(record.elementType, record.name),
+    weaponType: toWeaponType(record.weaponType, record.name),
     rarity: record.rarity,
     region: record.region || UNKNOWN_REGION,
     version: record.version,
@@ -76,11 +58,9 @@ function toCharacter(record: DbCharacter): GeneratedCharacter {
   };
 }
 
-/** 5-star first, then newest version first; name breaks ties so output is stable. */
+/** 5-star first, then the shared version-and-name order. */
 function byRosterOrder(a: GeneratedCharacter, b: GeneratedCharacter): number {
-  return (
-    b.rarity - a.rarity || compareVersions(b.version, a.version) || a.name.localeCompare(b.name)
-  );
+  return b.rarity - a.rarity || byVersionThenName(a, b);
 }
 
 /**

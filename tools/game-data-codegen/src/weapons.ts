@@ -1,38 +1,18 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { compareVersions, WEAPON_STAT_TYPES } from '@genshin/game-data';
 import type { Rarity, WeaponStatType, WeaponType } from '@genshin/game-data';
 import genshinDb from 'genshin-db';
 import type { Weapon as DbWeapon } from 'genshin-db';
 
 import { serializeEntry, writeGeneratedModule } from './emit.js';
+import { toWeaponStatType, toWeaponType } from './genshin-db-enums.js';
 import { queryInEnglish } from './language.js';
+import { byVersionThenName } from './roster-order.js';
 import { toId } from './slug.js';
 
 /** Lowest rarity included in the roster; 1–3 star weapons are fodder for team building. */
 const MINIMUM_RARITY = 4;
-
-/** Exported because character records carry the same `weaponType` enum. */
-export const WEAPON_TYPE_BY_GENSHIN_DB: Record<string, WeaponType> = {
-  WEAPON_SWORD_ONE_HAND: 'Sword',
-  WEAPON_CLAYMORE: 'Claymore',
-  WEAPON_POLE: 'Polearm',
-  WEAPON_BOW: 'Bow',
-  WEAPON_CATALYST: 'Catalyst',
-};
-
-/** Maps genshin-db `mainStatType` enums to `WeaponStatType` values. */
-const SUB_STAT_BY_GENSHIN_DB: Record<string, WeaponStatType> = {
-  FIGHT_PROP_ATTACK_PERCENT: WEAPON_STAT_TYPES.ATK_PERCENT,
-  FIGHT_PROP_CRITICAL: WEAPON_STAT_TYPES.CRIT_RATE,
-  FIGHT_PROP_CRITICAL_HURT: WEAPON_STAT_TYPES.CRIT_DMG,
-  FIGHT_PROP_CHARGE_EFFICIENCY: WEAPON_STAT_TYPES.ENERGY_RECHARGE,
-  FIGHT_PROP_ELEMENT_MASTERY: WEAPON_STAT_TYPES.ELEMENTAL_MASTERY,
-  FIGHT_PROP_PHYSICAL_ADD_HURT: WEAPON_STAT_TYPES.PHYSICAL_DMG,
-  FIGHT_PROP_HP_PERCENT: WEAPON_STAT_TYPES.HP_PERCENT,
-  FIGHT_PROP_DEFENSE_PERCENT: WEAPON_STAT_TYPES.DEF_PERCENT,
-};
 
 /**
  * One record on its way to being emitted, which is not the consumer's `Weapon`.
@@ -60,25 +40,21 @@ function isRosterMember(record: DbWeapon | undefined): record is DbWeapon {
 }
 
 function toWeapon(record: DbWeapon): GeneratedWeapon {
-  const type = WEAPON_TYPE_BY_GENSHIN_DB[record.weaponType];
-  if (!type) throw new Error(`Unknown weapon type "${record.weaponType}" for ${record.name}`);
-
   const weapon: GeneratedWeapon = {
     id: toId(record.name, 'weapon'),
     name: record.name,
-    type,
+    type: toWeaponType(record.weaponType, record.name),
     rarity: record.rarity,
     baseATK: Math.round(record.baseAtkValue),
     version: record.version,
   };
 
   if (record.mainStatType && record.baseStatText) {
-    const subStatType = SUB_STAT_BY_GENSHIN_DB[record.mainStatType];
-    if (!subStatType) {
-      throw new Error(`Unknown sub-stat "${record.mainStatType}" for ${record.name}`);
-    }
     // `baseStatText` is the in-game display, e.g. "9.6%" (percent) or "36" (flat EM).
-    weapon.subStat = { type: subStatType, value: parseFloat(record.baseStatText) };
+    weapon.subStat = {
+      type: toWeaponStatType(record.mainStatType, record.name),
+      value: parseFloat(record.baseStatText),
+    };
   }
 
   if (record.effectName && record.r1?.description) {
@@ -88,11 +64,9 @@ function toWeapon(record: DbWeapon): GeneratedWeapon {
   return weapon;
 }
 
-/** 5-star first, then newest version first; name breaks ties so output is stable. */
+/** 5-star first, then the shared version-and-name order. */
 function byRosterOrder(a: GeneratedWeapon, b: GeneratedWeapon): number {
-  return (
-    b.rarity - a.rarity || compareVersions(b.version, a.version) || a.name.localeCompare(b.name)
-  );
+  return b.rarity - a.rarity || byVersionThenName(a, b);
 }
 
 /**
