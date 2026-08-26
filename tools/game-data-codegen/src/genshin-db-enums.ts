@@ -1,17 +1,15 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+/**
+ * Translates the genshin-db enums into this project's vocabulary.
+ *
+ * One module holds every table because an enum spans record kinds: character
+ * and weapon records both carry `weaponType`.
+ */
+
 import { ELEMENTS, WEAPON_STAT_TYPES } from '@genshin/game-data';
 import type { Element, WeaponStatType, WeaponType } from '@genshin/game-data';
-
-/**
- * Translation of the genshin-db enums into this project's vocabulary.
- *
- * One module owns every table because a genshin-db enum is rarely confined to
- * the roster it appears in: character and weapon records both carry
- * `weaponType`. Upstream adding a value none of these tables map is drift the
- * generators abort on rather than emit a record for.
- */
 
 const ELEMENT_BY_GENSHIN_DB: Record<string, Element> = {
   ELEMENT_ANEMO: ELEMENTS.ANEMO,
@@ -42,10 +40,6 @@ const SUB_STAT_BY_GENSHIN_DB: Record<string, WeaponStatType> = {
   FIGHT_PROP_DEFENSE_PERCENT: WEAPON_STAT_TYPES.DEF_PERCENT,
 };
 
-/**
- * @throws Error naming the unmapped value, the kind of enum it belongs to, and
- * the record that carries it, which together say what upstream changed.
- */
 function translate<T>(table: Record<string, T>, kind: string, value: string, subject: string): T {
   const mapped = table[value];
   if (!mapped) throw new Error(`Unknown ${kind} "${value}" for ${subject}`);

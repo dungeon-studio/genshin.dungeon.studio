@@ -58,7 +58,6 @@ function toCharacter(record: DbCharacter): GeneratedCharacter {
   };
 }
 
-/** 5-star first, then the shared version-and-name order. */
 function byRosterOrder(a: GeneratedCharacter, b: GeneratedCharacter): number {
   return b.rarity - a.rarity || byVersionThenName(a, b);
 }

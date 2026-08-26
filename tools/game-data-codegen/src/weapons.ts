@@ -64,7 +64,6 @@ function toWeapon(record: DbWeapon): GeneratedWeapon {
   return weapon;
 }
 
-/** 5-star first, then the shared version-and-name order. */
 function byRosterOrder(a: GeneratedWeapon, b: GeneratedWeapon): number {
   return b.rarity - a.rarity || byVersionThenName(a, b);
 }

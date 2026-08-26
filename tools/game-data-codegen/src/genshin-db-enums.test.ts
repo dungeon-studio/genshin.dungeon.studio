@@ -6,8 +6,8 @@ import { describe, expect, it } from 'vitest';
 import { toWeaponType } from './genshin-db-enums.js';
 
 describe('genshin-db enum translation', () => {
-  // The generators only reach this path when upstream ships a value no table
-  // maps, which no roster in the pinned release can reproduce.
+  // No roster in the pinned release carries an unmapped value, so a direct call
+  // is the only way to reach this path.
   it('names the unmapped value and the record carrying it', () => {
     expect(() => toWeaponType('WEAPON_TRIDENT', 'Odette')).toThrow(
       'Unknown weapon type "WEAPON_TRIDENT" for Odette',
