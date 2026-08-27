@@ -52,7 +52,7 @@
     "@typescript/native": "npm:typescript@7.0.2",
     "@vitejs/plugin-react": "6.1.0",
     "@vitest/coverage-v8": "4.1.11",
-    "eslint": "10.8.1",
+    "eslint": "10.9.0",
     "eslint-plugin-jest-dom": "5.10.1",
     "eslint-plugin-jsx-a11y-x": "0.2.0",
     "eslint-plugin-react": "7.37.5",
