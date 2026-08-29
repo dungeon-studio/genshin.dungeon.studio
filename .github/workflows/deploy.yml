@@ -138,6 +138,13 @@ jobs:
           tags: |
             type=ref,event=branch
             type=sha,prefix={{branch}}-,format=short
+          # The remaining OCI labels default to repository metadata, which is
+          # correct for source, revision, created, licenses, and url. Title and
+          # description are not: they default to naming the whole product, and
+          # this image is one service within it.
+          labels: |
+            org.opencontainers.image.title=genshin-api
+            org.opencontainers.image.description=HTTP API for genshin.dungeon.studio
 
       - name: Build & Push Image
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
@@ -165,6 +172,12 @@ jobs:
           echo "Published image tags:"
           printf '%s\n' "$IMAGE_TAGS"
           echo "Deploy image URI: $IMAGE_URI"
+
+      - name: Verify Image Labels
+        env:
+          IMAGE_URI: ${{ steps.image.outputs.image_uri }}
+          EXPECTED_REVISION: ${{ github.sha }}
+        run: bash apps/api/scripts/verify-image-labels.sh "$IMAGE_URI" "$EXPECTED_REVISION"
 
       # Service lifecycle is intentionally CI-managed for fast app rollouts.
       # Terraform in dev manages supporting infra (APIs, Artifact Registry,
