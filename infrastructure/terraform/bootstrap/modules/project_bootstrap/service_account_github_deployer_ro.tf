@@ -1,7 +1,10 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# RO service account
+locals {
+  github_deployer_ro_member = "serviceAccount:${google_service_account.github_deployer_ro.email}"
+}
+
 resource "google_service_account" "github_deployer_ro" {
   project      = google_project.env.project_id
   account_id   = "github-deployer-ro"
@@ -17,15 +20,14 @@ resource "google_project_iam_custom_role" "github_deployer_ro_planner" {
   title       = "GitHub Deployer Planner"
   description = "Least-privilege read role for Terraform plan workflows"
 
-  # Keep this list limited to read/refresh permissions required by
-  # `infrastructure/terraform/environments/*` during `terraform plan`.
-  # When adding new environment resources, extend this role only for
-  # plan-time read failures and avoid broad predefined project roles.
-
+  # Scope to what `infrastructure/terraform/environments/*` needs during
+  # `terraform plan`. Extend this list rather than granting a predefined role.
   permissions = [
     "artifactregistry.repositories.get",
     "artifactregistry.repositories.list",
     "datastore.databases.get",
+    # The Firestore Admin API checks getMetadata, not get, on databases.get.
+    "datastore.databases.getMetadata",
     "datastore.databases.list",
     "dns.managedZones.get",
     "dns.managedZones.list",
@@ -62,42 +64,17 @@ resource "google_project_iam_custom_role" "github_deployer_ro_planner" {
 resource "google_project_iam_member" "github_deployer_ro_planner" {
   project = google_project.env.project_id
   role    = google_project_iam_custom_role.github_deployer_ro_planner.name
-  member  = "serviceAccount:${google_service_account.github_deployer_ro.email}"
-}
-
-resource "google_project_iam_member" "github_deployer_ro_sa_viewer" {
-  project = google_project.env.project_id
-  role    = "roles/iam.serviceAccountViewer"
-  member  = "serviceAccount:${google_service_account.github_deployer_ro.email}"
-}
-
-# Required for Terraform plan refresh of `google_firestore_database`.
-# The equivalent least-privilege custom permission set is currently insufficient
-# for provider read behavior; track tightening in a follow-up issue.
-resource "google_project_iam_member" "github_deployer_ro_datastore_viewer" {
-  project = google_project.env.project_id
-  role    = "roles/datastore.viewer"
-  member  = "serviceAccount:${google_service_account.github_deployer_ro.email}"
-}
-
-# Required for Terraform plan refresh of `google_firebase_web_app`.
-# The custom role includes `firebase.clients.get` and `firebase.projects.get`,
-# but the google-beta provider requires additional permissions covered by this
-# predefined role; track tightening in a follow-up issue.
-resource "google_project_iam_member" "github_deployer_ro_firebase_viewer" {
-  project = google_project.env.project_id
-  role    = "roles/firebase.viewer"
-  member  = "serviceAccount:${google_service_account.github_deployer_ro.email}"
+  member  = local.github_deployer_ro_member
 }
 
 resource "google_storage_bucket_iam_member" "github_deployer_ro_state_bucket" {
   bucket = var.state_bucket_name
   role   = "roles/storage.objectViewer"
-  member = "serviceAccount:${google_service_account.github_deployer_ro.email}"
+  member = local.github_deployer_ro_member
 }
 
 resource "google_storage_bucket_iam_member" "github_deployer_ro_bucket_reader" {
   bucket = var.state_bucket_name
   role   = "roles/storage.legacyBucketReader"
-  member = "serviceAccount:${google_service_account.github_deployer_ro.email}"
+  member = local.github_deployer_ro_member
 }

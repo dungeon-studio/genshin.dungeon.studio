@@ -6,11 +6,12 @@
 module "dev" {
   source = "./modules/project_bootstrap"
 
-  environment        = "dev"
-  project_id         = "dungeon-studio-genshin-dev"
-  project_name       = "DS Genshin Development"
-  billing_account_id = var.billing_account_id
-  state_bucket_name  = data.google_storage_bucket.state.name
+  environment                 = "dev"
+  project_id                  = "dungeon-studio-genshin-dev"
+  project_name                = "DS Genshin Development"
+  billing_account_id          = var.billing_account_id
+  state_bucket_name           = data.google_storage_bucket.state.name
+  grant_cloud_run_permissions = true
 
   depends_on = [module.shared, module.core]
 }
@@ -45,15 +46,4 @@ resource "google_project_iam_member" "dev_rw_viewer_core" {
   member  = "serviceAccount:${module.dev.github_deployer_rw_email}"
 
   depends_on = [module.dev, module.core, google_project_iam_custom_role.core_cross_project_reader]
-}
-
-# In-project: Allow dev RW SA to manage Cloud Run service IAM policies.
-# Required for environment Terraform resources such as
-# `google_cloud_run_service_iam_member` in dev.
-resource "google_project_iam_member" "dev_rw_run_admin" {
-  project = module.dev.project_id
-  role    = "roles/run.admin"
-  member  = "serviceAccount:${module.dev.github_deployer_rw_email}"
-
-  depends_on = [module.dev]
 }
