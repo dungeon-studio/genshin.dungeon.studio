@@ -16,9 +16,9 @@ describe('useCollectionStore', () => {
     useCollectionStore.getState().clearCharacters();
   });
 
-  describe('addCharacter', () => {
+  describe('ensureCharacter', () => {
     it('adds a character with minimum constellation level', () => {
-      useCollectionStore.getState().addCharacter('amber');
+      useCollectionStore.getState().ensureCharacter('amber');
 
       expect(useCollectionStore.getState().characters).toMatchObject({
         amber: { constellationLevel: 0 },
@@ -26,10 +26,10 @@ describe('useCollectionStore', () => {
     });
 
     it('does not overwrite an existing character', () => {
-      useCollectionStore.getState().addCharacter('amber');
+      useCollectionStore.getState().ensureCharacter('amber');
       const original = useCollectionStore.getState().characters['amber'];
 
-      useCollectionStore.getState().addCharacter('amber');
+      useCollectionStore.getState().ensureCharacter('amber');
       const after = useCollectionStore.getState().characters['amber'];
 
       expect(original).toBeDefined();
@@ -39,7 +39,7 @@ describe('useCollectionStore', () => {
 
   describe('removeCharacter', () => {
     it('removes a character from the collection', () => {
-      useCollectionStore.getState().addCharacter('amber');
+      useCollectionStore.getState().ensureCharacter('amber');
       useCollectionStore.getState().removeCharacter('amber');
 
       expect(useCollectionStore.getState().characters['amber']).toBeUndefined();
@@ -54,7 +54,7 @@ describe('useCollectionStore', () => {
 
   describe('setConstellationLevel', () => {
     it('updates the constellation level of an owned character', () => {
-      useCollectionStore.getState().addCharacter('amber');
+      useCollectionStore.getState().ensureCharacter('amber');
       useCollectionStore.getState().setConstellationLevel('amber', 3);
 
       expect(useCollectionStore.getState().characters).toMatchObject({
@@ -71,7 +71,7 @@ describe('useCollectionStore', () => {
 
   describe('isOwned', () => {
     it('returns true for owned characters', () => {
-      useCollectionStore.getState().addCharacter('amber');
+      useCollectionStore.getState().ensureCharacter('amber');
 
       expect(useCollectionStore.getState().isOwned('amber')).toBe(true);
     });
@@ -83,7 +83,7 @@ describe('useCollectionStore', () => {
 
   describe('replaceCharacters', () => {
     it('replaces the entire collection', () => {
-      useCollectionStore.getState().addCharacter('amber');
+      useCollectionStore.getState().ensureCharacter('amber');
       useCollectionStore.getState().replaceCharacters({ xiangling: makeCharacter('xiangling') });
 
       expect(useCollectionStore.getState().characters['amber']).toBeUndefined();
@@ -93,8 +93,8 @@ describe('useCollectionStore', () => {
 
   describe('clearCharacters', () => {
     it('empties the collection', () => {
-      useCollectionStore.getState().addCharacter('amber');
-      useCollectionStore.getState().addCharacter('xiangling');
+      useCollectionStore.getState().ensureCharacter('amber');
+      useCollectionStore.getState().ensureCharacter('xiangling');
       useCollectionStore.getState().clearCharacters();
 
       expect(Object.keys(useCollectionStore.getState().characters)).toHaveLength(0);

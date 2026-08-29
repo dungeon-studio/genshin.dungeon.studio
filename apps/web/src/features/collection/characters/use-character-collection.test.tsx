@@ -30,7 +30,7 @@ beforeEach(() => {
 describe('useCollection merge-on-first-login', () => {
   it('merges the local collection into the store and syncs new entries to the server', async () => {
     // Anonymous local collection built before signing in.
-    useCollectionStore.getState().addCharacter(SKIRK);
+    useCollectionStore.getState().ensureCharacter(SKIRK);
     useCollectionStore.getState().setConstellationLevel(SKIRK, 3);
 
     const putBodies: unknown[] = [];
@@ -54,7 +54,7 @@ describe('useCollection merge-on-first-login', () => {
   });
 
   it('does not re-push local entries when the same user refetches', async () => {
-    useCollectionStore.getState().addCharacter(SKIRK);
+    useCollectionStore.getState().ensureCharacter(SKIRK);
     useCollectionStore.getState().setConstellationLevel(SKIRK, 3);
 
     let getCount = 0;
@@ -85,7 +85,7 @@ describe('useCollection merge-on-first-login', () => {
   });
 
   it('clears the collection on logout so a different user merges fresh', async () => {
-    useCollectionStore.getState().addCharacter(SKIRK);
+    useCollectionStore.getState().ensureCharacter(SKIRK);
     useCollectionStore.getState().setConstellationLevel(SKIRK, 3);
 
     let serverCharacters = charactersDocument([]);
