@@ -40,7 +40,7 @@
     "@turbo/gen": "2.10.12",
     "@types/node": "25.9.5",
     "eslint": "10.9.1",
-    "firebase-tools": "15.28.1",
+    "firebase-tools": "15.28.2",
     "knip": "6.32.3",
     "prettier": "3.9.6",
     "prettier-plugin-tailwindcss": "0.8.1",
