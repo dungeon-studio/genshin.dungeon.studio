@@ -75,8 +75,8 @@ importers:
         specifier: 14.3.0
         version: 14.3.0(@firebase/app-compat@0.5.17)(@firebase/app@0.16.1)(supports-color@10.2.2)
       google-gax:
-        specifier: 6.0.2
-        version: 6.0.2(supports-color@10.2.2)
+        specifier: 6.1.0
+        version: 6.1.0(supports-color@10.2.2)
       hono:
         specifier: 4.13.3
         version: 4.13.3
@@ -4498,8 +4498,8 @@ packages:
     resolution: {integrity: sha512-M4vpZcXQIC1gqIVGQ7eaU3jXQA6zecStyTXu514TYfThlgSurYJOxHZo9fzU6hAgwPWvuEynAVHWyaIk80VeEA==}
     engines: {node: '>=18'}
 
-  google-gax@6.0.2:
-    resolution: {integrity: sha512-9O+aJyiZrGcEggeG9FoA1R3HRQEUi32ydPSvE42lFbh+D8KwQS57CgMsZ0JPpGCM1LFwEWe+yr2h/53xmgHnQA==}
+  google-gax@6.1.0:
+    resolution: {integrity: sha512-PN84pgPw6USmNfy8hlMkifsII+VzCTddRODjPqGZ0JKQuB3WYMEMMepTypmE7ymMXFYiOe3Oi0dHskQ4jkOZfg==}
     engines: {node: '>=22'}
 
   google-logging-utils@0.0.2:
@@ -11722,10 +11722,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  google-gax@6.0.2(supports-color@10.2.2):
+  google-gax@6.1.0(supports-color@10.2.2):
     dependencies:
       '@grpc/grpc-js': 1.14.4
       '@grpc/proto-loader': 0.8.1
+      '@opentelemetry/api': 1.9.1
       duplexify: 4.1.3
       google-auth-library: 11.0.2(supports-color@10.2.2)
       google-logging-utils: 2.0.1
