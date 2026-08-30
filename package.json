@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@ls-lint/ls-lint": "2.3.1",
-    "@turbo/gen": "2.10.11",
+    "@turbo/gen": "2.10.12",
     "@types/node": "25.9.5",
     "eslint": "10.9.0",
     "firebase-tools": "15.28.1",
@@ -47,7 +47,7 @@
     "stylelint": "17.14.1",
     "syncpack": "15.3.3",
     "tsx": "4.23.12",
-    "turbo": "2.10.11",
+    "turbo": "2.10.12",
     "typescript": "npm:@typescript/typescript6@6.0.2",
     "vitest": "4.1.11"
   },
