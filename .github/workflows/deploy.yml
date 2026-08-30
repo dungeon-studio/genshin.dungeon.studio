@@ -24,7 +24,7 @@ permissions:
 
 env:
   # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
-  TERRAFORM_VERSION: '1.15.9'
+  TERRAFORM_VERSION: '1.16.0'
 
 # Only one deploy per ref at a time. Cloud Run and the `:develop` image tag
 # are single mutable targets, so concurrent runs race: an older run's health
