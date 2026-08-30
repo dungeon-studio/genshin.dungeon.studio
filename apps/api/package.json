@@ -36,7 +36,7 @@
     "@types/node": "25.9.5",
     "@typescript/native": "npm:typescript@7.0.2",
     "@vitest/coverage-v8": "4.1.11",
-    "eslint": "10.9.0",
+    "eslint": "10.9.1",
     "fast-check": "4.9.0",
     "globals": "17.11.0",
     "json-schema-to-ts": "3.1.1",
