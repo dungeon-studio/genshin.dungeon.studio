@@ -108,7 +108,7 @@ repos:
   # GitHub Actions static analysis. Offline gate here; online supply-chain
   # audits need a token and run in ci.yml's workflows job.
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.29.0
+    rev: v1.30.0
     hooks:
       - id: zizmor
         args: [--no-progress, --offline]
