@@ -1,28 +1,12 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# RW service account
-resource "google_service_account" "github_deployer_rw" {
-  project      = google_project.env.project_id
-  account_id   = "github-deployer-rw"
-  display_name = "GitHub Applier"
-  description  = "GitHub Actions service account with write access for deployments"
+locals {
+  github_deployer_rw_member = "serviceAccount:${google_service_account.github_deployer_rw.email}"
 
-  depends_on = [google_project_service.serviceusage]
-}
-
-resource "google_project_iam_custom_role" "github_deployer_rw_applier" {
-  project     = google_project.env.project_id
-  role_id     = "githubDeployerApplier"
-  title       = "GitHub Deployer Applier"
-  description = "Least-privilege base role for Terraform apply workflows"
-
-  # Keep this role scoped to project-level mutate/read permissions needed by
-  # `infrastructure/terraform/environments/*` during `terraform apply`.
-  # Prefer adding narrowly scoped permissions here over granting broad roles
-  # such as `roles/editor`.
-
-  permissions = [
+  # Scope to what `infrastructure/terraform/environments/*` needs during
+  # `terraform apply`. Extend this list rather than granting a predefined role.
+  github_deployer_rw_permissions = [
     "artifactregistry.repositories.create",
     "artifactregistry.repositories.delete",
     "artifactregistry.repositories.downloadArtifacts",
@@ -30,8 +14,13 @@ resource "google_project_iam_custom_role" "github_deployer_rw_applier" {
     "artifactregistry.repositories.list",
     "artifactregistry.repositories.uploadArtifacts",
     "artifactregistry.repositories.update",
+    "datastore.databases.create",
+    "datastore.databases.delete",
     "datastore.databases.get",
+    # The Firestore Admin API checks getMetadata, not get, on databases.get.
+    "datastore.databases.getMetadata",
     "datastore.databases.list",
+    "datastore.databases.update",
     "dns.changes.create",
     "dns.changes.get",
     "dns.changes.list",
@@ -59,6 +48,11 @@ resource "google_project_iam_custom_role" "github_deployer_rw_applier" {
     "firebasehosting.sites.get",
     "firebasehosting.sites.list",
     "firebasehosting.sites.update",
+    # The deploy workflow acts as the runtime service account to roll out
+    # Cloud Run.
+    "iam.serviceAccounts.actAs",
+    "iam.serviceAccounts.get",
+    "iam.serviceAccounts.list",
     "resourcemanager.projects.get",
     "secretmanager.secrets.create",
     "secretmanager.secrets.delete",
@@ -85,8 +79,59 @@ resource "google_project_iam_custom_role" "github_deployer_rw_applier" {
     "storage.objects.delete",
     "storage.objects.get",
     "storage.objects.list",
-    "storage.objects.update"
+    "storage.objects.update",
   ]
+
+  # Terraform owns the domain mapping and the invoker IAM policy; the deploy
+  # workflow owns the service itself.
+  #
+  # `run.domainmappings.*` appears in neither `roles/run.admin` nor
+  # `gcloud iam list-testable-permissions`, yet domain mapping refresh fails
+  # without it.
+  github_deployer_rw_cloud_run_permissions = [
+    "run.configurations.get",
+    "run.configurations.list",
+    "run.domainmappings.create",
+    "run.domainmappings.delete",
+    "run.domainmappings.get",
+    "run.domainmappings.list",
+    "run.locations.list",
+    "run.operations.get",
+    "run.revisions.delete",
+    "run.revisions.get",
+    "run.revisions.list",
+    "run.routes.get",
+    # The deploy workflow mints an ID token to probe the service after rollout.
+    "run.routes.invoke",
+    "run.routes.list",
+    "run.services.create",
+    "run.services.get",
+    "run.services.getIamPolicy",
+    "run.services.list",
+    "run.services.setIamPolicy",
+    "run.services.update",
+  ]
+}
+
+resource "google_service_account" "github_deployer_rw" {
+  project      = google_project.env.project_id
+  account_id   = "github-deployer-rw"
+  display_name = "GitHub Applier"
+  description  = "GitHub Actions service account with write access for deployments"
+
+  depends_on = [google_project_service.serviceusage]
+}
+
+resource "google_project_iam_custom_role" "github_deployer_rw_applier" {
+  project     = google_project.env.project_id
+  role_id     = "githubDeployerApplier"
+  title       = "GitHub Deployer Applier"
+  description = "Least-privilege role for Terraform apply and deploy workflows"
+
+  permissions = concat(
+    local.github_deployer_rw_permissions,
+    var.grant_cloud_run_permissions ? local.github_deployer_rw_cloud_run_permissions : [],
+  )
 
   depends_on = [google_project_service.serviceusage]
 }
@@ -94,39 +139,17 @@ resource "google_project_iam_custom_role" "github_deployer_rw_applier" {
 resource "google_project_iam_member" "github_deployer_rw_applier" {
   project = google_project.env.project_id
   role    = google_project_iam_custom_role.github_deployer_rw_applier.name
-  member  = "serviceAccount:${google_service_account.github_deployer_rw.email}"
-}
-
-# Grant permission to create and manage service accounts in this project
-# Needed if environment terraform creates application service accounts
-resource "google_project_iam_member" "github_deployer_rw_sa_admin" {
-  project = google_project.env.project_id
-  role    = "roles/iam.serviceAccountAdmin"
-  member  = "serviceAccount:${google_service_account.github_deployer_rw.email}"
-}
-
-# Required for Cloud Run deploy to act as the default Compute Engine SA
-resource "google_project_iam_member" "github_deployer_rw_sa_user" {
-  project = google_project.env.project_id
-  role    = "roles/iam.serviceAccountUser"
-  member  = "serviceAccount:${google_service_account.github_deployer_rw.email}"
-}
-
-# Required for google_firestore_database (datastore.databases.create)
-resource "google_project_iam_member" "github_deployer_rw_datastore_owner" {
-  project = google_project.env.project_id
-  role    = "roles/datastore.owner"
-  member  = "serviceAccount:${google_service_account.github_deployer_rw.email}"
+  member  = local.github_deployer_rw_member
 }
 
 resource "google_storage_bucket_iam_member" "github_deployer_rw_state_bucket" {
   bucket = var.state_bucket_name
   role   = "roles/storage.objectAdmin"
-  member = "serviceAccount:${google_service_account.github_deployer_rw.email}"
+  member = local.github_deployer_rw_member
 }
 
 resource "google_storage_bucket_iam_member" "github_deployer_rw_bucket_reader" {
   bucket = var.state_bucket_name
   role   = "roles/storage.legacyBucketReader"
-  member = "serviceAccount:${google_service_account.github_deployer_rw.email}"
+  member = local.github_deployer_rw_member
 }
