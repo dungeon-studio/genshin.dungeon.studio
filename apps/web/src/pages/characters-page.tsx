@@ -19,7 +19,7 @@ import { ownedCharacterIds } from '@/features/collection/characters/use-characte
 export function CharactersPage(): JSX.Element {
   const {
     characters,
-    addCharacter,
+    ensureCharacter,
     removeCharacter,
     setConstellationLevel,
     isOwned,
@@ -95,7 +95,7 @@ export function CharactersPage(): JSX.Element {
                   character={character}
                   owned={owned}
                   constellationLevel={entry?.constellationLevel}
-                  onAdd={addCharacter}
+                  onAdd={ensureCharacter}
                   onRemove={removeCharacter}
                   onConstellationChange={handleConstellationChange}
                 />
