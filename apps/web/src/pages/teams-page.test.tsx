@@ -23,8 +23,8 @@ import { TeamsPage } from './teams-page';
 configure({ asyncUtilTimeout: 10_000 });
 
 // The page draws from real game data, so fixtures have to be real entries.
-function characterWielding(weaponType: WeaponType): Character {
-  const character = CHARACTER_ROSTER.find((c) => c.weaponType === weaponType);
+function characterWielding(weaponType: WeaponType, except?: Character): Character {
+  const character = CHARACTER_ROSTER.find((c) => c.weaponType === weaponType && c !== except);
   if (!character) throw new Error(`no ${weaponType} user in game data`);
   return character;
 }
@@ -39,13 +39,7 @@ const CLAYMORE = weaponOfType('Claymore');
 const BOW_WEAPON = weaponOfType('Bow');
 const CLAYMORE_USER = characterWielding('Claymore');
 const BOW_USER = characterWielding('Bow');
-const OTHER_CLAYMORE_USER = (() => {
-  const character = CHARACTER_ROSTER.find(
-    (c) => c.weaponType === 'Claymore' && c.id !== CLAYMORE_USER.id,
-  );
-  if (!character) throw new Error('no second Claymore user in game data');
-  return character;
-})();
+const OTHER_CLAYMORE_USER = characterWielding('Claymore', CLAYMORE_USER);
 const CLAYMORE_INSTANCE = 'claymore-instance' as CollectionWeaponId;
 const BOW_INSTANCE = 'bow-instance' as CollectionWeaponId;
 

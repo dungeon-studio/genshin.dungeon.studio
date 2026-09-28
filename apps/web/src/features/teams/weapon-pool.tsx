@@ -38,6 +38,18 @@ function buildEquippedWeapons(
   return map;
 }
 
+/** The lock on an instance another character holds, or undefined when the member may take it. */
+function weaponLock(
+  equippedBy: string | undefined,
+  currentCharacterId: string | undefined,
+): WeaponLock | undefined {
+  if (equippedBy === undefined || equippedBy === currentCharacterId) return undefined;
+  return {
+    holder: getCharacterById(equippedBy)?.name ?? 'another character',
+    offersRoute: currentCharacterId === undefined,
+  };
+}
+
 function poolFilterState(weaponType: WeaponType | undefined): WeaponFilterState {
   return {
     ...initialFilterState(),
@@ -160,19 +172,16 @@ export function WeaponPool({
           {filteredWeapons.flatMap((weapon) => {
             const instances = instancesByWeaponId.get(weapon.id) ?? [];
             return instances.map((instance) => {
-              const equippedBy = equippedWeapons.get(instance.weaponInstanceId);
-              const holder =
-                equippedBy !== undefined && equippedBy !== currentCharacterId
-                  ? (getCharacterById(equippedBy)?.name ?? 'another character')
-                  : undefined;
               return (
                 <PoolWeaponCard
                   key={instance.weaponInstanceId}
                   weapon={weapon}
                   refinementLevel={instance.refinementLevel}
                   selected={instance.weaponInstanceId === selectedCollectionWeaponId}
-                  holder={holder}
-                  showRoute={currentCharacterId === undefined}
+                  lock={weaponLock(
+                    equippedWeapons.get(instance.weaponInstanceId),
+                    currentCharacterId,
+                  )}
                   onClick={() => {
                     if (instance.weaponInstanceId === selectedCollectionWeaponId) {
                       onClear();
@@ -194,39 +203,37 @@ export function WeaponPool({
   );
 }
 
-interface PoolWeaponCardProps {
-  weapon: Weapon;
-  refinementLevel: number;
-  selected: boolean;
-  /** Name of the other character holding this instance, which locks the card. */
-  holder?: string;
+/** Another character holds the instance, so the card can't be picked. */
+interface WeaponLock {
+  holder: string;
   /**
    * Whether to point at the character-first route. Only an empty member can take it:
    * picking the holder there carries the weapon over, where on a filled member it
    * would replace the character being edited.
    */
-  showRoute: boolean;
+  offersRoute: boolean;
+}
+
+interface PoolWeaponCardProps {
+  weapon: Weapon;
+  refinementLevel: number;
+  selected: boolean;
+  lock?: WeaponLock;
   onClick: () => void;
 }
 
-function weaponCardLabel(weapon: Weapon, holder: string | undefined, selected: boolean): string {
-  if (holder) return `${weapon.name} is equipped by ${holder}`;
+function weaponCardLabel(weapon: Weapon, lock: WeaponLock | undefined, selected: boolean): string {
+  if (lock) return `${weapon.name} is equipped by ${lock.holder}`;
   if (selected) return `Remove ${weapon.name} from character`;
   return `Assign ${weapon.name} to character`;
 }
 
-function PoolWeaponCard({
-  weapon,
-  refinementLevel,
-  selected,
-  holder,
-  showRoute,
-  onClick,
-}: PoolWeaponCardProps) {
+function PoolWeaponCard({ weapon, refinementLevel, selected, lock, onClick }: PoolWeaponCardProps) {
   const routeId = useId();
-  const equipped = holder !== undefined;
-  const route =
-    equipped && showRoute ? `Pick ${holder} from Characters to bring it along.` : undefined;
+  const equipped = lock !== undefined;
+  const route = lock?.offersRoute
+    ? `Pick ${lock.holder} from Characters to bring it along.`
+    : undefined;
 
   return (
     <button
@@ -239,7 +246,7 @@ function PoolWeaponCard({
         selected && `ring-2 ring-inset ${RARITY_SELECTED_RINGS[weapon.rarity] ?? 'ring-border'}`,
         equipped ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-accent/50',
       )}
-      aria-label={weaponCardLabel(weapon, holder, selected)}
+      aria-label={weaponCardLabel(weapon, lock, selected)}
       aria-describedby={route ? routeId : undefined}
       aria-pressed={selected}
     >
@@ -257,9 +264,9 @@ function PoolWeaponCard({
           R{refinementLevel}
         </span>
       </span>
-      {equipped && (
+      {lock && (
         <span className="text-xs text-muted-foreground">
-          Equipped by {holder}.{route && <span id={routeId}> {route}</span>}
+          Equipped by {lock.holder}.{route && <span id={routeId}> {route}</span>}
         </span>
       )}
     </button>
