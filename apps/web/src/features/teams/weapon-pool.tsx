@@ -38,7 +38,6 @@ function buildEquippedWeapons(
   return map;
 }
 
-/** The lock on an instance another character holds, or undefined when the member may take it. */
 function weaponLock(
   equippedBy: string | undefined,
   currentCharacterId: string | undefined,
@@ -203,13 +202,11 @@ export function WeaponPool({
   );
 }
 
-/** Another character holds the instance, so the card can't be picked. */
 interface WeaponLock {
   holder: string;
   /**
-   * Whether to point at the character-first route. Only an empty member can take it:
-   * picking the holder there carries the weapon over, where on a filled member it
-   * would replace the character being edited.
+   * Only an empty member offers the character-first route. Picking the holder there
+   * carries the weapon over; on a filled member it would replace the character.
    */
   offersRoute: boolean;
 }
