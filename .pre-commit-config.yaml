@@ -113,6 +113,14 @@ repos:
       - id: zizmor
         args: [--no-progress, --offline]
 
+  # GitHub Actions correctness: expressions, job graph, and shellcheck over
+  # `run:` blocks. The docker image bundles shellcheck; the golang hook would
+  # need it on PATH.
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint-docker
+
   # Dockerfile linting
   - repo: https://github.com/hadolint/hadolint
     rev: v2.15.1
