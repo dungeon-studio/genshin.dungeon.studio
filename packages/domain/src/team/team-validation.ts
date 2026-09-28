@@ -44,24 +44,28 @@ export function validateTeam(
   context?: TeamValidationContext,
 ): ValidationIssue[] {
   return [
-    ...validateUniqueCharacters(team.members),
+    ...validateUnique(team.members, 'characterId', 'character ID'),
     ...(context ? validateOwnership(team.members, context) : []),
-    ...validateUniqueWeapons(team.members),
+    ...validateUnique(team.members, 'weaponInstanceId', 'weapon instance ID'),
     ...validateArtifactPlans(team.members),
   ];
 }
 
-function validateUniqueCharacters(members: CollectionTeamMembers): ValidationIssue[] {
+/** Flags every member after the first that repeats another's `key`. */
+function validateUnique(
+  members: CollectionTeamMembers,
+  key: 'characterId' | 'weaponInstanceId',
+  label: string,
+): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   const seen = new Set<string>();
   for (const [i, member] of members.entries()) {
-    if (member === null) continue;
-    if (seen.has(member.characterId)) {
-      issues.push(
-        issue(`Duplicate character ID: ${member.characterId}`, `members[${i}].characterId`),
-      );
+    const value = member?.[key];
+    if (!value) continue;
+    if (seen.has(value)) {
+      issues.push(issue(`Duplicate ${label}: ${value}`, `members[${i}].${key}`));
     }
-    seen.add(member.characterId);
+    seen.add(value);
   }
   return issues;
 }
@@ -86,24 +90,6 @@ function validateOwnership(
         ),
       );
     }
-  }
-  return issues;
-}
-
-function validateUniqueWeapons(members: CollectionTeamMembers): ValidationIssue[] {
-  const issues: ValidationIssue[] = [];
-  const seen = new Set<string>();
-  for (const [i, member] of members.entries()) {
-    if (!member?.weaponInstanceId) continue;
-    if (seen.has(member.weaponInstanceId)) {
-      issues.push(
-        issue(
-          `Duplicate weapon instance ID: ${member.weaponInstanceId}`,
-          `members[${i}].weaponInstanceId`,
-        ),
-      );
-    }
-    seen.add(member.weaponInstanceId);
   }
   return issues;
 }
