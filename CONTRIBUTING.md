@@ -76,12 +76,7 @@ Vite reads module resolution once at startup, so a server left running reports
 - The end-to-end suite in `tools/e2e`: `pnpm turbo run test:e2e`. It starts the Firebase emulators, the API, and the dev server itself, so stop any `pnpm dev` first—in this checkout or any other worktree—or the emulators fail to bind.
 - Feature work adds tests when it introduces testable behavior.
 
-Two checks run weekly and file a GitHub issue instead of blocking a pull request:
-
-- External links, because transient outages would make a per-PR check flaky.
-- Surviving mutants from `pnpm turbo run test:mutation`, because a run takes minutes and the score shifts under legitimate refactoring.
-
-For which workflow runs what, see [workflow conventions](docs/reference/workflow-conventions.md).
+Broken external URLs are the one exception: a weekly run files them as a GitHub issue rather than blocking a pull request, since transient outages would make that check flaky. For which workflow runs what, see [workflow conventions](docs/reference/workflow-conventions.md).
 
 **Commit types**. Use these prefixes in your commit messages:
 
