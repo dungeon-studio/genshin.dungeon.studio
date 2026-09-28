@@ -25,6 +25,8 @@ export function CharacterSummary({
       lightSrc={getElementIconPath(character.element, 'light')}
       darkSrc={getElementIconPath(character.element, 'dark')}
       alt={character.element}
+      loading="lazy"
+      decoding="async"
       className={cn(ICON_SLOT, dimmed && 'opacity-30')}
     />
   ) : (

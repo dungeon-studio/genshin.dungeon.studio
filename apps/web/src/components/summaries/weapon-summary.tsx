@@ -36,6 +36,8 @@ export function WeaponSummary({
       lightSrc={getWeaponTypeIconPath(iconType, 'light')}
       darkSrc={getWeaponTypeIconPath(iconType, 'dark')}
       alt=""
+      loading="lazy"
+      decoding="async"
       className={cn(ICON_SLOT, dimIcon && 'opacity-30')}
     />
   ) : (
