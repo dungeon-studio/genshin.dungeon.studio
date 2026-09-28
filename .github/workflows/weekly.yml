@@ -66,10 +66,9 @@ jobs:
           issue-number: ${{ steps.report.outputs.number }}
           labels: documentation
 
-  # Coverage says a line ran; a surviving mutant says no test checked what it
-  # did. Stryker reruns the suite per mutant, too slow to gate a PR, and the
-  # score moves under legitimate refactoring, so it reports into one issue
-  # instead. Never blocks.
+  # Stryker reruns the suite once per mutant, and the score shifts under
+  # legitimate refactoring, so survivors update one report issue instead of
+  # gating a pull request. Never blocks.
   mutation-score:
     name: Report mutation score
     runs-on: ubuntu-latest
@@ -131,8 +130,6 @@ jobs:
             "The full report is the `mutation-report` artifact on [the run](\($run))."
           ' "${report}" > mutation-report.md
 
-      # Reuse the open report if one exists so surviving mutants update a
-      # single issue instead of filing a new one every week.
       - name: Find existing report issue
         if: steps.summary.outputs.survivors != '0'
         id: report
