@@ -42,10 +42,9 @@ function entriesAheadOfServer(
  * resolves.
  *
  * The first resolution per signed-in user merges what this browser recorded
- * and pushes the entries the server is behind on. Later resolutions (refetches)
- * merge additively so they don't overwrite optimistic state while those pushes
- * are in flight. Signing out clears the store so a different account cannot
- * inherit the previous user's local data, and the next sign-in merges afresh.
+ * and pushes the entries the server is behind on. Refetches merge additively,
+ * so they don't overwrite optimistic state while those pushes are in flight.
+ * Signing out clears the store, so the next account starts from its own data.
  */
 function useServerSync(
   uid: string | undefined,
@@ -103,14 +102,11 @@ export interface UseCollectionResult {
 }
 
 /**
- * The collection's write actions, each with optimistic rollback and a toast on
- * failure.
+ * The collection's write actions, each applied to the store before the server
+ * confirms it.
  *
- * Each mutation writes to zustand first for instant UI feedback, then fires
- * the API call. On failure the onError callback rolls back the zustand change
- * only if the store still reflects this mutation's optimistic value (guards
- * against races from rapid user interactions). Errors are surfaced via toast
- * side-effects — no retry is attempted.
+ * A rejected write rolls back only if the store still holds its value, so a
+ * newer edit survives. Every failure toasts, and nothing retries.
  */
 function useOptimisticActions(
   isAuthenticated: boolean,

@@ -47,8 +47,8 @@ interface TeamStoreState {
 }
 
 /**
- * Maps one slot's members and stamps `updatedAt`, which is every per-member
- * edit's state transition.
+ * Maps one slot's members and stamps `updatedAt`, marking the change as a user
+ * edit.
  */
 function withMembers(
   state: Pick<TeamStoreState, 'teams'>,
@@ -67,7 +67,7 @@ function withMembers(
   };
 }
 
-/** The weapon `characterId` holds on any team other than `slot`, if one. */
+/** The weapon `characterId` holds on a team other than `slot`, if any. */
 function weaponHeldElsewhere(
   teams: Record<TeamSlot, CollectionTeam>,
   slot: TeamSlot,
@@ -96,7 +96,6 @@ function weaponHeldElsewhere(
  * like a user edit.
  */
 export const useTeamStore = create<TeamStoreState>()((set, get) => {
-  // Every edit to a member already in a position; an empty one has nothing to patch.
   const patchMember = (
     slot: TeamSlot,
     memberIndex: number,

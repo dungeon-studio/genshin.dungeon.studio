@@ -28,13 +28,7 @@ type MemberEditorActions = Pick<
   'assignCharacter' | 'removeCharacter' | 'assignWeapon' | 'removeWeapon'
 >;
 
-/**
- * Which member the editor sheet is pointed at, and the edits it makes there.
- *
- * A weapon chosen before the member has a character waits as the pending
- * weapon, because it has nowhere to persist yet; assigning a character then
- * takes it along.
- */
+/** Which member the editor sheet is pointed at, and the edits it makes there. */
 function useMemberEditor(
   weapons: Record<CollectionWeaponId, CollectionWeapon>,
   teams: UseTeamsResult['teams'],

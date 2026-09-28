@@ -51,7 +51,7 @@ export function validateTeam(
   ];
 }
 
-/** Flags every member after the first that repeats another's `key`. */
+/** Flags each member whose `key` repeats an earlier member's. */
 function validateUnique(
   members: CollectionTeamMembers,
   key: 'characterId' | 'weaponInstanceId',

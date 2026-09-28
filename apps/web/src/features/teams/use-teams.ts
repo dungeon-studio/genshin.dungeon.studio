@@ -56,7 +56,6 @@ function teamToSavePayload(team: CollectionTeam): SaveTeamPayload {
   };
 }
 
-/** Warns the user if they try to leave with a save still in flight. */
 function useWarnOnUnloadWhileSaving(isSaving: boolean): void {
   // A ref, so the handler registered once always sees the latest value.
   const isSavingRef = useRef(isSaving);
@@ -87,11 +86,6 @@ type TeamActions = Pick<
   | 'setTeamName'
 >;
 
-/**
- * The planner's edits, each applied to the store first and then persisted when
- * signed in. A failed request rolls the slot back only if the store still holds
- * the value that request sent.
- */
 function useTeamActions(
   isAuthenticated: boolean,
   saveTeamApi: ReturnType<typeof useSaveTeamMutation>['mutate'],

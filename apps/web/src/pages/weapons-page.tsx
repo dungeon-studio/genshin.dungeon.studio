@@ -30,7 +30,7 @@ function promptSignIn() {
   });
 }
 
-/** Preselects the weapon type a link such as `/weapons?type=Sword` names. */
+/** Preselects the weapon type a `?type=` query names, as in `/weapons?type=Sword`. */
 function filtersFromSearchParams(searchParams: URLSearchParams): WeaponFilterState {
   const state = initialFilterState();
   const typeParam = searchParams.get('type');

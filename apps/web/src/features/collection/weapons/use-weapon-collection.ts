@@ -36,9 +36,12 @@ export interface UseWeaponCollectionResult {
 }
 
 /**
- * The edits to an existing instance, each written to the store first and rolled
- * back with a toast if the server rejects it, provided the store still shows
- * the optimistic value. Adds are not here: they wait for the server's id.
+ * Edits to an owned instance, each applied to the store before the server
+ * confirms it.
+ *
+ * A rejected edit rolls back only if the store still holds its value, and
+ * every failure toasts. Adds can't be optimistic, because the server assigns
+ * the instance ID.
  */
 function useOptimisticEdits(
   isAuthenticated: boolean,
