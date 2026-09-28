@@ -14,6 +14,7 @@ import { useId, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ThemedIcon } from '@/components/ui/themed-icon';
 import type { OwnershipFilter, SortDirection } from '@/lib/collection-filters';
 import { toggleInSet } from '@/lib/toggle-in-set';
 import { cn } from '@/lib/utils';
@@ -281,17 +282,11 @@ function FilterChips<F extends BaseFilterState, T extends string>({
             aria-pressed={category.selected.has(value)}
             aria-label={`Filter by ${value}`}
           >
-            <img
-              src={category.iconPath(value, 'light')}
+            <ThemedIcon
+              lightSrc={category.iconPath(value, 'light')}
+              darkSrc={category.iconPath(value, 'dark')}
               alt=""
-              className="h-3.5 w-3.5 dark:hidden"
-              aria-hidden="true"
-            />
-            <img
-              src={category.iconPath(value, 'dark')}
-              alt=""
-              className="h-3.5 w-3.5 hidden dark:block"
-              aria-hidden="true"
+              className="h-3.5 w-3.5"
             />
             {value}
           </button>
