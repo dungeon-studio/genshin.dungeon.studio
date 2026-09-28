@@ -8,10 +8,10 @@ import type {
   TeamSlot,
 } from '@genshin/domain';
 import type { Weapon, WeaponType } from '@genshin/game-data';
-import { getWeaponById, WEAPON_ROSTER } from '@genshin/game-data';
+import { getCharacterById, getWeaponById, WEAPON_ROSTER } from '@genshin/game-data';
 import { Lock, Swords } from 'lucide-react';
 import type { JSX } from 'react';
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { WeaponSummary } from '@/components/summaries/weapon-summary';
@@ -161,14 +161,18 @@ export function WeaponPool({
             const instances = instancesByWeaponId.get(weapon.id) ?? [];
             return instances.map((instance) => {
               const equippedBy = equippedWeapons.get(instance.weaponInstanceId);
-              const equippedByOther = equippedBy !== undefined && equippedBy !== currentCharacterId;
+              const holder =
+                equippedBy !== undefined && equippedBy !== currentCharacterId
+                  ? (getCharacterById(equippedBy)?.name ?? 'another character')
+                  : undefined;
               return (
                 <PoolWeaponCard
                   key={instance.weaponInstanceId}
                   weapon={weapon}
                   refinementLevel={instance.refinementLevel}
                   selected={instance.weaponInstanceId === selectedCollectionWeaponId}
-                  equipped={equippedByOther}
+                  holder={holder}
+                  showRoute={currentCharacterId === undefined}
                   onClick={() => {
                     if (instance.weaponInstanceId === selectedCollectionWeaponId) {
                       onClear();
@@ -194,12 +198,19 @@ interface PoolWeaponCardProps {
   weapon: Weapon;
   refinementLevel: number;
   selected: boolean;
-  equipped: boolean;
+  /** Name of the other character holding this instance, which locks the card. */
+  holder?: string;
+  /**
+   * Whether to point at the character-first route. Only an empty member can take it:
+   * picking the holder there carries the weapon over, where on a filled member it
+   * would replace the character being edited.
+   */
+  showRoute: boolean;
   onClick: () => void;
 }
 
-function weaponCardLabel(weapon: Weapon, equipped: boolean, selected: boolean): string {
-  if (equipped) return `${weapon.name} is equipped by another character`;
+function weaponCardLabel(weapon: Weapon, holder: string | undefined, selected: boolean): string {
+  if (holder) return `${weapon.name} is equipped by ${holder}`;
   if (selected) return `Remove ${weapon.name} from character`;
   return `Assign ${weapon.name} to character`;
 }
@@ -208,35 +219,49 @@ function PoolWeaponCard({
   weapon,
   refinementLevel,
   selected,
-  equipped,
+  holder,
+  showRoute,
   onClick,
 }: PoolWeaponCardProps) {
+  const routeId = useId();
+  const equipped = holder !== undefined;
+  const route =
+    equipped && showRoute ? `Pick ${holder} from Characters to bring it along.` : undefined;
+
   return (
     <button
       type="button"
       onClick={equipped ? undefined : onClick}
       disabled={equipped}
       className={cn(
-        'gap-3 p-3 shadow-sm flex w-full items-center rounded-lg border border-l-4 border-border bg-card text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+        'gap-1 p-3 shadow-sm flex w-full flex-col rounded-lg border border-l-4 border-border bg-card text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
         RARITY_BORDER_COLORS[weapon.rarity] ?? 'border-l-border',
         selected && `ring-2 ring-inset ${RARITY_SELECTED_RINGS[weapon.rarity] ?? 'ring-border'}`,
-        equipped ? 'cursor-not-allowed opacity-40' : 'cursor-pointer hover:bg-accent/50',
+        equipped ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-accent/50',
       )}
-      aria-label={weaponCardLabel(weapon, equipped, selected)}
+      aria-label={weaponCardLabel(weapon, holder, selected)}
+      aria-describedby={route ? routeId : undefined}
       aria-pressed={selected}
     >
-      <WeaponSummary weapon={weapon} dimmed={false} />
-      {equipped && (
-        <Lock
-          className="shrink-0 text-destructive"
-          size={14}
-          aria-hidden="true"
-          focusable={false}
-        />
-      )}
-      <span className="px-2 py-0.5 text-xs font-bold shrink-0 rounded-full bg-muted text-muted-foreground tabular-nums">
-        R{refinementLevel}
+      <span className={cn('gap-3 flex w-full items-center', equipped && 'opacity-40')}>
+        <WeaponSummary weapon={weapon} dimmed={false} />
+        {equipped && (
+          <Lock
+            className="shrink-0 text-destructive"
+            size={14}
+            aria-hidden="true"
+            focusable={false}
+          />
+        )}
+        <span className="px-2 py-0.5 text-xs font-bold shrink-0 rounded-full bg-muted text-muted-foreground tabular-nums">
+          R{refinementLevel}
+        </span>
       </span>
+      {equipped && (
+        <span className="text-xs text-muted-foreground">
+          Equipped by {holder}.{route && <span id={routeId}> {route}</span>}
+        </span>
+      )}
     </button>
   );
 }

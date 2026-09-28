@@ -39,6 +39,13 @@ const CLAYMORE = weaponOfType('Claymore');
 const BOW_WEAPON = weaponOfType('Bow');
 const CLAYMORE_USER = characterWielding('Claymore');
 const BOW_USER = characterWielding('Bow');
+const OTHER_CLAYMORE_USER = (() => {
+  const character = CHARACTER_ROSTER.find(
+    (c) => c.weaponType === 'Claymore' && c.id !== CLAYMORE_USER.id,
+  );
+  if (!character) throw new Error('no second Claymore user in game data');
+  return character;
+})();
 const CLAYMORE_INSTANCE = 'claymore-instance' as CollectionWeaponId;
 const BOW_INSTANCE = 'bow-instance' as CollectionWeaponId;
 
@@ -243,7 +250,7 @@ describe('TeamsPage weapon-first flow', () => {
   // An empty member has no character, so the pool cannot tell that a weapon equipped
   // elsewhere belongs to the character about to be chosen. Reaching that pairing means
   // going character-first, where the weapon carries over on its own.
-  it('withholds a weapon another team already equips', async () => {
+  it('withholds a weapon another team already equips, and names the way to it', async () => {
     const user = userEvent.setup({ delay: null });
     renderTeamsPage();
 
@@ -256,14 +263,36 @@ describe('TeamsPage weapon-first flow', () => {
     await user.click(within(teamTwo).getAllByRole('button', { name: /No character/ })[0]);
     await user.click(await screen.findByRole('button', { name: 'Weapons' }));
 
-    expect(
-      await screen.findByRole('button', {
-        name: `${CLAYMORE.name} is equipped by another character`,
-      }),
-    ).toBeDisabled();
-    expect(
-      screen.queryByRole('button', { name: `Assign ${CLAYMORE.name} to character` }),
-    ).not.toBeInTheDocument();
+    const card = await screen.findByRole('button', {
+      name: `${CLAYMORE.name} is equipped by ${CLAYMORE_USER.name}`,
+    });
+    expect(card).toBeDisabled();
+    expect(card).toHaveAccessibleDescription(
+      `Pick ${CLAYMORE_USER.name} from Characters to bring it along.`,
+    );
+  }, 30_000);
+
+  it('offers no character-first route on a member that already has a character', async () => {
+    const user = userEvent.setup({ delay: null });
+    renderTeamsPage();
+
+    act(() => {
+      useTeamStore.getState().assignCharacter(1, 0, CLAYMORE_USER.id);
+      useTeamStore.getState().assignWeapon(1, 0, CLAYMORE_INSTANCE);
+      useTeamStore.getState().assignCharacter(2, 0, OTHER_CLAYMORE_USER.id);
+    });
+
+    const teamTwo = screen.getByRole('region', { name: 'Team 2' });
+    await user.click(
+      within(teamTwo).getByRole('button', { name: new RegExp(OTHER_CLAYMORE_USER.name) }),
+    );
+    await user.click(await screen.findByRole('button', { name: 'Weapons' }));
+
+    const card = await screen.findByRole('button', {
+      name: `${CLAYMORE.name} is equipped by ${CLAYMORE_USER.name}`,
+    });
+    expect(card).toBeDisabled();
+    expect(card).not.toHaveAccessibleDescription();
   }, 30_000);
 
   it('forgets a pending weapon once the editor is closed', async () => {

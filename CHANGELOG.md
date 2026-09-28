@@ -23,6 +23,7 @@ Security sections, since they then describe deltas from a shipped release.
 - Team builder as the default landing page with four teams of up to four character slots each.
 - Character assignment to team slots from the owned collection.
 - Per-character weapon assignment with conflict prevention when a weapon is already equipped on another team.
+- Weapons equipped on another team name their holder, and on an empty slot point to picking that character first to bring the weapon along.
 - Per-character artifact plan configuration with set and affix selection.
 - Team composition validation.
 - Responsive team editing sheet for small screens.
