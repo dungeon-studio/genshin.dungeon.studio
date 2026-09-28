@@ -3,7 +3,6 @@
 
 import type { CollectionWeapon, CollectionWeaponId, TeamSlot } from '@genshin/domain';
 import { TEAM_SLOTS } from '@genshin/domain';
-import type { Weapon, WeaponType } from '@genshin/game-data';
 import { getCharacterById, getWeaponById } from '@genshin/game-data';
 import type { JSX, ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
@@ -141,6 +140,8 @@ function useMemberEditor(
   };
 }
 
+type MemberEditor = ReturnType<typeof useMemberEditor>;
+
 export function TeamsPage(): JSX.Element {
   const { characters, getCharacter } = useCollection();
   const { weapons } = useWeaponCollection();
@@ -169,7 +170,7 @@ export function TeamsPage(): JSX.Element {
     assignWeapon,
     removeWeapon,
   });
-  const { selectedSlot, selectedMemberIndex, editing, selectedMember, pendingWeaponId } = editor;
+  const { selectedSlot, selectedMemberIndex } = editor;
   const selectedTeam = selectedSlot !== null ? teams[selectedSlot] : null;
 
   return (
@@ -230,17 +231,10 @@ export function TeamsPage(): JSX.Element {
 
               <div className="mt-3 min-h-0 gap-3 flex flex-1 flex-col">
                 <TeamEditorPanel
-                  editing={editing}
+                  editor={editor}
                   activeTab={activeTab}
                   characters={characters}
                   collectionWeapons={collectionWeapons}
-                  pendingWeapon={editor.pendingWeapon}
-                  assignedCharacterWeaponType={editor.assignedCharacterWeaponType}
-                  selectedCollectionWeaponId={selectedMember?.weaponInstanceId ?? pendingWeaponId}
-                  onToggleCharacter={editor.toggleCharacter}
-                  onClearPendingWeapon={editor.clearPendingWeapon}
-                  onWeaponSelect={editor.selectWeapon}
-                  onWeaponClear={editor.clearWeapon}
                 />
               </div>
             </>
@@ -277,33 +271,21 @@ function TabButton({ tab, activeTab, onSelect, children }: TabButtonProps): JSX.
 }
 
 interface TeamEditorPanelProps {
-  editing: { slot: TeamSlot; memberIndex: number } | null;
+  editor: MemberEditor;
   activeTab: SheetTab;
   characters: CharacterCollection;
   collectionWeapons: CollectionWeapon[];
-  pendingWeapon: Weapon | undefined;
-  assignedCharacterWeaponType: WeaponType | undefined;
-  selectedCollectionWeaponId: CollectionWeaponId | undefined;
-  onToggleCharacter: (characterId: string) => void;
-  onClearPendingWeapon: () => void;
-  onWeaponSelect: (collectionWeaponId: CollectionWeaponId) => void;
-  onWeaponClear: () => void;
 }
 
 /** The active tab's pool, or a prompt to pick a member when none is selected. */
 function TeamEditorPanel({
-  editing,
+  editor,
   activeTab,
   characters,
   collectionWeapons,
-  pendingWeapon,
-  assignedCharacterWeaponType,
-  selectedCollectionWeaponId,
-  onToggleCharacter,
-  onClearPendingWeapon,
-  onWeaponSelect,
-  onWeaponClear,
 }: TeamEditorPanelProps): JSX.Element {
+  const { editing, pendingWeapon, assignedCharacterWeaponType } = editor;
+
   if (editing === null) {
     return (
       <p className="text-sm text-muted-foreground">
@@ -318,11 +300,13 @@ function TeamEditorPanel({
         key={assignedCharacterWeaponType ?? 'any'}
         collectionWeapons={collectionWeapons}
         weaponType={assignedCharacterWeaponType}
-        selectedCollectionWeaponId={selectedCollectionWeaponId}
+        selectedCollectionWeaponId={
+          editor.selectedMember?.weaponInstanceId ?? editor.pendingWeaponId
+        }
         slot={editing.slot}
         memberIndex={editing.memberIndex}
-        onSelect={onWeaponSelect}
-        onClear={onWeaponClear}
+        onSelect={editor.selectWeapon}
+        onClear={editor.clearWeapon}
       />
     );
   }
@@ -335,7 +319,12 @@ function TeamEditorPanel({
             Showing {pendingWeapon.type} users for{' '}
             <span className="font-medium text-foreground">{pendingWeapon.name}</span>
           </p>
-          <Button variant="outline" size="sm" className="ml-auto" onClick={onClearPendingWeapon}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-auto"
+            onClick={editor.clearPendingWeapon}
+          >
             Clear weapon
           </Button>
         </div>
@@ -345,7 +334,7 @@ function TeamEditorPanel({
         slot={editing.slot}
         memberIndex={editing.memberIndex}
         weaponType={pendingWeapon?.type}
-        onAssign={onToggleCharacter}
+        onAssign={editor.toggleCharacter}
       />
     </>
   );
