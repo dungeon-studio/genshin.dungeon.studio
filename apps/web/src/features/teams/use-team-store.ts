@@ -60,126 +60,95 @@ interface TeamStoreState {
  * replace state wholesale, which is how a server response lands without looking
  * like a user edit.
  */
+/**
+ * Maps one slot's members and stamps `updatedAt`, which is every per-member
+ * edit's state transition.
+ */
+function withMembers(
+  state: Pick<TeamStoreState, 'teams'>,
+  slot: TeamSlot,
+  update: (member: CollectionTeamMember | null, index: number) => { characterId: string } | null,
+): Pick<TeamStoreState, 'teams'> {
+  return {
+    teams: {
+      ...state.teams,
+      [slot]: {
+        ...state.teams[slot],
+        members: state.teams[slot].members.map(update) as CollectionTeamMembers,
+        updatedAt: nowTimestamp(),
+      },
+    },
+  };
+}
+
+/** The weapon `characterId` holds on any team other than `slot`, if one. */
+function weaponHeldElsewhere(
+  teams: Record<TeamSlot, CollectionTeam>,
+  slot: TeamSlot,
+  characterId: string,
+): CollectionTeamMember['weaponInstanceId'] {
+  for (const other of Object.values(teams)) {
+    if (other.slot === slot) continue;
+    const held = other.members.find((m) => m?.characterId === characterId && m.weaponInstanceId);
+    if (held) return held.weaponInstanceId;
+  }
+  return undefined;
+}
+
 export const useTeamStore = create<TeamStoreState>()((set, get) => ({
   teams: initialTeams(),
 
   assignCharacter: (slot, memberIndex, characterId, collectionWeaponId) => {
     if (!isValidMemberIndex(memberIndex)) return;
-    const team = get().teams[slot];
-    if (team.members.some((m) => m?.characterId === characterId)) return;
+    const { teams } = get();
+    if (teams[slot].members.some((m) => m?.characterId === characterId)) return;
 
-    // Auto-populate weapon from another team where this character already has one equipped.
-    const allTeams = get().teams;
-    let existingWeaponId: CollectionTeamMember['weaponInstanceId'];
-    for (const other of Object.values(allTeams)) {
-      if (other.slot === slot) continue;
-      for (const member of other.members) {
-        if (member?.characterId === characterId && member.weaponInstanceId) {
-          existingWeaponId = member.weaponInstanceId;
-          break;
-        }
-      }
-      if (existingWeaponId) break;
-    }
+    const weaponInstanceId = collectionWeaponId ?? weaponHeldElsewhere(teams, slot, characterId);
 
-    const weaponInstanceId = collectionWeaponId ?? existingWeaponId;
-
-    set((state) => ({
-      teams: {
-        ...state.teams,
-        [slot]: {
-          ...state.teams[slot],
-          members: state.teams[slot].members.map((m, i) =>
-            i === memberIndex ? { characterId, ...(weaponInstanceId && { weaponInstanceId }) } : m,
-          ) as CollectionTeamMembers,
-          updatedAt: nowTimestamp(),
-        },
-      },
-    }));
+    set((state) =>
+      withMembers(state, slot, (m, i) =>
+        i === memberIndex ? { characterId, ...(weaponInstanceId && { weaponInstanceId }) } : m,
+      ),
+    );
   },
 
   removeCharacter: (slot, memberIndex) => {
     if (!isValidMemberIndex(memberIndex)) return;
-
-    set((state) => ({
-      teams: {
-        ...state.teams,
-        [slot]: {
-          ...state.teams[slot],
-          members: state.teams[slot].members.map((m, i) =>
-            i === memberIndex ? null : m,
-          ) as CollectionTeamMembers,
-          updatedAt: nowTimestamp(),
-        },
-      },
-    }));
+    set((state) => withMembers(state, slot, (m, i) => (i === memberIndex ? null : m)));
   },
 
   assignWeapon: (slot, memberIndex, collectionWeaponId) => {
     if (!isValidMemberIndex(memberIndex)) return;
     if (!get().teams[slot].members[memberIndex]) return;
-
-    set((state) => ({
-      teams: {
-        ...state.teams,
-        [slot]: {
-          ...state.teams[slot],
-          members: state.teams[slot].members.map((m, i) =>
-            i === memberIndex && m ? { ...m, weaponInstanceId: collectionWeaponId } : m,
-          ) as CollectionTeamMembers,
-          updatedAt: nowTimestamp(),
-        },
-      },
-    }));
+    set((state) =>
+      withMembers(state, slot, (m, i) =>
+        i === memberIndex && m ? { ...m, weaponInstanceId: collectionWeaponId } : m,
+      ),
+    );
   },
 
   removeWeapon: (slot, memberIndex) => {
     if (!isValidMemberIndex(memberIndex)) return;
     if (!get().teams[slot].members[memberIndex]) return;
-
-    set((state) => ({
-      teams: {
-        ...state.teams,
-        [slot]: {
-          ...state.teams[slot],
-          members: state.teams[slot].members.map((m, i) =>
-            i === memberIndex && m ? { ...m, weaponInstanceId: undefined } : m,
-          ) as CollectionTeamMembers,
-          updatedAt: nowTimestamp(),
-        },
-      },
-    }));
+    set((state) =>
+      withMembers(state, slot, (m, i) =>
+        i === memberIndex && m ? { ...m, weaponInstanceId: undefined } : m,
+      ),
+    );
   },
 
   setArtifactPlan: (slot, memberIndex, plan) => {
     if (!isValidMemberIndex(memberIndex)) return;
     if (!get().teams[slot].members[memberIndex]) return;
-
-    set((state) => ({
-      teams: {
-        ...state.teams,
-        [slot]: {
-          ...state.teams[slot],
-          members: state.teams[slot].members.map((m, i) =>
-            i === memberIndex && m ? { ...m, artifactPlan: plan } : m,
-          ) as CollectionTeamMembers,
-          updatedAt: nowTimestamp(),
-        },
-      },
-    }));
+    set((state) =>
+      withMembers(state, slot, (m, i) =>
+        i === memberIndex && m ? { ...m, artifactPlan: plan } : m,
+      ),
+    );
   },
 
   clearTeam: (slot) => {
-    set((state) => ({
-      teams: {
-        ...state.teams,
-        [slot]: {
-          ...state.teams[slot],
-          members: [null, null, null, null],
-          updatedAt: nowTimestamp(),
-        },
-      },
-    }));
+    set((state) => withMembers(state, slot, () => null));
   },
 
   setTeamName: (slot, name) => {
