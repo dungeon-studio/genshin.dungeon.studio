@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { CollectionWeapon } from '@genshin/domain';
 import type { WeaponId, WeaponType } from '@genshin/game-data';
 import { WEAPON_ROSTER, WEAPON_TYPES } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
@@ -29,6 +30,41 @@ function promptSignIn() {
   });
 }
 
+/** Preselects the weapon type a link such as `/weapons?type=Sword` names. */
+function filtersFromSearchParams(searchParams: URLSearchParams): WeaponFilterState {
+  const state = initialFilterState();
+  const typeParam = searchParams.get('type');
+  const weaponTypeValues = Object.values(WEAPON_TYPES) as WeaponType[];
+  if (typeParam && weaponTypeValues.includes(typeParam as WeaponType)) {
+    state.weaponTypes = new Set<WeaponType>([typeParam as WeaponType]);
+  }
+  return state;
+}
+
+function countInstances(instances: CollectionWeapon[]): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const instance of instances) {
+    counts[instance.weaponId] = (counts[instance.weaponId] ?? 0) + 1;
+  }
+  return counts;
+}
+
+function LoadingCollection(): JSX.Element {
+  return (
+    <Container className="py-12">
+      <h1 className="sr-only">Weapons</h1>
+      <div className="py-24 flex items-center justify-center">
+        <Loader2
+          className="h-8 w-8 animate-spin text-muted-foreground"
+          aria-hidden="true"
+          focusable={false}
+        />
+        <span className="sr-only">Loading collection</span>
+      </div>
+    </Container>
+  );
+}
+
 export function WeaponsPage(): JSX.Element {
   const {
     weapons,
@@ -44,29 +80,16 @@ export function WeaponsPage(): JSX.Element {
 
   const [searchParams] = useSearchParams();
 
-  const [filters, setFilters] = useState<WeaponFilterState>(() => {
-    const state = initialFilterState();
-    const typeParam = searchParams.get('type');
-    const weaponTypeValues = Object.values(WEAPON_TYPES) as WeaponType[];
-    if (typeParam && weaponTypeValues.includes(typeParam as WeaponType)) {
-      state.weaponTypes = new Set<WeaponType>([typeParam as WeaponType]);
-    }
-    return state;
-  });
+  const [filters, setFilters] = useState<WeaponFilterState>(() =>
+    filtersFromSearchParams(searchParams),
+  );
   const [selectedWeaponId, setSelectedWeaponId] = useState<WeaponId | null>(null);
 
   const effectiveSelectedWeaponId = isAuthenticated ? selectedWeaponId : null;
 
   const ownedWeaponIds = useMemo(() => weaponIdsOf(Object.values(weapons)), [weapons]);
 
-  // Count instances per weaponId for badges
-  const instanceCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    for (const instance of Object.values(weapons)) {
-      counts[instance.weaponId] = (counts[instance.weaponId] ?? 0) + 1;
-    }
-    return counts;
-  }, [weapons]);
+  const instanceCounts = useMemo(() => countInstances(Object.values(weapons)), [weapons]);
 
   const { filteredWeapons, filteredOwnedCount } = useMemo(() => {
     const filtered = filterWeapons(WEAPON_ROSTER, filters, ownedWeaponIds);
@@ -99,28 +122,7 @@ export function WeaponsPage(): JSX.Element {
     [selectedWeaponId, isAuthenticated, ensureWeapon],
   );
 
-  const handleAddWeapon = useCallback(
-    (weaponId: WeaponId) => {
-      addWeapon(weaponId);
-    },
-    [addWeapon],
-  );
-
-  if (isLoading) {
-    return (
-      <Container className="py-12">
-        <h1 className="sr-only">Weapons</h1>
-        <div className="py-24 flex items-center justify-center">
-          <Loader2
-            className="h-8 w-8 animate-spin text-muted-foreground"
-            aria-hidden="true"
-            focusable={false}
-          />
-          <span className="sr-only">Loading collection</span>
-        </div>
-      </Container>
-    );
-  }
+  if (isLoading) return <LoadingCollection />;
 
   return (
     <>
@@ -167,7 +169,7 @@ export function WeaponsPage(): JSX.Element {
         weaponId={effectiveSelectedWeaponId}
         instances={selectedInstances}
         onClose={() => setSelectedWeaponId(null)}
-        onAdd={handleAddWeapon}
+        onAdd={addWeapon}
         onRemove={removeWeapon}
         onRefinementChange={setRefinementLevel}
       />
