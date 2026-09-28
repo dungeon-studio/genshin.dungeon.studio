@@ -37,6 +37,10 @@
       ],
       "env": ["FAST_CHECK_SEED"]
     },
+    "test:mutation": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
     "test:integration": {
       "dependsOn": ["^build"],
       "cache": false

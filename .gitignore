@@ -62,6 +62,10 @@ coverage-integration/
 # Test results
 test-results/
 
+# Stryker mutation testing
+.stryker-tmp/
+reports/
+
 # Vite
 .cache/
 vite.config.js.timestamp-*
