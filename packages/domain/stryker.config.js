@@ -11,6 +11,4 @@ export default {
   // core multiplies memory by the host's core count.
   concurrency: 2,
   reporters: ['clear-text', 'progress', 'html', 'json'],
-  htmlReporter: { fileName: 'reports/mutation/index.html' },
-  jsonReporter: { fileName: 'reports/mutation/mutation.json' },
 };

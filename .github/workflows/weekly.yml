@@ -77,6 +77,8 @@ jobs:
     permissions:
       contents: read
       issues: write
+    env:
+      PACKAGE: packages/domain
 
     steps:
       - name: Checkout repository
@@ -94,42 +96,40 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: mutation-report
-          path: packages/domain/reports/mutation/
+          path: ${{ env.PACKAGE }}/reports/mutation/
 
       - name: Summarise surviving mutants
         id: summary
         env:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          REPORT: packages/domain/reports/mutation/mutation.json
         run: |
-          survivors=$(jq '[.files[].mutants[].status | select(IN("Survived", "NoCoverage"))] | length' "${REPORT}")
+          report="${PACKAGE}/reports/mutation/mutation.json"
+          survivors=$(jq '[.files[].mutants[].status | select(IN("Survived", "NoCoverage"))] | length' "${report}")
           echo "survivors=${survivors}" >> "${GITHUB_OUTPUT}"
-          jq -r --arg run "${RUN_URL}" '
-            def detected: map(select(.status == "Killed" or .status == "Timeout")) | length;
+          jq -r --arg package "${PACKAGE}" --arg run "${RUN_URL}" '
+            def surviving: .status | IN("Survived", "NoCoverage");
+            def detected: map(select(.status | IN("Killed", "Timeout"))) | length;
             def valid: map(select(.status | IN("CompileError", "RuntimeError", "Ignored") | not)) | length;
             def score: if valid == 0 then "n/a" else "\((detected * 10000 / valid | round) / 100)%" end;
-            def count($s): map(select(.status == $s)) | length;
-            "Mutation score for `packages/domain`: **\([.files[].mutants[]] | score)**",
+            def count($status): map(select(.status == $status)) | length;
+            def files: .files | to_entries | sort_by(.key)[] | {file: .key, mutants: .value.mutants};
+            "Mutation score for `\($package)`: **\([.files[].mutants[]] | score)**",
             "",
             "| File | Score | Survived | No coverage |",
             "| --- | ---: | ---: | ---: |",
-            (.files | to_entries | sort_by(.key)[] | .value.mutants as $m
-              | ($m | count("Survived")) as $survived
-              | ($m | count("NoCoverage")) as $uncovered
-              | select($survived + $uncovered > 0)
-              | "| `\(.key)` | \($m | score) | \($survived) | \($uncovered) |"),
+            (files | select(any(.mutants[]; surviving))
+              | ["`\(.file)`", (.mutants | score, count("Survived"), count("NoCoverage"))]
+              | "| \(join(" | ")) |"),
             "",
             "<details><summary>Surviving mutants</summary>",
             "",
-            (.files | to_entries | sort_by(.key)[] | .key as $f
-              | .value.mutants | sort_by(.location.start.line)[]
-              | select(.status == "Survived" or .status == "NoCoverage")
-              | "- `\($f):\(.location.start.line)` \(.mutatorName) (\(.status))"),
+            (files | .file as $file | .mutants | sort_by(.location.start.line)[] | select(surviving)
+              | "- `\($file):\(.location.start.line)` \(.mutatorName) (\(.status))"),
             "",
             "</details>",
             "",
             "The full report is the `mutation-report` artifact on [the run](\($run))."
-          ' "${REPORT}" > mutation-report.md
+          ' "${report}" > mutation-report.md
 
       # Reuse the open report if one exists so surviving mutants update a
       # single issue instead of filing a new one every week.
