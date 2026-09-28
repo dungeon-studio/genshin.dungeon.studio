@@ -105,20 +105,20 @@ repos:
       - id: reuse
         always_run: true
 
-  # GitHub Actions static analysis. Offline gate here; online supply-chain
-  # audits need a token and run in ci.yml's workflows job.
+  # GitHub Actions static analysis: zizmor audits security, actionlint checks
+  # correctness (expressions, job graph, shellcheck over `run:` blocks).
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
     rev: v1.29.0
     hooks:
       - id: zizmor
+        # Offline gate here; online supply-chain audits need a token and run
+        # in ci.yml's workflows job.
         args: [--no-progress, --offline]
-
-  # GitHub Actions correctness: expressions, job graph, and shellcheck over
-  # `run:` blocks. The docker image bundles shellcheck; the golang hook would
-  # need it on PATH.
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.12
     hooks:
+      # The docker image bundles shellcheck; the golang hook would need it on
+      # PATH.
       - id: actionlint-docker
 
   # Dockerfile linting
