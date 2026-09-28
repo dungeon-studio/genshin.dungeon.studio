@@ -37,6 +37,60 @@ function entriesAheadOfServer(
     .map((entry) => ({ characterId: entry.characterId, level: entry.constellationLevel }));
 }
 
+/**
+ * Reconciles the local store with the server's collection whenever the query
+ * resolves.
+ *
+ * The first resolution per signed-in user merges what this browser recorded
+ * and pushes the entries the server is behind on. Later resolutions (refetches)
+ * merge additively so they don't overwrite optimistic state while those pushes
+ * are in flight. Signing out clears the store so a different account cannot
+ * inherit the previous user's local data, and the next sign-in merges afresh.
+ */
+function useServerSync(
+  uid: string | undefined,
+  apiCharacters: CharacterCollection | undefined,
+  setConstellationLevelApi: ReturnType<typeof useSetConstellationLevelMutation>['mutate'],
+  applyMutationResult: (result: MutationResult) => void,
+): void {
+  const replaceCharacters = useCollectionStore((s) => s.replaceCharacters);
+  const clearCharacters = useCollectionStore((s) => s.clearCharacters);
+  const mergedForUser = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (uid === undefined) {
+      mergedForUser.current = null;
+      clearCharacters();
+    }
+  }, [uid, clearCharacters]);
+
+  useEffect(() => {
+    if (!apiCharacters) return;
+
+    const merged = mergeCollections(useCollectionStore.getState().characters, apiCharacters);
+    replaceCharacters(merged);
+
+    if (uid === undefined || mergedForUser.current === uid) return;
+
+    const diffs = entriesAheadOfServer(merged, apiCharacters);
+
+    for (const diff of diffs) {
+      setConstellationLevelApi(diff, {
+        onSuccess: applyMutationResult,
+        onError: () => {
+          toast.error('Failed to sync a merged character to the server.');
+        },
+      });
+    }
+
+    if (diffs.length > 0) {
+      toast.success(`Merged ${diffs.length} character(s) from your local collection.`);
+    }
+
+    mergedForUser.current = uid;
+  }, [apiCharacters, uid, replaceCharacters, setConstellationLevelApi, applyMutationResult]);
+}
+
 export interface UseCollectionResult {
   characters: CharacterCollection;
   addCharacter: (characterId: CharacterId) => void;
@@ -49,99 +103,28 @@ export interface UseCollectionResult {
 }
 
 /**
- * The character collection page's whole interface: what the user owns, the
- * actions that change it, and the state of the sync behind it.
+ * The collection's write actions, each with optimistic rollback and a toast on
+ * failure.
  *
- * Reads always come from the local store, so the page renders before the
- * network answers and keeps working signed out. Signing in merges what this
- * browser recorded with the account's own collection and pushes anything the
- * server hasn't seen, which is how a visitor's offline work survives their
- * first sign-in.
+ * Each mutation writes to zustand first for instant UI feedback, then fires
+ * the API call. On failure the onError callback rolls back the zustand change
+ * only if the store still reflects this mutation's optimistic value (guards
+ * against races from rapid user interactions). Errors are surfaced via toast
+ * side-effects — no retry is attempted.
  */
-export function useCollection(): UseCollectionResult {
-  const { user, loading: authLoading } = useAuth();
-  const isAuthenticated = user !== null;
-
-  // Zustand store — always the read layer
-  const characters = useCollectionStore((s) => s.characters);
+function useOptimisticActions(
+  isAuthenticated: boolean,
+  api: {
+    addCharacterApi: ReturnType<typeof useAddCharacterMutation>['mutate'];
+    removeCharacterApi: ReturnType<typeof useRemoveCharacterMutation>['mutate'];
+    setConstellationLevelApi: ReturnType<typeof useSetConstellationLevelMutation>['mutate'];
+  },
+  applyMutationResult: (result: MutationResult) => void,
+): Pick<UseCollectionResult, 'addCharacter' | 'removeCharacter' | 'setConstellationLevel'> {
+  const { addCharacterApi, removeCharacterApi, setConstellationLevelApi } = api;
   const storeAddCharacter = useCollectionStore((s) => s.addCharacter);
   const storeRemoveCharacter = useCollectionStore((s) => s.removeCharacter);
   const storeSetConstellationLevel = useCollectionStore((s) => s.setConstellationLevel);
-  const replaceCharacters = useCollectionStore((s) => s.replaceCharacters);
-  const clearCharacters = useCollectionStore((s) => s.clearCharacters);
-
-  // TanStack Query — background sync when authenticated
-  const {
-    data: apiCharacters,
-    error: queryError,
-    isLoading: queryLoading,
-  } = useCharacterCollectionQuery(user?.uid);
-
-  const { mutate: addCharacterApi } = useAddCharacterMutation(user?.uid);
-  const { mutate: removeCharacterApi } = useRemoveCharacterMutation(user?.uid);
-  const { mutate: setConstellationLevelApi } = useSetConstellationLevelMutation(user?.uid);
-
-  // Patch zustand with confirmed server data
-  const applyMutationResult = useCallback(
-    ({ characterId, entry }: MutationResult) => {
-      storeSetConstellationLevel(characterId, entry.constellationLevel);
-    },
-    [storeSetConstellationLevel],
-  );
-
-  // Merge anonymous localStorage data with server data on first query resolution
-  // per user session. Subsequent resolutions (refetches) merge additively to
-  // avoid overwriting optimistic state while merge mutations are in flight.
-  const mergedForUser = useRef<string | null>(null);
-
-  // Reset merge tracking and clear persisted collection on logout so
-  // re-login triggers a fresh merge and a different account cannot
-  // inherit the previous user's local data.
-  useEffect(() => {
-    if (!user) {
-      mergedForUser.current = null;
-      clearCharacters();
-    }
-  }, [user, clearCharacters]);
-
-  useEffect(() => {
-    if (!apiCharacters) return;
-
-    if (user && mergedForUser.current !== user.uid) {
-      const localData = useCollectionStore.getState().characters;
-      const merged = mergeCollections(localData, apiCharacters);
-      replaceCharacters(merged);
-
-      const diffs = entriesAheadOfServer(merged, apiCharacters);
-
-      for (const diff of diffs) {
-        setConstellationLevelApi(diff, {
-          onSuccess: applyMutationResult,
-          onError: () => {
-            toast.error('Failed to sync a merged character to the server.');
-          },
-        });
-      }
-
-      if (diffs.length > 0) {
-        toast.success(`Merged ${diffs.length} character(s) from your local collection.`);
-      }
-
-      mergedForUser.current = user.uid;
-    } else {
-      // Keep refetches additive so in-flight merge mutations aren't overwritten.
-      const currentCharacters = useCollectionStore.getState().characters;
-      const merged = mergeCollections(currentCharacters, apiCharacters);
-      replaceCharacters(merged);
-    }
-  }, [apiCharacters, user, replaceCharacters, setConstellationLevelApi, applyMutationResult]);
-
-  // Mutation error strategy: optimistic rollback + toast notification.
-  // Each mutation writes to zustand first for instant UI feedback, then fires
-  // the API call. On failure the onError callback rolls back the zustand change
-  // only if the store still reflects this mutation's optimistic value (guards
-  // against races from rapid user interactions). Errors are surfaced via toast
-  // side-effects — no retry is attempted.
 
   const addCharacter = useCallback(
     (id: CharacterId) => {
@@ -228,6 +211,54 @@ export function useCollection(): UseCollectionResult {
       }
     },
     [isAuthenticated, setConstellationLevelApi, storeSetConstellationLevel, applyMutationResult],
+  );
+
+  return { addCharacter, removeCharacter, setConstellationLevel };
+}
+
+/**
+ * The character collection page's whole interface: what the user owns, the
+ * actions that change it, and the state of the sync behind it.
+ *
+ * Reads always come from the local store, so the page renders before the
+ * network answers and keeps working signed out. Signing in merges what this
+ * browser recorded with the account's own collection and pushes anything the
+ * server hasn't seen, which is how a visitor's offline work survives their
+ * first sign-in.
+ */
+export function useCollection(): UseCollectionResult {
+  const { user, loading: authLoading } = useAuth();
+  const isAuthenticated = user !== null;
+
+  // Zustand store — always the read layer
+  const characters = useCollectionStore((s) => s.characters);
+  const storeSetConstellationLevel = useCollectionStore((s) => s.setConstellationLevel);
+
+  // TanStack Query — background sync when authenticated
+  const {
+    data: apiCharacters,
+    error: queryError,
+    isLoading: queryLoading,
+  } = useCharacterCollectionQuery(user?.uid);
+
+  const { mutate: addCharacterApi } = useAddCharacterMutation(user?.uid);
+  const { mutate: removeCharacterApi } = useRemoveCharacterMutation(user?.uid);
+  const { mutate: setConstellationLevelApi } = useSetConstellationLevelMutation(user?.uid);
+
+  // Patch zustand with confirmed server data
+  const applyMutationResult = useCallback(
+    ({ characterId, entry }: MutationResult) => {
+      storeSetConstellationLevel(characterId, entry.constellationLevel);
+    },
+    [storeSetConstellationLevel],
+  );
+
+  useServerSync(user?.uid, apiCharacters, setConstellationLevelApi, applyMutationResult);
+
+  const { addCharacter, removeCharacter, setConstellationLevel } = useOptimisticActions(
+    isAuthenticated,
+    { addCharacterApi, removeCharacterApi, setConstellationLevelApi },
+    applyMutationResult,
   );
 
   const isOwned = useCallback((id: CharacterId) => id in characters, [characters]);
