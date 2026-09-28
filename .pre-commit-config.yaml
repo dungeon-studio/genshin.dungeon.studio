@@ -34,6 +34,7 @@ repos:
         args: [--unsafe] # Allow custom YAML tags
       - id: check-json
         exclude: '\.jsonc$|\.vscode/|tsconfig|\.devcontainer/' # Skip JSONC files and dirs with JSON-with-comments
+      - id: check-toml
 
       # Prevent issues
       - id: check-added-large-files
@@ -42,6 +43,11 @@ repos:
       - id: check-merge-conflict
       - id: check-symlinks
       - id: destroyed-symlinks
+      - id: check-shebang-scripts-are-executable
+        # tsc copies this shebang into the emitted bin; the source never runs.
+        exclude: ^tools/game-data-codegen/src/cli\.ts$
+      - id: check-executables-have-shebangs
+      - id: detect-private-key
 
       # Git hygiene
       - id: no-commit-to-branch
