@@ -35,29 +35,41 @@ if (healthBearerToken) {
   headers.set('Authorization', `Bearer ${healthBearerToken}`);
 }
 
+type HealthAttempt = { healthy: HealthResponse } | { failure: string };
+
+const checkHealth = async (): Promise<HealthAttempt> => {
+  try {
+    const response = await fetch(healthUrl, { headers });
+
+    if (!response.ok) {
+      return { failure: `http_status=${response.status}; status_text=${response.statusText}` };
+    }
+
+    const healthResponseBody = (await response.json()) as HealthResponse;
+
+    if (healthResponseBody.status !== 'ok') {
+      return { failure: `unexpected_status=${String(healthResponseBody.status)}` };
+    }
+    if (healthResponseBody.sha !== expectedSha) {
+      return {
+        failure: `sha_mismatch=deployed:${String(healthResponseBody.sha)} expected:${expectedSha}`,
+      };
+    }
+    return { healthy: healthResponseBody };
+  } catch (error) {
+    return { failure: error instanceof Error ? error.message : String(error) };
+  }
+};
+
 const getHealthWithRetry = async (): Promise<HealthResponse> => {
   let lastFailure: string | undefined;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-    try {
-      const response = await fetch(healthUrl, { headers });
-
-      if (response.ok) {
-        const healthResponseBody = (await response.json()) as HealthResponse;
-
-        if (healthResponseBody.status !== 'ok') {
-          lastFailure = `unexpected_status=${String(healthResponseBody.status)}`;
-        } else if (healthResponseBody.sha !== expectedSha) {
-          lastFailure = `sha_mismatch=deployed:${String(healthResponseBody.sha)} expected:${expectedSha}`;
-        } else {
-          return healthResponseBody;
-        }
-      } else {
-        lastFailure = `http_status=${response.status}; status_text=${response.statusText}`;
-      }
-    } catch (error) {
-      lastFailure = error instanceof Error ? error.message : String(error);
+    const result = await checkHealth();
+    if ('healthy' in result) {
+      return result.healthy;
     }
+    lastFailure = result.failure;
 
     if (attempt === maxAttempts) {
       throw new Error(
