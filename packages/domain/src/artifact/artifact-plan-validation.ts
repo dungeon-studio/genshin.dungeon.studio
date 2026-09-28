@@ -80,11 +80,13 @@ function validateMinorAffixes(
     issues.push(issue(`${field} must have at most 3 entries`, field));
   }
 
-  for (const [i, affix] of affixes.entries()) {
-    if (!(ARTIFACT_MINOR_AFFIXES as readonly string[]).includes(affix)) {
-      issues.push(issue(`Invalid minor affix: ${affix}`, `${field}[${i}]`));
-    }
-  }
+  issues.push(
+    ...affixes.flatMap((affix, i) =>
+      (ARTIFACT_MINOR_AFFIXES as readonly string[]).includes(affix)
+        ? []
+        : [issue(`Invalid minor affix: ${affix}`, `${field}[${i}]`)],
+    ),
+  );
 
   if (new Set(affixes).size !== affixes.length) {
     issues.push(issue(`${field} contains duplicates`, field));
