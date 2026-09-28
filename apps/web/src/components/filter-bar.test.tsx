@@ -49,7 +49,7 @@ function renderBar(
       onChange={onChange}
       category={category}
       sortFields={SORT_FIELDS}
-      noun="items"
+      noun={{ one: 'item', other: 'items' }}
       searchLabel="Search items by name"
       filteredCount={props.filteredCount ?? 5}
       totalCount={props.totalCount ?? 5}
@@ -141,6 +141,12 @@ describe('FilterBar', () => {
 
     expect(screen.getByText(/3 items/)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'owned' })).not.toBeInTheDocument();
+  });
+
+  it('uses the singular noun for a single match', () => {
+    renderBar({ showOwnership: false, filteredCount: 1 });
+
+    expect(screen.getByText('1 item')).toBeInTheDocument();
   });
 
   it('hides the category row when configured off', () => {

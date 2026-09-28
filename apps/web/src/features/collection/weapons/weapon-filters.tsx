@@ -43,7 +43,7 @@ export function WeaponFilters({
       filters={filters}
       onChange={onChange}
       sortFields={SORT_FIELDS}
-      noun="weapons"
+      noun={{ one: 'weapon', other: 'weapons' }}
       searchLabel="Search weapons by name"
       showOwnership={showOwnership}
       collapsible={collapsible}

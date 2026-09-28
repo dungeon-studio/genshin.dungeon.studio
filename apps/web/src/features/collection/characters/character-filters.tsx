@@ -42,7 +42,7 @@ export function CharacterFilters({
       filters={filters}
       onChange={onChange}
       sortFields={SORT_FIELDS}
-      noun="characters"
+      noun={{ one: 'character', other: 'characters' }}
       searchLabel="Search characters by name"
       showOwnership={showOwnership}
       collapsible={collapsible}

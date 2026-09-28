@@ -46,13 +46,18 @@ interface FilterCounts {
   filteredOwnedCount: number;
 }
 
+interface Noun {
+  one: string;
+  other: string;
+}
+
 interface FilterBarProps<F extends BaseFilterState, T extends string> extends FilterCounts {
   filters: F;
   onChange: (filters: F) => void;
   category: FilterCategoryConfig<T>;
   sortFields: readonly { value: F['sortField']; label: string }[];
-  /** Plural noun for the summary, e.g. "characters". */
-  noun: string;
+  /** Noun for the summary count, e.g. `{ one: 'character', other: 'characters' }`. */
+  noun: Noun;
   searchLabel: string;
   showOwnership?: boolean;
   /** Hide the filter chips behind a toggle below the `sm` breakpoint. */
@@ -343,7 +348,7 @@ function FilterToggle({
 }
 
 interface FilterSummaryProps extends FilterCounts {
-  noun: string;
+  noun: Noun;
   showOwnership: boolean;
 }
 
@@ -359,7 +364,7 @@ function summaryText({
   ownedCount,
   filteredOwnedCount,
 }: FilterSummaryProps): string {
-  if (!showOwnership) return `${filteredCount} ${noun}`;
+  if (!showOwnership) return `${filteredCount} ${filteredCount === 1 ? noun.one : noun.other}`;
   if (filteredCount === totalCount) return `${ownedCount} / ${totalCount} owned`;
   return `${filteredOwnedCount} / ${filteredCount} owned`;
 }
