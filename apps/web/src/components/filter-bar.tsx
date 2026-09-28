@@ -56,7 +56,7 @@ interface FilterBarProps<F extends BaseFilterState, T extends string> extends Fi
   onChange: (filters: F) => void;
   category: FilterCategoryConfig<T>;
   sortFields: readonly { value: F['sortField']; label: string }[];
-  /** Noun for the summary count, e.g. `{ one: 'character', other: 'characters' }`. */
+  /** What the summary counts, e.g. characters. */
   noun: Noun;
   searchLabel: string;
   showOwnership?: boolean;
