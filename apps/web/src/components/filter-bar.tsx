@@ -364,7 +364,11 @@ function summaryText({
   ownedCount,
   filteredOwnedCount,
 }: FilterSummaryProps): string {
-  if (!showOwnership) return `${filteredCount} ${filteredCount === 1 ? noun.one : noun.other}`;
+  if (!showOwnership) return formatCount(filteredCount, noun);
   if (filteredCount === totalCount) return `${ownedCount} / ${totalCount} owned`;
   return `${filteredOwnedCount} / ${filteredCount} owned`;
+}
+
+function formatCount(count: number, noun: Noun): string {
+  return `${count} ${count === 1 ? noun.one : noun.other}`;
 }
