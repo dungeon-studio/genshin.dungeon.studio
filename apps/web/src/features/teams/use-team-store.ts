@@ -47,20 +47,6 @@ interface TeamStoreState {
 }
 
 /**
- * The four teams as the UI currently shows them, with no knowledge of the API.
- *
- * Components reach for `useTeams` instead, which wraps this with loading and
- * saving. This store is for that hook and for tests.
- *
- * Every mutation is a silent no-op when it can't apply, such as an index
- * outside a team or a weapon assigned to an empty position, so a caller gets no
- * signal that nothing happened.
- *
- * `setTeam` and `setTeams` are the exception to the `updatedAt` stamping. They
- * replace state wholesale, which is how a server response lands without looking
- * like a user edit.
- */
-/**
  * Maps one slot's members and stamps `updatedAt`, which is every per-member
  * edit's state transition.
  */
@@ -95,6 +81,20 @@ function weaponHeldElsewhere(
   return undefined;
 }
 
+/**
+ * The four teams as the UI currently shows them, with no knowledge of the API.
+ *
+ * Components reach for `useTeams` instead, which wraps this with loading and
+ * saving. This store is for that hook and for tests.
+ *
+ * Every mutation is a silent no-op when it can't apply, such as an index
+ * outside a team or a weapon assigned to an empty position, so a caller gets no
+ * signal that nothing happened.
+ *
+ * `setTeam` and `setTeams` are the exception to the `updatedAt` stamping. They
+ * replace state wholesale, which is how a server response lands without looking
+ * like a user edit.
+ */
 export const useTeamStore = create<TeamStoreState>()((set, get) => ({
   teams: initialTeams(),
 
