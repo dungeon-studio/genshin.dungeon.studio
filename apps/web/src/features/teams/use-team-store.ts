@@ -95,90 +95,86 @@ function weaponHeldElsewhere(
  * replace state wholesale, which is how a server response lands without looking
  * like a user edit.
  */
-export const useTeamStore = create<TeamStoreState>()((set, get) => ({
-  teams: initialTeams(),
-
-  assignCharacter: (slot, memberIndex, characterId, collectionWeaponId) => {
-    if (!isValidMemberIndex(memberIndex)) return;
-    const { teams } = get();
-    if (teams[slot].members.some((m) => m?.characterId === characterId)) return;
-
-    const weaponInstanceId = collectionWeaponId ?? weaponHeldElsewhere(teams, slot, characterId);
-
+export const useTeamStore = create<TeamStoreState>()((set, get) => {
+  // Every edit to a member already in a position; an empty one has nothing to patch.
+  const patchMember = (
+    slot: TeamSlot,
+    memberIndex: number,
+    patch: Partial<Omit<CollectionTeamMember, 'characterId'>>,
+  ) => {
+    if (!isValidMemberIndex(memberIndex) || !get().teams[slot].members[memberIndex]) return;
     set((state) =>
-      withMembers(state, slot, (m, i) =>
-        i === memberIndex ? { characterId, ...(weaponInstanceId && { weaponInstanceId }) } : m,
-      ),
+      withMembers(state, slot, (m, i) => (i === memberIndex && m ? { ...m, ...patch } : m)),
     );
-  },
+  };
 
-  removeCharacter: (slot, memberIndex) => {
-    if (!isValidMemberIndex(memberIndex)) return;
-    set((state) => withMembers(state, slot, (m, i) => (i === memberIndex ? null : m)));
-  },
+  return {
+    teams: initialTeams(),
 
-  assignWeapon: (slot, memberIndex, collectionWeaponId) => {
-    if (!isValidMemberIndex(memberIndex)) return;
-    if (!get().teams[slot].members[memberIndex]) return;
-    set((state) =>
-      withMembers(state, slot, (m, i) =>
-        i === memberIndex && m ? { ...m, weaponInstanceId: collectionWeaponId } : m,
-      ),
-    );
-  },
+    assignCharacter: (slot, memberIndex, characterId, collectionWeaponId) => {
+      if (!isValidMemberIndex(memberIndex)) return;
+      const { teams } = get();
+      if (teams[slot].members.some((m) => m?.characterId === characterId)) return;
 
-  removeWeapon: (slot, memberIndex) => {
-    if (!isValidMemberIndex(memberIndex)) return;
-    if (!get().teams[slot].members[memberIndex]) return;
-    set((state) =>
-      withMembers(state, slot, (m, i) =>
-        i === memberIndex && m ? { ...m, weaponInstanceId: undefined } : m,
-      ),
-    );
-  },
+      const weaponInstanceId = collectionWeaponId ?? weaponHeldElsewhere(teams, slot, characterId);
 
-  setArtifactPlan: (slot, memberIndex, plan) => {
-    if (!isValidMemberIndex(memberIndex)) return;
-    if (!get().teams[slot].members[memberIndex]) return;
-    set((state) =>
-      withMembers(state, slot, (m, i) =>
-        i === memberIndex && m ? { ...m, artifactPlan: plan } : m,
-      ),
-    );
-  },
+      set((state) =>
+        withMembers(state, slot, (m, i) =>
+          i === memberIndex ? { characterId, ...(weaponInstanceId && { weaponInstanceId }) } : m,
+        ),
+      );
+    },
 
-  clearTeam: (slot) => {
-    set((state) => withMembers(state, slot, () => null));
-  },
+    removeCharacter: (slot, memberIndex) => {
+      if (!isValidMemberIndex(memberIndex)) return;
+      set((state) => withMembers(state, slot, (m, i) => (i === memberIndex ? null : m)));
+    },
 
-  setTeamName: (slot, name) => {
-    const trimmed = name.trim();
-    const nextName = trimmed || defaultTeamName(slot);
-    set((state) => ({
-      teams: {
-        ...state.teams,
-        [slot]: { ...state.teams[slot], name: nextName, updatedAt: nowTimestamp() },
-      },
-    }));
-  },
+    assignWeapon: (slot, memberIndex, collectionWeaponId) => {
+      patchMember(slot, memberIndex, { weaponInstanceId: collectionWeaponId });
+    },
 
-  setTeam: (slot, team) => {
-    set((state) => ({
-      teams: { ...state.teams, [slot]: team },
-    }));
-  },
+    removeWeapon: (slot, memberIndex) => {
+      patchMember(slot, memberIndex, { weaponInstanceId: undefined });
+    },
 
-  setTeams: (teams) => {
-    set({ teams });
-  },
+    setArtifactPlan: (slot, memberIndex, plan) => {
+      patchMember(slot, memberIndex, { artifactPlan: plan });
+    },
 
-  resetTeams: () => {
-    set({ teams: initialTeams() });
-  },
+    clearTeam: (slot) => {
+      set((state) => withMembers(state, slot, () => null));
+    },
 
-  getTeam: (slot) => get().teams[slot],
+    setTeamName: (slot, name) => {
+      const trimmed = name.trim();
+      const nextName = trimmed || defaultTeamName(slot);
+      set((state) => ({
+        teams: {
+          ...state.teams,
+          [slot]: { ...state.teams[slot], name: nextName, updatedAt: nowTimestamp() },
+        },
+      }));
+    },
 
-  isCharacterInTeam: (slot, characterId) => {
-    return get().teams[slot].members.some((m) => m?.characterId === characterId);
-  },
-}));
+    setTeam: (slot, team) => {
+      set((state) => ({
+        teams: { ...state.teams, [slot]: team },
+      }));
+    },
+
+    setTeams: (teams) => {
+      set({ teams });
+    },
+
+    resetTeams: () => {
+      set({ teams: initialTeams() });
+    },
+
+    getTeam: (slot) => get().teams[slot],
+
+    isCharacterInTeam: (slot, characterId) => {
+      return get().teams[slot].members.some((m) => m?.characterId === characterId);
+    },
+  };
+});
