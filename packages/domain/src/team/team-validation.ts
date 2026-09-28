@@ -43,11 +43,18 @@ export function validateTeam(
   team: { name: string; members: CollectionTeamMembers; description?: string },
   context?: TeamValidationContext,
 ): ValidationIssue[] {
-  const issues: ValidationIssue[] = [];
+  return [
+    ...validateUniqueCharacters(team.members),
+    ...(context ? validateOwnership(team.members, context) : []),
+    ...validateUniqueWeapons(team.members),
+    ...validateArtifactPlans(team.members),
+  ];
+}
 
-  // Per-team uniqueness: no duplicate character IDs --------------------
+function validateUniqueCharacters(members: CollectionTeamMembers): ValidationIssue[] {
+  const issues: ValidationIssue[] = [];
   const seen = new Set<string>();
-  for (const [i, member] of team.members.entries()) {
+  for (const [i, member] of members.entries()) {
     if (member === null) continue;
     if (seen.has(member.characterId)) {
       issues.push(
@@ -56,55 +63,57 @@ export function validateTeam(
     }
     seen.add(member.characterId);
   }
+  return issues;
+}
 
-  // Ownership checks (when collection context is available) ------------
-  if (context) {
-    for (const [i, member] of team.members.entries()) {
-      if (member === null) continue;
-      if (!context.ownedCharacterIds.has(member.characterId)) {
-        issues.push(
-          issue(`Character not in collection: ${member.characterId}`, `members[${i}].characterId`),
-        );
-      }
-      if (member.weaponInstanceId && !context.ownedWeaponInstanceIds.has(member.weaponInstanceId)) {
-        issues.push(
-          issue(
-            `Weapon instance not in collection: ${member.weaponInstanceId}`,
-            `members[${i}].weaponInstanceId`,
-          ),
-        );
-      }
-    }
-  }
-
-  // Per-team weapon uniqueness: no duplicate weapon instance IDs ------
-  const seenWeapons = new Set<string>();
-  for (const [i, member] of team.members.entries()) {
+function validateOwnership(
+  members: CollectionTeamMembers,
+  context: TeamValidationContext,
+): ValidationIssue[] {
+  const issues: ValidationIssue[] = [];
+  for (const [i, member] of members.entries()) {
     if (member === null) continue;
-    if (member.weaponInstanceId) {
-      if (seenWeapons.has(member.weaponInstanceId)) {
-        issues.push(
-          issue(
-            `Duplicate weapon instance ID: ${member.weaponInstanceId}`,
-            `members[${i}].weaponInstanceId`,
-          ),
-        );
-      }
-      seenWeapons.add(member.weaponInstanceId);
-    }
-  }
-
-  // Per-member artifact plan validation --------------------------------
-  for (const [i, member] of team.members.entries()) {
-    if (member === null) continue;
-    if (member.artifactPlan) {
+    if (!context.ownedCharacterIds.has(member.characterId)) {
       issues.push(
-        ...prefixPaths(validateArtifactPlan(member.artifactPlan), `members[${i}].artifactPlan`),
+        issue(`Character not in collection: ${member.characterId}`, `members[${i}].characterId`),
+      );
+    }
+    if (member.weaponInstanceId && !context.ownedWeaponInstanceIds.has(member.weaponInstanceId)) {
+      issues.push(
+        issue(
+          `Weapon instance not in collection: ${member.weaponInstanceId}`,
+          `members[${i}].weaponInstanceId`,
+        ),
       );
     }
   }
-
   return issues;
+}
+
+function validateUniqueWeapons(members: CollectionTeamMembers): ValidationIssue[] {
+  const issues: ValidationIssue[] = [];
+  const seen = new Set<string>();
+  for (const [i, member] of members.entries()) {
+    if (!member?.weaponInstanceId) continue;
+    if (seen.has(member.weaponInstanceId)) {
+      issues.push(
+        issue(
+          `Duplicate weapon instance ID: ${member.weaponInstanceId}`,
+          `members[${i}].weaponInstanceId`,
+        ),
+      );
+    }
+    seen.add(member.weaponInstanceId);
+  }
+  return issues;
+}
+
+function validateArtifactPlans(members: CollectionTeamMembers): ValidationIssue[] {
+  return [...members.entries()].flatMap(([i, member]) =>
+    member?.artifactPlan
+      ? prefixPaths(validateArtifactPlan(member.artifactPlan), `members[${i}].artifactPlan`)
+      : [],
+  );
 }
 
 /**

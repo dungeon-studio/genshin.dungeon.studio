@@ -39,73 +39,72 @@ export function validateArtifactPlan(plan: {
   priorityMinorAffixes?: string[];
   secondaryMinorAffixes?: string[];
 }): ValidationIssue[] {
+  return [
+    ...validateMainAffix('sands', plan.sands, SANDS_MAIN_AFFIXES),
+    ...validateMainAffix('goblet', plan.goblet, GOBLET_MAIN_AFFIXES),
+    ...validateMainAffix('circlet', plan.circlet, CIRCLET_MAIN_AFFIXES),
+    ...validateSets(plan.sets),
+    ...validateMinorAffixes('priorityMinorAffixes', plan.priorityMinorAffixes),
+    ...validateMinorAffixes('secondaryMinorAffixes', plan.secondaryMinorAffixes),
+    ...validateDisjointMinorAffixes(plan.priorityMinorAffixes, plan.secondaryMinorAffixes),
+  ];
+}
+
+function validateMainAffix(
+  slot: 'sands' | 'goblet' | 'circlet',
+  affix: string | undefined,
+  allowed: readonly string[],
+): ValidationIssue[] {
+  if (affix === undefined || allowed.includes(affix)) return [];
+  return [issue(`Invalid ${slot} main affix: ${affix}`, slot)];
+}
+
+function validateSets(sets: string[] | undefined): ValidationIssue[] {
+  if (sets === undefined) return [];
+  if (sets.length < 1 || sets.length > 2) {
+    return [issue('Artifact plan must have 1-2 sets', 'sets')];
+  }
+  return sets.flatMap((setId, i) =>
+    getArtifactSetById(setId) ? [] : [issue(`Unknown artifact set: ${setId}`, `sets[${i}]`)],
+  );
+}
+
+function validateMinorAffixes(
+  field: 'priorityMinorAffixes' | 'secondaryMinorAffixes',
+  affixes: string[] | undefined,
+): ValidationIssue[] {
+  if (affixes === undefined) return [];
   const issues: ValidationIssue[] = [];
 
-  // Main affixes -------------------------------------------------------
-  if (plan.sands !== undefined && !(SANDS_MAIN_AFFIXES as readonly string[]).includes(plan.sands)) {
-    issues.push(issue(`Invalid sands main affix: ${plan.sands}`, 'sands'));
+  if (affixes.length > 3) {
+    issues.push(issue(`${field} must have at most 3 entries`, field));
   }
 
-  if (
-    plan.goblet !== undefined &&
-    !(GOBLET_MAIN_AFFIXES as readonly string[]).includes(plan.goblet)
-  ) {
-    issues.push(issue(`Invalid goblet main affix: ${plan.goblet}`, 'goblet'));
-  }
-
-  if (
-    plan.circlet !== undefined &&
-    !(CIRCLET_MAIN_AFFIXES as readonly string[]).includes(plan.circlet)
-  ) {
-    issues.push(issue(`Invalid circlet main affix: ${plan.circlet}`, 'circlet'));
-  }
-
-  // Sets ---------------------------------------------------------------
-  if (plan.sets !== undefined) {
-    if (plan.sets.length < 1 || plan.sets.length > 2) {
-      issues.push(issue('Artifact plan must have 1-2 sets', 'sets'));
-    } else {
-      for (const [i, setId] of plan.sets.entries()) {
-        if (!getArtifactSetById(setId)) {
-          issues.push(issue(`Unknown artifact set: ${setId}`, `sets[${i}]`));
-        }
-      }
+  for (const [i, affix] of affixes.entries()) {
+    if (!(ARTIFACT_MINOR_AFFIXES as readonly string[]).includes(affix)) {
+      issues.push(issue(`Invalid minor affix: ${affix}`, `${field}[${i}]`));
     }
   }
 
-  // Minor affixes ------------------------------------------------------
-  for (const field of ['priorityMinorAffixes', 'secondaryMinorAffixes'] as const) {
-    const arr = plan[field];
-    if (arr === undefined) continue;
-
-    if (arr.length > 3) {
-      issues.push(issue(`${field} must have at most 3 entries`, field));
-    }
-
-    for (const [i, affix] of arr.entries()) {
-      if (!(ARTIFACT_MINOR_AFFIXES as readonly string[]).includes(affix)) {
-        issues.push(issue(`Invalid minor affix: ${affix}`, `${field}[${i}]`));
-      }
-    }
-
-    if (new Set(arr).size !== arr.length) {
-      issues.push(issue(`${field} contains duplicates`, field));
-    }
-  }
-
-  // Disjointness -------------------------------------------------------
-  if (plan.priorityMinorAffixes && plan.secondaryMinorAffixes) {
-    const prioritySet = new Set(plan.priorityMinorAffixes);
-    const overlap = plan.secondaryMinorAffixes.filter((s) => prioritySet.has(s));
-    if (overlap.length > 0) {
-      issues.push(
-        issue(
-          `Priority and secondary minor affixes must be disjoint. Overlap: ${overlap.join(', ')}`,
-          'secondaryMinorAffixes',
-        ),
-      );
-    }
+  if (new Set(affixes).size !== affixes.length) {
+    issues.push(issue(`${field} contains duplicates`, field));
   }
 
   return issues;
+}
+
+function validateDisjointMinorAffixes(
+  priority: string[] | undefined,
+  secondary: string[] | undefined,
+): ValidationIssue[] {
+  if (!priority || !secondary) return [];
+  const prioritySet = new Set(priority);
+  const overlap = secondary.filter((s) => prioritySet.has(s));
+  if (overlap.length === 0) return [];
+  return [
+    issue(
+      `Priority and secondary minor affixes must be disjoint. Overlap: ${overlap.join(', ')}`,
+      'secondaryMinorAffixes',
+    ),
+  ];
 }
