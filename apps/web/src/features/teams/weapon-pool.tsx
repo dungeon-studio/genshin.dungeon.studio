@@ -108,39 +108,8 @@ export function WeaponPool({
     return map;
   }, [collectionWeapons]);
 
-  if (ownedCount === 0) {
-    return (
-      <div className="gap-4 py-12 flex flex-1 flex-col items-center justify-center">
-        <Swords className="h-10 w-10 text-muted-foreground" aria-hidden="true" focusable={false} />
-        <div className="text-center">
-          <p className="font-medium">No weapons in your collection</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Visit the weapons page to add weapons to your collection.
-          </p>
-        </div>
-        <Button asChild>
-          <Link to="/weapons">Go to Weapons</Link>
-        </Button>
-      </div>
-    );
-  }
-
-  if (weaponType && !hasWeaponsOfType) {
-    return (
-      <div className="gap-4 py-12 flex flex-1 flex-col items-center justify-center">
-        <Swords className="h-10 w-10 text-muted-foreground" aria-hidden="true" focusable={false} />
-        <div className="text-center">
-          <p className="font-medium">No {weaponType} weapons in your collection</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Visit the weapons page to add {weaponType} weapons to your collection.
-          </p>
-        </div>
-        <Button asChild>
-          <Link to={`/weapons?type=${weaponType}`}>Go to Weapons</Link>
-        </Button>
-      </div>
-    );
-  }
+  if (ownedCount === 0) return <EmptyPool />;
+  if (weaponType && !hasWeaponsOfType) return <EmptyPool weaponType={weaponType} />;
 
   return (
     <div className="min-h-0 gap-3 flex flex-1 flex-col">
@@ -186,6 +155,25 @@ export function WeaponPool({
           <p className="py-8 text-center text-muted-foreground">No weapons match your filters.</p>
         )}
       </div>
+    </div>
+  );
+}
+
+/** Points at the weapons page, filtered to `weaponType` when the member needs one. */
+function EmptyPool({ weaponType }: { weaponType?: WeaponType }): JSX.Element {
+  const kind = weaponType ? `${weaponType} weapons` : 'weapons';
+  return (
+    <div className="gap-4 py-12 flex flex-1 flex-col items-center justify-center">
+      <Swords className="h-10 w-10 text-muted-foreground" aria-hidden="true" focusable={false} />
+      <div className="text-center">
+        <p className="font-medium">No {kind} in your collection</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Visit the weapons page to add {kind} to your collection.
+        </p>
+      </div>
+      <Button asChild>
+        <Link to={weaponType ? `/weapons?type=${weaponType}` : '/weapons'}>Go to Weapons</Link>
+      </Button>
     </div>
   );
 }
