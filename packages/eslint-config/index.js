@@ -8,6 +8,7 @@ import vitest from '@vitest/eslint-plugin';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 import importX from 'eslint-plugin-import-x';
+import sonarjs from 'eslint-plugin-sonarjs';
 import tsdoc from 'eslint-plugin-tsdoc';
 import unusedImports from 'eslint-plugin-unused-imports';
 import tseslint from 'typescript-eslint';
@@ -126,6 +127,35 @@ const TSDOC_SYNTAX = {
   rules: { 'tsdoc/syntax': 'error' },
 };
 
+/**
+ * The code smells a linter can measure: long functions, deep nesting, long
+ * parameter lists, and logic duplicated within a file.
+ *
+ * `max-lines-per-function` is off for vitest files, where it measures
+ * `describe` callbacks rather than any one piece of logic.
+ */
+const STRUCTURAL_SMELLS = [
+  {
+    files: LINTED_FILES,
+    plugins: { sonarjs },
+    rules: {
+      complexity: ['error', 15],
+      'max-depth': ['error', 3],
+      'max-params': ['error', 4],
+      'max-lines-per-function': ['error', { max: 100, skipBlankLines: true, skipComments: true }],
+      'sonarjs/no-identical-functions': 'error',
+      'sonarjs/no-duplicated-branches': 'error',
+      'sonarjs/no-all-duplicated-branches': 'error',
+      'sonarjs/no-collapsible-if': 'error',
+      'sonarjs/prefer-single-boolean-return': 'error',
+    },
+  },
+  {
+    files: VITEST_FILES,
+    rules: { 'max-lines-per-function': 'off' },
+  },
+];
+
 /** Import rules that need no workspace context. */
 const IMPORT_DISCIPLINE = {
   files: LINTED_FILES,
@@ -209,6 +239,7 @@ export default function genshinConfig(packageDir) {
     typeAwareRules(packageDir),
     TYPESCRIPT_STRICTNESS,
     TSDOC_SYNTAX,
+    STRUCTURAL_SMELLS,
     IMPORT_DISCIPLINE,
     declaredDependencies(packageDir),
     VITEST_CONVENTIONS,
