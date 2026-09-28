@@ -65,3 +65,89 @@ jobs:
           content-filepath: ./lychee/out.md
           issue-number: ${{ steps.report.outputs.number }}
           labels: documentation
+
+  # Coverage says a line ran; a surviving mutant says no test checked what it
+  # did. Stryker reruns the suite per mutant, too slow to gate a PR, and the
+  # score moves under legitimate refactoring, so it reports into one issue
+  # instead. Never blocks.
+  mutation-score:
+    name: Report mutation score
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Run mutation tests
+        run: pnpm turbo run test:mutation
+
+      - name: Upload mutation report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: mutation-report
+          path: packages/domain/reports/mutation/
+
+      - name: Summarise surviving mutants
+        id: summary
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          REPORT: packages/domain/reports/mutation/mutation.json
+        run: |
+          survivors=$(jq '[.files[].mutants[].status | select(IN("Survived", "NoCoverage"))] | length' "${REPORT}")
+          echo "survivors=${survivors}" >> "${GITHUB_OUTPUT}"
+          jq -r --arg run "${RUN_URL}" '
+            def detected: map(select(.status == "Killed" or .status == "Timeout")) | length;
+            def valid: map(select(.status | IN("CompileError", "RuntimeError", "Ignored") | not)) | length;
+            def score: if valid == 0 then "n/a" else "\((detected * 10000 / valid | round) / 100)%" end;
+            def count($s): map(select(.status == $s)) | length;
+            "Mutation score for `packages/domain`: **\([.files[].mutants[]] | score)**",
+            "",
+            "| File | Score | Survived | No coverage |",
+            "| --- | ---: | ---: | ---: |",
+            (.files | to_entries | sort_by(.key)[] | .value.mutants as $m
+              | ($m | count("Survived")) as $survived
+              | ($m | count("NoCoverage")) as $uncovered
+              | select($survived + $uncovered > 0)
+              | "| `\(.key)` | \($m | score) | \($survived) | \($uncovered) |"),
+            "",
+            "<details><summary>Surviving mutants</summary>",
+            "",
+            (.files | to_entries | sort_by(.key)[] | .key as $f
+              | .value.mutants | sort_by(.location.start.line)[]
+              | select(.status == "Survived" or .status == "NoCoverage")
+              | "- `\($f):\(.location.start.line)` \(.mutatorName) (\(.status))"),
+            "",
+            "</details>",
+            "",
+            "The full report is the `mutation-report` artifact on [the run](\($run))."
+          ' "${REPORT}" > mutation-report.md
+
+      # Reuse the open report if one exists so surviving mutants update a
+      # single issue instead of filing a new one every week.
+      - name: Find existing report issue
+        if: steps.summary.outputs.survivors != '0'
+        id: report
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          number=$(gh issue list --repo "${{ github.repository }}" --state open \
+            --search 'Mutation Testing Report in:title' --json number --jq '.[0].number // empty')
+          echo "number=${number}" >> "${GITHUB_OUTPUT}"
+
+      - name: Open or update issue on surviving mutants
+        if: steps.summary.outputs.survivors != '0'
+        uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6.0.0
+        with:
+          title: Mutation Testing Report
+          content-filepath: ./mutation-report.md
+          issue-number: ${{ steps.report.outputs.number }}
+          labels: domain
