@@ -22,9 +22,13 @@ export type Element = (typeof ELEMENTS)[keyof typeof ELEMENTS];
  * `ELEMENT_REACTION_TYPES` holds the reactions themselves.
  */
 export const REACTION_TYPES = {
+  /** Multiplies the damage of the triggering hit. */
   AMPLIFYING: 'AMPLIFYING',
+  /** Deals fixed damage scaling with level and Elemental Mastery. */
   TRANSFORMATIVE: 'TRANSFORMATIVE',
+  /** Adds flat damage to the triggering hit. */
   ADDITIVE: 'ADDITIVE',
+  /** Creates Dendro Cores that burst. */
   DENDRO_CORE: 'DENDRO_CORE',
   STATUS: 'STATUS',
   LUNAR: 'LUNAR',
@@ -44,7 +48,7 @@ interface ReactionInfo {
   elements?: Element[];
   note?: string;
   requirement?: string;
-  version: string; // Release version when reaction was introduced or significantly changed
+  version: string;
 }
 
 /**
@@ -57,7 +61,6 @@ interface ReactionInfo {
  * @see https://genshin-impact.fandom.com/wiki/Elemental_Reaction
  */
 export const ELEMENT_REACTION_TYPES: Record<string, ReactionInfo> = {
-  // Amplifying Reactions (damage multipliers)
   VAPORIZE: {
     type: REACTION_TYPES.AMPLIFYING,
     elements: [ELEMENTS.PYRO, ELEMENTS.HYDRO],
@@ -69,7 +72,6 @@ export const ELEMENT_REACTION_TYPES: Record<string, ReactionInfo> = {
     version: '1.0',
   },
 
-  // Transformative Reactions (fixed damage + EM scaling)
   OVERLOADED: {
     type: REACTION_TYPES.TRANSFORMATIVE,
     elements: [ELEMENTS.PYRO, ELEMENTS.ELECTRO],
@@ -97,7 +99,6 @@ export const ELEMENT_REACTION_TYPES: Record<string, ReactionInfo> = {
     version: '3.0',
   },
 
-  // Additive Reactions (flat damage bonus to triggering attack)
   AGGRAVATE: {
     type: REACTION_TYPES.ADDITIVE,
     elements: [ELEMENTS.ELECTRO, ELEMENTS.DENDRO],
@@ -109,7 +110,6 @@ export const ELEMENT_REACTION_TYPES: Record<string, ReactionInfo> = {
     version: '3.0',
   },
 
-  // Dendro Core Reactions (create Dendro Cores that burst)
   BLOOM: {
     type: REACTION_TYPES.DENDRO_CORE,
     elements: [ELEMENTS.HYDRO, ELEMENTS.DENDRO],
@@ -128,7 +128,6 @@ export const ELEMENT_REACTION_TYPES: Record<string, ReactionInfo> = {
     version: '3.0',
   },
 
-  // Special/Status Reactions
   FROZEN: {
     type: REACTION_TYPES.STATUS,
     elements: [ELEMENTS.HYDRO, ELEMENTS.CRYO],
@@ -136,7 +135,6 @@ export const ELEMENT_REACTION_TYPES: Record<string, ReactionInfo> = {
   },
   CRYSTALLIZE: { type: REACTION_TYPES.STATUS, elements: [ELEMENTS.GEO], version: '1.0' },
 
-  // Lunar Reactions
   LUNAR_CHARGED: {
     type: REACTION_TYPES.LUNAR,
     elements: [ELEMENTS.HYDRO, ELEMENTS.ELECTRO],
