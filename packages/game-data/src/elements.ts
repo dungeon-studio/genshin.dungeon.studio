@@ -24,11 +24,11 @@ export type Element = (typeof ELEMENTS)[keyof typeof ELEMENTS];
 export const REACTION_TYPES = {
   /** Multiplies the damage of the triggering hit. */
   AMPLIFYING: 'AMPLIFYING',
-  /** Deals fixed damage scaling with level and Elemental Mastery. */
+  /** Deals its own damage, scaling with level and Elemental Mastery. */
   TRANSFORMATIVE: 'TRANSFORMATIVE',
   /** Adds flat damage to the triggering hit. */
   ADDITIVE: 'ADDITIVE',
-  /** Creates Dendro Cores that burst. */
+  /** Deals damage through Dendro Cores. */
   DENDRO_CORE: 'DENDRO_CORE',
   STATUS: 'STATUS',
   LUNAR: 'LUNAR',

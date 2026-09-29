@@ -5,78 +5,31 @@ SPDX-License-Identifier: MIT
 
 # How to update elemental reactions
 
-Add or update elemental reaction data when Genshin Impact introduces new reactions or changes reaction mechanics.
+`@genshin/game-data-codegen` doesn't generate reactions, so
+`ELEMENT_REACTION_TYPES` in `packages/game-data/src/elements.ts` changes only by
+hand. Update it when the game adds a reaction or changes what triggers one.
 
-## When to update
+## Add or change a reaction
 
-- Genshin Impact introduces new reactions, for example, Lunar reactions in v5.1.
-- Reaction mechanics change significantly.
-- The game adjusts reaction damage multipliers.
+1. Look up the reaction on the
+   [Elemental Reactions wiki page](https://genshin-impact.fandom.com/wiki/Elemental_Reaction).
+2. Add or edit its entry in `ELEMENT_REACTION_TYPES`. `version` is the release
+   that introduced the reaction, so an edit leaves it unchanged.
 
-## Prerequisites
+   ```typescript
+   HYPERBLOOM: {
+     type: REACTION_TYPES.DENDRO_CORE,
+     elements: [ELEMENTS.ELECTRO],
+     requirement: 'Bloom active',
+     version: '3.0',
+   },
+   ```
 
-- Access to [Genshin Impact Wiki - Elemental Reactions](https://genshin-impact.fandom.com/wiki/Elemental_Reaction)
-- Familiarity with the game-data package structure
+3. Confirm the gates pass:
 
-## Steps
-
-### 1. Review the official source
-
-Visit the [Elemental Reactions wiki page](https://genshin-impact.fandom.com/wiki/Elemental_Reaction) to gather reaction details and change history for the version you're updating.
-
-### 2. Update `packages/game-data/src/elements.ts`
-
-Add the new reaction to `ELEMENT_REACTION_TYPES`:
-
-**In `ELEMENT_REACTION_TYPES`:**
-
-```typescript
-REACTION_NAME: {
-  type: 'REACTION_TYPE', // AMPLIFYING, TRANSFORMATIVE, ADDITIVE, DENDRO_CORE, STATUS, LUNAR
-  elements: [ELEMENTS.ELEMENT1, ELEMENTS.ELEMENT2], // if applicable
-  note?: 'Additional context',
-  requirement?: 'Prerequisites like "Bloom active"',
-  version: '1.0', // Release version (for example, "1.0", "3.0", "5.1")
-}
-```
-
-### 3. Verify and test
-
-```bash
-# Type check
-pnpm --filter @genshin/game-data typecheck
-
-# Build
-pnpm --filter @genshin/game-data build
-
-# Lint
-pnpm --filter @genshin/game-data lint
-```
-
-## Example: Genshin Impact added Lunar reactions in v5.1
-
-The game added Lunar reactions—Lunar-Charged, Lunar-Bloom, Lunar-Crystallize—in v5.1. Here's how you add them:
-
-```typescript
-// In ELEMENT_REACTION_TYPES
-LUNAR_CHARGED: {
-  type: 'LUNAR',
-  elements: [ELEMENTS.HYDRO, ELEMENTS.ELECTRO],
-  note: 'Enhanced Electro-Charged with bonus scaling',
-},
-LUNAR_BLOOM: {
-  type: 'LUNAR',
-  elements: [ELEMENTS.HYDRO, ELEMENTS.DENDRO],
-  note: 'Enhanced Bloom variant',
-},
-LUNAR_CRYSTALLIZE: {
-  type: 'LUNAR',
-  elements: [ELEMENTS.GEO, ELEMENTS.HYDRO],
-  note: 'Enhanced Crystallize with Moondrifts',
-},
-
-
-```
+   ```bash
+   pnpm turbo run typecheck test lint --filter @genshin/game-data
+   ```
 
 ## See also
 
