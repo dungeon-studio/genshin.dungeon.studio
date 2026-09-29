@@ -101,7 +101,7 @@ jobs:
 
       - name: Upload coverage and test results to Codecov
         if: ${{ !cancelled() }}
-        uses: ./.github/actions/codecov-upload
+        uses: ./.github/actions/codecov-upload-workspace
         with:
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -204,7 +204,7 @@ jobs:
       # apps/api/src/**; Codecov merges the two reports.
       - name: Upload integration coverage to Codecov
         if: ${{ !cancelled() }}
-        uses: ./.github/actions/codecov-report
+        uses: ./.github/actions/codecov-upload
         with:
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
           files: apps/api/coverage-integration/lcov.info
@@ -212,7 +212,7 @@ jobs:
 
       - name: Upload integration test results to Codecov
         if: ${{ !cancelled() }}
-        uses: ./.github/actions/codecov-report
+        uses: ./.github/actions/codecov-upload
         with:
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
           files: apps/api/test-results/integration-junit.xml
@@ -253,7 +253,7 @@ jobs:
       # the condition.
       - name: Upload end-to-end test results to Codecov
         if: ${{ !cancelled() }}
-        uses: ./.github/actions/codecov-report
+        uses: ./.github/actions/codecov-upload
         with:
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
           files: tools/e2e/test-results/e2e-junit.xml

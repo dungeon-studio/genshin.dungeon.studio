@@ -15,7 +15,12 @@ const REFERENCE_PACKAGE = 'validation';
 
 const TEST_ONLY_DEV_DEPENDENCIES = ['vitest', '@vitest/coverage-v8'];
 
-const CODECOV_UPLOAD_ACTION = join('.github', 'actions', 'codecov-upload', 'action.yml');
+const CODECOV_UPLOAD_WORKSPACE_ACTION = join(
+  '.github',
+  'actions',
+  'codecov-upload-workspace',
+  'action.yml',
+);
 const API_DOCKERFILE = join('apps', 'api', 'Dockerfile');
 const CODECOV_CONFIG = 'codecov.yml';
 
@@ -134,14 +139,14 @@ function writeManifest(root: string, answers: Answers): string {
 
 // Codecov needs one upload per flag; the action's own comment explains why.
 function addCodecovUploads(root: string, { name }: Answers): string {
-  return rewriteFile(root, CODECOV_UPLOAD_ACTION, (source) =>
+  return rewriteFile(root, CODECOV_UPLOAD_WORKSPACE_ACTION, (source) =>
     insertAfterLast(
       source,
       /^ {4}- name: Upload .+\n(?: {6}.+\n)*/gm,
       `
     - name: Upload ${name} coverage
       if: \${{ !cancelled() }}
-      uses: ./.github/actions/codecov-report
+      uses: ./.github/actions/codecov-upload
       with:
         codecov-token: \${{ inputs.codecov-token }}
         files: packages/${name}/coverage/lcov.info
@@ -149,14 +154,14 @@ function addCodecovUploads(root: string, { name }: Answers): string {
 
     - name: Upload ${name} test results
       if: \${{ !cancelled() }}
-      uses: ./.github/actions/codecov-report
+      uses: ./.github/actions/codecov-upload
       with:
         codecov-token: \${{ inputs.codecov-token }}
         files: packages/${name}/test-results/junit.xml
         flag: ${name}
         report_type: test_results
 `,
-      CODECOV_UPLOAD_ACTION,
+      CODECOV_UPLOAD_WORKSPACE_ACTION,
     ),
   );
 }
