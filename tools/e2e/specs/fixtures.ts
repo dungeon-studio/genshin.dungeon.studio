@@ -79,8 +79,8 @@ export async function withApiWrite(
  * Answer every matching API write from here on with a 503, as the API would
  * while down.
  *
- * Only the write itself is answered; the CORS preflight ahead of it still
- * reaches the real API, so the browser treats the 503 as the API's own.
+ * The API is cross-origin, so the 503 needs its own CORS header; without it
+ * the app sees a network error instead of the API's response.
  */
 export async function rejectApiWrite(
   page: Page,
@@ -112,11 +112,7 @@ function isApiWrite(request: Request, method: string, pathFragment: string): boo
   return request.method() === method && request.url().includes(pathFragment);
 }
 
-/**
- * The emulator account a persona signs in as within the running test.
- *
- * `persona` separates the accounts one test signs in as.
- */
+/** The emulator account `persona` signs in as; each persona in a test gets its own. */
 function account(persona: string): { email: string; displayName: string } {
   // Identifies the attempt, not the test: retrying against the same account
   // would inherit the Firestore documents the failed attempt left behind.
@@ -129,7 +125,7 @@ function account(persona: string): { email: string; displayName: string } {
 /**
  * Sign in through the Firebase Auth emulator's Google provider screen.
  *
- * Each call registers a new emulator account, so signed-in specs never share
+ * Every test gets its own emulator accounts, so signed-in specs never share
  * Firestore documents. The screen is the one the Firebase CLI serves at
  * /emulator/auth/handler; its controls carry no accessible names, hence the ids.
  */

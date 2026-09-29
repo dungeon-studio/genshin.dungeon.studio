@@ -98,9 +98,9 @@ test('signing out keeps the collection from reaching the next account', async ({
 
   await signIn(page, 'second');
 
-  // The second account's own write, surviving the reload below, is what shows
-  // its server collection has loaded by the time the first character's absence
-  // is asserted.
+  // Asserting an absence passes even before the collection loads. This
+  // account's own character coming back after the reload shows the load
+  // finished.
   await withApiWrite(page, 'PUT', apiPath.character(otherCharacter), () =>
     page.getByRole('button', { name: addCharacterLabel(otherCharacter) }).click(),
   );
