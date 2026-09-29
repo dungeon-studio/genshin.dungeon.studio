@@ -42,11 +42,10 @@ function filtersFromSearchParams(searchParams: URLSearchParams): WeaponFilterSta
 }
 
 function countInstances(instances: CollectionWeapon[]): Record<string, number> {
-  const counts: Record<string, number> = {};
-  for (const instance of instances) {
-    counts[instance.weaponId] = (counts[instance.weaponId] ?? 0) + 1;
-  }
-  return counts;
+  return instances.reduce<Record<string, number>>(
+    (counts, { weaponId }) => ({ ...counts, [weaponId]: (counts[weaponId] ?? 0) + 1 }),
+    {},
+  );
 }
 
 function LoadingCollection(): JSX.Element {

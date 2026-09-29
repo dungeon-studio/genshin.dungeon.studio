@@ -8,15 +8,14 @@ import { CHARACTER_ROSTER } from '@genshin/game-data';
 import { Lock, Users } from 'lucide-react';
 import type { JSX } from 'react';
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 import { CharacterSummary } from '@/components/summaries/character-summary';
-import { Button } from '@/components/ui/button';
 import { CharacterFilters } from '@/features/collection/characters/character-filters';
 import type { CharacterFilterState } from '@/features/collection/characters/filtering';
 import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
 import type { CharacterCollection } from '@/features/collection/characters/use-character-collection-store';
 import { ownedCharacterIds } from '@/features/collection/characters/use-character-collection-store';
+import { EmptyPool } from '@/features/teams/empty-pool';
 import { useTeamStore } from '@/features/teams/use-team-store';
 import { ELEMENT_BORDER_COLORS, ELEMENT_SELECTED_RINGS } from '@/lib/element-styles';
 import { cn } from '@/lib/utils';
@@ -83,18 +82,13 @@ export function CharacterPool({
 
   if (ownedCount === 0) {
     return (
-      <div className="gap-4 py-12 flex flex-1 flex-col items-center justify-center">
-        <Users className="h-10 w-10 text-muted-foreground" aria-hidden="true" focusable={false} />
-        <div className="text-center">
-          <p className="font-medium">No characters in your collection</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Visit the characters page to add characters to your collection.
-          </p>
-        </div>
-        <Button asChild>
-          <Link to="/characters">Go to Characters</Link>
-        </Button>
-      </div>
+      <EmptyPool
+        icon={Users}
+        heading="No characters in your collection"
+        body="Visit the characters page to add characters to your collection."
+        ctaLabel="Go to Characters"
+        to="/characters"
+      />
     );
   }
 
