@@ -94,45 +94,13 @@ export function WeaponInstanceSidebar({
           {[...instances]
             .sort((a, b) => b.refinementLevel - a.refinementLevel)
             .map((instance, index) => (
-              <div
+              <InstanceRow
                 key={instance.weaponInstanceId}
-                className="gap-3 p-3 flex items-center rounded-lg border border-border bg-card"
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-card-foreground tabular-nums">
-                    R{instance.refinementLevel}
-                  </p>
-                </div>
-
-                <div className="gap-1 flex items-center">
-                  {REFINEMENT_LEVELS.map((level) => (
-                    <button
-                      key={level}
-                      type="button"
-                      onClick={() => onRefinementChange(instance.weaponInstanceId, level)}
-                      className={cn(
-                        'h-7 w-7 rounded text-xs font-bold tabular-nums transition-colors',
-                        level === instance.refinementLevel
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted text-muted-foreground hover:bg-muted/80',
-                      )}
-                      aria-label={`Set refinement level ${level}`}
-                      aria-pressed={level === instance.refinementLevel}
-                    >
-                      {level}
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => onRemove(instance.weaponInstanceId)}
-                  className="p-1 shrink-0 rounded-md text-destructive transition-opacity hover:bg-destructive hover:text-destructive-foreground focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none"
-                  aria-label={`Remove instance ${index + 1}`}
-                >
-                  <Trash2 className="h-4 w-4" aria-hidden="true" focusable={false} />
-                </button>
-              </div>
+                instance={instance}
+                position={index + 1}
+                onRemove={onRemove}
+                onRefinementChange={onRefinementChange}
+              />
             ))}
         </div>
 
@@ -146,5 +114,59 @@ export function WeaponInstanceSidebar({
         )}
       </SheetContent>
     </Sheet>
+  );
+}
+
+interface InstanceRowProps {
+  instance: CollectionWeapon;
+  /** One-based position in the sorted list, which names the row to assistive technology. */
+  position: number;
+  onRemove: (collectionWeaponId: CollectionWeaponId) => void;
+  onRefinementChange: (collectionWeaponId: CollectionWeaponId, level: RefinementLevel) => void;
+}
+
+function InstanceRow({
+  instance,
+  position,
+  onRemove,
+  onRefinementChange,
+}: InstanceRowProps): JSX.Element {
+  return (
+    <div className="gap-3 p-3 flex items-center rounded-lg border border-border bg-card">
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-bold text-card-foreground tabular-nums">
+          R{instance.refinementLevel}
+        </p>
+      </div>
+
+      <div className="gap-1 flex items-center">
+        {REFINEMENT_LEVELS.map((level) => (
+          <button
+            key={level}
+            type="button"
+            onClick={() => onRefinementChange(instance.weaponInstanceId, level)}
+            className={cn(
+              'h-7 w-7 rounded text-xs font-bold tabular-nums transition-colors',
+              level === instance.refinementLevel
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80',
+            )}
+            aria-label={`Set refinement level ${level}`}
+            aria-pressed={level === instance.refinementLevel}
+          >
+            {level}
+          </button>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => onRemove(instance.weaponInstanceId)}
+        className="p-1 shrink-0 rounded-md text-destructive transition-opacity hover:bg-destructive hover:text-destructive-foreground focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none"
+        aria-label={`Remove instance ${position}`}
+      >
+        <Trash2 className="h-4 w-4" aria-hidden="true" focusable={false} />
+      </button>
+    </div>
   );
 }

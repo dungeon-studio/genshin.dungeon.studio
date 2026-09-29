@@ -3,7 +3,7 @@
 
 import type { ArtifactPlan, CollectionTeam, CollectionWeaponId, TeamSlot } from '@genshin/domain';
 import { initialTeams } from '@genshin/domain';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { toast } from 'sonner';
 
 import { useAuth } from '@/features/auth/use-auth';
@@ -56,6 +56,122 @@ function teamToSavePayload(team: CollectionTeam): SaveTeamPayload {
   };
 }
 
+function useWarnOnUnloadWhileSaving(isSaving: boolean): void {
+  // A ref, so the handler registered once always sees the latest value.
+  const isSavingRef = useRef(isSaving);
+  useEffect(() => {
+    isSavingRef.current = isSaving;
+  }, [isSaving]);
+
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (isSavingRef.current) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, []);
+}
+
+type TeamActions = Pick<
+  UseTeamsResult,
+  | 'assignCharacter'
+  | 'removeCharacter'
+  | 'assignWeapon'
+  | 'removeWeapon'
+  | 'setArtifactPlan'
+  | 'clearTeam'
+  | 'setTeamName'
+>;
+
+function useTeamActions(
+  isAuthenticated: boolean,
+  saveTeamApi: ReturnType<typeof useSaveTeamMutation>['mutate'],
+  deleteTeamApi: ReturnType<typeof useDeleteTeamMutation>['mutate'],
+): TeamActions {
+  return useMemo(() => {
+    const store = () => useTeamStore.getState();
+
+    const editThenPersist = (
+      slot: TeamSlot,
+      edit: () => void,
+      request: (onError: () => void) => void,
+      failure: string,
+    ) => {
+      const previousTeam = { ...store().teams[slot] };
+      edit();
+      if (!isAuthenticated) return;
+      const optimisticTeam = store().teams[slot];
+      request(() => {
+        if (store().teams[slot] !== optimisticTeam) {
+          toast.error(`${failure}.`);
+          return;
+        }
+        store().setTeam(slot, previousTeam);
+        toast.error(`${failure}. Change has been reverted.`);
+      });
+    };
+
+    const editThenSave = (slot: TeamSlot, edit: () => void) => {
+      editThenPersist(
+        slot,
+        edit,
+        (onError) => {
+          saveTeamApi(teamToSavePayload(store().teams[slot]), { onError });
+        },
+        'Failed to save team',
+      );
+    };
+
+    return {
+      assignCharacter: (slot, memberIndex, characterId, collectionWeaponId) => {
+        editThenSave(slot, () => {
+          store().assignCharacter(slot, memberIndex, characterId, collectionWeaponId);
+        });
+      },
+      removeCharacter: (slot, memberIndex) => {
+        editThenSave(slot, () => {
+          store().removeCharacter(slot, memberIndex);
+        });
+      },
+      assignWeapon: (slot, memberIndex, collectionWeaponId) => {
+        editThenSave(slot, () => {
+          store().assignWeapon(slot, memberIndex, collectionWeaponId);
+        });
+      },
+      removeWeapon: (slot, memberIndex) => {
+        editThenSave(slot, () => {
+          store().removeWeapon(slot, memberIndex);
+        });
+      },
+      setArtifactPlan: (slot, memberIndex, plan) => {
+        editThenSave(slot, () => {
+          store().setArtifactPlan(slot, memberIndex, plan);
+        });
+      },
+      setTeamName: (slot, name) => {
+        editThenSave(slot, () => {
+          store().setTeamName(slot, name);
+        });
+      },
+      clearTeam: (slot) => {
+        editThenPersist(
+          slot,
+          () => {
+            store().clearTeam(slot);
+          },
+          (onError) => {
+            deleteTeamApi(slot, { onError });
+          },
+          'Failed to clear team',
+        );
+      },
+    };
+  }, [isAuthenticated, saveTeamApi, deleteTeamApi]);
+}
+
 /**
  * The team planner's whole interface: the four teams, the actions that change
  * them, and the state of the save behind them.
@@ -73,14 +189,6 @@ export function useTeams(): UseTeamsResult {
   const isAuthenticated = user !== null;
 
   const teams = useTeamStore((s) => s.teams);
-  const storeAssignCharacter = useTeamStore((s) => s.assignCharacter);
-  const storeRemoveCharacter = useTeamStore((s) => s.removeCharacter);
-  const storeAssignWeapon = useTeamStore((s) => s.assignWeapon);
-  const storeRemoveWeapon = useTeamStore((s) => s.removeWeapon);
-  const storeSetArtifactPlan = useTeamStore((s) => s.setArtifactPlan);
-  const storeClearTeam = useTeamStore((s) => s.clearTeam);
-  const storeSetTeamName = useTeamStore((s) => s.setTeamName);
-  const storeSetTeam = useTeamStore((s) => s.setTeam);
   const storeSetTeams = useTeamStore((s) => s.setTeams);
   const storeResetTeams = useTeamStore((s) => s.resetTeams);
 
@@ -91,23 +199,7 @@ export function useTeams(): UseTeamsResult {
 
   const isSaving = isSavePending || isDeletePending;
 
-  // Track isSaving in a ref so the beforeunload handler always sees the latest value.
-  const isSavingRef = useRef(isSaving);
-  useEffect(() => {
-    isSavingRef.current = isSaving;
-  }, [isSaving]);
-
-  // Warn the user if they try to leave with unsaved changes in flight.
-  useEffect(() => {
-    const handler = (e: BeforeUnloadEvent) => {
-      if (isSavingRef.current) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
-    window.addEventListener('beforeunload', handler);
-    return () => window.removeEventListener('beforeunload', handler);
-  }, []);
+  useWarnOnUnloadWhileSaving(isSaving);
 
   // Reset store on logout
   useEffect(() => {
@@ -122,116 +214,7 @@ export function useTeams(): UseTeamsResult {
     storeSetTeams(collectionTeamsToStore(apiTeams));
   }, [apiTeams, storeSetTeams]);
 
-  // Helper: save a team slot after an optimistic store update, rolling back on failure
-  // only if the store still reflects this request's optimistic value.
-  const saveAfterMutation = useCallback(
-    (slot: TeamSlot, previousTeam: CollectionTeam) => {
-      const optimisticTeam = useTeamStore.getState().teams[slot];
-      saveTeamApi(teamToSavePayload(optimisticTeam), {
-        onError: () => {
-          if (useTeamStore.getState().teams[slot] !== optimisticTeam) {
-            toast.error('Failed to save team.');
-            return;
-          }
-          storeSetTeam(slot, previousTeam);
-          toast.error('Failed to save team. Change has been reverted.');
-        },
-      });
-    },
-    [saveTeamApi, storeSetTeam],
-  );
-
-  const assignCharacter = useCallback(
-    (
-      slot: TeamSlot,
-      memberIndex: number,
-      characterId: string,
-      collectionWeaponId?: CollectionWeaponId,
-    ) => {
-      const previousTeam = { ...useTeamStore.getState().teams[slot] };
-      storeAssignCharacter(slot, memberIndex, characterId, collectionWeaponId);
-      if (isAuthenticated) {
-        saveAfterMutation(slot, previousTeam);
-      }
-    },
-    [isAuthenticated, storeAssignCharacter, saveAfterMutation],
-  );
-
-  const removeCharacter = useCallback(
-    (slot: TeamSlot, memberIndex: number) => {
-      const previousTeam = { ...useTeamStore.getState().teams[slot] };
-      storeRemoveCharacter(slot, memberIndex);
-      if (isAuthenticated) {
-        saveAfterMutation(slot, previousTeam);
-      }
-    },
-    [isAuthenticated, storeRemoveCharacter, saveAfterMutation],
-  );
-
-  const assignWeapon = useCallback(
-    (slot: TeamSlot, memberIndex: number, collectionWeaponId: CollectionWeaponId) => {
-      const previousTeam = { ...useTeamStore.getState().teams[slot] };
-      storeAssignWeapon(slot, memberIndex, collectionWeaponId);
-      if (isAuthenticated) {
-        saveAfterMutation(slot, previousTeam);
-      }
-    },
-    [isAuthenticated, storeAssignWeapon, saveAfterMutation],
-  );
-
-  const removeWeapon = useCallback(
-    (slot: TeamSlot, memberIndex: number) => {
-      const previousTeam = { ...useTeamStore.getState().teams[slot] };
-      storeRemoveWeapon(slot, memberIndex);
-      if (isAuthenticated) {
-        saveAfterMutation(slot, previousTeam);
-      }
-    },
-    [isAuthenticated, storeRemoveWeapon, saveAfterMutation],
-  );
-
-  const setArtifactPlan = useCallback(
-    (slot: TeamSlot, memberIndex: number, plan: ArtifactPlan | undefined) => {
-      const previousTeam = { ...useTeamStore.getState().teams[slot] };
-      storeSetArtifactPlan(slot, memberIndex, plan);
-      if (isAuthenticated) {
-        saveAfterMutation(slot, previousTeam);
-      }
-    },
-    [isAuthenticated, storeSetArtifactPlan, saveAfterMutation],
-  );
-
-  const clearTeam = useCallback(
-    (slot: TeamSlot) => {
-      const previousTeam = { ...useTeamStore.getState().teams[slot] };
-      storeClearTeam(slot);
-      if (isAuthenticated) {
-        const optimisticClearedTeam = useTeamStore.getState().teams[slot];
-        deleteTeamApi(slot, {
-          onError: () => {
-            if (useTeamStore.getState().teams[slot] !== optimisticClearedTeam) {
-              toast.error('Failed to clear team.');
-              return;
-            }
-            storeSetTeam(slot, previousTeam);
-            toast.error('Failed to clear team. Change has been reverted.');
-          },
-        });
-      }
-    },
-    [isAuthenticated, storeClearTeam, deleteTeamApi, storeSetTeam],
-  );
-
-  const setTeamName = useCallback(
-    (slot: TeamSlot, name: string) => {
-      const previousTeam = { ...useTeamStore.getState().teams[slot] };
-      storeSetTeamName(slot, name);
-      if (isAuthenticated) {
-        saveAfterMutation(slot, previousTeam);
-      }
-    },
-    [isAuthenticated, storeSetTeamName, saveAfterMutation],
-  );
+  const actions = useTeamActions(isAuthenticated, saveTeamApi, deleteTeamApi);
 
   const getTeam = useCallback((slot: TeamSlot) => teams[slot], [teams]);
 
@@ -245,13 +228,7 @@ export function useTeams(): UseTeamsResult {
 
   return {
     teams,
-    assignCharacter,
-    removeCharacter,
-    assignWeapon,
-    removeWeapon,
-    setArtifactPlan,
-    clearTeam,
-    setTeamName,
+    ...actions,
     getTeam,
     isCharacterInTeam,
     isSaving,

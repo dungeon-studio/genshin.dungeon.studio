@@ -43,68 +43,63 @@ export function validateTeam(
   team: { name: string; members: CollectionTeamMembers; description?: string },
   context?: TeamValidationContext,
 ): ValidationIssue[] {
+  return [
+    ...validateUnique(team.members, 'characterId', 'character ID'),
+    ...(context ? validateOwnership(team.members, context) : []),
+    ...validateUnique(team.members, 'weaponInstanceId', 'weapon instance ID'),
+    ...validateArtifactPlans(team.members),
+  ];
+}
+
+/** Flags each member whose `key` repeats an earlier member's. */
+function validateUnique(
+  members: CollectionTeamMembers,
+  key: 'characterId' | 'weaponInstanceId',
+  label: string,
+): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
-
-  // Per-team uniqueness: no duplicate character IDs --------------------
   const seen = new Set<string>();
-  for (const [i, member] of team.members.entries()) {
-    if (member === null) continue;
-    if (seen.has(member.characterId)) {
-      issues.push(
-        issue(`Duplicate character ID: ${member.characterId}`, `members[${i}].characterId`),
-      );
+  for (const [i, member] of members.entries()) {
+    const value = member?.[key];
+    if (!value) continue;
+    if (seen.has(value)) {
+      issues.push(issue(`Duplicate ${label}: ${value}`, `members[${i}].${key}`));
     }
-    seen.add(member.characterId);
+    seen.add(value);
   }
-
-  // Ownership checks (when collection context is available) ------------
-  if (context) {
-    for (const [i, member] of team.members.entries()) {
-      if (member === null) continue;
-      if (!context.ownedCharacterIds.has(member.characterId)) {
-        issues.push(
-          issue(`Character not in collection: ${member.characterId}`, `members[${i}].characterId`),
-        );
-      }
-      if (member.weaponInstanceId && !context.ownedWeaponInstanceIds.has(member.weaponInstanceId)) {
-        issues.push(
-          issue(
-            `Weapon instance not in collection: ${member.weaponInstanceId}`,
-            `members[${i}].weaponInstanceId`,
-          ),
-        );
-      }
-    }
-  }
-
-  // Per-team weapon uniqueness: no duplicate weapon instance IDs ------
-  const seenWeapons = new Set<string>();
-  for (const [i, member] of team.members.entries()) {
-    if (member === null) continue;
-    if (member.weaponInstanceId) {
-      if (seenWeapons.has(member.weaponInstanceId)) {
-        issues.push(
-          issue(
-            `Duplicate weapon instance ID: ${member.weaponInstanceId}`,
-            `members[${i}].weaponInstanceId`,
-          ),
-        );
-      }
-      seenWeapons.add(member.weaponInstanceId);
-    }
-  }
-
-  // Per-member artifact plan validation --------------------------------
-  for (const [i, member] of team.members.entries()) {
-    if (member === null) continue;
-    if (member.artifactPlan) {
-      issues.push(
-        ...prefixPaths(validateArtifactPlan(member.artifactPlan), `members[${i}].artifactPlan`),
-      );
-    }
-  }
-
   return issues;
+}
+
+function validateOwnership(
+  members: CollectionTeamMembers,
+  context: TeamValidationContext,
+): ValidationIssue[] {
+  const issues: ValidationIssue[] = [];
+  for (const [i, member] of members.entries()) {
+    if (member === null) continue;
+    if (!context.ownedCharacterIds.has(member.characterId)) {
+      issues.push(
+        issue(`Character not in collection: ${member.characterId}`, `members[${i}].characterId`),
+      );
+    }
+    if (member.weaponInstanceId && !context.ownedWeaponInstanceIds.has(member.weaponInstanceId)) {
+      issues.push(
+        issue(
+          `Weapon instance not in collection: ${member.weaponInstanceId}`,
+          `members[${i}].weaponInstanceId`,
+        ),
+      );
+    }
+  }
+  return issues;
+}
+
+function validateArtifactPlans(members: CollectionTeamMembers): ValidationIssue[] {
+  return [...members.entries()].flatMap(([i, member]) =>
+    member?.artifactPlan
+      ? prefixPaths(validateArtifactPlan(member.artifactPlan), `members[${i}].artifactPlan`)
+      : [],
+  );
 }
 
 /**

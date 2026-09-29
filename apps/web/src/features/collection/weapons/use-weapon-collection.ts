@@ -36,6 +36,81 @@ export interface UseWeaponCollectionResult {
 }
 
 /**
+ * Edits to an owned instance, each applied to the store before the server
+ * confirms it.
+ *
+ * A rejected edit rolls back only if the store still holds its value, and
+ * every failure toasts. Adds can't be optimistic, because the server assigns
+ * the instance ID.
+ */
+function useOptimisticEdits(
+  isAuthenticated: boolean,
+  api: {
+    removeWeaponApi: ReturnType<typeof useRemoveWeaponMutation>['mutate'];
+    setRefinementLevelApi: ReturnType<typeof useSetRefinementLevelMutation>['mutate'];
+  },
+  applyMutationResult: (result: WeaponMutationResult) => void,
+): Pick<UseWeaponCollectionResult, 'removeWeapon' | 'setRefinementLevel'> {
+  const { removeWeaponApi, setRefinementLevelApi } = api;
+  const storeAddWeapon = useWeaponCollectionStore((s) => s.addWeapon);
+  const storeRemoveWeapon = useWeaponCollectionStore((s) => s.removeWeapon);
+  const storeSetRefinementLevel = useWeaponCollectionStore((s) => s.setRefinementLevel);
+
+  const removeWeapon = useCallback(
+    (collectionWeaponId: CollectionWeaponId) => {
+      if (!isAuthenticated) return;
+
+      const current = useWeaponCollectionStore.getState().weapons[collectionWeaponId];
+      if (!current) return;
+
+      storeRemoveWeapon(collectionWeaponId);
+      removeWeaponApi(collectionWeaponId, {
+        onError: () => {
+          const stillAbsent = !(collectionWeaponId in useWeaponCollectionStore.getState().weapons);
+          if (stillAbsent) {
+            storeAddWeapon(current);
+            toast.error('Failed to remove weapon. Change has been reverted.');
+          } else {
+            toast.error('Failed to remove weapon.');
+          }
+        },
+      });
+    },
+    [isAuthenticated, removeWeaponApi, storeRemoveWeapon, storeAddWeapon],
+  );
+
+  const setRefinementLevel = useCallback(
+    (collectionWeaponId: CollectionWeaponId, level: RefinementLevel) => {
+      if (!isAuthenticated) return;
+
+      const previous = useWeaponCollectionStore.getState().weapons[collectionWeaponId];
+      if (!previous || previous.refinementLevel === level) return;
+
+      storeSetRefinementLevel(collectionWeaponId, level);
+      setRefinementLevelApi(
+        { collectionWeaponId, level },
+        {
+          onSuccess: applyMutationResult,
+          onError: () => {
+            const currentLevel =
+              useWeaponCollectionStore.getState().weapons[collectionWeaponId]?.refinementLevel;
+            if (currentLevel === level) {
+              storeSetRefinementLevel(collectionWeaponId, previous.refinementLevel);
+              toast.error('Failed to update refinement level. Change has been reverted.');
+            } else {
+              toast.error('Failed to update refinement level.');
+            }
+          },
+        },
+      );
+    },
+    [isAuthenticated, setRefinementLevelApi, storeSetRefinementLevel, applyMutationResult],
+  );
+
+  return { removeWeapon, setRefinementLevel };
+}
+
+/**
  * The weapon collection's whole interface: the instances the user owns, the
  * actions that change them, and the state of the sync behind them.
  *
@@ -51,8 +126,6 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   const weapons = useWeaponCollectionStore((s) => s.weapons);
   const storeSetWeapons = useWeaponCollectionStore((s) => s.setWeapons);
   const storeAddWeapon = useWeaponCollectionStore((s) => s.addWeapon);
-  const storeRemoveWeapon = useWeaponCollectionStore((s) => s.removeWeapon);
-  const storeSetRefinementLevel = useWeaponCollectionStore((s) => s.setRefinementLevel);
   const clearWeapons = useWeaponCollectionStore((s) => s.clearWeapons);
 
   const {
@@ -127,55 +200,10 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     [isAuthenticated, runAdd],
   );
 
-  const removeWeapon = useCallback(
-    (collectionWeaponId: CollectionWeaponId) => {
-      if (!isAuthenticated) return;
-
-      const current = useWeaponCollectionStore.getState().weapons[collectionWeaponId];
-      if (!current) return;
-
-      storeRemoveWeapon(collectionWeaponId);
-      removeWeaponApi(collectionWeaponId, {
-        onError: () => {
-          const stillAbsent = !(collectionWeaponId in useWeaponCollectionStore.getState().weapons);
-          if (stillAbsent) {
-            storeAddWeapon(current);
-            toast.error('Failed to remove weapon. Change has been reverted.');
-          } else {
-            toast.error('Failed to remove weapon.');
-          }
-        },
-      });
-    },
-    [isAuthenticated, removeWeaponApi, storeRemoveWeapon, storeAddWeapon],
-  );
-
-  const setRefinementLevel = useCallback(
-    (collectionWeaponId: CollectionWeaponId, level: RefinementLevel) => {
-      if (!isAuthenticated) return;
-
-      const previous = useWeaponCollectionStore.getState().weapons[collectionWeaponId];
-      if (!previous || previous.refinementLevel === level) return;
-
-      storeSetRefinementLevel(collectionWeaponId, level);
-      setRefinementLevelApi(
-        { collectionWeaponId, level },
-        {
-          onSuccess: applyMutationResult,
-          onError: () => {
-            const currentLevel =
-              useWeaponCollectionStore.getState().weapons[collectionWeaponId]?.refinementLevel;
-            if (currentLevel === level) {
-              storeSetRefinementLevel(collectionWeaponId, previous.refinementLevel);
-              toast.error('Failed to update refinement level. Change has been reverted.');
-            } else {
-              toast.error('Failed to update refinement level.');
-            }
-          },
-        },
-      );
-    },
-    [isAuthenticated, setRefinementLevelApi, storeSetRefinementLevel, applyMutationResult],
+  const { removeWeapon, setRefinementLevel } = useOptimisticEdits(
+    isAuthenticated,
+    { removeWeaponApi, setRefinementLevelApi },
+    applyMutationResult,
   );
 
   const getWeaponsByWeaponId = useCallback(
