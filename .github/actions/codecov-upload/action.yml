@@ -5,8 +5,8 @@
 name: Codecov upload
 description: Upload one coverage or test-results report to Codecov under one flag
 
-# A broken upload must not fail the job it reports on, so nothing gates on this
-# action's exit status. Confirm uploads from the uploader's output instead.
+# A failed upload leaves the job green. Confirm an upload from the uploader's
+# output, not the check.
 
 inputs:
   codecov-token:

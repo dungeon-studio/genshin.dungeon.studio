@@ -137,7 +137,7 @@ function writeManifest(root: string, answers: Answers): string {
   return path;
 }
 
-// Codecov needs one upload per flag; the action's own comment explains why.
+// Codecov needs one upload per flag; codecov-upload-workspace explains why.
 function addCodecovUpload(root: string, { name }: Answers): string {
   return rewriteFile(root, CODECOV_UPLOAD_WORKSPACE_ACTION, (source) =>
     insertAfterLast(

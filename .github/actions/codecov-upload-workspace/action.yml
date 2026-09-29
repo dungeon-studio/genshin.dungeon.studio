@@ -6,7 +6,7 @@ name: Codecov workspace upload
 description: Upload every package's coverage and test results under its own flag
 
 # One upload per flag. Codecov applies a report's entire coverage to every flag
-# it is tagged with, so a single upload carrying all seven would report each
+# it is tagged with, so a single upload carrying every package would report each
 # package's coverage as the whole workspace's. The `paths` under
 # flag_management in codecov.yml filter what the UI displays; they do not
 # segment an upload.
