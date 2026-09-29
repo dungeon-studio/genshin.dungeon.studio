@@ -41,9 +41,6 @@ interface TeamStoreState {
   setTeam: (slot: TeamSlot, team: CollectionTeam) => void;
   setTeams: (teams: Record<TeamSlot, CollectionTeam>) => void;
   resetTeams: () => void;
-
-  getTeam: (slot: TeamSlot) => CollectionTeam;
-  isCharacterInTeam: (slot: TeamSlot, characterId: string) => boolean;
 }
 
 /**
@@ -168,12 +165,6 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => {
 
     resetTeams: () => {
       set({ teams: initialTeams() });
-    },
-
-    getTeam: (slot) => get().teams[slot],
-
-    isCharacterInTeam: (slot, characterId) => {
-      return get().teams[slot].members.some((m) => m?.characterId === characterId);
     },
   };
 });

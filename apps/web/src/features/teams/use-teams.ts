@@ -31,7 +31,6 @@ export interface UseTeamsResult {
   clearTeam: (slot: TeamSlot) => void;
   setTeamName: (slot: TeamSlot, name: string) => void;
   getTeam: (slot: TeamSlot) => CollectionTeam;
-  isCharacterInTeam: (slot: TeamSlot, characterId: string) => boolean;
   isSaving: boolean;
   isLoading: boolean;
   error: Error | null;
@@ -201,14 +200,12 @@ export function useTeams(): UseTeamsResult {
 
   useWarnOnUnloadWhileSaving(isSaving);
 
-  // Reset store on logout
   useEffect(() => {
     if (!user) {
       storeResetTeams();
     }
   }, [user, storeResetTeams]);
 
-  // Populate store from API data
   useEffect(() => {
     if (!apiTeams) return;
     storeSetTeams(collectionTeamsToStore(apiTeams));
@@ -218,19 +215,12 @@ export function useTeams(): UseTeamsResult {
 
   const getTeam = useCallback((slot: TeamSlot) => teams[slot], [teams]);
 
-  const isCharacterInTeam = useCallback(
-    (slot: TeamSlot, characterId: string) =>
-      teams[slot].members.some((m) => m?.characterId === characterId),
-    [teams],
-  );
-
   const error = isAuthenticated ? (queryError ?? null) : null;
 
   return {
     teams,
     ...actions,
     getTeam,
-    isCharacterInTeam,
     isSaving,
     isLoading: authLoading || (isAuthenticated && queryLoading),
     error,
