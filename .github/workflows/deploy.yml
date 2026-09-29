@@ -35,9 +35,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Holds a pushed commit until its own CI run passes. A `workflow_run` trigger
-  # would drop the `paths:` filter above and rebind `github.sha` to the branch
-  # head, which the image tag and APP_GIT_SHA both read.
+  # Polls because a `workflow_run` trigger ignores `paths:` and sets
+  # `github.sha` to the branch head instead of the commit CI tested.
   wait-for-ci:
     name: Wait for the commit's CI run
     runs-on: ubuntu-latest
@@ -49,9 +48,10 @@ jobs:
       GH_TOKEN: ${{ github.token }}
 
     steps:
-      # Skipped rather than the whole job, so a manual dispatch still passes
-      # this job and a broken CI cannot block a recovery deploy. CI starts
-      # from the same push, so its run may not be listed yet.
+      # A manual dispatch skips the wait, so a broken CI can't block a recovery
+      # deploy. The condition sits on this step because a skipped job would
+      # skip every job that needs it. CI starts from the same push, so its run
+      # may not exist yet.
       - name: Wait for CI
         if: github.event_name == 'push'
         run: |
