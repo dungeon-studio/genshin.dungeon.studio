@@ -4,8 +4,15 @@
 import type { Rarity } from '@genshin/game-data';
 
 type OwnershipFilter = 'all' | 'owned' | 'unowned';
-type SortField = 'release' | 'name';
 type SortDirection = 'asc' | 'desc';
+
+/** The sort fields every collection offers, with their display labels. */
+export const SORT_FIELDS = [
+  { value: 'release', label: 'Release' },
+  { value: 'name', label: 'Name' },
+] as const;
+
+type SortField = (typeof SORT_FIELDS)[number]['value'];
 
 /** Fields shared by every collection filter; each concrete state adds its own category set. */
 export interface BaseFilterState {
@@ -32,11 +39,13 @@ interface CollectionItem {
   rarity: Rarity;
 }
 
+type Comparator<I> = (a: I, b: I) => number;
+
 /** The two ways collections differ when filtered: which category they group by, and how they order by release. */
 export interface CollectionFilterConfig<I extends CollectionItem, F extends BaseFilterState, C> {
   category: (item: I) => C;
   selectedCategories: (filters: F) => ReadonlySet<C>;
-  compareRelease: (a: I, b: I) => number;
+  compareRelease: Comparator<I>;
 }
 
 /**
@@ -44,8 +53,6 @@ export interface CollectionFilterConfig<I extends CollectionItem, F extends Base
  *
  * An empty category or rarity set means no constraint rather than no matches, so
  * the default state shows everything.
- *
- * Name and then ID break a release tie, so the order is stable.
  */
 export function filterCollection<I extends CollectionItem, F extends BaseFilterState, C>(
   items: readonly I[],
@@ -53,33 +60,47 @@ export function filterCollection<I extends CollectionItem, F extends BaseFilterS
   ownedIds: ReadonlySet<string>,
   config: CollectionFilterConfig<I, F, C>,
 ): I[] {
+  return items.filter(matcher(filters, ownedIds, config)).sort(comparator(filters, config));
+}
+
+const OWNERSHIP_MATCHES: Record<OwnershipFilter, (owned: boolean) => boolean> = {
+  all: () => true,
+  owned: (owned) => owned,
+  unowned: (owned) => !owned,
+};
+
+function allows<T>(selected: ReadonlySet<T>, value: T): boolean {
+  return selected.size === 0 || selected.has(value);
+}
+
+function matcher<I extends CollectionItem, F extends BaseFilterState, C>(
+  filters: F,
+  ownedIds: ReadonlySet<string>,
+  config: CollectionFilterConfig<I, F, C>,
+): (item: I) => boolean {
   const searchLower = filters.search.toLowerCase();
   const categories = config.selectedCategories(filters);
+  const ownershipMatches = OWNERSHIP_MATCHES[filters.ownership];
 
-  const result = items.filter((item) => {
-    if (searchLower && !item.name.toLowerCase().includes(searchLower)) return false;
-    if (categories.size > 0 && !categories.has(config.category(item))) return false;
-    if (filters.rarities.size > 0 && !filters.rarities.has(item.rarity)) return false;
-    if (filters.ownership === 'owned' && !ownedIds.has(item.id)) return false;
-    if (filters.ownership === 'unowned' && ownedIds.has(item.id)) return false;
-    return true;
-  });
+  return (item) =>
+    item.name.toLowerCase().includes(searchLower) &&
+    allows(categories, config.category(item)) &&
+    allows(filters.rarities, item.rarity) &&
+    ownershipMatches(ownedIds.has(item.id));
+}
 
-  result.sort((a, b) => {
-    let cmp = 0;
-    switch (filters.sortField) {
-      case 'release':
-        cmp = config.compareRelease(a, b);
-        if (cmp === 0) {
-          cmp = a.name.localeCompare(b.name) || a.id.localeCompare(b.id);
-        }
-        break;
-      case 'name':
-        cmp = a.name.localeCompare(b.name);
-        break;
-    }
-    return filters.sortDirection === 'desc' ? -cmp : cmp;
-  });
+const byName: Comparator<CollectionItem> = (a, b) => a.name.localeCompare(b.name);
+const byId: Comparator<CollectionItem> = (a, b) => a.id.localeCompare(b.id);
 
-  return result;
+/** Name and then ID break a release tie, so the order is stable. */
+function byRelease<I extends CollectionItem>(compareRelease: Comparator<I>): Comparator<I> {
+  return (a, b) => compareRelease(a, b) || byName(a, b) || byId(a, b);
+}
+
+function comparator<I extends CollectionItem, F extends BaseFilterState, C>(
+  filters: F,
+  config: CollectionFilterConfig<I, F, C>,
+): Comparator<I> {
+  const compare = filters.sortField === 'release' ? byRelease(config.compareRelease) : byName;
+  return filters.sortDirection === 'desc' ? (a, b) => -compare(a, b) : compare;
 }
