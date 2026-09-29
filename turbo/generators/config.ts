@@ -138,28 +138,19 @@ function writeManifest(root: string, answers: Answers): string {
 }
 
 // Codecov needs one upload per flag; the action's own comment explains why.
-function addCodecovUploads(root: string, { name }: Answers): string {
+function addCodecovUpload(root: string, { name }: Answers): string {
   return rewriteFile(root, CODECOV_UPLOAD_WORKSPACE_ACTION, (source) =>
     insertAfterLast(
       source,
       /^ {4}- name: Upload .+\n(?: {6}.+\n)*/gm,
       `
-    - name: Upload ${name} coverage
+    - name: Upload ${name}
       if: \${{ !cancelled() }}
-      uses: ./.github/actions/codecov-upload
+      uses: ./.github/actions/codecov-upload-package
       with:
         codecov-token: \${{ inputs.codecov-token }}
-        files: packages/${name}/coverage/lcov.info
+        directory: packages/${name}
         flag: ${name}
-
-    - name: Upload ${name} test results
-      if: \${{ !cancelled() }}
-      uses: ./.github/actions/codecov-upload
-      with:
-        codecov-token: \${{ inputs.codecov-token }}
-        files: packages/${name}/test-results/junit.xml
-        flag: ${name}
-        report_type: test_results
 `,
       CODECOV_UPLOAD_WORKSPACE_ACTION,
     ),
@@ -295,7 +286,7 @@ function scaffoldActions(root: string, answers: Answers): PlopTypes.ActionType[]
 function wiringActions(root: string, answers: Answers): PlopTypes.ActionType[] {
   return [
     ...(answers.tests
-      ? [() => addCodecovUploads(root, answers), () => addCodecovFlagAndComponent(root, answers)]
+      ? [() => addCodecovUpload(root, answers), () => addCodecovFlagAndComponent(root, answers)]
       : []),
     ...(answers.apiRuntimeDependency ? [() => addDockerfileCopies(root, answers)] : []),
   ];

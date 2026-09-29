@@ -23,121 +23,58 @@ runs:
   using: composite
 
   steps:
-    - name: Upload web coverage
+    - name: Upload web
       if: ${{ !cancelled() }}
-      uses: ./.github/actions/codecov-upload
+      uses: ./.github/actions/codecov-upload-package
       with:
         codecov-token: ${{ inputs.codecov-token }}
-        files: apps/web/coverage/lcov.info
+        directory: apps/web
         flag: web
 
-    - name: Upload web test results
+    - name: Upload api
       if: ${{ !cancelled() }}
-      uses: ./.github/actions/codecov-upload
+      uses: ./.github/actions/codecov-upload-package
       with:
         codecov-token: ${{ inputs.codecov-token }}
-        files: apps/web/test-results/junit.xml
-        flag: web
-        report_type: test_results
-
-    - name: Upload api coverage
-      if: ${{ !cancelled() }}
-      uses: ./.github/actions/codecov-upload
-      with:
-        codecov-token: ${{ inputs.codecov-token }}
-        files: apps/api/coverage/lcov.info
+        directory: apps/api
         flag: api
 
-    - name: Upload api test results
+    - name: Upload game-data
       if: ${{ !cancelled() }}
-      uses: ./.github/actions/codecov-upload
+      uses: ./.github/actions/codecov-upload-package
       with:
         codecov-token: ${{ inputs.codecov-token }}
-        files: apps/api/test-results/junit.xml
-        flag: api
-        report_type: test_results
-
-    - name: Upload game-data coverage
-      if: ${{ !cancelled() }}
-      uses: ./.github/actions/codecov-upload
-      with:
-        codecov-token: ${{ inputs.codecov-token }}
-        files: packages/game-data/coverage/lcov.info
+        directory: packages/game-data
         flag: game-data
 
-    - name: Upload game-data test results
+    - name: Upload domain
       if: ${{ !cancelled() }}
-      uses: ./.github/actions/codecov-upload
+      uses: ./.github/actions/codecov-upload-package
       with:
         codecov-token: ${{ inputs.codecov-token }}
-        files: packages/game-data/test-results/junit.xml
-        flag: game-data
-        report_type: test_results
-
-    - name: Upload domain coverage
-      if: ${{ !cancelled() }}
-      uses: ./.github/actions/codecov-upload
-      with:
-        codecov-token: ${{ inputs.codecov-token }}
-        files: packages/domain/coverage/lcov.info
+        directory: packages/domain
         flag: domain
 
-    - name: Upload domain test results
+    - name: Upload collection-json
       if: ${{ !cancelled() }}
-      uses: ./.github/actions/codecov-upload
+      uses: ./.github/actions/codecov-upload-package
       with:
         codecov-token: ${{ inputs.codecov-token }}
-        files: packages/domain/test-results/junit.xml
-        flag: domain
-        report_type: test_results
-
-    - name: Upload collection-json coverage
-      if: ${{ !cancelled() }}
-      uses: ./.github/actions/codecov-upload
-      with:
-        codecov-token: ${{ inputs.codecov-token }}
-        files: packages/collection-json/coverage/lcov.info
+        directory: packages/collection-json
         flag: collection-json
 
-    - name: Upload collection-json test results
+    - name: Upload validation
       if: ${{ !cancelled() }}
-      uses: ./.github/actions/codecov-upload
+      uses: ./.github/actions/codecov-upload-package
       with:
         codecov-token: ${{ inputs.codecov-token }}
-        files: packages/collection-json/test-results/junit.xml
-        flag: collection-json
-        report_type: test_results
-
-    - name: Upload validation coverage
-      if: ${{ !cancelled() }}
-      uses: ./.github/actions/codecov-upload
-      with:
-        codecov-token: ${{ inputs.codecov-token }}
-        files: packages/validation/coverage/lcov.info
+        directory: packages/validation
         flag: validation
 
-    - name: Upload validation test results
+    - name: Upload game-data-codegen
       if: ${{ !cancelled() }}
-      uses: ./.github/actions/codecov-upload
+      uses: ./.github/actions/codecov-upload-package
       with:
         codecov-token: ${{ inputs.codecov-token }}
-        files: packages/validation/test-results/junit.xml
-        flag: validation
-        report_type: test_results
-
-    - name: Upload game-data-codegen coverage
-      if: ${{ !cancelled() }}
-      uses: ./.github/actions/codecov-upload
-      with:
-        codecov-token: ${{ inputs.codecov-token }}
-        files: tools/game-data-codegen/coverage/lcov.info
+        directory: tools/game-data-codegen
         flag: game-data-codegen
-
-    - name: Upload game-data-codegen test results
-      if: ${{ !cancelled() }}
-      uses: ./.github/actions/codecov-upload
-      with:
-        codecov-token: ${{ inputs.codecov-token }}
-        files: tools/game-data-codegen/test-results/junit.xml
-        flag: game-data-codegen
-        report_type: test_results
