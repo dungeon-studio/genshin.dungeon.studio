@@ -65,7 +65,7 @@ export async function withApiWrite(
   page: Page,
   method: string,
   pathFragment: string,
-  action: () => Promise<unknown>,
+  action: () => Promise<void>,
 ): Promise<void> {
   const settled = page.waitForResponse(
     (response) => isApiWrite(response.request(), method, pathFragment) && response.ok(),
