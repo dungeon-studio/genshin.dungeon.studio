@@ -11,13 +11,11 @@ Thank you for your interest in contributing. This project is a team building com
 
 1. Open the repository in VS Code
 2. Click **"Reopen in Container"** when prompted. DevContainers extension required.
-3. Wait for container setup, about 2 to 3 minutes on first run
+3. Wait for container setup to finish
 
 Without DevContainers, follow the [Manual Setup Guide](docs/how-tos/manual-setup.md) instead.
 
 ### Quick start commands
-
-Once you set up your environment:
 
 ```bash
 git checkout develop
@@ -34,30 +32,30 @@ Vite reads module resolution once at startup, so a server left running reports
 
 ## Code of conduct
 
-This project commits to providing a welcoming and inclusive environment. Please be respectful and constructive in all interactions.
+Be respectful and constructive in all interactions.
 
 ## Workflow
 
 1. Pick up an [existing issue](https://github.com/dungeon-studio/genshin.dungeon.studio/issues), or open one before starting larger work.
 2. Write tests alongside or before the implementation.
-3. Open a pull request into `develop` whose description references the issue and whose title follows the [commit message rules](#commit-messages).
+3. Open a pull request into `develop` that references the issue. Its title follows the [commit message rules](#commit-messages).
 4. Keep the description accurate as review changes the work.
 
-For code conventions—comments, documentation strategy, naming, shared types, test utilities, and platform compatibility—see [Code conventions](docs/reference/code-conventions.md).
+Follow [Code conventions](docs/reference/code-conventions.md) for what no linter checks.
 
 ## Pass the checks
 
-[ci.yml](.github/workflows/ci.yml) runs every pre-commit hook plus the workspace, integration, and end-to-end suites. To reproduce it locally:
+To reproduce CI locally:
 
 - Run `pre-commit install` once so each commit runs the hooks CI runs over the whole tree. The first commit afterward builds each hook's environment and can take several minutes. `pre-commit run --all-files` matches the CI run.
 - `pnpm turbo run typecheck test build verify` runs the workspace suite.
 - `pnpm turbo run test:integration` and `pnpm turbo run test:e2e` each start the Firebase emulators themselves. Stop any `pnpm dev` first, in this checkout or any other worktree, or the emulators fail to bind.
 
-[`.pre-commit-config.yaml`](.pre-commit-config.yaml) is the source of truth for which checks run. When one fails:
+When a check fails:
 
-- `package.json` dependencies stay pinned exactly, with no `^` or `~` ranges. Run `pnpm exec syncpack fix` to pin offenders.
-- Every source file carries an SPDX license header. See [Add SPDX headers](docs/how-tos/add-spdx-headers.md).
-- The lint hook reports without rewriting, so run `pnpm lint -- --fix` to apply the fixes it can make.
+- For a dependency range such as `^1.2.3`, run `pnpm exec syncpack fix` to pin it exactly.
+- For a missing SPDX license header, follow [Add SPDX headers](docs/how-tos/add-spdx-headers.md).
+- For lint errors, run `pnpm lint -- --fix`. The hook reports without rewriting.
 
 Broken external URLs don't block a pull request. A weekly run files them as a GitHub issue instead. For which workflow runs what, see [workflow conventions](docs/reference/workflow-conventions.md).
 
@@ -69,7 +67,7 @@ Broken external URLs don't block a pull request. A weekly run files them as a Gi
 - **Assert only the necessary properties**: keep each assertion as close to the property under test as possible. Redundant assertions obscure what the test proves.
 - **Use `satisfies` for fixture annotations**: it validates the fixture shape at the declaration site without changing the inferred type, avoiding index-signature assignability errors.
 - **One schema assertion per route test, then field-level spot checks**: validate the response with AJV using the published JSON Schema, then assert one specific value. Don't re-test the schema field by field.
-- **Reserve the emulator suite for what no route can produce**: an `*.integration.test.ts` earns its place by planting a stored document the API itself would never write. Re-covering what the route or browser suites already reach doesn't earn one.
+- **Reserve the emulator suite for what no route can produce**: an `*.integration.test.ts` earns its place only by planting a stored document the API itself would never write.
 
 ## Commit messages
 
