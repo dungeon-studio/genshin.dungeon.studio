@@ -74,25 +74,18 @@ function validateMinorAffixes(
   affixes: string[] | undefined,
 ): ValidationIssue[] {
   if (affixes === undefined) return [];
-  const issues: ValidationIssue[] = [];
 
-  if (affixes.length > 3) {
-    issues.push(issue(`${field} must have at most 3 entries`, field));
-  }
-
-  issues.push(
+  return [
+    ...(affixes.length > 3 ? [issue(`${field} must have at most 3 entries`, field)] : []),
     ...affixes.flatMap((affix, i) =>
       (ARTIFACT_MINOR_AFFIXES as readonly string[]).includes(affix)
         ? []
         : [issue(`Invalid minor affix: ${affix}`, `${field}[${i}]`)],
     ),
-  );
-
-  if (new Set(affixes).size !== affixes.length) {
-    issues.push(issue(`${field} contains duplicates`, field));
-  }
-
-  return issues;
+    ...(new Set(affixes).size !== affixes.length
+      ? [issue(`${field} contains duplicates`, field)]
+      : []),
+  ];
 }
 
 function validateDisjointMinorAffixes(
