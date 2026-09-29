@@ -1,0 +1,37 @@
+---
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+name: Codecov report
+description: Upload one coverage or test-results report to Codecov under one flag
+
+# A broken upload must not fail the job it reports on, so nothing gates on this
+# action's exit status. Confirm uploads from the uploader's output instead.
+
+inputs:
+  codecov-token:
+    description: 'Codecov upload token'
+    required: true
+  files:
+    description: 'Report file to upload'
+    required: true
+  flag:
+    description: 'Codecov flag the report belongs to'
+    required: true
+  report_type:
+    description: 'test_results for a JUnit report; empty uploads coverage'
+    required: false
+    default: ''
+
+runs:
+  using: composite
+
+  steps:
+    - name: Upload to Codecov
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: ${{ inputs.files }}
+        flags: ${{ inputs.flag }}
+        report_type: ${{ inputs.report_type }}
+        fail_ci_if_error: false

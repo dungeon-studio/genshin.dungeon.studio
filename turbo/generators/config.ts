@@ -141,22 +141,20 @@ function addCodecovUploads(root: string, { name }: Answers): string {
       `
     - name: Upload ${name} coverage
       if: \${{ !cancelled() }}
-      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      uses: ./.github/actions/codecov-report
       with:
-        token: \${{ inputs.codecov-token }}
+        codecov-token: \${{ inputs.codecov-token }}
         files: packages/${name}/coverage/lcov.info
-        flags: ${name}
-        fail_ci_if_error: false
+        flag: ${name}
 
     - name: Upload ${name} test results
       if: \${{ !cancelled() }}
-      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      uses: ./.github/actions/codecov-report
       with:
-        token: \${{ inputs.codecov-token }}
+        codecov-token: \${{ inputs.codecov-token }}
         files: packages/${name}/test-results/junit.xml
-        flags: ${name}
+        flag: ${name}
         report_type: test_results
-        fail_ci_if_error: false
 `,
       CODECOV_UPLOAD_ACTION,
     ),
