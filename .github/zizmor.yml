@@ -9,10 +9,10 @@ rules:
     disable: true
 
   cache-poisoning:
-    # ci.yml publishes nothing: it builds to prove the workspace compiles and
-    # discards the output, and deploy.yml owns every artifact that leaves the
-    # repository. GitHub scopes cache writes to the writing branch, so a pull
-    # request cannot write into the scope a develop or main run restores from.
+    # The ci.yml jobs that restore caches publish nothing. Publishing happens in
+    # deploy.yml, which zizmor audits on its own. GitHub scopes cache writes to
+    # the writing branch, so a pull request cannot write into the scope a
+    # develop or main run restores from.
     ignore:
       - ci.yml
 
@@ -20,4 +20,5 @@ rules:
     # Environment secrets cannot be passed by name: only the reusable declares
     # `environment:`, so the caller has no handle on them and must inherit.
     ignore:
+      - ci.yml
       - terraform-apply.yml
