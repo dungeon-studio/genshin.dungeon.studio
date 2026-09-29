@@ -118,31 +118,31 @@ export function validateAcrossTeams(
   currentMembers: CollectionTeamMembers,
   allTeams: { slot: TeamSlot; members: CollectionTeamMembers }[],
 ): ValidationIssue[] {
-  const issues: ValidationIssue[] = [];
+  const holders = weaponHoldersOutside(slot, allTeams);
+  return [...currentMembers.entries()].flatMap(([i, member]) => {
+    if (!member?.weaponInstanceId) return [];
+    const holder = holders.get(member.weaponInstanceId);
+    if (!holder || holder === member.characterId) return [];
+    return [
+      issue(
+        `Weapon instance ${member.weaponInstanceId} is already equipped by character ${holder}`,
+        `members[${i}].weaponInstanceId`,
+      ),
+    ];
+  });
+}
 
-  const equippedWeapons = new Map<string, string>();
-  for (const team of allTeams) {
-    if (team.slot === slot) continue;
-    for (const member of team.members) {
-      if (member?.weaponInstanceId) {
-        equippedWeapons.set(member.weaponInstanceId, member.characterId);
-      }
-    }
-  }
-
-  for (const [i, member] of currentMembers.entries()) {
-    if (!member?.weaponInstanceId) continue;
-
-    const existingOwner = equippedWeapons.get(member.weaponInstanceId);
-    if (existingOwner && existingOwner !== member.characterId) {
-      issues.push(
-        issue(
-          `Weapon instance ${member.weaponInstanceId} is already equipped by character ${existingOwner}`,
-          `members[${i}].weaponInstanceId`,
-        ),
-      );
-    }
-  }
-
-  return issues;
+/** Maps each weapon instance equipped outside `slot` to the character holding it. */
+function weaponHoldersOutside(
+  slot: TeamSlot,
+  allTeams: { slot: TeamSlot; members: CollectionTeamMembers }[],
+): Map<string, string> {
+  return new Map(
+    allTeams
+      .filter((team) => team.slot !== slot)
+      .flatMap((team) => team.members)
+      .flatMap((member) =>
+        member?.weaponInstanceId ? [[member.weaponInstanceId, member.characterId] as const] : [],
+      ),
+  );
 }
