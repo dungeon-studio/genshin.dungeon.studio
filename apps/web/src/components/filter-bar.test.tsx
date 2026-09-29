@@ -5,9 +5,10 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { SORT_FIELDS } from '@/features/collection/sort-fields';
+import type { BaseFilterState } from '@/lib/collection-filters';
+import { SORT_FIELDS } from '@/lib/collection-filters';
 
-import { type BaseFilterState, FilterBar, type FilterCategoryConfig } from './filter-bar';
+import { FilterBar, type FilterCategoryConfig } from './filter-bar';
 
 function baseFilters(overrides: Partial<BaseFilterState> = {}): BaseFilterState {
   return {

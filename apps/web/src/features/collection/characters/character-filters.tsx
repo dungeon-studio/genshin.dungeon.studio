@@ -6,11 +6,11 @@ import { ELEMENTS } from '@genshin/game-data';
 import type { JSX } from 'react';
 
 import { FilterBar } from '@/components/filter-bar';
+import { SORT_FIELDS } from '@/lib/collection-filters';
 import { ELEMENT_BG_COLORS } from '@/lib/element-styles';
 import { getElementIconPath } from '@/lib/elements';
 import { toggleInSet } from '@/lib/toggle-in-set';
 
-import { SORT_FIELDS } from '../sort-fields';
 import type { CharacterFilterState } from './filtering';
 
 interface CharacterFiltersProps {

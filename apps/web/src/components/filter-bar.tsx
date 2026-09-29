@@ -15,18 +15,9 @@ import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ThemedIcon } from '@/components/ui/themed-icon';
-import type { OwnershipFilter, SortDirection } from '@/lib/collection-filters';
+import type { BaseFilterState } from '@/lib/collection-filters';
 import { toggleInSet } from '@/lib/toggle-in-set';
 import { cn } from '@/lib/utils';
-
-/** Fields shared by every collection filter; each concrete state adds its own category set, driven separately via {@link FilterCategoryConfig}. */
-export interface BaseFilterState {
-  search: string;
-  rarities: Set<Rarity>;
-  ownership: OwnershipFilter;
-  sortField: string;
-  sortDirection: SortDirection;
-}
 
 /** Configures the one filter row that differs between collection types. */
 export interface FilterCategoryConfig<T extends string> {
