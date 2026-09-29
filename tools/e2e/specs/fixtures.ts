@@ -3,7 +3,7 @@
 
 import type { Character, Weapon } from '@genshin/game-data';
 import { CHARACTER_ROSTER, WEAPON_ROSTER } from '@genshin/game-data';
-import type { Page } from '@playwright/test';
+import type { Page, Request } from '@playwright/test';
 import { test as base, expect } from '@playwright/test';
 
 /**
@@ -68,10 +68,7 @@ export async function withApiWrite(
   action: () => Promise<void>,
 ): Promise<void> {
   const settled = page.waitForResponse(
-    (response) =>
-      response.request().method() === method &&
-      response.url().includes(pathFragment) &&
-      response.ok(),
+    (response) => isApiWrite(response.request(), method, pathFragment) && response.ok(),
   );
 
   await action();
@@ -79,17 +76,61 @@ export async function withApiWrite(
 }
 
 /**
- * Sign in through the Firebase Auth emulator's Google provider screen.
+ * Answer every matching API write from here on with a 503, as the API would
+ * while down.
  *
- * Each call registers a new emulator account, so signed-in specs never share
- * Firestore documents. The screen is the one the Firebase CLI serves at
- * /emulator/auth/handler; its controls carry no accessible names, hence the ids.
+ * The API is cross-origin, so the 503 needs its own CORS header; without it
+ * the app sees a network error instead of the API's response.
  */
-async function signIn(page: Page): Promise<void> {
+export async function rejectApiWrite(
+  page: Page,
+  method: string,
+  pathFragment: string,
+): Promise<void> {
+  const status = 503;
+
+  await page.route(
+    () => true,
+    (route) =>
+      isApiWrite(route.request(), method, pathFragment)
+        ? route.fulfill({
+            status,
+            contentType: 'application/problem+json',
+            headers: { 'Access-Control-Allow-Origin': new URL(page.url()).origin },
+            body: JSON.stringify({
+              type: 'about:blank',
+              title: 'Service Unavailable',
+              status,
+              detail: 'Injected by the end-to-end suite.',
+            }),
+          })
+        : route.fallback(),
+  );
+}
+
+function isApiWrite(request: Request, method: string, pathFragment: string): boolean {
+  return request.method() === method && request.url().includes(pathFragment);
+}
+
+/** The emulator account `persona` signs in as; each persona in a test gets its own. */
+function account(persona: string): { email: string; displayName: string } {
   // Identifies the attempt, not the test: retrying against the same account
   // would inherit the Firestore documents the failed attempt left behind.
   const { testId, retry } = base.info();
-  const account = `${testId}-${retry}`;
+  const id = `${testId}-${retry}-${persona}`;
+
+  return { email: `e2e.${id}@example.com`, displayName: `E2E Traveler ${id}` };
+}
+
+/**
+ * Sign in through the Firebase Auth emulator's Google provider screen.
+ *
+ * Every test gets its own emulator accounts, so signed-in specs never share
+ * Firestore documents. The screen is the one the Firebase CLI serves at
+ * /emulator/auth/handler; its controls carry no accessible names, hence the ids.
+ */
+export async function signIn(page: Page, persona = 'traveler'): Promise<void> {
+  const { email, displayName } = account(persona);
 
   const popupPromise = page.waitForEvent('popup');
   await page.getByRole('button', { name: 'Sign in' }).click();
@@ -100,17 +141,23 @@ async function signIn(page: Page): Promise<void> {
   await popup.waitForLoadState('load');
   await popup.getByRole('button', { name: 'Add new account' }).click();
 
-  const displayName = `E2E Traveler ${account}`;
-
-  const email = popup.locator('#email-input');
-  await expect(email).toBeVisible();
-  await email.fill(`e2e.${account}@example.com`);
+  const emailInput = popup.locator('#email-input');
+  await expect(emailInput).toBeVisible();
+  await emailInput.fill(email);
   await popup.locator('#display-name-input').fill(displayName);
   await popup.locator('#sign-in').click();
 
   // The header switching over is the signal that the credential reached the
   // app; waiting on the popup closing races the message it still has to send.
   await expect(page.getByRole('button', { name: displayName })).toBeVisible();
+}
+
+/** Sign `persona` out through the header's account menu. */
+export async function signOut(page: Page, persona = 'traveler'): Promise<void> {
+  await page.getByRole('button', { name: account(persona).displayName }).click();
+  await page.getByRole('menuitem', { name: 'Sign out' }).click();
+
+  await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
 }
 
 /** Put a character in the signed-in collection via the UI, server write included. */
