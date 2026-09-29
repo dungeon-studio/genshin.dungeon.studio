@@ -120,7 +120,6 @@ export function validateAcrossTeams(
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
 
-  // Build a map of weaponInstanceId → characterId from other teams.
   const equippedWeapons = new Map<string, string>();
   for (const team of allTeams) {
     if (team.slot === slot) continue;
