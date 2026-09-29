@@ -4,20 +4,11 @@
 
 name: Deploy
 
+# CI calls this once a push to develop passes. A manual dispatch skips CI, so a
+# broken CI can't block a recovery deploy.
 on:
+  workflow_call:
   workflow_dispatch:
-  push:
-    branches: [develop]
-    paths:
-      - 'apps/web/**'
-      - 'apps/api/**'
-      # The apps bundle the workspace packages and resolve their transitive
-      # dependencies through the root lockfile.
-      - 'packages/**'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/deploy.yml'
-      - '.github/actions/setup-node-pnpm/**'
-      - '.github/actions/setup-playwright/**'
 
 permissions:
   contents: read
@@ -35,39 +26,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Polls because a `workflow_run` trigger ignores `paths:` and sets
-  # `github.sha` to the branch head instead of the commit CI tested.
-  wait-for-ci:
-    name: Wait for the commit's CI run
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      actions: read
-    env:
-      GH_REPO: ${{ github.repository }}
-      GH_TOKEN: ${{ github.token }}
-
-    steps:
-      # A manual dispatch skips the wait, so a broken CI can't block a recovery
-      # deploy. The condition sits on this step because a skipped job would
-      # skip every job that needs it. CI starts from the same push, so its run
-      # may not exist yet.
-      - name: Wait for CI
-        if: github.event_name == 'push'
-        run: |
-          set -euo pipefail
-          for _ in $(seq 1 12); do
-            run_id=$(gh run list --workflow ci.yml --commit "$GITHUB_SHA" \
-              --event push --limit 1 --json databaseId --jq '.[0].databaseId // empty')
-            [ -n "$run_id" ] && break
-            sleep 10
-          done
-          test -n "$run_id" || { echo "no CI run found for $GITHUB_SHA" >&2; exit 1; }
-          gh run watch "$run_id" --exit-status --interval 30
-
   web:
     if: github.ref == 'refs/heads/develop'
-    needs: wait-for-ci
     name: Web
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -127,7 +87,6 @@ jobs:
 
   api:
     if: github.ref == 'refs/heads/develop'
-    needs: wait-for-ci
     name: API
     runs-on: ubuntu-latest
     timeout-minutes: 20
