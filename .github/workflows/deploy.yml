@@ -4,8 +4,8 @@
 
 name: Deploy
 
-# CI calls this once a push to develop passes. A manual dispatch skips CI, so a
-# broken CI can't block a recovery deploy.
+# CI calls this after a push to develop passes. Dispatch it by hand to recover
+# when CI itself is broken.
 on:
   workflow_call:
   workflow_dispatch:

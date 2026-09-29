@@ -545,8 +545,9 @@ jobs:
               - '.github/actions/setup-node-pnpm/**'
               - '.github/actions/setup-playwright/**'
 
-  # Needs every job that runs on a push, so a commit failing any of them never
-  # reaches the dev environment. A new push job belongs in this list.
+  # A new job that runs on a push belongs in `needs:`, or a commit failing it
+  # still deploys. `schema-compat` stays out because it runs only on pull
+  # requests, and a skipped need skips the deploy.
   deploy:
     name: Deploy to dev
     needs:

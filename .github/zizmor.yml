@@ -9,10 +9,10 @@ rules:
     disable: true
 
   cache-poisoning:
-    # ci.yml's own jobs build to prove the workspace compiles and discard the
-    # output; only deploy.yml, which it calls on develop, publishes artifacts.
-    # GitHub scopes cache writes to the writing branch, so a pull request
-    # cannot write into the scope a develop or main run restores from.
+    # The ci.yml jobs that restore caches publish nothing. Publishing happens in
+    # deploy.yml, which zizmor audits on its own. GitHub scopes cache writes to
+    # the writing branch, so a pull request cannot write into the scope a
+    # develop or main run restores from.
     ignore:
       - ci.yml
 
