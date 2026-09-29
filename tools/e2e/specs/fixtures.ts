@@ -79,20 +79,28 @@ export async function withApiWrite(
 }
 
 /**
+ * The emulator account a persona signs in as within the running test.
+ *
+ * `persona` separates the accounts one test signs in as.
+ */
+function account(persona: string): { email: string; displayName: string } {
+  // Identifies the attempt, not the test: retrying against the same account
+  // would inherit the Firestore documents the failed attempt left behind.
+  const { testId, retry } = base.info();
+  const id = `${testId}-${retry}-${persona}`;
+
+  return { email: `e2e.${id}@example.com`, displayName: `E2E Traveler ${id}` };
+}
+
+/**
  * Sign in through the Firebase Auth emulator's Google provider screen.
  *
  * Each call registers a new emulator account, so signed-in specs never share
  * Firestore documents. The screen is the one the Firebase CLI serves at
  * /emulator/auth/handler; its controls carry no accessible names, hence the ids.
- *
- * `persona` separates the accounts one test signs in as. Resolves to the
- * display name the header shows for the account.
  */
-export async function signIn(page: Page, persona = 'traveler'): Promise<string> {
-  // Identifies the attempt, not the test: retrying against the same account
-  // would inherit the Firestore documents the failed attempt left behind.
-  const { testId, retry } = base.info();
-  const account = `${testId}-${retry}-${persona}`;
+export async function signIn(page: Page, persona = 'traveler'): Promise<void> {
+  const { email, displayName } = account(persona);
 
   const popupPromise = page.waitForEvent('popup');
   await page.getByRole('button', { name: 'Sign in' }).click();
@@ -103,24 +111,20 @@ export async function signIn(page: Page, persona = 'traveler'): Promise<string> 
   await popup.waitForLoadState('load');
   await popup.getByRole('button', { name: 'Add new account' }).click();
 
-  const displayName = `E2E Traveler ${account}`;
-
-  const email = popup.locator('#email-input');
-  await expect(email).toBeVisible();
-  await email.fill(`e2e.${account}@example.com`);
+  const emailInput = popup.locator('#email-input');
+  await expect(emailInput).toBeVisible();
+  await emailInput.fill(email);
   await popup.locator('#display-name-input').fill(displayName);
   await popup.locator('#sign-in').click();
 
   // The header switching over is the signal that the credential reached the
   // app; waiting on the popup closing races the message it still has to send.
   await expect(page.getByRole('button', { name: displayName })).toBeVisible();
-
-  return displayName;
 }
 
-/** Sign out through the account menu the header shows under `displayName`. */
-export async function signOut(page: Page, displayName: string): Promise<void> {
-  await page.getByRole('button', { name: displayName }).click();
+/** Sign `persona` out through the header's account menu. */
+export async function signOut(page: Page, persona = 'traveler'): Promise<void> {
+  await page.getByRole('button', { name: account(persona).displayName }).click();
   await page.getByRole('menuitem', { name: 'Sign out' }).click();
 
   await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();

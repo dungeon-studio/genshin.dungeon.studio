@@ -90,10 +90,10 @@ test('an anonymous collection merges into the account on first sign-in', async (
 
 test('signing out keeps the collection from reaching the next account', async ({ page }) => {
   await page.goto('/characters');
-  const first = await signIn(page, 'first');
+  await signIn(page, 'first');
   await collectCharacter(page, character);
 
-  await signOut(page, first);
+  await signOut(page, 'first');
 
   await expect(page.getByRole('button', { name: addCharacterLabel(character) })).toBeVisible();
 
