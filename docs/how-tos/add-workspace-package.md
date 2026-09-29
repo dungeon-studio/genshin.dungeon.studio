@@ -24,7 +24,7 @@ pnpm exec turbo gen package
 
 Two of its answers gate injections, so answer them from what the package is
 actually for. Declaring tests adds `vitest.config.ts`, the Codecov flag and
-component, and the upload steps. Declaring an `apps/api` runtime dependency
+component, and the upload step. Declaring an `apps/api` runtime dependency
 adds the `apps/api/Dockerfile` COPY lines.
 
 When a file it injects into has changed shape, the generator stops and names

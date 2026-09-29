@@ -101,7 +101,7 @@ jobs:
 
       - name: Upload coverage and test results to Codecov
         if: ${{ !cancelled() }}
-        uses: ./.github/actions/codecov-upload
+        uses: ./.github/actions/codecov-upload-workspace
         with:
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -204,22 +204,20 @@ jobs:
       # apps/api/src/**; Codecov merges the two reports.
       - name: Upload integration coverage to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        uses: ./.github/actions/codecov-upload
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
           files: apps/api/coverage-integration/lcov.info
-          flags: api
-          fail_ci_if_error: false
+          flag: api
 
       - name: Upload integration test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        uses: ./.github/actions/codecov-upload
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
           files: apps/api/test-results/integration-junit.xml
-          flags: api
+          flag: api
           report_type: test_results
-          fail_ci_if_error: false
 
   # Drives a real browser through the assembled stack — Firebase emulators, the
   # API, and the Vite dev server. Separate from the workspace job because it is
@@ -255,13 +253,12 @@ jobs:
       # the condition.
       - name: Upload end-to-end test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        uses: ./.github/actions/codecov-upload
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
           files: tools/e2e/test-results/e2e-junit.xml
-          flags: e2e
+          flag: e2e
           report_type: test_results
-          fail_ci_if_error: false
 
       - name: Upload Playwright report
         if: failure()

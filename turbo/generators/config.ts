@@ -15,7 +15,12 @@ const REFERENCE_PACKAGE = 'validation';
 
 const TEST_ONLY_DEV_DEPENDENCIES = ['vitest', '@vitest/coverage-v8'];
 
-const CODECOV_UPLOAD_ACTION = join('.github', 'actions', 'codecov-upload', 'action.yml');
+const CODECOV_UPLOAD_WORKSPACE_ACTION = join(
+  '.github',
+  'actions',
+  'codecov-upload-workspace',
+  'action.yml',
+);
 const API_DOCKERFILE = join('apps', 'api', 'Dockerfile');
 const CODECOV_CONFIG = 'codecov.yml';
 
@@ -132,33 +137,22 @@ function writeManifest(root: string, answers: Answers): string {
   return path;
 }
 
-// Codecov needs one upload per flag; the action's own comment explains why.
-function addCodecovUploads(root: string, { name }: Answers): string {
-  return rewriteFile(root, CODECOV_UPLOAD_ACTION, (source) =>
+// Codecov needs one upload per flag; codecov-upload-workspace explains why.
+function addCodecovUpload(root: string, { name }: Answers): string {
+  return rewriteFile(root, CODECOV_UPLOAD_WORKSPACE_ACTION, (source) =>
     insertAfterLast(
       source,
       /^ {4}- name: Upload .+\n(?: {6}.+\n)*/gm,
       `
-    - name: Upload ${name} coverage
+    - name: Upload ${name}
       if: \${{ !cancelled() }}
-      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      uses: ./.github/actions/codecov-upload-package
       with:
-        token: \${{ inputs.codecov-token }}
-        files: packages/${name}/coverage/lcov.info
-        flags: ${name}
-        fail_ci_if_error: false
-
-    - name: Upload ${name} test results
-      if: \${{ !cancelled() }}
-      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
-      with:
-        token: \${{ inputs.codecov-token }}
-        files: packages/${name}/test-results/junit.xml
-        flags: ${name}
-        report_type: test_results
-        fail_ci_if_error: false
+        codecov-token: \${{ inputs.codecov-token }}
+        directory: packages/${name}
+        flag: ${name}
 `,
-      CODECOV_UPLOAD_ACTION,
+      CODECOV_UPLOAD_WORKSPACE_ACTION,
     ),
   );
 }
@@ -292,7 +286,7 @@ function scaffoldActions(root: string, answers: Answers): PlopTypes.ActionType[]
 function wiringActions(root: string, answers: Answers): PlopTypes.ActionType[] {
   return [
     ...(answers.tests
-      ? [() => addCodecovUploads(root, answers), () => addCodecovFlagAndComponent(root, answers)]
+      ? [() => addCodecovUpload(root, answers), () => addCodecovFlagAndComponent(root, answers)]
       : []),
     ...(answers.apiRuntimeDependency ? [() => addDockerfileCopies(root, answers)] : []),
   ];
