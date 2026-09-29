@@ -10,6 +10,7 @@ import {
   constellationLabel,
   equippablePair,
   expect,
+  rejectApiWrite,
   removeCharacterLabel,
   signIn,
   signOut,
@@ -77,9 +78,7 @@ test('an anonymous collection merges into the account on first sign-in', async (
 
   // Signing in from the same page keeps the anonymous store alive; a navigation
   // would clear it before the account arrives.
-  await withApiWrite(page, 'PUT', apiPath.character(character), async () => {
-    await signIn(page);
-  });
+  await withApiWrite(page, 'PUT', apiPath.character(character), () => signIn(page));
 
   await expect(page.getByText('Merged 1 character(s) from your local collection.')).toBeVisible();
 
@@ -117,23 +116,7 @@ test('signing out keeps the collection from reaching the next account', async ({
 test('a rejected add rolls back and says so', async ({ signedInPage: page }) => {
   await page.goto('/characters');
 
-  await page.route(
-    (url) => url.pathname.endsWith(apiPath.character(character)),
-    (route) =>
-      route.request().method() === 'PUT'
-        ? route.fulfill({
-            status: 503,
-            contentType: 'application/problem+json',
-            headers: { 'Access-Control-Allow-Origin': new URL(page.url()).origin },
-            body: JSON.stringify({
-              type: 'about:blank',
-              title: 'Service Unavailable',
-              status: 503,
-              detail: 'Injected by the end-to-end suite.',
-            }),
-          })
-        : route.fallback(),
-  );
+  await rejectApiWrite(page, 'PUT', apiPath.character(character));
 
   await page.getByRole('button', { name: addCharacterLabel(character) }).click();
 

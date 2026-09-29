@@ -3,7 +3,7 @@
 
 import type { Character, Weapon } from '@genshin/game-data';
 import { CHARACTER_ROSTER, WEAPON_ROSTER } from '@genshin/game-data';
-import type { Page } from '@playwright/test';
+import type { Page, Request } from '@playwright/test';
 import { test as base, expect } from '@playwright/test';
 
 /**
@@ -65,17 +65,51 @@ export async function withApiWrite(
   page: Page,
   method: string,
   pathFragment: string,
-  action: () => Promise<void>,
+  action: () => Promise<unknown>,
 ): Promise<void> {
   const settled = page.waitForResponse(
-    (response) =>
-      response.request().method() === method &&
-      response.url().includes(pathFragment) &&
-      response.ok(),
+    (response) => isApiWrite(response.request(), method, pathFragment) && response.ok(),
   );
 
   await action();
   await settled;
+}
+
+/**
+ * Answer every matching API write from here on with a 503, as the API would
+ * while down.
+ *
+ * Only the write itself is answered; the CORS preflight ahead of it still
+ * reaches the real API, so the browser treats the 503 as the API's own.
+ */
+export async function rejectApiWrite(
+  page: Page,
+  method: string,
+  pathFragment: string,
+): Promise<void> {
+  const status = 503;
+
+  await page.route(
+    () => true,
+    (route) =>
+      isApiWrite(route.request(), method, pathFragment)
+        ? route.fulfill({
+            status,
+            contentType: 'application/problem+json',
+            headers: { 'Access-Control-Allow-Origin': new URL(page.url()).origin },
+            body: JSON.stringify({
+              type: 'about:blank',
+              title: 'Service Unavailable',
+              status,
+              detail: 'Injected by the end-to-end suite.',
+            }),
+          })
+        : route.fallback(),
+  );
+}
+
+function isApiWrite(request: Request, method: string, pathFragment: string): boolean {
+  return request.method() === method && request.url().includes(pathFragment);
 }
 
 /**
