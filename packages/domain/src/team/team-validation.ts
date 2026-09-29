@@ -6,10 +6,8 @@
  * `assertCollectionTeam` covers.
  *
  * Collects issues rather than throwing on the first, because the caller is a
- * form that shows every field's message at once. Nothing here reads storage: a
- * check that needs to know what the user owns takes a
- * {@link TeamValidationContext} the caller has already populated, from the
- * zustand store on the web or from Firestore in the API.
+ * form that shows every field's message at once. Nothing here reads storage;
+ * ownership checks take a {@link TeamValidationContext} from the caller.
  */
 
 import type { ValidationIssue } from '@genshin/validation';
@@ -19,25 +17,20 @@ import type { CollectionTeamMembers, TeamSlot } from './collection-team.js';
 import { validateArtifactPlan } from '../artifact/artifact-plan-validation.js';
 
 /**
- * Caller-supplied ownership data for collection-aware validation.
- *
- * On the web, populate from zustand / TanStack Query state.
- * On the API, populate from Firestore lookups before calling validators.
+ * What the user owns. The web fills it from zustand and TanStack Query state,
+ * the API from Firestore.
  */
 export interface TeamValidationContext {
-  /** Character IDs the user owns. */
   ownedCharacterIds: ReadonlySet<string>;
-  /** Weapon instance IDs the user owns. */
   ownedWeaponInstanceIds: ReadonlySet<string>;
 }
 
 /**
- * Checks one team in isolation: no character or weapon instance appears twice
- * in it, and every member's artifact plan holds up.
+ * Checks one team without looking at the user's other teams; conflicts between
+ * teams are {@link validateAcrossTeams}'s job.
  *
- * @param context - what the user owns. Omitting it skips the ownership checks,
- * which is how the web validates before it knows the collection.
- * @returns every issue found, empty when the team is valid.
+ * @param context - omitting it skips the ownership checks, which is how the web
+ * validates before it knows the collection.
  */
 export function validateTeam(
   team: { name: string; members: CollectionTeamMembers; description?: string },
@@ -103,15 +96,11 @@ function validateArtifactPlans(members: CollectionTeamMembers): ValidationIssue[
 }
 
 /**
- * A weapon instance is a single physical item, so only one character may hold
- * it. The game allows the same character to carry it across several teams,
- * though, so the conflict is between two different characters rather than
- * between two teams.
+ * Flags each weapon instance in `currentMembers` that a different character
+ * holds in another team. The game lets one character carry the same instance
+ * in several teams.
  *
- * @param slot - the team being saved, skipped when scanning the others so its
- * own stored version doesn't conflict with itself.
- * @param allTeams - the user's persisted teams, which may include `slot`.
- * @returns every issue found, empty when nothing conflicts.
+ * @param slot - the team being saved. Its stored copy in `allTeams` is skipped.
  */
 export function validateAcrossTeams(
   slot: TeamSlot,
