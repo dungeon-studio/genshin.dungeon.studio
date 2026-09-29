@@ -1,0 +1,80 @@
+---
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+name: Codecov workspace upload
+description: Upload every package's coverage and test results under its own flag
+
+# One upload per flag. Codecov applies a report's entire coverage to every flag
+# it is tagged with, so a single upload carrying every package would report each
+# package's coverage as the whole workspace's. The `paths` under
+# flag_management in codecov.yml filter what the UI displays; they do not
+# segment an upload.
+#
+# A failing package must not suppress the coverage of the ones that passed,
+# hence the condition on every step.
+
+inputs:
+  codecov-token:
+    description: 'Codecov upload token'
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    - name: Upload web
+      if: ${{ !cancelled() }}
+      uses: ./.github/actions/codecov-upload-package
+      with:
+        codecov-token: ${{ inputs.codecov-token }}
+        directory: apps/web
+        flag: web
+
+    - name: Upload api
+      if: ${{ !cancelled() }}
+      uses: ./.github/actions/codecov-upload-package
+      with:
+        codecov-token: ${{ inputs.codecov-token }}
+        directory: apps/api
+        flag: api
+
+    - name: Upload game-data
+      if: ${{ !cancelled() }}
+      uses: ./.github/actions/codecov-upload-package
+      with:
+        codecov-token: ${{ inputs.codecov-token }}
+        directory: packages/game-data
+        flag: game-data
+
+    - name: Upload domain
+      if: ${{ !cancelled() }}
+      uses: ./.github/actions/codecov-upload-package
+      with:
+        codecov-token: ${{ inputs.codecov-token }}
+        directory: packages/domain
+        flag: domain
+
+    - name: Upload collection-json
+      if: ${{ !cancelled() }}
+      uses: ./.github/actions/codecov-upload-package
+      with:
+        codecov-token: ${{ inputs.codecov-token }}
+        directory: packages/collection-json
+        flag: collection-json
+
+    - name: Upload validation
+      if: ${{ !cancelled() }}
+      uses: ./.github/actions/codecov-upload-package
+      with:
+        codecov-token: ${{ inputs.codecov-token }}
+        directory: packages/validation
+        flag: validation
+
+    - name: Upload game-data-codegen
+      if: ${{ !cancelled() }}
+      uses: ./.github/actions/codecov-upload-package
+      with:
+        codecov-token: ${{ inputs.codecov-token }}
+        directory: tools/game-data-codegen
+        flag: game-data-codegen
