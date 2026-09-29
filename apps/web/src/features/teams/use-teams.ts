@@ -94,12 +94,15 @@ function useTeamActions(
   return useMemo(() => {
     const store = () => useTeamStore.getState();
 
-    const persist = (
+    const editThenPersist = (
       slot: TeamSlot,
-      previousTeam: CollectionTeam,
+      edit: () => void,
       request: (onError: () => void) => void,
       failure: string,
     ) => {
+      const previousTeam = { ...store().teams[slot] };
+      edit();
+      if (!isAuthenticated) return;
       const optimisticTeam = store().teams[slot];
       request(() => {
         if (store().teams[slot] !== optimisticTeam) {
@@ -112,12 +115,9 @@ function useTeamActions(
     };
 
     const editThenSave = (slot: TeamSlot, edit: () => void) => {
-      const previousTeam = { ...store().teams[slot] };
-      edit();
-      if (!isAuthenticated) return;
-      persist(
+      editThenPersist(
         slot,
-        previousTeam,
+        edit,
         (onError) => {
           saveTeamApi(teamToSavePayload(store().teams[slot]), { onError });
         },
@@ -157,12 +157,11 @@ function useTeamActions(
         });
       },
       clearTeam: (slot) => {
-        const previousTeam = { ...store().teams[slot] };
-        store().clearTeam(slot);
-        if (!isAuthenticated) return;
-        persist(
+        editThenPersist(
           slot,
-          previousTeam,
+          () => {
+            store().clearTeam(slot);
+          },
           (onError) => {
             deleteTeamApi(slot, { onError });
           },
