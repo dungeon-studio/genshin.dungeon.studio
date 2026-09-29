@@ -37,10 +37,8 @@ concurrency:
 jobs:
   # Holds a pushed commit until its own CI run passes. A `workflow_run` trigger
   # would drop the `paths:` filter above and rebind `github.sha` to the branch
-  # head, which the image tag and APP_GIT_SHA both read. A manual dispatch skips
-  # the wait, so a broken CI cannot block a recovery deploy.
+  # head, which the image tag and APP_GIT_SHA both read.
   wait-for-ci:
-    if: github.event_name == 'push'
     name: Wait for the commit's CI run
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -51,8 +49,11 @@ jobs:
       GH_TOKEN: ${{ github.token }}
 
     steps:
-      # CI starts from the same push, so its run may not be listed yet.
+      # Skipped rather than the whole job, so a manual dispatch still passes
+      # this job and a broken CI cannot block a recovery deploy. CI starts
+      # from the same push, so its run may not be listed yet.
       - name: Wait for CI
+        if: github.event_name == 'push'
         run: |
           set -euo pipefail
           for _ in $(seq 1 12); do
@@ -65,11 +66,7 @@ jobs:
           gh run watch "$run_id" --exit-status --interval 30
 
   web:
-    # Skipped rather than failed on dispatch, so a status function has to
-    # replace the implicit success() check.
-    if: >-
-      !cancelled() && github.ref == 'refs/heads/develop'
-      && contains(fromJSON('["success", "skipped"]'), needs.wait-for-ci.result)
+    if: github.ref == 'refs/heads/develop'
     needs: wait-for-ci
     name: Web
     runs-on: ubuntu-latest
@@ -129,9 +126,7 @@ jobs:
         run: bash apps/web/scripts/verify-deployment.sh "https://develop.genshin.dungeon.studio"
 
   api:
-    if: >-
-      !cancelled() && github.ref == 'refs/heads/develop'
-      && contains(fromJSON('["success", "skipped"]'), needs.wait-for-ci.result)
+    if: github.ref == 'refs/heads/develop'
     needs: wait-for-ci
     name: API
     runs-on: ubuntu-latest
@@ -273,12 +268,8 @@ jobs:
   # Its own job, gated on both deploys, because the conclusion is read per-SHA
   # when promoting a version onward: a failure here has to mean the environment
   # rather than a build or a Firebase outage.
-  # The skipped wait-for-ci on dispatch would also skip this job through the
-  # implicit success() check, so the deploys' results are tested directly.
   verify:
-    if: >-
-      !cancelled() && github.ref == 'refs/heads/develop'
-      && needs.web.result == 'success' && needs.api.result == 'success'
+    if: github.ref == 'refs/heads/develop'
     name: Verify the deployed environment
     runs-on: ubuntu-latest
     timeout-minutes: 10
