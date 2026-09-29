@@ -57,7 +57,7 @@ interface ReactionInfo {
  * @see https://genshin-impact.fandom.com/wiki/Elemental_Reaction
  */
 export const ELEMENT_REACTION_TYPES: Record<string, ReactionInfo> = {
-  // Amplifying Reactions (damage multipliers) - version 1.0
+  // Amplifying Reactions (damage multipliers)
   VAPORIZE: {
     type: REACTION_TYPES.AMPLIFYING,
     elements: [ELEMENTS.PYRO, ELEMENTS.HYDRO],
@@ -69,7 +69,7 @@ export const ELEMENT_REACTION_TYPES: Record<string, ReactionInfo> = {
     version: '1.0',
   },
 
-  // Transformative Reactions (fixed damage + EM scaling) - version 1.0 base
+  // Transformative Reactions (fixed damage + EM scaling)
   OVERLOADED: {
     type: REACTION_TYPES.TRANSFORMATIVE,
     elements: [ELEMENTS.PYRO, ELEMENTS.ELECTRO],
@@ -97,7 +97,7 @@ export const ELEMENT_REACTION_TYPES: Record<string, ReactionInfo> = {
     version: '3.0',
   },
 
-  // Additive Reactions (flat damage bonus to triggering attack) - version 3.0
+  // Additive Reactions (flat damage bonus to triggering attack)
   AGGRAVATE: {
     type: REACTION_TYPES.ADDITIVE,
     elements: [ELEMENTS.ELECTRO, ELEMENTS.DENDRO],
@@ -109,7 +109,7 @@ export const ELEMENT_REACTION_TYPES: Record<string, ReactionInfo> = {
     version: '3.0',
   },
 
-  // Dendro Core Reactions (create Dendro Cores that burst) - version 3.0
+  // Dendro Core Reactions (create Dendro Cores that burst)
   BLOOM: {
     type: REACTION_TYPES.DENDRO_CORE,
     elements: [ELEMENTS.HYDRO, ELEMENTS.DENDRO],
@@ -128,7 +128,7 @@ export const ELEMENT_REACTION_TYPES: Record<string, ReactionInfo> = {
     version: '3.0',
   },
 
-  // Special/Status Reactions - version 1.0
+  // Special/Status Reactions
   FROZEN: {
     type: REACTION_TYPES.STATUS,
     elements: [ELEMENTS.HYDRO, ELEMENTS.CRYO],
@@ -136,7 +136,7 @@ export const ELEMENT_REACTION_TYPES: Record<string, ReactionInfo> = {
   },
   CRYSTALLIZE: { type: REACTION_TYPES.STATUS, elements: [ELEMENTS.GEO], version: '1.0' },
 
-  // Lunar Reactions (version 5.1+ content, Fontaine region) - version 5.1
+  // Lunar Reactions
   LUNAR_CHARGED: {
     type: REACTION_TYPES.LUNAR,
     elements: [ELEMENTS.HYDRO, ELEMENTS.ELECTRO],

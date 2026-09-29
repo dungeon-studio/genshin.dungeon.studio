@@ -40,11 +40,7 @@ REACTION_NAME: {
 }
 ```
 
-### 3. Update version comment
-
-Update the MAINTENANCE NOTE comment at the top of `elements.ts` with the latest version and description of changes.
-
-### 4. Verify and test
+### 3. Verify and test
 
 ```bash
 # Type check
