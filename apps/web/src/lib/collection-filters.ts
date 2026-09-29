@@ -6,7 +6,6 @@ import type { Rarity } from '@genshin/game-data';
 type OwnershipFilter = 'all' | 'owned' | 'unowned';
 type SortDirection = 'asc' | 'desc';
 
-/** The sort fields every collection offers, with their display labels. */
 export const SORT_FIELDS = [
   { value: 'release', label: 'Release' },
   { value: 'name', label: 'Name' },
@@ -14,7 +13,7 @@ export const SORT_FIELDS = [
 
 type SortField = (typeof SORT_FIELDS)[number]['value'];
 
-/** Fields shared by every collection filter; each concrete state adds its own category set. */
+/** Each collection extends this with its own category set. */
 export interface BaseFilterState {
   search: string;
   rarities: Set<Rarity>;
@@ -41,19 +40,14 @@ interface CollectionItem {
 
 type Comparator<I> = (a: I, b: I) => number;
 
-/** The two ways collections differ when filtered: which category they group by, and how they order by release. */
+/** `compareRelease` may tie; name and then ID break the tie, so the order is stable. */
 export interface CollectionFilterConfig<I extends CollectionItem, F extends BaseFilterState, C> {
   category: (item: I) => C;
   selectedCategories: (filters: F) => ReadonlySet<C>;
   compareRelease: Comparator<I>;
 }
 
-/**
- * The collection narrowed and ordered for display.
- *
- * An empty category or rarity set means no constraint rather than no matches, so
- * the default state shows everything.
- */
+/** An empty category or rarity set means no constraint, so the default state shows everything. */
 export function filterCollection<I extends CollectionItem, F extends BaseFilterState, C>(
   items: readonly I[],
   filters: F,
@@ -92,7 +86,6 @@ function matcher<I extends CollectionItem, F extends BaseFilterState, C>(
 const byName: Comparator<CollectionItem> = (a, b) => a.name.localeCompare(b.name);
 const byId: Comparator<CollectionItem> = (a, b) => a.id.localeCompare(b.id);
 
-/** Name and then ID break a release tie, so the order is stable. */
 function byRelease<I extends CollectionItem>(compareRelease: Comparator<I>): Comparator<I> {
   return (a, b) => compareRelease(a, b) || byName(a, b) || byId(a, b);
 }

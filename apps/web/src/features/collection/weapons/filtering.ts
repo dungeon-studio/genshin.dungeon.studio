@@ -15,12 +15,7 @@ export function initialFilterState(): WeaponFilterState {
   return { ...initialBaseFilterState(), weaponTypes: new Set<WeaponType>() };
 }
 
-/**
- * The weapon catalogue narrowed by type and ordered for display.
- *
- * Weapons carry no release date, so ordering by release uses the version.
- * Everything from one version ties and falls back to name and then ID.
- */
+/** Weapons carry no release date, so release order uses the version and weapons from one version tie. */
 export function filterWeapons(
   weapons: readonly Weapon[],
   filters: WeaponFilterState,

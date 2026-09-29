@@ -14,12 +14,7 @@ export function initialFilterState(): CharacterFilterState {
   return { ...initialBaseFilterState(), elements: new Set<Element>() };
 }
 
-/**
- * The roster narrowed by element and ordered for display.
- *
- * Ordering by release uses each character's release date, which separates
- * characters that shipped in one version.
- */
+/** Release order uses each character's release date, which separates characters that shipped in one version. */
 export function filterCharacters(
   characters: readonly Character[],
   filters: CharacterFilterState,
