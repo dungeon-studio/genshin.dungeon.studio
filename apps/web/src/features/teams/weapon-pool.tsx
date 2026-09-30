@@ -16,7 +16,10 @@ import { useId, useMemo, useState } from 'react';
 import { WeaponSummary } from '@/components/summaries/weapon-summary';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
-import { weaponIdsOf } from '@/features/collection/weapons/use-weapon-collection-store';
+import {
+  groupByWeapon,
+  weaponIdsOf,
+} from '@/features/collection/weapons/use-weapon-collection-store';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
 import { EmptyPool } from '@/features/teams/empty-pool';
 import { useTeamStore } from '@/features/teams/use-team-store';
@@ -104,14 +107,7 @@ export function WeaponPool({
     };
   }, [filters, ownedWeaponIds, hasWeaponsOfType]);
 
-  const instancesByWeaponId = useMemo(
-    () =>
-      collectionWeapons.reduce(
-        (map, cw) => map.set(cw.weaponId, [...(map.get(cw.weaponId) ?? []), cw]),
-        new Map<string, CollectionWeapon[]>(),
-      ),
-    [collectionWeapons],
-  );
+  const instancesByWeaponId = useMemo(() => groupByWeapon(collectionWeapons), [collectionWeapons]);
 
   if (ownedCount === 0) return <EmptyWeaponPool />;
   if (weaponType && !hasWeaponsOfType) return <EmptyWeaponPool weaponType={weaponType} />;

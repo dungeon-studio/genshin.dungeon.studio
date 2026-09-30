@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionWeapon } from '@genshin/domain';
 import type { WeaponId, WeaponType } from '@genshin/game-data';
 import { WEAPON_ROSTER, WEAPON_TYPES } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
@@ -15,7 +14,10 @@ import { signInWithGoogle } from '@/features/auth';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
-import { weaponIdsOf } from '@/features/collection/weapons/use-weapon-collection-store';
+import {
+  groupByWeapon,
+  weaponIdsOf,
+} from '@/features/collection/weapons/use-weapon-collection-store';
 import { WeaponCard } from '@/features/collection/weapons/weapon-card';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
 import { WeaponInstanceSidebar } from '@/features/collection/weapons/weapon-instance-sidebar';
@@ -39,13 +41,6 @@ function filtersFromSearchParams(searchParams: URLSearchParams): WeaponFilterSta
     state.weaponTypes = new Set<WeaponType>([typeParam as WeaponType]);
   }
   return state;
-}
-
-function countInstances(instances: CollectionWeapon[]): Record<string, number> {
-  return instances.reduce<Record<string, number>>(
-    (counts, { weaponId }) => ({ ...counts, [weaponId]: (counts[weaponId] ?? 0) + 1 }),
-    {},
-  );
 }
 
 function LoadingCollection(): JSX.Element {
@@ -88,7 +83,7 @@ export function WeaponsPage(): JSX.Element {
 
   const ownedWeaponIds = useMemo(() => weaponIdsOf(Object.values(weapons)), [weapons]);
 
-  const instanceCounts = useMemo(() => countInstances(Object.values(weapons)), [weapons]);
+  const instancesByWeaponId = useMemo(() => groupByWeapon(Object.values(weapons)), [weapons]);
 
   const { filteredWeapons, filteredOwnedCount } = useMemo(() => {
     const filtered = filterWeapons(WEAPON_ROSTER, filters, ownedWeaponIds);
@@ -152,7 +147,7 @@ export function WeaponsPage(): JSX.Element {
             <WeaponCard
               key={weapon.id}
               weapon={weapon}
-              instanceCount={instanceCounts[weapon.id] ?? 0}
+              instanceCount={instancesByWeaponId.get(weapon.id)?.length ?? 0}
               selected={effectiveSelectedWeaponId === weapon.id}
               onClick={handleWeaponClick}
             />
