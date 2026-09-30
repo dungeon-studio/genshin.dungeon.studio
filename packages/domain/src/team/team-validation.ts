@@ -107,7 +107,7 @@ export function validateAcrossTeams(
   currentMembers: CollectionTeamMembers,
   allTeams: { slot: TeamSlot; members: CollectionTeamMembers }[],
 ): ValidationIssue[] {
-  const holders = weaponHoldersOutside(slot, allTeams);
+  const holders = weaponHoldersInOtherTeams(slot, allTeams);
   return [...currentMembers.entries()].flatMap(([i, member]) => {
     if (!member?.weaponInstanceId) return [];
     const holder = holders.get(member.weaponInstanceId);
@@ -121,8 +121,8 @@ export function validateAcrossTeams(
   });
 }
 
-/** Maps each weapon instance equipped outside `slot` to the character holding it. */
-function weaponHoldersOutside(
+/** Maps each equipped weapon instance to the character holding it. */
+function weaponHoldersInOtherTeams(
   slot: TeamSlot,
   allTeams: { slot: TeamSlot; members: CollectionTeamMembers }[],
 ): Map<string, string> {
