@@ -72,7 +72,7 @@ Rules about whether a value is legal, rather than whether it's well-formed, go i
 
 Colocate a small helper component in the same file as its only caller, as a private function that isn't exported. Promote it to its own file when a second caller appears.
 
-Apply Tailwind utility classes directly rather than inline `style` objects, and merge conditional class names with `cn()` from `@/lib/utils`. A value only the browser can compute—a measured offset, a percentage from live data—is the exception.
+Apply Tailwind utility classes directly rather than inline `style` objects. A value only the browser can compute—a measured offset, a percentage from live data—is the exception. Merge conditional class names with `cn()`.
 
 ## Tests
 

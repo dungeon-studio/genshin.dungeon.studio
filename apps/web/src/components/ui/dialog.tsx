@@ -6,7 +6,7 @@ import { X } from 'lucide-react';
 import type { JSX } from 'react';
 import * as React from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/class-names';
 
 const Dialog = DialogPrimitive.Root;
 

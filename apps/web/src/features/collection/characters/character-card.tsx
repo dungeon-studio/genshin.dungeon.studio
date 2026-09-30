@@ -11,13 +11,13 @@ import { useState } from 'react';
 
 import { CharacterSummary } from '@/components/summaries/character-summary';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/class-names';
 import {
   ELEMENT_BORDER_COLORS,
   ELEMENT_BORDER_COLORS_DIM,
   ELEMENT_FOCUS_RINGS,
   ELEMENT_SELECTED_RINGS,
 } from '@/lib/element-styles';
-import { cn } from '@/lib/utils';
 
 interface ConstellationPopoverProps {
   character: Character;
