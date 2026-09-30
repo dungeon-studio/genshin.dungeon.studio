@@ -43,10 +43,7 @@ interface TeamStoreState {
   resetTeams: () => void;
 }
 
-/**
- * Overwrites fields of one slot's team and stamps `updatedAt`, marking the
- * change as a user edit.
- */
+/** Stamps `updatedAt` alongside `patch`, marking the change as a user edit. */
 function withTeam(
   state: Pick<TeamStoreState, 'teams'>,
   slot: TeamSlot,
@@ -70,7 +67,6 @@ function withMembers(
   });
 }
 
-/** The weapon `characterId` holds on a team other than `slot`, if any. */
 function weaponHeldElsewhere(
   teams: Record<TeamSlot, CollectionTeam>,
   slot: TeamSlot,
