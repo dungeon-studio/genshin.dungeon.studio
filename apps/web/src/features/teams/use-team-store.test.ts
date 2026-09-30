@@ -289,7 +289,6 @@ describe('useTeamStore', () => {
       useTeamStore.getState().setTeam(3, custom);
 
       expect(useTeamStore.getState().teams[3]).toEqual(custom);
-      // Other teams unchanged
       expect(useTeamStore.getState().teams[1].name).toBe('Team 1');
     });
   });

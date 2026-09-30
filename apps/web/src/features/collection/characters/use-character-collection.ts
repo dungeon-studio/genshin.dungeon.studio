@@ -241,7 +241,6 @@ export function useCollection(): UseCollectionResult {
   const { mutate: removeCharacterApi } = useRemoveCharacterMutation(user?.uid);
   const { mutate: setConstellationLevelApi } = useSetConstellationLevelMutation(user?.uid);
 
-  // Patch zustand with confirmed server data
   const applyMutationResult = useCallback(
     ({ characterId, entry }: MutationResult) => {
       storeSetConstellationLevel(characterId, entry.constellationLevel);
