@@ -21,8 +21,8 @@ import { filterWeapons, initialFilterState } from '@/features/collection/weapons
 import { weaponIdsOf } from '@/features/collection/weapons/use-weapon-collection-store';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
 import { useTeamStore } from '@/features/teams/use-team-store';
+import { cn } from '@/lib/class-names';
 import { RARITY_BORDER_COLORS, RARITY_SELECTED_RINGS } from '@/lib/rarity-styles';
-import { cn } from '@/lib/utils';
 
 function buildEquippedWeapons(
   teams: Record<TeamSlot, CollectionTeam>,

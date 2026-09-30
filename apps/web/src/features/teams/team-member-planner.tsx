@@ -11,8 +11,8 @@ import { getCharacterById } from '@genshin/game-data';
 import type { JSX } from 'react';
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { cn } from '@/lib/class-names';
 import { elementBorderClass } from '@/lib/element-styles';
-import { cn } from '@/lib/utils';
 
 import { ArtifactPlanner } from './artifact-planner';
 import { TeamMemberSummary } from './team-member-summary';

@@ -5,8 +5,8 @@ import type { Weapon } from '@genshin/game-data';
 import type { JSX } from 'react';
 
 import { WeaponSummary } from '@/components/summaries/weapon-summary';
+import { cn } from '@/lib/class-names';
 import { RARITY_BORDER_COLORS } from '@/lib/rarity-styles';
-import { cn } from '@/lib/utils';
 
 interface WeaponCardProps {
   weapon: Weapon;
