@@ -98,7 +98,7 @@ writing tests.
 - Prefer composition over inheritance and use early returns for conditional rendering.
 - Use semantic HTML: proper heading hierarchy, structural elements, and native interactive elements (`<button>`, not `<div onClick>`).
 - Mark decorative Lucide icons with `aria-hidden="true"` and `focusable={false}`. Icons inside labeled buttons, or adjacent to labeled inputs, are decorative.
-- Use aliases such as `@/components`, `@/components/ui`, `@/lib`, and `@/lib/class-names`.
+- Use aliases such as `@/components`, `@/components/ui`, and `@/lib`.
 - `shadcn/ui` gotchas:
   - Use ESM imports in Tailwind or Vite config (`import ...`), not `require()`.
   - Keep Vite starter CSS dark-mode defaults removed from `apps/web/src/index.css`; don't reintroduce `color-scheme` or `prefers-color-scheme` defaults.
