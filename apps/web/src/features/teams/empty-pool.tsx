@@ -15,7 +15,6 @@ interface EmptyPoolProps {
   to: string;
 }
 
-/** Stands in for a pool with nothing owned, pointing at the page that adds to it. */
 export function EmptyPool({
   icon: Icon,
   heading,
