@@ -55,3 +55,4 @@ Widening the roster means relaxing one of those two rules.
 - [Update Elemental Reactions](update-game-reactions.md)
 - [Update Genshin Impact Game Weapons](update-game-weapons.md)
 - [Update Genshin Impact Artifact Sets](update-game-artifacts.md)
+- [Regenerate Genshin Impact Elemental Resonances](update-game-resonances.md)
