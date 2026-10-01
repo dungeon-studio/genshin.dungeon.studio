@@ -44,3 +44,4 @@ with no mapping. To add one:
 - [Regenerate Genshin Impact Characters](update-game-characters.md)
 - [Update Elemental Reactions](update-game-reactions.md)
 - [Update Genshin Impact Artifact Sets](update-game-artifacts.md)
+- [Regenerate Genshin Impact Elemental Resonances](update-game-resonances.md)
