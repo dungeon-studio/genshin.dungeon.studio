@@ -20,9 +20,8 @@ import type { ValidationIssue } from '@genshin/validation';
 import { issue } from '@genshin/validation';
 
 /**
- * An artifact plan whose affix names and set IDs are plain strings. The
- * game-data types on `ArtifactPlan` rule out, at compile time, the very values
- * `validateArtifactPlan` exists to report.
+ * `ArtifactPlan` with plain strings in place of its game-data types, which would
+ * reject at compile time the unknown names and IDs `validateArtifactPlan` reports.
  */
 interface UncheckedArtifactPlan {
   sands?: string;

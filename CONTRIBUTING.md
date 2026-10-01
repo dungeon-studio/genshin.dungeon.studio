@@ -85,7 +85,7 @@ Separate a commit body from the subject with a blank line and wrap it at 72 char
 
 [CHANGELOG.md](CHANGELOG.md) is hand-curated and follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). GitHub Release notes are separate and build themselves from merged pull requests.
 
-Add a changelog line for any change a user of the deployed app would notice. That covers a new or removed feature, a change to existing behavior, a user-facing bug fix, or a security fix. Put it under `### Added` in the `[Unreleased]` section, one bullet per change. Skip internal refactors, test-only changes, dependency bumps users don't perceive, and documentation fixes. The [CHANGELOG.md](CHANGELOG.md) header describes the entry layout.
+Add a changelog line for any change a user of the deployed app would notice. That covers a new or removed feature, a change to existing behavior, a user-facing bug fix, or a security fix. Put it under `### Added` in the `[Unreleased]` section, one bullet per change. Skip internal refactors, test-only changes, dependency bumps users don't perceive, and documentation fixes.
 
 Name a technology—"zustand store," "TanStack Query"—only when the user interacts with that technology directly.
 
