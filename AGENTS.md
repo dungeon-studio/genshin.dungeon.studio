@@ -119,7 +119,7 @@ writing tests.
 ## Documentation rules
 
 - Place guidance at the highest-priority location that fits, following the documentation strategy in [Code conventions](docs/reference/code-conventions.md). Don't duplicate guidance across files; link to the canonical source.
-- Keep docs accurate to `HEAD`: verify dependencies, command availability, and feature status. State plans explicitly as planned or not yet implemented.
+- Keep docs accurate to `HEAD`: verify dependencies, command availability, and feature status. Describe only what exists; the issue tracker and milestones carry plans.
 - Every source file needs SPDX headers. For files without comment syntax, declare them in `REUSE.toml`; see [How to add SPDX headers to new files](docs/how-tos/add-spdx-headers.md).
 - Wrap file and directory paths in backticks in prose and YAML metadata (for example, `apps/web`, `packages/game-data/src/index.ts`). Markdown link targets don't need backticks.
 - When adding features, keep these descriptions in sync: `package.json` `description`, `README.md` tagline or summary, and `CONTRIBUTING.md` references to commands or scripts.

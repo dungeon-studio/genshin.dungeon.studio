@@ -20,25 +20,26 @@ import type { ValidationIssue } from '@genshin/validation';
 import { issue } from '@genshin/validation';
 
 /**
- * Checks a plan's affix names and set IDs against game data, plus the rules no
- * type expresses: at most three minor affixes per list, no duplicates within a
- * list, and no affix in both.
- *
- * @returns every issue found, empty when the plan is valid.
+ * `ArtifactPlan` with plain strings in place of its game-data types, which would
+ * reject at compile time the unknown names and IDs `validateArtifactPlan` reports.
  */
-// Intentionally uses loose string types instead of ArtifactPlan's branded types
-// (SandsMainAffix, etc.). The validator's job is to check raw input *before* it
-// becomes a domain object. Accepting ArtifactPlan would make the call circular.
-// Once #590 lands, JSON Schema enum constraints handle this at the boundary and
-// this function shrinks to just the disjointness check.
-export function validateArtifactPlan(plan: {
+interface UncheckedArtifactPlan {
   sands?: string;
   goblet?: string;
   circlet?: string;
   sets?: string[];
   priorityMinorAffixes?: string[];
   secondaryMinorAffixes?: string[];
-}): ValidationIssue[] {
+}
+
+/**
+ * Checks a plan's affix names and set IDs against game data, plus the rules no
+ * type expresses: at most three minor affixes per list, no duplicates within a
+ * list, and no affix in both.
+ *
+ * @returns every issue found, empty when the plan is valid.
+ */
+export function validateArtifactPlan(plan: UncheckedArtifactPlan): ValidationIssue[] {
   return [
     ...validateMainAffix('sands', plan.sands, SANDS_MAIN_AFFIXES),
     ...validateMainAffix('goblet', plan.goblet, GOBLET_MAIN_AFFIXES),
