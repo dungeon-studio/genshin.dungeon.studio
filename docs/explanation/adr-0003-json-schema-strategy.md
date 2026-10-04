@@ -11,7 +11,7 @@ amended-by: ADR-0005
 
 <!-- vale Microsoft.HeadingAcronyms = YES -->
 
-[ADR-0005](adr-0005-schema-direction-segment.md) later replaced this record's schema path convention and source file layout. Every other decision here stands.
+[ADR-0005](adr-0005-schema-direction-segment.md) later replaced this record's schema path convention and source file layout.
 
 ## Context and problem statement
 
@@ -198,7 +198,7 @@ This creates symmetric content negotiation: clients declare the schema they expe
 
 - Good, because dedicated endpoints keep schemas independently cacheable, addressable, and reusable across documentation and tooling. Inline `$schema` references in every response would bloat payloads and mix data with metadata.
 - Good, because `profile` on `Content-Type` mirrors `profile` on `Accept`, so both directions of content negotiation use the same parameter.
-- Good, because co-hosting with the API keeps the `$id` and the retrieval address identical, avoids cross-origin complexity, and deploys schemas atomically with the code they describe.
+- Good, because co-hosting with the API keeps the `$id` and the retrieval address identical, avoids cross-origin complexity, and deploys schemas atomically with the code they describe. Schema files live alongside the route handlers, so updating both together is natural.
 - Good, because versioning every schema from first publication means clients always compare version numbers the same way, and the major, minor, or patch bump says what kind of change happened.
 
 ### Documentation-only schemas

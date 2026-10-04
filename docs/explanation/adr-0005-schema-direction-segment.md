@@ -91,7 +91,7 @@ File names use the pattern `{method}-{direction}-v{n}.ts`. The serving path mirr
 
 ### Schema `$id` values
 
-The schema route stamps `$id` at serve time using the request origin, as established in ADR-0003:
+The schema route stamps `$id` at serve time using the request origin:
 
 ```json
 {
@@ -130,7 +130,6 @@ All other decisions from ADR-0003 remain in effect:
 
 `/profiles/json-schema/{module}/{method}/{direction}/{version}.json`, with directories like `profile/get/response/1.0.0.json`.
 
-- Good, because it separates request schemas from response schemas.
 - Bad, because it adds two levels of nesting beyond the module, where the flat layout achieves the same disambiguation with less structure.
 
 ### ADR-0003 convention with implicit direction
@@ -145,5 +144,5 @@ This record formalizes the convention already implemented in the codebase. Issue
 
 - [ADR-0003](adr-0003-json-schema-strategy.md), the base decision this record amends
 - [`schema-versioning.md`](../reference/schema-versioning.md), for how `v{n}` in these paths relates to the repository's wider versioning model
-- [Issue #479](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/479), which proposed this change
+- [Issue #479](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/479), Schema paths include request/response direction segment
 - [PR #478 discussion](https://github.com/dungeon-studio/genshin.dungeon.studio/pull/478#discussion_r2935894001), where the ambiguity surfaced

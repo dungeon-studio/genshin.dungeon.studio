@@ -85,11 +85,13 @@ No verification:
 
 Time-based `max-age` on HTML:
 
-- Bad, because it delays users seeing a deploy.
+- Bad, because it delays users seeing a deploy and is less reliable.
+- Bad, because the HTTP/1.0 `Expires` header is obsolete, and `max-age=0` on HTML creates unnecessary cache requests.
+- Bad, because `must-revalidate` adds nothing that `no-cache` doesn't already give, and `no-cache` is simpler and standard.
 
 No cache:
 
-- Bad, because every request pays the round trip.
+- Bad, because every request pays the endpoint overhead, which worsens performance.
 
 Service worker:
 
