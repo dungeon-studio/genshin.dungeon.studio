@@ -123,7 +123,6 @@ test('a rejected add rolls back and says so', async ({ signedInPage: page, pageF
   await expect(page.getByText('Failed to add character. Change has been reverted.')).toBeVisible();
   await expect(page.getByRole('button', { name: addCharacterLabel(character) })).toBeVisible();
 
-  // The browser logs the injected 503 itself. It is the one failure this test
-  // asked for, so it leaves the list before the fixture checks it.
+  // Chromium logs the injected 503 as a console error.
   expect(pageFailures.splice(0)).toEqual([expect.stringContaining('status of 503')]);
 });

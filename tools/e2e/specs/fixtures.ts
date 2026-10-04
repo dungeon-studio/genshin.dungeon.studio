@@ -75,17 +75,14 @@ export async function withApiWrite(
     blockedApiWrite(page, method, pathFragment),
   ]);
 
-  // Awaited together because the block can land while the action is still
-  // running.
+  // A blocked request can fail before the action resolves.
   await Promise.all([settled, action()]);
 }
 
 /**
- * Reject as soon as a matching API write fails in the browser.
+ * Fail, naming the request, when the browser blocks a matching API write.
  *
- * A write the browser blocks, as it does when the API refuses the app's origin,
- * never gets a response to wait for; without this, the wait runs out the test
- * timeout on a message that never names the request.
+ * A blocked write, such as one refused by CORS, never gets a response to wait on.
  */
 async function blockedApiWrite(page: Page, method: string, pathFragment: string): Promise<never> {
   const request = await page.waitForEvent('requestfailed', (candidate) =>
