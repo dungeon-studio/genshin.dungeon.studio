@@ -43,13 +43,21 @@ const OTHER_CLAYMORE_USER = characterWielding('Claymore', CLAYMORE_USER);
 const CLAYMORE_INSTANCE = 'claymore-instance' as CollectionWeaponId;
 const BOW_INSTANCE = 'bow-instance' as CollectionWeaponId;
 
-function renderTeamsPage() {
+interface RenderOptions {
+  /** Owns a Claymore user and a Bow user, plus one weapon of each type. */
+  seeded?: boolean;
+  loading?: boolean;
+}
+
+function renderTeamsPage({ seeded = true, loading = false }: RenderOptions = {}) {
   const view = render(
     <MemoryRouter>
       <TeamsPage />
     </MemoryRouter>,
-    { wrapper: createWrapper() },
+    { wrapper: createWrapper({ loading }) },
   );
+
+  if (!seeded) return view;
 
   // Seeded after mount: the hooks clear their stores on finding no signed-in user.
   act(() => {
@@ -67,13 +75,13 @@ function renderTeamsPage() {
   return view;
 }
 
-describe('TeamsPage weapon-first flow', () => {
-  beforeEach(() => {
-    useTeamStore.getState().resetTeams();
-    useCollectionStore.getState().clearCharacters();
-    useWeaponCollectionStore.getState().clearWeapons();
-  });
+beforeEach(() => {
+  useTeamStore.getState().resetTeams();
+  useCollectionStore.getState().clearCharacters();
+  useWeaponCollectionStore.getState().clearWeapons();
+});
 
+describe('TeamsPage weapon-first flow', () => {
   it('assigns a weapon picked before a character, and narrows the pool to its wielders', async () => {
     const user = userEvent.setup({ delay: null });
     renderTeamsPage();
@@ -311,23 +319,8 @@ describe('TeamsPage weapon-first flow', () => {
 });
 
 describe('TeamsPage empty collection', () => {
-  beforeEach(() => {
-    useTeamStore.getState().resetTeams();
-    useCollectionStore.getState().clearCharacters();
-    useWeaponCollectionStore.getState().clearWeapons();
-  });
-
-  function renderWithoutCharacters(options: { loading?: boolean } = {}) {
-    return render(
-      <MemoryRouter>
-        <TeamsPage />
-      </MemoryRouter>,
-      { wrapper: createWrapper(options) },
-    );
-  }
-
   it('points the user at the characters page', () => {
-    renderWithoutCharacters();
+    renderTeamsPage({ seeded: false });
 
     expect(screen.getByRole('link', { name: 'Go to Characters' })).toHaveAttribute(
       'href',
@@ -336,7 +329,7 @@ describe('TeamsPage empty collection', () => {
   });
 
   it('withholds the prompt until the collection has loaded', () => {
-    renderWithoutCharacters({ loading: true });
+    renderTeamsPage({ seeded: false, loading: true });
 
     expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
   });
