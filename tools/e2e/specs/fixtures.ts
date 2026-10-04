@@ -4,7 +4,8 @@
 import type { Character, Weapon } from '@genshin/game-data';
 import { CHARACTER_ROSTER, WEAPON_ROSTER } from '@genshin/game-data';
 import type { Page, Request } from '@playwright/test';
-import { test as base, expect } from '@playwright/test';
+
+import { test as base, expect } from './page-failures';
 
 /**
  * A character and a weapon the character can actually equip.
@@ -60,6 +61,10 @@ export const apiPath = {
  * behind it, so the UI reaches its asserted state before the server has the
  * change. Anything that later reloads the page has to await that write, and the
  * listener has to be watching before the request goes out.
+ *
+ * A write the browser blocks, as it does when the API refuses the app's origin,
+ * never gets a response; it fails here as soon as the request does rather than
+ * waiting out the test timeout.
  */
 export async function withApiWrite(
   page: Page,
@@ -67,12 +72,22 @@ export async function withApiWrite(
   pathFragment: string,
   action: () => Promise<void>,
 ): Promise<void> {
-  const settled = page.waitForResponse(
-    (response) => isApiWrite(response.request(), method, pathFragment) && response.ok(),
-  );
+  const settled = Promise.race([
+    page.waitForResponse(
+      (response) => isApiWrite(response.request(), method, pathFragment) && response.ok(),
+    ),
+    page
+      .waitForEvent('requestfailed', (request) => isApiWrite(request, method, pathFragment))
+      .then((request) => {
+        throw new Error(
+          `${request.method()} ${request.url()} failed: ${request.failure()?.errorText ?? 'unknown error'}`,
+        );
+      }),
+  ]);
 
-  await action();
-  await settled;
+  // Awaited together because the failure can land while the action is still
+  // running.
+  await Promise.all([settled, action()]);
 }
 
 /**
