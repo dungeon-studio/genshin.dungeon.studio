@@ -5,12 +5,8 @@
 // (ci.yml passes the base ref via SCHEMA_COMPAT_BASE) rather than per commit,
 // since it proves a branch against its base.
 
-import { execFileSync } from 'node:child_process';
-
 import { checkSnapshotCompat } from './compat.js';
-
-const git = (args: string[]): string =>
-  execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+import { git } from './git.js';
 
 /**
  * The git ref holding the last-shipped schemas. Defaults to `origin/develop`
@@ -31,7 +27,7 @@ function resolveBaseRef(): string {
 }
 
 const baseRef = resolveBaseRef();
-const violations = checkSnapshotCompat(git(['rev-parse', '--show-toplevel']), baseRef);
+const violations = checkSnapshotCompat(git(['rev-parse', '--show-toplevel']).trim(), baseRef);
 
 if (violations.length > 0) {
   console.error(`Schema compatibility check failed (base: ${baseRef}):\n`);

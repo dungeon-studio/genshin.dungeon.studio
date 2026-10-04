@@ -30,13 +30,10 @@ export function toSnapshot(schema: z.ZodType): string {
 }
 
 /**
- * Write `{dir}/{name}/v{n}.json` for every registered version.
- *
- * Throws before writing anything when a `currentVersion` isn't the newest
- * defined schema: the writer would stamp data with a version the reader can't
- * resolve.
+ * Throw when a `currentVersion` isn't the newest defined schema: the writer
+ * would stamp data with a version the reader can't resolve.
  */
-export function exportSnapshots(registry: SchemaRegistry, dir: string): void {
+function assertCurrentIsLatest(registry: SchemaRegistry): void {
   for (const [name, { versions, currentVersion }] of Object.entries(registry)) {
     const latest = Math.max(...Object.keys(versions).map(Number));
     if (currentVersion !== latest) {
@@ -45,6 +42,11 @@ export function exportSnapshots(registry: SchemaRegistry, dir: string): void {
       );
     }
   }
+}
+
+/** Write `{dir}/{name}/v{n}.json` for every registered version, validating the whole registry first. */
+export function exportSnapshots(registry: SchemaRegistry, dir: string): void {
+  assertCurrentIsLatest(registry);
 
   for (const [name, { versions }] of Object.entries(registry)) {
     mkdirSync(join(dir, name), { recursive: true });
