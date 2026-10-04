@@ -70,12 +70,12 @@ Zod
 zustand
 
 # Standards, formats, and acronyms
+ADR
 API
 APIs
 camelCase
 CI/CD
 CLI
-DSGEP
 ESM
 HMR
 HTTP

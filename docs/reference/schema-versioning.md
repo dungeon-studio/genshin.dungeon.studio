@@ -72,8 +72,8 @@ real loss.
 
 The `profile` media type parameter on `Content-Type` and `Accept` carries the
 version, naming a JSON Schema served at its own URL.
-[DSGEP-003](../explanation/dsgep-003-json-schema-strategy.md) decides that
-mechanism; [DSGEP-005](../explanation/dsgep-005-schema-direction-segment.md)
+[ADR-0003](../explanation/adr-0003-json-schema-strategy.md) decides that
+mechanism; [ADR-0005](../explanation/adr-0005-schema-direction-segment.md)
 decides the schema paths.
 
 A route declares its **acceptor set** as the profile list passed to
@@ -87,8 +87,8 @@ type is the union over its route's acceptor set, and serialisation emits the
 current version alone.
 
 Retiring a version withdraws it from every acceptor set and from the schema
-endpoints, following DSGEP-003's [major version transition
-process](../explanation/dsgep-003-json-schema-strategy.md#major-version-transition-process).
+endpoints, following ADR-0003's [major version transition
+process](../explanation/adr-0003-json-schema-strategy.md#major-version-transition-process).
 
 ---
 

@@ -79,6 +79,20 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
 SPDX-License-Identifier = "MIT"
 
+[[annotations]]
+path = "docs/explanation/adr-*.md"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
+SPDX-License-Identifier = "MIT"
+
+# Adapted from the MADR 4.0.0 template, which MADR offers under MIT.
+
+[[annotations]]
+path = "docs/explanation/adr-template.md"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2017-2022 Oliver Kopp, Olaf Zimmermann"
+SPDX-License-Identifier = "MIT"
+
 # A template's own header belongs to the file it generates. Overriding rather
 # than aggregating keeps the interpolated `{{ currentYear }}` out of the
 # copyright holders reuse reports.

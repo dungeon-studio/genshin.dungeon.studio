@@ -82,7 +82,7 @@ Terraform, or workflow. Read it from an environment variable.
 
 - Define each JSON Schema as a typed TypeScript module in `apps/api/src/profiles/json-schema/{module}/`, not a `.json` file.
 - Export a single `const` using `as const satisfies JsonSchemaProfile` from `@/profiles/json-schema/json-schema-profile.js`.
-- Name files `{method}-{direction}-v{n}.ts` (for example, `get-response-v1.ts`, `put-request-v1.ts`). `{method}` is the lowercase HTTP method and `{direction}` is `request` or `response`. The serving path mirrors the filename: `/profiles/json-schema/{module}/{method}-{direction}-v{n}.json`. See [DSGEP-005](docs/explanation/dsgep-005-schema-direction-segment.md).
+- Name files `{method}-{direction}-v{n}.ts` (for example, `get-response-v1.ts`, `put-request-v1.ts`). `{method}` is the lowercase HTTP method and `{direction}` is `request` or `response`. The serving path mirrors the filename: `/profiles/json-schema/{module}/{method}-{direction}-v{n}.json`. See [ADR-0005](docs/explanation/adr-0005-schema-direction-segment.md).
 - Register every schema module in `apps/api/src/profiles/json-schema/registry.ts`. The registry completeness test discovers files on disk and asserts the registry contains each one.
 - The schema route stamps `$id` from the request origin at serve time. Don't declare `$id` in schema modules.
 
@@ -120,6 +120,7 @@ writing tests.
 
 - Place guidance at the highest-priority location that fits, following the documentation strategy in [Code conventions](docs/reference/code-conventions.md). Don't duplicate guidance across files; link to the canonical source.
 - Keep docs accurate to `HEAD`: verify dependencies, command availability, and feature status. State plans explicitly as planned or not yet implemented.
+- Record architecture decisions as MADR records at `docs/explanation/adr-NNNN-<slug>.md`, numbered in sequence and copied from `docs/explanation/adr-template.md`.
 - Every source file needs SPDX headers. For files without comment syntax, declare them in `REUSE.toml`; see [How to add SPDX headers to new files](docs/how-tos/add-spdx-headers.md).
 - Wrap file and directory paths in backticks in prose and YAML metadata (for example, `apps/web`, `packages/game-data/src/index.ts`). Markdown link targets don't need backticks.
 - When adding features, keep these descriptions in sync: `package.json` `description`, `README.md` tagline or summary, and `CONTRIBUTING.md` references to commands or scripts.
