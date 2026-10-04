@@ -16,7 +16,8 @@
     "ghcr.io/devcontainers/features/terraform:1": {},
     "ghcr.io/devcontainers-extra/features/pre-commit:2": {},
     "ghcr.io/shinepukur/devcontainer-features/vale:1": {
-      "version": "3.14.1"
+      // renovate: datasource=github-tags depName=errata-ai/vale extractVersion=^v(?<version>.+)$
+      "version": "3.19.0"
     },
     "ghcr.io/devcontainers-extra/features/firebase-cli:2": {},
     "ghcr.io/devcontainers/features/java:1": {
