@@ -5,7 +5,7 @@ import type { Element } from '@genshin/game-data';
 import { ELEMENTS } from '@genshin/game-data';
 import type { JSX } from 'react';
 
-import { FilterBar } from '@/components/filter-bar';
+import { CollectionToolbar } from '@/components/collection-toolbar';
 import { SORT_FIELDS } from '@/lib/collection-filters';
 import { ELEMENT_BG_COLORS } from '@/lib/element-styles';
 import { getElementIconPath } from '@/lib/elements';
@@ -38,7 +38,7 @@ export function CharacterFilters({
   }
 
   return (
-    <FilterBar
+    <CollectionToolbar
       filters={filters}
       onChange={onChange}
       sortFields={SORT_FIELDS}

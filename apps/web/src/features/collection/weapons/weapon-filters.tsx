@@ -5,7 +5,7 @@ import type { WeaponType } from '@genshin/game-data';
 import { WEAPON_TYPES } from '@genshin/game-data';
 import type { JSX } from 'react';
 
-import { FilterBar } from '@/components/filter-bar';
+import { CollectionToolbar } from '@/components/collection-toolbar';
 import { SORT_FIELDS } from '@/lib/collection-filters';
 import { toggleInSet } from '@/lib/toggle-in-set';
 import { getWeaponTypeIconPath } from '@/lib/weapon-types';
@@ -39,7 +39,7 @@ export function WeaponFilters({
   }
 
   return (
-    <FilterBar
+    <CollectionToolbar
       filters={filters}
       onChange={onChange}
       sortFields={SORT_FIELDS}
