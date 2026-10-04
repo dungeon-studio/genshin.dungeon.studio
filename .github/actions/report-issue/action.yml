@@ -1,0 +1,42 @@
+---
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+name: Report issue
+description: Open a report issue, or update the open one with the same title so repeat findings never file duplicates
+
+# The calling job needs `issues: write`.
+
+inputs:
+  title:
+    description: 'Issue title, also the key that finds the open report'
+    required: true
+  content-filepath:
+    description: 'Markdown file holding the issue body'
+    required: true
+  labels:
+    description: 'Comma-separated labels for the issue'
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    - name: Find existing report issue
+      id: report
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        TITLE: ${{ inputs.title }}
+      run: |
+        number=$(gh issue list --repo "${GITHUB_REPOSITORY}" --state open \
+          --search "${TITLE} in:title" --json number --jq '.[0].number // empty')
+        echo "number=${number}" >> "${GITHUB_OUTPUT}"
+
+    - name: Open or update report issue
+      uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6.0.0
+      with:
+        title: ${{ inputs.title }}
+        content-filepath: ${{ inputs.content-filepath }}
+        issue-number: ${{ steps.report.outputs.number }}
+        labels: ${{ inputs.labels }}
