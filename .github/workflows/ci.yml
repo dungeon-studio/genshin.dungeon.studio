@@ -135,7 +135,7 @@ jobs:
       - name: Check schema compatibility
         env:
           SCHEMA_COMPAT_BASE: origin/${{ github.base_ref }}
-        run: pnpm --filter @genshin/api schemas:check
+        run: pnpm --filter @genshin/schema-snapshots schemas:check
 
   # Smoke-tests the root `pnpm dev` script — the one command a contributor runs
   # to bring up the whole stack (web, API, Firebase emulators). The e2e job below

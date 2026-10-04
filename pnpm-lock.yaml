@@ -96,6 +96,9 @@ importers:
       '@genshin/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@genshin/schema-snapshots':
+        specifier: workspace:*
+        version: link:../../tools/schema-snapshots
       '@genshin/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -123,9 +126,6 @@ importers:
       json-schema-to-ts:
         specifier: 3.1.1
         version: 3.1.1
-      jsoncompat:
-        specifier: 0.4.2
-        version: 0.4.2
       tsc-alias:
         specifier: 1.9.2
         version: 1.9.2
@@ -214,6 +214,9 @@ importers:
       '@genshin/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@genshin/schema-snapshots':
+        specifier: workspace:*
+        version: link:../../tools/schema-snapshots
       '@genshin/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig

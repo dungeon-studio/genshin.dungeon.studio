@@ -4,7 +4,8 @@
 import { z } from 'zod';
 
 // One persisted collection entry, exported as the unit the compatibility gate
-// snapshots (see schema-registry.ts for why the entry, not the whole store).
+// snapshots (see `SchemaRegistry` in tools/schema-snapshots for why the entry,
+// not the whole store).
 // Kept as loose as the Firestore-side V1CharacterSchema (apps/api): the snapshot
 // gates structure only, while assertCollectionCharacter enforces the domain
 // semantics (known character, constellation range, ISO timestamps) at migrate time.
