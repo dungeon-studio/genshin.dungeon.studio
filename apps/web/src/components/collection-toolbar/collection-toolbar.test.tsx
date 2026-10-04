@@ -6,7 +6,6 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { BaseFilterState } from '@/lib/collection-filters';
-import { SORT_FIELDS } from '@/lib/collection-filters';
 
 import { CollectionToolbar } from './collection-toolbar';
 import type { FilterCategoryConfig } from './types';
@@ -50,7 +49,6 @@ function renderToolbar(
       filters={props.filters ?? baseFilters()}
       onChange={onChange}
       category={category}
-      sortFields={SORT_FIELDS}
       noun={{ one: 'item', other: 'items' }}
       searchLabel="Search items by name"
       filteredCount={props.filteredCount ?? 5}

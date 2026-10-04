@@ -6,7 +6,6 @@ import { ELEMENTS } from '@genshin/game-data';
 import type { JSX } from 'react';
 
 import { CollectionToolbar } from '@/components/collection-toolbar';
-import { SORT_FIELDS } from '@/lib/collection-filters';
 import { ELEMENT_BG_COLORS } from '@/lib/element-styles';
 import { getElementIconPath } from '@/lib/elements';
 import { toggleInSet } from '@/lib/toggle-in-set';
@@ -41,7 +40,6 @@ export function CharacterFilters({
     <CollectionToolbar
       filters={filters}
       onChange={onChange}
-      sortFields={SORT_FIELDS}
       noun={{ one: 'character', other: 'characters' }}
       searchLabel="Search characters by name"
       showOwnership={showOwnership}

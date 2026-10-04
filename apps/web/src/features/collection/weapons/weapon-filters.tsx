@@ -6,7 +6,6 @@ import { WEAPON_TYPES } from '@genshin/game-data';
 import type { JSX } from 'react';
 
 import { CollectionToolbar } from '@/components/collection-toolbar';
-import { SORT_FIELDS } from '@/lib/collection-filters';
 import { toggleInSet } from '@/lib/toggle-in-set';
 import { getWeaponTypeIconPath } from '@/lib/weapon-types';
 
@@ -42,7 +41,6 @@ export function WeaponFilters({
     <CollectionToolbar
       filters={filters}
       onChange={onChange}
-      sortFields={SORT_FIELDS}
       noun={{ one: 'weapon', other: 'weapons' }}
       searchLabel="Search weapons by name"
       showOwnership={showOwnership}

@@ -18,7 +18,6 @@ interface CollectionToolbarProps<F extends BaseFilterState, T extends string> ex
   filters: F;
   onChange: (filters: F) => void;
   category: FilterCategoryConfig<T>;
-  sortFields: readonly { value: F['sortField']; label: string }[];
   /** What the summary counts, e.g. characters. */
   noun: Noun;
   searchLabel: string;
@@ -41,7 +40,6 @@ export function CollectionToolbar<F extends BaseFilterState, T extends string>({
   filters,
   onChange,
   category,
-  sortFields,
   noun,
   searchLabel,
   showOwnership = true,
@@ -72,7 +70,7 @@ export function CollectionToolbar<F extends BaseFilterState, T extends string>({
         {/* Held together so the slack falls before the pair, not between them. */}
         <div className="gap-1.5 ml-auto flex shrink-0 items-center">
           <FilterSummary noun={noun} showOwnership={showOwnership} {...counts} />
-          <SortControl filters={filters} onChange={onChange} sortFields={sortFields} />
+          <SortControl filters={filters} onChange={onChange} />
         </div>
       </div>
 
