@@ -74,11 +74,8 @@ jobs:
 
             core.info(`${summary} Within the ${STALE_DAYS}-day window.`);
 
-  # The post-deploy verify job in deploy.yml answers whether a change broke dev.
-  # Breakage with no deploy behind it, such as an expired certificate, a
-  # Firebase quota or policy change, or DNS drift, only shows up by rerunning
-  # the same suite on a schedule. Failures update one report issue and block
-  # nothing.
+  # Reruns the post-deploy suite to catch breakage no deploy caused: an expired
+  # certificate, a Firebase quota or policy change, or DNS drift. Never blocks.
   deployed-environment:
     name: Check the deployed environment
     runs-on: ubuntu-latest

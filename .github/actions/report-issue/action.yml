@@ -3,13 +3,13 @@
 # SPDX-License-Identifier: MIT
 
 name: Report issue
-description: Open a report issue, or update the open one with the same title so repeat findings never file duplicates
+description: Update the open issue with this title, or open one if none exists
 
 # The calling job needs `issues: write`.
 
 inputs:
   title:
-    description: 'Issue title, also the key that finds the open report'
+    description: 'Issue title, which also identifies the open issue to update'
     required: true
   content-filepath:
     description: 'Markdown file holding the issue body'
