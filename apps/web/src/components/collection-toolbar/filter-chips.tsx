@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { Rarity } from '@genshin/game-data';
-import type { JSX } from 'react';
+import type { JSX, ReactNode } from 'react';
 
 import { ThemedIcon } from '@/components/ui/themed-icon';
 import type { BaseFilterState } from '@/lib/collection-filters';
@@ -12,9 +12,6 @@ import { cn } from '@/lib/utils';
 import type { FilterCategoryConfig } from './types';
 
 const RARITY_VALUES: Rarity[] = [5, 4];
-
-const CHIP = 'rounded-full px-2.5 py-1 text-xs font-medium transition-colors';
-const CHIP_IDLE = 'bg-muted text-muted-foreground hover:bg-muted/80';
 
 interface FilterChipsProps<F extends BaseFilterState, T extends string> {
   filters: F;
@@ -39,51 +36,42 @@ export function FilterChips<F extends BaseFilterState, T extends string>({
     <div className="gap-1.5 flex flex-wrap items-center">
       {showOwnership &&
         (['all', 'owned', 'unowned'] as const).map((value) => (
-          <button
+          <Chip
             key={value}
-            type="button"
+            pressed={filters.ownership === value}
             onClick={() => onChange({ ...filters, ownership: value })}
-            className={cn(
-              CHIP,
-              'capitalize',
-              filters.ownership === value ? 'bg-foreground text-background' : CHIP_IDLE,
-            )}
-            aria-pressed={filters.ownership === value}
+            className="capitalize"
+            pressedClassName="bg-foreground text-background"
           >
             {value}
-          </button>
+          </Chip>
         ))}
 
       {showOwnership && <ChipDivider />}
 
       {RARITY_VALUES.map((rarity) => (
-        <button
+        <Chip
           key={rarity}
-          type="button"
+          pressed={filters.rarities.has(rarity)}
           onClick={() => toggleRarity(rarity)}
-          className={cn(CHIP, filters.rarities.has(rarity) ? 'text-white bg-geo-dark' : CHIP_IDLE)}
-          aria-pressed={filters.rarities.has(rarity)}
-          aria-label={`Filter by ${rarity}-star`}
+          pressedClassName="text-white bg-geo-dark"
+          label={`Filter by ${rarity}-star`}
         >
           {rarity}★
-        </button>
+        </Chip>
       ))}
 
       {showCategory && <ChipDivider />}
 
       {showCategory &&
         category.values.map((value) => (
-          <button
+          <Chip
             key={value}
-            type="button"
+            pressed={category.selected.has(value)}
             onClick={() => category.onToggle(value)}
-            className={cn(
-              CHIP,
-              'gap-1.5 inline-flex items-center',
-              category.selected.has(value) ? category.activeClassName(value) : CHIP_IDLE,
-            )}
-            aria-pressed={category.selected.has(value)}
-            aria-label={`Filter by ${value}`}
+            className="gap-1.5 inline-flex items-center"
+            pressedClassName={category.activeClassName(value)}
+            label={`Filter by ${value}`}
           >
             <ThemedIcon
               lightSrc={category.iconPath(value, 'light')}
@@ -92,9 +80,43 @@ export function FilterChips<F extends BaseFilterState, T extends string>({
               className="h-3.5 w-3.5"
             />
             {value}
-          </button>
+          </Chip>
         ))}
     </div>
+  );
+}
+
+interface ChipProps {
+  pressed: boolean;
+  onClick: () => void;
+  pressedClassName: string;
+  className?: string;
+  label?: string;
+  children: ReactNode;
+}
+
+function Chip({
+  pressed,
+  onClick,
+  pressedClassName,
+  className,
+  label,
+  children,
+}: ChipProps): JSX.Element {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'px-2.5 py-1 text-xs font-medium rounded-full transition-colors',
+        className,
+        pressed ? pressedClassName : 'bg-muted text-muted-foreground hover:bg-muted/80',
+      )}
+      aria-pressed={pressed}
+      aria-label={label}
+    >
+      {children}
+    </button>
   );
 }
 
