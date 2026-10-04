@@ -74,6 +74,74 @@ jobs:
 
             core.info(`${summary} Within the ${STALE_DAYS}-day window.`);
 
+  # The post-deploy verify job in deploy.yml answers whether a change broke dev.
+  # Breakage with no deploy behind it, such as an expired certificate, a
+  # Firebase quota or policy change, or DNS drift, only shows up by rerunning
+  # the same suite on a schedule. Failures update one report issue and block
+  # nothing.
+  deployed-environment:
+    name: Check the deployed environment
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+
+    env:
+      E2E_BASE_URL: https://develop.genshin.dungeon.studio
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - uses: ./.github/actions/setup-playwright
+
+      - name: Run end-to-end tests
+        id: e2e
+        continue-on-error: true
+        run: pnpm turbo run test:deployed --filter=@genshin/e2e
+
+      - name: Upload Playwright report
+        if: steps.e2e.outcome == 'failure'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-report
+          path: /tmp/genshin-e2e
+          retention-days: 7
+
+      - name: Write report
+        if: steps.e2e.outcome == 'failure'
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          cat > deployed-report.md <<EOF
+          The scheduled \`@deployed\` suite failed against ${E2E_BASE_URL}.
+
+          The Playwright report is the \`playwright-report\` artifact on [the run](${RUN_URL}).
+          EOF
+
+      - name: Find existing report issue
+        if: steps.e2e.outcome == 'failure'
+        id: report
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          number=$(gh issue list --repo "${{ github.repository }}" --state open \
+            --search 'Deployed Environment Report in:title' --json number --jq '.[0].number // empty')
+          echo "number=${number}" >> "${GITHUB_OUTPUT}"
+
+      - name: Open or update issue on failure
+        if: steps.e2e.outcome == 'failure'
+        uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6.0.0
+        with:
+          title: Deployed Environment Report
+          content-filepath: ./deployed-report.md
+          issue-number: ${{ steps.report.outputs.number }}
+          labels: bug
+
   stale-pull-requests:
     name: Prune stale pull requests
     runs-on: ubuntu-latest
