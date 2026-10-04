@@ -246,7 +246,10 @@ export function TeamsPage(): JSX.Element {
   );
 }
 
-/** Points a user with no characters at where teams start, ahead of the empty team rows. */
+/**
+ * Leaves the team rows in place: a user who removes every character still sees the teams
+ * that reference them.
+ */
 function EmptyCollectionPrompt(): JSX.Element {
   return (
     <EmptyCollection

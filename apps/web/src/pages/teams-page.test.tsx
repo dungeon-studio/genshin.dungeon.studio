@@ -44,7 +44,6 @@ const CLAYMORE_INSTANCE = 'claymore-instance' as CollectionWeaponId;
 const BOW_INSTANCE = 'bow-instance' as CollectionWeaponId;
 
 interface RenderOptions {
-  /** Owns a Claymore user and a Bow user, plus one weapon of each type. */
   seeded?: boolean;
   loading?: boolean;
 }

@@ -12,13 +12,12 @@ interface EmptyCollectionProps {
   icon: LucideIcon;
   title: string;
   description: string;
-  /** The collection page that fills the gap. */
   to: string;
   action: string;
   className?: string;
 }
 
-/** Stands in for a view that has nothing to show until the user adds to a collection. */
+/** Empty state for a view that needs collection entries before it can show anything. */
 export function EmptyCollection({
   icon: Icon,
   title,
