@@ -44,7 +44,7 @@ function assertCurrentIsLatest(registry: SchemaRegistry): void {
   }
 }
 
-/** Write `{dir}/{name}/v{n}.json` for every registered version, validating the whole registry first. */
+/** Write `{dir}/{name}/v{n}.json` for every registered version, or nothing when the registry is invalid. */
 export function exportSnapshots(registry: SchemaRegistry, dir: string): void {
   assertCurrentIsLatest(registry);
 

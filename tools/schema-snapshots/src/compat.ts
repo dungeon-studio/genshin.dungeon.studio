@@ -44,8 +44,7 @@ export function checkSnapshotCompat(repoRoot: string, baseRef: string): string[]
       const base = git(['show', `${baseRef}:${path}`], repoRoot);
       const head = readFileSync(join(repoRoot, path), 'utf8');
 
-      // "deserializer" compatibility holds when the new schema accepts everything
-      // the old one did (L(old) ⊆ L(new)), meaning the change only widens.
+      // "deserializer" mode passes when the new schema accepts everything the old one did.
       if (check_compat(base, head, 'deserializer')) return [];
 
       return [

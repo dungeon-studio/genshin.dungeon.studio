@@ -10,8 +10,7 @@ import { V1PersistedCollectionSchema } from './v1.js';
  * The version zustand `persist` stamps onto every write.
  *
  * Bump this and add a `schemas/v{n}.ts` whenever the persisted shape changes;
- * the compatibility gate (`tools/schema-snapshots`) then
- * forces the change to only widen.
+ * the compatibility gate in `tools/schema-snapshots` forces a change to only widen.
  */
 export const CURRENT_VERSION = 1 as const;
 

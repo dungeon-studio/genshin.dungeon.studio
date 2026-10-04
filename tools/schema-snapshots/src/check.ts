@@ -1,18 +1,16 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-// Repo-wide gate over every committed schema snapshot. Runs per pull request
-// (ci.yml passes the base ref via SCHEMA_COMPAT_BASE) rather than per commit,
-// since it proves a branch against its base.
+// Proves a branch against its base, so it runs per pull request, not per commit.
 
 import { checkSnapshotCompat } from './compat.js';
 import { git } from './git.js';
 
 /**
- * The git ref holding the last-shipped schemas. Defaults to `origin/develop`
- * (the merge target) rather than a local `develop`, which can be stale enough
- * to predate the snapshots and pass vacuously. Falls back to `HEAD` before the
- * remote exists, which compares the branch with itself and so proves nothing.
+ * The git ref holding the last-shipped schemas: `SCHEMA_COMPAT_BASE` when set,
+ * else `origin/develop`. A local `develop` can predate the snapshots and pass
+ * vacuously. The `HEAD` fallback, for a clone with no remote, compares the
+ * branch with itself and proves nothing.
  */
 function resolveBaseRef(): string {
   const override = process.env.SCHEMA_COMPAT_BASE;
