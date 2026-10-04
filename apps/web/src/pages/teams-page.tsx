@@ -4,14 +4,17 @@
 import type { CollectionWeapon, CollectionWeaponId, TeamSlot } from '@genshin/domain';
 import { TEAM_SLOTS } from '@genshin/domain';
 import { getCharacterById, getWeaponById } from '@genshin/game-data';
+import { Users } from 'lucide-react';
 import type { JSX, ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { Container } from '@/components/chrome/container';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
 import type { CharacterCollection } from '@/features/collection/characters/use-character-collection-store';
+import { ownedCharacterIds } from '@/features/collection/characters/use-character-collection-store';
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
 import { CharacterPool } from '@/features/teams/character-pool';
 import { TeamPlanner } from '@/features/teams/team-planner';
@@ -137,8 +140,13 @@ function useMemberEditor(
 type MemberEditor = ReturnType<typeof useMemberEditor>;
 
 export function TeamsPage(): JSX.Element {
-  const { characters, getCharacter } = useCollection();
+  const { characters, getCharacter, isLoading: collectionLoading } = useCollection();
   const { weapons } = useWeaponCollection();
+
+  const collectionEmpty = useMemo(
+    () => !collectionLoading && ownedCharacterIds(characters).size === 0,
+    [collectionLoading, characters],
+  );
 
   const collectionWeapons = useMemo(() => Object.values(weapons), [weapons]);
 
@@ -170,6 +178,8 @@ export function TeamsPage(): JSX.Element {
   return (
     <Container className="py-12">
       <h1 className="sr-only">Teams</h1>
+
+      {collectionEmpty && <EmptyCollectionPrompt />}
 
       <div className="space-y-4">
         {TEAM_SLOTS.map((slot) => (
@@ -236,6 +246,29 @@ export function TeamsPage(): JSX.Element {
         </SheetContent>
       </Sheet>
     </Container>
+  );
+}
+
+/** Points a user with no characters at where teams start, ahead of the empty team rows. */
+function EmptyCollectionPrompt(): JSX.Element {
+  return (
+    <section
+      aria-labelledby="empty-collection-heading"
+      className="mb-8 gap-4 p-6 sm:flex-row flex flex-col items-center rounded-lg border border-border"
+    >
+      <Users className="h-10 w-10 text-muted-foreground" aria-hidden="true" focusable={false} />
+      <div className="sm:text-left text-center">
+        <h2 id="empty-collection-heading" className="font-medium">
+          No characters in your collection
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Add the characters you own to start building teams.
+        </p>
+      </div>
+      <Button asChild className="sm:ml-auto">
+        <Link to="/characters">Go to Characters</Link>
+      </Button>
+    </section>
   );
 }
 

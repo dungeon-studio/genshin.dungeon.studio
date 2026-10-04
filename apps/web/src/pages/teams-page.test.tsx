@@ -309,3 +309,41 @@ describe('TeamsPage weapon-first flow', () => {
     expect(screen.queryByText(/users for/)).not.toBeInTheDocument();
   }, 30_000);
 });
+
+describe('TeamsPage empty collection', () => {
+  beforeEach(() => {
+    useTeamStore.getState().resetTeams();
+    useCollectionStore.getState().clearCharacters();
+    useWeaponCollectionStore.getState().clearWeapons();
+  });
+
+  function renderWithoutCharacters(options: { loading?: boolean } = {}) {
+    return render(
+      <MemoryRouter>
+        <TeamsPage />
+      </MemoryRouter>,
+      { wrapper: createWrapper(options) },
+    );
+  }
+
+  it('points the user at the characters page', () => {
+    renderWithoutCharacters();
+
+    expect(screen.getByRole('link', { name: 'Go to Characters' })).toHaveAttribute(
+      'href',
+      '/characters',
+    );
+  });
+
+  it('withholds the prompt until the collection has loaded', () => {
+    renderWithoutCharacters({ loading: true });
+
+    expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
+  });
+
+  it('shows no prompt once the user owns a character', () => {
+    renderTeamsPage();
+
+    expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
+  });
+});
