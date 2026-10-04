@@ -90,6 +90,7 @@ export function CollectionToolbar<F extends BaseFilterState, T extends string>({
           filters={filters}
           onChange={onChange}
           category={category}
+          showCategory={showCategory}
           showOwnership={showOwnership}
         />
       </div>

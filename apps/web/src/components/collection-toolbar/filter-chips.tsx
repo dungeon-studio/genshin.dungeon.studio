@@ -20,6 +20,7 @@ interface FilterChipsProps<F extends BaseFilterState, T extends string> {
   filters: F;
   onChange: (filters: F) => void;
   category: FilterCategoryConfig<T>;
+  showCategory: boolean;
   showOwnership: boolean;
 }
 
@@ -27,10 +28,9 @@ export function FilterChips<F extends BaseFilterState, T extends string>({
   filters,
   onChange,
   category,
+  showCategory,
   showOwnership,
 }: FilterChipsProps<F, T>): JSX.Element {
-  const showCategory = category.show ?? true;
-
   function toggleRarity(rarity: Rarity) {
     onChange({ ...filters, rarities: toggleInSet(filters.rarities, rarity) });
   }
