@@ -50,13 +50,6 @@ export function CollectionToolbar<F extends BaseFilterState, T extends string>({
   const controlsId = useId();
   const [expanded, setExpanded] = useState(false);
 
-  // Sorting reorders rather than narrows, so it never counts.
-  const activeFilterCount =
-    (filters.search ? 1 : 0) +
-    filters.rarities.size +
-    (showCategory ? category.selected.size : 0) +
-    (showOwnership && filters.ownership !== 'all' ? 1 : 0);
-
   return (
     <div className="space-y-1.5">
       {/* Wraps rather than squeezing the search box below its placeholder on ~320px screens. */}
@@ -79,7 +72,11 @@ export function CollectionToolbar<F extends BaseFilterState, T extends string>({
           <FilterToggle
             expanded={expanded}
             onToggle={() => setExpanded((wasExpanded) => !wasExpanded)}
-            activeCount={activeFilterCount}
+            activeCount={countActiveFilters(
+              filters,
+              showCategory ? category.selected.size : 0,
+              showOwnership,
+            )}
             controlsId={controlsId}
           />
         </div>
@@ -95,5 +92,19 @@ export function CollectionToolbar<F extends BaseFilterState, T extends string>({
         />
       </div>
     </div>
+  );
+}
+
+/** Sorting reorders rather than narrows, so it never counts. */
+function countActiveFilters(
+  filters: BaseFilterState,
+  selectedCategoryCount: number,
+  showOwnership: boolean,
+): number {
+  return (
+    (filters.search ? 1 : 0) +
+    filters.rarities.size +
+    selectedCategoryCount +
+    (showOwnership && filters.ownership !== 'all' ? 1 : 0)
   );
 }
