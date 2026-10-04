@@ -76,7 +76,7 @@
     },
     {
       "customType": "regex",
-      "description": "Track annotated version options of devcontainer features the devcontainer manager doesn't read",
+      "description": "Track annotated version options of devcontainer features",
       "managerFilePatterns": [".devcontainer/devcontainer.json"],
       "matchStrings": [
         "// renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s+\"version\":\\s*\"(?<currentValue>[^\"]+)\""
