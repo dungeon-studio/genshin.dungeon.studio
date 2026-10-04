@@ -31,7 +31,7 @@ interface CharacterPoolProps {
   memberIndex: number;
   /**
    * Restricts the pool to characters wielding this type. Deliberately not a toolbar
-   * facet: it constrains which character is valid, so the user must not be able to
+   * filter: it constrains which character is valid, so the user must not be able to
    * clear it and pick one that cannot equip the weapon.
    */
   weaponType?: WeaponType;

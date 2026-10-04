@@ -6,10 +6,10 @@ export interface FilterCategoryConfig<T extends string> {
   values: readonly T[];
   selected: Set<T>;
   onToggle: (value: T) => void;
-  /** Active-state classes for a value, e.g. per-element background color. */
+  /** Replaces a selected chip's idle colors, so it sets both background and text. */
   activeClassName: (value: T) => string;
   iconPath: (value: T, variant: 'light' | 'dark') => string;
-  /** Render the category row (default true). */
+  /** Defaults to true. */
   show?: boolean;
 }
 

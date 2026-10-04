@@ -27,11 +27,9 @@ interface CollectionToolbarProps<F extends BaseFilterState, T extends string> ex
 }
 
 /**
- * The search, filter, and sort row every collection page shares.
+ * The search, sort, count, and filter controls every collection page shares.
  *
- * Generic over both the filter state and the one category that differs between
- * collections, which is what lets characters filter by element and weapons by
- * type through the same component. A new collection supplies a
+ * Collections differ only in their category row, so a new one supplies a
  * {@link FilterCategoryConfig} rather than a new toolbar.
  *
  * Controlled: it holds no filter state and hands a whole new `F` to `onChange`.
