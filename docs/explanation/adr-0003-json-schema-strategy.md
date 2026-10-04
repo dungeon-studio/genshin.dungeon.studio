@@ -11,7 +11,7 @@ amended-by: ADR-0005
 
 <!-- vale Microsoft.HeadingAcronyms = YES -->
 
-[ADR-0005](adr-0005-schema-direction-segment.md) later replaced this record's schema path convention and source file layout.
+[ADR-0005](adr-0005-schema-direction-segment.md) replaces this record's schema path convention and source file layout.
 
 ## Context and problem statement
 
@@ -233,8 +233,6 @@ Keep schemas unversioned by default and use distinct filenames such as `get-v2.j
 - Bad, because clients can't compare version numbers to determine compatibility.
 
 ## More information
-
-ADR-0005 replaced the file location and serving paths below with a flat `apps/api/src/profiles/json-schema/{module}/{method}-{direction}-v{n}.ts` layout. They stay as the shape this decision accepted.
 
 ### Schema file location
 

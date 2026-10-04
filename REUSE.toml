@@ -74,18 +74,12 @@ SPDX-License-Identifier = "MIT"
 # Frontmatter must be the first line, leaving no room for a header.
 
 [[annotations]]
-path = ".claude/commands/**.md"
+path = [".claude/commands/**.md", "docs/explanation/adr-*.md"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
 SPDX-License-Identifier = "MIT"
 
-[[annotations]]
-path = "docs/explanation/adr-*.md"
-precedence = "aggregate"
-SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
-SPDX-License-Identifier = "MIT"
-
-# Adapted from the MADR 4.0.0 template, which MADR offers under MIT.
+# Adapted from the MADR template.
 
 [[annotations]]
 path = "docs/explanation/adr-template.md"

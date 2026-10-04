@@ -41,12 +41,11 @@ The verification and cache decisions from ADR-0002 carry over unchanged: structu
 - Good, because the custom domain serves HTTPS, unblocking Firebase Auth.
 - Good, because Firebase manages the CDN and certificates.
 - Bad, because the catch-all rewrite to `index.html` means no server-side 404 responses, so the client handles unknown routes.
-- Bad, because the site now depends on Firebase.
+- Bad, because the site depends on Firebase.
 - Bad, because Firebase Hosting Terraform resources are beta-only and need the `google-beta` provider.
 
 ## More information
 
-- [ADR-0002](adr-0002-web-deployment-automation.md) is the decision this one supersedes.
 - [ADR-0001](adr-0001-wif-architecture.md) covers how the pipeline authenticates to Google Cloud.
 - [Firebase Hosting documentation](https://firebase.google.com/docs/hosting)
 - [`Cache-Control` header reference](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control)

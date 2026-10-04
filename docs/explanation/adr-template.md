@@ -1,9 +1,7 @@
 ---
-# MADR 4.0.0 front matter. `status` is one of proposed, rejected, accepted,
-# deprecated, or "superseded by ADR-NNNN". This project extends it with
-# `supersedes`, `amends`, and `amended-by`, each taking an ADR-NNNN value.
-# Pair `supersedes` with the other record's superseded status, and `amends`
-# with the other record's `amended-by`, so both directions read.
+# status: proposed, rejected, accepted, deprecated, or superseded by ADR-NNNN.
+# Optional project keys, each an ADR-NNNN: supersedes, amends, amended-by.
+# Give the other record the reverse so both directions read.
 status: proposed
 date: YYYY-MM-DD
 decision-makers: Name

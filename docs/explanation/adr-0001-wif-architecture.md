@@ -73,7 +73,7 @@ The pool lives in `dungeon-studio-genshin-shared` because that project already h
 - Good, because security configuration lives in bootstrap and environments consume it, so ownership is clear.
 - Good, because one place holds the WIF configuration to check when authentication fails.
 - Good, because adding staging or production environments means calling the bindings module again, with no new WIF infrastructure.
-- Bad, because bootstrap Terraform now manages cross-project IAM, with dev service accounts binding to the shared WIF pool. This increases bootstrap scope.
+- Bad, because bootstrap Terraform manages cross-project IAM, with dev service accounts binding to the shared WIF pool. This increases bootstrap scope.
 - Bad, because bootstrap must run with a user account that has sufficient permissions. Automating it would need a different authentication mechanism, such as a service account with domain-wide delegation.
 - Neutral, because bootstrap reads the state bucket from the shared project it also creates. This intentional deadlock requires creating the shared project and state bucket out of band on first run, then importing the project. That's acceptable because state is only for disaster recovery, and projects can be rebuilt from scratch.
 

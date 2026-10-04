@@ -17,8 +17,6 @@ amends: ADR-0003
 
 ADR-0003 also set a source file layout using nested directories per module and name. During implementation, the codebase adopted a flatter convention: schema files live directly under `apps/api/src/profiles/json-schema/{module}/` with filenames like `get-response-v1.ts` and serving paths like `/profiles/json-schema/profile/get-response-v1.json`. This embeds both the HTTP method and the direction in the filename, making request and response schemas distinguishable without additional directory nesting.
 
-The codebase has seven schema modules across five domain modules (`root`, `profile`, `characters`, `teams`, `weapons`). The gap between the ADR-0003 convention and the implementation surfaced during review of PR #478.
-
 ## Decision drivers
 
 - A PATCH endpoint may define both a request schema and a response schema, so the path needs a direction discriminator.
@@ -55,39 +53,13 @@ Where:
 ### Examples
 
 ```text
-GET /profiles/json-schema/profile/get-response-v1.json       → profile GET response schema v1
-GET /profiles/json-schema/profile/patch-request-v1.json       → profile PATCH request body schema v1
-GET /profiles/json-schema/characters/put-request-v1.json      → character PUT request body schema v1
-GET /profiles/json-schema/teams/put-request-v1.json           → team PUT request body schema v1
-GET /profiles/json-schema/weapons/post-request-v1.json        → weapon creation request schema v1
-GET /profiles/json-schema/weapons/patch-request-v1.json       → weapon update request schema v1
-GET /profiles/json-schema/root/get-response-v1.json           → API root response schema v1
+GET /profiles/json-schema/profile/get-response-v1.json    → profile GET response schema v1
+GET /profiles/json-schema/profile/patch-request-v1.json   → profile PATCH request body schema v1
 ```
 
 ### Source file layout
 
-Schema source files under `apps/api/src/profiles/json-schema/` use a flat layout per module:
-
-```text
-apps/api/src/profiles/json-schema/
-├── characters/
-│   └── put-request-v1.ts
-├── profile/
-│   ├── get-response-v1.ts
-│   └── patch-request-v1.ts
-├── root/
-│   └── get-response-v1.ts
-├── teams/
-│   └── put-request-v1.ts
-├── weapons/
-│   ├── patch-request-v1.ts
-│   └── post-request-v1.ts
-├── json-schema-profile.ts
-├── registry.ts
-└── registry.test.ts
-```
-
-File names use the pattern `{method}-{direction}-v{n}.ts`. The serving path mirrors the filename: `/profiles/json-schema/{module}/{method}-{direction}-v{n}.json`.
+Schema source files live in `apps/api/src/profiles/json-schema/{module}/`, one flat directory per module. File names use the pattern `{method}-{direction}-v{n}.ts`. The serving path mirrors the filename: `/profiles/json-schema/{module}/{method}-{direction}-v{n}.json`.
 
 ### Schema `$id` values
 
@@ -139,8 +111,6 @@ Keep `/schemas/{module}/{name}/{version}.json`, where `get` implicitly means the
 - Bad, because implicit conventions create ambiguity. A new contributor wouldn't know whether `patch/1.0.0.json` is the request or response schema without checking the file contents.
 
 ## More information
-
-This record formalizes the convention already implemented in the codebase. Issue [#570](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/570) moved schema modules from `src/schemas/` to `src/profiles/json-schema/` and renamed `schemaRegistry` to `jsonSchemaRegistry`, placing JSON Schema modules alongside ALPS under a unified `profiles/` directory. Alex Brandt drafted the record on 2026-03-15 and accepted it on 2026-04-04 with those paths.
 
 - [ADR-0003](adr-0003-json-schema-strategy.md), the base decision this record amends
 - [`schema-versioning.md`](../reference/schema-versioning.md), for how `v{n}` in these paths relates to the repository's wider versioning model

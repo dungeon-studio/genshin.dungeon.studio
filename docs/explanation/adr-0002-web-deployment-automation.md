@@ -117,6 +117,5 @@ Push trigger on `develop`:
 
 ## More information
 
-- [ADR-0004](adr-0004-firebase-hosting-migration.md) supersedes this decision by migrating web hosting to Firebase Hosting.
 - [ADR-0001](adr-0001-wif-architecture.md) covers how the pipeline authenticates to Google Cloud.
 - [`Cache-Control` header reference](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control)
