@@ -7,14 +7,14 @@ import { getCharacterById, getWeaponById } from '@genshin/game-data';
 import { Users } from 'lucide-react';
 import type { JSX, ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 import { Container } from '@/components/chrome/container';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
 import type { CharacterCollection } from '@/features/collection/characters/use-character-collection-store';
-import { ownedCharacterIds } from '@/features/collection/characters/use-character-collection-store';
+import { ownedCharacters } from '@/features/collection/characters/use-character-collection-store';
+import { EmptyCollection } from '@/features/collection/empty-collection';
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
 import { CharacterPool } from '@/features/teams/character-pool';
 import { TeamPlanner } from '@/features/teams/team-planner';
@@ -143,10 +143,7 @@ export function TeamsPage(): JSX.Element {
   const { characters, getCharacter, isLoading: collectionLoading } = useCollection();
   const { weapons } = useWeaponCollection();
 
-  const collectionEmpty = useMemo(
-    () => !collectionLoading && ownedCharacterIds(characters).size === 0,
-    [collectionLoading, characters],
-  );
+  const collectionEmpty = !collectionLoading && ownedCharacters(characters).length === 0;
 
   const collectionWeapons = useMemo(() => Object.values(weapons), [weapons]);
 
@@ -252,23 +249,14 @@ export function TeamsPage(): JSX.Element {
 /** Points a user with no characters at where teams start, ahead of the empty team rows. */
 function EmptyCollectionPrompt(): JSX.Element {
   return (
-    <section
-      aria-labelledby="empty-collection-heading"
-      className="mb-8 gap-4 p-6 sm:flex-row flex flex-col items-center rounded-lg border border-border"
-    >
-      <Users className="h-10 w-10 text-muted-foreground" aria-hidden="true" focusable={false} />
-      <div className="sm:text-left text-center">
-        <h2 id="empty-collection-heading" className="font-medium">
-          No characters in your collection
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Add the characters you own to start building teams.
-        </p>
-      </div>
-      <Button asChild className="sm:ml-auto">
-        <Link to="/characters">Go to Characters</Link>
-      </Button>
-    </section>
+    <EmptyCollection
+      icon={Users}
+      title="No characters in your collection"
+      description="Add the characters you own to start building teams."
+      to="/characters"
+      action="Go to Characters"
+      className="mb-8 rounded-lg border border-border"
+    />
   );
 }
 
