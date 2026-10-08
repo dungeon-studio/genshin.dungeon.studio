@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import contentType from 'content-type';
+import * as contentType from 'content-type';
 import type { MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
@@ -50,43 +50,36 @@ export function negotiateRequestSchema(profiles: ProfileLink[]): MiddlewareHandl
   const paths = profiles.map((p) => p.path);
 
   return async (c, next) => {
-    const header = c.req.header('Content-Type');
-    let profile: string | undefined;
-
-    if (header) {
-      // contentType.parse is lenient and does not throw on malformed input;
-      // round-trip through format to surface invalid type, parameter names,
-      // or values via its TypeError.
-      try {
-        const parsed = contentType.parse(header);
-        contentType.format(parsed);
-        profile = parsed.parameters['profile'];
-      } catch {
-        throw new HTTPException(400, {
-          message: 'Malformed Content-Type header',
-        });
-      }
-    }
-
-    let matched: string;
-
-    if (!profile) {
-      matched = paths[0];
-    } else {
-      const path = profilePath(profile);
-      const found = paths.find((p) => p === path);
-
-      if (!found) {
-        const supported = paths.join(', ');
-        throw new HTTPException(415, {
-          message: `Unsupported schema version. Supported: ${supported}`,
-        });
-      }
-
-      matched = found;
-    }
-
-    c.set('negotiatedSchema', matched);
+    const profile = parseProfile(c.req.header('Content-Type'));
+    c.set('negotiatedSchema', selectSchema(paths, profile));
     await next();
   };
+}
+
+function parseProfile(header: string | undefined): string | undefined {
+  if (!header) return undefined;
+
+  // parse accepts malformed headers and format rejects them, so the
+  // round-trip is the validation.
+  try {
+    const parsed = contentType.parse(header);
+    contentType.format(parsed);
+    return parsed.parameters['profile'];
+  } catch {
+    throw new HTTPException(400, {
+      message: 'Malformed Content-Type header',
+    });
+  }
+}
+
+function selectSchema(paths: string[], profile: string | undefined): string {
+  if (!profile) return paths[0];
+
+  const path = profilePath(profile);
+  if (paths.includes(path)) return path;
+
+  const supported = paths.join(', ');
+  throw new HTTPException(415, {
+    message: `Unsupported schema version. Supported: ${supported}`,
+  });
 }
