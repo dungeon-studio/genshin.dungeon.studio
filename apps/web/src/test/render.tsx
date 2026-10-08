@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import { QueryClient } from '@tanstack/react-query';
-import type { User } from 'firebase/auth';
 import type { ReactNode } from 'react';
 
+import type { AuthUser } from '@/features/auth';
 import { TestProviders } from '@/test/providers';
 
-// The composite hooks only read `user.uid`; a partial User is sufficient.
-export function fakeUser(uid: string): User {
-  return { uid } as User;
+// The composite hooks only read `user.uid`; a partial `AuthUser` is sufficient.
+export function fakeUser(uid: string): AuthUser {
+  return { uid } as AuthUser;
 }
 
 export function createTestQueryClient(): QueryClient {
@@ -23,7 +23,7 @@ export function createTestQueryClient(): QueryClient {
 }
 
 interface WrapperOptions {
-  user?: User | null;
+  user?: AuthUser | null;
   loading?: boolean;
   queryClient?: QueryClient;
 }

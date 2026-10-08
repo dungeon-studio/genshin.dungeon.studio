@@ -1,17 +1,17 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { User as FirebaseUser } from 'firebase/auth';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged } from '@firebase/auth';
 import { useEffect, useState } from 'react';
 import type { JSX, ReactNode } from 'react';
 
 import { auth } from '@/lib/firebase';
 
+import type { AuthUser } from './auth-context';
 import { AuthContext } from './auth-context';
 
 export function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
-  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

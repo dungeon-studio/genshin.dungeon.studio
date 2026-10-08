@@ -3,12 +3,12 @@
 
 import type { CharacterId } from '@genshin/domain';
 import { act, renderHook, waitFor } from '@testing-library/react';
-import type { User } from 'firebase/auth';
 import { http, HttpResponse } from 'msw';
 import type { ReactNode } from 'react';
 import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { AuthUser } from '@/features/auth';
 import { charactersDocument, makeCharacter } from '@/test/fixtures';
 import { server } from '@/test/msw/server';
 import { TestProviders } from '@/test/providers';
@@ -97,7 +97,7 @@ describe('useCollection merge-on-first-login', () => {
     );
 
     const queryClient = createTestQueryClient();
-    let authUser: User | null = fakeUser('user-1');
+    let authUser: AuthUser | null = fakeUser('user-1');
     function Wrapper({ children }: { children: ReactNode }) {
       return (
         <TestProviders queryClient={queryClient} user={authUser}>

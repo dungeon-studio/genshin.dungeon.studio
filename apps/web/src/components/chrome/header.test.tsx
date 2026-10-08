@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 import { render, screen } from '@testing-library/react';
-import type { User as FirebaseUser } from 'firebase/auth';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
+import type { AuthUser } from '@/features/auth';
 import { AuthContext } from '@/features/auth/auth-context';
 
 // ThemeToggle reads `window.matchMedia`, which jsdom doesn't implement.
@@ -15,9 +15,9 @@ vi.mock('@/features/account', () => ({ AccountMenu: () => <div>account menu</div
 
 const { Header } = await import('./header');
 
-const TRAVELER = { uid: 'user-1', displayName: 'Traveler', photoURL: null } as FirebaseUser;
+const TRAVELER = { uid: 'user-1', displayName: 'Traveler', photoURL: null } as AuthUser;
 
-function renderHeader(user: FirebaseUser | null) {
+function renderHeader(user: AuthUser | null) {
   const wrapper = ({ children }: { children: ReactNode }): ReactNode => (
     <MemoryRouter>
       <AuthContext value={{ user, loading: false }}>{children}</AuthContext>
