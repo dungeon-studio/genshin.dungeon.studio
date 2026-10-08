@@ -4,7 +4,8 @@
 import type { Character, Weapon } from '@genshin/game-data';
 import { CHARACTER_ROSTER, WEAPON_ROSTER } from '@genshin/game-data';
 import type { Page, Request } from '@playwright/test';
-import { test as base, expect } from '@playwright/test';
+
+import { test as base, expect } from './page-failures';
 
 /**
  * A character and a weapon the character can actually equip.
@@ -67,12 +68,30 @@ export async function withApiWrite(
   pathFragment: string,
   action: () => Promise<void>,
 ): Promise<void> {
-  const settled = page.waitForResponse(
-    (response) => isApiWrite(response.request(), method, pathFragment) && response.ok(),
+  const settled = Promise.race([
+    page.waitForResponse(
+      (response) => isApiWrite(response.request(), method, pathFragment) && response.ok(),
+    ),
+    blockedApiWrite(page, method, pathFragment),
+  ]);
+
+  // A blocked request can fail before the action resolves.
+  await Promise.all([settled, action()]);
+}
+
+/**
+ * Fail, naming the request, when the browser blocks a matching API write.
+ *
+ * A blocked write, such as one refused by CORS, never gets a response to wait on.
+ */
+async function blockedApiWrite(page: Page, method: string, pathFragment: string): Promise<never> {
+  const request = await page.waitForEvent('requestfailed', (candidate) =>
+    isApiWrite(candidate, method, pathFragment),
   );
 
-  await action();
-  await settled;
+  throw new Error(
+    `${request.method()} ${request.url()} failed: ${request.failure()?.errorText ?? 'unknown error'}`,
+  );
 }
 
 /**

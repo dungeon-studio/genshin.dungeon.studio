@@ -42,11 +42,6 @@ beforeAll(() => {
 describe('CORS', () => {
   const origin = 'http://localhost:5173';
 
-  it('allows the configured frontend origin', async () => {
-    const res = await app.request('/health', { headers: { Origin: origin } });
-    expect(res.headers.get('access-control-allow-origin')).toBe(origin);
-  });
-
   it('withholds the header from any other origin', async () => {
     const res = await app.request('/health', {
       headers: { Origin: 'https://not-the-frontend.example' },
