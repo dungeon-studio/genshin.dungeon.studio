@@ -43,13 +43,20 @@ const OTHER_CLAYMORE_USER = characterWielding('Claymore', CLAYMORE_USER);
 const CLAYMORE_INSTANCE = 'claymore-instance' as CollectionWeaponId;
 const BOW_INSTANCE = 'bow-instance' as CollectionWeaponId;
 
-function renderTeamsPage() {
+interface RenderOptions {
+  seeded?: boolean;
+  loading?: boolean;
+}
+
+function renderTeamsPage({ seeded = true, loading = false }: RenderOptions = {}) {
   const view = render(
     <MemoryRouter>
       <TeamsPage />
     </MemoryRouter>,
-    { wrapper: createWrapper() },
+    { wrapper: createWrapper({ loading }) },
   );
+
+  if (!seeded) return view;
 
   // Seeded after mount: the hooks clear their stores on finding no signed-in user.
   act(() => {
@@ -67,13 +74,13 @@ function renderTeamsPage() {
   return view;
 }
 
-describe('TeamsPage weapon-first flow', () => {
-  beforeEach(() => {
-    useTeamStore.getState().resetTeams();
-    useCollectionStore.getState().clearCharacters();
-    useWeaponCollectionStore.getState().clearWeapons();
-  });
+beforeEach(() => {
+  useTeamStore.getState().resetTeams();
+  useCollectionStore.getState().clearCharacters();
+  useWeaponCollectionStore.getState().clearWeapons();
+});
 
+describe('TeamsPage weapon-first flow', () => {
   it('assigns a weapon picked before a character, and narrows the pool to its wielders', async () => {
     const user = userEvent.setup({ delay: null });
     renderTeamsPage();
@@ -308,4 +315,27 @@ describe('TeamsPage weapon-first flow', () => {
     ).toBeInTheDocument();
     expect(screen.queryByText(/users for/)).not.toBeInTheDocument();
   }, 30_000);
+});
+
+describe('TeamsPage empty collection', () => {
+  it('points the user at the characters page', () => {
+    renderTeamsPage({ seeded: false });
+
+    expect(screen.getByRole('link', { name: 'Go to Characters' })).toHaveAttribute(
+      'href',
+      '/characters',
+    );
+  });
+
+  it('withholds the prompt until the collection has loaded', () => {
+    renderTeamsPage({ seeded: false, loading: true });
+
+    expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
+  });
+
+  it('shows no prompt once the user owns a character', () => {
+    renderTeamsPage();
+
+    expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
+  });
 });

@@ -4,6 +4,7 @@
 import type { CollectionWeapon, CollectionWeaponId, TeamSlot } from '@genshin/domain';
 import { TEAM_SLOTS } from '@genshin/domain';
 import { getCharacterById, getWeaponById } from '@genshin/game-data';
+import { Users } from 'lucide-react';
 import type { JSX, ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -12,6 +13,8 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
 import type { CharacterCollection } from '@/features/collection/characters/use-character-collection-store';
+import { ownedCharacters } from '@/features/collection/characters/use-character-collection-store';
+import { EmptyCollection } from '@/features/collection/empty-collection';
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
 import { CharacterPool } from '@/features/teams/character-pool';
 import { TeamPlanner } from '@/features/teams/team-planner';
@@ -137,8 +140,10 @@ function useMemberEditor(
 type MemberEditor = ReturnType<typeof useMemberEditor>;
 
 export function TeamsPage(): JSX.Element {
-  const { characters, getCharacter } = useCollection();
+  const { characters, getCharacter, isLoading: collectionLoading } = useCollection();
   const { weapons } = useWeaponCollection();
+
+  const collectionEmpty = !collectionLoading && ownedCharacters(characters).length === 0;
 
   const collectionWeapons = useMemo(() => Object.values(weapons), [weapons]);
 
@@ -170,6 +175,8 @@ export function TeamsPage(): JSX.Element {
   return (
     <Container className="py-12">
       <h1 className="sr-only">Teams</h1>
+
+      {collectionEmpty && <EmptyCollectionPrompt />}
 
       <div className="space-y-4">
         {TEAM_SLOTS.map((slot) => (
@@ -236,6 +243,23 @@ export function TeamsPage(): JSX.Element {
         </SheetContent>
       </Sheet>
     </Container>
+  );
+}
+
+/**
+ * Leaves the team rows in place: a user who removes every character still sees the teams
+ * that reference them.
+ */
+function EmptyCollectionPrompt(): JSX.Element {
+  return (
+    <EmptyCollection
+      icon={Users}
+      title="No characters in your collection"
+      description="Add the characters you own to start building teams."
+      to="/characters"
+      action="Go to Characters"
+      className="mb-8 rounded-lg border border-border"
+    />
   );
 }
 
