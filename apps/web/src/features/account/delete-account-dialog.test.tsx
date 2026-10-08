@@ -83,6 +83,20 @@ describe('DeleteAccountDialog', () => {
     });
   });
 
+  it('confirms the erasure even when ending the session fails', async () => {
+    erasureSucceeds();
+    vi.mocked(signOut).mockRejectedValueOnce(new Error('network down'));
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    renderDialog();
+
+    await confirmDeletion();
+
+    await waitFor(() => {
+      expect(toast.success).toHaveBeenCalled();
+    });
+    expect(toast.error).not.toHaveBeenCalled();
+  });
+
   // The account survived, so the user has to stay signed in to ask again.
   it('keeps the session when the erasure fails', async () => {
     erasureFails();

@@ -1,12 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { signOut } from '@firebase/auth';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
+import { signOut } from '@/features/auth/sign-out';
 import { ApiError, apiDelete } from '@/lib/api';
-import { auth } from '@/lib/firebase';
 
 export interface UseDeleteAccountResult {
   deleteAccount: () => void;
@@ -31,7 +30,7 @@ export function useDeleteAccount(): UseDeleteAccountResult {
   const { mutate, isPending } = useMutation({
     mutationFn: async () => apiDelete('/account'),
     onSuccess: async () => {
-      await signOut(auth);
+      await signOut();
       queryClient.clear();
       toast.success('Your account and its data have been deleted.');
     },
