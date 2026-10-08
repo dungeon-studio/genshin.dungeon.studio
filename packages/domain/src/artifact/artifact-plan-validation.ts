@@ -20,17 +20,10 @@ import type { ValidationIssue } from '@genshin/validation';
 import { issue } from '@genshin/validation';
 
 /**
- * Checks a plan's affix names and set IDs against game data, plus the rules no
- * type expresses: at most three minor affixes per list, no duplicates within a
- * list, and no affix in both.
- *
- * @returns every issue found, empty when the plan is valid.
+ * Checks a plan against game data and the rules its type can't express. Takes
+ * plain strings because it checks raw input before it becomes an
+ * `ArtifactPlan`.
  */
-// Intentionally uses loose string types instead of ArtifactPlan's branded types
-// (SandsMainAffix, etc.). The validator's job is to check raw input *before* it
-// becomes a domain object. Accepting ArtifactPlan would make the call circular.
-// Once #590 lands, JSON Schema enum constraints handle this at the boundary and
-// this function shrinks to just the disjointness check.
 export function validateArtifactPlan(plan: {
   sands?: string;
   goblet?: string;
