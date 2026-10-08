@@ -237,5 +237,9 @@ repos:
         name: schema snapshots (regenerate from Zod)
         entry: pnpm exec turbo run schemas:export
         language: system
-        files: ^apps/[^/]+/(src/.+/schemas/|schema-snapshots/)
+        files: |
+          (?x)^(
+            [^/]+/[^/]+/(src/.+/schemas/|scripts/schema-registry\.ts$|schema-snapshots/)
+            | tools/schema-snapshots/src/
+          )
         pass_filenames: false

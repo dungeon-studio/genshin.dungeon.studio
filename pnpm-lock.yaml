@@ -96,6 +96,9 @@ importers:
       '@genshin/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@genshin/schema-snapshots':
+        specifier: workspace:*
+        version: link:../../tools/schema-snapshots
       '@genshin/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -123,9 +126,6 @@ importers:
       json-schema-to-ts:
         specifier: 3.1.1
         version: 3.1.1
-      jsoncompat:
-        specifier: 0.4.2
-        version: 0.4.2
       tsc-alias:
         specifier: 1.9.2
         version: 1.9.2
@@ -217,6 +217,9 @@ importers:
       '@genshin/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@genshin/schema-snapshots':
+        specifier: workspace:*
+        version: link:../../tools/schema-snapshots
       '@genshin/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -513,6 +516,43 @@ importers:
       eslint:
         specifier: 10.9.1
         version: 10.9.1(jiti@2.7.0)(supports-color@10.2.2)
+      typescript:
+        specifier: npm:@typescript/typescript6@6.0.2
+        version: '@typescript/typescript6@6.0.2'
+      vitest:
+        specifier: 4.1.11
+        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@25.9.5)(@vitest/coverage-v8@4.1.11)(jsdom@30.0.1)(msw@2.15.0(@types/node@25.9.5)(@typescript/typescript6@6.0.2))(vite@8.2.2(@types/node@25.9.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))
+
+  tools/schema-snapshots:
+    dependencies:
+      jsoncompat:
+        specifier: 0.4.2
+        version: 0.4.2
+      zod:
+        specifier: 4.5.4
+        version: 4.5.4
+    devDependencies:
+      '@genshin/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      '@genshin/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+      '@types/node':
+        specifier: 25.9.5
+        version: 25.9.5
+      '@typescript/native':
+        specifier: npm:typescript@7.0.2
+        version: typescript@7.0.2
+      '@vitest/coverage-v8':
+        specifier: 4.1.11
+        version: 4.1.11(vitest@4.1.11)
+      eslint:
+        specifier: 10.9.1
+        version: 10.9.1(jiti@2.7.0)(supports-color@10.2.2)
+      tsx:
+        specifier: 4.23.13
+        version: 4.23.13
       typescript:
         specifier: npm:@typescript/typescript6@6.0.2
         version: '@typescript/typescript6@6.0.2'

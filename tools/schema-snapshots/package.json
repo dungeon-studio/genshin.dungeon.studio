@@ -1,0 +1,40 @@
+{
+  "name": "@genshin/schema-snapshots",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Zod-to-JSON Schema snapshot export and the base-branch schema compatibility gate",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint . --max-warnings=0",
+    "schemas:check": "tsx src/check.ts"
+  },
+  "dependencies": {
+    "jsoncompat": "0.4.2",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@genshin/eslint-config": "workspace:*",
+    "@genshin/tsconfig": "workspace:*",
+    "@types/node": "25.9.5",
+    "@typescript/native": "npm:typescript@7.0.2",
+    "@vitest/coverage-v8": "4.1.11",
+    "eslint": "10.9.1",
+    "tsx": "4.23.13",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
+    "vitest": "4.1.11"
+  }
+}
