@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
 import type { AuthUser } from '@/features/auth';
 import { TestProviders } from '@/test/providers';
 
-// The composite hooks only read `user.uid`; a partial AuthUser is sufficient.
+// The composite hooks only read `user.uid`; a partial `AuthUser` is sufficient.
 export function fakeUser(uid: string): AuthUser {
   return { uid } as AuthUser;
 }
