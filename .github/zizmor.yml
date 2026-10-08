@@ -8,6 +8,11 @@ rules:
     # next bump. Comment hygiene, not a security signal, so opt out repo-wide.
     disable: true
 
+  self-repository:
+    # The `$/` form this audit asks for fails actionlint until
+    # rhysd/actionlint#711 lands; #1529 re-enables it and migrates.
+    disable: true
+
   cache-poisoning:
     # ci.yml publishes nothing: it builds to prove the workspace compiles and
     # discards the output, and deploy.yml owns every artifact that leaves the
