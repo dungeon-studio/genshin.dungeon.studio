@@ -33,7 +33,7 @@
     "@genshin/eslint-config": "workspace:*",
     "@genshin/tsconfig": "workspace:*",
     "@types/negotiator": "0.6.5",
-    "@types/node": "25.9.5",
+    "@types/node": "25.9.9",
     "@typescript/native": "npm:typescript@7.0.2",
     "@vitest/coverage-v8": "4.1.11",
     "eslint": "10.9.1",
