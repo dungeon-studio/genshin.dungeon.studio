@@ -3,8 +3,8 @@
 ---
 name: CI
 
-# Every sensor that runs unconditionally on an integration event.
-# See docs/reference/workflow-conventions.md.
+# Every sensor that runs unconditionally on an integration event, and the
+# deploy they gate on develop. See docs/reference/workflow-conventions.md.
 on:
   pull_request:
   push:
@@ -514,3 +514,60 @@ jobs:
       - name: Cleanup container
         if: always()
         run: docker rm -f api-smoke 2>/dev/null || true
+
+  deploy-changes:
+    name: Detect deployable changes
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      deploy: ${{ steps.filter.outputs.deploy }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Filter paths
+        id: filter
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        with:
+          filters: |
+            deploy:
+              - 'apps/web/**'
+              - 'apps/api/**'
+              # The apps bundle the workspace packages and resolve their
+              # transitive dependencies through the root lockfile.
+              - 'packages/**'
+              - 'pnpm-lock.yaml'
+              - '.github/workflows/deploy.yml'
+              - '.github/actions/setup-node-pnpm/**'
+              - '.github/actions/setup-playwright/**'
+
+  # A new job that runs on a push belongs in `needs:`, or a commit failing it
+  # still deploys. `schema-compat` stays out because it runs only on pull
+  # requests, and a skipped need skips the deploy.
+  deploy:
+    name: Deploy to dev
+    needs:
+      - deploy-changes
+      - workspace
+      - dev-smoke
+      - integration
+      - e2e
+      - pre-commit
+      - secrets
+      - workflow-audit
+      - trivy-terraform
+      - trivy-dockerfile
+      - trivy-dependencies
+      - container
+    if: needs.deploy-changes.outputs.deploy == 'true'
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy.yml
+    # A called workflow resolves its `environment:` secrets only if the caller
+    # passes a secrets mapping.
+    secrets: inherit

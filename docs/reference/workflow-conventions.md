@@ -19,7 +19,7 @@ A workflow file is named for _when_ it runs. Its jobs are named for _what_ they 
 
 Workflows that mutate state outside the checkout are named for what they change instead: `deploy.yml`, `terraform-apply.yml`, `labels.yml`, `release-notes.yml`.
 
-A new check lands as a job in the file matching its when. A new file needs a different when: a new trigger, a new cadence, or a path gate. Two jobs on different triggers belong in different files even when they serve the same purpose, since sharing a file forces each to guard itself against the other's events. Reusable (`workflow_call`) workflows sit outside the rule, since a caller decides when they run.
+A new check lands as a job in the file matching its when. A `ci.yml` job that runs on a push also joins the `needs:` of the `deploy` job, which calls `deploy.yml` only after every such job passes. A new file needs a different when: a new trigger, a new cadence, or a path gate. Two jobs on different triggers belong in different files even when they serve the same purpose, since sharing a file forces each to guard itself against the other's events. Reusable (`workflow_call`) workflows sit outside the rule, since a caller decides when they run.
 
 The rule and its rationale come from [architecture decision record 0004 in alunduil-chezmoi](https://github.com/alunduil/alunduil-chezmoi/blob/main/docs/adr/0004-consolidate-ci-workflow.md).
 
