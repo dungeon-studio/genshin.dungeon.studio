@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { makeWeapon } from '@/test/fixtures';
 
-import { useWeaponCollectionStore } from './use-weapon-collection-store';
+import { groupByWeapon, useWeaponCollectionStore } from './use-weapon-collection-store';
 
 // Two weapons from game data, so a filtered read has something to leave out
 // and a roster change cannot strand the suite.
@@ -103,5 +103,22 @@ describe('useWeaponCollectionStore', () => {
 
       expect(Object.keys(useWeaponCollectionStore.getState().weapons)).toHaveLength(0);
     });
+  });
+});
+
+describe('groupByWeapon', () => {
+  it('collects every instance under its weapon', () => {
+    const first = makeWeapon('inst-1', WEAPON.id);
+    const other = makeWeapon('inst-2', OTHER_WEAPON.id);
+    const second = makeWeapon('inst-3', WEAPON.id);
+
+    const groups = groupByWeapon([first, other, second]);
+
+    expect(groups).toEqual(
+      new Map([
+        [WEAPON.id, [first, second]],
+        [OTHER_WEAPON.id, [other]],
+      ]),
+    );
   });
 });
