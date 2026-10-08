@@ -41,44 +41,41 @@ interface TeamStoreState {
   setTeam: (slot: TeamSlot, team: CollectionTeam) => void;
   setTeams: (teams: Record<TeamSlot, CollectionTeam>) => void;
   resetTeams: () => void;
-
-  getTeam: (slot: TeamSlot) => CollectionTeam;
-  isCharacterInTeam: (slot: TeamSlot, characterId: string) => boolean;
 }
 
-/**
- * Maps one slot's members and stamps `updatedAt`, marking the change as a user
- * edit.
- */
+/** Stamps `updatedAt` alongside `patch`, marking the change as a user edit. */
+function withTeam(
+  state: Pick<TeamStoreState, 'teams'>,
+  slot: TeamSlot,
+  patch: Partial<Pick<CollectionTeam, 'name' | 'members'>>,
+): Pick<TeamStoreState, 'teams'> {
+  return {
+    teams: {
+      ...state.teams,
+      [slot]: { ...state.teams[slot], ...patch, updatedAt: nowTimestamp() },
+    },
+  };
+}
+
 function withMembers(
   state: Pick<TeamStoreState, 'teams'>,
   slot: TeamSlot,
   update: (member: CollectionTeamMember | null, index: number) => { characterId: string } | null,
 ): Pick<TeamStoreState, 'teams'> {
-  return {
-    teams: {
-      ...state.teams,
-      [slot]: {
-        ...state.teams[slot],
-        members: state.teams[slot].members.map(update) as CollectionTeamMembers,
-        updatedAt: nowTimestamp(),
-      },
-    },
-  };
+  return withTeam(state, slot, {
+    members: state.teams[slot].members.map(update) as CollectionTeamMembers,
+  });
 }
 
-/** The weapon `characterId` holds on a team other than `slot`, if any. */
 function weaponHeldElsewhere(
   teams: Record<TeamSlot, CollectionTeam>,
   slot: TeamSlot,
   characterId: string,
 ): CollectionTeamMember['weaponInstanceId'] {
-  for (const other of Object.values(teams)) {
-    if (other.slot === slot) continue;
-    const held = other.members.find((m) => m?.characterId === characterId && m.weaponInstanceId);
-    if (held) return held.weaponInstanceId;
-  }
-  return undefined;
+  return Object.values(teams)
+    .filter((other) => other.slot !== slot)
+    .flatMap((other) => other.members)
+    .find((m) => m?.characterId === characterId && m.weaponInstanceId)?.weaponInstanceId;
 }
 
 /**
@@ -146,14 +143,7 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => {
     },
 
     setTeamName: (slot, name) => {
-      const trimmed = name.trim();
-      const nextName = trimmed || defaultTeamName(slot);
-      set((state) => ({
-        teams: {
-          ...state.teams,
-          [slot]: { ...state.teams[slot], name: nextName, updatedAt: nowTimestamp() },
-        },
-      }));
+      set((state) => withTeam(state, slot, { name: name.trim() || defaultTeamName(slot) }));
     },
 
     setTeam: (slot, team) => {
@@ -168,12 +158,6 @@ export const useTeamStore = create<TeamStoreState>()((set, get) => {
 
     resetTeams: () => {
       set({ teams: initialTeams() });
-    },
-
-    getTeam: (slot) => get().teams[slot],
-
-    isCharacterInTeam: (slot, characterId) => {
-      return get().teams[slot].members.some((m) => m?.characterId === characterId);
     },
   };
 });
