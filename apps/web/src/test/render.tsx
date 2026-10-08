@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { User } from '@firebase/auth';
 import { QueryClient } from '@tanstack/react-query';
-import type { User } from 'firebase/auth';
 import type { ReactNode } from 'react';
 
 import { TestProviders } from '@/test/providers';

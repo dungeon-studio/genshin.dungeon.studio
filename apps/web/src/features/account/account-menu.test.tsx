@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { signOut } from '@firebase/auth';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { signOut } from 'firebase/auth';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createWrapper, fakeUser } from '@/test/render';
@@ -11,7 +11,7 @@ import { createWrapper, fakeUser } from '@/test/render';
 import { AccountMenu } from './account-menu';
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
-vi.mock('firebase/auth', () => ({ signOut: vi.fn() }));
+vi.mock('@firebase/auth', () => ({ signOut: vi.fn() }));
 
 const TRAVELER = { displayName: 'Traveler', photoURL: null };
 

@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { User as FirebaseUser } from '@firebase/auth';
 import { render, screen } from '@testing-library/react';
-import type { User as FirebaseUser } from 'firebase/auth';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';

@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { signOut } from '@firebase/auth';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { signOut } from 'firebase/auth';
 import { toast } from 'sonner';
 
 import { ApiError, apiDelete } from '@/lib/api';

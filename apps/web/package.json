@@ -15,6 +15,8 @@
     "typecheck": "tsc -b --noEmit && tsc --project tsconfig.scripts.json --noEmit"
   },
   "dependencies": {
+    "@firebase/app": "0.16.1",
+    "@firebase/auth": "1.13.5",
     "@genshin/collection-json": "workspace:*",
     "@genshin/domain": "workspace:*",
     "@genshin/game-data": "workspace:*",
@@ -26,7 +28,6 @@
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "cmdk": "1.1.1",
-    "firebase": "12.18.0",
     "lucide-react": "1.37.0",
     "motion": "13.1.1",
     "react": "19.2.8",

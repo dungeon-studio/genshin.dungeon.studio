@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { User as FirebaseUser } from 'firebase/auth';
-import { onAuthStateChanged } from 'firebase/auth';
+import type { User as FirebaseUser } from '@firebase/auth';
+import { onAuthStateChanged } from '@firebase/auth';
 import { useEffect, useState } from 'react';
 import type { JSX, ReactNode } from 'react';
 

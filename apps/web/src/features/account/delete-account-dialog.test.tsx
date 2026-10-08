@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { signOut } from '@firebase/auth';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { signOut } from 'firebase/auth';
 import { http, HttpResponse } from 'msw';
 import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -14,7 +14,7 @@ import { createWrapper, fakeUser } from '@/test/render';
 import { DeleteAccountDialog } from './delete-account-dialog';
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
-vi.mock('firebase/auth', () => ({ signOut: vi.fn() }));
+vi.mock('@firebase/auth', () => ({ signOut: vi.fn() }));
 
 const ACCOUNT_URL = 'http://localhost:8080/account';
 
