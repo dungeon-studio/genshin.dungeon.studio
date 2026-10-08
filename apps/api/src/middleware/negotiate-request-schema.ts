@@ -56,17 +56,11 @@ export function negotiateRequestSchema(profiles: ProfileLink[]): MiddlewareHandl
   };
 }
 
-/**
- * Read the `profile` parameter from a `Content-Type` header.
- *
- * @throws HTTPException 400 when the header is malformed.
- */
 function parseProfile(header: string | undefined): string | undefined {
   if (!header) return undefined;
 
-  // contentType.parse is lenient and does not throw on malformed input;
-  // round-trip through format to surface invalid type, parameter names,
-  // or values via its TypeError.
+  // parse accepts malformed headers and format rejects them, so the
+  // round-trip is the validation.
   try {
     const parsed = contentType.parse(header);
     contentType.format(parsed);
@@ -78,11 +72,6 @@ function parseProfile(header: string | undefined): string | undefined {
   }
 }
 
-/**
- * Select the schema path a profile names, defaulting to the first when absent.
- *
- * @throws HTTPException 415 when the profile names no supported path.
- */
 function selectSchema(paths: string[], profile: string | undefined): string {
   if (!profile) return paths[0];
 
