@@ -35,6 +35,20 @@ describe('renderModule', () => {
   it('ends with a newline, so regeneration leaves nothing for the formatter', () => {
     expect(rendered.endsWith('\n')).toBe(true);
   });
+
+  it('records provenance as header comments ahead of the export', () => {
+    const withProvenance = renderModule({
+      path: 'src/resonances.generated.ts',
+      exportName: 'RESONANCE_DATA',
+      command: 'resonances',
+      entries: [],
+      provenance: ['Source: upstream at abc123'],
+    });
+
+    expect(withProvenance).toContain(
+      'generate resonances\n//\n// Source: upstream at abc123\n\nexport const RESONANCE_DATA',
+    );
+  });
 });
 
 describe('resolveGeneratedPath', () => {

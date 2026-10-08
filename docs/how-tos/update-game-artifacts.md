@@ -45,3 +45,4 @@ record the error names before widening the check in
 - [Regenerate Genshin Impact Characters](update-game-characters.md)
 - [Regenerate Genshin Impact Weapons](update-game-weapons.md)
 - [Update Elemental Reactions](update-game-reactions.md)
+- [Regenerate Genshin Impact Elemental Resonances](update-game-resonances.md)

@@ -6,6 +6,7 @@ import { Command } from 'commander';
 
 import { generateArtifactSets } from './artifacts.js';
 import { generateCharacters } from './characters.js';
+import { generateResonances } from './resonances.js';
 import { generateWeapons } from './weapons.js';
 
 interface Roster {
@@ -13,28 +14,31 @@ interface Roster {
   command: string;
   /** Singular record name; the printed count appends an `s`. */
   label: string;
-  generate: () => number;
+  generate: () => number | Promise<number>;
 }
 
 const ROSTERS: readonly Roster[] = [
   { command: 'characters', label: 'character', generate: generateCharacters },
   { command: 'weapons', label: 'weapon', generate: generateWeapons },
   { command: 'artifacts', label: 'artifact set', generate: generateArtifactSets },
+  { command: 'resonances', label: 'elemental resonance', generate: generateResonances },
 ];
 
 const program = new Command();
 
 program
   .name('game-data-codegen')
-  .description('Generate @genshin/game-data sources from the offline genshin-db dataset');
+  .description(
+    'Generate @genshin/game-data sources from genshin-db and, for resonances, AnimeGameData',
+  );
 
 for (const { command, label, generate } of ROSTERS) {
   program
     .command(command)
     .description(`Regenerate the ${label} roster in @genshin/game-data/src/${command}.generated.ts`)
-    .action((): void => {
-      console.log(`Generated ${generate()} ${label}s into @genshin/game-data`);
+    .action(async (): Promise<void> => {
+      console.log(`Generated ${await generate()} ${label}s into @genshin/game-data`);
     });
 }
 
-program.parse();
+await program.parseAsync();

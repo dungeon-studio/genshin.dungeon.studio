@@ -2,7 +2,7 @@
   "name": "@genshin/game-data-codegen",
   "version": "0.1.0",
   "private": true,
-  "description": "Code generators that build @genshin/game-data sources from genshin-db",
+  "description": "Code generators that build @genshin/game-data sources from genshin-db and AnimeGameData",
   "type": "module",
   "bin": {
     "game-data-codegen": "./dist/cli.js"
