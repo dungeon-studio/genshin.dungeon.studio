@@ -9,8 +9,8 @@ rules:
     disable: true
 
   self-repository:
-    # The `$/` form this audit asks for fails actionlint until
-    # rhysd/actionlint#711 lands; #1529 re-enables it and migrates.
+    # actionlint rejects the `$/` form this audit asks for until
+    # rhysd/actionlint#711 ships; #1529 tracks the migration.
     disable: true
 
   cache-poisoning:
