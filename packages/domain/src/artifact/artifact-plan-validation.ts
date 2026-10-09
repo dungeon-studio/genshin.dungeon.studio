@@ -2,9 +2,8 @@
 /* SPDX-License-Identifier: MIT */
 
 /**
- * The cross-field half of artifact plan checking. Affix names, set IDs, list
- * lengths, and duplicates within a list are JSON Schema keywords, so the API's
- * request schema enforces them; what stays here relates one field to another.
+ * Artifact plan rules that relate one field to another. The API's request
+ * schema checks each field on its own.
  *
  * Collects issues rather than throwing on the first, because the caller is a
  * form that shows every field's message at once.

@@ -27,7 +27,7 @@ vi.mock('@/repositories/weapons/index.js', () => ({
   remove: vi.fn(),
 }));
 
-// The app imports schema modules whose `enum` lists read game-data at load.
+// Keeps the real exports, which the app's request schemas read at import.
 vi.mock('@genshin/game-data', async (importOriginal) => ({
   ...(await importOriginal<typeof GameData>()),
   getWeaponById: vi.fn(),

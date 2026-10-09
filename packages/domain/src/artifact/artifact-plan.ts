@@ -43,9 +43,8 @@ const MIN_MINOR_AFFIXES = 0;
 const MAX_MINOR_AFFIXES = 3;
 
 /**
- * Structural check only. Affix names and set IDs are checked against game-data
- * by the API's request schema, which takes its `enum` values from the same
- * arrays.
+ * Structural check only. The API's request schema checks affix names and set
+ * IDs against game data.
  *
  * @param path - prefix for the field names in a failure, so a guard over an
  * enclosing structure reports the position that broke.
