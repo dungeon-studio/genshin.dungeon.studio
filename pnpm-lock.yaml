@@ -492,8 +492,8 @@ importers:
         specifier: 15.0.0
         version: 15.0.0
       genshin-db:
-        specifier: 5.2.13
-        version: 5.2.13
+        specifier: 5.2.14
+        version: 5.2.14
     devDependencies:
       '@genshin/eslint-config':
         specifier: workspace:*
@@ -4595,8 +4595,8 @@ packages:
     resolution: {integrity: sha512-SFdFmIJi+ybC0vjlHN0ZGVGHc3lgE0DxPAT0djjVg+kjOnSqclqmj0KQ7ykTOLP6YxoqOvuAODGdcHJn+43q3g==}
     engines: {node: '>= 0.4'}
 
-  genshin-db@5.2.13:
-    resolution: {integrity: sha512-0oedxYGyhUYJRvLvuFStC9rF7wvnJEtIJgPoWq4CEABdWFB/GnJNu1VBRLBqOLaOrtSbUkmMpXO140VeLlMSHA==}
+  genshin-db@5.2.14:
+    resolution: {integrity: sha512-ynW5TYaEKJJOCUghETzv0CAe3OPUgtoKMWHxnpca9zyyrPmzEsYg4ATbplbdAh3ED0cc4fwLm83HxMquCGKX6w==}
 
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -12060,7 +12060,7 @@ snapshots:
 
   generator-function@2.0.1: {}
 
-  genshin-db@5.2.13:
+  genshin-db@5.2.14:
     dependencies:
       fuzzysort: 1.9.0
       pako: 2.2.0
