@@ -94,13 +94,13 @@ characters.get('/:characterId', async (c) => {
 characters.put(
   '/:characterId',
   negotiateRequestSchema([characterPutRequestV1]),
-  validateRequestBody([characterPutRequestV1]),
+  validateRequestBody<[typeof characterPutRequestV1], SaveCharacterBody>([characterPutRequestV1]),
   async (c) => {
     const userId = c.get('user').uid;
     const { characterId } = c.req.param();
 
     const knownId = requireCharacterId(characterId);
-    const { constellationLevel } = c.get('validatedBody') as SaveCharacterBody;
+    const { constellationLevel } = c.get('validatedBody');
     const { character, created } = await Characters.save(userId, knownId, constellationLevel);
     const baseUrl = new URL(c.req.url).origin;
 

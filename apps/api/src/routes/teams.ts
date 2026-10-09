@@ -13,7 +13,6 @@ import {
 } from '@genshin/domain';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import type { FromSchema } from 'json-schema-to-ts';
 
 import { auth } from '@/middleware/auth.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
@@ -44,8 +43,6 @@ export const teams = new Hono<{
 teams.use('*', auth);
 
 teams.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: teamItemV1 }]));
-
-type UpdateTeamBody = FromSchema<typeof teamPutRequestV1.schema>;
 
 function parseSlot(param: string): TeamSlot {
   const slot = Number(param);
@@ -94,7 +91,7 @@ teams.put(
   async (c) => {
     const userId = c.get('user').uid;
     const slot = parseSlot(c.req.param('slot'));
-    const body = c.get('validatedBody') as UpdateTeamBody;
+    const body = c.get('validatedBody');
     const members = body.members && deserialiseCollectionTeamMembers(body.members);
 
     if (members) {
