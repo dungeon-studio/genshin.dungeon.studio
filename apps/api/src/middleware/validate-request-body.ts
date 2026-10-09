@@ -58,10 +58,7 @@ export type ValidatedRequestBodyVariables<Body = unknown> = {
   validatedBody: Body;
 };
 
-/**
- * The body type a list of profiles accepts: the union of each schema's derived
- * type, since the negotiated version decides which one validated the body.
- */
+/** A union, because negotiation picks which profile validated the body. */
 type RequestBodyOf<Schemas extends readonly JsonSchemaProfile[]> = {
   [K in keyof Schemas]: Schemas[K]['schema'] extends JSONSchema
     ? FromSchema<Schemas[K]['schema']>
@@ -80,9 +77,8 @@ type RequestBodyOf<Schemas extends readonly JsonSchemaProfile[]> = {
  *
  * Schemas compile once at registration, so a malformed one surfaces at startup.
  *
- * `validatedBody` is typed from the schemas. Pass `Body` explicitly to refine a
- * property `FromSchema` widens, such as integer bounds it reports as `number`;
- * the constraint keeps the refinement a subtype of what the schemas accept.
+ * Pass `Body` to restore a constraint `FromSchema` drops, such as an integer
+ * range it widens to `number`.
  *
  * @throws Error when `negotiateRequestSchema` hasn't run, or when it negotiated
  * a path this list has no schema for.
@@ -124,8 +120,7 @@ export function validateRequestBody<
       throw new ProblemException(422, validationProblem(entry.validate.errors ?? []));
     }
 
-    // ajv's guard has no static link to the schema's derived type; this is the
-    // one place that relates them.
+    // ajv's type guard can't name the schema's derived type.
     c.set('validatedBody', body as Body);
     await next();
   };
