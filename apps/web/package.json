@@ -63,7 +63,7 @@
     "globals": "17.13.0",
     "jsdom": "30.0.1",
     "msw": "2.15.0",
-    "postcss": "8.5.26",
+    "postcss": "8.5.29",
     "stylelint": "17.14.1",
     "stylelint-config-standard": "40.0.0",
     "tailwindcss": "4.3.3",
