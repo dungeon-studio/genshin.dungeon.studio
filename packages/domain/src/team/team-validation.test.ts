@@ -6,7 +6,6 @@ import { describe, expect, it } from 'vitest';
 import type { CollectionTeamMembers, TeamSlot } from './collection-team.js';
 import type { TeamValidationContext } from './team-validation.js';
 import { validateTeam, validateAcrossTeams } from './team-validation.js';
-import type { ArtifactPlan } from '../artifact/artifact-plan.js';
 
 const EMPTY_MEMBERS: CollectionTeamMembers = [null, null, null, null];
 
@@ -95,7 +94,7 @@ describe('validateTeam', () => {
       members: [
         {
           characterId: 'columbina',
-          artifactPlan: { sands: 'INVALID_AFFIX' } as unknown as ArtifactPlan,
+          artifactPlan: { priorityMinorAffixes: ['HP'], secondaryMinorAffixes: ['HP'] },
         },
         null,
         null,

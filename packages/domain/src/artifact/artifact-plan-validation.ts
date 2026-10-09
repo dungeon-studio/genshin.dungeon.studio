@@ -2,96 +2,26 @@
 /* SPDX-License-Identifier: MIT */
 
 /**
- * The value half of artifact plan checking, paired with `assertArtifactPlan`'s
- * structural half.
+ * The cross-field half of artifact plan checking. Affix names, set IDs, list
+ * lengths, and duplicates within a list are JSON Schema keywords, so the API's
+ * request schema enforces them; what stays here relates one field to another.
  *
  * Collects issues rather than throwing on the first, because the caller is a
  * form that shows every field's message at once.
  */
 
-import {
-  ARTIFACT_MINOR_AFFIXES,
-  CIRCLET_MAIN_AFFIXES,
-  getArtifactSetById,
-  GOBLET_MAIN_AFFIXES,
-  SANDS_MAIN_AFFIXES,
-} from '@genshin/game-data';
 import type { ValidationIssue } from '@genshin/validation';
 import { issue } from '@genshin/validation';
 
+import type { ArtifactPlan } from './artifact-plan.js';
+
 /**
- * Checks a plan's affix names and set IDs against game data, plus the rules no
- * type expresses: at most three minor affixes per list, no duplicates within a
- * list, and no affix in both.
+ * Checks that no minor affix appears in both the priority and secondary lists.
  *
  * @returns every issue found, empty when the plan is valid.
  */
-// Intentionally uses loose string types instead of ArtifactPlan's branded types
-// (SandsMainAffix, etc.). The validator's job is to check raw input *before* it
-// becomes a domain object. Accepting ArtifactPlan would make the call circular.
-// Once #590 lands, JSON Schema enum constraints handle this at the boundary and
-// this function shrinks to just the disjointness check.
-export function validateArtifactPlan(plan: {
-  sands?: string;
-  goblet?: string;
-  circlet?: string;
-  sets?: string[];
-  priorityMinorAffixes?: string[];
-  secondaryMinorAffixes?: string[];
-}): ValidationIssue[] {
-  return [
-    ...validateMainAffix('sands', plan.sands, SANDS_MAIN_AFFIXES),
-    ...validateMainAffix('goblet', plan.goblet, GOBLET_MAIN_AFFIXES),
-    ...validateMainAffix('circlet', plan.circlet, CIRCLET_MAIN_AFFIXES),
-    ...validateSets(plan.sets),
-    ...validateMinorAffixes('priorityMinorAffixes', plan.priorityMinorAffixes),
-    ...validateMinorAffixes('secondaryMinorAffixes', plan.secondaryMinorAffixes),
-    ...validateDisjointMinorAffixes(plan.priorityMinorAffixes, plan.secondaryMinorAffixes),
-  ];
-}
-
-function validateMainAffix(
-  slot: 'sands' | 'goblet' | 'circlet',
-  affix: string | undefined,
-  allowed: readonly string[],
-): ValidationIssue[] {
-  if (affix === undefined || allowed.includes(affix)) return [];
-  return [issue(`Invalid ${slot} main affix: ${affix}`, slot)];
-}
-
-function validateSets(sets: string[] | undefined): ValidationIssue[] {
-  if (sets === undefined) return [];
-  if (sets.length < 1 || sets.length > 2) {
-    return [issue('Artifact plan must have 1-2 sets', 'sets')];
-  }
-  return sets.flatMap((setId, i) =>
-    getArtifactSetById(setId) ? [] : [issue(`Unknown artifact set: ${setId}`, `sets[${i}]`)],
-  );
-}
-
-function validateMinorAffixes(
-  field: 'priorityMinorAffixes' | 'secondaryMinorAffixes',
-  affixes: string[] | undefined,
-): ValidationIssue[] {
-  if (affixes === undefined) return [];
-
-  return [
-    ...(affixes.length > 3 ? [issue(`${field} must have at most 3 entries`, field)] : []),
-    ...affixes.flatMap((affix, i) =>
-      (ARTIFACT_MINOR_AFFIXES as readonly string[]).includes(affix)
-        ? []
-        : [issue(`Invalid minor affix: ${affix}`, `${field}[${i}]`)],
-    ),
-    ...(new Set(affixes).size !== affixes.length
-      ? [issue(`${field} contains duplicates`, field)]
-      : []),
-  ];
-}
-
-function validateDisjointMinorAffixes(
-  priority: string[] | undefined,
-  secondary: string[] | undefined,
-): ValidationIssue[] {
+export function validateArtifactPlan(plan: ArtifactPlan): ValidationIssue[] {
+  const { priorityMinorAffixes: priority, secondaryMinorAffixes: secondary } = plan;
   if (!priority || !secondary) return [];
   const prioritySet = new Set(priority);
   const overlap = secondary.filter((s) => prioritySet.has(s));

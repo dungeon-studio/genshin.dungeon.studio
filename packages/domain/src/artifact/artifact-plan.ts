@@ -43,9 +43,9 @@ const MIN_MINOR_AFFIXES = 0;
 const MAX_MINOR_AFFIXES = 3;
 
 /**
- * Structural check only. Affix names and set IDs are validated against
- * game-data by `validateArtifactPlan`, which collects every problem instead of
- * throwing on the first.
+ * Structural check only. Affix names and set IDs are checked against game-data
+ * by the API's request schema, which takes its `enum` values from the same
+ * arrays.
  *
  * @param path - prefix for the field names in a failure, so a guard over an
  * enclosing structure reports the position that broke.
