@@ -8,6 +8,7 @@ import {
   buildCollection,
   buildItem,
   COLLECTION_JSON,
+  itemData,
 } from './collection-json.js';
 
 describe('COLLECTION_JSON', () => {
@@ -49,6 +50,17 @@ describe('buildItem', () => {
     const item = buildItem('http://example.com/items/1', [], links);
 
     expect(item.links).toEqual(links);
+  });
+});
+
+describe('itemData', () => {
+  it('keys every datum by name, including ones the caller did not expect', () => {
+    const item = buildItem('http://example.com/items/1', [
+      { name: 'id', value: '1' },
+      { name: 'injected', value: 'evil' },
+    ]);
+
+    expect(itemData(item)).toEqual({ id: '1', injected: 'evil' });
   });
 });
 
