@@ -141,6 +141,17 @@ export function buildItem(href: string, data: Datum[], links?: Link[]): Item {
 }
 
 /**
+ * Flattens an item's data into a record keyed by datum name, the inverse of
+ * `buildItem`'s data.
+ *
+ * The record is unvalidated wire input: it carries every datum the item sent,
+ * including names the caller doesn't expect.
+ */
+export function itemData(item: Item): Record<string, DatumValue | undefined> {
+  return Object.fromEntries(item.data.map((d) => [d.name, d.value]));
+}
+
+/**
  * Assembles the envelope, stamping the media type's version.
  *
  * Each optional part is left out when empty, on the same reasoning as

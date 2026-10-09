@@ -6,6 +6,7 @@ export {
   assertCollectionDocument,
   buildCollection,
   buildItem,
+  itemData,
   serialiseCollection,
   type Collection,
   type CollectionDocument,

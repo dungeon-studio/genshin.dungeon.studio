@@ -15,6 +15,7 @@
 import {
   buildCollection,
   buildItem,
+  itemData,
   type CollectionDocument,
   type CollectionJsonRepresentation,
   type Item,
@@ -105,9 +106,7 @@ function parseMembers(item: Item): unknown {
  * @throws TypeError naming the field that failed.
  */
 export function deserialiseTeam(item: Item): CollectionTeam {
-  const data: Record<string, unknown> = Object.fromEntries(
-    item.data.filter((d) => d.name !== 'members').map((d) => [d.name, d.value]),
-  );
+  const data: Record<string, unknown> = itemData(item);
   data.members = deserialiseCollectionTeamMembers(parseMembers(item));
   assertCollectionTeam(data);
   return data;

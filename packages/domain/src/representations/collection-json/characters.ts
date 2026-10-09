@@ -10,6 +10,7 @@
 
 import {
   buildItem,
+  itemData,
   type CollectionJsonRepresentation,
   type Item,
   type Template,
@@ -64,7 +65,7 @@ export function serialiseCharacter(character: CollectionCharacter, baseUrl: stri
  * @throws TypeError naming the field that failed.
  */
 export function deserialiseCharacter(item: Item): CollectionCharacter {
-  const data = Object.fromEntries(item.data.map((d) => [d.name, d.value]));
+  const data = itemData(item);
   assertCollectionCharacter(data);
   return {
     characterId: data.characterId,
