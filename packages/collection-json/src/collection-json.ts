@@ -141,11 +141,10 @@ export function buildItem(href: string, data: Datum[], links?: Link[]): Item {
 }
 
 /**
- * Flattens an item's data into a record keyed by datum name, the inverse of
- * `buildItem`'s data.
+ * Reads an item's data as a record without validating it.
  *
- * The record is unvalidated wire input: it carries every datum the item sent,
- * including names the caller doesn't expect.
+ * The record keeps every datum the sender included, so a caller builds its
+ * result from the fields it expects rather than returning the record.
  */
 export function itemData(item: Item): Record<string, DatumValue | undefined> {
   return Object.fromEntries(item.data.map((d) => [d.name, d.value]));
