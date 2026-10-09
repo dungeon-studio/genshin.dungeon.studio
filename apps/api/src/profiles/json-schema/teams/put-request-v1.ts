@@ -1,18 +1,15 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { ArtifactSet } from '@genshin/game-data';
 import {
   ARTIFACT_MINOR_AFFIXES,
-  ARTIFACT_SETS,
+  ARTIFACT_SET_IDS,
   CIRCLET_MAIN_AFFIXES,
   GOBLET_MAIN_AFFIXES,
   SANDS_MAIN_AFFIXES,
 } from '@genshin/game-data';
 
 import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
-
-const ARTIFACT_SET_IDS = Object.keys(ARTIFACT_SETS) as ArtifactSet['id'][];
 
 export const teamPutRequestV1 = {
   path: '/profiles/json-schema/teams/put-request-v1.json',
