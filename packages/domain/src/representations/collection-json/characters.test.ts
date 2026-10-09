@@ -36,3 +36,11 @@ describe('character serialisation round-trip', () => {
     expect(result.constellationLevel).toBe(6);
   });
 });
+
+describe('deserialiseCharacter sanitisation', () => {
+  it('strips unknown data entries off the deserialised character', () => {
+    const item = serialiseCharacter(VALID_CHARACTER, BASE_URL);
+    const injected = { ...item, data: [...item.data, { name: 'injected', value: 'evil' }] };
+    expect(deserialiseCharacter(injected)).toEqual(VALID_CHARACTER);
+  });
+});

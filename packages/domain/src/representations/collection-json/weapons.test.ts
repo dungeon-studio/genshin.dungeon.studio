@@ -47,3 +47,11 @@ describe('weapon serialisation round-trip', () => {
     expect(result.refinementLevel).toBe(5);
   });
 });
+
+describe('deserialiseWeapon sanitisation', () => {
+  it('strips unknown data entries off the deserialised weapon', () => {
+    const item = serialiseWeapon(VALID_WEAPON, BASE_URL);
+    const injected = { ...item, data: [...item.data, { name: 'injected', value: 'evil' }] };
+    expect(deserialiseWeapon(injected)).toEqual(VALID_WEAPON);
+  });
+});

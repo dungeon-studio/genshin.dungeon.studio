@@ -66,7 +66,12 @@ export function serialiseCharacter(character: CollectionCharacter, baseUrl: stri
 export function deserialiseCharacter(item: Item): CollectionCharacter {
   const data = Object.fromEntries(item.data.map((d) => [d.name, d.value]));
   assertCollectionCharacter(data);
-  return data;
+  return {
+    characterId: data.characterId,
+    constellationLevel: data.constellationLevel,
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+  };
 }
 
 /** What the generic collection helpers consume for this resource. */
