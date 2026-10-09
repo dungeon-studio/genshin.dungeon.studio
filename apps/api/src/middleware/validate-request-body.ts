@@ -62,7 +62,7 @@ export type ValidatedRequestBodyVariables<Body = unknown> = {
  * The body type a list of profiles accepts: the union of each schema's derived
  * type, since the negotiated version decides which one validated the body.
  */
-export type RequestBodyOf<Schemas extends readonly JsonSchemaProfile[]> = {
+type RequestBodyOf<Schemas extends readonly JsonSchemaProfile[]> = {
   [K in keyof Schemas]: Schemas[K]['schema'] extends JSONSchema
     ? FromSchema<Schemas[K]['schema']>
     : never;

@@ -41,8 +41,6 @@ weapons.use('*', auth);
 
 weapons.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: weaponItemV1 }]));
 
-// FromSchema widens the schema's integer bounds to `number`; request validation
-// has already enforced them, so the intersection puts the range back.
 type CreateWeaponBody = FromSchema<typeof weaponPostRequestV1.schema> & {
   refinementLevel: RefinementLevel;
 };
