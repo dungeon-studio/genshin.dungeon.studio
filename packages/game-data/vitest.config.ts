@@ -1,19 +1,14 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { defineConfig } from 'vitest/config';
+import baseConfig from '@genshin/vitest-config';
+import { defineConfig, mergeConfig } from 'vitest/config';
 
-export default defineConfig({
-  test: {
-    exclude: ['dist/**', 'node_modules/**'],
-    reporters: ['default', 'junit'],
-    outputFile: {
-      junit: './test-results/junit.xml',
+export default mergeConfig(
+  baseConfig,
+  defineConfig({
+    test: {
+      exclude: ['dist/**', 'node_modules/**'],
     },
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'lcov'],
-      reportsDirectory: './coverage',
-    },
-  },
-});
+  }),
+);

@@ -33,7 +33,8 @@
         "package.json",
         "vite.config.*",
         "vitest.config.*",
-        "tsconfig*.json"
+        "tsconfig*.json",
+        "$TURBO_ROOT$/packages/vitest-config/index.js"
       ],
       "env": ["FAST_CHECK_SEED"]
     },

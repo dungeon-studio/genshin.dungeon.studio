@@ -34,6 +34,7 @@
   "devDependencies": {
     "@genshin/eslint-config": "workspace:*",
     "@genshin/tsconfig": "workspace:*",
+    "@genshin/vitest-config": "workspace:*",
     "@stryker-mutator/core": "10.0.0",
     "@stryker-mutator/vitest-runner": "10.0.0",
     "@typescript/native": "npm:typescript@7.0.2",
