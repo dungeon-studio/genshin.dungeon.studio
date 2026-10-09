@@ -96,23 +96,21 @@ export function useRemoveWeaponMutation(
   });
 }
 
+export interface SetRefinementLevelVariables {
+  collectionWeaponId: CollectionWeaponId;
+  level: RefinementLevel;
+}
+
 export function useSetRefinementLevelMutation(
   userId: string | undefined,
-): UseMutationResult<
-  WeaponMutationResult,
-  Error,
-  { collectionWeaponId: CollectionWeaponId; level: RefinementLevel }
-> {
+): UseMutationResult<WeaponMutationResult, Error, SetRefinementLevelVariables> {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({
       collectionWeaponId,
       level,
-    }: {
-      collectionWeaponId: CollectionWeaponId;
-      level: RefinementLevel;
-    }): Promise<WeaponMutationResult> => {
+    }: SetRefinementLevelVariables): Promise<WeaponMutationResult> => {
       const response = await apiPatch(`/weapons/${encodeURIComponent(collectionWeaponId)}`, {
         refinementLevel: level,
       });
