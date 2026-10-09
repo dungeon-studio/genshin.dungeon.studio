@@ -10,6 +10,7 @@
 
 import {
   buildItem,
+  itemData,
   type CollectionJsonRepresentation,
   type Item,
   type Link,
@@ -84,9 +85,15 @@ export function serialiseWeapon(weapon: CollectionWeapon, baseUrl: string): Item
  * @throws TypeError naming the field that failed.
  */
 export function deserialiseWeapon(item: Item): CollectionWeapon {
-  const data = Object.fromEntries(item.data.map((d) => [d.name, d.value]));
+  const data = itemData(item);
   assertCollectionWeapon(data);
-  return data;
+  return {
+    weaponInstanceId: data.weaponInstanceId,
+    weaponId: data.weaponId,
+    refinementLevel: data.refinementLevel,
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+  };
 }
 
 /** What the generic collection helpers consume for this resource. */
