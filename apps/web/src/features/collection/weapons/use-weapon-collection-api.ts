@@ -13,7 +13,7 @@
  */
 
 import { assertCollectionDocument } from '@genshin/collection-json';
-import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
+import type { CollectionWeapon, CollectionWeaponId, RefinementLevel } from '@genshin/domain';
 import { deserialiseWeapon, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -101,7 +101,7 @@ export function useSetRefinementLevelMutation(
 ): UseMutationResult<
   WeaponMutationResult,
   Error,
-  { collectionWeaponId: CollectionWeaponId; level: number }
+  { collectionWeaponId: CollectionWeaponId; level: RefinementLevel }
 > {
   const queryClient = useQueryClient();
 
@@ -111,7 +111,7 @@ export function useSetRefinementLevelMutation(
       level,
     }: {
       collectionWeaponId: CollectionWeaponId;
-      level: number;
+      level: RefinementLevel;
     }): Promise<WeaponMutationResult> => {
       const response = await apiPatch(`/weapons/${encodeURIComponent(collectionWeaponId)}`, {
         refinementLevel: level,

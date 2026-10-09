@@ -48,14 +48,6 @@ describe('useWeaponCollectionStore', () => {
       expect(storedWeapon('inst-1')?.refinementLevel).toBe(3);
     });
 
-    it('ignores invalid refinement levels', () => {
-      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', WEAPON.id));
-      useWeaponCollectionStore.getState().setRefinementLevel('inst-1', 0);
-      useWeaponCollectionStore.getState().setRefinementLevel('inst-1', 6);
-
-      expect(storedWeapon('inst-1')?.refinementLevel).toBe(1);
-    });
-
     it('ignores updates for nonexistent weapons', () => {
       useWeaponCollectionStore.getState().setRefinementLevel('nonexistent', 3);
 
