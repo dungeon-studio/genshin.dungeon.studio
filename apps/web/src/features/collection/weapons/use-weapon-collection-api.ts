@@ -13,7 +13,7 @@
  */
 
 import { assertCollectionDocument } from '@genshin/collection-json';
-import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
+import type { CollectionWeapon, CollectionWeaponId, RefinementLevel } from '@genshin/domain';
 import { deserialiseWeapon, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -96,23 +96,21 @@ export function useRemoveWeaponMutation(
   });
 }
 
+export interface SetRefinementLevelVariables {
+  collectionWeaponId: CollectionWeaponId;
+  level: RefinementLevel;
+}
+
 export function useSetRefinementLevelMutation(
   userId: string | undefined,
-): UseMutationResult<
-  WeaponMutationResult,
-  Error,
-  { collectionWeaponId: CollectionWeaponId; level: number }
-> {
+): UseMutationResult<WeaponMutationResult, Error, SetRefinementLevelVariables> {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({
       collectionWeaponId,
       level,
-    }: {
-      collectionWeaponId: CollectionWeaponId;
-      level: number;
-    }): Promise<WeaponMutationResult> => {
+    }: SetRefinementLevelVariables): Promise<WeaponMutationResult> => {
       const response = await apiPatch(`/weapons/${encodeURIComponent(collectionWeaponId)}`, {
         refinementLevel: level,
       });
