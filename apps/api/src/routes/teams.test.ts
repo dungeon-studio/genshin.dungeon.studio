@@ -482,7 +482,7 @@ describe('Team routes', () => {
         expect(res.status).toBe(200);
       });
 
-      it('returns 400 for unknown artifact set', async () => {
+      it('returns 422 for unknown artifact set', async () => {
         const res = await app.request(
           authedRequest('PUT', '/teams/1', {
             members: [
@@ -505,9 +505,9 @@ describe('Team routes', () => {
           }),
         );
 
-        expect(res.status).toBe(400);
+        expect(res.status).toBe(422);
         const body = (await res.json()) as { detail: string };
-        expect(body.detail).toContain('Unknown artifact set');
+        expect(body.detail).toContain('/members/0/artifactPlan/sets/0');
       });
 
       it('returns 400 when priority and secondary minor affixes overlap', async () => {

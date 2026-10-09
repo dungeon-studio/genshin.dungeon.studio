@@ -4,6 +4,7 @@
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
 import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
 import { makeWeapon } from '@genshin/domain/testing';
+import type * as GameData from '@genshin/game-data';
 import { getWeaponById } from '@genshin/game-data';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -26,7 +27,9 @@ vi.mock('@/repositories/weapons/index.js', () => ({
   remove: vi.fn(),
 }));
 
-vi.mock('@genshin/game-data', () => ({
+// The app imports schema modules whose `enum` lists read game-data at load.
+vi.mock('@genshin/game-data', async (importOriginal) => ({
+  ...(await importOriginal<typeof GameData>()),
   getWeaponById: vi.fn(),
 }));
 

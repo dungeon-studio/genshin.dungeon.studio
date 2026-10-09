@@ -1,7 +1,18 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { ArtifactSet } from '@genshin/game-data';
+import {
+  ARTIFACT_MINOR_AFFIXES,
+  ARTIFACT_SETS,
+  CIRCLET_MAIN_AFFIXES,
+  GOBLET_MAIN_AFFIXES,
+  SANDS_MAIN_AFFIXES,
+} from '@genshin/game-data';
+
 import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
+
+const ARTIFACT_SET_IDS = Object.keys(ARTIFACT_SETS) as ArtifactSet['id'][];
 
 export const teamPutRequestV1 = {
   path: '/profiles/json-schema/teams/put-request-v1.json',
@@ -56,37 +67,36 @@ export const teamPutRequestV1 = {
         type: 'object',
         properties: {
           sands: {
-            type: 'string',
-            minLength: 1,
+            enum: SANDS_MAIN_AFFIXES,
             description: 'Desired main stat for Sands of Eon',
           },
           goblet: {
-            type: 'string',
-            minLength: 1,
+            enum: GOBLET_MAIN_AFFIXES,
             description: 'Desired main stat for Goblet of Eonothem',
           },
           circlet: {
-            type: 'string',
-            minLength: 1,
+            enum: CIRCLET_MAIN_AFFIXES,
             description: 'Desired main stat for Circlet of Logos',
           },
           sets: {
             type: 'array',
-            items: { type: 'string', minLength: 1 },
+            items: { enum: ARTIFACT_SET_IDS },
             minItems: 1,
             maxItems: 2,
             description: '1-2 artifact set IDs from game data',
           },
           priorityMinorAffixes: {
             type: 'array',
-            items: { type: 'string', minLength: 1 },
+            items: { enum: ARTIFACT_MINOR_AFFIXES },
             maxItems: 3,
+            uniqueItems: true,
             description: '0-3 priority minor affixes',
           },
           secondaryMinorAffixes: {
             type: 'array',
-            items: { type: 'string', minLength: 1 },
+            items: { enum: ARTIFACT_MINOR_AFFIXES },
             maxItems: 3,
+            uniqueItems: true,
             description: '0-3 secondary minor affixes (disjoint from priorityMinorAffixes)',
           },
         },
