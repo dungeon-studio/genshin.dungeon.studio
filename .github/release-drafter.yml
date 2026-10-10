@@ -40,7 +40,7 @@ replacers:
 version-resolver:
   major:
     labels:
-      - 'breaking-change'
+      - 'breaking change'
   minor:
     labels:
       - 'enhancement'
@@ -54,7 +54,7 @@ version-resolver:
   default: patch
 
 # Apply category labels from conventional-commit PR titles so the categories
-# above are driven by commit prefixes without manual labeling. A breaking-change
+# above are driven by commit prefixes without manual labeling. A breaking change
 # marker (type!:) adds the major-bump label on top of the type label.
 autolabeler:
   - label: 'enhancement'
@@ -76,7 +76,7 @@ autolabeler:
     title:
       - '/^(chore|build)(?!\(deps)(\(.+\))?:/i'
       - '/^(ci|style|refactor|test|perf|revert)(\(.+\))?:/i'
-  - label: 'breaking-change'
+  - label: 'breaking change'
     title:
       - '/^\w+(\(.+\))?!:/'
   # Component labels from the changed file paths, so a PR is tagged by the part
