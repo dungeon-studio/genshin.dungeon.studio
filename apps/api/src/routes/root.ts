@@ -4,6 +4,7 @@
 import type { Env, Hono as HonoApp } from 'hono';
 import { Hono } from 'hono';
 
+import { negotiatedJson } from '@/http/negotiated-response.js';
 import { isRouteHandler } from '@/http/route-table.js';
 import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-content.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
@@ -57,7 +58,7 @@ export function root<E extends Env>(
   router.get(
     '/',
     negotiateContent([{ mediaType: 'application/json', profile: rootGetResponseV1 }]),
-    (c) => c.json({ links }, 200, { 'Content-Type': c.get('negotiatedMediaType') }),
+    (c) => negotiatedJson(c, { links }),
   );
 
   return router;

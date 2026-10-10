@@ -9,11 +9,7 @@
  * arbitraries.
  */
 
-import {
-  type CollectionDocument,
-  type CollectionJsonRepresentation,
-  serialiseCollection,
-} from '@genshin/collection-json';
+import { type CollectionDocument, serialiseCollection } from '@genshin/collection-json';
 
 import type { CharacterId, CollectionCharacter } from './character/collection-character.js';
 import type { ISOTimestamp } from './iso-timestamp.js';
@@ -74,36 +70,22 @@ export function makeTeam(slot: TeamSlot, overrides: Partial<CollectionTeam> = {}
   };
 }
 
-/**
- * Wrap entities in the collection envelope the routes serve.
- *
- * The envelope carries the representation's template, without which the suites
- * assert against a document the API never sends.
- */
-function collectionDocument<T>(
-  representation: CollectionJsonRepresentation<T>,
-  collectionHref: (baseUrl: string) => string,
-  entities: T[],
-  baseUrl: string,
-): CollectionDocument {
-  return serialiseCollection(
-    representation,
-    collectionHref(baseUrl),
-    entities.map((entity) => representation.serialise(entity, baseUrl)),
-  );
-}
-
 export function charactersDocument(
   characters: CollectionCharacter[],
   baseUrl: string,
 ): CollectionDocument {
-  return collectionDocument(characterRepresentation, characterCollectionHref, characters, baseUrl);
+  return serialiseCollection(
+    characterRepresentation,
+    characterCollectionHref(baseUrl),
+    characters,
+    baseUrl,
+  );
 }
 
 export function weaponsDocument(weapons: CollectionWeapon[], baseUrl: string): CollectionDocument {
-  return collectionDocument(weaponRepresentation, weaponCollectionHref, weapons, baseUrl);
+  return serialiseCollection(weaponRepresentation, weaponCollectionHref(baseUrl), weapons, baseUrl);
 }
 
 export function teamsDocument(teams: CollectionTeam[], baseUrl: string): CollectionDocument {
-  return collectionDocument(teamRepresentation, teamCollectionHref, teams, baseUrl);
+  return serialiseCollection(teamRepresentation, teamCollectionHref(baseUrl), teams, baseUrl);
 }

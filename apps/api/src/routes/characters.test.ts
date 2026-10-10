@@ -2,7 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
-import { MAX_CONSTELLATION_LEVEL, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import {
+  characterItemDocument,
+  characterListDocument,
+  MAX_CONSTELLATION_LEVEL,
+  MIN_CONSTELLATION_LEVEL,
+} from '@genshin/domain';
 import { makeCharacter } from '@genshin/domain/testing';
 import type * as GameData from '@genshin/game-data';
 import { getCharacterById } from '@genshin/game-data';
@@ -34,9 +39,11 @@ vi.mock('@genshin/game-data', async (importOriginal) => ({
 
 const FAKE_CHARACTER = makeCharacter('albedo', { constellationLevel: 2 });
 
+const BASE_URL = 'http://localhost';
+
 const EXPECTED_CONTENT_TYPE = toMediaTypeString(
   { mediaType: COLLECTION_JSON, profile: characterItemV1 },
-  'http://localhost',
+  BASE_URL,
 );
 
 describe('Character routes', () => {
@@ -92,26 +99,8 @@ describe('Character routes', () => {
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
-    it('returns one item per character', () => {
-      expect(body.collection.items).toHaveLength(1);
-    });
-
-    it('includes character domain data', () => {
-      expect(body.collection.items[0].data).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ name: 'characterId', value: 'albedo' }),
-          expect.objectContaining({ name: 'constellationLevel', value: 2 }),
-        ]),
-      );
-    });
-
-    it('returns empty items when no characters exist', async () => {
-      vi.mocked(Characters.list).mockResolvedValue([]);
-
-      const res = await app.request(authedRequest('GET', '/characters'));
-
-      const body = (await res.json()) as CollectionDocument;
-      expect(body.collection.items).toEqual([]);
+    it('returns the stored characters as the list document', () => {
+      expect(body).toEqual(characterListDocument([FAKE_CHARACTER], BASE_URL));
     });
 
     it('returns 500 when repository throws', async () => {
@@ -143,17 +132,8 @@ describe('Character routes', () => {
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
-    it('returns single-item collection', () => {
-      expect(body.collection.items).toHaveLength(1);
-    });
-
-    it('includes character domain data', () => {
-      expect(body.collection.items[0].data).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ name: 'characterId', value: 'albedo' }),
-          expect.objectContaining({ name: 'constellationLevel', value: 2 }),
-        ]),
-      );
+    it('returns the stored character as an item document', () => {
+      expect(body).toEqual(characterItemDocument(FAKE_CHARACTER, BASE_URL));
     });
 
     it('returns 404 when character not in collection', async () => {
@@ -193,17 +173,8 @@ describe('Character routes', () => {
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
-    it('returns single-item collection', () => {
-      expect(body.collection.items).toHaveLength(1);
-    });
-
-    it('includes character domain data', () => {
-      expect(body.collection.items[0].data).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ name: 'characterId', value: 'albedo' }),
-          expect.objectContaining({ name: 'constellationLevel', value: 2 }),
-        ]),
-      );
+    it('returns the saved character as an item document', () => {
+      expect(body).toEqual(characterItemDocument(FAKE_CHARACTER, BASE_URL));
     });
 
     it('returns 201 when character is newly added', () => {

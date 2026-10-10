@@ -1,20 +1,20 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
+import { COLLECTION_JSON } from '@genshin/collection-json';
 import type { RefinementLevel, UUID } from '@genshin/domain';
 import {
-  serialiseWeapon,
-  weaponCollectionHref,
+  weaponItemDocument,
   weaponItemHref,
-  weaponsOfHref,
-  weaponRepresentation,
+  weaponListDocument,
+  weaponsOfDocument,
 } from '@genshin/domain';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import type { FromSchema } from 'json-schema-to-ts';
 
 import { requireWeaponId } from '@/catalogue.js';
+import { negotiatedJson } from '@/http/negotiated-response.js';
 import { auth } from '@/middleware/auth.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
@@ -61,34 +61,12 @@ weapons.get('/', async (c) => {
 
     const instances = await Weapons.list(userId, requireWeaponId(weaponId));
 
-    return c.body(
-      JSON.stringify(
-        serialiseCollection(
-          weaponRepresentation,
-          weaponsOfHref(baseUrl, weaponId),
-          instances.map((w) => serialiseWeapon(w, baseUrl)),
-        ),
-      ),
-      {
-        headers: { 'Content-Type': c.get('negotiatedMediaType') },
-      },
-    );
+    return negotiatedJson(c, weaponsOfDocument(weaponId, instances, baseUrl));
   }
 
   const items = await Weapons.list(userId);
 
-  return c.body(
-    JSON.stringify(
-      serialiseCollection(
-        weaponRepresentation,
-        weaponCollectionHref(baseUrl),
-        items.map((w) => serialiseWeapon(w, baseUrl)),
-      ),
-    ),
-    {
-      headers: { 'Content-Type': c.get('negotiatedMediaType') },
-    },
-  );
+  return negotiatedJson(c, weaponListDocument(items, baseUrl));
 });
 
 // POST /weapons — Create new weapon instance
@@ -103,20 +81,9 @@ weapons.post(
     const weapon = await Weapons.create(userId, requireWeaponId(weaponId), refinementLevel);
     const baseUrl = new URL(c.req.url).origin;
 
-    return c.body(
-      JSON.stringify(
-        serialiseCollection(weaponRepresentation, weaponCollectionHref(baseUrl), [
-          serialiseWeapon(weapon, baseUrl),
-        ]),
-      ),
-      {
-        status: 201,
-        headers: {
-          'Content-Type': c.get('negotiatedMediaType'),
-          Location: weaponItemHref(baseUrl, weapon),
-        },
-      },
-    );
+    return negotiatedJson(c, weaponListDocument([weapon], baseUrl), 201, {
+      Location: weaponItemHref(baseUrl, weapon),
+    });
   },
 );
 
@@ -133,16 +100,7 @@ weapons.get('/:weaponInstanceId', async (c) => {
 
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(
-    JSON.stringify(
-      serialiseCollection(weaponRepresentation, weaponItemHref(baseUrl, weapon), [
-        serialiseWeapon(weapon, baseUrl),
-      ]),
-    ),
-    {
-      headers: { 'Content-Type': c.get('negotiatedMediaType') },
-    },
-  );
+  return negotiatedJson(c, weaponItemDocument(weapon, baseUrl));
 });
 
 // PATCH /weapons/:weaponInstanceId — Update weapon instance
@@ -164,16 +122,7 @@ weapons.patch(
 
     const baseUrl = new URL(c.req.url).origin;
 
-    return c.body(
-      JSON.stringify(
-        serialiseCollection(weaponRepresentation, weaponItemHref(baseUrl, weapon), [
-          serialiseWeapon(weapon, baseUrl),
-        ]),
-      ),
-      {
-        headers: { 'Content-Type': c.get('negotiatedMediaType') },
-      },
-    );
+    return negotiatedJson(c, weaponItemDocument(weapon, baseUrl));
   },
 );
 

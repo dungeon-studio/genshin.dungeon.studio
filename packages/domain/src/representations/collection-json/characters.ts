@@ -11,6 +11,9 @@
 import {
   buildItem,
   itemData,
+  serialiseCollection,
+  serialiseItemDocument,
+  type CollectionDocument,
   type CollectionJsonRepresentation,
   type Item,
   type Template,
@@ -54,6 +57,25 @@ export function serialiseCharacter(character: CollectionCharacter, baseUrl: stri
     { name: 'createdAt', value: character.createdAt },
     { name: 'updatedAt', value: character.updatedAt },
   ]);
+}
+
+export function characterListDocument(
+  characters: CollectionCharacter[],
+  baseUrl: string,
+): CollectionDocument {
+  return serialiseCollection(
+    characterRepresentation,
+    characterCollectionHref(baseUrl),
+    characters,
+    baseUrl,
+  );
+}
+
+export function characterItemDocument(
+  character: CollectionCharacter,
+  baseUrl: string,
+): CollectionDocument {
+  return serialiseItemDocument(characterRepresentation, character, baseUrl);
 }
 
 /**

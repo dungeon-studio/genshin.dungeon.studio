@@ -8,6 +8,7 @@ export {
   buildItem,
   itemData,
   serialiseCollection,
+  serialiseItemDocument,
   type Collection,
   type CollectionDocument,
   type CollectionJsonRepresentation,

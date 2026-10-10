@@ -9,7 +9,20 @@ import {
   buildItem,
   COLLECTION_JSON,
   itemData,
+  serialiseCollection,
+  serialiseItemDocument,
+  type CollectionJsonRepresentation,
 } from './collection-json.js';
+
+type Widget = { id: string };
+
+const BASE_URL = 'http://example.com';
+
+const widgetRepresentation = {
+  serialise: (widget, baseUrl) => buildItem(`${baseUrl}/widgets/${widget.id}`, []),
+  deserialise: (item) => ({ id: item.href.split('/').at(-1) ?? '' }),
+  template: { data: [{ name: 'id' }] },
+} satisfies CollectionJsonRepresentation<Widget>;
 
 describe('COLLECTION_JSON', () => {
   it('equals the IANA-registered media type', () => {
@@ -185,5 +198,47 @@ describe('assertCollectionDocument', () => {
     expect(() => assertCollectionDocument({ collection: { items: 'not-an-array' } })).toThrow(
       TypeError,
     );
+  });
+});
+
+describe('serialiseCollection', () => {
+  it('serialises each entity against the base URL, in order', () => {
+    const doc = serialiseCollection(
+      widgetRepresentation,
+      `${BASE_URL}/widgets`,
+      [{ id: 'a' }, { id: 'b' }],
+      BASE_URL,
+    );
+
+    expect(doc.collection.items.map((item) => item.href)).toEqual([
+      `${BASE_URL}/widgets/a`,
+      `${BASE_URL}/widgets/b`,
+    ]);
+  });
+
+  it("carries the representation's template", () => {
+    const doc = serialiseCollection(widgetRepresentation, `${BASE_URL}/widgets`, [], BASE_URL);
+
+    expect(doc.collection.template).toEqual(widgetRepresentation.template);
+  });
+});
+
+describe('serialiseItemDocument', () => {
+  it("addresses the document at the item's own URL", () => {
+    const doc = serialiseItemDocument(widgetRepresentation, { id: 'a' }, BASE_URL);
+
+    expect(doc.collection.href).toBe(`${BASE_URL}/widgets/a`);
+  });
+
+  it('holds only that item', () => {
+    const doc = serialiseItemDocument(widgetRepresentation, { id: 'a' }, BASE_URL);
+
+    expect(doc.collection.items.map((item) => item.href)).toEqual([`${BASE_URL}/widgets/a`]);
+  });
+
+  it("carries the representation's template", () => {
+    const doc = serialiseItemDocument(widgetRepresentation, { id: 'a' }, BASE_URL);
+
+    expect(doc.collection.template).toEqual(widgetRepresentation.template);
   });
 });

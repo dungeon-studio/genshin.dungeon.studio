@@ -4,7 +4,13 @@
 import type { DatumValue, Item } from '@genshin/collection-json';
 import { describe, expect, it } from 'vitest';
 
-import { deserialiseTeam, serialiseTeam } from './teams.js';
+import {
+  deserialiseTeam,
+  serialiseTeam,
+  teamItemDocument,
+  teamListDocument,
+  teamRepresentation,
+} from './teams.js';
 import type { ISOTimestamp } from '../../iso-timestamp.js';
 import type { CollectionTeam, CollectionTeamMembers } from '../../team/collection-team.js';
 
@@ -238,5 +244,43 @@ describe('deserialiseTeam member sanitisation', () => {
   it('rejects a member with a non-string characterId', () => {
     const item = itemWithRawMembers([{ characterId: 42 }, null, null, null]);
     expect(() => deserialiseTeam(item)).toThrow(/members\[0\]\.characterId must be a string/);
+  });
+});
+
+describe('teamListDocument', () => {
+  it('addresses the collection URL', () => {
+    const document = teamListDocument([VALID_TEAM], BASE_URL);
+    expect(document.collection.href).toBe(`${BASE_URL}/teams`);
+  });
+
+  it('holds one item per team in order', () => {
+    const other: CollectionTeam = { ...VALID_TEAM, slot: 2 };
+    const document = teamListDocument([VALID_TEAM, other], BASE_URL);
+    expect(document.collection.items.map((item) => item.href)).toEqual([
+      `${BASE_URL}/teams/1`,
+      `${BASE_URL}/teams/2`,
+    ]);
+  });
+
+  it('carries the team template', () => {
+    const document = teamListDocument([], BASE_URL);
+    expect(document.collection.template).toEqual(teamRepresentation.template);
+  });
+});
+
+describe('teamItemDocument', () => {
+  it("addresses the team's own URL", () => {
+    const document = teamItemDocument(VALID_TEAM, BASE_URL);
+    expect(document.collection.href).toBe(`${BASE_URL}/teams/1`);
+  });
+
+  it('holds only that team', () => {
+    const document = teamItemDocument(VALID_TEAM, BASE_URL);
+    expect(document.collection.items.map((item) => item.href)).toEqual([`${BASE_URL}/teams/1`]);
+  });
+
+  it('carries the team template', () => {
+    const document = teamItemDocument(VALID_TEAM, BASE_URL);
+    expect(document.collection.template).toEqual(teamRepresentation.template);
   });
 });

@@ -11,6 +11,9 @@
 import {
   buildItem,
   itemData,
+  serialiseCollection,
+  serialiseItemDocument,
+  type CollectionDocument,
   type CollectionJsonRepresentation,
   type Item,
   type Link,
@@ -74,6 +77,31 @@ export function serialiseWeapon(weapon: CollectionWeapon, baseUrl: string): Item
     ],
     links,
   );
+}
+
+export function weaponListDocument(
+  weapons: CollectionWeapon[],
+  baseUrl: string,
+): CollectionDocument {
+  return serialiseCollection(weaponRepresentation, weaponCollectionHref(baseUrl), weapons, baseUrl);
+}
+
+/** The user's copies of one weapon. */
+export function weaponsOfDocument(
+  weaponId: string,
+  weapons: CollectionWeapon[],
+  baseUrl: string,
+): CollectionDocument {
+  return serialiseCollection(
+    weaponRepresentation,
+    weaponsOfHref(baseUrl, weaponId),
+    weapons,
+    baseUrl,
+  );
+}
+
+export function weaponItemDocument(weapon: CollectionWeapon, baseUrl: string): CollectionDocument {
+  return serialiseItemDocument(weaponRepresentation, weapon, baseUrl);
 }
 
 /**
