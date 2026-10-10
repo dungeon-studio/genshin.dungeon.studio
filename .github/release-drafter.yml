@@ -32,9 +32,10 @@ change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&'
 
 # Strip the conventional-commit prefix from each bullet; the category heading
-# already conveys the type, so 'feat: add X' reads as 'add X'.
+# already conveys the type, so 'feat: add X' reads as 'add X'. Any type
+# matches: the title check in pull-request-metadata.yml owns the type list.
 replacers:
-  - search: '/^(\s*-\s)(?:feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(?:\([^)]*\))?!?:\s+/gim'
+  - search: '/^(\s*-\s)[a-z]+(?:\([^)]*\))?!?:\s+/gim'
     replace: '$1'
 
 version-resolver:
@@ -72,10 +73,11 @@ autolabeler:
   - label: 'dependencies'
     title:
       - '/^(chore|build|fix)\(deps(-dev)?\)/i'
+  # Every type without a category of its own, so a type added to the title
+  # check lands here without editing this file.
   - label: 'chore'
     title:
-      - '/^(chore|build)(?!\(deps)(\(.+\))?:/i'
-      - '/^(ci|style|refactor|test|perf|revert)(\(.+\))?:/i'
+      - '/^(?!(feat|fix|docs)\b)[a-z]+(?!\(deps)(\(.+\))?!?:/i'
   - label: 'breaking change'
     title:
       - '/^\w+(\(.+\))?!:/'

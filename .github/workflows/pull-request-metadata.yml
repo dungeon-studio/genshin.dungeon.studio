@@ -35,8 +35,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # The same set .github/release-drafter.yml strips from release note
-          # bullets; the two lists have to move together.
+          # The authoritative type list: commitlint's config-conventional set,
+          # which CONTRIBUTING.md links to.
+          # https://github.com/conventional-changelog/commitlint/tree/master/@commitlint/config-conventional
           types: |
             feat
             fix

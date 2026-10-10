@@ -31,6 +31,7 @@ Cloud Run
 Cloud Storage
 Codecov
 CodeQL
+commitlint
 Copilot
 corepack
 Dependabot
