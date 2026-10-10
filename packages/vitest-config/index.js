@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { defineConfig } from 'vitest/config';
+import { configDefaults, defineConfig } from 'vitest/config';
 
 /**
  * Shared Vitest base for every workspace, composed with `mergeConfig`.
@@ -13,6 +13,9 @@ import { defineConfig } from 'vitest/config';
  */
 export default defineConfig({
   test: {
+    // Spread the defaults: assigning `exclude` replaces them, which would drop
+    // node_modules from the ignore list.
+    exclude: [...configDefaults.exclude, '**/dist/**'],
     reporters: ['default', 'junit'],
     outputFile: {
       junit: './test-results/junit.xml',

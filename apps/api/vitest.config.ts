@@ -4,7 +4,7 @@
 import { fileURLToPath } from 'node:url';
 
 import baseConfig from '@genshin/vitest-config';
-import { configDefaults, defineConfig, mergeConfig } from 'vitest/config';
+import { defineConfig, mergeConfig } from 'vitest/config';
 
 export default mergeConfig(
   baseConfig,
@@ -18,9 +18,7 @@ export default mergeConfig(
       globals: true,
       // Error-path suites log by design; silence keeps the run readable.
       env: { LOG_LEVEL: 'silent' },
-      // Spread the defaults: assigning `exclude` replaces them, which would drop
-      // node_modules and dist from the ignore list.
-      exclude: [...configDefaults.exclude, '**/*.integration.test.ts'],
+      exclude: ['**/*.integration.test.ts'],
       setupFiles: ['./src/test/setup.ts'],
     },
   }),
