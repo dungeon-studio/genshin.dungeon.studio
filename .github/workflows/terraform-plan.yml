@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   terraform-plan:
-    name: ${{ matrix.display }}
+    name: Plan ${{ matrix.environment }} infrastructure
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -35,15 +35,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          # display only sets the check name; environment is the directory
-          # under infrastructure/terraform/environments and stays lowercase.
-          - environment: core
-            display: Core
-          - environment: dev
-            display: Dev
-          - environment: staging
-            display: Staging
+        environment: [core, dev, staging]
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
