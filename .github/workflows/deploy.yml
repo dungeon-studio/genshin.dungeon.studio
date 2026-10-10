@@ -138,10 +138,8 @@ jobs:
           tags: |
             type=ref,event=branch
             type=sha,prefix={{branch}}-,format=short
-          # The remaining OCI labels default to repository metadata, which is
-          # correct for source, revision, created, licenses, and url. Title and
-          # description are not: they default to naming the whole product, and
-          # this image is one service within it.
+          # Title and description default to the repository, which names the
+          # whole product; this image is one service within it.
           labels: |
             org.opencontainers.image.title=genshin-api
             org.opencontainers.image.description=HTTP API for genshin.dungeon.studio

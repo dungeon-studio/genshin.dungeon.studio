@@ -2,13 +2,10 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# Assert that a pushed image carries the OCI provenance labels, and that its
-# recorded revision is the commit it was built from.
-#
-# The labels are applied by BuildKit from docker/metadata-action rather than by
-# LABEL instructions, because a build-time --label overrides any LABEL of the
-# same key. That puts them beyond the reach of a Dockerfile linter, leaving the
-# published manifest as the only place they can be checked.
+# BuildKit applies the OCI labels from docker/metadata-action, and a build-time
+# --label overrides any Dockerfile LABEL with the same key. A Dockerfile linter
+# never sees the shipped values, so the published manifest is the only place to
+# check them.
 
 set -euo pipefail
 set -x
@@ -40,8 +37,6 @@ MISSING=$(jq -r --args '
 
 REVISION=$(jq -r '.revision' <<<"$LABELS")
 
-# A complete label set pointing at the wrong commit is the failure that
-# matters, since consumers read this as the image's provenance.
 [ "$REVISION" = "$EXPECTED_REVISION" ] || {
   echo "revision mismatch: image=$REVISION expected=$EXPECTED_REVISION" >&2
   exit 1
