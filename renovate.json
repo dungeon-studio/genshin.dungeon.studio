@@ -40,7 +40,7 @@
       "minimumReleaseAge": null
     },
     {
-      "description": "Move each tool in one pull request across all of its pins, so develop never runs two versions of it between merges",
+      "description": "Move each dependency in one pull request across all of its pins, so develop never holds two versions of it",
       "matchDepNames": ["hashicorp/terraform", "fsfe/reuse-tool", "lycheeverse/lychee", "node"],
       "groupName": "{{depName}}"
     }
