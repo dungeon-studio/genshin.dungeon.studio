@@ -102,8 +102,9 @@ export function serialiseCollection<T>(
   repr: CollectionJsonRepresentation<T>,
   href: string,
   items: Item[],
+  links?: Link[],
 ): CollectionDocument {
-  return buildCollection(href, items, { template: repr.template });
+  return buildCollection(href, items, { template: repr.template, links });
 }
 
 // --- Assertions ---

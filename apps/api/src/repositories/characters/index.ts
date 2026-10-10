@@ -9,6 +9,8 @@ import type {
 } from '@genshin/domain';
 
 import { db } from '@/firebase/firestore.js';
+import type { Page, PageRequest } from '@/http/page.js';
+import { readPage } from '@/repositories/firestore/page.js';
 import { readSnapshot } from '@/repositories/firestore/snapshot.js';
 
 import { fromDocument, toDocument } from './document.js';
@@ -18,10 +20,11 @@ function collectionRef(userId: string) {
   return db.collection('users').doc(userId).collection('characters');
 }
 
-export async function list(userId: string): Promise<CollectionCharacter[]> {
-  const snapshot = await collectionRef(userId).get();
-
-  return snapshot.docs.map((doc) => fromDocument(doc.id, doc.data()));
+export async function list(
+  userId: string,
+  request: PageRequest,
+): Promise<Page<CollectionCharacter>> {
+  return readPage(collectionRef(userId), request, (doc) => fromDocument(doc.id, doc.data()));
 }
 
 export async function get(

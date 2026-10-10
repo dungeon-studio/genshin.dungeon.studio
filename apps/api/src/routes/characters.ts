@@ -14,6 +14,7 @@ import { HTTPException } from 'hono/http-exception';
 import type { FromSchema } from 'json-schema-to-ts';
 
 import { requireCharacterId } from '@/catalogue.js';
+import { pageLinks, parsePageRequest } from '@/http/page.js';
 import { auth } from '@/middleware/auth.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
@@ -43,10 +44,10 @@ type SaveCharacterBody = FromSchema<typeof characterPutRequestV1.schema> & {
   constellationLevel: ConstellationLevel;
 };
 
-// GET /characters — List user's character collection
+// GET /characters — List a page of the user's character collection
 characters.get('/', async (c) => {
   const userId = c.get('user').uid;
-  const items = await Characters.list(userId);
+  const page = await Characters.list(userId, parsePageRequest(c));
   const baseUrl = new URL(c.req.url).origin;
 
   return c.body(
@@ -54,7 +55,8 @@ characters.get('/', async (c) => {
       serialiseCollection(
         characterRepresentation,
         characterCollectionHref(baseUrl),
-        items.map((item) => serialiseCharacter(item, baseUrl)),
+        page.items.map((item) => serialiseCharacter(item, baseUrl)),
+        pageLinks(c, page),
       ),
     ),
     {

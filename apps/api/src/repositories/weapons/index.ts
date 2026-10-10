@@ -7,6 +7,8 @@ import type { CollectionWeapon, ISOTimestamp, RefinementLevel, UUID } from '@gen
 import type { WeaponId } from '@genshin/game-data';
 
 import { db } from '@/firebase/firestore.js';
+import type { Page, PageRequest } from '@/http/page.js';
+import { readPage } from '@/repositories/firestore/page.js';
 import { readSnapshot } from '@/repositories/firestore/snapshot.js';
 
 import { fromDocument, toDocument } from './document.js';
@@ -15,13 +17,16 @@ function collectionRef(userId: string) {
   return db.collection('users').doc(userId).collection('weapons');
 }
 
-export async function list(userId: string, weaponId?: string): Promise<CollectionWeapon[]> {
+export async function list(
+  userId: string,
+  request: PageRequest,
+  weaponId?: string,
+): Promise<Page<CollectionWeapon>> {
   const ref = weaponId
     ? collectionRef(userId).where('weaponId', '==', weaponId)
     : collectionRef(userId);
-  const snapshot = await ref.get();
 
-  return snapshot.docs.map((doc) => fromDocument(doc.id as UUID, doc.data()));
+  return readPage(ref, request, (doc) => fromDocument(doc.id as UUID, doc.data()));
 }
 
 export async function get(

@@ -4,6 +4,8 @@
 import type { CollectionTeam, ISOTimestamp, TeamSlot } from '@genshin/domain';
 
 import { db } from '@/firebase/firestore.js';
+import type { Page, PageRequest } from '@/http/page.js';
+import { readPage } from '@/repositories/firestore/page.js';
 import { readSnapshot } from '@/repositories/firestore/snapshot.js';
 
 import { fromDocument, toDocument } from './document.js';
@@ -13,18 +15,34 @@ function collectionRef(userId: string) {
   return db.collection('users').doc(userId).collection('teams');
 }
 
+function isSlotId(id: string): boolean {
+  return /^[1-4]$/.test(id);
+}
+
 /**
- * The teams the user has saved, which is fewer than four until they've saved
- * all four.
+ * One page of the teams the user has saved.
  *
  * Skips any document whose ID isn't a slot number, so a stray write under the
- * collection can't break a read.
+ * collection can't break a read. A page can then hold fewer teams than its
+ * limit while another page remains.
  */
-export async function list(userId: string): Promise<CollectionTeam[]> {
+export async function list(userId: string, request: PageRequest): Promise<Page<CollectionTeam>> {
+  const page = await readPage(collectionRef(userId), request, (doc) =>
+    isSlotId(doc.id) ? fromDocument(Number(doc.id) as TeamSlot, doc.data()) : null,
+  );
+
+  return { ...page, items: page.items.filter((team) => team !== null) };
+}
+
+/**
+ * Every team the user has saved, which is fewer than four until they've saved
+ * all four, for checks that span every slot.
+ */
+export async function listAll(userId: string): Promise<CollectionTeam[]> {
   const snapshot = await collectionRef(userId).get();
 
   return snapshot.docs
-    .filter((doc) => /^[1-4]$/.test(doc.id))
+    .filter((doc) => isSlotId(doc.id))
     .map((doc) => fromDocument(Number(doc.id) as TeamSlot, doc.data()));
 }
 

@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 
 import { documentRef, newUserId } from '@/test/firestore.js';
 
-import { get, list, remove, save } from './index.js';
+import { get, list, listAll, remove, save } from './index.js';
 
 const SLOT: TeamSlot = 1;
 const CHARACTER = CHARACTER_ROSTER[0];
@@ -116,10 +116,13 @@ describe('remove', () => {
   });
 });
 
-describe('list', () => {
-  // The routes reject any slot outside 1-4 before the repository sees it.
-  // Reading such a document back as a team would hand `fromDocument` a slot the
-  // domain rejects.
+// The routes reject any slot outside 1-4 before the repository sees it.
+// Reading such a document back as a team would hand `fromDocument` a slot the
+// domain rejects.
+describe.each([
+  ['list', async (userId: string) => (await list(userId, { limit: 10 })).items],
+  ['listAll', listAll],
+])('%s', (_, read) => {
   it('skips documents whose id is not a slot', async () => {
     const { userId } = await userWithTeam({ name: TEAM_NAME });
     await teamRef(userId, '9').set({
@@ -130,7 +133,7 @@ describe('list', () => {
       updatedAt: UPDATED_AT,
     });
 
-    const teams = await list(userId);
+    const teams = await read(userId);
 
     expect(teams.map((team) => team.slot)).toEqual([SLOT]);
   });

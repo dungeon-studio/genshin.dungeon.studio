@@ -19,6 +19,7 @@ import {
   type CollectionDocument,
   type CollectionJsonRepresentation,
   type Item,
+  type Link,
   type Template,
 } from '@genshin/collection-json';
 
@@ -59,11 +60,15 @@ export function serialiseTeam(team: CollectionTeam, baseUrl: string): Item {
   ]);
 }
 
-export function teamListDocument(teams: CollectionTeam[], baseUrl: string): CollectionDocument {
+export function teamListDocument(
+  teams: CollectionTeam[],
+  baseUrl: string,
+  links?: Link[],
+): CollectionDocument {
   return buildCollection(
     teamCollectionHref(baseUrl),
     teams.map((t) => serialiseTeam(t, baseUrl)),
-    { template: TEAM_TEMPLATE },
+    { template: TEAM_TEMPLATE, links },
   );
 }
 

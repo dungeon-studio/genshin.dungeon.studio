@@ -15,6 +15,7 @@ import { HTTPException } from 'hono/http-exception';
 import type { FromSchema } from 'json-schema-to-ts';
 
 import { requireWeaponId } from '@/catalogue.js';
+import { pageLinks, parsePageRequest } from '@/http/page.js';
 import { auth } from '@/middleware/auth.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
@@ -48,41 +49,29 @@ type UpdateWeaponBody = FromSchema<typeof weaponPatchRequestV1.schema> & {
   refinementLevel: RefinementLevel;
 };
 
-// GET /weapons — List all weapon instances, optionally filtered by weaponId
+// GET /weapons — List a page of weapon instances, optionally filtered by weaponId
 weapons.get('/', async (c) => {
   const userId = c.get('user').uid;
   const weaponId = c.req.query('weaponId');
   const baseUrl = new URL(c.req.url).origin;
 
-  if (weaponId !== undefined) {
-    if (!weaponId) {
-      throw new HTTPException(400, { message: 'weaponId query parameter must not be empty' });
-    }
-
-    const instances = await Weapons.list(userId, requireWeaponId(weaponId));
-
-    return c.body(
-      JSON.stringify(
-        serialiseCollection(
-          weaponRepresentation,
-          weaponsOfHref(baseUrl, weaponId),
-          instances.map((w) => serialiseWeapon(w, baseUrl)),
-        ),
-      ),
-      {
-        headers: { 'Content-Type': c.get('negotiatedMediaType') },
-      },
-    );
+  if (weaponId !== undefined && !weaponId) {
+    throw new HTTPException(400, { message: 'weaponId query parameter must not be empty' });
   }
 
-  const items = await Weapons.list(userId);
+  const request = parsePageRequest(c);
+  const filter = weaponId === undefined ? undefined : requireWeaponId(weaponId);
+  const page = await Weapons.list(userId, request, filter);
+  const href =
+    weaponId === undefined ? weaponCollectionHref(baseUrl) : weaponsOfHref(baseUrl, weaponId);
 
   return c.body(
     JSON.stringify(
       serialiseCollection(
         weaponRepresentation,
-        weaponCollectionHref(baseUrl),
-        items.map((w) => serialiseWeapon(w, baseUrl)),
+        href,
+        page.items.map((w) => serialiseWeapon(w, baseUrl)),
+        pageLinks(c, page),
       ),
     ),
     {
