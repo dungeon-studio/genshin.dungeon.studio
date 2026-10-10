@@ -77,10 +77,13 @@ function typeAwareRules(packageDir) {
         tsconfigRootDir: packageDir,
       },
     },
-    // Both from `stylisticTypeChecked`, whose remaining rules overlap Prettier.
     rules: {
+      // Both from `stylisticTypeChecked`, whose remaining rules overlap Prettier.
       '@typescript-eslint/prefer-nullish-coalescing': 'error',
       '@typescript-eslint/prefer-optional-chain': 'error',
+      // Sound only because `noUncheckedIndexedAccess` types a lookup as
+      // possibly `undefined`; without it, every guard on one reads as dead.
+      '@typescript-eslint/no-unnecessary-condition': 'error',
     },
   };
 }
