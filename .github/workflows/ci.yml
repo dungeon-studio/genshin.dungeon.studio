@@ -453,8 +453,8 @@ jobs:
           exit-code: '1'
           trivy-config: .trivy.yaml
 
-  # One build feeds both the scan and the smoke test. The scan goes first and
-  # never fails the job, so a smoke-test failure cannot cost us its results.
+  # The scan runs before the smoke test so a smoke-test failure cannot skip
+  # the upload.
   container:
     name: Scan and smoke-test container
     runs-on: ubuntu-latest
@@ -483,12 +483,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Reports rather than blocks: base-image fixes arrive on the upstream
-      # digest's schedule, not ours. Pushes to develop upload too, so a pull
-      # request's Trivy alerts show only what it introduces. Findings without
-      # an upgrade path are noise in a report nobody can act on. Severity comes
-      # from .trivy.yaml, which SARIF output honours; a severity input here
-      # would be dropped for SARIF unless limit-severities-for-sarif is set.
+      # Base-image fixes arrive on the upstream digest's schedule, so findings
+      # report without blocking. A finding with no upgrade path leaves nothing
+      # to act on. trivy-action drops a severity input for SARIF unless
+      # limit-severities-for-sarif is set.
       - name: Scan Container Image
         uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e # master
         with:
