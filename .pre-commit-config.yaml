@@ -122,10 +122,9 @@ repos:
   - repo: https://github.com/Mateusz-Grzelinski/actionlint-py
     rev: v1.7.12.25
     hooks:
-      # actionlint skips shellcheck when it isn't on PATH, which the hook's
-      # environment provides through this dependency.
-      # Renovate tracks additional_dependencies only on hooks that declare a
-      # language.
+      # actionlint skips shellcheck when it isn't on PATH, so the hook's
+      # environment installs it. The explicit language lets Renovate track that
+      # pin.
       - id: actionlint
         language: python
         additional_dependencies: [shellcheck-py==0.11.0.1]
