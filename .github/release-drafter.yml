@@ -32,8 +32,8 @@ change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&'
 
 # Strip the conventional-commit prefix from each bullet; the category heading
-# already conveys the type, so 'feat: add X' reads as 'add X'. Any type
-# matches: the title check in pull-request-metadata.yml owns the type list.
+# already conveys the type, so 'feat: add X' reads as 'add X'. The title check
+# in pull-request-metadata.yml owns the type list.
 replacers:
   - search: '/^(\s*-\s)\w+(?:\([^)]*\))?!?:\s+/gim'
     replace: '$1'
@@ -73,8 +73,8 @@ autolabeler:
   - label: 'dependencies'
     title:
       - '/^\w+\(deps(-dev)?\)/i'
-  # Every type without a category of its own, so a type added to the title
-  # check lands here without editing this file.
+  # Catch-all for types without a category; the excluded types mirror the rules
+  # above.
   - label: 'chore'
     title:
       - '/^(?!(feat|fix|docs)\b)\w+(?!\(deps)(\(.+\))?!?:/i'

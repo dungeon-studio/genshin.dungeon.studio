@@ -73,8 +73,8 @@ Broken external URLs don't block a pull request. A weekly run files them as a Gi
 
 Pull requests squash-merge, so the pull request title becomes the commit on `develop` and carries these rules:
 
-- Format: `type(scope): subject`
-- Types: the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) set from commitlint's [`config-conventional`](https://github.com/conventional-changelog/commitlint/tree/master/@commitlint/config-conventional). The `Check pull request title` job in [`pull-request-metadata.yml`](.github/workflows/pull-request-metadata.yml) enforces it.
+- Format: `type(scope): subject`, per [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+- Types: commitlint's [`config-conventional`](https://github.com/conventional-changelog/commitlint/tree/master/@commitlint/config-conventional) set, enforced by the title check in [`pull-request-metadata.yml`](.github/workflows/pull-request-metadata.yml)
 - Write the subject in imperative mood, lowercase, under 50 characters, and with no trailing period: `add character filter`, not `added` or `adds`
 
 Scope is optional and unchecked. When present, it names the one package or tool the change touches, such as `feat(web)` or `chore(renovate)`. Omit it for changes that span several.
