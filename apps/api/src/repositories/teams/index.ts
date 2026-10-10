@@ -24,10 +24,11 @@ function readTeam(doc: QueryDocumentSnapshot): CollectionTeam | null {
 }
 
 /**
- * One page of the teams the user has saved.
+ * One page of the user's saved teams, for a list response; see `listAll` for
+ * checks across every slot.
  *
- * Skipping stray documents can leave a page holding fewer teams than its limit
- * while another page remains.
+ * Skipping stray documents can leave a page short of its limit while another
+ * page remains.
  */
 export async function list(userId: string, request: PageRequest): Promise<Page<CollectionTeam>> {
   const page = await readPage(collectionRef(userId), request, readTeam);
@@ -35,10 +36,7 @@ export async function list(userId: string, request: PageRequest): Promise<Page<C
   return { ...page, items: page.items.filter((team) => team !== null) };
 }
 
-/**
- * Every team the user has saved, which is fewer than four until they've saved
- * all four, for checks that span every slot.
- */
+/** Every saved team, unpaged, for checks that span all four slots. */
 export async function listAll(userId: string): Promise<CollectionTeam[]> {
   const snapshot = await collectionRef(userId).get();
 

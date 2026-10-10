@@ -6,13 +6,7 @@ import { assertCollectionDocument } from '@genshin/collection-json';
 
 import { apiGet } from '@/lib/api';
 
-/**
- * Every item of a paged collection, following `next` links until the server
- * stops sending one.
- *
- * The collection and team pages need the whole collection at once, so the
- * paging stays invisible to them.
- */
+/** Every item of a paged collection, following `next` links to the last page. */
 export async function apiGetAllItems(path: string): Promise<Item[]> {
   const items: Item[] = [];
   let href: string | undefined = path;

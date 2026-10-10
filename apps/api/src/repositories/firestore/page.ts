@@ -4,27 +4,24 @@
 import type { Query, QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { FieldPath } from 'firebase-admin/firestore';
 
-/**
- * One page's worth of a list request: how many records, and the document ID
- * the page starts after.
- */
 export interface PageRequest {
   limit: number;
+  /** Document ID the page starts after, exclusive. */
   after?: string;
 }
 
-/** A page of records, with the document ID to resume after when more remain. */
 export interface Page<T> {
   items: T[];
+  /** Document ID the next page starts after; absent on the last page. */
   next?: string;
 }
 
 /**
  * Reads one page of a query in document ID order.
  *
- * Document ID is the sort because it's unique and stable, so a cursor naming
- * the last ID returned resumes exactly where the page ended. Fetching one extra
- * document tells whether another page exists without a second query.
+ * Document IDs are unique and stable, so a page resumes exactly where the last
+ * one ended. Fetching one extra document reveals whether another page exists
+ * without a second query.
  */
 export async function readPage<T>(
   query: Query,

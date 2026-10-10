@@ -50,7 +50,6 @@ type UpdateWeaponBody = FromSchema<typeof weaponPatchRequestV1.schema> & {
   refinementLevel: RefinementLevel;
 };
 
-/** The weapon a list is filtered to, if any, and the URL of the collection it lists. */
 function weaponListScope(
   weaponId: string | undefined,
   baseUrl: string,

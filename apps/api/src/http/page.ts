@@ -11,11 +11,11 @@ export const DEFAULT_PAGE_LIMIT = 50;
 export const MAX_PAGE_LIMIT = 100;
 
 /**
- * Reads `limit` and `cursor` from the query string.
+ * The page a list request asks for.
  *
- * The cursor is opaque to clients, which follow the `next` link rather than
- * building one, so its encoding can change without breaking them. A cursor that
- * doesn't decode to a document ID is a 400, not an empty page.
+ * Clients follow the `next` link rather than build a cursor, so its encoding
+ * can change freely. A cursor that doesn't decode to a document ID is a 400,
+ * not an empty page.
  */
 export function parsePageRequest(c: Context): PageRequest {
   const rawLimit = c.req.query('limit');
@@ -60,8 +60,7 @@ function encodeCursor(after: string): string {
 /**
  * The collection's `next` link, or none on the last page.
  *
- * Built from the request URL so the page's other query parameters, such as a
- * filter or an explicit `limit`, carry over to the next request.
+ * Built from the request URL, so filters and an explicit `limit` carry over.
  */
 export function pageLinks(c: Context, page: Page<unknown>): Link[] {
   if (page.next === undefined) {
