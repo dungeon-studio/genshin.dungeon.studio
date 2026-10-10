@@ -32,9 +32,9 @@ print_version() {
   echo "  ${label}: ${version}"
 }
 
-# The lifecycle scripts run under `set -x`, which drowns these reports in trace
-# output. `shopt -po` prints the command that restores the caller's setting,
-# whatever it was.
+# The lifecycle scripts run under `set -x`, which buries these reports in trace
+# output. `shopt -po xtrace` prints the `set` command that restores the
+# caller's setting.
 quietly() {
   local restore
   restore="$(shopt -po xtrace 2>/dev/null)" || true
@@ -43,9 +43,9 @@ quietly() {
   eval "${restore}"
 }
 
-# Verification and the version summary have to cover the same tools; one list
-# is what stops them drifting apart. It spans everything the container
-# provisions, feature-installed or script-installed.
+# One list feeds both verification and the version summary so they can't
+# drift apart. It covers every tool the container provisions, by feature or by
+# script.
 for_each_tool() {
   local action="$1"
   "${action}" "node" node --version
