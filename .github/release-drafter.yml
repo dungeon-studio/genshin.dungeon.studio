@@ -35,7 +35,7 @@ change-title-escapes: '\<*_&'
 # already conveys the type, so 'feat: add X' reads as 'add X'. Any type
 # matches: the title check in pull-request-metadata.yml owns the type list.
 replacers:
-  - search: '/^(\s*-\s)[a-z]+(?:\([^)]*\))?!?:\s+/gim'
+  - search: '/^(\s*-\s)\w+(?:\([^)]*\))?!?:\s+/gim'
     replace: '$1'
 
 version-resolver:
@@ -66,18 +66,18 @@ autolabeler:
       - '/^fix(\(.+\))?!?:/i'
   - label: 'documentation'
     title:
-      - '/^docs(\(.+\))?:/i'
+      - '/^docs(\(.+\))?!?:/i'
   - label: 'security'
     title:
-      - '/^(feat|fix|chore)\(security\)/i'
+      - '/^\w+\(security\)/i'
   - label: 'dependencies'
     title:
-      - '/^(chore|build|fix)\(deps(-dev)?\)/i'
+      - '/^\w+\(deps(-dev)?\)/i'
   # Every type without a category of its own, so a type added to the title
   # check lands here without editing this file.
   - label: 'chore'
     title:
-      - '/^(?!(feat|fix|docs)\b)[a-z]+(?!\(deps)(\(.+\))?!?:/i'
+      - '/^(?!(feat|fix|docs)\b)\w+(?!\(deps)(\(.+\))?!?:/i'
   - label: 'breaking change'
     title:
       - '/^\w+(\(.+\))?!:/'

@@ -35,8 +35,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # The authoritative type list: commitlint's config-conventional set,
-          # which CONTRIBUTING.md links to.
+          # The authoritative type list: commitlint's config-conventional set.
           # https://github.com/conventional-changelog/commitlint/tree/master/@commitlint/config-conventional
           types: |
             feat
