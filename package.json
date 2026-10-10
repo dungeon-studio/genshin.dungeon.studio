@@ -44,7 +44,7 @@
     "knip": "6.33.0",
     "prettier": "3.9.9",
     "prettier-plugin-tailwindcss": "0.8.1",
-    "stylelint": "17.14.1",
+    "stylelint": "17.16.0",
     "syncpack": "15.3.3",
     "tsx": "4.23.15",
     "turbo": "2.10.12",
