@@ -456,11 +456,11 @@ jobs:
           exit-code: '1'
           trivy-config: .trivy.yaml
 
-      # The lockfile carries no licences; Trivy reads them from node_modules,
-      # which it finds only when scanning the directory. UNKNOWN fails so a
-      # licence outside Trivy's classification gets a decision.
       - uses: ./.github/actions/setup-node-pnpm
 
+      # Licences come from node_modules, which Trivy reads only on a directory
+      # scan. Failing on UNKNOWN forces a decision on any licence Trivy can't
+      # classify.
       - name: Scan dependency licences
         uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e # master
         with:
