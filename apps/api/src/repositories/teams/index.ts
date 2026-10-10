@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import type { CollectionTeam, ISOTimestamp, TeamSlot } from '@genshin/domain';
+import type { QueryDocumentSnapshot } from 'firebase-admin/firestore';
 
 import { db } from '@/firebase/firestore.js';
-import type { Page, PageRequest } from '@/http/page.js';
-import { readPage } from '@/repositories/firestore/page.js';
+import { readPage, type Page, type PageRequest } from '@/repositories/firestore/page.js';
 import { readSnapshot } from '@/repositories/firestore/snapshot.js';
 
 import { fromDocument, toDocument } from './document.js';
@@ -15,21 +15,22 @@ function collectionRef(userId: string) {
   return db.collection('users').doc(userId).collection('teams');
 }
 
-function isSlotId(id: string): boolean {
-  return /^[1-4]$/.test(id);
+/**
+ * Reads a stored team, or `null` for a document whose ID isn't a slot number,
+ * so a stray write under the collection can't break a read.
+ */
+function readTeam(doc: QueryDocumentSnapshot): CollectionTeam | null {
+  return /^[1-4]$/.test(doc.id) ? fromDocument(Number(doc.id) as TeamSlot, doc.data()) : null;
 }
 
 /**
  * One page of the teams the user has saved.
  *
- * Skips any document whose ID isn't a slot number, so a stray write under the
- * collection can't break a read. A page can then hold fewer teams than its
- * limit while another page remains.
+ * Skipping stray documents can leave a page holding fewer teams than its limit
+ * while another page remains.
  */
 export async function list(userId: string, request: PageRequest): Promise<Page<CollectionTeam>> {
-  const page = await readPage(collectionRef(userId), request, (doc) =>
-    isSlotId(doc.id) ? fromDocument(Number(doc.id) as TeamSlot, doc.data()) : null,
-  );
+  const page = await readPage(collectionRef(userId), request, readTeam);
 
   return { ...page, items: page.items.filter((team) => team !== null) };
 }
@@ -41,9 +42,7 @@ export async function list(userId: string, request: PageRequest): Promise<Page<C
 export async function listAll(userId: string): Promise<CollectionTeam[]> {
   const snapshot = await collectionRef(userId).get();
 
-  return snapshot.docs
-    .filter((doc) => isSlotId(doc.id))
-    .map((doc) => fromDocument(Number(doc.id) as TeamSlot, doc.data()));
+  return snapshot.docs.map(readTeam).filter((team) => team !== null);
 }
 
 export async function get(userId: string, slot: TeamSlot): Promise<CollectionTeam | null> {

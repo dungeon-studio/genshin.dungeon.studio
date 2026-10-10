@@ -10,6 +10,7 @@ import {
   weaponsOfHref,
   weaponRepresentation,
 } from '@genshin/domain';
+import type { WeaponId } from '@genshin/game-data';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import type { FromSchema } from 'json-schema-to-ts';
@@ -49,21 +50,29 @@ type UpdateWeaponBody = FromSchema<typeof weaponPatchRequestV1.schema> & {
   refinementLevel: RefinementLevel;
 };
 
+/** The weapon a list is filtered to, if any, and the URL of the collection it lists. */
+function weaponListScope(
+  weaponId: string | undefined,
+  baseUrl: string,
+): { filter?: WeaponId; href: string } {
+  if (weaponId === undefined) {
+    return { href: weaponCollectionHref(baseUrl) };
+  }
+  if (!weaponId) {
+    throw new HTTPException(400, { message: 'weaponId query parameter must not be empty' });
+  }
+
+  return { filter: requireWeaponId(weaponId), href: weaponsOfHref(baseUrl, weaponId) };
+}
+
 // GET /weapons — List a page of weapon instances, optionally filtered by weaponId
 weapons.get('/', async (c) => {
   const userId = c.get('user').uid;
   const weaponId = c.req.query('weaponId');
   const baseUrl = new URL(c.req.url).origin;
 
-  if (weaponId !== undefined && !weaponId) {
-    throw new HTTPException(400, { message: 'weaponId query parameter must not be empty' });
-  }
-
-  const request = parsePageRequest(c);
-  const filter = weaponId === undefined ? undefined : requireWeaponId(weaponId);
-  const page = await Weapons.list(userId, request, filter);
-  const href =
-    weaponId === undefined ? weaponCollectionHref(baseUrl) : weaponsOfHref(baseUrl, weaponId);
+  const { filter, href } = weaponListScope(weaponId, baseUrl);
+  const page = await Weapons.list(userId, parsePageRequest(c), filter);
 
   return c.body(
     JSON.stringify(

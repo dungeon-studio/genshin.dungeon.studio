@@ -9,8 +9,7 @@ import type {
 } from '@genshin/domain';
 
 import { db } from '@/firebase/firestore.js';
-import type { Page, PageRequest } from '@/http/page.js';
-import { readPage } from '@/repositories/firestore/page.js';
+import { readPage, type Page, type PageRequest } from '@/repositories/firestore/page.js';
 import { readSnapshot } from '@/repositories/firestore/snapshot.js';
 
 import { fromDocument, toDocument } from './document.js';

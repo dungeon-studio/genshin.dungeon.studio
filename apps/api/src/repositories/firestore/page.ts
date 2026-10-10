@@ -4,7 +4,20 @@
 import type { Query, QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { FieldPath } from 'firebase-admin/firestore';
 
-import type { Page, PageRequest } from '@/http/page.js';
+/**
+ * One page's worth of a list request: how many records, and the document ID
+ * the page starts after.
+ */
+export interface PageRequest {
+  limit: number;
+  after?: string;
+}
+
+/** A page of records, with the document ID to resume after when more remain. */
+export interface Page<T> {
+  items: T[];
+  next?: string;
+}
 
 /**
  * Reads one page of a query in document ID order.

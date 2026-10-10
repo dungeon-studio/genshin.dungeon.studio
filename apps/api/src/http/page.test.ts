@@ -5,7 +5,8 @@ import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { describe, expect, it } from 'vitest';
 
-import type { Page, PageRequest } from './page.js';
+import type { Page, PageRequest } from '@/repositories/firestore/page.js';
+
 import { DEFAULT_PAGE_LIMIT, MAX_PAGE_LIMIT, pageLinks, parsePageRequest } from './page.js';
 
 const BASE = 'http://localhost/items';

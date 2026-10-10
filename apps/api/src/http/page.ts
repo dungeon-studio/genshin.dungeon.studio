@@ -5,23 +5,10 @@ import type { Link } from '@genshin/collection-json';
 import type { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
+import type { Page, PageRequest } from '@/repositories/firestore/page.js';
+
 export const DEFAULT_PAGE_LIMIT = 50;
 export const MAX_PAGE_LIMIT = 100;
-
-/**
- * One page's worth of a list request: how many records, and the document ID
- * the page starts after.
- */
-export interface PageRequest {
-  limit: number;
-  after?: string;
-}
-
-/** A page of records, with the document ID to resume after when more remain. */
-export interface Page<T> {
-  items: T[];
-  next?: string;
-}
 
 /**
  * Reads `limit` and `cursor` from the query string.

@@ -7,8 +7,7 @@ import type { CollectionWeapon, ISOTimestamp, RefinementLevel, UUID } from '@gen
 import type { WeaponId } from '@genshin/game-data';
 
 import { db } from '@/firebase/firestore.js';
-import type { Page, PageRequest } from '@/http/page.js';
-import { readPage } from '@/repositories/firestore/page.js';
+import { readPage, type Page, type PageRequest } from '@/repositories/firestore/page.js';
 import { readSnapshot } from '@/repositories/firestore/snapshot.js';
 
 import { fromDocument, toDocument } from './document.js';
