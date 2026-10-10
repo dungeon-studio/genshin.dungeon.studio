@@ -431,9 +431,6 @@ jobs:
           sarif_file: dockerfile-results.sarif
           category: trivy-dockerfile
 
-  # No SARIF here: trivy-action unsets TRIVY_SEVERITY whenever the format is
-  # sarif, which would discard the severity floor .trivy.yaml sets and fail
-  # this gate on every advisory in the tree.
   trivy-dependencies:
     name: Scan dependencies
     runs-on: ubuntu-latest
@@ -456,9 +453,8 @@ jobs:
           exit-code: '1'
           trivy-config: .trivy.yaml
 
-  # One build feeds both the scan and the smoke test. The scan goes first
-  # because trivy-action defaults to exit-code 0 and reports through SARIF, so
-  # a smoke-test failure cannot cost us its results.
+  # One build feeds both the scan and the smoke test. The scan goes first and
+  # never fails the job, so a smoke-test failure cannot cost us its results.
   container:
     name: Scan and smoke-test container
     runs-on: ubuntu-latest
@@ -490,7 +486,9 @@ jobs:
       # Reports rather than blocks: base-image fixes arrive on the upstream
       # digest's schedule, not ours. Pushes to develop upload too, so a pull
       # request's Trivy alerts show only what it introduces. Findings without
-      # an upgrade path are noise in a report nobody can act on.
+      # an upgrade path are noise in a report nobody can act on. Severity comes
+      # from .trivy.yaml, which SARIF output honours; a severity input here
+      # would be dropped for SARIF unless limit-severities-for-sarif is set.
       - name: Scan Container Image
         uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e # master
         with:
@@ -499,7 +497,6 @@ jobs:
           ignore-unfixed: true
           exit-code: '0'
           format: sarif
-          limit-severities-for-sarif: true
           output: container-results.sarif
           trivy-config: .trivy.yaml
 
