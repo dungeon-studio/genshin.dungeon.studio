@@ -13,7 +13,7 @@ const PACKAGES_DIRECTORY = 'packages';
 // syncpack reaches into a .hbs, so a pinned version here would start rotting.
 const REFERENCE_PACKAGE = 'validation';
 
-const TEST_ONLY_DEV_DEPENDENCIES = ['vitest', '@vitest/coverage-v8'];
+const TEST_ONLY_DEV_DEPENDENCIES = ['vitest', '@vitest/coverage-v8', '@genshin/vitest-config'];
 
 const CODECOV_UPLOAD_WORKSPACE_ACTION = join(
   '.github',

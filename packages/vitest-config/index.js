@@ -3,18 +3,10 @@
 
 import { configDefaults, defineConfig } from 'vitest/config';
 
-/**
- * Shared Vitest base for every workspace, composed with `mergeConfig`.
- *
- * @remarks
- * `coverage` and `reporters` are root-only options: they take effect when
- * turbo runs a package as its own root and are inert under the repository's
- * root `vitest.config.ts`.
- */
+/** Vitest settings every workspace shares. */
 export default defineConfig({
   test: {
-    // Spread the defaults: assigning `exclude` replaces them, which would drop
-    // node_modules from the ignore list.
+    // Assigning `exclude` drops Vitest's defaults instead of extending them.
     exclude: [...configDefaults.exclude, '**/dist/**'],
     reporters: ['default', 'junit'],
     outputFile: {
