@@ -131,6 +131,7 @@ SRECon
 [Pp]arseable
 [Rr]epo
 [Rr]ollouts
+[Rr]uleset
 [Ss]erializer
 [Ss]uperset
 [Tt]oolchain

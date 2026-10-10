@@ -23,6 +23,15 @@ A new check lands as a job in the file matching its when. A new file needs a dif
 
 The rule and its rationale come from [architecture decision record 0004 in alunduil-chezmoi](https://github.com/alunduil/alunduil-chezmoi/blob/main/docs/adr/0004-consolidate-ci-workflow.md).
 
+## Required checks
+
+The `develop` ruleset lists the checks that block a merge, and that list is the authoritative set. A required check matches a check run by name, which comes from the job's `name:` rather than its id.
+
+- Renaming a required job breaks the gate without warning. Update the ruleset in the same change.
+- Job names stay unique across every workflow, since a name matching two check runs is ambiguous.
+- A path-gated workflow is never required. It doesn't report on a pull request outside its paths, and a required check that never reports blocks the merge indefinitely.
+- GitHub-managed CodeQL runs, each named `Analyze (…)`, aren't required checks. Code scanning and Code Quality each report one per language under the same name, and the ruleset already gates their findings with its own rules.
+
 ## Push triggers
 
 A push run attests a branch after a merge lands, because the merge result itself was never tested. The set follows the [git-flow](https://nvie.com/posts/a-successful-git-branching-model/) branches whose merge result ships or gets inherited: `develop`, `main`, `release/*`, and `hotfix/*`. Feature branches are absent deliberately; the unfiltered `pull_request` trigger already gates them.
