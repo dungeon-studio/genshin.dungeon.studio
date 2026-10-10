@@ -46,10 +46,22 @@ trivy image --scanners vuln --ignore-unfixed --exit-code 0 --config .trivy.yaml 
 
 ## Scan dependencies
 
-The only scan that blocks a pull request, so match CI exactly:
+The only scans that block a pull request, so match CI exactly. The licence scan
+reads licences from `node_modules`, so run `pnpm install` first:
 
 ```bash
 trivy fs --scanners vuln --config .trivy.yaml pnpm-lock.yaml
+trivy fs --scanners license --severity UNKNOWN,HIGH,CRITICAL --config .trivy.yaml .
 ```
+
+The licence scan fails on licences Trivy rates restricted or forbidden, such as
+GPL and AGPL, and on licences it can't classify. Resolve a licence failure in
+one of three ways:
+
+- Replace the dependency with one under an accepted licence.
+- Add a permissive licence Trivy doesn't classify to `license.permissive` in
+  `.trivy.yaml`.
+- Record an accepted copyleft licence in `.trivyignore.yaml`. The entry exempts
+  that licence in every package.
 
 Record an advisory with no upstream fix in `.trivyignore.yaml`.

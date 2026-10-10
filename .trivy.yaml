@@ -18,4 +18,11 @@ misconfiguration:
     vars:
       - infrastructure/terraform/environments/dev/terraform.tfvars
 
+# Listing a licence under a category replaces Trivy's built-in list for it.
+# `permissive` has no built-in list, so it takes the additions.
+license:
+  permissive:
+    - BlueOak-1.0.0
+    - MIT-0
+
 ignorefile: .trivyignore.yaml

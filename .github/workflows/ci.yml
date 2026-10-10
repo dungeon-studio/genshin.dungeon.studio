@@ -444,12 +444,27 @@ jobs:
 
       # The lockfile resolves every workspace; scanning the directory would
       # also walk build output and fixtures.
-      - name: Scan dependencies
+      - name: Scan dependency vulnerabilities
         uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e # master
         with:
           scan-type: fs
           scan-ref: pnpm-lock.yaml
           scanners: vuln
+          exit-code: '1'
+          trivy-config: .trivy.yaml
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      # Licences come from node_modules, which Trivy reads only on a directory
+      # scan. Failing on UNKNOWN forces a decision on any licence Trivy can't
+      # classify.
+      - name: Scan dependency licences
+        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e # master
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: license
+          severity: UNKNOWN,HIGH,CRITICAL
           exit-code: '1'
           trivy-config: .trivy.yaml
 
