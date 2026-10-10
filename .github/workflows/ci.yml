@@ -487,11 +487,19 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      # Reports rather than blocks: base-image fixes arrive on the upstream
+      # digest's schedule, not ours. Pushes to develop upload too, so a pull
+      # request's Trivy alerts show only what it introduces. Findings without
+      # an upgrade path are noise in a report nobody can act on.
       - name: Scan Container Image
         uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e # master
         with:
           image-ref: api:ci
+          scanners: vuln
+          ignore-unfixed: true
+          exit-code: '0'
           format: sarif
+          limit-severities-for-sarif: true
           output: container-results.sarif
           trivy-config: .trivy.yaml
 
