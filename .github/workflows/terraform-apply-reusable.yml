@@ -20,7 +20,7 @@ env:
 
 jobs:
   terraform-apply:
-    name: Apply
+    name: Run terraform apply
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: ${{ inputs.environment }}

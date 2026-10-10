@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   terraform-plan:
-    name: Plan ${{ matrix.environment }}
+    name: Plan ${{ matrix.environment }} infrastructure
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

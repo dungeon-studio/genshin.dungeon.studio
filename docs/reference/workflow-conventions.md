@@ -29,6 +29,7 @@ The `develop` ruleset is the authoritative list of checks that block a merge. A 
 
 - Renaming a required job blocks every pull request until the ruleset names the new check. Update the ruleset when the rename merges.
 - Job names stay unique across every workflow, since a name matching two check runs is ambiguous.
+- A job name reads on its own, with no workflow name beside it, because that's how the ruleset shows it. `Plan dev infrastructure` qualifies; `Dev` doesn't.
 - A path-gated workflow is never required. It doesn't report on a pull request outside its paths, and a required check that never reports blocks the merge indefinitely.
 - The GitHub-managed `Analyze` runs aren't required. Code scanning and Code Quality both report under those names, and the ruleset gates their findings through its own rules.
 
