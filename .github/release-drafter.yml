@@ -57,6 +57,11 @@ version-resolver:
 # Apply category labels from conventional-commit PR titles so the categories
 # above are driven by commit prefixes without manual labeling. A breaking-change
 # marker (type!:) adds the major-bump label on top of the type label.
+#
+# A retitled PR changes category instead of collecting a second one. Any label
+# named below is removed when no rule selects it, even one applied by hand.
+sync-labels: true
+
 autolabeler:
   - label: 'enhancement'
     title:
@@ -67,9 +72,12 @@ autolabeler:
   - label: 'documentation'
     title:
       - '/^docs(\(.+\))?!?:/i'
+  # Renovate labels vulnerability PRs itself; matching its [security] title
+  # suffix keeps sync-labels from removing that label.
   - label: 'security'
     title:
       - '/^\w+\(security\)/i'
+      - '/\[security\]$/i'
   - label: 'dependencies'
     title:
       - '/^\w+\(deps(-dev)?\)/i'
