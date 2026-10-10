@@ -12,13 +12,15 @@
  * `useCollection` is what a component reaches for; these are its parts.
  */
 
+import type { Item } from '@genshin/collection-json';
 import { assertCollectionDocument } from '@genshin/collection-json';
 import type { CharacterId, CollectionCharacter, ConstellationLevel } from '@genshin/domain';
 import { deserialiseCharacter, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { apiDelete, apiGet, apiPut } from '@/lib/api';
+import { apiDelete, apiPut } from '@/lib/api';
+import { apiGetAllItems } from '@/lib/api-collection';
 import { invalidateUserQuery } from '@/lib/invalidate-user-query';
 import { userScopedKey } from '@/lib/user-scoped-key';
 
@@ -31,11 +33,10 @@ export interface MutationResult {
 
 const charactersKey = userScopedKey('characters');
 
-function parseCollectionResponse(response: unknown): CharacterCollection {
-  assertCollectionDocument(response);
+function toCharacterCollection(items: Item[]): CharacterCollection {
   const record: CharacterCollection = {};
 
-  for (const item of response.collection.items) {
+  for (const item of items) {
     const character = deserialiseCharacter(item);
     record[character.characterId] = character;
   }
@@ -63,8 +64,7 @@ export function useCharacterCollectionQuery(
   return useQuery({
     queryKey: charactersKey(userId ?? ''),
     queryFn: async () => {
-      const response = await apiGet('/characters');
-      return parseCollectionResponse(response);
+      return toCharacterCollection(await apiGetAllItems('/characters'));
     },
     enabled: userId !== undefined,
   });

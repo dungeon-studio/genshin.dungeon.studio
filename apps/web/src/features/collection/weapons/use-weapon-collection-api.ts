@@ -12,13 +12,15 @@
  * `useWeaponCollection` is what a component reaches for; these are its parts.
  */
 
+import type { Item } from '@genshin/collection-json';
 import { assertCollectionDocument } from '@genshin/collection-json';
 import type { CollectionWeapon, CollectionWeaponId, RefinementLevel } from '@genshin/domain';
 import { deserialiseWeapon, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { apiDelete, apiGet, apiPatch, apiPost } from '@/lib/api';
+import { apiDelete, apiPatch, apiPost } from '@/lib/api';
+import { apiGetAllItems } from '@/lib/api-collection';
 import { invalidateUserQuery } from '@/lib/invalidate-user-query';
 import { userScopedKey } from '@/lib/user-scoped-key';
 
@@ -30,11 +32,10 @@ export interface WeaponMutationResult {
 
 const weaponsKey = userScopedKey('weapons');
 
-function parseWeaponCollectionResponse(response: unknown): WeaponRecord {
-  assertCollectionDocument(response);
+function toWeaponRecord(items: Item[]): WeaponRecord {
   const record: WeaponRecord = {};
 
-  for (const item of response.collection.items) {
+  for (const item of items) {
     const weapon = deserialiseWeapon(item);
     record[weapon.weaponInstanceId] = weapon;
   }
@@ -59,8 +60,7 @@ export function useWeaponCollectionQuery(
   return useQuery({
     queryKey: weaponsKey(userId ?? ''),
     queryFn: async () => {
-      const response = await apiGet('/weapons');
-      return parseWeaponCollectionResponse(response);
+      return toWeaponRecord(await apiGetAllItems('/weapons'));
     },
     enabled: userId !== undefined,
   });

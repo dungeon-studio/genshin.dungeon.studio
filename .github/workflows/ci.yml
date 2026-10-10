@@ -262,7 +262,7 @@ jobs:
 
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: playwright-report
           path: /tmp/genshin-e2e
@@ -431,9 +431,6 @@ jobs:
           sarif_file: dockerfile-results.sarif
           category: trivy-dockerfile
 
-  # No SARIF here: trivy-action unsets TRIVY_SEVERITY whenever the format is
-  # sarif, which would discard the severity floor .trivy.yaml sets and fail
-  # this gate on every advisory in the tree.
   trivy-dependencies:
     name: Scan dependencies
     runs-on: ubuntu-latest
@@ -471,9 +468,8 @@ jobs:
           exit-code: '1'
           trivy-config: .trivy.yaml
 
-  # One build feeds both the scan and the smoke test. The scan goes first
-  # because trivy-action defaults to exit-code 0 and reports through SARIF, so
-  # a smoke-test failure cannot cost us its results.
+  # The scan runs before the smoke test so a smoke-test failure cannot skip
+  # the upload.
   container:
     name: Scan and smoke-test container
     runs-on: ubuntu-latest
@@ -502,10 +498,17 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      # Base-image fixes arrive on the upstream digest's schedule, so findings
+      # report without blocking. A finding with no upgrade path leaves nothing
+      # to act on. trivy-action drops a severity input for SARIF unless
+      # limit-severities-for-sarif is set.
       - name: Scan Container Image
         uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e # master
         with:
           image-ref: api:ci
+          scanners: vuln
+          ignore-unfixed: true
+          exit-code: '0'
           format: sarif
           output: container-results.sarif
           trivy-config: .trivy.yaml

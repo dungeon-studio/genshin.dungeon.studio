@@ -84,7 +84,11 @@ See [RFC9457]: <https://www.rfc-editor.org/rfc/rfc9457>
 
 ### 6. Consistent list behavior
 
-Paginate with cursors under the query parameter names `limit` and `cursor`, and filter through explicit parameters. The response's media type contract and published schema define its cursor fields, including next and previous tokens.
+Page a collection that can grow without bound through the query parameters `limit` and `cursor`. A collection with a fixed size, such as the four team slots, returns whole.
+
+Cursors are opaque. Clients follow a page's `next` link rather than build one.
+
+Filter through explicit query parameters.
 
 ### 7. Authentication header convention
 

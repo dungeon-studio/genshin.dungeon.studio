@@ -40,24 +40,9 @@
       "minimumReleaseAge": null
     },
     {
-      "description": "Move the Terraform CLI in one pull request across the bootstrap and dev required_version constraints and the TERRAFORM_VERSION pins in four workflows",
-      "matchDepNames": ["hashicorp/terraform"],
-      "groupName": "terraform cli"
-    },
-    {
-      "description": "Move reuse in one pull request across the pre-commit rev and the REUSE_VERSION pin in scripts/install-reuse.sh",
-      "matchDepNames": ["fsfe/reuse-tool"],
-      "groupName": "reuse"
-    },
-    {
-      "description": "Move the lychee binary in one pull request across the ci.yml pin and the devcontainer bootstrap script; lycheeverse/lychee-action versions separately and stays out of the group",
-      "matchDepNames": ["lycheeverse/lychee"],
-      "groupName": "lychee"
-    },
-    {
-      "description": "Move Node in one pull request across .nvmrc, the API runtime image, the devcontainer feature, and the package.json engines field",
-      "matchDepNames": ["node"],
-      "groupName": "node"
+      "description": "Move each dependency in one pull request across all of its pins, so develop never holds two versions of it",
+      "matchDepNames": ["hashicorp/terraform", "fsfe/reuse-tool", "lycheeverse/lychee", "node"],
+      "groupName": "{{depName}}"
     }
   ],
   "customManagers": [
