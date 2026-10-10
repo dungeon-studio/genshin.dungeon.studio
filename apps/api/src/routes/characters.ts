@@ -39,8 +39,6 @@ characters.use('*', auth);
 
 characters.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: characterItemV1 }]));
 
-// FromSchema widens the schema's integer bounds to `number`; request validation
-// has already enforced them, so the intersection puts the range back.
 type SaveCharacterBody = FromSchema<typeof characterPutRequestV1.schema> & {
   constellationLevel: ConstellationLevel;
 };
@@ -94,13 +92,13 @@ characters.get('/:characterId', async (c) => {
 characters.put(
   '/:characterId',
   negotiateRequestSchema([characterPutRequestV1]),
-  validateRequestBody([characterPutRequestV1]),
+  validateRequestBody<[typeof characterPutRequestV1], SaveCharacterBody>([characterPutRequestV1]),
   async (c) => {
     const userId = c.get('user').uid;
     const { characterId } = c.req.param();
 
     const knownId = requireCharacterId(characterId);
-    const { constellationLevel } = c.get('validatedBody') as SaveCharacterBody;
+    const { constellationLevel } = c.get('validatedBody');
     const { character, created } = await Characters.save(userId, knownId, constellationLevel);
     const baseUrl = new URL(c.req.url).origin;
 

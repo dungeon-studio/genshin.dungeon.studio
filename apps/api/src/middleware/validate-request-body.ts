@@ -5,9 +5,11 @@ import type { ErrorObject, SchemaObject } from 'ajv/dist/2020.js';
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import type { MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import type { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
 import type { ProblemOptions } from '@/http/problem.js';
 import { ProblemException } from '@/http/problem.js';
+import type { NegotiatedRequestSchemaVariables } from '@/middleware/negotiate-request-schema.js';
 import type { JsonSchemaProfile } from '@/profiles/json-schema/json-schema-profile.js';
 
 const ajv = new Ajv2020({ allErrors: true });
@@ -51,10 +53,17 @@ function validationProblem(errors: ErrorObject[]): ProblemOptions {
   return { type, message: detail || 'Request body validation failed' };
 }
 
-export type ValidatedRequestBodyVariables = {
+export type ValidatedRequestBodyVariables<Body = unknown> = {
   /** The parsed and validated request body. */
-  validatedBody: unknown;
+  validatedBody: Body;
 };
+
+/** A union, because negotiation picks which profile validated the body. */
+type RequestBodyOf<Schemas extends readonly JsonSchemaProfile[]> = {
+  [K in keyof Schemas]: Schemas[K]['schema'] extends JSONSchema
+    ? FromSchema<Schemas[K]['schema']>
+    : never;
+}[number];
 
 /**
  * Rejects a request body the negotiated schema doesn't accept, and sets
@@ -68,10 +77,20 @@ export type ValidatedRequestBodyVariables = {
  *
  * Schemas compile once at registration, so a malformed one surfaces at startup.
  *
+ * Pass `Body` to restore a constraint `FromSchema` drops, such as an integer
+ * range it widens to `number`.
+ *
  * @throws Error when `negotiateRequestSchema` hasn't run, or when it negotiated
  * a path this list has no schema for.
  */
-export function validateRequestBody(schemas: JsonSchemaProfile[]): MiddlewareHandler {
+export function validateRequestBody<
+  const Schemas extends readonly JsonSchemaProfile[],
+  Body extends RequestBodyOf<Schemas> = RequestBodyOf<Schemas>,
+>(
+  schemas: Schemas,
+): MiddlewareHandler<{
+  Variables: NegotiatedRequestSchemaVariables & ValidatedRequestBodyVariables<Body>;
+}> {
   const entries = schemas.map((s) => ({
     path: s.path,
     validate: ajv.compile(s.schema as SchemaObject),
@@ -101,7 +120,8 @@ export function validateRequestBody(schemas: JsonSchemaProfile[]): MiddlewareHan
       throw new ProblemException(422, validationProblem(entry.validate.errors ?? []));
     }
 
-    c.set('validatedBody', body);
+    // ajv's type guard can't name the schema's derived type.
+    c.set('validatedBody', body as Body);
     await next();
   };
 }
