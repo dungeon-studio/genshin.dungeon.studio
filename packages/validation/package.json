@@ -24,6 +24,7 @@
   "devDependencies": {
     "@genshin/eslint-config": "workspace:*",
     "@genshin/tsconfig": "workspace:*",
+    "@genshin/vitest-config": "workspace:*",
     "@typescript/native": "npm:typescript@7.0.2",
     "@vitest/coverage-v8": "4.1.11",
     "eslint": "10.12.0",
