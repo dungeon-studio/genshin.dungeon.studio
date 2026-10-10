@@ -84,9 +84,11 @@ See [RFC9457]: <https://www.rfc-editor.org/rfc/rfc9457>
 
 ### 6. Consistent list behavior
 
-Page a collection that can grow without bound, under the query parameters `limit` and `cursor`, and filter through explicit parameters. A collection with a fixed size, such as the four team slots, returns whole.
+Page a collection that can grow without bound through the query parameters `limit` and `cursor`. A collection with a fixed size, such as the four team slots, returns whole.
 
-Cursors are opaque. A page links to the next one with a Collection+JSON `next` link, which clients follow rather than build.
+Cursors are opaque. Clients follow a page's `next` link rather than build one.
+
+Filter through explicit query parameters.
 
 ### 7. Authentication header convention
 
