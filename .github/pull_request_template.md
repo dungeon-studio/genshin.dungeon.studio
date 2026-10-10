@@ -2,18 +2,18 @@ Closes #
 
 ## Summary
 
-<!-- Why this change. Lead with the user-visible outcome, not the diff. -->
+<!-- Why this change, leading with the outcome a user sees. -->
 
 ## Gotchas
 
-<!-- One bullet per surprise: where to spend attention and why.
-     Delete this section if nothing surprises. -->
+<!-- One bullet per thing likely to surprise a reviewer, and why.
+     Delete this section if nothing would. -->
 
 -
 
 ## Verification
 
-<!-- One bullet per material check beyond CI, past tense.
+<!-- One bullet per check you ran beyond CI, in past tense.
      Delete this section if CI covers everything. -->
 
 -

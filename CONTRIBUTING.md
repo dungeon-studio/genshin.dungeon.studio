@@ -38,7 +38,7 @@ Be respectful and constructive in all interactions.
 
 1. Pick up an [existing issue](https://github.com/dungeon-studio/genshin.dungeon.studio/issues), or open one before starting larger work.
 2. Write tests alongside or before the implementation.
-3. Open a pull request into `develop` that references the issue. Its title follows the [commit message rules](#commit-messages), and its description fills in the [pull request template](.github/pull_request_template.md).
+3. Open a pull request into `develop` that references the issue. Its title follows the [commit message rules](#commit-messages). Its description follows the [pull request template](.github/pull_request_template.md).
 4. Keep the description accurate as review changes the work.
 
 Follow [Code conventions](docs/reference/code-conventions.md) for what no linter checks.

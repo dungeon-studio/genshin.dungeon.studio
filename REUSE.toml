@@ -79,8 +79,8 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
 SPDX-License-Identifier = "MIT"
 
-# The template's text seeds every pull request body, so a header would ship
-# into each one.
+# GitHub copies the pull request template into each new pull request body, so
+# an inline header would appear there.
 
 [[annotations]]
 path = ".github/pull_request_template.md"

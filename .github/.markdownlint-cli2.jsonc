@@ -2,7 +2,7 @@
   // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
   // SPDX-License-Identifier: MIT
   "config": {
-    // The pull request title is the heading; the template fills the body below it.
+    // A pull request body sits below its title, so it starts without a heading.
     "MD041": false,
   },
 }
