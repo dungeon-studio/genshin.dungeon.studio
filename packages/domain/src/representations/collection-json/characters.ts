@@ -9,8 +9,10 @@
  */
 
 import {
+  buildCollection,
   buildItem,
   itemData,
+  type CollectionDocument,
   type CollectionJsonRepresentation,
   type Item,
   type Template,
@@ -54,6 +56,35 @@ export function serialiseCharacter(character: CollectionCharacter, baseUrl: stri
     { name: 'createdAt', value: character.createdAt },
     { name: 'updatedAt', value: character.updatedAt },
   ]);
+}
+
+export function characterListDocument(
+  characters: CollectionCharacter[],
+  baseUrl: string,
+): CollectionDocument {
+  return buildCollection(
+    characterCollectionHref(baseUrl),
+    characters.map((c) => serialiseCharacter(c, baseUrl)),
+    { template: CHARACTER_TEMPLATE },
+  );
+}
+
+/**
+ * One owned character as a whole document, for a response addressing a single
+ * character.
+ *
+ * Collection+JSON has no single-item media type, so the document is a
+ * collection holding one item, with the item's own URL as the collection href.
+ */
+export function characterItemDocument(
+  character: CollectionCharacter,
+  baseUrl: string,
+): CollectionDocument {
+  return buildCollection(
+    characterItemHref(baseUrl, character),
+    [serialiseCharacter(character, baseUrl)],
+    { template: CHARACTER_TEMPLATE },
+  );
 }
 
 /**
