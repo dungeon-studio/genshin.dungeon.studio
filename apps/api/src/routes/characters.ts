@@ -14,6 +14,7 @@ import { HTTPException } from 'hono/http-exception';
 import type { FromSchema } from 'json-schema-to-ts';
 
 import { requireCharacterId } from '@/catalogue.js';
+import { negotiatedJson } from '@/http/negotiated-response.js';
 import { auth } from '@/middleware/auth.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
@@ -49,17 +50,13 @@ characters.get('/', async (c) => {
   const items = await Characters.list(userId);
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(
-    JSON.stringify(
-      serialiseCollection(
-        characterRepresentation,
-        characterCollectionHref(baseUrl),
-        items.map((item) => serialiseCharacter(item, baseUrl)),
-      ),
+  return negotiatedJson(
+    c,
+    serialiseCollection(
+      characterRepresentation,
+      characterCollectionHref(baseUrl),
+      items.map((item) => serialiseCharacter(item, baseUrl)),
     ),
-    {
-      headers: { 'Content-Type': c.get('negotiatedMediaType') },
-    },
   );
 });
 
@@ -76,15 +73,11 @@ characters.get('/:characterId', async (c) => {
 
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(
-    JSON.stringify(
-      serialiseCollection(characterRepresentation, characterItemHref(baseUrl, character), [
-        serialiseCharacter(character, baseUrl),
-      ]),
-    ),
-    {
-      headers: { 'Content-Type': c.get('negotiatedMediaType') },
-    },
+  return negotiatedJson(
+    c,
+    serialiseCollection(characterRepresentation, characterItemHref(baseUrl, character), [
+      serialiseCharacter(character, baseUrl),
+    ]),
   );
 });
 
@@ -102,16 +95,12 @@ characters.put(
     const { character, created } = await Characters.save(userId, knownId, constellationLevel);
     const baseUrl = new URL(c.req.url).origin;
 
-    return c.body(
-      JSON.stringify(
-        serialiseCollection(characterRepresentation, characterItemHref(baseUrl, character), [
-          serialiseCharacter(character, baseUrl),
-        ]),
-      ),
-      {
-        status: created ? 201 : 200,
-        headers: { 'Content-Type': c.get('negotiatedMediaType') },
-      },
+    return negotiatedJson(
+      c,
+      serialiseCollection(characterRepresentation, characterItemHref(baseUrl, character), [
+        serialiseCharacter(character, baseUrl),
+      ]),
+      created ? 201 : 200,
     );
   },
 );
