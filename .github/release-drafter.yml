@@ -56,6 +56,13 @@ version-resolver:
 # Apply category labels from conventional-commit PR titles so the categories
 # above are driven by commit prefixes without manual labeling. A breaking-change
 # marker (type!:) adds the major-bump label on top of the type label.
+#
+# sync-labels removes a label named below once its matchers stop firing, so a
+# retitled PR moves category instead of collecting both. Labels absent from
+# this list are left alone; one named here survives only while a rule selects
+# it, which is why the security rule also matches Renovate's [security] suffix.
+sync-labels: true
+
 autolabeler:
   - label: 'enhancement'
     title:
@@ -69,6 +76,7 @@ autolabeler:
   - label: 'security'
     title:
       - '/^(feat|fix|chore)\(security\)/i'
+      - '/\[security\]$/i'
   - label: 'dependencies'
     title:
       - '/^(chore|build|fix)\(deps(-dev)?\)/i'

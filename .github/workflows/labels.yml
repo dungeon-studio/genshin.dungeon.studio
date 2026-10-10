@@ -8,7 +8,7 @@ name: Labels
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize]
+    types: [opened, edited, reopened, synchronize]
 
 permissions:
   contents: read
