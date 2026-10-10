@@ -444,7 +444,7 @@ jobs:
 
       # The lockfile resolves every workspace; scanning the directory would
       # also walk build output and fixtures.
-      - name: Scan dependencies
+      - name: Scan dependency vulnerabilities
         uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e # master
         with:
           scan-type: fs
