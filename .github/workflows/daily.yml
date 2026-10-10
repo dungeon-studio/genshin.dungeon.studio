@@ -98,8 +98,10 @@ jobs:
           stale-pr-label: stale
           # Closing a Renovate pull request tells Renovate the version is
           # unwanted and it will not re-offer it. Renovate labels nothing by
-          # default, so this depends on renovate.json applying the label.
-          exempt-pr-labels: dependencies
+          # default, so exempting `dependencies` relies on renovate.json
+          # applying it. A `blocked` pull request waits on other work, not on
+          # its author.
+          exempt-pr-labels: blocked,dependencies
           stale-pr-message: >-
             This has been quiet for 30 days, so it's picked up a stale label. A
             comment or a push clears the label and restarts the clock. Otherwise

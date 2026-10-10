@@ -40,7 +40,7 @@ replacers:
 version-resolver:
   major:
     labels:
-      - 'breaking-change'
+      - 'breaking change'
   minor:
     labels:
       - 'enhancement'
@@ -76,7 +76,7 @@ autolabeler:
     title:
       - '/^(chore|build)(?!\(deps)(\(.+\))?:/i'
       - '/^(ci|style|refactor|test|perf|revert)(\(.+\))?:/i'
-  - label: 'breaking-change'
+  - label: 'breaking change'
     title:
       - '/^\w+(\(.+\))?!:/'
   # Component labels from the changed file paths, so a PR is tagged by the part
