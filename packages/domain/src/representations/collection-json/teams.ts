@@ -64,7 +64,6 @@ export function teamListDocument(teams: CollectionTeam[], baseUrl: string): Coll
   return serialiseCollection(teamRepresentation, teamCollectionHref(baseUrl), teams, baseUrl);
 }
 
-/** One team as a whole document, for a response addressing a single slot. */
 export function teamItemDocument(team: CollectionTeam, baseUrl: string): CollectionDocument {
   return serialiseItemDocument(teamRepresentation, team, baseUrl);
 }

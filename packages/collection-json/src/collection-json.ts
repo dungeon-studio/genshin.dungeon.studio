@@ -93,7 +93,7 @@ export interface CollectionJsonRepresentation<T> {
 }
 
 /**
- * Serialise entities into a CollectionDocument addressed at `href`.
+ * Serialise entities as one collection document.
  *
  * Reads the template from the representation so each resource module
  * only declares data, not envelope-wrapping behaviour.
@@ -112,10 +112,8 @@ export function serialiseCollection<T>(
 }
 
 /**
- * Serialise one entity as a whole document, for a response addressing it.
- *
- * Collection+JSON has no single-item media type, so the document is a
- * one-item collection addressed at the item's own URL.
+ * Serialise one entity as a one-item collection document, since
+ * Collection+JSON has no single-item media type.
  */
 export function serialiseItemDocument<T>(
   repr: CollectionJsonRepresentation<T>,
