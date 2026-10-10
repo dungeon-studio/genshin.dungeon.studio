@@ -57,10 +57,9 @@ version-resolver:
 # above are driven by commit prefixes without manual labeling. A breaking-change
 # marker (type!:) adds the major-bump label on top of the type label.
 #
-# sync-labels removes a label named below once its matchers stop firing, so a
-# retitled PR moves category instead of collecting both. Labels absent from
-# this list are left alone; one named here survives only while a rule selects
-# it, which is why the security rule also matches Renovate's [security] suffix.
+# sync-labels removes a label named below once no rule selects it, so a
+# retitled PR moves category instead of collecting both. Labels not named below
+# are left alone.
 sync-labels: true
 
 autolabeler:
@@ -73,6 +72,8 @@ autolabeler:
   - label: 'documentation'
     title:
       - '/^docs(\(.+\))?:/i'
+  # Renovate labels vulnerability PRs itself; matching its [security] title
+  # suffix keeps sync-labels from removing that label.
   - label: 'security'
     title:
       - '/^(feat|fix|chore)\(security\)/i'
