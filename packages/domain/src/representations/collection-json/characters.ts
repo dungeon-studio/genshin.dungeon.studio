@@ -96,11 +96,9 @@ export function characterListDocument(
 }
 
 /**
- * One owned character as a whole document, for a response addressing a single
- * character.
- *
- * Collection+JSON has no single-item media type, so the document is a
- * collection holding one item, with the item's own URL as the collection href.
+ * For a response addressing one character. Collection+JSON has no single-item
+ * media type, so the document is a one-item collection whose href is the item's
+ * own URL.
  */
 export function characterItemDocument(
   character: CollectionCharacter,

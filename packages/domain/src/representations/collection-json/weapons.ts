@@ -116,7 +116,6 @@ export function weaponListDocument(
   );
 }
 
-/** The user's copies of one weapon, addressed by the filtered collection URL. */
 export function weaponsOfDocument(
   weapons: CollectionWeapon[],
   baseUrl: string,
@@ -130,11 +129,9 @@ export function weaponsOfDocument(
 }
 
 /**
- * One owned weapon as a whole document, for a response addressing a single
- * instance.
- *
- * Collection+JSON has no single-item media type, so the document is a
- * collection holding one item, with the item's own URL as the collection href.
+ * For a response addressing one instance. Collection+JSON has no single-item
+ * media type, so the document is a one-item collection whose href is the item's
+ * own URL.
  */
 export function weaponItemDocument(weapon: CollectionWeapon, baseUrl: string): CollectionDocument {
   return serialiseCollection(weaponRepresentation, weaponItemHref(baseUrl, weapon), [
