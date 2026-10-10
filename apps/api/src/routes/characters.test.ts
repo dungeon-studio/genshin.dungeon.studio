@@ -4,6 +4,7 @@
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
 import { MAX_CONSTELLATION_LEVEL, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { makeCharacter } from '@genshin/domain/testing';
+import type * as GameData from '@genshin/game-data';
 import { getCharacterById } from '@genshin/game-data';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -25,7 +26,9 @@ vi.mock('@/repositories/characters/index.js', () => ({
   remove: vi.fn(),
 }));
 
-vi.mock('@genshin/game-data', () => ({
+// Keeps the real exports, which the app's request schemas read at import.
+vi.mock('@genshin/game-data', async (importOriginal) => ({
+  ...(await importOriginal<typeof GameData>()),
   getCharacterById: vi.fn(),
 }));
 

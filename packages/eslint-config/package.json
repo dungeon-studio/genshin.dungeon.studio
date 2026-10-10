@@ -22,9 +22,9 @@
     "eslint-plugin-sonarjs": "4.2.2",
     "eslint-plugin-tsdoc": "0.5.4",
     "eslint-plugin-unused-imports": "4.4.1",
-    "typescript-eslint": "8.71.0"
+    "typescript-eslint": "8.71.1"
   },
   "peerDependencies": {
-    "eslint": "10.9.1"
+    "eslint": "10.12.0"
   }
 }

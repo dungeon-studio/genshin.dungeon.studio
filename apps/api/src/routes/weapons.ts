@@ -41,8 +41,6 @@ weapons.use('*', auth);
 
 weapons.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: weaponItemV1 }]));
 
-// FromSchema widens the schema's integer bounds to `number`; request validation
-// has already enforced them, so the intersection puts the range back.
 type CreateWeaponBody = FromSchema<typeof weaponPostRequestV1.schema> & {
   refinementLevel: RefinementLevel;
 };
@@ -97,10 +95,10 @@ weapons.get('/', async (c) => {
 weapons.post(
   '/',
   negotiateRequestSchema([weaponPostRequestV1]),
-  validateRequestBody([weaponPostRequestV1]),
+  validateRequestBody<[typeof weaponPostRequestV1], CreateWeaponBody>([weaponPostRequestV1]),
   async (c) => {
     const userId = c.get('user').uid;
-    const { weaponId, refinementLevel } = c.get('validatedBody') as CreateWeaponBody;
+    const { weaponId, refinementLevel } = c.get('validatedBody');
 
     const weapon = await Weapons.create(userId, requireWeaponId(weaponId), refinementLevel);
     const baseUrl = new URL(c.req.url).origin;
@@ -151,12 +149,12 @@ weapons.get('/:weaponInstanceId', async (c) => {
 weapons.patch(
   '/:weaponInstanceId',
   negotiateRequestSchema([weaponPatchRequestV1]),
-  validateRequestBody([weaponPatchRequestV1]),
+  validateRequestBody<[typeof weaponPatchRequestV1], UpdateWeaponBody>([weaponPatchRequestV1]),
   async (c) => {
     const userId = c.get('user').uid;
     const weaponInstanceId = c.req.param('weaponInstanceId') as UUID;
 
-    const { refinementLevel } = c.get('validatedBody') as UpdateWeaponBody;
+    const { refinementLevel } = c.get('validatedBody');
 
     const weapon = await Weapons.update(userId, weaponInstanceId, refinementLevel);
 
