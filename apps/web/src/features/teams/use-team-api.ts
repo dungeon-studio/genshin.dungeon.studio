@@ -12,13 +12,13 @@
  * `useTeams` is what a component reaches for; these are its parts.
  */
 
+import { assertCollectionDocument } from '@genshin/collection-json';
 import type { CollectionTeam, CollectionTeamMembers, TeamSlot } from '@genshin/domain';
 import { deserialiseTeam } from '@genshin/domain';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { apiDelete, apiPut } from '@/lib/api';
-import { apiGetAllItems } from '@/lib/api-collection';
+import { apiDelete, apiGet, apiPut } from '@/lib/api';
 import { invalidateUserQuery } from '@/lib/invalidate-user-query';
 import { userScopedKey } from '@/lib/user-scoped-key';
 
@@ -31,12 +31,17 @@ export interface SaveTeamPayload {
 
 const teamsKey = userScopedKey('teams');
 
+function parseTeamsResponse(response: unknown): CollectionTeam[] {
+  assertCollectionDocument(response);
+  return response.collection.items.map((item) => deserialiseTeam(item));
+}
+
 export function useTeamsQuery(userId: string | undefined): UseQueryResult<CollectionTeam[], Error> {
   return useQuery({
     queryKey: teamsKey(userId ?? ''),
     queryFn: async () => {
-      const items = await apiGetAllItems('/teams');
-      return items.map((item) => deserialiseTeam(item));
+      const response = await apiGet('/teams');
+      return parseTeamsResponse(response);
     },
     enabled: userId !== undefined,
   });
