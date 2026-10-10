@@ -9,9 +9,9 @@
  */
 
 import {
-  buildCollection,
   buildItem,
   itemData,
+  serialiseCollection,
   type CollectionDocument,
   type CollectionJsonRepresentation,
   type Item,
@@ -58,35 +58,6 @@ export function serialiseCharacter(character: CollectionCharacter, baseUrl: stri
   ]);
 }
 
-export function characterListDocument(
-  characters: CollectionCharacter[],
-  baseUrl: string,
-): CollectionDocument {
-  return buildCollection(
-    characterCollectionHref(baseUrl),
-    characters.map((c) => serialiseCharacter(c, baseUrl)),
-    { template: CHARACTER_TEMPLATE },
-  );
-}
-
-/**
- * One owned character as a whole document, for a response addressing a single
- * character.
- *
- * Collection+JSON has no single-item media type, so the document is a
- * collection holding one item, with the item's own URL as the collection href.
- */
-export function characterItemDocument(
-  character: CollectionCharacter,
-  baseUrl: string,
-): CollectionDocument {
-  return buildCollection(
-    characterItemHref(baseUrl, character),
-    [serialiseCharacter(character, baseUrl)],
-    { template: CHARACTER_TEMPLATE },
-  );
-}
-
 /**
  * Reads an owned character back out of a Collection+JSON item.
  *
@@ -112,3 +83,30 @@ export const characterRepresentation = {
   deserialise: deserialiseCharacter,
   template: CHARACTER_TEMPLATE,
 } satisfies CollectionJsonRepresentation<CollectionCharacter>;
+
+export function characterListDocument(
+  characters: CollectionCharacter[],
+  baseUrl: string,
+): CollectionDocument {
+  return serialiseCollection(
+    characterRepresentation,
+    characterCollectionHref(baseUrl),
+    characters.map((c) => serialiseCharacter(c, baseUrl)),
+  );
+}
+
+/**
+ * One owned character as a whole document, for a response addressing a single
+ * character.
+ *
+ * Collection+JSON has no single-item media type, so the document is a
+ * collection holding one item, with the item's own URL as the collection href.
+ */
+export function characterItemDocument(
+  character: CollectionCharacter,
+  baseUrl: string,
+): CollectionDocument {
+  return serialiseCollection(characterRepresentation, characterItemHref(baseUrl, character), [
+    serialiseCharacter(character, baseUrl),
+  ]);
+}
