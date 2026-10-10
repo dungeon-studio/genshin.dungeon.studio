@@ -21,7 +21,6 @@ vi.mock('@/firebase/auth.js', () => ({
 
 vi.mock('@/repositories/teams/index.js', () => ({
   list: vi.fn(),
-  listAll: vi.fn(),
   get: vi.fn(),
   save: vi.fn(),
   remove: vi.fn(),
@@ -77,7 +76,7 @@ describe('Team routes', () => {
     let body: CollectionDocument;
 
     beforeEach(async () => {
-      vi.mocked(Teams.list).mockResolvedValue({ items: [FAKE_TEAM, FAKE_EMPTY_TEAM] });
+      vi.mocked(Teams.list).mockResolvedValue([FAKE_TEAM, FAKE_EMPTY_TEAM]);
       res = await app.request(authedRequest('GET', '/teams'));
       body = (await res.json()) as CollectionDocument;
     });
@@ -104,7 +103,7 @@ describe('Team routes', () => {
     });
 
     it('returns empty items when no teams exist', async () => {
-      vi.mocked(Teams.list).mockResolvedValue({ items: [] });
+      vi.mocked(Teams.list).mockResolvedValue([]);
 
       const res = await app.request(authedRequest('GET', '/teams'));
 
@@ -120,29 +119,6 @@ describe('Team routes', () => {
       expect(res.status).toBe(500);
       const body = (await res.json()) as { detail: string };
       expect(body.detail).toBe('An unexpected error occurred');
-    });
-
-    it('passes the page request through and links the next page', async () => {
-      vi.mocked(Teams.list).mockResolvedValue({ items: [], next: 'last-id' });
-      const cursor = Buffer.from('prev-id').toString('base64url');
-
-      const res = await app.request(authedRequest('GET', `/teams?limit=2&cursor=${cursor}`));
-
-      expect(Teams.list).toHaveBeenCalledWith(FAKE_TOKEN.uid, { limit: 2, after: 'prev-id' });
-      const body = (await res.json()) as CollectionDocument;
-      expect(body.collection.links).toEqual([
-        expect.objectContaining({
-          rel: 'next',
-          href: expect.stringContaining('limit=2') as string,
-        }),
-      ]);
-    });
-
-    it('returns a 400 problem document for a limit above the maximum', async () => {
-      const res = await app.request(authedRequest('GET', '/teams?limit=101'));
-
-      expect(res.status).toBe(400);
-      expect(res.headers.get('content-type')).toBe('application/problem+json');
     });
   });
 
@@ -218,7 +194,7 @@ describe('Team routes', () => {
     beforeEach(() => {
       mockCharacterOwned();
       mockWeaponOwned();
-      vi.mocked(Teams.listAll).mockResolvedValue([]);
+      vi.mocked(Teams.list).mockResolvedValue([]);
     });
 
     let res: Response;
@@ -462,7 +438,7 @@ describe('Team routes', () => {
       });
 
       it('returns 400 when weapon equipped by different character in another team', async () => {
-        vi.mocked(Teams.listAll).mockResolvedValue([
+        vi.mocked(Teams.list).mockResolvedValue([
           {
             ...FAKE_TEAM,
             slot: 2,
@@ -482,7 +458,7 @@ describe('Team routes', () => {
       });
 
       it('allows same character to carry same weapon across teams', async () => {
-        vi.mocked(Teams.listAll).mockResolvedValue([
+        vi.mocked(Teams.list).mockResolvedValue([
           {
             ...FAKE_TEAM,
             slot: 2,

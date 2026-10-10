@@ -2,10 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import type { CollectionTeam, ISOTimestamp, TeamSlot } from '@genshin/domain';
-import type { QueryDocumentSnapshot } from 'firebase-admin/firestore';
 
 import { db } from '@/firebase/firestore.js';
-import { readPage, type Page, type PageRequest } from '@/repositories/firestore/page.js';
 import { readSnapshot } from '@/repositories/firestore/snapshot.js';
 
 import { fromDocument, toDocument } from './document.js';
@@ -16,31 +14,18 @@ function collectionRef(userId: string) {
 }
 
 /**
- * Reads a stored team, or `null` for a document whose ID isn't a slot number,
- * so a stray write under the collection can't break a read.
- */
-function readTeam(doc: QueryDocumentSnapshot): CollectionTeam | null {
-  return /^[1-4]$/.test(doc.id) ? fromDocument(Number(doc.id) as TeamSlot, doc.data()) : null;
-}
-
-/**
- * One page of the user's saved teams, for a list response; see `listAll` for
- * checks across every slot.
+ * The teams the user has saved, which is fewer than four until they've saved
+ * all four.
  *
- * Skipping stray documents can leave a page short of its limit while another
- * page remains.
+ * Skips any document whose ID isn't a slot number, so a stray write under the
+ * collection can't break a read.
  */
-export async function list(userId: string, request: PageRequest): Promise<Page<CollectionTeam>> {
-  const page = await readPage(collectionRef(userId), request, readTeam);
-
-  return { ...page, items: page.items.filter((team) => team !== null) };
-}
-
-/** Every saved team, unpaged, for checks that span all four slots. */
-export async function listAll(userId: string): Promise<CollectionTeam[]> {
+export async function list(userId: string): Promise<CollectionTeam[]> {
   const snapshot = await collectionRef(userId).get();
 
-  return snapshot.docs.map(readTeam).filter((team) => team !== null);
+  return snapshot.docs
+    .filter((doc) => /^[1-4]$/.test(doc.id))
+    .map((doc) => fromDocument(Number(doc.id) as TeamSlot, doc.data()));
 }
 
 export async function get(userId: string, slot: TeamSlot): Promise<CollectionTeam | null> {

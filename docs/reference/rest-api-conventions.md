@@ -95,6 +95,8 @@ While records remain, the Collection+JSON document carries a collection-level li
 
 An out-of-range or malformed `limit`, or a `cursor` the server didn't issue, draws `400 Bad Request`.
 
+`GET /teams` is the exception. A user has at most four teams, so it returns every team, ignores `limit` and `cursor`, and never carries a `next` link.
+
 ### 7. Authentication header convention
 
 When authentication is active, carry bearer tokens in the `Authorization` header and distinguish authentication failures (`401`) from authorization failures (`403`).

@@ -14,7 +14,6 @@ import {
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
-import { pageLinks, parsePageRequest } from '@/http/page.js';
 import { auth } from '@/middleware/auth.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
@@ -55,13 +54,13 @@ function parseSlot(param: string): TeamSlot {
   return slot;
 }
 
-// GET /teams — List a page of the user's teams
+// GET /teams — List user's teams
 teams.get('/', async (c) => {
   const userId = c.get('user').uid;
-  const page = await Teams.list(userId, parsePageRequest(c));
+  const items = await Teams.list(userId);
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(JSON.stringify(teamListDocument(page.items, baseUrl, pageLinks(c, page))), {
+  return c.body(JSON.stringify(teamListDocument(items, baseUrl)), {
     headers: { 'Content-Type': c.get('negotiatedMediaType') },
   });
 });
@@ -135,7 +134,7 @@ async function validateComposition(
 
   // Cross-team weapon uniqueness: a weapon instance can only be equipped by one
   // character at a time across all teams (#635).
-  const issues = validateAcrossTeams(slot, members, await Teams.listAll(userId));
+  const issues = validateAcrossTeams(slot, members, await Teams.list(userId));
 
   if (issues.length > 0) {
     throw new HTTPException(400, { message: issues[0].message });
