@@ -72,18 +72,10 @@ check_tools() {
   verify "playwright-browsers" pnpm --filter @genshin/e2e exec playwright install --list
 }
 
-run_verification() {
-  quietly check_tools
-}
-
 show_versions() {
   step "Environment versions"
 
   for_each_tool print_version
-}
-
-run_version_summary() {
-  quietly show_versions
 }
 
 show_status() {
@@ -101,6 +93,8 @@ show_status() {
   echo "Setup complete — all tools verified."
 }
 
-run_status() {
+verify_toolchain() {
+  quietly check_tools
+  quietly show_versions
   quietly show_status
 }
