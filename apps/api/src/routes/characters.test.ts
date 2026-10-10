@@ -86,7 +86,7 @@ describe('Character routes', () => {
     let body: CollectionDocument;
 
     beforeEach(async () => {
-      vi.mocked(Characters.list).mockResolvedValue([FAKE_CHARACTER]);
+      vi.mocked(Characters.list).mockResolvedValue({ items: [FAKE_CHARACTER] });
       res = await app.request(authedRequest('GET', '/characters'));
       body = (await res.json()) as CollectionDocument;
     });
@@ -111,6 +111,29 @@ describe('Character routes', () => {
       expect(res.status).toBe(500);
       const body = (await res.json()) as { detail: string };
       expect(body.detail).toBe('An unexpected error occurred');
+    });
+
+    it('passes the page request through and links the next page', async () => {
+      vi.mocked(Characters.list).mockResolvedValue({ items: [], next: 'last-id' });
+      const cursor = Buffer.from('prev-id').toString('base64url');
+
+      const res = await app.request(authedRequest('GET', `/characters?limit=2&cursor=${cursor}`));
+
+      expect(Characters.list).toHaveBeenCalledWith(FAKE_TOKEN.uid, { limit: 2, after: 'prev-id' });
+      const body = (await res.json()) as CollectionDocument;
+      expect(body.collection.links).toEqual([
+        expect.objectContaining({
+          rel: 'next',
+          href: expect.stringContaining('limit=2') as string,
+        }),
+      ]);
+    });
+
+    it('returns a 400 problem document for a limit above the maximum', async () => {
+      const res = await app.request(authedRequest('GET', '/characters?limit=101'));
+
+      expect(res.status).toBe(400);
+      expect(res.headers.get('content-type')).toBe('application/problem+json');
     });
   });
 

@@ -36,13 +36,42 @@ describe('list', () => {
     await create(userId, WEAPON.id, REFINEMENT_LEVEL);
     await create(userId, OTHER_WEAPON.id, REFINEMENT_LEVEL);
 
-    const instances = await list(userId, WEAPON.id);
+    const { items: instances } = await list(userId, { limit: 10 }, WEAPON.id);
 
     expect(instances).toHaveLength(2);
     expect(instances.map((instance) => instance.weaponId)).toEqual([WEAPON.id, WEAPON.id]);
     expect(instances.map((instance) => instance.weaponInstanceId)).toContain(
       wanted.weaponInstanceId,
     );
+  });
+
+  it('yields every filtered instance exactly once when walked page by page', async () => {
+    const userId = newUserId();
+    const created = await Promise.all(
+      Array.from({ length: 5 }, () => create(userId, WEAPON.id, REFINEMENT_LEVEL)),
+    );
+    await create(userId, OTHER_WEAPON.id, REFINEMENT_LEVEL);
+
+    const walked: string[] = [];
+    let after: string | undefined;
+    do {
+      const page = await list(userId, { limit: 2, after }, WEAPON.id);
+      walked.push(...page.items.map((instance) => instance.weaponInstanceId));
+      after = page.next;
+    } while (after !== undefined);
+
+    expect(walked.sort()).toEqual(created.map((instance) => instance.weaponInstanceId).sort());
+  });
+
+  it('reports no next page when the last page is exactly full', async () => {
+    const userId = newUserId();
+    await create(userId, WEAPON.id, REFINEMENT_LEVEL);
+    await create(userId, WEAPON.id, REFINEMENT_LEVEL);
+
+    const page = await list(userId, { limit: 2 });
+
+    expect(page.items).toHaveLength(2);
+    expect(page.next).toBeUndefined();
   });
 });
 
