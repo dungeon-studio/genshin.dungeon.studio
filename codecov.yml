@@ -1,10 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 ---
-# Inert and awaiting deletion in #879, so no tests are written for it.
-ignore:
-  - 'apps/api/src/repositories/profile/index.ts'
-
 coverage:
   status:
     project:
@@ -77,12 +73,6 @@ component_management:
       name: 'API: Middleware'
       paths:
         - apps/api/src/middleware/**
-      flag_regexes:
-        - api
-    - component_id: api-representations
-      name: 'API: Representations'
-      paths:
-        - apps/api/src/representations/**
       flag_regexes:
         - api
     - component_id: api-firebase
