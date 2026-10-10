@@ -119,18 +119,22 @@ repos:
       - id: zizmor
         # Online audits need a token, so they run in ci.yml's workflows job.
         args: [--no-progress, --offline]
-  - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.12
+  - repo: https://github.com/Mateusz-Grzelinski/actionlint-py
+    rev: v1.7.12.25
     hooks:
-      # actionlint skips shellcheck when it isn't on PATH; this image bundles
-      # it.
-      - id: actionlint-docker
+      # actionlint skips shellcheck when it isn't on PATH, which the hook's
+      # environment provides through this dependency.
+      # Renovate tracks additional_dependencies only on hooks that declare a
+      # language.
+      - id: actionlint
+        language: python
+        additional_dependencies: [shellcheck-py==0.11.0.1]
 
   # Dockerfile linting
-  - repo: https://github.com/hadolint/hadolint
+  - repo: https://github.com/AleksaC/hadolint-py
     rev: v2.15.1
     hooks:
-      - id: hadolint-docker
+      - id: hadolint
 
   # Renovate config validation
   - repo: https://github.com/renovatebot/pre-commit-hooks
