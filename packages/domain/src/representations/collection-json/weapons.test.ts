@@ -44,7 +44,7 @@ describe('weapon serialisation round-trip', () => {
     if (links === undefined) {
       throw new Error('expected item to have links');
     }
-    expect(links[0].rel).toBe('collection');
+    expect(links[0]?.rel).toBe('collection');
   });
 
   it('preserves refinement level through round-trip', () => {

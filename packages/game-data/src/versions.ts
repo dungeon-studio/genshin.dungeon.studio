@@ -13,7 +13,8 @@ const LUNA_VERSIONS: Record<string, readonly [number, number]> = {
 };
 
 function versionTuple(version: string): readonly [number, number] {
-  if (Object.hasOwn(LUNA_VERSIONS, version)) return LUNA_VERSIONS[version];
+  const luna = Object.hasOwn(LUNA_VERSIONS, version) ? LUNA_VERSIONS[version] : undefined;
+  if (luna !== undefined) return luna;
 
   const parts = version.split('.');
   if (parts.length > 2) {

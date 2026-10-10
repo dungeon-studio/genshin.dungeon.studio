@@ -57,9 +57,8 @@ describe('compareVersions', () => {
     });
 
     it('is >= the latest version in the character roster', () => {
-      const maxCharacterVersion = CHARACTER_ROSTER.reduce(
-        (max, c) => (compareVersions(c.version, max) > 0 ? c.version : max),
-        CHARACTER_ROSTER[0].version,
+      const maxCharacterVersion = CHARACTER_ROSTER.map((c) => c.version).reduce((max, version) =>
+        compareVersions(version, max) > 0 ? version : max,
       );
       expect(compareVersions(GAME_DATA_VERSION, maxCharacterVersion)).toBeGreaterThanOrEqual(0);
     });

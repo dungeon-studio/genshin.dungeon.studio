@@ -41,11 +41,10 @@ function themeTokens(selector: string): Map<string, string> {
   const blocks = css.matchAll(new RegExp(`${escaped}\\s*\\{([^}]*)\\}`, 'g'));
 
   const tokens = new Map(
-    [...blocks].flatMap(([, body]) =>
-      [...body.matchAll(/--([\w-]+):\s*([^;]+);/g)].map(([, name, value]): [string, string] => [
-        name,
-        value.trim(),
-      ]),
+    [...blocks].flatMap(([, body = '']) =>
+      [...body.matchAll(/--([\w-]+):\s*([^;]+);/g)].map(
+        ([, name = '', value = '']): [string, string] => [name, value.trim()],
+      ),
     ),
   );
 
@@ -57,11 +56,17 @@ function themeTokens(selector: string): Map<string, string> {
 /** The bare `H S% L%` triple Tailwind wraps in `hsl(var(--token))`. */
 function parseHsl(value: string): Hsl {
   const parts = value.split(/\s+/).map((part) => Number.parseFloat(part));
-  if (parts.length !== 3 || !parts.every((part) => Number.isFinite(part))) {
+  const [hue, saturation, lightness] = parts;
+  if (
+    parts.length !== 3 ||
+    hue === undefined ||
+    saturation === undefined ||
+    lightness === undefined ||
+    !parts.every((part) => Number.isFinite(part))
+  ) {
     throw new Error(`expected an "H S% L%" triple, got: ${value}`);
   }
 
-  const [hue, saturation, lightness] = parts;
   return [hue, saturation, lightness];
 }
 

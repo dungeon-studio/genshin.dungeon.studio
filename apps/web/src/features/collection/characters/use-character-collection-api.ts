@@ -46,12 +46,12 @@ function toCharacterCollection(items: Item[]): CharacterCollection {
 
 function parseSingleCharacterResponse(response: unknown): MutationResult {
   assertCollectionDocument(response);
-  if (response.collection.items.length !== 1) {
-    throw new Error(
-      `Invalid API response: expected exactly one item, got ${response.collection.items.length}`,
-    );
+  const { items } = response.collection;
+  const [item] = items;
+  if (items.length !== 1 || item === undefined) {
+    throw new Error(`Invalid API response: expected exactly one item, got ${items.length}`);
   }
-  const character = deserialiseCharacter(response.collection.items[0]);
+  const character = deserialiseCharacter(item);
   return {
     characterId: character.characterId,
     entry: character,

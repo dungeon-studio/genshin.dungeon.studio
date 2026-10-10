@@ -45,12 +45,12 @@ function toWeaponRecord(items: Item[]): WeaponRecord {
 
 function parseSingleWeaponResponse(response: unknown): WeaponMutationResult {
   assertCollectionDocument(response);
-  if (response.collection.items.length !== 1) {
-    throw new Error(
-      `Invalid API response: expected exactly one item, got ${response.collection.items.length}`,
-    );
+  const { items } = response.collection;
+  const [item] = items;
+  if (items.length !== 1 || item === undefined) {
+    throw new Error(`Invalid API response: expected exactly one item, got ${items.length}`);
   }
-  const weapon = deserialiseWeapon(response.collection.items[0]);
+  const weapon = deserialiseWeapon(item);
   return { weapon };
 }
 

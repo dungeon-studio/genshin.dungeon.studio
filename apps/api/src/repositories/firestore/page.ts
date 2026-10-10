@@ -38,9 +38,10 @@ export async function readPage<T>(
   const docs = snapshot.docs.slice(0, request.limit);
   const items = docs.map(parse);
 
-  if (snapshot.docs.length <= request.limit) {
+  const last = docs.at(-1);
+  if (snapshot.docs.length <= request.limit || last === undefined) {
     return { items };
   }
 
-  return { items, next: docs[docs.length - 1].id };
+  return { items, next: last.id };
 }

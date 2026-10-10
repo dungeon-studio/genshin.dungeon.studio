@@ -5,7 +5,7 @@ import type { ArtifactPlan } from '@genshin/domain';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { assert, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { ArtifactPlanner } from './artifact-planner';
 
@@ -138,7 +138,9 @@ describe('ArtifactPlanner', () => {
     expect(screen.getByText('Unfinished Reverie')).toBeInTheDocument();
 
     // Clearing the first set drops both selections.
-    await user.click(screen.getAllByRole('button', { name: 'Clear selection' })[0]);
+    const [clearFirst] = screen.getAllByRole('button', { name: 'Clear selection' });
+    assert.isDefined(clearFirst);
+    await user.click(clearFirst);
     expect(screen.queryByText('Obsidian Codex')).not.toBeInTheDocument();
     expect(screen.queryByText('Unfinished Reverie')).not.toBeInTheDocument();
   });

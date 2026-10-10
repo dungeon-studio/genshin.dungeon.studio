@@ -43,6 +43,12 @@ const OTHER_CLAYMORE_USER = characterWielding('Claymore', CLAYMORE_USER);
 const CLAYMORE_INSTANCE = 'claymore-instance' as CollectionWeaponId;
 const BOW_INSTANCE = 'bow-instance' as CollectionWeaponId;
 
+async function firstEmptyMember() {
+  const [member] = await screen.findAllByRole('button', { name: /No character/ });
+  if (!member) throw new Error('no empty member position');
+  return member;
+}
+
 function renderTeamsPage() {
   const view = render(
     <MemoryRouter>
@@ -78,7 +84,7 @@ describe('TeamsPage weapon-first flow', () => {
     const user = userEvent.setup({ delay: null });
     renderTeamsPage();
 
-    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+    await user.click(await firstEmptyMember());
     await user.click(await screen.findByRole('button', { name: 'Weapons' }));
     await user.click(
       await screen.findByRole('button', { name: `Assign ${CLAYMORE.name} to character` }),
@@ -106,7 +112,7 @@ describe('TeamsPage weapon-first flow', () => {
     const user = userEvent.setup({ delay: null });
     renderTeamsPage();
 
-    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+    await user.click(await firstEmptyMember());
 
     expect(
       await screen.findByRole('button', { name: `Add ${BOW_USER.name} to team` }),
@@ -117,7 +123,7 @@ describe('TeamsPage weapon-first flow', () => {
     const user = userEvent.setup({ delay: null });
     renderTeamsPage();
 
-    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+    await user.click(await firstEmptyMember());
     await user.click(await screen.findByRole('button', { name: 'Weapons' }));
 
     expect(
@@ -135,7 +141,7 @@ describe('TeamsPage weapon-first flow', () => {
     const user = userEvent.setup({ delay: null });
     renderTeamsPage();
 
-    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+    await user.click(await firstEmptyMember());
     await user.click(await screen.findByRole('button', { name: 'Weapons' }));
     await user.click(
       await screen.findByRole('button', { name: `Assign ${CLAYMORE.name} to character` }),
@@ -158,7 +164,7 @@ describe('TeamsPage weapon-first flow', () => {
       const user = userEvent.setup({ delay: null });
       renderTeamsPage();
 
-      await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+      await user.click(await firstEmptyMember());
       await user.click(
         await screen.findByRole('button', { name: `Add ${CLAYMORE_USER.name} to team` }),
       );
@@ -183,7 +189,7 @@ describe('TeamsPage weapon-first flow', () => {
       const user = userEvent.setup({ delay: null });
       renderTeamsPage();
 
-      await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+      await user.click(await firstEmptyMember());
       await user.click(
         await screen.findByRole('button', { name: `Add ${CLAYMORE_USER.name} to team` }),
       );
@@ -200,7 +206,7 @@ describe('TeamsPage weapon-first flow', () => {
       const user = userEvent.setup({ delay: null });
       renderTeamsPage();
 
-      await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+      await user.click(await firstEmptyMember());
       await user.click(
         await screen.findByRole('button', { name: `Add ${CLAYMORE_USER.name} to team` }),
       );
@@ -224,7 +230,7 @@ describe('TeamsPage weapon-first flow', () => {
     const user = userEvent.setup({ delay: null });
     renderTeamsPage();
 
-    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+    await user.click(await firstEmptyMember());
     await user.click(await screen.findByRole('button', { name: 'Weapons' }));
     await user.click(
       await screen.findByRole('button', { name: `Assign ${CLAYMORE.name} to character` }),
@@ -254,7 +260,9 @@ describe('TeamsPage weapon-first flow', () => {
     });
 
     const teamTwo = screen.getByRole('region', { name: 'Team 2' });
-    await user.click(within(teamTwo).getAllByRole('button', { name: /No character/ })[0]);
+    const [teamTwoMember] = within(teamTwo).getAllByRole('button', { name: /No character/ });
+    if (!teamTwoMember) throw new Error('no empty member position in team 2');
+    await user.click(teamTwoMember);
     await user.click(await screen.findByRole('button', { name: 'Weapons' }));
 
     const card = await screen.findByRole('button', {
@@ -293,14 +301,14 @@ describe('TeamsPage weapon-first flow', () => {
     const user = userEvent.setup({ delay: null });
     renderTeamsPage();
 
-    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+    await user.click(await firstEmptyMember());
     await user.click(await screen.findByRole('button', { name: 'Weapons' }));
     await user.click(
       await screen.findByRole('button', { name: `Assign ${CLAYMORE.name} to character` }),
     );
 
     await user.click(screen.getByRole('button', { name: 'Close' }));
-    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+    await user.click(await firstEmptyMember());
 
     // Reopened on the same member, so a surviving weapon would still be constraining.
     expect(
