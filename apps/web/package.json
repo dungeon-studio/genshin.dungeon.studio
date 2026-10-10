@@ -15,7 +15,7 @@
     "typecheck": "tsc -b --noEmit && tsc --project tsconfig.scripts.json --noEmit"
   },
   "dependencies": {
-    "@firebase/app": "0.16.2",
+    "@firebase/app": "0.16.3",
     "@firebase/auth": "1.13.6",
     "@genshin/collection-json": "workspace:*",
     "@genshin/domain": "workspace:*",
