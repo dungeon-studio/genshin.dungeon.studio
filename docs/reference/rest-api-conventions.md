@@ -84,7 +84,16 @@ See [RFC9457]: <https://www.rfc-editor.org/rfc/rfc9457>
 
 ### 6. Consistent list behavior
 
-Paginate with cursors under the query parameter names `limit` and `cursor`, and filter through explicit parameters. The response's media type contract and published schema define its cursor fields, including next and previous tokens.
+List endpoints return one page at a time, ordered by document ID, and filter through explicit parameters such as `weaponId`.
+
+| Query parameter | Meaning                                                                             |
+| --------------- | ----------------------------------------------------------------------------------- |
+| `limit`         | Records per page, an integer from 1 to 100. Defaults to 50.                         |
+| `cursor`        | Opaque token from a `next` link. Clients follow the link rather than build a token. |
+
+While records remain, the Collection+JSON document carries a collection-level link with `rel` `next`, keeping the request's other query parameters. The last page carries no `next` link, and no response carries a previous link.
+
+An out-of-range or malformed `limit`, or a `cursor` the server didn't issue, draws `400 Bad Request`.
 
 ### 7. Authentication header convention
 
