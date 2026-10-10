@@ -68,7 +68,7 @@ Terraform, or workflow. Read it from an environment variable.
 - Every workspace `tsconfig.json` extends `@genshin/tsconfig` and never re-declares a strictness flag; those belong in the shared config. Keep local only the options TypeScript resolves relative to the declaring file (`outDir`, `rootDir`, `paths`, `include`) and the platform axis (`module`, `moduleResolution`, `lib`, `types`, `jsx`).
 - The API uses `tsconfig.json` (includes tests) for typechecking and `tsconfig.build.json` (excludes tests) for emit. The build config extends `tsconfig.json`, so compiler options stay in sync automatically; only the exclude patterns differ.
 - When `tsconfig.json` uses project references, type-check with `tsc -b --noEmit`. Plain `tsc --noEmit` won't follow references.
-- A new project-wide check belongs in `.pre-commit-config.yaml`, which `ci.yml` runs over the whole tree. The `runCmd` chain in `devcontainer.yml` exercises the built image's toolchain instead, so it takes a command only when nothing else in the chain runs that tool.
+- [Where a check runs](docs/reference/workflow-conventions.md#where-a-check-runs) decides whether a new check is a pre-commit hook or a workflow job. The `runCmd` chain in `devcontainer.yml` exercises the built image's toolchain instead, so it takes a command only when nothing else in the chain runs that tool.
 
 ## API design rules
 
