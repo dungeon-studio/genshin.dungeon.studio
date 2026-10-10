@@ -13,17 +13,22 @@
 set -euo pipefail
 set -x
 
-IMAGE_URI="${1:?Error: image URI is required as first argument}"
-EXPECTED_REVISION="${2:?Error: expected revision is required as second argument}"
+IMAGE_URI="${IMAGE_URI:?Error: IMAGE_URI is required}"
+EXPECTED_REVISION="${EXPECTED_REVISION:?Error: EXPECTED_REVISION is required}"
 
 REQUIRED_LABELS=(source revision created licenses title description url)
 
-LABELS=$(docker buildx imagetools inspect "$IMAGE_URI" --format '{{json .Image.Config.Labels}}')
+LABELS=$(
+  docker buildx imagetools inspect "$IMAGE_URI" --format '{{json .Image.Config.Labels}}' |
+    jq --arg ns org.opencontainers.image. '
+      (. // {})
+      | with_entries(select(.key | startswith($ns)) | .key |= ltrimstr($ns))
+    '
+)
 
 MISSING=$(jq -r --args '
   . as $labels
   | $ARGS.positional
-  | map("org.opencontainers.image." + .)
   | map(select(($labels[.] // "") == ""))
   | join(", ")
 ' "${REQUIRED_LABELS[@]}" <<<"$LABELS")
@@ -33,7 +38,7 @@ MISSING=$(jq -r --args '
   exit 1
 }
 
-REVISION=$(jq -r '.["org.opencontainers.image.revision"]' <<<"$LABELS")
+REVISION=$(jq -r '.revision' <<<"$LABELS")
 
 # A complete label set pointing at the wrong commit is the failure that
 # matters, since consumers read this as the image's provenance.

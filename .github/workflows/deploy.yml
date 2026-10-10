@@ -177,7 +177,7 @@ jobs:
         env:
           IMAGE_URI: ${{ steps.image.outputs.image_uri }}
           EXPECTED_REVISION: ${{ github.sha }}
-        run: bash apps/api/scripts/verify-image-labels.sh "$IMAGE_URI" "$EXPECTED_REVISION"
+        run: bash apps/api/scripts/verify-image-labels.sh
 
       # Service lifecycle is intentionally CI-managed for fast app rollouts.
       # Terraform in dev manages supporting infra (APIs, Artifact Registry,
