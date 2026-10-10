@@ -25,12 +25,12 @@ The rule and its rationale come from [architecture decision record 0004 in alund
 
 ## Required checks
 
-The `develop` ruleset lists the checks that block a merge, and that list is the authoritative set. A required check matches a check run by name, which comes from the job's `name:` rather than its id.
+The `develop` ruleset is the authoritative list of checks that block a merge. A required check matches a check run by name, which comes from the job's `name:` rather than its id.
 
-- Renaming a required job breaks the gate without warning. Update the ruleset in the same change.
+- Renaming a required job silently breaks the gate. Update the ruleset when the rename merges.
 - Job names stay unique across every workflow, since a name matching two check runs is ambiguous.
 - A path-gated workflow is never required. It doesn't report on a pull request outside its paths, and a required check that never reports blocks the merge indefinitely.
-- GitHub-managed CodeQL runs, each named `Analyze (…)`, aren't required checks. Code scanning and Code Quality each report one per language under the same name, and the ruleset already gates their findings with its own rules.
+- The GitHub-managed `Analyze` runs aren't required. Code scanning and Code Quality both report under those names, and the ruleset gates their findings through its own rules.
 
 ## Push triggers
 
