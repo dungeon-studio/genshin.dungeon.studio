@@ -60,7 +60,7 @@ function encodeCursor(after: string): string {
 /**
  * The document with a `next` link added, or unchanged on the last page.
  *
- * Built from the request URL, so filters and an explicit `limit` carry over.
+ * The link reuses the request URL, so filters and an explicit `limit` carry over.
  */
 export function linkNextPage(
   c: Context,
