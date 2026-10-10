@@ -36,9 +36,12 @@ trivy config apps/api
 
 ## Scan the API container image
 
+CI reports these findings to the Security tab instead of failing the pull
+request. This command prints the same set:
+
 ```bash
 docker build -t api-local:scan -f apps/api/Dockerfile .
-trivy image api-local:scan
+trivy image --scanners vuln --ignore-unfixed --exit-code 0 --config .trivy.yaml api-local:scan
 ```
 
 ## Scan dependencies
