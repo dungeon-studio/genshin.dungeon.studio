@@ -1,14 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
+import { COLLECTION_JSON } from '@genshin/collection-json';
 import type { RefinementLevel, UUID } from '@genshin/domain';
 import {
-  serialiseWeapon,
-  weaponCollectionHref,
+  weaponItemDocument,
   weaponItemHref,
-  weaponsOfHref,
-  weaponRepresentation,
+  weaponListDocument,
+  weaponsOfDocument,
 } from '@genshin/domain';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
@@ -62,26 +61,12 @@ weapons.get('/', async (c) => {
 
     const instances = await Weapons.list(userId, requireWeaponId(weaponId));
 
-    return negotiatedJson(
-      c,
-      serialiseCollection(
-        weaponRepresentation,
-        weaponsOfHref(baseUrl, weaponId),
-        instances.map((w) => serialiseWeapon(w, baseUrl)),
-      ),
-    );
+    return negotiatedJson(c, weaponsOfDocument(weaponId, instances, baseUrl));
   }
 
   const items = await Weapons.list(userId);
 
-  return negotiatedJson(
-    c,
-    serialiseCollection(
-      weaponRepresentation,
-      weaponCollectionHref(baseUrl),
-      items.map((w) => serialiseWeapon(w, baseUrl)),
-    ),
-  );
+  return negotiatedJson(c, weaponListDocument(items, baseUrl));
 });
 
 // POST /weapons — Create new weapon instance
@@ -96,14 +81,9 @@ weapons.post(
     const weapon = await Weapons.create(userId, requireWeaponId(weaponId), refinementLevel);
     const baseUrl = new URL(c.req.url).origin;
 
-    return negotiatedJson(
-      c,
-      serialiseCollection(weaponRepresentation, weaponCollectionHref(baseUrl), [
-        serialiseWeapon(weapon, baseUrl),
-      ]),
-      201,
-      { Location: weaponItemHref(baseUrl, weapon) },
-    );
+    return negotiatedJson(c, weaponListDocument([weapon], baseUrl), 201, {
+      Location: weaponItemHref(baseUrl, weapon),
+    });
   },
 );
 
@@ -120,12 +100,7 @@ weapons.get('/:weaponInstanceId', async (c) => {
 
   const baseUrl = new URL(c.req.url).origin;
 
-  return negotiatedJson(
-    c,
-    serialiseCollection(weaponRepresentation, weaponItemHref(baseUrl, weapon), [
-      serialiseWeapon(weapon, baseUrl),
-    ]),
-  );
+  return negotiatedJson(c, weaponItemDocument(weapon, baseUrl));
 });
 
 // PATCH /weapons/:weaponInstanceId — Update weapon instance
@@ -147,12 +122,7 @@ weapons.patch(
 
     const baseUrl = new URL(c.req.url).origin;
 
-    return negotiatedJson(
-      c,
-      serialiseCollection(weaponRepresentation, weaponItemHref(baseUrl, weapon), [
-        serialiseWeapon(weapon, baseUrl),
-      ]),
-    );
+    return negotiatedJson(c, weaponItemDocument(weapon, baseUrl));
   },
 );
 

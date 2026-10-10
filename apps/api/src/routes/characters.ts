@@ -1,14 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { COLLECTION_JSON, serialiseCollection } from '@genshin/collection-json';
+import { COLLECTION_JSON } from '@genshin/collection-json';
 import type { ConstellationLevel } from '@genshin/domain';
-import {
-  characterCollectionHref,
-  characterItemHref,
-  characterRepresentation,
-  serialiseCharacter,
-} from '@genshin/domain';
+import { characterItemDocument, characterListDocument } from '@genshin/domain';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import type { FromSchema } from 'json-schema-to-ts';
@@ -50,14 +45,7 @@ characters.get('/', async (c) => {
   const items = await Characters.list(userId);
   const baseUrl = new URL(c.req.url).origin;
 
-  return negotiatedJson(
-    c,
-    serialiseCollection(
-      characterRepresentation,
-      characterCollectionHref(baseUrl),
-      items.map((item) => serialiseCharacter(item, baseUrl)),
-    ),
-  );
+  return negotiatedJson(c, characterListDocument(items, baseUrl));
 });
 
 // GET /characters/:characterId — Get specific character record
@@ -73,12 +61,7 @@ characters.get('/:characterId', async (c) => {
 
   const baseUrl = new URL(c.req.url).origin;
 
-  return negotiatedJson(
-    c,
-    serialiseCollection(characterRepresentation, characterItemHref(baseUrl, character), [
-      serialiseCharacter(character, baseUrl),
-    ]),
-  );
+  return negotiatedJson(c, characterItemDocument(character, baseUrl));
 });
 
 // PUT /characters/:characterId — Save/update character (idempotent upsert)
@@ -95,13 +78,7 @@ characters.put(
     const { character, created } = await Characters.save(userId, knownId, constellationLevel);
     const baseUrl = new URL(c.req.url).origin;
 
-    return negotiatedJson(
-      c,
-      serialiseCollection(characterRepresentation, characterItemHref(baseUrl, character), [
-        serialiseCharacter(character, baseUrl),
-      ]),
-      created ? 201 : 200,
-    );
+    return negotiatedJson(c, characterItemDocument(character, baseUrl), created ? 201 : 200);
   },
 );
 
