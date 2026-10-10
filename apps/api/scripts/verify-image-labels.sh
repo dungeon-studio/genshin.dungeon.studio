@@ -11,6 +11,7 @@
 # published manifest as the only place they can be checked.
 
 set -euo pipefail
+set -x
 
 IMAGE_URI="${1:?Error: image URI is required as first argument}"
 EXPECTED_REVISION="${2:?Error: expected revision is required as second argument}"
@@ -25,11 +26,14 @@ MISSING=$(jq -r --args '
   | map("org.opencontainers.image." + .)
   | map(select(($labels[.] // "") == ""))
   | join(", ")
-' "${REQUIRED_LABELS[@]}" <<< "$LABELS")
+' "${REQUIRED_LABELS[@]}" <<<"$LABELS")
 
-[ -z "$MISSING" ] || { echo "missing OCI labels: $MISSING" >&2; exit 1; }
+[ -z "$MISSING" ] || {
+  echo "missing OCI labels: $MISSING" >&2
+  exit 1
+}
 
-REVISION=$(jq -r '.["org.opencontainers.image.revision"]' <<< "$LABELS")
+REVISION=$(jq -r '.["org.opencontainers.image.revision"]' <<<"$LABELS")
 
 # A complete label set pointing at the wrong commit is the failure that
 # matters, since consumers read this as the image's provenance.
