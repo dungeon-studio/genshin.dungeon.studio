@@ -50,9 +50,11 @@ const FAKE_TEAM = makeTeam(1, {
 
 const FAKE_EMPTY_TEAM = makeTeam(2);
 
+const BASE_URL = 'http://localhost';
+
 const EXPECTED_CONTENT_TYPE = toMediaTypeString(
   { mediaType: COLLECTION_JSON, profile: teamItemV1 },
-  'http://localhost',
+  BASE_URL,
 );
 
 function mockCharacterOwned() {
@@ -91,7 +93,7 @@ describe('Team routes', () => {
     });
 
     it('returns the stored teams as the list document', () => {
-      expect(body).toEqual(teamListDocument([FAKE_TEAM, FAKE_EMPTY_TEAM], 'http://localhost'));
+      expect(body).toEqual(teamListDocument([FAKE_TEAM, FAKE_EMPTY_TEAM], BASE_URL));
     });
 
     it('returns 500 when repository throws', async () => {
@@ -124,7 +126,7 @@ describe('Team routes', () => {
     });
 
     it('returns the stored team as an item document', () => {
-      expect(body).toEqual(teamItemDocument(FAKE_TEAM, 'http://localhost'));
+      expect(body).toEqual(teamItemDocument(FAKE_TEAM, BASE_URL));
     });
 
     it('returns 404 when team not found', async () => {
@@ -193,7 +195,7 @@ describe('Team routes', () => {
     });
 
     it('returns the saved team as an item document', () => {
-      expect(body).toEqual(teamItemDocument(FAKE_TEAM, 'http://localhost'));
+      expect(body).toEqual(teamItemDocument(FAKE_TEAM, BASE_URL));
     });
 
     it('returns 201 when team is newly created', () => {

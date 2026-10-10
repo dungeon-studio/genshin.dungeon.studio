@@ -9,9 +9,10 @@
  */
 
 import {
-  buildCollection,
   buildItem,
   itemData,
+  serialiseCollection,
+  serialiseItemDocument,
   type CollectionDocument,
   type CollectionJsonRepresentation,
   type Item,
@@ -62,23 +63,19 @@ export function characterListDocument(
   characters: CollectionCharacter[],
   baseUrl: string,
 ): CollectionDocument {
-  return buildCollection(
+  return serialiseCollection(
+    characterRepresentation,
     characterCollectionHref(baseUrl),
-    characters.map((c) => serialiseCharacter(c, baseUrl)),
-    { template: CHARACTER_TEMPLATE },
+    characters,
+    baseUrl,
   );
 }
 
-/** One owned character as a one-item collection: Collection+JSON has no single-item media type. */
 export function characterItemDocument(
   character: CollectionCharacter,
   baseUrl: string,
 ): CollectionDocument {
-  return buildCollection(
-    characterItemHref(baseUrl, character),
-    [serialiseCharacter(character, baseUrl)],
-    { template: CHARACTER_TEMPLATE },
-  );
+  return serialiseItemDocument(characterRepresentation, character, baseUrl);
 }
 
 /**

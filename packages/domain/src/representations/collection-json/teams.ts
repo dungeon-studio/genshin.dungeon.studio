@@ -13,9 +13,10 @@
  */
 
 import {
-  buildCollection,
   buildItem,
   itemData,
+  serialiseCollection,
+  serialiseItemDocument,
   type CollectionDocument,
   type CollectionJsonRepresentation,
   type Item,
@@ -60,23 +61,12 @@ export function serialiseTeam(team: CollectionTeam, baseUrl: string): Item {
 }
 
 export function teamListDocument(teams: CollectionTeam[], baseUrl: string): CollectionDocument {
-  return buildCollection(
-    teamCollectionHref(baseUrl),
-    teams.map((t) => serialiseTeam(t, baseUrl)),
-    { template: TEAM_TEMPLATE },
-  );
+  return serialiseCollection(teamRepresentation, teamCollectionHref(baseUrl), teams, baseUrl);
 }
 
-/**
- * One team as a whole document, for a response addressing a single slot.
- *
- * Collection+JSON has no single-item media type, so the document is a
- * collection holding one item, with the item's own URL as the collection href.
- */
+/** One team as a whole document, for a response addressing a single slot. */
 export function teamItemDocument(team: CollectionTeam, baseUrl: string): CollectionDocument {
-  return buildCollection(teamItemHref(baseUrl, team), [serialiseTeam(team, baseUrl)], {
-    template: TEAM_TEMPLATE,
-  });
+  return serialiseItemDocument(teamRepresentation, team, baseUrl);
 }
 
 function parseMembers(item: Item): unknown {

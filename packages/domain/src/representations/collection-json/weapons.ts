@@ -9,9 +9,10 @@
  */
 
 import {
-  buildCollection,
   buildItem,
   itemData,
+  serialiseCollection,
+  serialiseItemDocument,
   type CollectionDocument,
   type CollectionJsonRepresentation,
   type Item,
@@ -82,11 +83,7 @@ export function weaponListDocument(
   weapons: CollectionWeapon[],
   baseUrl: string,
 ): CollectionDocument {
-  return buildCollection(
-    weaponCollectionHref(baseUrl),
-    weapons.map((w) => serialiseWeapon(w, baseUrl)),
-    { template: WEAPON_TEMPLATE },
-  );
+  return serialiseCollection(weaponRepresentation, weaponCollectionHref(baseUrl), weapons, baseUrl);
 }
 
 /** The user's copies of one weapon. */
@@ -95,18 +92,16 @@ export function weaponsOfDocument(
   weapons: CollectionWeapon[],
   baseUrl: string,
 ): CollectionDocument {
-  return buildCollection(
+  return serialiseCollection(
+    weaponRepresentation,
     weaponsOfHref(baseUrl, weaponId),
-    weapons.map((w) => serialiseWeapon(w, baseUrl)),
-    { template: WEAPON_TEMPLATE },
+    weapons,
+    baseUrl,
   );
 }
 
-/** One owned weapon as a one-item collection: Collection+JSON has no single-item media type. */
 export function weaponItemDocument(weapon: CollectionWeapon, baseUrl: string): CollectionDocument {
-  return buildCollection(weaponItemHref(baseUrl, weapon), [serialiseWeapon(weapon, baseUrl)], {
-    template: WEAPON_TEMPLATE,
-  });
+  return serialiseItemDocument(weaponRepresentation, weapon, baseUrl);
 }
 
 /**

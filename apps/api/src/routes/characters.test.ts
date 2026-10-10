@@ -39,9 +39,11 @@ vi.mock('@genshin/game-data', async (importOriginal) => ({
 
 const FAKE_CHARACTER = makeCharacter('albedo', { constellationLevel: 2 });
 
+const BASE_URL = 'http://localhost';
+
 const EXPECTED_CONTENT_TYPE = toMediaTypeString(
   { mediaType: COLLECTION_JSON, profile: characterItemV1 },
-  'http://localhost',
+  BASE_URL,
 );
 
 describe('Character routes', () => {
@@ -98,7 +100,7 @@ describe('Character routes', () => {
     });
 
     it('returns the stored characters as the list document', () => {
-      expect(body).toEqual(characterListDocument([FAKE_CHARACTER], 'http://localhost'));
+      expect(body).toEqual(characterListDocument([FAKE_CHARACTER], BASE_URL));
     });
 
     it('returns 500 when repository throws', async () => {
@@ -131,7 +133,7 @@ describe('Character routes', () => {
     });
 
     it('returns the stored character as an item document', () => {
-      expect(body).toEqual(characterItemDocument(FAKE_CHARACTER, 'http://localhost'));
+      expect(body).toEqual(characterItemDocument(FAKE_CHARACTER, BASE_URL));
     });
 
     it('returns 404 when character not in collection', async () => {
@@ -172,7 +174,7 @@ describe('Character routes', () => {
     });
 
     it('returns the saved character as an item document', () => {
-      expect(body).toEqual(characterItemDocument(FAKE_CHARACTER, 'http://localhost'));
+      expect(body).toEqual(characterItemDocument(FAKE_CHARACTER, BASE_URL));
     });
 
     it('returns 201 when character is newly added', () => {

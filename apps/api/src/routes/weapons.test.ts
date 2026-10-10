@@ -41,9 +41,11 @@ vi.mock('@genshin/game-data', async (importOriginal) => ({
 
 const FAKE_WEAPON = makeWeapon('instance-uuid-1', 'mistsplitter-reforged');
 
+const BASE_URL = 'http://localhost';
+
 const EXPECTED_CONTENT_TYPE = toMediaTypeString(
   { mediaType: COLLECTION_JSON, profile: weaponItemV1 },
-  'http://localhost',
+  BASE_URL,
 );
 
 describe('Weapon routes', () => {
@@ -74,7 +76,7 @@ describe('Weapon routes', () => {
     });
 
     it('returns the stored weapons as the list document', () => {
-      expect(body).toEqual(weaponListDocument([FAKE_WEAPON], 'http://localhost'));
+      expect(body).toEqual(weaponListDocument([FAKE_WEAPON], BASE_URL));
     });
 
     it('returns 500 when repository throws', async () => {
@@ -111,9 +113,7 @@ describe('Weapon routes', () => {
     });
 
     it("returns the stored copies as the weapon's filtered document", () => {
-      expect(body).toEqual(
-        weaponsOfDocument('mistsplitter-reforged', [FAKE_WEAPON], 'http://localhost'),
-      );
+      expect(body).toEqual(weaponsOfDocument('mistsplitter-reforged', [FAKE_WEAPON], BASE_URL));
     });
 
     it('returns 400 for unknown weapon ID', async () => {
@@ -163,7 +163,7 @@ describe('Weapon routes', () => {
     });
 
     it('returns the created weapon in the list document', () => {
-      expect(body).toEqual(weaponListDocument([FAKE_WEAPON], 'http://localhost'));
+      expect(body).toEqual(weaponListDocument([FAKE_WEAPON], BASE_URL));
     });
 
     it('returns Location header pointing to created instance', () => {
@@ -325,7 +325,7 @@ describe('Weapon routes', () => {
     });
 
     it('returns the stored weapon as an item document', () => {
-      expect(body).toEqual(weaponItemDocument(FAKE_WEAPON, 'http://localhost'));
+      expect(body).toEqual(weaponItemDocument(FAKE_WEAPON, BASE_URL));
     });
 
     it('returns 404 when weapon instance not found', async () => {
@@ -362,7 +362,7 @@ describe('Weapon routes', () => {
     });
 
     it('returns the updated weapon as an item document', () => {
-      expect(body).toEqual(weaponItemDocument(FAKE_WEAPON, 'http://localhost'));
+      expect(body).toEqual(weaponItemDocument(FAKE_WEAPON, BASE_URL));
     });
 
     it('returns 404 when weapon instance not found', async () => {
