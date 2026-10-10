@@ -456,6 +456,21 @@ jobs:
           exit-code: '1'
           trivy-config: .trivy.yaml
 
+      # The lockfile carries no licences; Trivy reads them from node_modules,
+      # which it finds only when scanning the directory. UNKNOWN fails so a
+      # licence outside Trivy's classification gets a decision.
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Scan dependency licences
+        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e # master
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: license
+          severity: UNKNOWN,HIGH,CRITICAL
+          exit-code: '1'
+          trivy-config: .trivy.yaml
+
   # One build feeds both the scan and the smoke test. The scan goes first
   # because trivy-action defaults to exit-code 0 and reports through SARIF, so
   # a smoke-test failure cannot cost us its results.

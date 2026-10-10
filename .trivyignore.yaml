@@ -17,3 +17,14 @@
 misconfigurations: []
 vulnerabilities: []
 secrets: []
+
+# Trivy ignores `purls` on a licence entry, so each entry exempts its licence
+# in every package.
+licenses:
+  - id: LGPL-3.0-only
+    statement: >-
+      eslint-plugin-sonarjs and @sonarsource/analyzer-commons-configurations
+      run at lint time and never ship. Trivy counts them as production because
+      @genshin/eslint-config declares its plugins as dependencies. On expiry,
+      confirm with `pnpm licenses list` that no other package uses LGPL.
+    expired_at: 2027-10-10

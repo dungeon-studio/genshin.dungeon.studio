@@ -18,4 +18,12 @@ misconfiguration:
     vars:
       - infrastructure/terraform/environments/dev/terraform.tfvars
 
+# Licences Trivy can't classify scan as UNKNOWN, which the licence scan fails
+# on. Listing a licence under a category replaces that category's built-in
+# list, so permissive additions go in `permissive`, which is empty by default.
+license:
+  permissive:
+    - BlueOak-1.0.0
+    - MIT-0
+
 ignorefile: .trivyignore.yaml
