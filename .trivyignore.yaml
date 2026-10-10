@@ -24,7 +24,9 @@ licenses:
   - id: LGPL-3.0-only
     statement: >-
       Accepted because eslint-plugin-sonarjs and its
-      @sonarsource/analyzer-commons-configurations dependency only run at lint
-      time; @genshin/eslint-config lists them as dependencies, so Trivy scans
-      them. Revisit when `pnpm licenses list` shows another LGPL package.
+      @sonarsource/analyzer-commons-configurations dependency run only at lint
+      time and are never distributed; Trivy scans them because
+      @genshin/eslint-config lists them as dependencies. Revisit when
+      `pnpm licenses list` shows another LGPL package or the API image becomes
+      public.
     expired_at: 2027-10-10

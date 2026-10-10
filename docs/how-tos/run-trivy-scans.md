@@ -54,9 +54,11 @@ trivy fs --scanners vuln --config .trivy.yaml pnpm-lock.yaml
 trivy fs --scanners license --severity UNKNOWN,HIGH,CRITICAL --config .trivy.yaml .
 ```
 
-A licence fails when Trivy rates it restricted or forbidden, such as GPL or
-AGPL, or can't classify it. Resolve a licence failure in one of two ways:
+The licence scan fails on licences Trivy rates restricted or forbidden, such as
+GPL and AGPL, and on licences it can't classify. Resolve a licence failure in
+one of three ways:
 
+- Replace the dependency with one under an accepted licence.
 - Add a permissive licence Trivy doesn't classify to `license.permissive` in
   `.trivy.yaml`.
 - Record an accepted copyleft licence in `.trivyignore.yaml`. The entry exempts
