@@ -38,7 +38,7 @@ Be respectful and constructive in all interactions.
 
 1. Pick up an [existing issue](https://github.com/dungeon-studio/genshin.dungeon.studio/issues), or open one before starting larger work.
 2. Write tests alongside or before the implementation.
-3. Open a pull request into `develop` that references the issue. Its title follows the [commit message rules](#commit-messages).
+3. Open a pull request into `develop` that references the issue. Its title follows the [commit message rules](#commit-messages). Its description follows the [pull request template](.github/pull_request_template.md).
 4. Keep the description accurate as review changes the work.
 
 Follow [Code conventions](docs/reference/code-conventions.md) for what no linter checks.
@@ -73,11 +73,11 @@ Broken external URLs don't block a pull request. A weekly run files them as a Gi
 
 Pull requests squash-merge, so the pull request title becomes the commit on `develop` and carries these rules:
 
-- Format: `type(scope): subject`
-- Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
+- Format: `type(scope): subject`, per [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+- Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`, from commitlint's [`config-conventional`](https://github.com/conventional-changelog/commitlint/tree/master/@commitlint/config-conventional)
 - Write the subject in imperative mood, lowercase, under 50 characters, and with no trailing period: `add character filter`, not `added` or `adds`
 
-Scope names the one workspace package the change touches: `feat(web)` for `apps/web`, `fix(api)` for `apps/api`, `refactor(game-data)` for `packages/game-data`, `chore(domain)` for `packages/domain`, and `chore(infra)` for Terraform and infrastructure. Omit the scope for changes that span packages, including most `docs:` changes.
+Scope is optional and unchecked. When present, it names the one package or tool the change touches, such as `feat(web)` or `chore(renovate)`. Omit it for changes that span several.
 
 Separate a commit body from the subject with a blank line and wrap it at 72 characters. Use it to explain what changed and why rather than how.
 

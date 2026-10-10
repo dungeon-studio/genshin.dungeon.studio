@@ -32,9 +32,10 @@ change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&'
 
 # Strip the conventional-commit prefix from each bullet; the category heading
-# already conveys the type, so 'feat: add X' reads as 'add X'.
+# already conveys the type, so 'feat: add X' reads as 'add X'. The title check
+# in pull-request-metadata.yml owns the type list.
 replacers:
-  - search: '/^(\s*-\s)(?:feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(?:\([^)]*\))?!?:\s+/gim'
+  - search: '/^(\s*-\s)\w+(?:\([^)]*\))?!?:\s+/gim'
     replace: '$1'
 
 version-resolver:
@@ -70,20 +71,21 @@ autolabeler:
       - '/^fix(\(.+\))?!?:/i'
   - label: 'documentation'
     title:
-      - '/^docs(\(.+\))?:/i'
+      - '/^docs(\(.+\))?!?:/i'
   # Renovate labels vulnerability PRs itself; matching its [security] title
   # suffix keeps sync-labels from removing that label.
   - label: 'security'
     title:
-      - '/^(feat|fix|chore)\(security\)/i'
+      - '/^\w+\(security\)/i'
       - '/\[security\]$/i'
   - label: 'dependencies'
     title:
-      - '/^(chore|build|fix)\(deps(-dev)?\)/i'
+      - '/^\w+\(deps(-dev)?\)/i'
+  # Catch-all for types without a category; the excluded types mirror the rules
+  # above.
   - label: 'chore'
     title:
-      - '/^(chore|build)(?!\(deps)(\(.+\))?:/i'
-      - '/^(ci|style|refactor|test|perf|revert)(\(.+\))?:/i'
+      - '/^(?!(feat|fix|docs)\b)\w+(?!\(deps)(\(.+\))?!?:/i'
   - label: 'breaking change'
     title:
       - '/^\w+(\(.+\))?!:/'
