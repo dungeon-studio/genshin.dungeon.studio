@@ -49,6 +49,9 @@ export const ARTIFACT_SETS: Readonly<Record<ArtifactSetId, ArtifactSet>> = ARTIF
 /** Display order, as the generator writes it: newest release first. */
 export const ARTIFACT_SET_ROSTER: readonly ArtifactSet[] = Object.values(ARTIFACT_SETS);
 
+/** Every set ID, newest release first. */
+export const ARTIFACT_SET_IDS: readonly ArtifactSetId[] = ARTIFACT_SET_ROSTER.map((set) => set.id);
+
 /**
  * Valid main affixes for Sands of Eon
  */
