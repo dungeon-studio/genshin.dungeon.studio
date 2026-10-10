@@ -57,9 +57,8 @@ version-resolver:
 # above are driven by commit prefixes without manual labeling. A breaking-change
 # marker (type!:) adds the major-bump label on top of the type label.
 #
-# sync-labels removes a label named below once no rule selects it, so a
-# retitled PR moves category instead of collecting both. Labels not named below
-# are left alone.
+# A retitled PR changes category instead of collecting a second one. Any label
+# named below is removed when no rule selects it, even one applied by hand.
 sync-labels: true
 
 autolabeler:
