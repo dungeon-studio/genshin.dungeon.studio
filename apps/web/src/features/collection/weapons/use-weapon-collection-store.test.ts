@@ -3,7 +3,7 @@
 
 import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
 import { WEAPON_ROSTER } from '@genshin/game-data';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { assert, beforeEach, describe, expect, it } from 'vitest';
 
 import { makeWeapon } from '@/test/fixtures';
 
@@ -12,6 +12,8 @@ import { useWeaponCollectionStore } from './use-weapon-collection-store';
 // Two weapons from game data, so a filtered read has something to leave out
 // and a roster change cannot strand the suite.
 const [WEAPON, OTHER_WEAPON] = WEAPON_ROSTER;
+assert.isDefined(WEAPON);
+assert.isDefined(OTHER_WEAPON);
 
 function storedWeapon(weaponInstanceId: CollectionWeaponId): CollectionWeapon | undefined {
   return useWeaponCollectionStore.getState().weapons[weaponInstanceId];

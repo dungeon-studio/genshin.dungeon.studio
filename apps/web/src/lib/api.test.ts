@@ -41,7 +41,7 @@ describe('API methods (unauthenticated)', () => {
 
     await apiPut('/profiles/me', body);
 
-    const [, init] = vi.mocked(fetch).mock.calls[0];
+    const init = vi.mocked(fetch).mock.calls[0]?.[1];
     expect(init?.method).toBe('PUT');
     expect(init?.body).toBe(JSON.stringify(body));
   });
@@ -56,7 +56,7 @@ describe('API methods (unauthenticated)', () => {
 
     await apiPost('/weapons', { weaponId: 'sword-1' });
 
-    const [, init] = vi.mocked(fetch).mock.calls[0];
+    const init = vi.mocked(fetch).mock.calls[0]?.[1];
     expect(init?.method).toBe('POST');
   });
 
@@ -70,7 +70,7 @@ describe('API methods (unauthenticated)', () => {
 
     await apiPatch('/weapons/1', { refinementLevel: 3 });
 
-    const [, init] = vi.mocked(fetch).mock.calls[0];
+    const init = vi.mocked(fetch).mock.calls[0]?.[1];
     expect(init?.method).toBe('PATCH');
   });
 
@@ -79,7 +79,7 @@ describe('API methods (unauthenticated)', () => {
 
     await apiDelete('/teams/1');
 
-    const [, init] = vi.mocked(fetch).mock.calls[0];
+    const init = vi.mocked(fetch).mock.calls[0]?.[1];
     expect(init?.method).toBe('DELETE');
   });
 

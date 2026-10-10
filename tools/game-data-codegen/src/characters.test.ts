@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { compareVersions } from '@genshin/game-data';
-import { describe, expect, it } from 'vitest';
+import { assert, describe, expect, it } from 'vitest';
 
 import { buildCharacters } from './characters.js';
 
@@ -30,9 +30,11 @@ describe('buildCharacters', () => {
   });
 
   it('sorts by rarity descending, then version descending', () => {
-    const outOfOrder = characters
-      .slice(1)
-      .filter((current, index) => !precedes(characters[index], current));
+    const outOfOrder = characters.slice(1).filter((current, index) => {
+      const previous = characters[index];
+      assert.isDefined(previous);
+      return !precedes(previous, current);
+    });
 
     expect(outOfOrder).toEqual([]);
   });

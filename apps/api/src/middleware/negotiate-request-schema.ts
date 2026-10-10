@@ -43,15 +43,15 @@ export type NegotiatedRequestSchemaVariables = {
  * @throws Error at registration, not per request, when `profiles` is empty.
  */
 export function negotiateRequestSchema(profiles: ProfileLink[]): MiddlewareHandler {
-  if (profiles.length === 0) {
+  const paths = profiles.map((p) => p.path);
+  const [latest] = paths;
+  if (latest === undefined) {
     throw new Error('negotiateRequestSchema requires at least one profile');
   }
 
-  const paths = profiles.map((p) => p.path);
-
   return async (c, next) => {
     const profile = parseProfile(c.req.header('Content-Type'));
-    c.set('negotiatedSchema', selectSchema(paths, profile));
+    c.set('negotiatedSchema', selectSchema(paths, latest, profile));
     await next();
   };
 }
@@ -72,8 +72,8 @@ function parseProfile(header: string | undefined): string | undefined {
   }
 }
 
-function selectSchema(paths: string[], profile: string | undefined): string {
-  if (!profile) return paths[0];
+function selectSchema(paths: string[], latest: string, profile: string | undefined): string {
+  if (!profile) return latest;
 
   const path = profilePath(profile);
   if (paths.includes(path)) return path;

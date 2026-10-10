@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { compareVersions } from '@genshin/game-data';
-import { describe, expect, it } from 'vitest';
+import { assert, describe, expect, it } from 'vitest';
 
 import { buildWeapons } from './weapons.js';
 
@@ -36,9 +36,11 @@ describe('buildWeapons', () => {
   });
 
   it('sorts by rarity descending, then version descending', () => {
-    const outOfOrder = weapons
-      .slice(1)
-      .filter((current, index) => !precedes(weapons[index], current));
+    const outOfOrder = weapons.slice(1).filter((current, index) => {
+      const previous = weapons[index];
+      assert.isDefined(previous);
+      return !precedes(previous, current);
+    });
 
     expect(outOfOrder).toEqual([]);
   });

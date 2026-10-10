@@ -15,7 +15,7 @@ describe('migratePersistedCollection', () => {
   it('adopts a valid unversioned collection', () => {
     const result = migratePersistedCollection({ characters: { amber: entry('amber', 2) } });
 
-    expect(result.characters['amber'].constellationLevel).toBe(2);
+    expect(result.characters['amber']?.constellationLevel).toBe(2);
   });
 
   it('discards a structurally invalid blob', () => {

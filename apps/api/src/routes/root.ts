@@ -34,8 +34,8 @@ function discoverLinks<E extends Env>(app: HonoApp<E>): Record<string, { href: s
     if (seen.has(path)) continue;
     seen.add(path);
 
-    const segments = path.split('/').filter(Boolean);
-    const name = segments[segments.length - 1];
+    const name = path.split('/').filter(Boolean).at(-1);
+    if (name === undefined) continue;
     links[name] = { href: path };
   }
 
