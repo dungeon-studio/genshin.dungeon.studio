@@ -3,7 +3,7 @@
 
 import type { ComponentProps, JSX } from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/class-names';
 
 /**
  * Centers content and constrains it to the app's horizontal gutter. Apply it to
