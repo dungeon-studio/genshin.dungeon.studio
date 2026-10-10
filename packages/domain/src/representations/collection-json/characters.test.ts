@@ -3,7 +3,13 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { deserialiseCharacter, serialiseCharacter } from './characters.js';
+import {
+  characterItemDocument,
+  characterListDocument,
+  characterRepresentation,
+  deserialiseCharacter,
+  serialiseCharacter,
+} from './characters.js';
 import type { CollectionCharacter } from '../../character/collection-character.js';
 import type { ISOTimestamp } from '../../iso-timestamp.js';
 
@@ -42,5 +48,45 @@ describe('deserialiseCharacter sanitisation', () => {
     const item = serialiseCharacter(VALID_CHARACTER, BASE_URL);
     const injected = { ...item, data: [...item.data, { name: 'injected', value: 'evil' }] };
     expect(deserialiseCharacter(injected)).toEqual(VALID_CHARACTER);
+  });
+});
+
+describe('characterListDocument', () => {
+  it('addresses the collection URL', () => {
+    const document = characterListDocument([VALID_CHARACTER], BASE_URL);
+    expect(document.collection.href).toBe(`${BASE_URL}/characters`);
+  });
+
+  it('holds one item per character in order', () => {
+    const other: CollectionCharacter = { ...VALID_CHARACTER, characterId: 'durin' };
+    const document = characterListDocument([VALID_CHARACTER, other], BASE_URL);
+    expect(document.collection.items.map((item) => item.href)).toEqual([
+      `${BASE_URL}/characters/columbina`,
+      `${BASE_URL}/characters/durin`,
+    ]);
+  });
+
+  it('carries the character template', () => {
+    const document = characterListDocument([], BASE_URL);
+    expect(document.collection.template).toEqual(characterRepresentation.template);
+  });
+});
+
+describe('characterItemDocument', () => {
+  it("addresses the character's own URL", () => {
+    const document = characterItemDocument(VALID_CHARACTER, BASE_URL);
+    expect(document.collection.href).toBe(`${BASE_URL}/characters/columbina`);
+  });
+
+  it('holds only that character', () => {
+    const document = characterItemDocument(VALID_CHARACTER, BASE_URL);
+    expect(document.collection.items.map((item) => item.href)).toEqual([
+      `${BASE_URL}/characters/columbina`,
+    ]);
+  });
+
+  it('carries the character template', () => {
+    const document = characterItemDocument(VALID_CHARACTER, BASE_URL);
+    expect(document.collection.template).toEqual(characterRepresentation.template);
   });
 });

@@ -2,7 +2,13 @@
 // SPDX-License-Identifier: MIT
 
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
-import { MAX_REFINEMENT_LEVEL, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
+import {
+  MAX_REFINEMENT_LEVEL,
+  MIN_REFINEMENT_LEVEL,
+  weaponItemDocument,
+  weaponListDocument,
+  weaponsOfDocument,
+} from '@genshin/domain';
 import { makeWeapon } from '@genshin/domain/testing';
 import type * as GameData from '@genshin/game-data';
 import { getWeaponById } from '@genshin/game-data';
@@ -35,17 +41,11 @@ vi.mock('@genshin/game-data', async (importOriginal) => ({
 
 const FAKE_WEAPON = makeWeapon('instance-uuid-1', 'mistsplitter-reforged');
 
-const FAKE_WEAPON_ITEM_DATA = [
-  { name: 'weaponInstanceId', value: FAKE_WEAPON.weaponInstanceId },
-  { name: 'weaponId', value: FAKE_WEAPON.weaponId },
-  { name: 'refinementLevel', value: FAKE_WEAPON.refinementLevel },
-  { name: 'createdAt', value: FAKE_WEAPON.createdAt },
-  { name: 'updatedAt', value: FAKE_WEAPON.updatedAt },
-];
+const BASE_URL = 'http://localhost';
 
 const EXPECTED_CONTENT_TYPE = toMediaTypeString(
   { mediaType: COLLECTION_JSON, profile: weaponItemV1 },
-  'http://localhost',
+  BASE_URL,
 );
 
 describe('Weapon routes', () => {
@@ -75,30 +75,8 @@ describe('Weapon routes', () => {
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
-    it('returns one item per weapon', () => {
-      expect(body.collection.items).toHaveLength(1);
-    });
-
-    it('includes weapon domain data', () => {
-      expect(body.collection.items[0].data).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ name: 'weaponId', value: 'mistsplitter-reforged' }),
-          expect.objectContaining({ name: 'refinementLevel', value: 1 }),
-        ]),
-      );
-    });
-
-    it('sets collection.href without query string', () => {
-      expect(body.collection.href).toBe('http://localhost/weapons');
-    });
-
-    it('returns empty items when no weapons exist', async () => {
-      vi.mocked(Weapons.list).mockResolvedValue({ items: [] });
-
-      const res = await app.request(authedRequest('GET', '/weapons'));
-
-      const body = (await res.json()) as CollectionDocument;
-      expect(body.collection.items).toEqual([]);
+    it('returns the stored weapons as the list document', () => {
+      expect(body).toEqual(weaponListDocument([FAKE_WEAPON], BASE_URL));
     });
 
     it('returns 500 when repository throws', async () => {
@@ -134,32 +112,8 @@ describe('Weapon routes', () => {
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
-    it('returns one item per instance', () => {
-      expect(body.collection.items).toHaveLength(1);
-    });
-
-    it('includes weapon domain data', () => {
-      expect(body.collection.items[0].data).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ name: 'weaponId', value: 'mistsplitter-reforged' }),
-          expect.objectContaining({ name: 'refinementLevel', value: 1 }),
-        ]),
-      );
-    });
-
-    it('sets collection.href with query string', () => {
-      expect(body.collection.href).toBe('http://localhost/weapons?weaponId=mistsplitter-reforged');
-    });
-
-    it('returns empty items when no instances exist', async () => {
-      vi.mocked(Weapons.list).mockResolvedValue({ items: [] });
-
-      const res = await app.request(
-        authedRequest('GET', '/weapons?weaponId=mistsplitter-reforged'),
-      );
-
-      const body = (await res.json()) as CollectionDocument;
-      expect(body.collection.items).toEqual([]);
+    it("returns the stored copies as the weapon's filtered document", () => {
+      expect(body).toEqual(weaponsOfDocument('mistsplitter-reforged', [FAKE_WEAPON], BASE_URL));
     });
 
     it('returns 400 for unknown weapon ID', async () => {
@@ -237,16 +191,12 @@ describe('Weapon routes', () => {
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
+    it('returns the created weapon in the list document', () => {
+      expect(body).toEqual(weaponListDocument([FAKE_WEAPON], BASE_URL));
+    });
+
     it('returns Location header pointing to created instance', () => {
       expect(res.headers.get('location')).toBe('http://localhost/weapons/instance-uuid-1');
-    });
-
-    it('returns single-item collection', () => {
-      expect(body.collection.items).toHaveLength(1);
-    });
-
-    it('includes weapon domain data', () => {
-      expect(body.collection.items[0].data).toEqual(FAKE_WEAPON_ITEM_DATA);
     });
 
     it('returns 400 for unknown weapon ID', async () => {
@@ -403,12 +353,8 @@ describe('Weapon routes', () => {
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
-    it('returns single-item collection', () => {
-      expect(body.collection.items).toHaveLength(1);
-    });
-
-    it('includes weapon domain data', () => {
-      expect(body.collection.items[0].data).toEqual(FAKE_WEAPON_ITEM_DATA);
+    it('returns the stored weapon as an item document', () => {
+      expect(body).toEqual(weaponItemDocument(FAKE_WEAPON, BASE_URL));
     });
 
     it('returns 404 when weapon instance not found', async () => {
@@ -444,12 +390,8 @@ describe('Weapon routes', () => {
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
-    it('returns single-item collection', () => {
-      expect(body.collection.items).toHaveLength(1);
-    });
-
-    it('includes weapon domain data', () => {
-      expect(body.collection.items[0].data).toEqual(FAKE_WEAPON_ITEM_DATA);
+    it('returns the updated weapon as an item document', () => {
+      expect(body).toEqual(weaponItemDocument(FAKE_WEAPON, BASE_URL));
     });
 
     it('returns 404 when weapon instance not found', async () => {

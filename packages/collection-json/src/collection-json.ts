@@ -93,7 +93,7 @@ export interface CollectionJsonRepresentation<T> {
 }
 
 /**
- * Wrap pre-built Items into a CollectionDocument envelope.
+ * Serialise entities as one collection document.
  *
  * Reads the template from the representation so each resource module
  * only declares data, not envelope-wrapping behaviour.
@@ -101,10 +101,27 @@ export interface CollectionJsonRepresentation<T> {
 export function serialiseCollection<T>(
   repr: CollectionJsonRepresentation<T>,
   href: string,
-  items: Item[],
-  links?: Link[],
+  entities: T[],
+  baseUrl: string,
 ): CollectionDocument {
-  return buildCollection(href, items, { template: repr.template, links });
+  return buildCollection(
+    href,
+    entities.map((entity) => repr.serialise(entity, baseUrl)),
+    { template: repr.template },
+  );
+}
+
+/**
+ * Serialise one entity as a one-item collection document, since
+ * Collection+JSON has no single-item media type.
+ */
+export function serialiseItemDocument<T>(
+  repr: CollectionJsonRepresentation<T>,
+  entity: T,
+  baseUrl: string,
+): CollectionDocument {
+  const item = repr.serialise(entity, baseUrl);
+  return buildCollection(item.href, [item], { template: repr.template });
 }
 
 // --- Assertions ---

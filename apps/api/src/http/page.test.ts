@@ -1,13 +1,14 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { buildCollection } from '@genshin/collection-json';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { describe, expect, it } from 'vitest';
 
 import type { Page, PageRequest } from '@/repositories/firestore/page.js';
 
-import { DEFAULT_PAGE_LIMIT, MAX_PAGE_LIMIT, pageLinks, parsePageRequest } from './page.js';
+import { DEFAULT_PAGE_LIMIT, MAX_PAGE_LIMIT, linkNextPage, parsePageRequest } from './page.js';
 
 const BASE = 'http://localhost/items';
 
@@ -26,7 +27,9 @@ async function parse(query: string): Promise<PageRequest | number> {
 
 async function linksFor(query: string, page: Page<unknown>) {
   const app = new Hono();
-  app.get('/items', (c) => c.json(pageLinks(c, page)));
+  app.get('/items', (c) =>
+    c.json(linkNextPage(c, page, buildCollection(BASE, [])).collection.links ?? []),
+  );
 
   const res = await app.request(`${BASE}${query}`);
 
@@ -73,7 +76,7 @@ describe('parsePageRequest', () => {
   });
 });
 
-describe('pageLinks', () => {
+describe('linkNextPage', () => {
   it('omits next on the last page', async () => {
     expect(await linksFor('?limit=2', { items: [] })).toEqual([]);
   });

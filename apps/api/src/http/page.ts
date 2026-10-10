@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { Link } from '@genshin/collection-json';
+import type { CollectionDocument } from '@genshin/collection-json';
 import type { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
@@ -58,17 +58,22 @@ function encodeCursor(after: string): string {
 }
 
 /**
- * The collection's `next` link, or none on the last page.
+ * The document with a `next` link added, or unchanged on the last page.
  *
  * Built from the request URL, so filters and an explicit `limit` carry over.
  */
-export function pageLinks(c: Context, page: Page<unknown>): Link[] {
+export function linkNextPage(
+  c: Context,
+  page: Page<unknown>,
+  document: CollectionDocument,
+): CollectionDocument {
   if (page.next === undefined) {
-    return [];
+    return document;
   }
 
   const url = new URL(c.req.url);
   url.searchParams.set('cursor', encodeCursor(page.next));
+  const links = [...(document.collection.links ?? []), { rel: 'next', href: url.href }];
 
-  return [{ rel: 'next', href: url.href }];
+  return { collection: { ...document.collection, links } };
 }
