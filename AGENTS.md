@@ -74,7 +74,6 @@ Terraform, or workflow. Read it from an environment variable.
 
 - Use the [REST API conventions reference](docs/reference/rest-api-conventions.md) for route shape, methods, status codes, error format, pagination, and auth handling.
 - All error responses use RFC 9457 Problem Details (`application/problem+json`) via `apps/api/src/http/problem.ts`. Always include a `detail` field, even for generic errors, to keep a stable schema for clients.
-- List endpoints use cursor-based pagination (`limit` and `cursor`).
 - Prefer explicit types over type munging. For example, define `ProfileUpdate` rather than using `Partial<Pick<UserProfile, 'name'>>` inline.
 - Keep route handlers thin, compose middleware, and validate inputs at the boundary.
 

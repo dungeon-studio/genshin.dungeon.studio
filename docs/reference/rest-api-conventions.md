@@ -84,18 +84,9 @@ See [RFC9457]: <https://www.rfc-editor.org/rfc/rfc9457>
 
 ### 6. Consistent list behavior
 
-List endpoints return one page at a time, ordered by document ID, and filter through explicit parameters such as `weaponId`.
+Page a collection that can grow without bound, under the query parameters `limit` and `cursor`, and filter through explicit parameters. A collection with a fixed size, such as the four team slots, returns whole.
 
-| Query parameter | Meaning                                                                             |
-| --------------- | ----------------------------------------------------------------------------------- |
-| `limit`         | Records per page, an integer from 1 to 100. Defaults to 50.                         |
-| `cursor`        | Opaque token from a `next` link. Clients follow the link rather than build a token. |
-
-While records remain, the Collection+JSON document carries a collection-level link with `rel` `next`, keeping the request's other query parameters. The last page carries no `next` link, and no response carries a previous link.
-
-An out-of-range or malformed `limit`, or a `cursor` the server didn't issue, draws `400 Bad Request`.
-
-`GET /teams` is the exception. A user has at most four teams, so it returns every team, ignores `limit` and `cursor`, and never carries a `next` link.
+Cursors are opaque. A page links to the next one with a Collection+JSON `next` link, which clients follow rather than build.
 
 ### 7. Authentication header convention
 
