@@ -40,24 +40,9 @@
       "minimumReleaseAge": null
     },
     {
-      "description": "Move the Terraform CLI in one pull request across all of its pins, so the version workflows install never drifts from the version the configuration requires",
-      "matchDepNames": ["hashicorp/terraform"],
-      "groupName": "terraform cli"
-    },
-    {
-      "description": "Move reuse in one pull request across all of its pins, so the pre-commit hook and the installed CLI run the same version",
-      "matchDepNames": ["fsfe/reuse-tool"],
-      "groupName": "reuse"
-    },
-    {
-      "description": "Move the lychee binary in one pull request across all of its pins, so CI and the devcontainer check links with the same version",
-      "matchDepNames": ["lycheeverse/lychee"],
-      "groupName": "lychee"
-    },
-    {
-      "description": "Move Node in one pull request across all of its pins, so development, CI, and the API runtime image run the same version",
-      "matchDepNames": ["node"],
-      "groupName": "node"
+      "description": "Move each tool in one pull request across all of its pins, so develop never runs two versions of it between merges",
+      "matchDepNames": ["hashicorp/terraform", "fsfe/reuse-tool", "lycheeverse/lychee", "node"],
+      "groupName": "{{depName}}"
     }
   ],
   "customManagers": [
