@@ -5,10 +5,6 @@
 # Shared helpers for DevContainer lifecycle scripts.
 # Source this file; do not execute it directly.
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
 FAILURES=()
 
 step() {
@@ -67,10 +63,6 @@ for_each_tool() {
   "${action}" "playwright" pnpm --filter @genshin/e2e exec playwright --version
 }
 
-# ---------------------------------------------------------------------------
-# Verification
-# ---------------------------------------------------------------------------
-
 check_tools() {
   step "Verifying installed tools"
 
@@ -84,10 +76,6 @@ run_verification() {
   quietly check_tools
 }
 
-# ---------------------------------------------------------------------------
-# Version summary
-# ---------------------------------------------------------------------------
-
 show_versions() {
   step "Environment versions"
 
@@ -97,10 +85,6 @@ show_versions() {
 run_version_summary() {
   quietly show_versions
 }
-
-# ---------------------------------------------------------------------------
-# Final status
-# ---------------------------------------------------------------------------
 
 show_status() {
   echo ""
