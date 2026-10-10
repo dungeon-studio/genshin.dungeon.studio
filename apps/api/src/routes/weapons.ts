@@ -14,6 +14,7 @@ import { HTTPException } from 'hono/http-exception';
 import type { FromSchema } from 'json-schema-to-ts';
 
 import { requireWeaponId } from '@/catalogue.js';
+import { collectionResponse } from '@/http/collection-response.js';
 import { auth } from '@/middleware/auth.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
@@ -60,16 +61,12 @@ weapons.get('/', async (c) => {
 
     const instances = await Weapons.list(userId, requireWeaponId(weaponId));
 
-    return c.body(JSON.stringify(weaponsOfDocument(instances, baseUrl, weaponId)), {
-      headers: { 'Content-Type': c.get('negotiatedMediaType') },
-    });
+    return collectionResponse(c, weaponsOfDocument(instances, baseUrl, weaponId));
   }
 
   const items = await Weapons.list(userId);
 
-  return c.body(JSON.stringify(weaponListDocument(items, baseUrl)), {
-    headers: { 'Content-Type': c.get('negotiatedMediaType') },
-  });
+  return collectionResponse(c, weaponListDocument(items, baseUrl));
 });
 
 // POST /weapons — Create new weapon instance
@@ -84,12 +81,8 @@ weapons.post(
     const weapon = await Weapons.create(userId, requireWeaponId(weaponId), refinementLevel);
     const baseUrl = new URL(c.req.url).origin;
 
-    return c.body(JSON.stringify(weaponListDocument([weapon], baseUrl)), {
-      status: 201,
-      headers: {
-        'Content-Type': c.get('negotiatedMediaType'),
-        Location: weaponItemHref(baseUrl, weapon),
-      },
+    return collectionResponse(c, weaponListDocument([weapon], baseUrl), 201, {
+      Location: weaponItemHref(baseUrl, weapon),
     });
   },
 );
@@ -107,9 +100,7 @@ weapons.get('/:weaponInstanceId', async (c) => {
 
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(JSON.stringify(weaponItemDocument(weapon, baseUrl)), {
-    headers: { 'Content-Type': c.get('negotiatedMediaType') },
-  });
+  return collectionResponse(c, weaponItemDocument(weapon, baseUrl));
 });
 
 // PATCH /weapons/:weaponInstanceId — Update weapon instance
@@ -131,9 +122,7 @@ weapons.patch(
 
     const baseUrl = new URL(c.req.url).origin;
 
-    return c.body(JSON.stringify(weaponItemDocument(weapon, baseUrl)), {
-      headers: { 'Content-Type': c.get('negotiatedMediaType') },
-    });
+    return collectionResponse(c, weaponItemDocument(weapon, baseUrl));
   },
 );
 

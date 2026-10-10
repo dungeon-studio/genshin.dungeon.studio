@@ -14,6 +14,7 @@ import {
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
+import { collectionResponse } from '@/http/collection-response.js';
 import { auth } from '@/middleware/auth.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
@@ -60,9 +61,7 @@ teams.get('/', async (c) => {
   const items = await Teams.list(userId);
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(JSON.stringify(teamListDocument(items, baseUrl)), {
-    headers: { 'Content-Type': c.get('negotiatedMediaType') },
-  });
+  return collectionResponse(c, teamListDocument(items, baseUrl));
 });
 
 // GET /teams/:slot — Get specific team
@@ -78,9 +77,7 @@ teams.get('/:slot', async (c) => {
 
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(JSON.stringify(teamItemDocument(team, baseUrl)), {
-    headers: { 'Content-Type': c.get('negotiatedMediaType') },
-  });
+  return collectionResponse(c, teamItemDocument(team, baseUrl));
 });
 
 // PUT /teams/:slot — Create or update team composition (idempotent upsert)
@@ -102,10 +99,7 @@ teams.put(
 
     const baseUrl = new URL(c.req.url).origin;
 
-    return c.body(JSON.stringify(teamItemDocument(team, baseUrl)), {
-      status: created ? 201 : 200,
-      headers: { 'Content-Type': c.get('negotiatedMediaType') },
-    });
+    return collectionResponse(c, teamItemDocument(team, baseUrl), created ? 201 : 200);
   },
 );
 

@@ -9,6 +9,7 @@ import { HTTPException } from 'hono/http-exception';
 import type { FromSchema } from 'json-schema-to-ts';
 
 import { requireCharacterId } from '@/catalogue.js';
+import { collectionResponse } from '@/http/collection-response.js';
 import { auth } from '@/middleware/auth.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
@@ -44,9 +45,7 @@ characters.get('/', async (c) => {
   const items = await Characters.list(userId);
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(JSON.stringify(characterListDocument(items, baseUrl)), {
-    headers: { 'Content-Type': c.get('negotiatedMediaType') },
-  });
+  return collectionResponse(c, characterListDocument(items, baseUrl));
 });
 
 // GET /characters/:characterId — Get specific character record
@@ -62,9 +61,7 @@ characters.get('/:characterId', async (c) => {
 
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(JSON.stringify(characterItemDocument(character, baseUrl)), {
-    headers: { 'Content-Type': c.get('negotiatedMediaType') },
-  });
+  return collectionResponse(c, characterItemDocument(character, baseUrl));
 });
 
 // PUT /characters/:characterId — Save/update character (idempotent upsert)
@@ -81,10 +78,7 @@ characters.put(
     const { character, created } = await Characters.save(userId, knownId, constellationLevel);
     const baseUrl = new URL(c.req.url).origin;
 
-    return c.body(JSON.stringify(characterItemDocument(character, baseUrl)), {
-      status: created ? 201 : 200,
-      headers: { 'Content-Type': c.get('negotiatedMediaType') },
-    });
+    return collectionResponse(c, characterItemDocument(character, baseUrl), created ? 201 : 200);
   },
 );
 
