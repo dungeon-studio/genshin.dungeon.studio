@@ -47,7 +47,7 @@ Follow [Code conventions](docs/reference/code-conventions.md) for what no linter
 
 To reproduce CI locally:
 
-- Run `pre-commit install` once so each commit runs the hooks CI runs over the whole tree. The first commit afterward builds each hook's environment and can take several minutes. `pre-commit run --all-files` matches the CI run.
+- Run `pre-commit install` once so each commit runs the hooks CI runs over the whole tree. The first commit afterward builds each hook's environment and can take several minutes. `pre-commit run --all-files` reproduces the static checks CI runs, and expects Terraform, Trivy, and lychee on your `PATH`. The DevContainer provides all three.
 - `pnpm turbo run typecheck test build verify` runs the workspace suite.
 - `pnpm turbo run test:integration` and `pnpm turbo run test:e2e` each start the Firebase emulators themselves. Stop any `pnpm dev` first, in this checkout or any other worktree, or the emulators fail to bind.
 

@@ -66,6 +66,7 @@ Verzod
 Vite
 Vitest
 yamllint
+zizmor
 Zod
 zustand
 

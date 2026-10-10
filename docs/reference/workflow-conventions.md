@@ -23,6 +23,20 @@ A new check lands as a job in the file matching its when. A new file needs a dif
 
 The rule and its rationale come from [architecture decision record 0004 in alunduil-chezmoi](https://github.com/alunduil/alunduil-chezmoi/blob/main/docs/adr/0004-consolidate-ci-workflow.md).
 
+## Where a check runs
+
+A check whose result depends only on the working tree is a pre-commit hook: linters, formatters, type checks, and static scans. A commit and a CI run over the same tree then give the same answer. The `pre-commit` job in `ci.yml` runs every hook over the whole tree, so adding a hook needs no workflow change.
+
+A check that needs more than the working tree is a workflow job:
+
+- Execution: tests, end-to-end runs, and container builds.
+- Another revision: coverage and schema compatibility, which compare with the base branch.
+- The network or a credential: online workflow audits, verified secret scanning, and external links.
+
+A tool whose checks fall on both sides runs in both places. zizmor audits offline in a hook and online in `ci.yml`. lychee checks internal links in a hook and external links in `weekly.yml`.
+
+A hook prefers a tool that pre-commit installs into the hook's own environment. A hook calling a tool from `PATH` makes every contributor install that tool, and the `pre-commit` job install it too. A hook running in Docker aborts the whole pre-commit run when the daemon is down, so use a variant that doesn't need Docker.
+
 ## Push triggers
 
 A push run attests a branch after a merge lands, because the merge result itself was never tested. The set follows the [git-flow](https://nvie.com/posts/a-successful-git-branching-model/) branches whose merge result ships or gets inherited: `develop`, `main`, `release/*`, and `hotfix/*`. Feature branches are absent deliberately; the unfiltered `pull_request` trigger already gates them.
