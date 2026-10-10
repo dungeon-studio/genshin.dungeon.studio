@@ -89,7 +89,7 @@ export function weaponListDocument(
   );
 }
 
-/** The user's copies of one weapon, as the filtered view `weaponsOfHref` addresses. */
+/** The user's copies of one weapon. */
 export function weaponsOfDocument(
   weaponId: string,
   weapons: CollectionWeapon[],
@@ -102,12 +102,7 @@ export function weaponsOfDocument(
   );
 }
 
-/**
- * One owned weapon as a whole document, for a response addressing it.
- *
- * Collection+JSON has no single-item media type, so the document is a
- * collection holding one item, with the item's own URL as the collection href.
- */
+/** One owned weapon as a one-item collection: Collection+JSON has no single-item media type. */
 export function weaponItemDocument(weapon: CollectionWeapon, baseUrl: string): CollectionDocument {
   return buildCollection(weaponItemHref(baseUrl, weapon), [serialiseWeapon(weapon, baseUrl)], {
     template: WEAPON_TEMPLATE,

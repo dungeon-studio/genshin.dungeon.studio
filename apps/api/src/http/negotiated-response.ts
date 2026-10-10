@@ -9,8 +9,8 @@ import type { NegotiatedResponseContentVariables } from '@/middleware/negotiate-
 /**
  * A JSON response served as the media type `negotiateContent` picked.
  *
- * The negotiated type overrides any `Content-Type` in `headers`, so a route
- * cannot serve a representation other than the one it negotiated.
+ * A `Content-Type` in `headers` is ignored, so a route serves only the
+ * representation it negotiated.
  */
 export function negotiatedJson<E extends { Variables: NegotiatedResponseContentVariables }>(
   c: Context<E>,

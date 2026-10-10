@@ -69,12 +69,7 @@ export function characterListDocument(
   );
 }
 
-/**
- * One owned character as a whole document, for a response addressing it.
- *
- * Collection+JSON has no single-item media type, so the document is a
- * collection holding one item, with the item's own URL as the collection href.
- */
+/** One owned character as a one-item collection: Collection+JSON has no single-item media type. */
 export function characterItemDocument(
   character: CollectionCharacter,
   baseUrl: string,
