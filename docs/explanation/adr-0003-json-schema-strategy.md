@@ -1,21 +1,19 @@
-<!-- SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> -->
-<!-- SPDX-License-Identifier: MIT -->
+---
+status: accepted
+date: 2026-03-01
+decision-makers: Alex Brandt
+amended-by: ADR-0005
+---
 
 <!-- vale Microsoft.HeadingAcronyms = NO -->
 
-# DSGEP-003: JSON Schema presentation and discovery strategy
+# JSON Schema presentation and discovery strategy
 
 <!-- vale Microsoft.HeadingAcronyms = YES -->
 
-- **Status**: Accepted
-- **Created**: 2026-03-01
-- **Authors**: Alex Brandt
+[ADR-0005](adr-0005-schema-direction-segment.md) replaces this record's schema path convention and source file layout.
 
-## Abstract
-
-This Dungeon Studio Genshin Enhancement Proposal (DSGEP) defines how the API publishes, exposes, and versions JSON Schemas. It establishes schema hosting at dedicated API endpoints, a canonical URI pattern, a discovery mechanism using the `profile` media type parameter, and a stability contract distinguishing breaking from non-breaking changes.
-
-## Problem statement
+## Context and problem statement
 
 The REST API conventions in `rest-api-conventions.md`, specifically [Principle 4](../reference/rest-api-conventions.md), require a published JSON Schema for every request and response shape. Several planned features depend on schema discovery and URI decisions, but no architectural decision exists for:
 
@@ -25,24 +23,35 @@ The REST API conventions in `rest-api-conventions.md`, specifically [Principle 4
 - What stability guarantees published schemas carry
 - What constitutes a breaking versus non-breaking schema change
 
-Without these decisions, each feature would make ad-hoc choices, creating inconsistency in the API contract.
+The `apps/api` application is early stage, built on Hono with a small number of routes defined in `apps/api/src/main.ts`. The codebase has begun organizing domain modules: `profile` exists with a `json/` subdirectory, but modules such as `team` and `teams` aren't yet present. This record uses the target module structure in examples and implementation notes. The REST conventions reference JSON Schema 2020-12 and content negotiation via `Accept` and `Content-Type` headers.
 
-## Context
+Relevant standards:
 
-### Current state
+- [JSON Schema 2020-12](https://json-schema.org/draft/2020-12), the schema vocabulary
+- [RFC 8288](https://www.rfc-editor.org/rfc/rfc8288), Web Linking, which defines `Link` header syntax and relation types
+- [RFC 6906](https://www.rfc-editor.org/rfc/rfc6906), the `profile` link relation type
+- [RFC 6838](https://www.rfc-editor.org/rfc/rfc6838), media type registration, referenced by Principle 4
 
-The `apps/api` application is early stage, built on Hono with a small number of routes defined in `apps/api/src/main.ts`. The codebase has begun organizing domain modules: `profile` exists with a `json/` subdirectory, but modules such as `team` and `teams` aren't yet present. This DSGEP uses the target module structure in examples and implementation notes. The REST conventions reference JSON Schema 2020-12 and content negotiation via `Accept` and `Content-Type` headers.
+## Decision drivers
 
-### Relevant standards
+- Each feature making its own choices would leave the API contract inconsistent.
+- Clients should find schemas through standard HTTP mechanisms, without out-of-band documentation.
+- Schemas should stay in sync with the routes they describe.
+- Clients should be able to tell an additive change from a breaking one.
 
-- [JSON Schema 2020-12](https://json-schema.org/draft/2020-12): The schema vocabulary
-- [RFC 8288](https://www.rfc-editor.org/rfc/rfc8288): Web Linking, which defines `Link` header syntax and relation types
-- [RFC 6906](https://www.rfc-editor.org/rfc/rfc6906): The `profile` link relation type
-- [RFC 6838](https://www.rfc-editor.org/rfc/rfc6838): Media type registration, referenced by Principle 4
+## Considered options
 
-## Decision
+- Dedicated API endpoints, discovered via the `profile` media type parameter, with semantic versions
+- Documentation-only schemas
+- OpenAPI specification as the schema source
+- `Link` header with `rel="describedby"` for discovery
+- Unversioned schema naming
 
-### 1. Schema hosting: Dedicated API endpoints
+## Decision outcome
+
+Chosen option: dedicated API endpoints, discovered via the `profile` media type parameter, with semantic versions.
+
+### Schema hosting at dedicated API endpoints
 
 Serve schemas from the API itself at dedicated endpoints under the `/schemas` path. Schema source files live alongside their domain module in `apps/api/src/{module}/json/schemas/{name}/` as versioned `.json` files. Each module owns the schemas for its resource representations. Every schema carries a [Semantic Versioning 2.0.0](https://semver.org/) version from initial publication.
 
@@ -71,7 +80,7 @@ The API serves schemas with `Content-Type: application/schema+json` as defined b
 
 <!-- vale Microsoft.HeadingAcronyms = NO -->
 
-### 2. Schema URI structure
+### Schema URI structure
 
 <!-- vale Microsoft.HeadingAcronyms = YES -->
 
@@ -89,7 +98,7 @@ Each schema declares a canonical `$id` using the API's production base address:
 
 The `$id` includes the version, making each version a distinct, immutable schema. The API endpoint path mirrors the `$id` path segment so that resolving the `$id` retrieves the schema directly.
 
-### 3. Discovery mechanism: `profile` media type parameter
+### Discovery via the `profile` media type parameter
 
 API responses include a `profile` parameter on the `Content-Type` header referencing the schema that describes the response body:
 
@@ -110,11 +119,11 @@ This approach:
 
 Examples in this document use relative URI references for readability. Implementations use absolute URIs matching the `$id` of the schema.
 
-### 4. Stability contract
+### Stability contract
 
 Every published schema carries a [Semantic Versioning 2.0.0](https://semver.org/) version. The version communicates the nature of changes:
 
-#### Major version: Breaking changes
+#### Major version for breaking changes
 
 Increment the major version for changes that can break existing consumers:
 
@@ -126,7 +135,7 @@ Increment the major version for changes that can break existing consumers:
 - Removing a value from an `enum`
 - Changing the structure of a nested object
 
-#### Minor version: Non-breaking additions
+#### Minor version for non-breaking additions
 
 Increment the minor version for backward-compatible additions:
 
@@ -134,7 +143,7 @@ Increment the minor version for backward-compatible additions:
 - Adding a new value to an `enum` that clients treat as extensible
 - Relaxing a constraint, such as increasing `maxLength` or removing a `pattern`
 
-#### Patch version: Documentation-only changes
+#### Patch version for documentation-only changes
 
 Increment the patch version for changes that don't affect validation:
 
@@ -172,86 +181,58 @@ The API uses the `profile` value to determine which response shape to serve:
 
 This creates symmetric content negotiation: clients declare the schema they expect via `Accept`, and the server confirms the schema it used via `Content-Type`.
 
-## Rationale
+### Consequences
 
-### Why dedicated endpoints over inline schemas
+- Good, because clients find schemas through standard HTTP mechanisms without out-of-band documentation.
+- Good, because versioned schema URIs are immutable while available, allowing aggressive caching. The latest alias uses short-lived caching to reflect updates. Negotiated API responses require `Vary: Accept` so shared caches distinguish between schema versions.
+- Good, because standard JSON Schema 2020-12 with a resolvable `$id` works with validators, code generators, and documentation tools.
+- Good, because schemas deploy with the API, so they're always in sync with the routes they describe.
+- Bad, because every response needs a `profile` parameter on `Content-Type`, requiring middleware that maps routes to schema versions.
+- Bad, because each request and response shape needs a hand-authored schema file kept in sync with the implementation.
+- Bad, because major version bumps require publishing a new version file and managing a transition period for the previous version.
+- Neutral, because this record covers schema publication and discovery only. Whether the API validates incoming requests against schemas at runtime is a separate decision.
 
-Inline schemas that embed `$schema` references in every response bloat payloads and mix data with metadata. Dedicated endpoints keep schemas independently cacheable, addressable, and reusable across documentation and tooling.
+## Pros and cons of the options
 
-### Why `profile` parameter over `Link` headers
+### Dedicated endpoints with `profile` discovery and semantic versions
 
-RFC 8288 `Link` headers with `rel="describedby"` are a common discovery mechanism, but they exist outside the content negotiation model. Since clients already use `profile` on `Accept` to request a specific schema version, using `profile` on `Content-Type` in the response creates symmetric negotiation. Both directions use the same parameter on the standard content negotiation headers, making the protocol easier to understand and implement.
+- Good, because dedicated endpoints keep schemas independently cacheable, addressable, and reusable across documentation and tooling. Inline `$schema` references in every response would bloat payloads and mix data with metadata.
+- Good, because `profile` on `Content-Type` mirrors `profile` on `Accept`, so both directions of content negotiation use the same parameter.
+- Good, because co-hosting with the API keeps the `$id` and the retrieval address identical, avoids cross-origin complexity, and deploys schemas atomically with the code they describe. Schema files live alongside the route handlers, so updating both together is natural.
+- Good, because versioning every schema from first publication means clients always compare version numbers the same way, and the major, minor, or patch bump says what kind of change happened.
 
-### Why serve from the API rather than a separate host
+### Documentation-only schemas
 
-Co-hosting schemas with the API keeps the `$id` and the retrieval address identical, avoids cross-origin complexity, and ensures schemas deploy atomically with the API code they describe. The schema files live alongside the route handlers, making it natural to update both together.
+Publish schemas only in documentation, such as an OpenAPI spec, not as live API endpoints.
 
-### Why semver for all schemas from the start
+- Bad, because schemas drift from actual API behavior without automated serving.
+- Bad, because clients can't programmatically discover schemas at runtime.
+- Bad, because it violates Principle 4's intent that schemas are discoverable alongside representations.
 
-Versioning every schema from initial publication ensures consistency: clients always know how to interpret changes by comparing version numbers. Without upfront versioning, schemas remain unversioned until a breaking change forces a name-based distinction like `get-v2.json`, creating inconsistency between first-version schemas and later schemas. The semver model communicates the nature of a change (major, minor, patch) directly, which ad-hoc naming can't express.
+### OpenAPI specification as the schema source
 
-## Consequences
+Define schemas exclusively in an OpenAPI document and derive everything from it.
 
-### Positive
+- Bad, because OpenAPI schemas use a subset of JSON Schema, and some JSON Schema 2020-12 features don't map cleanly.
+- Bad, because it couples schema publication to a specific documentation format.
+- Neutral, because the project can adopt OpenAPI later and reference the published schemas, keeping concerns separate.
 
-- **Discoverable**: Clients find schemas through standard HTTP mechanisms without out-of-band documentation
-- **cacheable**: Versioned schema URIs are immutable while available, allowing aggressive caching. The latest alias uses short-lived caching to reflect updates. Negotiated API responses require `Vary: Accept` so shared caches distinguish between schema versions
-- **Tooling-friendly**: Standard JSON Schema 2020-12 with a resolvable `$id` works with validators, code generators, and documentation tools
-- **Atomic deployment**: Schemas deploy with the API, so they're always in sync with the routes they describe
+### `Link` header with `rel="describedby"`
 
-### Negative
+Use `Link: </schemas/team/get/1.0.0.json>; rel="describedby"` headers on responses instead of the `profile` parameter on `Content-Type`.
 
-- **Per-response overhead**: Every response needs a `profile` parameter on `Content-Type`, requiring middleware that maps routes to schema versions
-- **Schema file maintenance**: Each request and response shape needs a hand-authored schema file kept in sync with the implementation
-- **Version file management**: Major version bumps require publishing a new version file and managing a transition period for the previous version
+- Bad, because it's asymmetric: clients would use `profile` on `Accept` but the server would answer through a `Link` header.
+- Bad, because `Link` headers exist outside the content negotiation model, adding a separate discovery channel.
 
-### Neutral
+### Unversioned schema naming
 
-- **No runtime validation requirement**: This DSGEP defines schema publication and discovery. Whether the API validates incoming requests against schemas at runtime is a separate decision.
+Keep schemas unversioned by default and use distinct filenames such as `get-v2.json` only when breaking changes occur.
 
-## Alternatives considered
+- Bad, because first-version schemas would be unversioned while later ones carry versions in their names.
+- Bad, because a name doesn't communicate whether a change is additive or breaking.
+- Bad, because clients can't compare version numbers to determine compatibility.
 
-### Alternative 1: Documentation-only schemas
-
-**Approach**: publish schemas only in documentation, such as an OpenAPI spec, not as live API endpoints.
-
-**Rejected because**:
-
-- Schemas drift from actual API behavior without automated serving
-- Clients can't programmatically discover schemas at runtime
-- Violates Principle 4's intent that schemas are discoverable alongside representations
-
-### Alternative 2: OpenAPI specification as the schema source
-
-**Approach**: define schemas exclusively in an OpenAPI document and derive everything from it.
-
-**Rejected because**:
-
-- OpenAPI schemas use a subset of JSON Schema; some JSON Schema 2020-12 features don't map cleanly
-- Couples schema publication to a specific documentation format
-- The project can adopt OpenAPI later and reference the published schemas, keeping concerns separate
-
-### Alternative 3: `Link` header with `rel="describedby"` for discovery
-
-**Approach**: use `Link: </schemas/team/get/1.0.0.json>; rel="describedby"` headers on responses instead of the `profile` parameter on `Content-Type`.
-
-**Rejected because**:
-
-- Asymmetric: clients would use `profile` on `Accept` but the server would use a different mechanism, the `Link` header, in the response
-- `Link` headers exist outside the content negotiation model, adding a separate discovery channel
-- The `profile` parameter on `Content-Type` directly mirrors the `profile` parameter on `Accept`, creating a simpler and more consistent protocol
-
-### Alternative 4: Ad-hoc schema naming without versions
-
-**Approach**: keep schemas unversioned by default and use distinct file names such as `get-v2.json` only when breaking changes occur.
-
-**Rejected because**:
-
-- Creates inconsistency between first-version schemas (unversioned) and later schemas (ad-hoc versioned)
-- Doesn't communicate whether a change is additive or breaking
-- Clients can't compare version numbers to determine compatibility
-
-## Implementation notes
+## More information
 
 ### Schema file location
 
@@ -308,26 +289,22 @@ app.get('/schemas/:module/:name.json', async (c) => {
 });
 ```
 
-## References
+### References
 
-- [`rest-api-conventions.md`](../reference/rest-api-conventions.md): Principle 4, predictable representation shapes
-- [`schema-versioning.md`](../reference/schema-versioning.md): Where each boundary carries its version, including this one
-- [Understanding schema versioning](understanding-schema-versioning.md): The two-role model behind them
-- [JSON Schema 2020-12](https://json-schema.org/draft/2020-12): Schema vocabulary
+- [`rest-api-conventions.md`](../reference/rest-api-conventions.md), whose Principle 4 asks for predictable representation shapes
+- [`schema-versioning.md`](../reference/schema-versioning.md), where each boundary carries its version, including this one
+- [Understanding schema versioning](understanding-schema-versioning.md), the two-role model behind them
+- [JSON Schema 2020-12](https://json-schema.org/draft/2020-12), the schema vocabulary
 
 <!-- vale alex.Condescending = NO -->
 
-- [RFC 5829: Link Relation Types for Simple Version Navigation](https://www.rfc-editor.org/rfc/rfc5829): `successor-version` relation type for major version transitions
+- [RFC 5829, Link Relation Types for Simple Version Navigation](https://www.rfc-editor.org/rfc/rfc5829), the `successor-version` relation type for major version transitions
 
 <!-- vale alex.Condescending = YES -->
 
-- [RFC 8288: Web Linking](https://www.rfc-editor.org/rfc/rfc8288): `Link` header syntax
-- [RFC 8594: The Sunset HTTP Header Field](https://www.rfc-editor.org/rfc/rfc8594): `Sunset` header for communicating deprecation timelines
-- [RFC 6906: The `profile` Link Relation Type](https://www.rfc-editor.org/rfc/rfc6906): `profile` parameter semantics for schema discovery
-- [RFC 6838: Media Type Registration](https://www.rfc-editor.org/rfc/rfc6838): Media type conventions
-- [Semantic Versioning 2.0.0](https://semver.org/): Schema version numbering convention
-- [dsgep-001-wif-architecture.md](dsgep-001-wif-architecture.md): Related DSGEP
-
-## Revision history
-
-- 2026-03-01: Initial draft (DSGEP-003)
+- [RFC 8288, Web Linking](https://www.rfc-editor.org/rfc/rfc8288), for `Link` header syntax
+- [RFC 8594, The Sunset HTTP Header Field](https://www.rfc-editor.org/rfc/rfc8594), the `Sunset` header for communicating deprecation timelines
+- [RFC 6906, The `profile` Link Relation Type](https://www.rfc-editor.org/rfc/rfc6906), for `profile` parameter semantics for schema discovery
+- [RFC 6838, Media Type Registration](https://www.rfc-editor.org/rfc/rfc6838), for media type conventions
+- [Semantic Versioning 2.0.0](https://semver.org/), the schema version numbering convention
+- [ADR-0005](adr-0005-schema-direction-segment.md), which amends this record's path convention
