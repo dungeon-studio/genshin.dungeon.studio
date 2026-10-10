@@ -138,6 +138,11 @@ jobs:
           tags: |
             type=ref,event=branch
             type=sha,prefix={{branch}}-,format=short
+          # Title and description default to the repository, which names the
+          # whole product; this image is one service within it.
+          labels: |
+            org.opencontainers.image.title=genshin-api
+            org.opencontainers.image.description=HTTP API for genshin.dungeon.studio
 
       - name: Build & Push Image
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
@@ -165,6 +170,12 @@ jobs:
           echo "Published image tags:"
           printf '%s\n' "$IMAGE_TAGS"
           echo "Deploy image URI: $IMAGE_URI"
+
+      - name: Verify Image Labels
+        env:
+          IMAGE_URI: ${{ steps.image.outputs.image_uri }}
+          EXPECTED_REVISION: ${{ github.sha }}
+        run: bash apps/api/scripts/verify-image-labels.sh
 
       # Service lifecycle is intentionally CI-managed for fast app rollouts.
       # Terraform in dev manages supporting infra (APIs, Artifact Registry,
