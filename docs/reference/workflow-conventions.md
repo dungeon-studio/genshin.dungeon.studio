@@ -11,7 +11,7 @@ Conventions for GitHub Actions workflows in `.github/workflows/` and the pre-com
 
 ## Where a check runs
 
-A check whose result depends only on the working tree is a pre-commit hook: linters, formatters, type checks, and static scans. A commit and a CI run over the same tree then give the same answer. The `pre-commit` job in `ci.yml` runs every hook over the whole tree, so adding a hook needs no workflow change.
+A check whose result depends only on the working tree is a pre-commit hook: linters, formatters, type checks, and static scans. A commit and a CI run over the same tree then give the same answer. Adding a hook needs no workflow change.
 
 A check that needs more than the working tree is a workflow job:
 
@@ -21,7 +21,7 @@ A check that needs more than the working tree is a workflow job:
 
 A tool whose checks fall on both sides runs in both places. zizmor audits offline in a hook and online in `ci.yml`. lychee checks internal links in a hook and external links in `weekly.yml`.
 
-A hook prefers a tool that pre-commit installs into the hook's own environment. A hook calling a tool from `PATH` makes every contributor install that tool, and the `pre-commit` job install it too. A hook running in Docker aborts the whole pre-commit run when the daemon is down, so use a variant that doesn't need Docker.
+Prefer a hook whose tool pre-commit installs. A hook calling a tool from `PATH` makes every contributor and the `pre-commit` job install it. Avoid Docker hooks: when the daemon is down, they abort the whole pre-commit run.
 
 ## Naming
 
