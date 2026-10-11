@@ -123,22 +123,35 @@ describe('ArtifactPlanner', () => {
     expect(substatNames('Secondary substats')).toEqual(['Energy Recharge']);
   });
 
-  it('selects, replaces, and clears artifact sets', async () => {
+  // Opening the set popover mounts the whole roster, so each test opens it at
+  // most once and starts from the plan it needs.
+  it('selects a first artifact set', async () => {
     const user = userEvent.setup({ pointerEventsCheck: 0 });
     render(<Harness />);
 
-    // Choose a first set; a second search only appears once a first is set.
     await user.click(screen.getByRole('combobox', { name: 'Search artifact set...' }));
     await user.click(await screen.findByRole('option', { name: 'Obsidian Codex' }));
-    expect(screen.getByText('Obsidian Codex')).toBeInTheDocument();
 
-    // Choose a second set from the now-visible second search.
+    expect(screen.getByText('Obsidian Codex')).toBeInTheDocument();
+  });
+
+  it('selects a second artifact set once a first is chosen', async () => {
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
+    render(<Harness initial={{ sets: ['obsidian-codex'] }} />);
+
     await user.click(screen.getByRole('combobox', { name: 'Optional second 2-piece set...' }));
     await user.click(await screen.findByRole('option', { name: 'Unfinished Reverie' }));
-    expect(screen.getByText('Unfinished Reverie')).toBeInTheDocument();
 
-    // Clearing the first set drops both selections.
+    expect(screen.getByText('Obsidian Codex')).toBeInTheDocument();
+    expect(screen.getByText('Unfinished Reverie')).toBeInTheDocument();
+  });
+
+  it('clears both artifact sets when the first is cleared', async () => {
+    const user = userEvent.setup();
+    render(<Harness initial={{ sets: ['obsidian-codex', 'unfinished-reverie'] }} />);
+
     await user.click(screen.getAllByRole('button', { name: 'Clear selection' })[0]);
+
     expect(screen.queryByText('Obsidian Codex')).not.toBeInTheDocument();
     expect(screen.queryByText('Unfinished Reverie')).not.toBeInTheDocument();
   });
