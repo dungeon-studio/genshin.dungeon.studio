@@ -14,10 +14,8 @@ import { documentVersion } from '../src/repositories/schema-version.js';
 import * as teams from '../src/repositories/teams/document.js';
 import * as weapons from '../src/repositories/weapons/document.js';
 
-type RepositoryName = 'characters' | 'teams' | 'weapons';
-
 interface SweptRepository {
-  readonly name: RepositoryName;
+  readonly name: string;
   readonly currentVersion: number;
   /** Goes through the repository so the sweep counts and migrates as production does. */
   readonly migrate: (documentId: string, raw: Record<string, unknown>) => DocumentData;
@@ -42,19 +40,19 @@ const REPOSITORIES: readonly SweptRepository[] = [
 ];
 
 /**
- * Documents counted per repository, keyed by stored version. `invalid` counts the
- * documents the repository can't read.
+ * Documents counted per repository name, keyed by stored version. `invalid`
+ * counts the documents the repository can't read.
  */
-type Census = Record<RepositoryName, Map<number | 'invalid', number>>;
+type Census = Map<string, Map<number | 'invalid', number>>;
 
 export interface SweepResult {
   census: Census;
   rewritten: number;
 }
 
-function tally(census: Census, repository: RepositoryName, key: number | 'invalid'): void {
-  const counts = census[repository];
-  counts.set(key, (counts.get(key) ?? 0) + 1);
+function tally(census: Census, repository: string, key: number | 'invalid'): void {
+  const counts = census.get(repository) ?? new Map<number | 'invalid', number>();
+  census.set(repository, counts.set(key, (counts.get(key) ?? 0) + 1));
 }
 
 /**
@@ -71,13 +69,13 @@ async function rewrite(snapshot: QueryDocumentSnapshot, migrated: DocumentData):
   });
 }
 
-type ReadResult = { version: number; migrated: DocumentData } | 'invalid';
+type ParseResult = { version: number; migrated: DocumentData } | 'invalid';
 
 /**
  * Reports an unreadable document as invalid instead of throwing, so one bad
  * document can't hide the rest of the census.
  */
-function read(repository: SweptRepository, document: QueryDocumentSnapshot): ReadResult {
+function parse(repository: SweptRepository, document: QueryDocumentSnapshot): ParseResult {
   const raw = document.data();
   const version = documentVersion(raw);
   if (version === null) return 'invalid';
@@ -105,13 +103,10 @@ export async function sweep(
   users: Iterable<DocumentReference>,
   { write }: { write: boolean },
 ): Promise<SweepResult> {
-  const result: SweepResult = {
-    census: { characters: new Map(), teams: new Map(), weapons: new Map() },
-    rewritten: 0,
-  };
+  const result: SweepResult = { census: new Map(), rewritten: 0 };
 
   for await (const { repository, document } of storedDocuments(users)) {
-    const outcome = read(repository, document);
+    const outcome = parse(repository, document);
     if (outcome === 'invalid') {
       tally(result.census, repository.name, 'invalid');
       continue;

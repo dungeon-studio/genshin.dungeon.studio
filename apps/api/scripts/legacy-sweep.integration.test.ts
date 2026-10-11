@@ -44,9 +44,9 @@ describe('a read-only sweep', () => {
 
     const { census } = await run(userId, false);
 
-    expect(census.characters).toEqual(new Map([[0, 1]]));
-    expect(census.teams).toEqual(new Map([[0, 1]]));
-    expect(census.weapons).toEqual(new Map([[1, 1]]));
+    expect(census.get('characters')).toEqual(new Map([[0, 1]]));
+    expect(census.get('teams')).toEqual(new Map([[0, 1]]));
+    expect(census.get('weapons')).toEqual(new Map([[1, 1]]));
   });
 
   it('writes nothing', async () => {
@@ -79,8 +79,8 @@ describe('a writing sweep', () => {
 
     const { census } = await run(userId, false);
 
-    expect(census.characters).toEqual(new Map([[1, 1]]));
-    expect(census.teams).toEqual(new Map([[1, 1]]));
+    expect(census.get('characters')).toEqual(new Map([[1, 1]]));
+    expect(census.get('teams')).toEqual(new Map([[1, 1]]));
   });
 });
 
@@ -91,7 +91,7 @@ it('counts a document no version accepts and sweeps on past it', async () => {
 
   const { census, rewritten } = await run(userId, true);
 
-  expect(census.characters).toEqual(
+  expect(census.get('characters')).toEqual(
     new Map<number | 'invalid', number>([
       ['invalid', 1],
       [0, 1],
