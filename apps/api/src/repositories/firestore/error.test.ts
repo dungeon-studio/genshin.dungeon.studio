@@ -2,28 +2,15 @@
 // SPDX-License-Identifier: MIT
 
 import { GrpcStatus } from 'firebase-admin/firestore';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type * as LoggerModule from '@/logger.js';
+import { logger } from '@/logger.js';
 import { firestoreError } from '@/test/firestore-error.js';
 
-const lines: string[] = [];
+import { isFirestoreError, toHttpException } from './error.js';
 
-vi.mock('@/logger.js', async (importOriginal) => {
-  const actual = await importOriginal<typeof LoggerModule>();
-  return {
-    ...actual,
-    logger: actual.createLogger({
-      level: 'error',
-      destination: { write: (line: string) => lines.push(line) },
-    }),
-  };
-});
-
-const { isFirestoreError, toHttpException } = await import('./error.js');
-
-beforeEach(() => {
-  lines.length = 0;
+afterEach(() => {
+  vi.restoreAllMocks();
 });
 
 describe('isFirestoreError', () => {
@@ -58,9 +45,11 @@ describe('toHttpException', () => {
     ['by name when gRPC defines it', GrpcStatus.UNAVAILABLE, 'UNAVAILABLE'],
     ['by number when gRPC does not', 99 as GrpcStatus, '99'],
   ])('logs the code %s', (_label, code, logged) => {
+    const error = vi.spyOn(logger, 'error');
     toHttpException(firestoreError(code));
-    expect(lines.map((line) => JSON.parse(line) as unknown)).toEqual([
+    expect(error).toHaveBeenCalledWith(
       expect.objectContaining({ grpcCode: logged }),
-    ]);
+      expect.anything(),
+    );
   });
 });
