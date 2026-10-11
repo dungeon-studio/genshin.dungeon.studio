@@ -194,9 +194,13 @@ jobs:
             --cpu=1
             --memory=512Mi
             --concurrency=80
+          # LOG_LEVEL is declared rather than left to the logger's default:
+          # the absence of info-level schema-migration lines is the signal
+          # that a legacy version has drained, so a raised level would fake it.
           env_vars: |
             FRONTEND_ORIGIN=${{ env.FRONTEND_ORIGIN }}
             APP_GIT_SHA=${{ github.sha }}
+            LOG_LEVEL=info
 
       - name: Verify Public Health
         continue-on-error: true
