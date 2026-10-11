@@ -12,31 +12,23 @@ import { rootGetResponseV1 } from '@/profiles/json-schema/root/get-response-v1.j
 
 /**
  * Discover top-level resource paths from the app's registered routes.
- * Returns GET-accessible paths that have a discrete handler (e.g.
- * `/characters`, `/health`).
+ * Returns single-segment, GET-accessible paths that have a discrete handler
+ * (e.g. `/characters`, `/health`), keyed by that segment.
  *
- * Excludes the root path itself, wildcard catch-all routes (like
- * `/profiles/json-schema/*` and `/profiles/alps/*`), and sub-resource
- * paths that contain route parameters.
+ * Deeper paths are sub-resources or descriptor documents such as
+ * `/profiles/json-schema/teams/put-request-v1.json`, which clients reach
+ * through the `profile` parameter on `Content-Type` instead.
  */
 function discoverLinks<E extends Env>(app: HonoApp<E>): Record<string, { href: string }> {
-  const seen = new Set<string>();
   const links: Record<string, { href: string }> = {};
 
   for (const route of app.routes) {
     if (route.method !== 'GET') continue;
     if (!isRouteHandler(route.handler)) continue;
 
-    const path = route.path;
-
-    // Skip root, wildcards, and parameterized sub-resources
-    if (path === '/' || path.includes('*') || path.includes(':')) continue;
-    if (seen.has(path)) continue;
-    seen.add(path);
-
-    const name = path.split('/').filter(Boolean).at(-1);
-    if (name === undefined) continue;
-    links[name] = { href: path };
+    const match = /^\/([^/:*]+)$/.exec(route.path);
+    if (match?.[1] === undefined) continue;
+    links[match[1]] = { href: route.path };
   }
 
   return links;
