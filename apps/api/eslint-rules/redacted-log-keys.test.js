@@ -17,6 +17,9 @@ const invalid = (code, ...errors) => ({ code, options, errors });
 /** @param {string} name */
 const unredacted = (name) => ({ messageId: 'unredactedValue', data: { name } });
 
+/** @param {string} name */
+const tooDeep = (name) => ({ messageId: 'tooDeep', data: { name } });
+
 new RuleTester().run('redacted-log-keys', redactedLogKeys, {
   valid: [
     'logger.info({ uid }, "signed in")',
@@ -38,9 +41,6 @@ new RuleTester().run('redacted-log-keys', redactedLogKeys, {
     invalid('logger.info(`signed in as ${email}`)', unredacted('email')),
     invalid('c.get("logger").warn({ who: c.get("user") })', unredacted('user')),
     invalid('logger.child({ caller: { [authorization]: true } })', unredacted('authorization')),
-    invalid('logger.info({ a: { b: { token } } })', {
-      messageId: 'tooDeep',
-      data: { name: 'token' },
-    }),
+    invalid('logger.info({ a: { b: { token } } })', tooDeep('token')),
   ],
 });
