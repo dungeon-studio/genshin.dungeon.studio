@@ -6,7 +6,7 @@ import { Command } from 'commander';
 
 import { generateArtifactSets } from './artifacts.js';
 import { generateCharacters } from './characters.js';
-import { fetchBanners } from './paimon-moe.js';
+import { generateRateUpDates } from './paimon-moe.js';
 import { generateWeapons } from './weapons.js';
 
 interface Roster {
@@ -52,12 +52,14 @@ program
     ROSTERS.forEach(regenerate);
   });
 
+// Fetches from paimon-moe, so `all` leaves it out to keep regeneration offline.
 program
-  .command('fetch-banners')
-  .description("Refresh the vendored snapshot of paimon-moe's banner data that dates debuts")
+  .command('rate-up-dates')
+  .description(
+    "Regenerate src/rate-up-dates.generated.ts, which dates debuts, from paimon-moe's banners",
+  )
   .action(async (): Promise<void> => {
-    await fetchBanners();
-    console.log('Fetched paimon-moe banners; regenerate to apply them');
+    console.log(`Dated ${await generateRateUpDates()} characters; regenerate characters to apply`);
   });
 
 await program.parseAsync();

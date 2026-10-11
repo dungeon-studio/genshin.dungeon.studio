@@ -26,11 +26,6 @@
         "config": ["vitest.config.ts", "vitest.integration.config.ts"]
       }
     },
-    "tools/game-data-codegen": {
-      // knip resolves the import to the vendored .js, so its type declaration
-      // has no importer.
-      "ignoreFiles": ["vendor/paimon-moe/banners.d.ts"]
-    },
     "apps/web": {
       // The shadcn kit is vendored with its upstream surface intact, so an
       // export the app hasn't reached for yet isn't dead code.

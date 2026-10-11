@@ -1,9 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { Banner } from './paimon-moe.js';
-import { characterBanners } from './paimon-moe.js';
-import { toKebabCase } from './slug.js';
+import { FIRST_RATE_UP_DATES } from './rate-up-dates.generated.js';
 
 /**
  * Launch characters are dated to release day: the standard pool had them from
@@ -14,40 +12,23 @@ const LAUNCH = { version: '1.0', date: '2020-09-28' };
 /** Resolves a character's ISO 8601 debut date from its id and genshin-db version. */
 export type DebutDate = (id: string, version: string) => string;
 
-function firstRateUps(banners: readonly Banner[]): Map<string, string> {
-  const firstRateUp = new Map<string, string>();
-  for (const banner of banners) {
-    const date = banner.start.slice(0, 'YYYY-MM-DD'.length);
-    for (const name of [...banner.featured, ...banner.featuredRare]) {
-      const id = toKebabCase(name);
-      const known = firstRateUp.get(id);
-      if (!known || date < known) firstRateUp.set(id, date);
-    }
-  }
-  return firstRateUp;
-}
-
 /**
- * Date each character by their first rate-up banner, five-star or four-star.
+ * Date each character by their first rate-up banner, keyed by roster id.
  *
- * @throws Error, from the returned function, naming a post-launch character no
- *   banner rates up.
+ * @throws Error, from the returned function, naming a post-launch character
+ *   with no rate-up date.
  */
-export function debutDates(banners: readonly Banner[]): DebutDate {
-  const firstRateUp = firstRateUps(banners);
-
+export function debutDates(firstRateUp: Readonly<Record<string, string>>): DebutDate {
   return (id, version) => {
     if (version === LAUNCH.version) return LAUNCH.date;
 
-    const date = firstRateUp.get(id);
+    const date = firstRateUp[id];
     if (!date) {
-      throw new Error(
-        `No banner in the paimon-moe snapshot rates up "${id}"; refresh it with \`fetch-banners\``,
-      );
+      throw new Error(`No rate-up date for "${id}"; refresh them with \`generate rate-up-dates\``);
     }
     return date;
   };
 }
 
-/** Debut dates from the vendored paimon-moe snapshot. */
-export const debutDate: DebutDate = debutDates(characterBanners);
+/** Debut dates from the generated rate-up table. */
+export const debutDate: DebutDate = debutDates(FIRST_RATE_UP_DATES);
