@@ -5,6 +5,7 @@ import type { CollectionWeaponId } from '@genshin/domain';
 import type { Character, Weapon, WeaponType } from '@genshin/game-data';
 import { CHARACTER_ROSTER, WEAPON_ROSTER } from '@genshin/game-data';
 import { act, configure, render, screen, within } from '@testing-library/react';
+import type { UserEvent } from '@testing-library/user-event';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -19,9 +20,7 @@ import { TeamsPage } from './teams-page';
 
 // These mount the whole page and drive it through many interactions, which runs
 // several times slower when the rest of the suite is competing for workers than it
-// does alone — past the default one-second budget for async queries. Under
-// coverage instrumentation a whole case runs to tens of seconds, so the suite
-// takes its own test timeout too.
+// does alone — past the default one-second budget for async queries.
 configure({ asyncUtilTimeout: 10_000 });
 
 // The page draws from real game data, so fixtures have to be real entries.
@@ -45,8 +44,9 @@ const OTHER_CLAYMORE_USER = characterWielding('Claymore', CLAYMORE_USER);
 const CLAYMORE_INSTANCE = 'claymore-instance' as CollectionWeaponId;
 const BOW_INSTANCE = 'bow-instance' as CollectionWeaponId;
 
-function renderTeamsPage() {
-  const view = render(
+function setupTeamsPage(): UserEvent {
+  const user = userEvent.setup({ delay: null });
+  render(
     <MemoryRouter>
       <TeamsPage />
     </MemoryRouter>,
@@ -66,9 +66,27 @@ function renderTeamsPage() {
     });
   });
 
-  return view;
+  return user;
 }
 
+async function openFirstEmptyMember(user: UserEvent): Promise<void> {
+  await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+}
+
+async function pickWeaponFirst(user: UserEvent, weapon: Weapon): Promise<void> {
+  await openFirstEmptyMember(user);
+  await user.click(await screen.findByRole('button', { name: 'Weapons' }));
+  await user.click(
+    await screen.findByRole('button', { name: `Assign ${weapon.name} to character` }),
+  );
+}
+
+async function pickCharacterFirst(user: UserEvent, character: Character): Promise<void> {
+  await openFirstEmptyMember(user);
+  await user.click(await screen.findByRole('button', { name: `Add ${character.name} to team` }));
+}
+
+// Under coverage instrumentation a single case runs to tens of seconds.
 describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   beforeEach(() => {
     useTeamStore.getState().resetTeams();
@@ -77,15 +95,9 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   });
 
   it('assigns a weapon picked before a character, and narrows the pool to its wielders', async () => {
-    const user = userEvent.setup({ delay: null });
-    renderTeamsPage();
+    const user = setupTeamsPage();
 
-    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
-    await user.click(await screen.findByRole('button', { name: 'Weapons' }));
-    await user.click(
-      await screen.findByRole('button', { name: `Assign ${CLAYMORE.name} to character` }),
-    );
-
+    await pickWeaponFirst(user, CLAYMORE);
     await user.click(screen.getByRole('button', { name: 'Characters' }));
 
     // Awaited first so the absence below is checked against a rendered pool.
@@ -102,24 +114,22 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
       characterId: CLAYMORE_USER.id,
       weaponInstanceId: CLAYMORE_INSTANCE,
     });
-  }, 30_000);
+  });
 
   it('leaves the character pool unnarrowed when no weapon was picked first', async () => {
-    const user = userEvent.setup({ delay: null });
-    renderTeamsPage();
+    const user = setupTeamsPage();
 
-    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+    await openFirstEmptyMember(user);
 
     expect(
       await screen.findByRole('button', { name: `Add ${BOW_USER.name} to team` }),
     ).toBeInTheDocument();
-  }, 30_000);
+  });
 
   it('offers weapons of any type, filterable, on a member with no character', async () => {
-    const user = userEvent.setup({ delay: null });
-    renderTeamsPage();
+    const user = setupTeamsPage();
 
-    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+    await openFirstEmptyMember(user);
     await user.click(await screen.findByRole('button', { name: 'Weapons' }));
 
     expect(
@@ -131,17 +141,12 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
 
     // The type chips are hidden in the character-first flow, where the type is fixed.
     expect(screen.getByRole('button', { name: 'Filter by Claymore' })).toBeInTheDocument();
-  }, 30_000);
+  });
 
   it('restores the whole character pool when the pending weapon is cleared', async () => {
-    const user = userEvent.setup({ delay: null });
-    renderTeamsPage();
+    const user = setupTeamsPage();
 
-    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
-    await user.click(await screen.findByRole('button', { name: 'Weapons' }));
-    await user.click(
-      await screen.findByRole('button', { name: `Assign ${CLAYMORE.name} to character` }),
-    );
+    await pickWeaponFirst(user, CLAYMORE);
     await user.click(screen.getByRole('button', { name: 'Characters' }));
 
     expect(await screen.findByText(new RegExp(`Showing Claymore users for`))).toBeInTheDocument();
@@ -153,17 +158,13 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
       await screen.findByRole('button', { name: `Add ${BOW_USER.name} to team` }),
     ).toBeInTheDocument();
     expect(screen.queryByText(/Showing Claymore users for/)).not.toBeInTheDocument();
-  }, 30_000);
+  });
 
   describe('character-first flow', () => {
     it('constrains the weapon pool to the assigned character and equips from it', async () => {
-      const user = userEvent.setup({ delay: null });
-      renderTeamsPage();
+      const user = setupTeamsPage();
 
-      await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
-      await user.click(
-        await screen.findByRole('button', { name: `Add ${CLAYMORE_USER.name} to team` }),
-      );
+      await pickCharacterFirst(user, CLAYMORE_USER);
       await user.click(screen.getByRole('button', { name: 'Weapons' }));
 
       const claymore = await screen.findByRole('button', {
@@ -179,16 +180,12 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
         characterId: CLAYMORE_USER.id,
         weaponInstanceId: CLAYMORE_INSTANCE,
       });
-    }, 30_000);
+    });
 
     it('empties the slot when the assigned character is picked again', async () => {
-      const user = userEvent.setup({ delay: null });
-      renderTeamsPage();
+      const user = setupTeamsPage();
 
-      await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
-      await user.click(
-        await screen.findByRole('button', { name: `Add ${CLAYMORE_USER.name} to team` }),
-      );
+      await pickCharacterFirst(user, CLAYMORE_USER);
 
       // Now assigned, so the same card offers removal.
       await user.click(
@@ -196,16 +193,12 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
       );
 
       expect(useTeamStore.getState().teams[1].members[0]).toBeNull();
-    }, 30_000);
+    });
 
     it('unequips the weapon when the equipped one is picked again', async () => {
-      const user = userEvent.setup({ delay: null });
-      renderTeamsPage();
+      const user = setupTeamsPage();
 
-      await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
-      await user.click(
-        await screen.findByRole('button', { name: `Add ${CLAYMORE_USER.name} to team` }),
-      );
+      await pickCharacterFirst(user, CLAYMORE_USER);
       await user.click(screen.getByRole('button', { name: 'Weapons' }));
       await user.click(
         await screen.findByRole('button', { name: `Assign ${CLAYMORE.name} to character` }),
@@ -219,18 +212,13 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
       expect(useTeamStore.getState().teams[1].members[0]).toEqual({
         characterId: CLAYMORE_USER.id,
       });
-    }, 30_000);
+    });
   });
 
   it('drops a pending weapon when the same card is picked again', async () => {
-    const user = userEvent.setup({ delay: null });
-    renderTeamsPage();
+    const user = setupTeamsPage();
 
-    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
-    await user.click(await screen.findByRole('button', { name: 'Weapons' }));
-    await user.click(
-      await screen.findByRole('button', { name: `Assign ${CLAYMORE.name} to character` }),
-    );
+    await pickWeaponFirst(user, CLAYMORE);
     await user.click(
       await screen.findByRole('button', { name: `Remove ${CLAYMORE.name} from character` }),
     );
@@ -241,14 +229,13 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
       await screen.findByRole('button', { name: `Add ${BOW_USER.name} to team` }),
     ).toBeInTheDocument();
     expect(screen.queryByText(/users for/)).not.toBeInTheDocument();
-  }, 30_000);
+  });
 
   // An empty member has no character, so the pool cannot tell that a weapon equipped
   // elsewhere belongs to the character about to be chosen. Reaching that pairing means
   // going character-first, where the weapon carries over on its own.
   it('withholds a weapon another team already equips, and names the way to it', async () => {
-    const user = userEvent.setup({ delay: null });
-    renderTeamsPage();
+    const user = setupTeamsPage();
 
     act(() => {
       useTeamStore.getState().assignCharacter(1, 0, CLAYMORE_USER.id);
@@ -266,11 +253,10 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
     expect(card).toHaveAccessibleDescription(
       `Pick ${CLAYMORE_USER.name} from Characters to bring it along.`,
     );
-  }, 30_000);
+  });
 
   it('offers no character-first route on a member that already has a character', async () => {
-    const user = userEvent.setup({ delay: null });
-    renderTeamsPage();
+    const user = setupTeamsPage();
 
     act(() => {
       useTeamStore.getState().assignCharacter(1, 0, CLAYMORE_USER.id);
@@ -289,25 +275,19 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
     });
     expect(card).toBeDisabled();
     expect(card).not.toHaveAccessibleDescription();
-  }, 30_000);
+  });
 
   it('forgets a pending weapon once the editor is closed', async () => {
-    const user = userEvent.setup({ delay: null });
-    renderTeamsPage();
+    const user = setupTeamsPage();
 
-    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
-    await user.click(await screen.findByRole('button', { name: 'Weapons' }));
-    await user.click(
-      await screen.findByRole('button', { name: `Assign ${CLAYMORE.name} to character` }),
-    );
-
+    await pickWeaponFirst(user, CLAYMORE);
     await user.click(screen.getByRole('button', { name: 'Close' }));
-    await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+    await openFirstEmptyMember(user);
 
     // Reopened on the same member, so a surviving weapon would still be constraining.
     expect(
       await screen.findByRole('button', { name: `Add ${BOW_USER.name} to team` }),
     ).toBeInTheDocument();
     expect(screen.queryByText(/users for/)).not.toBeInTheDocument();
-  }, 30_000);
+  });
 });
