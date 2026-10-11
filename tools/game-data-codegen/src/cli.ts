@@ -6,6 +6,7 @@ import { Command } from 'commander';
 
 import { generateArtifactSets } from './artifacts.js';
 import { generateCharacters } from './characters.js';
+import { fetchBanners } from './debut-dates.js';
 import { generateWeapons } from './weapons.js';
 
 interface Roster {
@@ -51,4 +52,12 @@ program
     ROSTERS.forEach(regenerate);
   });
 
-program.parse();
+program
+  .command('fetch-banners')
+  .description("Refresh the vendored snapshot of paimon-moe's banner data that dates debuts")
+  .action(async (): Promise<void> => {
+    await fetchBanners();
+    console.log('Fetched paimon-moe banners; regenerate to apply them');
+  });
+
+await program.parseAsync();

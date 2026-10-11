@@ -54,6 +54,14 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "2015 Titus Wormer and contributors"
 SPDX-License-Identifier = "MIT"
 
+# Vendored from https://github.com/MadeBaruna/paimon-moe
+
+[[annotations]]
+path = "tools/game-data-codegen/vendor/paimon-moe/banners.js"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2021 Made Baruna"
+SPDX-License-Identifier = "MIT"
+
 [[annotations]]
 path = ["**.json", ".prettierrc", ".nvmrc"]
 precedence = "aggregate"
