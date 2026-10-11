@@ -24,8 +24,19 @@ Install Trivy following the
 
 ## Scan Terraform
 
+Scan one environment at a time with its own variable values, as CI does.
+Replace `dev` with `core`, `staging`, or `prod`:
+
 ```bash
-trivy config infrastructure/terraform
+trivy config --config .trivy.yaml \
+  --tf-vars infrastructure/terraform/environments/dev/terraform.tfvars \
+  infrastructure/terraform/environments/dev
+```
+
+`bootstrap` has no `terraform.tfvars`, so scan it without `--tf-vars`:
+
+```bash
+trivy config --config .trivy.yaml infrastructure/terraform/bootstrap
 ```
 
 ## Scan the API Dockerfile

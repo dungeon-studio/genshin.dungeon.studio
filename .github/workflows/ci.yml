@@ -372,13 +372,35 @@ jobs:
         with:
           config: .github/zizmor.yml
 
+  # One scan per root module: Trivy applies a tfvars file to every root module
+  # under the scan path, so a single scan would evaluate each environment with
+  # another's values.
   trivy-terraform:
-    name: Scan Terraform
+    name: Scan ${{ matrix.root }} Terraform
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: read
       security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - root: bootstrap
+            path: infrastructure/terraform/bootstrap
+          - root: core
+            path: infrastructure/terraform/environments/core
+            tf-vars: infrastructure/terraform/environments/core/terraform.tfvars
+          - root: dev
+            path: infrastructure/terraform/environments/dev
+            tf-vars: infrastructure/terraform/environments/dev/terraform.tfvars
+          - root: staging
+            path: infrastructure/terraform/environments/staging
+            tf-vars: infrastructure/terraform/environments/staging/terraform.tfvars
+          - root: prod
+            path: infrastructure/terraform/environments/prod
+            tf-vars: infrastructure/terraform/environments/prod/terraform.tfvars
 
     steps:
       - name: Checkout repository
@@ -390,7 +412,8 @@ jobs:
         uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e # master
         with:
           scan-type: config
-          scan-ref: infrastructure/terraform
+          scan-ref: ${{ matrix.path }}
+          tf-vars: ${{ matrix.tf-vars }}
           format: sarif
           output: terraform-results.sarif
           trivy-config: .trivy.yaml
@@ -400,7 +423,7 @@ jobs:
         if: always()
         with:
           sarif_file: terraform-results.sarif
-          category: trivy-terraform
+          category: trivy-terraform-${{ matrix.root }}
 
   trivy-dockerfile:
     name: Scan Dockerfile
