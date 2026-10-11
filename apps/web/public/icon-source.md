@@ -87,6 +87,7 @@ document's `og:url` and `og:image` point at whichever origin serves them.
 uv run apps/web/scripts/generate-brand-assets.py
 ```
 
-Rerun after changing a source mark or adding an environment, and commit the
-result. Badge suffixes and colors come from `src/lib/environments.ts`, which
-the script duplicates. Nothing checks that the colors still agree.
+Rerun after changing a source mark or the environment table in
+`src/lib/environments.json`, and commit the result. Badge suffixes, glyphs, and
+colors come from that table. The `brand-assets` pre-commit hook reruns the
+script and fails when an asset it rewrites differs from the committed one.

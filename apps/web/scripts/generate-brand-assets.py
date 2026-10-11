@@ -3,7 +3,7 @@
 
 # /// script
 # requires-python = ">=3.11"
-# dependencies = ["pillow>=11,<12"]
+# dependencies = ["pillow==11.3.0"]
 # ///
 
 """Derive the committed brand assets from the two source marks in public/.
@@ -14,18 +14,23 @@ Python rather than the workspace's own toolchain because the favicon is a
 multi-resolution .ico, which Pillow writes directly and the Node imaging
 libraries do not.
 
-BADGES duplicates the environment table in src/lib/environments.ts and nothing
-checks the colors agree, so change the two together.
+The brand-assets pre-commit hook reruns this and fails on any asset it rewrites,
+so its output must stay byte-reproducible: Pillow is pinned to the version the
+hook installs.
 """
 
 from __future__ import annotations
 
+import io
+import json
 from dataclasses import dataclass
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-PUBLIC = Path(__file__).resolve().parent.parent / "public"
+WEB = Path(__file__).resolve().parent.parent
+PUBLIC = WEB / "public"
+ENVIRONMENTS = WEB / "src" / "lib" / "environments.json"
 
 FONT = Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf")
 
@@ -49,10 +54,36 @@ class Badge:
     color: str
 
 
-BADGES = [
-    Badge(suffix="alpha", glyph="α", color="#752f93"),
-    Badge(suffix="beta", glyph="β", color="#1c5392"),
-]
+def load_badges() -> list[Badge]:
+    """One badge per environment that announces itself; production has none."""
+    environments = json.loads(ENVIRONMENTS.read_text(encoding="utf-8"))
+    return [
+        Badge(
+            suffix=environment["badge"]["iconSuffix"],
+            glyph=environment["badge"]["glyph"],
+            color=environment["themeColor"],
+        )
+        for environment in environments.values()
+        if environment["badge"] is not None
+    ]
+
+
+def save(image: Image.Image, name: str, **params: object) -> bool:
+    """Write the asset only when its bytes change, and report it as stale.
+
+    Returns whether it was stale, so the caller can say how to recover.
+    """
+    path = PUBLIC / name
+    buffer = io.BytesIO()
+    image.save(buffer, format=Image.registered_extensions()[path.suffix], **params)
+    encoded = buffer.getvalue()
+
+    if path.exists() and path.read_bytes() == encoded:
+        return False
+
+    path.write_bytes(encoded)
+    print(f"{path.relative_to(WEB.parent.parent)} was stale and has been regenerated")
+    return True
 
 
 def variant(name: str, suffix: str) -> str:
@@ -94,24 +125,30 @@ def apply_badge(mark: Image.Image, badge: Badge) -> Image.Image:
     return badged
 
 
-def write_badged_icons() -> None:
+def write_badged_icons() -> bool:
     light = Image.open(PUBLIC / "icon-512x512.png")
     dark = Image.open(PUBLIC / "favicon-32x32-dark.png")
+    stale = False
 
-    for badge in BADGES:
+    for badge in load_badges():
         badged_light = apply_badge(light, badge)
 
-        badged_light.resize(FAVICON_SIZE, Image.LANCZOS).save(
-            PUBLIC / variant("favicon-32x32.png", badge.suffix)
+        stale |= save(
+            badged_light.resize(FAVICON_SIZE, Image.LANCZOS),
+            variant("favicon-32x32.png", badge.suffix),
         )
-        badged_light.save(
-            PUBLIC / variant("favicon.ico", badge.suffix),
+        stale |= save(
+            badged_light,
+            variant("favicon.ico", badge.suffix),
             sizes=ICO_SIZES,
         )
         # The dark mark exists only at its display size, so it is badged there.
-        apply_badge(dark, badge).save(
-            PUBLIC / variant("favicon-32x32-dark.png", badge.suffix)
+        stale |= save(
+            apply_badge(dark, badge),
+            variant("favicon-32x32-dark.png", badge.suffix),
         )
+
+    return stale
 
 
 def fit_font(draw: ImageDraw.ImageDraw, text: str, size: int, max_width: int) -> ImageFont.FreeTypeFont:
@@ -138,7 +175,7 @@ def draw_centered_line(
     )
 
 
-def write_og_image() -> None:
+def write_og_image() -> bool:
     """A link preview is read at thumbnail size, so it carries mark and name only."""
     canvas = Image.new("RGB", OG_SIZE, BRAND_TEAL)
 
@@ -150,12 +187,18 @@ def write_og_image() -> None:
     draw_centered_line(draw, "Genshin Planner", 428, 88, "#ffffff")
     draw_centered_line(draw, "Plan your teams and manage your collection.", 518, 36, "#a8d5d1")
 
-    canvas.save(PUBLIC / "og-image.png")
+    return save(canvas, "og-image.png")
 
 
 if __name__ == "__main__":
     if not FONT.exists():
         raise SystemExit(f"{FONT} is missing; install the DejaVu fonts and retry")
 
-    write_badged_icons()
-    write_og_image()
+    stale = write_badged_icons()
+    stale |= write_og_image()
+
+    if stale:
+        print(
+            "Commit the regenerated assets. To rebuild them locally, run "
+            "`uv run apps/web/scripts/generate-brand-assets.py`."
+        )
