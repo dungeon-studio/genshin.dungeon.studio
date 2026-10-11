@@ -3,13 +3,12 @@
 
 import type { ISOTimestamp } from '@genshin/domain';
 import { makeCharacter } from '@genshin/domain/testing';
-import { CHARACTER_ROSTER } from '@genshin/game-data';
-import { assert, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+import { CHARACTER } from '@/test/roster.js';
 
 import { nextCharacter } from './merge.js';
 
-const [CHARACTER] = CHARACTER_ROSTER;
-assert.isDefined(CHARACTER);
 const NOW = '2026-01-02T00:00:00.000Z' as ISOTimestamp;
 
 const stored = makeCharacter(CHARACTER.id, { constellationLevel: 1 });

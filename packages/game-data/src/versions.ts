@@ -5,15 +5,15 @@
 export const GAME_DATA_VERSION = '7.0';
 
 // Luna versions map to [major, minor] tuples in the 6.x series (after 5.x, the last numeric era).
-const LUNA_VERSIONS: Record<string, readonly [number, number]> = {
-  'Luna I': [6, 0],
-  'Luna II': [6, 1],
-  'Luna III': [6, 2],
-  'Luna IV': [6, 3],
-};
+const LUNA_VERSIONS = new Map<string, readonly [number, number]>([
+  ['Luna I', [6, 0]],
+  ['Luna II', [6, 1]],
+  ['Luna III', [6, 2]],
+  ['Luna IV', [6, 3]],
+]);
 
 function versionTuple(version: string): readonly [number, number] {
-  const luna = Object.hasOwn(LUNA_VERSIONS, version) ? LUNA_VERSIONS[version] : undefined;
+  const luna = LUNA_VERSIONS.get(version);
   if (luna !== undefined) return luna;
 
   const parts = version.split('.');

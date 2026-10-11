@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import { compareVersions } from '@genshin/game-data';
-import { assert, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { buildArtifactSets } from './artifacts.js';
+import { outOfOrder } from './test/out-of-order.js';
 
 describe('buildArtifactSets', () => {
   const sets = buildArtifactSets();
@@ -29,12 +30,11 @@ describe('buildArtifactSets', () => {
   });
 
   it('sorts by version descending', () => {
-    const outOfOrder = sets.slice(1).filter((current, index) => {
-      const previous = sets[index];
-      assert.isDefined(previous);
-      return compareVersions(previous.version, current.version) < 0;
-    });
-
-    expect(outOfOrder).toEqual([]);
+    expect(
+      outOfOrder(
+        sets,
+        (previous, current) => compareVersions(previous.version, current.version) >= 0,
+      ),
+    ).toEqual([]);
   });
 });

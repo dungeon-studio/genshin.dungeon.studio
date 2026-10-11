@@ -51,7 +51,7 @@ export function negotiateRequestSchema(profiles: ProfileLink[]): MiddlewareHandl
 
   return async (c, next) => {
     const profile = parseProfile(c.req.header('Content-Type'));
-    c.set('negotiatedSchema', selectSchema(paths, latest, profile));
+    c.set('negotiatedSchema', profile ? selectSchema(paths, profile) : latest);
     await next();
   };
 }
@@ -72,9 +72,7 @@ function parseProfile(header: string | undefined): string | undefined {
   }
 }
 
-function selectSchema(paths: string[], latest: string, profile: string | undefined): string {
-  if (!profile) return latest;
-
+function selectSchema(paths: string[], profile: string): string {
   const path = profilePath(profile);
   if (paths.includes(path)) return path;
 
