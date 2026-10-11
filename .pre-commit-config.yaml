@@ -79,6 +79,10 @@ repos:
     hooks:
       - id: terraform_fmt
         args: [--args=-recursive]
+      - id: terraform_validate
+        # Validation is static, so it needs neither the GCS backend nor
+        # credentials.
+        args: [--tf-init-args=-backend=false]
       - id: terraform_trivy
         args:
           - --args=--severity=HIGH,CRITICAL
