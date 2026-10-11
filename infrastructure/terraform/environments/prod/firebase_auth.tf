@@ -61,9 +61,8 @@ resource "google_identity_platform_default_supported_idp_config" "google" {
 
   enabled = true
 
-  # The API never returns client_secret on read, so state always holds null and
-  # every plan would re-propose it. Ignore the drift and recreate the config when
-  # a new secret version lands, so a rotation still reaches Identity Platform.
+  # Identity Platform never returns client_secret, so it always reads as drift.
+  # Rotating the secret replaces this config, briefly disabling Google sign-in.
   lifecycle {
     ignore_changes       = [client_secret]
     replace_triggered_by = [terraform_data.firebase_auth_google_client_secret_version]
