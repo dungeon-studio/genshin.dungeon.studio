@@ -38,35 +38,33 @@ export function TeamMemberPlanner({
 
   const borderClass = elementBorderClass(character?.element);
 
+  const summary = (
+    <TeamMemberSummary
+      member={member}
+      collectionCharacter={collectionCharacter}
+      collectionWeapon={collectionWeapon}
+    />
+  );
+
   return (
     <Card
-      className={cn(
-        'border-l-4 transition-colors',
-        borderClass,
-        onSelect && 'cursor-pointer',
-        selected && 'ring-2 ring-primary',
-      )}
-      onClick={onSelect}
-      role={onSelect ? 'button' : undefined}
-      tabIndex={onSelect ? 0 : undefined}
-      aria-pressed={onSelect ? selected : undefined}
-      onKeyDown={
-        onSelect
-          ? (e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onSelect();
-              }
-            }
-          : undefined
-      }
+      className={cn('border-l-4 transition-colors', borderClass, selected && 'ring-2 ring-primary')}
     >
       <CardHeader className="p-3 pb-1.5">
-        <TeamMemberSummary
-          member={member}
-          collectionCharacter={collectionCharacter}
-          collectionWeapon={collectionWeapon}
-        />
+        {/* Only the header selects: the artifact planner's controls sit outside
+            it so their clicks and keypresses never reach onSelect. */}
+        {onSelect ? (
+          <button
+            type="button"
+            onClick={onSelect}
+            aria-pressed={selected}
+            className="w-full cursor-pointer rounded-md text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
+            {summary}
+          </button>
+        ) : (
+          summary
+        )}
       </CardHeader>
 
       {character && member && (
