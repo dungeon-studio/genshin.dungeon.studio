@@ -4,12 +4,7 @@
 
 exclude: |
   (?x)^(
-    \.styles/(?!config)|    # Vale vendor files (exclude all of .styles/ except .styles/config/)
-    node_modules/|
-    \.pnpm-store/|
-    dist/|
-    build/|
-    \.turbo/|
+    \.styles/(?!config)|    # Vale syncs packages here; only config/ is ours
     pnpm-lock\.yaml
   )
 
@@ -24,9 +19,9 @@ repos:
         args: [--fix=lf]
 
       - id: check-yaml
-        args: [--unsafe] # Allow custom YAML tags
       - id: check-json
-        exclude: '\.jsonc$|\.vscode/|tsconfig|\.devcontainer/' # Skip JSONC files and dirs with JSON-with-comments
+        # Their tools read these as JSON with comments.
+        exclude: '\.vscode/|tsconfig|\.devcontainer/'
       - id: check-toml
 
       - id: check-added-large-files

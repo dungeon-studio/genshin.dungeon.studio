@@ -32,8 +32,6 @@ pids
 .env
 .env.*
 !.env.example
-.env.local
-.env.*.local
 
 # Optional REPL history
 .node_repl_history
