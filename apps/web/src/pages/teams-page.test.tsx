@@ -19,7 +19,9 @@ import { TeamsPage } from './teams-page';
 
 // These mount the whole page and drive it through many interactions, which runs
 // several times slower when the rest of the suite is competing for workers than it
-// does alone — past the default one-second budget for async queries.
+// does alone — past the default one-second budget for async queries. Under
+// coverage instrumentation a whole case runs to tens of seconds, so the suite
+// takes its own test timeout too.
 configure({ asyncUtilTimeout: 10_000 });
 
 // The page draws from real game data, so fixtures have to be real entries.
@@ -67,7 +69,7 @@ function renderTeamsPage() {
   return view;
 }
 
-describe('TeamsPage weapon-first flow', () => {
+describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   beforeEach(() => {
     useTeamStore.getState().resetTeams();
     useCollectionStore.getState().clearCharacters();

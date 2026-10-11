@@ -123,7 +123,9 @@ describe('ArtifactPlanner', () => {
     expect(substatNames('Secondary substats')).toEqual(['Energy Recharge']);
   });
 
-  it('selects, replaces, and clears artifact sets', async () => {
+  // Six sequential interactions through Radix and cmdk sit near the default
+  // five-second budget alone, and coverage instrumentation pushes them past it.
+  it('selects, replaces, and clears artifact sets', { timeout: 15_000 }, async () => {
     const user = userEvent.setup({ pointerEventsCheck: 0 });
     render(<Harness />);
 
