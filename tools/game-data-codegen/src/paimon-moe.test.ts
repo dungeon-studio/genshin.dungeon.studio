@@ -3,19 +3,19 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { firstRateUps, renderRateUpDates, toCharacterBanners } from './paimon-moe.js';
+import { firstBannerDates, renderFirstBannerDates, toCharacterBanners } from './paimon-moe.js';
 
 describe('toCharacterBanners', () => {
-  it('rejects a module whose banners lack a rate-up list', () => {
+  it('rejects a module whose banners lack a featured list', () => {
     const reshaped = { banners: { characters: [{ start: '2020-09-28 00:00:00', featured: [] }] } };
 
     expect(() => toCharacterBanners(reshaped)).toThrow('no longer exports character banners');
   });
 });
 
-describe('firstRateUps', () => {
-  it('keeps the earliest banner across five-star and four-star rate-ups', () => {
-    const dates = firstRateUps([
+describe('firstBannerDates', () => {
+  it('keeps the earliest banner featuring a character at five-star or four-star', () => {
+    const dates = firstBannerDates([
       { start: '2022-03-30 18:00:00', featured: ['kaedehara_kazuha'], featuredRare: [] },
       { start: '2021-06-29 18:00:00', featured: ['klee'], featuredRare: ['kaedehara_kazuha'] },
     ]);
@@ -24,8 +24,8 @@ describe('firstRateUps', () => {
   });
 });
 
-describe('renderRateUpDates', () => {
-  const rendered = renderRateUpDates(
+describe('renderFirstBannerDates', () => {
+  const rendered = renderFirstBannerDates(
     new Map([
       ['kaedehara-kazuha', '2021-06-29'],
       ['albedo', '2020-12-23'],

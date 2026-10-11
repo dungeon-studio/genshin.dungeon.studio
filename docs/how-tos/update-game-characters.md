@@ -35,14 +35,14 @@ pnpm turbo run typecheck test lint --filter @genshin/game-data
 ## Date a new character
 
 `genshin-db` carries no release dates, so `generate characters` dates debuts
-from `tools/game-data-codegen/src/rate-up-dates.generated.ts`, a table generated
-from
+from `tools/game-data-codegen/src/first-banner-dates.generated.ts`, a table
+generated from
 [paimon-moe's `banners.js`](https://github.com/MadeBaruna/paimon-moe/blob/main/src/data/banners.js).
 When a character debuts after the table, generation aborts and names them.
 Regenerate the table, rebuild, then regenerate the roster:
 
 ```bash
-pnpm --filter @genshin/game-data-codegen generate rate-up-dates
+pnpm --filter @genshin/game-data-codegen generate first-banner-dates
 pnpm turbo run build --filter @genshin/game-data-codegen
 pnpm --filter @genshin/game-data-codegen generate characters
 ```
