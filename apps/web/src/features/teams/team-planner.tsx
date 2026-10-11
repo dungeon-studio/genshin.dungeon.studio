@@ -105,7 +105,7 @@ export function TeamPlanner({
         )}
       </div>
 
-      <div className="gap-4 sm:grid-cols-4 grid grid-cols-2">
+      <div className="gap-4 sm:grid-cols-4 grid grid-cols-1">
         {members.map((member, i) => (
           <TeamMemberPlanner
             // Team slots are positional and fixed in number, so the index is a
