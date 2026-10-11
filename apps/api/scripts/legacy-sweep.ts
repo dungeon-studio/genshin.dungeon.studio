@@ -53,13 +53,6 @@ export interface SweepResult {
   rewritten: number;
 }
 
-export function emptyResult(): SweepResult {
-  return {
-    census: { characters: new Map(), teams: new Map(), weapons: new Map() },
-    rewritten: 0,
-  };
-}
-
 function tally(census: Census, repository: RepositoryName, key: number | 'invalid'): void {
   const counts = census[repository];
   counts.set(key, (counts.get(key) ?? 0) + 1);
@@ -81,50 +74,61 @@ async function rewrite(snapshot: QueryDocumentSnapshot, migrated: DocumentData):
   });
 }
 
+type ReadResult = { version: number; migrated: DocumentData } | 'invalid';
+
 /**
- * Reads every versioned document under one user through its repository,
- * counting each by the version it was stored at, and with `write` rewrites the
- * legacy ones at the current version.
+ * Reads a stored document through its repository.
  *
- * A document that fails to read is counted as invalid rather than stopping the
- * sweep, so one bad document can't hide the rest of the census.
+ * A document that fails to read is reported invalid rather than thrown, so one
+ * bad document can't hide the rest of the census.
  */
-export async function sweepUser(
-  user: DocumentReference,
-  { write }: { write: boolean },
-  result: SweepResult,
-): Promise<void> {
-  for (const repository of REPOSITORIES) {
-    const snapshot = await user.collection(repository.name).get();
+function read(repository: SweptRepository, document: QueryDocumentSnapshot): ReadResult {
+  const raw = document.data();
+  const version = documentVersion(raw);
+  if (version === null) return 'invalid';
 
-    for (const document of snapshot.docs) {
-      const raw = document.data();
-      let migrated: DocumentData;
-      try {
-        migrated = repository.migrate(document.id, raw);
-      } catch {
-        tally(result.census, repository.name, 'invalid');
-        continue;
-      }
+  try {
+    return { version, migrated: repository.migrate(document.id, raw) };
+  } catch {
+    return 'invalid';
+  }
+}
 
-      // A document that parsed has a version: routing rejected any without one.
-      const version = documentVersion(raw) ?? repository.currentVersion;
-      tally(result.census, repository.name, version);
-
-      if (write && version < repository.currentVersion && (await rewrite(document, migrated))) {
-        result.rewritten += 1;
-      }
+/** Every versioned document under the given users, paired with its repository. */
+async function* storedDocuments(users: Iterable<DocumentReference>) {
+  for (const user of users) {
+    for (const repository of REPOSITORIES) {
+      const snapshot = await user.collection(repository.name).get();
+      yield* snapshot.docs.map((document) => ({ repository, document }));
     }
   }
 }
 
-/** Sweeps every user in the database. */
-export async function sweep(options: { write: boolean }): Promise<SweepResult> {
-  const result = emptyResult();
-  // listDocuments, unlike a query, includes users whose own document was never
-  // written but whose subcollections were.
-  for (const user of await db.collection('users').listDocuments()) {
-    await sweepUser(user, options, result);
+/**
+ * Reads every versioned document under the given users through its repository,
+ * counting each by the version it was stored at, and with `write` rewrites the
+ * legacy ones at the current version.
+ */
+export async function sweep(
+  users: Iterable<DocumentReference>,
+  { write }: { write: boolean },
+): Promise<SweepResult> {
+  const result: SweepResult = {
+    census: { characters: new Map(), teams: new Map(), weapons: new Map() },
+    rewritten: 0,
+  };
+
+  for await (const { repository, document } of storedDocuments(users)) {
+    const outcome = read(repository, document);
+    if (outcome === 'invalid') {
+      tally(result.census, repository.name, 'invalid');
+      continue;
+    }
+
+    tally(result.census, repository.name, outcome.version);
+    const legacy = outcome.version < repository.currentVersion;
+    if (write && legacy && (await rewrite(document, outcome.migrated))) result.rewritten += 1;
   }
+
   return result;
 }

@@ -9,7 +9,7 @@ import { db } from '@/firebase/firestore.js';
 import { documentRef, newUserId } from '@/test/firestore.js';
 import { CHARACTER, WEAPON } from '@/test/roster.js';
 
-import { emptyResult, sweepUser, type SweepResult } from './legacy-sweep.js';
+import { sweep, type SweepResult } from './legacy-sweep.js';
 
 const TIMESTAMPS = {
   createdAt: '2026-01-01T00:00:00.000Z',
@@ -33,10 +33,8 @@ async function seed(userId: string) {
   return { character, team };
 }
 
-async function run(userId: string, write: boolean): Promise<SweepResult> {
-  const result = emptyResult();
-  await sweepUser(db.collection('users').doc(userId), { write }, result);
-  return result;
+function run(userId: string, write: boolean): Promise<SweepResult> {
+  return sweep([db.collection('users').doc(userId)], { write });
 }
 
 describe('a read-only sweep', () => {
