@@ -15,6 +15,7 @@ import * as Characters from '@/repositories/characters/index.js';
 import * as Teams from '@/repositories/teams/index.js';
 import * as Weapons from '@/repositories/weapons/index.js';
 import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
+import { unroutedHrefs } from '@/test/hrefs.js';
 
 vi.mock('@/firebase/auth.js', () => ({
   verifyToken: vi.fn(),
@@ -96,6 +97,10 @@ describe('Team routes', () => {
       expect(body).toEqual(teamListDocument([FAKE_TEAM, FAKE_EMPTY_TEAM], BASE_URL));
     });
 
+    it('links only to paths the app routes as GET', () => {
+      expect(unroutedHrefs(body)).toEqual([]);
+    });
+
     it('returns 500 when repository throws', async () => {
       vi.mocked(Teams.list).mockRejectedValue(new Error('Firestore unavailable'));
 
@@ -127,6 +132,10 @@ describe('Team routes', () => {
 
     it('returns the stored team as an item document', () => {
       expect(body).toEqual(teamItemDocument(FAKE_TEAM, BASE_URL));
+    });
+
+    it('links only to paths the app routes as GET', () => {
+      expect(unroutedHrefs(body)).toEqual([]);
     });
 
     it('returns 404 when team not found', async () => {

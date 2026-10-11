@@ -20,6 +20,7 @@ import { toMediaTypeString } from '@/middleware/negotiate-content.js';
 import { weaponItemV1 } from '@/profiles/alps/weapon/item-v1.js';
 import * as Weapons from '@/repositories/weapons/index.js';
 import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
+import { unroutedHrefs } from '@/test/hrefs.js';
 
 vi.mock('@/firebase/auth.js', () => ({
   verifyToken: vi.fn(),
@@ -79,6 +80,15 @@ describe('Weapon routes', () => {
       expect(body).toEqual(weaponListDocument([FAKE_WEAPON], BASE_URL));
     });
 
+    it('links only to paths the app routes as GET', async () => {
+      vi.mocked(Weapons.list).mockResolvedValue({ items: [FAKE_WEAPON], next: 'last-id' });
+
+      const res = await app.request(authedRequest('GET', '/weapons'));
+
+      const body = (await res.json()) as CollectionDocument;
+      expect(unroutedHrefs(body)).toEqual([]);
+    });
+
     it('returns 500 when repository throws', async () => {
       vi.mocked(Weapons.list).mockRejectedValue(new Error('Firestore unavailable'));
 
@@ -114,6 +124,17 @@ describe('Weapon routes', () => {
 
     it("returns the stored copies as the weapon's filtered document", () => {
       expect(body).toEqual(weaponsOfDocument('mistsplitter-reforged', [FAKE_WEAPON], BASE_URL));
+    });
+
+    it('links only to paths the app routes as GET', async () => {
+      vi.mocked(Weapons.list).mockResolvedValue({ items: [FAKE_WEAPON], next: 'last-id' });
+
+      const res = await app.request(
+        authedRequest('GET', '/weapons?weaponId=mistsplitter-reforged'),
+      );
+
+      const body = (await res.json()) as CollectionDocument;
+      expect(unroutedHrefs(body)).toEqual([]);
     });
 
     it('returns 400 for unknown weapon ID', async () => {
@@ -355,6 +376,10 @@ describe('Weapon routes', () => {
 
     it('returns the stored weapon as an item document', () => {
       expect(body).toEqual(weaponItemDocument(FAKE_WEAPON, BASE_URL));
+    });
+
+    it('links only to paths the app routes as GET', () => {
+      expect(unroutedHrefs(body)).toEqual([]);
     });
 
     it('returns 404 when weapon instance not found', async () => {
