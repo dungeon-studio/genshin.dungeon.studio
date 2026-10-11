@@ -5,10 +5,9 @@ SPDX-License-Identifier: MIT
 
 # How to regenerate brand assets
 
-Regenerate the favicon files, environment badges, and link preview after
-changing a source mark or adding an environment. The script derives every brand
-asset in `apps/web/public/` from two source marks: `icon-512x512.png` and
-`favicon-32x32-dark.png`.
+Regenerate the environment-badged icons and the link preview after changing a
+source mark or adding an environment. The generator builds them from two source
+marks in `apps/web/public/`: `icon-512x512.png` and `favicon-32x32-dark.png`.
 
 For the prompts behind the source marks, see
 [`apps/web/provenance/icon-source.md`](../../apps/web/provenance/icon-source.md).

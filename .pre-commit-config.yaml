@@ -217,12 +217,10 @@ repos:
         pass_filenames: false
         always_run: true
 
-      # Vite copies apps/web/public/ verbatim into the deployed site, so
-      # anything else there is published. Notes about an asset belong in
-      # apps/web/provenance/.
+      # Vite deploys apps/web/public/ verbatim, so every file there is public.
       - id: web-public-images-only
         name: only images in apps/web/public
-        entry: only .png and .ico files belong in apps/web/public
+        entry: only .png and .ico files belong in apps/web/public; put asset notes in apps/web/provenance
         language: fail
         files: ^apps/web/public/
         exclude: \.(png|ico)$
