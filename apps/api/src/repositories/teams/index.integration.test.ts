@@ -49,8 +49,8 @@ describe('save', () => {
     expect(second.created).toBe(false);
   });
 
-  // The losing transaction retries after the client's backoff, which starts
-  // near a second, so this case outruns the default timeout.
+  // A contended transaction retries after the client's backoff, so this case
+  // outruns the default timeout.
   it('creates an unsaved slot exactly once under concurrent saves', async () => {
     const userId = newUserId();
 

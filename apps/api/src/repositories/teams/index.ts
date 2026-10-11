@@ -43,8 +43,8 @@ export interface SaveResult {
  * Merges an update into a slot, reporting whether the record was new so the
  * route can answer 201 rather than 200.
  *
- * Reads and writes in one transaction: two concurrent saves would otherwise
- * both see an empty slot and the later one would overwrite `createdAt`.
+ * Concurrent saves to an empty slot create it once: exactly one result reports
+ * `created`, and every result carries the stored `createdAt`.
  */
 export async function save(
   userId: string,
