@@ -6,8 +6,7 @@ import type { GrpcStatus } from 'firebase-admin/firestore';
 import type { FirestoreError } from '@/repositories/firestore/error.js';
 
 /**
- * A Firestore rejection in the shape the client library produces: a plain
- * `Error` with the gRPC status attached, not an instance of any library class.
+ * A Firestore rejection in the shape the client library produces.
  *
  * The emulator can't be made to exhaust a quota or go unavailable on demand, so
  * the transient codes reach the unit suite through this fixture instead.

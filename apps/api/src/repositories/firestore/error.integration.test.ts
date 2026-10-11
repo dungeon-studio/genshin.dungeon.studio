@@ -9,8 +9,8 @@ import { documentRef, newUserId } from '@/test/firestore.js';
 
 import { isFirestoreError } from './error.js';
 
-// The unit suite builds its errors by hand, so only a real rejection can show
-// that the shape it assumes is the one the client library produces.
+// The unit suite builds its errors by hand; only a real rejection confirms the
+// client library produces that shape.
 describe('isFirestoreError', () => {
   it('recognises a rejection from Firestore', async () => {
     const missing = documentRef(newUserId(), 'weapons', randomUUID());

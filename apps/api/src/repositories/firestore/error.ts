@@ -22,7 +22,6 @@ function labelFor(code: GrpcStatus): string {
   return GrpcStatus[code] ?? String(code);
 }
 
-/** A rejection from a Firestore call: an `Error` carrying a gRPC status code. */
 export interface FirestoreError extends Error {
   code: GrpcStatus;
 }
@@ -30,9 +29,8 @@ export interface FirestoreError extends Error {
 /**
  * Whether a thrown value came back from Firestore.
  *
- * Tests the runtime shape, not the class. Firestore rejects with a plain
- * `Error` that has a numeric `code` from gRPC, whereas Node.js system errors
- * and other Firebase errors carry string codes.
+ * Firestore rejects with a plain `Error` carrying a numeric gRPC `code`.
+ * Node.js system errors and other Firebase errors carry string codes.
  */
 export function isFirestoreError(err: unknown): err is FirestoreError {
   return err instanceof Error && 'code' in err && typeof err.code === 'number';
