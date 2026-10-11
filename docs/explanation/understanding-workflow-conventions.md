@@ -15,21 +15,21 @@ A hook whose tool pre-commit installs is the better hook. A hook calling a tool 
 
 ## Naming
 
-Grouping by trigger makes the trigger the only thing that distinguishes one workflow file from another. A job sharing a file with jobs on a different trigger has to guard itself against their events. Every such guard is a condition a reader must trace. Splitting by trigger removes the guards.
+Splitting files by trigger keeps jobs free of event guards. A job sharing a file with jobs on a different trigger has to guard itself against their events, and every guard is a condition a reader must trace.
 
 Workflows that mutate state outside the checkout break the pattern on purpose. A reader looking for what deploys the API looks for `deploy.yml`, not for the trigger it happens to use.
 
 Path gates narrow the when further, so a gated check gets its own file. Gating saves runner time, but a gated workflow can't be a required check, so only a check with expensive setup is worth gating.
 
-The rule and its rationale come from [architecture decision record 0004 in alunduil-chezmoi](https://github.com/alunduil/alunduil-chezmoi/blob/main/docs/adr/0004-consolidate-ci-workflow.md).
-
 Once a filename says _when_, it no longer says _what_, so the job name carries that. The ruleset shows a job name without its workflow, so `dev` alone tells a reviewer nothing. A name shared by two jobs is ambiguous, since the ruleset can't tell which run it meant.
+
+[Architecture decision record 0004 in alunduil-chezmoi](https://github.com/alunduil/alunduil-chezmoi/blob/main/docs/adr/0004-consolidate-ci-workflow.md) records the naming rule in full.
 
 ## Required checks
 
-A ruleset matches a required check by the job's display name, and nothing ties that name to the job's id or file. A rename stops satisfying the ruleset, so every pull request waits on a check that never reports.
+A ruleset matches a required check by the job's display name, and nothing ties that name to the job's id or file. A rename therefore looks to the ruleset like a check that stopped reporting.
 
-A path-gated workflow doesn't report on a pull request outside its paths. Requiring it would block those pull requests indefinitely, waiting on a check that never starts.
+A path-gated workflow doesn't report on a pull request outside its paths. Requiring it would block those pull requests indefinitely.
 
 Code scanning and Code Quality both report under the GitHub-managed `Analyze` name, so that name doesn't identify either one.
 

@@ -26,11 +26,11 @@ A tool whose checks fall on both sides runs in both places. zizmor audits offlin
 
 A workflow file is named for _when_ it runs:
 
-- `ci.yml` holds every sensor that runs on an integration event: a pull request, or a push to a long-lived branch.
+- `ci.yml` holds every check that runs on an integration event: a pull request, or a push to a long-lived branch.
 - `daily.yml` and `weekly.yml` hold the scheduled checks, one file per cadence.
-- A path-gated check has its own file. Only a check with expensive setup has a path gate, and its triggers share one `paths:` list through a YAML anchor (`paths: &paths`, then `paths: *paths`).
+- A path-gated check has its own file. Only a check with expensive setup has a path gate. Its triggers share one `paths:` list through a YAML anchor.
 
-Workflows that mutate state outside the checkout are named for what they change: `deploy.yml`, `terraform-apply.yml`, `labels.yml`, `release-notes.yml`.
+Workflows that mutate state outside the checkout are named for what they change, such as `deploy.yml`.
 
 A new check is a job in the file matching its when. A new file means a different when: a new trigger, a new cadence, or a path gate. Jobs on different triggers sit in different files, even when they serve the same purpose. Reusable (`workflow_call`) workflows are exempt, since a caller decides when they run.
 
@@ -46,7 +46,7 @@ The `develop` ruleset is the authoritative list of checks that block a merge. A 
 
 ## Push triggers
 
-Sensor workflows run on a push to the [git-flow](https://nvie.com/posts/a-successful-git-branching-model/) branches whose merge result ships or gets inherited: `develop`, `main`, `release/*`, and `hotfix/*`. Feature branches have no push trigger.
+A workflow that runs checks also runs on a push to the [git-flow](https://nvie.com/posts/a-successful-git-branching-model/) branches whose merge result ships or gets inherited: `develop`, `main`, `release/*`, and `hotfix/*`. Feature branches have no push trigger.
 
 ## Pinning tool versions
 
