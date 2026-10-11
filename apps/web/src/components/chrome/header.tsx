@@ -21,7 +21,7 @@ export function Header(): JSX.Element {
           className="gap-2 text-2xl font-bold flex items-center text-foreground hover:text-foreground/80"
         >
           <BrandMark />
-          Genshin Planner
+          <span className="sm:not-sr-only sr-only">Genshin Planner</span>
         </Link>
         <div className="gap-3 flex items-center">
           {auth.status === 'signed-in' && <AccountMenu user={auth.user} />}
