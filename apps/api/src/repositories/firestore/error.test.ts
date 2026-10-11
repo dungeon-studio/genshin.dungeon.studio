@@ -2,11 +2,29 @@
 // SPDX-License-Identifier: MIT
 
 import { GrpcStatus } from 'firebase-admin/firestore';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type * as LoggerModule from '@/logger.js';
 import { firestoreError } from '@/test/firestore-error.js';
 
-import { isFirestoreError, toHttpException } from './error.js';
+const lines: string[] = [];
+
+vi.mock('@/logger.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof LoggerModule>();
+  return {
+    ...actual,
+    logger: actual.createLogger({
+      level: 'error',
+      destination: { write: (line: string) => lines.push(line) },
+    }),
+  };
+});
+
+const { isFirestoreError, toHttpException } = await import('./error.js');
+
+beforeEach(() => {
+  lines.length = 0;
+});
 
 describe('isFirestoreError', () => {
   it.each([
@@ -34,5 +52,15 @@ describe('toHttpException', () => {
   it('says nothing about the underlying failure in the response', () => {
     const err = firestoreError(GrpcStatus.PERMISSION_DENIED);
     expect(toHttpException(err).message).not.toContain(err.message);
+  });
+
+  it.each([
+    ['by name when gRPC defines it', GrpcStatus.UNAVAILABLE, 'UNAVAILABLE'],
+    ['by number when gRPC does not', 99 as GrpcStatus, '99'],
+  ])('logs the code %s', (_label, code, logged) => {
+    toHttpException(firestoreError(code));
+    expect(lines.map((line) => JSON.parse(line) as unknown)).toEqual([
+      expect.objectContaining({ grpcCode: logged }),
+    ]);
   });
 });
