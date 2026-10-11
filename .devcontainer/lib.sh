@@ -59,7 +59,7 @@ for_each_tool() {
   "${action}" "reuse" reuse --version
   "${action}" "vale" vale --version
   "${action}" "lychee" lychee --version
-  "${action}" "firebase" firebase --version
+  "${action}" "firebase" pnpm exec firebase --version
   "${action}" "playwright" pnpm --filter @genshin/e2e exec playwright --version
 }
 
