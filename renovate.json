@@ -45,8 +45,8 @@
       "groupName": "{{depName}}"
     },
     {
-      "description": "Version the engines and type pins of Node.js like its nvm, devcontainer, and docker pins, which hold a new major until it reaches LTS",
-      "matchPackageNames": ["node", "@types/node"],
+      "description": "Hold a new Node.js major in the engines and type pins until it reaches LTS, as the nvm, devcontainer, and docker pins already do",
+      "matchDepNames": ["node", "@types/node"],
       "matchManagers": ["npm"],
       "versioning": "node"
     }
