@@ -74,9 +74,6 @@ importers:
       firebase-admin:
         specifier: 14.5.0
         version: 14.5.0(@firebase/app-compat@0.5.17)(@firebase/app@0.16.3)(supports-color@10.2.2)
-      google-gax:
-        specifier: 6.12.0
-        version: 6.12.0(supports-color@10.2.2)
       hono:
         specifier: 4.13.13
         version: 4.13.13
@@ -12241,6 +12238,7 @@ snapshots:
       retry-request: 9.0.1(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   google-logging-utils@0.0.2: {}
 
@@ -13680,6 +13678,7 @@ snapshots:
   proto3-json-serializer@4.0.2:
     dependencies:
       protobufjs: 7.6.5
+    optional: true
 
   protobufjs@7.6.5:
     dependencies:
@@ -13955,6 +13954,7 @@ snapshots:
       teeny-request: 11.0.1(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   retry@0.13.1: {}
 
@@ -14558,6 +14558,7 @@ snapshots:
       stream-events: 1.0.5
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   teex@1.0.1:
     dependencies:
