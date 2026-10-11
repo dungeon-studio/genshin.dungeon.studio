@@ -82,9 +82,8 @@ before the payloads are gone—a document nobody opens is still a document that
 breaks on the deployment that drops its version.
 
 Only a medium that expires its own contents, such as a cache TTL or a drained
-queue, reaches that state by itself. Stored payloads have to be rewritten.
-`pnpm --filter @genshin/api documents:sweep` counts Firestore documents by
-stored version. Its `--write` flag rewrites the legacy ones.
+queue, reaches that state by itself. Stored payloads have to be rewritten. For
+Firestore, see [Drain a legacy schema version](../how-tos/drain-a-legacy-schema-version.md).
 
 `schema-compat` refuses to drop a released version regardless of what the
 medium shows, so a retirement means changing the check too.
