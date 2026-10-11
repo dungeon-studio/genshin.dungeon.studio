@@ -7,10 +7,10 @@ import type { AuthState } from './auth-context';
 import { AuthContext } from './auth-context';
 
 /**
- * Who is signed in, once Firebase has restored any existing session.
+ * Who is signed in, once Firebase restores any existing session.
  *
- * The state stays `loading` until then, so a caller that treats it as signed
- * out flashes the wrong state on every reload.
+ * Until then the state is `loading`; treating it as signed out flashes the
+ * wrong view on every reload.
  *
  * @throws Error when called outside an `AuthProvider`.
  */

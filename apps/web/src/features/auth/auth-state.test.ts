@@ -11,7 +11,7 @@ import { awaitingUserData } from './auth-state';
 const SIGNED_IN: AuthState = { status: 'signed-in', user: fakeUser('user-1') };
 
 describe('awaitingUserData', () => {
-  it.each([true, false])('waits while auth settles, whatever the query reports (%o)', (query) => {
+  it.each([true, false])('waits while auth settles (query loading: %o)', (query) => {
     expect(awaitingUserData({ status: 'loading' }, query)).toBe(true);
   });
 
