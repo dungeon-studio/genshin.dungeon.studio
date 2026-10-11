@@ -127,8 +127,8 @@ describe('ArtifactPlanner', () => {
   const obsidianCodex = ARTIFACT_SETS['obsidian-codex'];
   const unfinishedReverie = ARTIFACT_SETS['unfinished-reverie'];
 
-  // Opening the set popover mounts the whole roster, so each test opens it at
-  // most once and starts from the plan it needs.
+  // Opening the set popover mounts the full roster, so each test opens it at
+  // most once.
   it('selects a first artifact set', async () => {
     const user = userEvent.setup({ pointerEventsCheck: 0 });
     render(<Harness />);
