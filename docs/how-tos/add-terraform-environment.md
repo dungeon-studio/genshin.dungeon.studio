@@ -42,19 +42,16 @@ Keep secret names aligned with infrastructure environment names.
 
 ## 3) Scaffold the environment folder
 
-Copy `infrastructure/terraform/environments/dev/` to `infrastructure/terraform/environments/<environment>/`, then update values.
+Create `infrastructure/terraform/environments/<environment>/` with these files, using `prod/` as the model:
 
-Keep these files in the new folder:
+- `backend.tf`: set the state `prefix` to `environments/<environment>`
+- `main.tf`: pin the providers and call `infrastructure/terraform/modules/application_environment`
+- `variables.tf` and `terraform.tfvars`: declare and set the values that vary per environment
+- `outputs.tf`: re-export the module outputs the deploy workflow reads
 
-- `backend.tf`
-- `main.tf`
-- `variables.tf`
-- `terraform.tfvars`
-- `outputs.tf`
+Start with every `enable_*` flag off. Turn on a domain flag after `core` publishes that name's DNS record, and the invoker flag after the first deploy.
 
-Update project IDs, project numbers, and any environment-specific variable values.
-
-For early scaffolding, `outputs.tf` can remain empty except SPDX headers until useful outputs exist.
+The first apply creates the Google OAuth secret containers, then fails reading them. Store the client ID and secret in those containers, then re-run the apply.
 
 ---
 

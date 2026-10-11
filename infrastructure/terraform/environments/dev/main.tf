@@ -23,9 +23,18 @@ provider "google-beta" {
   project = var.project_id
 }
 
-# Identity Platform must trust the registrable domain for sign-in redirects no
-# matter which environment serves, so it stays separate from the hostname.
-locals {
-  base_domain = "genshin.dungeon.studio"
-  web_domain  = "develop.${local.base_domain}"
+module "application_environment" {
+  source = "../../modules/application_environment"
+
+  project_id    = var.project_id
+  common_labels = var.common_labels
+
+  web_subdomain        = "develop"
+  web_app_display_name = "Genshin Planner (dev)"
+
+  enable_api_domain_mapping = var.enable_api_domain_mapping
+  enable_api_public_invoker = var.enable_api_public_invoker
+  enable_web_custom_domain  = true
+
+  firestore_delete_protection = false
 }
