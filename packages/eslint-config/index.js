@@ -41,7 +41,7 @@ const FILES_OUTSIDE_ANY_PROJECT = ['vitest.*config.ts', 'scripts/**/*.ts'];
 
 /** Paths allowed to import `devDependencies`. */
 const DEV_DEPENDENCY_FILES = [
-  '**/*.{test,spec}.{ts,tsx}',
+  '**/*.{test,spec}.{ts,tsx,js}',
   '**/test/**',
   '**/scripts/**',
   'eslint.config.js',

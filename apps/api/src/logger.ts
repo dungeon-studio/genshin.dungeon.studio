@@ -4,6 +4,8 @@
 import type { DestinationStream, Logger, LoggerOptions } from 'pino';
 import { pino, stdSerializers } from 'pino';
 
+import { SENSITIVE_KEYS } from '@/sensitive-keys.js';
+
 /**
  * Cloud Logging takes the level from a `severity` field naming a `LogSeverity`;
  * pino's numeric `level` is not one.
@@ -23,21 +25,9 @@ const SEVERITY_BY_LEVEL: Record<string, string> = {
 const CENSOR = '[Redacted]';
 
 /**
- * Identifiers in this workspace that hold a credential or a personal datum,
- * since object shorthand turns a variable name into a log key. No call site
- * logs one today: this is the net under future logging, not a description of
- * the current set, and nothing checks it automatically.
- *
- * A decoded Firebase ID token is sensitive whole — its custom claims are an
- * open index signature, so naming its fields could never be complete — which is
- * why `user`, the container, is on the list rather than the claims inside it.
- */
-const SENSITIVE_KEYS = ['authorization', 'token', 'idToken', 'user', 'uid', 'email'];
-
-/**
  * A leading `*` matches one ancestor, so each key is covered at the top level
  * and one below — enough to reach `err.token` without naming `err`. Deeper
- * paths are spelled out.
+ * paths are spelled out. The `redacted-log-keys` lint rule assumes this depth.
  */
 const REDACTED_PATHS = [
   ...SENSITIVE_KEYS.flatMap((key) => [key, `*.${key}`]),
