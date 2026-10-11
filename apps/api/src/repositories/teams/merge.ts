@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { CollectionTeam, ISOTimestamp, TeamSlot } from '@genshin/domain';
+import { defaultTeamName } from '@genshin/domain';
 
 /** What a save is changing. An absent field leaves the stored value alone. */
 export interface TeamUpdates {
@@ -30,7 +31,7 @@ export function nextTeam(
 
   return {
     slot,
-    name: updates.name ?? existing?.name ?? `Team ${slot}`,
+    name: updates.name ?? existing?.name ?? defaultTeamName(slot),
     members: updates.members ?? existing?.members ?? [null, null, null, null],
     ...(description !== undefined ? { description } : {}),
     createdAt: existing?.createdAt ?? now,
