@@ -86,7 +86,8 @@ async function pickCharacterFirst(user: UserEvent, character: Character): Promis
   await user.click(await screen.findByRole('button', { name: `Add ${character.name} to team` }));
 }
 
-// Under coverage instrumentation a single case runs to tens of seconds.
+// Under coverage, with the rest of the suite competing for workers, a case runs
+// to tens of seconds.
 describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   beforeEach(() => {
     useTeamStore.getState().resetTeams();
