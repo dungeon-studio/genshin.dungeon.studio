@@ -134,9 +134,8 @@ The API root (`GET /`) is a hypermedia entry point (HATEOAS) advertising availab
 }
 ```
 
-- **Link shape**: plain `href` strings keyed by resource name.
-- **Population**: derived at startup from the top-level `GET` routes, so a new resource appears without manual maintenance.
-- **Scope**: top-level resources only. A client finds a sub-resource from its collection and a descriptor document from the `profile` parameter on `Content-Type`.
+- **Link shape**: plain `href` strings keyed by the last path segment.
+- **Population**: derived at startup, so new resource endpoints appear without manual maintenance.
 - **Visibility**: every resource with a representation to fetch, authenticated or not; each enforces its own authorization. A resource that answers no `GET`, such as `/account`, is absent from the table; `OPTIONS` is the only way to find it.
 - **Version**: carried by `/health` alongside operational metadata such as `status` and `sha`.
 
