@@ -97,3 +97,8 @@ moved {
   from = google_firebase_hosting_custom_domain.web
   to   = module.application_environment.google_firebase_hosting_custom_domain.web[0]
 }
+
+moved {
+  from = terraform_data.firebase_auth_google_client_secret_version
+  to   = module.application_environment.terraform_data.firebase_auth_google_client_secret_version
+}
