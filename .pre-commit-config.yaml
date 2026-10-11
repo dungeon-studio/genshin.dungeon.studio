@@ -232,3 +232,11 @@ repos:
             public/(favicon|icon|og-image)[^/]*\.(png|ico)
           )$
         pass_filenames: false
+
+      # Generators import @genshin/game-data, so its sources feed the output too.
+      - id: game-data
+        name: game data (regenerate from genshin-db)
+        entry: scripts/regenerate-game-data.sh
+        language: script
+        files: ^(tools/game-data-codegen/|packages/game-data/src/|scripts/regenerate-game-data\.sh$)
+        pass_filenames: false
