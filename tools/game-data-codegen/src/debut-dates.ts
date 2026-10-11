@@ -1,15 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { writeFile } from 'node:fs/promises';
-
-import type { Banner } from '../vendor/paimon-moe/banners.js';
-import { banners } from '../vendor/paimon-moe/banners.js';
-
-const UPSTREAM_BANNERS =
-  'https://raw.githubusercontent.com/MadeBaruna/paimon-moe/main/src/data/banners.js';
-
-const BANNER_SNAPSHOT = new URL('../vendor/paimon-moe/banners.js', import.meta.url);
+import type { Banner } from './paimon-moe.js';
+import { characterBanners } from './paimon-moe.js';
 
 /**
  * Launch characters are dated to release day: the standard pool had them from
@@ -27,9 +20,9 @@ export type DebutDate = (id: string, version: string) => string;
  * @throws Error, from the returned function, naming a post-launch character no
  *   banner rates up.
  */
-export function debutDates(characterBanners: readonly Banner[]): DebutDate {
+export function debutDates(banners: readonly Banner[]): DebutDate {
   const firstBanner = new Map<string, string>();
-  for (const banner of characterBanners) {
+  for (const banner of banners) {
     const date = banner.start.slice(0, 'YYYY-MM-DD'.length);
     for (const name of [...banner.featured, ...banner.featuredRare]) {
       const id = name.replaceAll('_', '-');
@@ -52,15 +45,4 @@ export function debutDates(characterBanners: readonly Banner[]): DebutDate {
 }
 
 /** Debut dates from the vendored paimon-moe snapshot. */
-export const debutDate: DebutDate = debutDates(banners.characters);
-
-/** Replace the vendored snapshot with paimon-moe's current banner data. */
-export async function fetchBanners(): Promise<void> {
-  const response = await fetch(UPSTREAM_BANNERS);
-  if (!response.ok) {
-    throw new Error(
-      `Fetching ${UPSTREAM_BANNERS} failed: ${response.status} ${response.statusText}`,
-    );
-  }
-  await writeFile(BANNER_SNAPSHOT, await response.text());
-}
+export const debutDate: DebutDate = debutDates(characterBanners);

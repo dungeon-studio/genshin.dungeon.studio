@@ -6,7 +6,7 @@ import { Command } from 'commander';
 
 import { generateArtifactSets } from './artifacts.js';
 import { generateCharacters } from './characters.js';
-import { fetchBanners } from './debut-dates.js';
+import { fetchBanners } from './paimon-moe.js';
 import { generateWeapons } from './weapons.js';
 
 interface Roster {
