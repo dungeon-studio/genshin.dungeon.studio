@@ -131,6 +131,7 @@ SRECon
 [Nn]amespace
 [Oo]ptionalslop
 [Pp]arseable
+[Rr]efetch(es)?
 [Rr]epo
 [Rr]ollouts
 [Rr]uleset
