@@ -241,3 +241,17 @@ repos:
         language: system
         files: ^apps/[^/]+/(src/.+/schemas/|schema-snapshots/)
         pass_filenames: false
+
+      # Pillow matches the pin in the generator's script metadata.
+      - id: brand-assets
+        name: brand assets (regenerate from environments)
+        entry: python apps/web/scripts/generate-brand-assets.py
+        language: python
+        additional_dependencies: [pillow==11.3.0]
+        files: |
+          (?x)^apps/web/(
+            scripts/generate-brand-assets\.py|
+            src/lib/environments\.json|
+            public/(favicon|icon|og-image)[^/]*\.(png|ico)
+          )$
+        pass_filenames: false

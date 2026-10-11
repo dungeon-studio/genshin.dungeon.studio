@@ -1,0 +1,22 @@
+{
+  "dev": {
+    "themeColor": "#752f93",
+    "badge": {
+      "label": "Alpha",
+      "glyph": "α",
+      "iconSuffix": "alpha"
+    }
+  },
+  "staging": {
+    "themeColor": "#1c5392",
+    "badge": {
+      "label": "Beta",
+      "glyph": "β",
+      "iconSuffix": "beta"
+    }
+  },
+  "prod": {
+    "themeColor": "#1f514e",
+    "badge": null
+  }
+}
