@@ -17,7 +17,7 @@ The DevContainer installs act, and `.actrc` names the runner image so act won't 
 
 Run act from the main checkout, not a [linked worktree](https://git-scm.com/docs/git-worktree). act copies the working tree into the job container, and a linked worktree stores `.git` as a file pointing at the main checkout, so any step shelling out to git fails.
 
-Inside the DevContainer, leave act's copy-in behaviour alone. act's job containers are siblings of the DevContainer on the host daemon, so `--bind` mounts the workspace by its path on the host.
+Inside the DevContainer, don't pass `--bind`. act's job containers are siblings of the DevContainer on the host daemon, so `--bind` mounts the workspace by its path on the host.
 
 ## 1) Run a job
 

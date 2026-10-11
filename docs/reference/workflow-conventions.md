@@ -18,36 +18,35 @@ Conventions for GitHub Actions workflows in `.github/workflows/` and the pre-com
 | Another revision            | Workflow job    | Coverage and schema compatibility, which compare with the base   |
 | The network or a credential | Workflow job    | Online workflow audits, verified secret scanning, external links |
 
-A tool whose checks fall on both sides runs in both places. zizmor audits offline in a hook and online in `ci.yml`. lychee checks internal links in a hook and external links in `weekly.yml`.
-
 Adding a hook needs no workflow change.
+
+A tool whose checks fall on both sides runs in both places. zizmor audits offline in a hook and online in `ci.yml`. lychee checks internal links in a hook and external links in `weekly.yml`.
 
 ## Naming
 
-A workflow file is named for _when_ it runs. Its jobs are named for _what_ they check.
+A workflow file is named for _when_ it runs:
 
 - `ci.yml` holds every sensor that runs on an integration event: a pull request, or a push to a long-lived branch.
 - `daily.yml` and `weekly.yml` hold the scheduled checks, one file per cadence.
 - A path-gated check has its own file. Only a check with expensive setup has a path gate, and its triggers share one `paths:` list through a YAML anchor (`paths: &paths`, then `paths: *paths`).
-- Reusable (`workflow_call`) workflows are exempt, since a caller decides when they run.
 
 Workflows that mutate state outside the checkout are named for what they change: `deploy.yml`, `terraform-apply.yml`, `labels.yml`, `release-notes.yml`.
 
-A new check is a job in the file matching its when. A new file means a different when: a new trigger, a new cadence, or a path gate. Jobs on different triggers sit in different files, even when they serve the same purpose.
+A new check is a job in the file matching its when. A new file means a different when: a new trigger, a new cadence, or a path gate. Jobs on different triggers sit in different files, even when they serve the same purpose. Reusable (`workflow_call`) workflows are exempt, since a caller decides when they run.
+
+A job is named for _what_ it checks: the action and its subject, such as `Plan dev infrastructure`, never a bare environment name. Job names are unique across every workflow.
 
 ## Required checks
 
 The `develop` ruleset is the authoritative list of checks that block a merge. A required check matches a check run by name, which comes from the job's `name:` rather than its id.
 
 - Renaming a required job blocks every pull request until the ruleset names the new check.
-- Job names are unique across every workflow.
-- A job name names the action and its subject, such as `Plan dev infrastructure`, never a bare environment name.
 - A path-gated workflow is never required.
 - The GitHub-managed `Analyze` runs aren't required. The ruleset gates code scanning and Code Quality findings through its own rules.
 
 ## Push triggers
 
-Sensor workflows run on a push to the [git-flow](https://nvie.com/posts/a-successful-git-branching-model/) branches whose merge result ships or gets inherited: `develop`, `main`, `release/*`, and `hotfix/*`. Feature branches have no push trigger. The unfiltered `pull_request` trigger covers them.
+Sensor workflows run on a push to the [git-flow](https://nvie.com/posts/a-successful-git-branching-model/) branches whose merge result ships or gets inherited: `develop`, `main`, `release/*`, and `hotfix/*`. Feature branches have no push trigger.
 
 ## Pinning tool versions
 
