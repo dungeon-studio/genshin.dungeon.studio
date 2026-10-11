@@ -24,7 +24,6 @@ export function createTestQueryClient(): QueryClient {
 
 interface WrapperOptions {
   user?: AuthUser | null;
-  loading?: boolean;
   queryClient?: QueryClient;
 }
 
@@ -32,11 +31,11 @@ interface WrapperOptions {
 export function createWrapper(
   options: WrapperOptions = {},
 ): (props: { children: ReactNode }) => ReactNode {
-  const { user = null, loading = false, queryClient = createTestQueryClient() } = options;
+  const { user = null, queryClient = createTestQueryClient() } = options;
 
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
-      <TestProviders queryClient={queryClient} user={user} loading={loading}>
+      <TestProviders queryClient={queryClient} user={user}>
         {children}
       </TestProviders>
     );

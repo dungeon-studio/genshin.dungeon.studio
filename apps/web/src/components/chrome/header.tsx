@@ -11,7 +11,7 @@ import { AccountMenu } from '@/features/account';
 import { LoginButton, useAuth } from '@/features/auth';
 
 export function Header(): JSX.Element {
-  const { user, loading } = useAuth();
+  const auth = useAuth();
 
   return (
     <header className="border-b border-border bg-background">
@@ -24,7 +24,8 @@ export function Header(): JSX.Element {
           Genshin Planner
         </Link>
         <div className="gap-3 flex items-center">
-          {!loading && (user ? <AccountMenu user={user} /> : <LoginButton />)}
+          {auth.status === 'signed-in' && <AccountMenu user={auth.user} />}
+          {auth.status === 'signed-out' && <LoginButton />}
           <ThemeToggle />
         </div>
       </Container>

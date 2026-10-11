@@ -30,14 +30,14 @@ describe('AuthProvider', () => {
   it('stays loading until Firebase reports the restored session', () => {
     const { result } = renderAuth();
 
-    expect(result.current).toEqual({ user: null, loading: true });
+    expect(result.current).toEqual({ status: 'loading' });
 
     const user = fakeUser('user-1');
     act(() => {
       reportSession(user);
     });
 
-    expect(result.current).toEqual({ user, loading: false });
+    expect(result.current).toEqual({ status: 'signed-in', user });
   });
 
   it('settles signed out when Firebase finds no session', () => {
@@ -47,6 +47,6 @@ describe('AuthProvider', () => {
       reportSession(null);
     });
 
-    expect(result.current).toEqual({ user: null, loading: false });
+    expect(result.current).toEqual({ status: 'signed-out' });
   });
 });

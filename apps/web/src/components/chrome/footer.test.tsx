@@ -8,6 +8,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { AuthUser } from '@/features/auth';
 import { AuthContext } from '@/features/auth/auth-context';
+import { settledAuth } from '@/test/auth';
 
 vi.mock('@/lib/firebase', () => ({
   auth: { currentUser: null },
@@ -18,7 +19,7 @@ const { Footer } = await import('./footer');
 function renderFooter(user: AuthUser | null = null, initialRoute = '/'): ReturnType<typeof render> {
   const wrapper = ({ children }: { children: ReactNode }): ReactNode => (
     <MemoryRouter initialEntries={[initialRoute]}>
-      <AuthContext value={{ user, loading: false }}>{children}</AuthContext>
+      <AuthContext value={settledAuth(user)}>{children}</AuthContext>
     </MemoryRouter>
   );
 

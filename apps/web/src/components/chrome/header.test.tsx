@@ -8,6 +8,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { AuthUser } from '@/features/auth';
 import { AuthContext } from '@/features/auth/auth-context';
+import { settledAuth } from '@/test/auth';
 
 // ThemeToggle reads `window.matchMedia`, which jsdom doesn't implement.
 vi.mock('@/components/chrome/theme-toggle', () => ({ ThemeToggle: () => null }));
@@ -20,7 +21,7 @@ const TRAVELER = { uid: 'user-1', displayName: 'Traveler', photoURL: null } as A
 function renderHeader(user: AuthUser | null) {
   const wrapper = ({ children }: { children: ReactNode }): ReactNode => (
     <MemoryRouter>
-      <AuthContext value={{ user, loading: false }}>{children}</AuthContext>
+      <AuthContext value={settledAuth(user)}>{children}</AuthContext>
     </MemoryRouter>
   );
 
