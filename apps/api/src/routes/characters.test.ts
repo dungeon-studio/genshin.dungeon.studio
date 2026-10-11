@@ -19,6 +19,7 @@ import { toMediaTypeString } from '@/middleware/negotiate-content.js';
 import { characterItemV1 } from '@/profiles/alps/character/item-v1.js';
 import * as Characters from '@/repositories/characters/index.js';
 import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
+import { unroutedHrefs } from '@/test/hrefs.js';
 
 vi.mock('@/firebase/auth.js', () => ({
   verifyToken: vi.fn(),
@@ -103,6 +104,14 @@ describe('Character routes', () => {
       expect(body).toEqual(characterListDocument([FAKE_CHARACTER], BASE_URL));
     });
 
+    it('links only to paths the app routes as GET', async () => {
+      vi.mocked(Characters.list).mockResolvedValue({ items: [FAKE_CHARACTER], next: 'last-id' });
+
+      const res = await app.request(authedRequest('GET', '/characters'));
+
+      expect(unroutedHrefs((await res.json()) as CollectionDocument)).toEqual([]);
+    });
+
     it('returns 500 when repository throws', async () => {
       vi.mocked(Characters.list).mockRejectedValue(new Error('Firestore unavailable'));
 
@@ -157,6 +166,10 @@ describe('Character routes', () => {
 
     it('returns the stored character as an item document', () => {
       expect(body).toEqual(characterItemDocument(FAKE_CHARACTER, BASE_URL));
+    });
+
+    it('links only to paths the app routes as GET', () => {
+      expect(unroutedHrefs(body)).toEqual([]);
     });
 
     it('returns 404 when character not in collection', async () => {
