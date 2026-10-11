@@ -1,9 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-// Reads every document, so run it on demand: after a release that adds a
-// schema version, and before retiring one. `--write` rewrites the legacy
-// documents at the current version.
+// Reads every document, so it runs on demand rather than on a schedule. For
+// when and how, see `docs/how-tos/drain-a-legacy-schema-version.md`.
 
 import { parseArgs } from 'node:util';
 

@@ -23,8 +23,8 @@ pull request that deletes a released snapshot.
 pnpm --filter @genshin/api documents:sweep
 ```
 
-The run is read-only. Investigate any `invalid` count before going on: those
-documents already fail every read, and the rewrite skips them.
+Investigate any `invalid` count before going on: those documents already fail
+every read, and the rewrite skips them.
 
 ## 2) Rewrite the legacy documents
 
