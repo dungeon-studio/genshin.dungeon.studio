@@ -99,7 +99,7 @@ export function serializeFirstBannerDates(dates: ReadonlyMap<string, string>): s
  *
  * @throws Error when the fetch fails or upstream has reshaped the module.
  */
-async function fetchCharacterBanners(): Promise<Banner[]> {
+export async function fetchCharacterBanners(): Promise<Banner[]> {
   const response = await fetch(UPSTREAM_BANNERS);
   if (!response.ok) {
     throw new Error(
