@@ -6,6 +6,7 @@ import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
+import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 
 import type {
@@ -224,7 +225,7 @@ function useOptimisticActions(
  */
 export function useCollection(): UseCollectionResult {
   const auth = useAuth();
-  const uid = auth.status === 'signed-in' ? auth.user.uid : undefined;
+  const uid = signedInUid(auth);
   const isAuthenticated = uid !== undefined;
 
   // Zustand store — always the read layer
@@ -270,7 +271,7 @@ export function useCollection(): UseCollectionResult {
     setConstellationLevel,
     isOwned,
     getCharacter,
-    isLoading: auth.status === 'loading' || (isAuthenticated && queryLoading),
+    isLoading: awaitingUserData(auth, queryLoading),
     error,
   };
 }

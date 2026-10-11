@@ -6,6 +6,7 @@ import { initialTeams } from '@genshin/domain';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { toast } from 'sonner';
 
+import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 
 import type { SaveTeamPayload } from './use-team-api';
@@ -186,7 +187,7 @@ function useTeamActions(
  */
 export function useTeams(): UseTeamsResult {
   const auth = useAuth();
-  const uid = auth.status === 'signed-in' ? auth.user.uid : undefined;
+  const uid = signedInUid(auth);
   const isAuthenticated = uid !== undefined;
 
   const teams = useTeamStore((s) => s.teams);
@@ -233,7 +234,7 @@ export function useTeams(): UseTeamsResult {
     getTeam,
     isCharacterInTeam,
     isSaving,
-    isLoading: auth.status === 'loading' || (isAuthenticated && queryLoading),
+    isLoading: awaitingUserData(auth, queryLoading),
     error,
   };
 }
