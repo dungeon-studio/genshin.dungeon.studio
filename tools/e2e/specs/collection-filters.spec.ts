@@ -50,7 +50,12 @@ function namesOf(items: readonly CollectionItem[]): string[] {
 function describeFilters<I extends CollectionItem>(collection: CollectionPage<I>): void {
   const { noun, path, roster, category, cardName, collect, sample } = collection;
   const names = (page: Page) => renderedNames(page, cardName);
-  const sortedNames = async (page: Page) => (await names(page)).toSorted();
+
+  /** The grid settles on exactly the roster items `matches` keeps, in any order. */
+  const expectGridOf = (page: Page, matches: (item: I) => boolean) =>
+    expect
+      .poll(async () => (await names(page)).toSorted())
+      .toEqual(namesOf(roster.filter(matches)));
 
   test.describe(`the ${noun} filters`, () => {
     test('search narrows the grid to matching names', async ({ page }) => {
@@ -59,9 +64,7 @@ function describeFilters<I extends CollectionItem>(collection: CollectionPage<I>
       await page.getByRole('searchbox').fill(sample.name);
 
       const query = sample.name.toLowerCase();
-      await expect
-        .poll(() => sortedNames(page))
-        .toEqual(namesOf(roster.filter((item) => item.name.toLowerCase().includes(query))));
+      await expectGridOf(page, (item) => item.name.toLowerCase().includes(query));
     });
 
     test('a rarity chip narrows the grid to that rarity', async ({ page }) => {
@@ -69,9 +72,7 @@ function describeFilters<I extends CollectionItem>(collection: CollectionPage<I>
 
       await page.getByRole('button', { name: `Filter by ${RARITY}-star` }).click();
 
-      await expect
-        .poll(() => sortedNames(page))
-        .toEqual(namesOf(roster.filter((item) => item.rarity === RARITY)));
+      await expectGridOf(page, (item) => item.rarity === RARITY);
     });
 
     test('a category chip narrows the grid to that category', async ({ page }) => {
@@ -80,9 +81,7 @@ function describeFilters<I extends CollectionItem>(collection: CollectionPage<I>
       const value = category(sample);
       await page.getByRole('button', { name: `Filter by ${value}` }).click();
 
-      await expect
-        .poll(() => sortedNames(page))
-        .toEqual(namesOf(roster.filter((item) => category(item) === value)));
+      await expectGridOf(page, (item) => category(item) === value);
     });
 
     test('the ownership chips split owned from unowned', async ({ signedInPage: page }) => {
@@ -92,9 +91,7 @@ function describeFilters<I extends CollectionItem>(collection: CollectionPage<I>
       await expect.poll(() => names(page)).toEqual([sample.name]);
 
       await page.getByRole('button', { name: /^unowned$/i }).click();
-      await expect
-        .poll(() => sortedNames(page))
-        .toEqual(namesOf(roster.filter((item) => item !== sample)));
+      await expectGridOf(page, (item) => item !== sample);
     });
 
     test('the direction control reverses the order', async ({ page }) => {
