@@ -43,7 +43,7 @@ for (const roster of ROSTERS) {
     });
 }
 
-// One process loads genshin-db once, where a run per roster loads it each time.
+// genshin-db is slow to load, so one process serves every roster.
 program
   .command('all')
   .description('Regenerate every roster in @genshin/game-data')

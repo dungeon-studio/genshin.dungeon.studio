@@ -8,6 +8,5 @@ set -x
 pnpm exec turbo run build --filter=@genshin/game-data-codegen --output-logs=errors-only
 node tools/game-data-codegen/dist/cli.js all
 
-# The generators emit unformatted source, so committed modules only match
-# after Prettier.
+# The committed modules are Prettier-formatted; the generators' output isn't.
 pnpm exec prettier --write --log-level=warn packages/game-data/src/*.generated.ts

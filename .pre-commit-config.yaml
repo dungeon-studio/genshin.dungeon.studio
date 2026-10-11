@@ -233,7 +233,7 @@ repos:
           )$
         pass_filenames: false
 
-      # Generators import @genshin/game-data, so its sources feed the output too.
+      # The generators import @genshin/game-data, so its sources are inputs too.
       - id: game-data
         name: game data (regenerate from genshin-db)
         entry: scripts/regenerate-game-data.sh
