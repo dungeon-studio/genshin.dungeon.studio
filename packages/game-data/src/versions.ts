@@ -1,10 +1,6 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { ARTIFACT_SET_ROSTER } from './artifacts.js';
-import { CHARACTER_ROSTER } from './characters.js';
-import { WEAPON_ROSTER } from './weapons.js';
-
 // Luna versions map to [major, minor] tuples in the 6.x series (after 5.x, the last numeric era).
 const LUNA_VERSIONS = new Map<string, readonly [number, number]>([
   ['Luna I', [6, 0]],
@@ -54,11 +50,13 @@ export function compareVersions(a: string, b: string): number {
   return aMajor - bMajor || aMinor - bMinor;
 }
 
-/** The game version the static data in this package covers: the newest version any record carries. */
-export const GAME_DATA_VERSION: string = [
-  ...CHARACTER_ROSTER,
-  ...WEAPON_ROSTER,
-  ...ARTIFACT_SET_ROSTER,
-]
-  .map((record) => record.version)
-  .reduce((max, version) => (compareVersions(version, max) > 0 ? version : max));
+/**
+ * The newest of the given versions, by {@link compareVersions}.
+ *
+ * @throws TypeError on an empty list.
+ */
+export function latestVersion(versions: readonly string[]): string {
+  return versions.reduce((latest, version) =>
+    compareVersions(version, latest) > 0 ? version : latest,
+  );
+}

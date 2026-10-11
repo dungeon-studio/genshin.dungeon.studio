@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { compareVersions, GAME_DATA_VERSION } from './versions.js';
+import { compareVersions } from './versions.js';
 
 describe('compareVersions', () => {
   describe('numeric versions', () => {
@@ -47,12 +47,6 @@ describe('compareVersions', () => {
     it('places Luna versions after numeric versions', () => {
       expect(compareVersions('5.8', 'Luna I')).toBeLessThan(0);
       expect(compareVersions('Luna I', '5.8')).toBeGreaterThan(0);
-    });
-  });
-
-  describe('GAME_DATA_VERSION', () => {
-    it('is a valid version string for compareVersions', () => {
-      expect(() => compareVersions(GAME_DATA_VERSION, '1.0')).not.toThrow();
     });
   });
 
