@@ -148,8 +148,8 @@ importers:
         specifier: 0.16.2
         version: 0.16.2
       '@firebase/auth':
-        specifier: 1.13.6
-        version: 1.13.6(@firebase/app@0.16.2)
+        specifier: 1.13.7
+        version: 1.13.7(@firebase/app@0.16.2)
       '@genshin/collection-json':
         specifier: workspace:*
         version: link:../../packages/collection-json
@@ -1296,9 +1296,9 @@ packages:
   '@firebase/auth-interop-types@0.2.6':
     resolution: {integrity: sha512-FgwZqDrBqgK0BHI70QTv1v/5wmuDF9f8fsJFvKSxoRlK2PPfSQtZAk2jhXu4pe9BZzFi/e4UYusU/bEQHdf6Qg==}
 
-  '@firebase/auth@1.13.6':
-    resolution: {integrity: sha512-MKRLvF72HJ/irNn2fJR0Gv5FOZNtqv1IBeJHRwK8l8pZ/wi9vuUw8ecyCMvQDDNxfS6uW0MWACL5KC4Y8Pp+fA==}
-    engines: {node: '>=20.0.0'}
+  '@firebase/auth@1.13.7':
+    resolution: {integrity: sha512-00wn8cMrh1ZyEPF6RO5G081Xq1b57FN0QxChiAda0hy/D3Q5TrMk30qhWszRWCgXPRipw6yM6qtqUew3u3qEjA==}
+    engines: {node: '>=24.12.0'}
     peerDependencies:
       '@firebase/app': 0.x
       '@react-native-async-storage/async-storage': ^2.2.0 || ^3.0.0
@@ -8466,7 +8466,7 @@ snapshots:
 
   '@firebase/auth-interop-types@0.2.6': {}
 
-  '@firebase/auth@1.13.6(@firebase/app@0.16.2)':
+  '@firebase/auth@1.13.7(@firebase/app@0.16.2)':
     dependencies:
       '@firebase/app': 0.16.2
       '@firebase/component': 0.7.5
