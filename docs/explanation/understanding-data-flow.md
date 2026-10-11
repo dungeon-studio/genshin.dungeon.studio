@@ -9,15 +9,15 @@ the browser's `localStorage`. This document maps where each copy lives, which
 processes move data between them, and what each client write does to each copy
 when it succeeds and when it fails.
 
-It's written for a contributor changing a write path, and for whoever settles
-which copy is authoritative, the decision [#1133] tracks.
-It describes the system as it stands and decides nothing. It doesn't cover
+It's for contributors changing a write path, and for the decision in [#1133]
+on which copy is authoritative. It describes the system as it stands and
+decides nothing. It doesn't cover
 static game data, which ships in the bundle and is never written, or the
 theme preference, which stays in the browser that set it.
 
-The diagrams are Mermaid, which GitHub renders inline. The data flow diagrams
-show where data goes and nothing about order or failure. The sequence diagrams
-under [Write paths](#write-paths) carry those.
+The data flow diagrams show where data goes. The sequence diagrams under
+[Write paths](#write-paths) show order and failure, which a data flow diagram
+can't.
 
 ---
 
@@ -121,9 +121,9 @@ flowchart LR
 Two signals drive this diagram but carry no data, so they don't appear as
 flows:
 
-- A successful mutation invalidates its query key (`invalidateUserQuery`),
-  which makes 4.0 refetch. No collection or team mutation writes into D2
-  directly. Account deletion empties it with `queryClient.clear`.
+- A successful mutation invalidates its query, which makes 4.0 refetch. No
+  collection or team mutation writes into D2 directly. Account deletion
+  empties it.
 - An auth change to anything but signed in makes each feature's 5.0 effect empty
   its D1 store.
 
@@ -131,22 +131,21 @@ flows:
 
 ## Write paths
 
-The inventory works back from the sinks rather than forward from features,
-because sinks are finite and searchable:
+A write path is any code that reaches one of these:
 
-- Every non-`GET` route under `apps/api/src/routes/`.
-- Every zustand `set` and `persist` call under `apps/web/src/features/`.
-- Every TanStack Query `useMutation` and cache call.
+- A non-`GET` route under `apps/api/src/routes/`.
+- A zustand `set` or `persist` call under `apps/web/src/features/`.
+- A TanStack Query mutation or cache call.
 
-That yields four features: characters, weapons, teams, and the account. Artifact
-plans travel inside a team save, so they share the team path.
+Four features do: characters, weapons, teams, and the account. Artifact plans
+travel inside a team save, so they share the team path. A new write path
+belongs in this document.
 
 Each feature's hook is the only writer to its store and the only caller of its
 mutations, and each feature reads from its zustand store, never from the cache.
 Each hook also runs its own 5.0: an effect that copies the refetched cache into
 D1 whenever the query data changes. [Divergences](#divergences) compares the
-features side by side, so the sections below cover only what that table
-can't.
+features side by side.
 
 ### Characters
 
@@ -189,8 +188,6 @@ sequenceDiagram
     end
   end
 ```
-
-Signed out, the write stops at D1, and 6.0 carries it to D3.
 
 The first time the query resolves for a signed-in user, `useServerSync` also
 makes the sign-in push. It merges D1 into the server collection, then sends a
@@ -237,9 +234,6 @@ sequenceDiagram
   end
   Cache-->>Store: 5.0 effect: refetched weapons, setWeapons (replace)
 ```
-
-`ensureWeapon` keeps a set of in-flight weapon IDs so repeated clicks during
-one `POST` don't create several instances.
 
 ### Teams
 
@@ -326,39 +320,29 @@ Inbound, every feature runs the same chain:
 | Weapons    | `toWeaponRecord`: record keyed by instance ID          | identity: `setWeapons` stores the cache shape            |
 | Teams      | `parseTeamsResponse`: array of `CollectionTeam`        | `collectionTeamsToStore`: four slots over `initialTeams` |
 
-Teams reads with `apiGet`, one page. Characters and weapons follow `next`
-links through `apiGetAllItems`.
+Teams read one page. Characters and weapons follow `next` links to the end.
 
-Outbound has no shared conversion function. Each mutation builds its request
-body as an object literal: `{ constellationLevel }`, `{ weaponId, refinementLevel }`,
-`{ refinementLevel }`, or, for teams, `teamToSavePayload`, which passes the
-domain `CollectionTeamMembers` through unchanged. `apiPut`, `apiPost`, and
-`apiPatch` send it as plain JSON. 3.0 validates the body against the request
-schema, and teams rebuild members with `deserialiseCollectionTeamMembers` before
-the repository's `toDocument` stamps the current schema version.
+Outbound has no conversion layer: each mutation writes its request body inline,
+and teams send the domain members unchanged. 3.0 validates the body against the
+request schema, then the repository's `toDocument` stamps the current schema
+version.
 
 Conversions done in more than one layer:
 
-- **Timestamps.** The server mints `createdAt` and `updatedAt` in each
-  repository's `save`, for characters, weapons, and teams. The client mints its
-  own in the character store's `addCharacter` and `setConstellationLevel`, in
-  `preferHigherConstellation`, in the team store's edits, and in
-  `createEmptyTeam`. A character keeps the client's values until a refetch
-  replaces them, because `applyMutationResult` copies only the constellation
-  level.
-- **Default team name.** `createEmptyTeam` and the team store's `setTeamName`,
-  for a blank name, both use `defaultTeamName`. The server's `nextTeam` writes
-  the same string from its own template literal.
-- **Merge rule.** The server's `nextCharacter` keeps the latest write. The
-  client's `mergeCollections` keeps the higher constellation. The same pair of
-  values resolves differently depending on which side merges.
+- **Timestamps.** Both sides mint `createdAt` and `updatedAt`: the server on
+  every save, the client on every character and team store edit. D1 shows the
+  client's values until a refetch replaces them.
+- **Default team name.** The client calls `defaultTeamName`. The server's
+  `nextTeam` writes the same string itself.
+- **Merge rule.** The server keeps the latest write. The client's
+  `mergeCollections` keeps the higher constellation. The same two values
+  resolve differently depending on which side merges.
 
 ---
 
 ## Divergences
 
-Each feature answers the same question differently. The table records the
-answers as they stand.
+Characters, weapons, and teams differ on each of these questions:
 
 | Question                                   | Characters                             | Weapons                     | Teams                         |
 | ------------------------------------------ | -------------------------------------- | --------------------------- | ----------------------------- |
@@ -371,35 +355,27 @@ answers as they stand.
 
 Two consequences follow from those choices:
 
-- **The character merge protects only upward edits.** `preferHigherConstellation`
-  keeps the server's entry whenever the local level isn't higher. A refetch that
-  lands before a lowering or removing request completes restores the old value
-  in D1, even though the comment on `useServerSync` says refetches don't
-  overwrite optimistic state.
+- **The character merge protects only upward edits.** A refetch that lands
+  before a lowering or removing request completes restores the old value in
+  D1.
 - **Teams depend on the other two features.** The server rejects a team that
-  names a character or weapon instance missing from the collection. An
-  optimistic character add still in flight can therefore fail a team save that
-  depends on it, and the team rolls back. Removing a character or weapon
-  doesn't touch the teams that name it: no layer cascades.
+  names a character or weapon instance the user doesn't own, so a team save can
+  fail on a character add still in flight. Removing a character or weapon
+  leaves the teams that name it unchanged.
 
 ---
 
 ## Known defects
 
-Two character paths don't do what their own comments say. Each has an issue.
+Two character paths lose or resurrect data. Remove an entry here when its
+issue closes.
 
-- **A removal on another device comes back.** `mergeCollections` can't remove
-  a character, by design, so a character removed elsewhere stays in this
-  device's D1. `mergedForUser`, which stops a second push, is a `useRef`, so
-  it resets whenever `useCollection` mounts again, as it does on navigating
-  between the characters and teams pages. That mount's sign-in push then sends
+- **A removal on another device comes back.** The sign-in push repeats each
+  time `useCollection` mounts, such as on navigating between pages, and sends
   the removed character back to the server. Tracked in [#1741].
-- **The signed-out collection doesn't survive a page load.** Auth starts as
-  `loading`, and `signedInUid` returns `undefined` until it settles. The clear
-  effect in `useServerSync` reads that as signed out, empties D1, and 6.0
-  writes the empty collection to D3. A visitor's collection therefore reaches
-  the sign-in push only if they sign in without reloading. The hook
-  tests start already signed in, so they never exercise it. Tracked in [#1740].
+- **The signed-out collection doesn't survive a page load.** While auth loads,
+  the hook reads the user as signed out and empties D1, and 6.0 persists the
+  empty collection to D3. Tracked in [#1740].
 
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
 [#1740]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1740
