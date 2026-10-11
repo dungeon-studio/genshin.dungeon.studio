@@ -18,7 +18,6 @@ on your host before running it:
 
 - **Node.js** v20+ (`node --version`)
 - **Java** 21+, required by Firebase emulators (`java -version`)
-- **Firebase CLI** (`firebase --version`)
 - **GitHub CLI** (`gh --version`)
 - **pre-commit** (`pre-commit --version`)
 - **jq** (`jq --version`)
@@ -38,7 +37,6 @@ instructions. The commands below cover everything else.
 
 ```bash
 brew install openjdk@21 gh jq pipx pre-commit
-npm install -g firebase-tools
 ```
 
 #### Linux / Windows Subsystem for Linux
@@ -47,12 +45,10 @@ npm install -g firebase-tools
 # Debian/Ubuntu (including most WSL images)
 sudo apt-get install openjdk-21-jre-headless gh jq pipx
 pipx install pre-commit
-npm install -g firebase-tools
 
 # Fedora
 sudo dnf install java-21-openjdk-headless gh jq pipx
 pipx install pre-commit
-npm install -g firebase-tools
 ```
 
 ---

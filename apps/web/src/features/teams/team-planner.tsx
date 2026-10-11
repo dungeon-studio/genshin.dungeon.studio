@@ -24,8 +24,7 @@ interface TeamPlannerProps {
   members: CollectionTeam['members'];
   getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
   getCollectionWeapon: (collectionWeaponId: CollectionWeaponId) => CollectionWeapon | undefined;
-  selectedMemberIndex?: number | null;
-  onMemberSelect?: (memberIndex: number) => void;
+  onMemberEdit: (memberIndex: number) => void;
   onNameChange: (name: string) => void;
   onArtifactPlanChange?: (memberIndex: number, plan: ArtifactPlan | undefined) => void;
   onEdit?: () => void;
@@ -37,8 +36,7 @@ export function TeamPlanner({
   members,
   getCharacter,
   getCollectionWeapon,
-  selectedMemberIndex,
-  onMemberSelect,
+  onMemberEdit,
   onNameChange,
   onArtifactPlanChange,
   onEdit,
@@ -119,8 +117,7 @@ export function TeamPlanner({
             collectionWeapon={
               member?.weaponInstanceId ? getCollectionWeapon(member.weaponInstanceId) : undefined
             }
-            selected={selectedMemberIndex === i}
-            onSelect={onMemberSelect ? () => onMemberSelect(i) : undefined}
+            onEdit={() => onMemberEdit(i)}
             onArtifactPlanChange={
               onArtifactPlanChange ? (plan) => onArtifactPlanChange(i, plan) : undefined
             }

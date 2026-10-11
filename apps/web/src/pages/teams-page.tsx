@@ -183,7 +183,7 @@ export function TeamsPage(): JSX.Element {
               onNameChange={(name) => setTeamName(slot, name)}
               onArtifactPlanChange={(memberIndex, plan) => setArtifactPlan(slot, memberIndex, plan)}
               onEdit={() => editor.select(slot, null)}
-              onMemberSelect={(memberIndex) => editor.select(slot, memberIndex)}
+              onMemberEdit={(memberIndex) => editor.select(slot, memberIndex)}
             />
           </section>
         ))}

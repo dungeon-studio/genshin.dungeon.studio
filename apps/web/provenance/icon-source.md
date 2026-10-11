@@ -5,6 +5,9 @@ SPDX-License-Identifier: MIT
 
 # App icon prompts
 
+To rebuild the environment variants and the social preview, see
+[How to regenerate brand assets](../../../docs/how-tos/regenerate-brand-assets.md).
+
 ## Light mode variant
 
 ### Light mode prompt
@@ -80,13 +83,3 @@ another environment.
 
 Every environment shares one 1200×630 link preview, `og-image.png`. The
 document's `og:url` and `og:image` point at whichever origin serves them.
-
-## Regenerating
-
-```shell
-uv run apps/web/scripts/generate-brand-assets.py
-```
-
-Rerun after changing a source mark or `src/lib/environments.json`, then commit
-the result. That file supplies each badge's suffix, glyph, and color. The
-`brand-assets` pre-commit hook fails on any asset the script would change.
