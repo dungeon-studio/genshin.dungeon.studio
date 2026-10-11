@@ -5,6 +5,36 @@
 // Regenerate with: pnpm --filter @genshin/game-data-codegen generate weapons
 
 export const WEAPON_DATA = {
+  'beyond-the-chrysalis': {
+    id: 'beyond-the-chrysalis',
+    name: 'Beyond the Chrysalis',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 48,
+    version: '7.1',
+    subStat: {
+      type: 'CRIT DMG',
+      value: 9.6,
+    },
+    passiveName: 'Dance of Wings Unbound',
+    passiveDescription:
+      "Each time the equipping character uses their Elemental Skill or Elemental Burst, they gain one of the following three effects in sequence:\nWinds of Devotion: Increases the equipping character's CRIT DMG by 56% for 10s;\nWinds of Defiance: Increases Stellar Swirl reaction DMG dealt by the equipping character by 36% for 10s; and\nWinds of Plenty: Regenerates 5 Elemental Energy for the equipping character. Up to 5 Elemental Energy can be regenerated in this way every 4s.\nThe aforementioned effects are removed and the sequence is reset when the equipping character leaves the field.",
+  },
+  'hymn-of-the-maelstrom': {
+    id: 'hymn-of-the-maelstrom',
+    name: 'Hymn of the Maelstrom',
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 44,
+    version: '7.1',
+    subStat: {
+      type: 'HP%',
+      value: 14.4,
+    },
+    passiveName: 'Rondo of Slumber',
+    passiveDescription:
+      'Increases Healing Bonus by 4%.\nWhen performing healing, the equipping character gains the "Vatsamonga\'s Vatic Vintage" effect, which increases Max HP by 4% as well as increases the currently active party member\'s ATK by 0.4% for every 1,000 Max HP the equipping character has over 40,000. A maximum of 8% ATK can be gained in this way. This effect lasts 10s, max 3 stacks.\nWhen a nearby party member triggers a Frozen or Stellar Swirl reaction, the aforementioned Max HP and ATK boosts will be further increased by 75% for the next 5s.\nThe aforementioned effects can still trigger even when the equipping character is not on the field.',
+  },
   'exaiphanes-blade': {
     id: 'exaiphanes-blade',
     name: 'Exaiphanes Blade',
@@ -1099,6 +1129,66 @@ export const WEAPON_DATA = {
     passiveName: 'Wolfish Tracker',
     passiveDescription:
       "Increases ATK by 20%. On hit, attacks against opponents with less than 30% HP increase all party members' ATK by 40% for 12s. Can only occur once every 30s.",
+  },
+  'breezeborne-refrain': {
+    id: 'breezeborne-refrain',
+    name: 'Breezeborne Refrain',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 42,
+    version: '7.1',
+    subStat: {
+      type: 'CRIT Rate',
+      value: 6,
+    },
+    passiveName: "Viper's Ballad",
+    passiveDescription:
+      'Increases Energy Recharge by 20%. When the equipping character hits the opponent with their Elemental Skill or Elemental Burst, they gain a stack of "Hymn of the Pure." This effect can trigger once every 0.03s, max 3 stacks, and at 3 stacks, all instances of "Hymn of the Pure" are cleared to give the equipping character "Thus Lied the Viper" instead. This grants nearby party members a 24% Stellar Glimmer reaction DMG boost for 12s, during which no stacks of "Hymn of the Pure" can be obtained. The aforementioned effects can still trigger even when the equipping character is not on the field.',
+  },
+  'new-bough': {
+    id: 'new-bough',
+    name: 'New Bough',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: '7.1',
+    subStat: {
+      type: 'CRIT DMG',
+      value: 12,
+    },
+    passiveName: 'Wildgrowth',
+    passiveDescription:
+      'When the equipping character hits the opponent with an attack within 12s after using the Elemental Skill, they gain the "Verdant" effect, which increases their ATK by 4% and their Elemental Mastery by 20. This effect lasts 6s and can trigger once every second. Max 3 stacks. The aforementioned effects can still trigger even when the equipping character is not on the field.\nRadiance: Stellar Glimmer: The effect of "Verdant" is changed to: Increases ATK by 6% as well as Stellar Glimmer reaction DMG dealt by the equipping character by 8%.',
+  },
+  'silver-light': {
+    id: 'silver-light',
+    name: 'Silver Light',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: '7.1',
+    subStat: {
+      type: 'ATK%',
+      value: 9,
+    },
+    passiveName: 'Radiance on the Water',
+    passiveDescription:
+      "Increases Elemental Mastery by 52 for 12s after Elemental Skill use. Max 2 stacks, and each stack's duration is independent of the others.",
+  },
+  'winters-heavy-heart': {
+    id: 'winters-heavy-heart',
+    name: "Winter's Heavy Heart",
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 42,
+    version: '7.1',
+    subStat: {
+      type: 'CRIT DMG',
+      value: 12,
+    },
+    passiveName: 'Secrets of Frost',
+    passiveDescription:
+      'The equipping character gains "Silver-Tinged Blood Pact": The equipping character\'s Elemental Mastery is increased by 24 for every Cryo character present in the party. For every Electro character present in the party, the equipping character\'s ATK is increased by 4.8%. Up to 4 Cryo or Electro characters can provide the above buffs.\nRadiance: Stellar Glimmer: The effect of Silver-Tinged Blood Pact is changed to: For every Cryo or Electro character present in the party, the equipping character gains a 20-point Elemental Mastery boost and deals 6% increased Stellar Glimmer reaction DMG.',
   },
   'blade-of-atonement': {
     id: 'blade-of-atonement',
