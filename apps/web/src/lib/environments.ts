@@ -38,7 +38,7 @@ export interface Environment {
  * siblings, in a hue the palette does not already give a meaning to.
  *
  * The values live in `environments.json` because the brand-asset generator
- * draws the badged favicons from the same table.
+ * reads the same table.
  */
 export const ENVIRONMENTS: Readonly<Record<EnvironmentName, Environment>> = {
   dev: { name: 'dev', ...table.dev },

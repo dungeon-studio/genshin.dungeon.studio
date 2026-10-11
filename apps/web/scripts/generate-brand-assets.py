@@ -14,9 +14,8 @@ Python rather than the workspace's own toolchain because the favicon is a
 multi-resolution .ico, which Pillow writes directly and the Node imaging
 libraries do not.
 
-The brand-assets pre-commit hook reruns this and fails on any asset it rewrites,
-so its output must stay byte-reproducible: Pillow is pinned to the version the
-hook installs.
+Pillow is pinned to the brand-assets hook's version, because another version
+may encode different bytes and fail the hook on unchanged inputs.
 """
 
 from __future__ import annotations
@@ -57,7 +56,6 @@ class Badge:
 
 
 def load_badges() -> list[Badge]:
-    """One badge per environment that announces itself; production has none."""
     environments = json.loads(ENVIRONMENTS.read_text(encoding="utf-8"))
     return [
         Badge(
@@ -71,7 +69,6 @@ def load_badges() -> list[Badge]:
 
 
 def encode(name: str, image: Image.Image, **params: object) -> tuple[str, bytes]:
-    """Encode in the format the name's extension implies."""
     buffer = io.BytesIO()
     image.save(buffer, format=Image.registered_extensions()[Path(name).suffix], **params)
     return name, buffer.getvalue()
@@ -184,11 +181,7 @@ def og_image() -> tuple[str, bytes]:
 
 
 def main() -> None:
-    """Rewrite only the assets whose bytes changed and name each one.
-
-    The pre-commit hook fails on any rewrite, so this listing is the message a
-    contributor sees when an asset has gone stale.
-    """
+    """The hook fails on any rewrite, so this listing is what a contributor sees."""
     if not FONT.exists():
         raise SystemExit(f"{FONT} is missing; install the DejaVu fonts and retry")
 
