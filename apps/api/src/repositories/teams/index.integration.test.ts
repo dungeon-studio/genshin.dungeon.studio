@@ -2,15 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import type { CollectionTeamMembers, TeamSlot } from '@genshin/domain';
-import { CHARACTER_ROSTER } from '@genshin/game-data';
 import { describe, expect, it } from 'vitest';
 
 import { documentRef, newUserId } from '@/test/firestore.js';
+import { CHARACTER } from '@/test/roster.js';
 
 import { get, list, remove, save } from './index.js';
 
 const SLOT: TeamSlot = 1;
-const CHARACTER = CHARACTER_ROSTER[0];
 const TEAM_NAME = 'Vaporise';
 const RENAMED = 'Melt';
 const DESCRIPTION = 'Opens with the hydro application';

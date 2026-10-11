@@ -195,7 +195,7 @@ function useOptimisticActions(
             onSuccess: applyMutationResult,
             onError: () => {
               const currentLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
-              if (previousLevel !== undefined && currentLevel === level) {
+              if (currentLevel === level) {
                 storeSetConstellationLevel(id, previousLevel);
                 toast.error('Failed to update constellation level. Change has been reverted.');
               } else {

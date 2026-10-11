@@ -80,7 +80,7 @@ describe('FilterBar', () => {
 
     await user.click(screen.getByRole('button', { name: 'Filter by 5-star' }));
 
-    expect(onChange.mock.calls[0][0].rarities.has(5)).toBe(true);
+    expect(onChange.mock.calls[0]?.[0].rarities.has(5)).toBe(true);
   });
 
   it('removes a rarity that was already selected', async () => {
@@ -89,7 +89,7 @@ describe('FilterBar', () => {
 
     await user.click(screen.getByRole('button', { name: 'Filter by 5-star' }));
 
-    expect(onChange.mock.calls[0][0].rarities.has(5)).toBe(false);
+    expect(onChange.mock.calls[0]?.[0].rarities.has(5)).toBe(false);
   });
 
   it('delegates category toggles to the config', async () => {

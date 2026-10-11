@@ -136,7 +136,7 @@ describe('validateAcrossTeams', () => {
     };
     const issues = validateAcrossTeams(1, current, [otherTeam]);
     expect(issues.length).toBeGreaterThan(0);
-    expect(issues[0].message).toMatch(/already equipped/i);
+    expect(issues[0]?.message).toMatch(/already equipped/i);
   });
 
   it('ignores the same team slot when checking other teams', () => {

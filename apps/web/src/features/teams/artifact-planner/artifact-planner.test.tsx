@@ -6,7 +6,7 @@ import { ARTIFACT_SETS } from '@genshin/game-data';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { assert, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { ArtifactPlanner } from './artifact-planner';
 
@@ -154,7 +154,9 @@ describe('ArtifactPlanner', () => {
     const user = userEvent.setup();
     render(<Harness initial={{ sets: [obsidianCodex.id, unfinishedReverie.id] }} />);
 
-    await user.click(screen.getAllByRole('button', { name: 'Clear selection' })[0]);
+    const [clearFirst] = screen.getAllByRole('button', { name: 'Clear selection' });
+    assert.isDefined(clearFirst);
+    await user.click(clearFirst);
 
     expect(screen.queryByText(obsidianCodex.name)).not.toBeInTheDocument();
     expect(screen.queryByText(unfinishedReverie.name)).not.toBeInTheDocument();

@@ -9,7 +9,11 @@ import { Button } from '@/components/ui/button';
 import type { Theme } from './theme-context';
 import { useTheme } from './use-theme';
 
-const CYCLE: Theme[] = ['system', 'light', 'dark'];
+const NEXT: Record<Theme, Theme> = {
+  system: 'light',
+  light: 'dark',
+  dark: 'system',
+};
 
 const FACES: Record<Theme, { icon: typeof Sun; label: string }> = {
   light: { icon: Sun, label: 'Light mode' },
@@ -23,7 +27,7 @@ export function ThemeToggle(): JSX.Element {
   const { icon: Icon, label } = FACES[theme];
 
   function cycle() {
-    setTheme(CYCLE[(CYCLE.indexOf(theme) + 1) % CYCLE.length]);
+    setTheme(NEXT[theme]);
   }
 
   return (

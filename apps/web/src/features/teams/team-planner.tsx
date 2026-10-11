@@ -10,7 +10,6 @@ import type {
   CollectionWeaponId,
   TeamSlot,
 } from '@genshin/domain';
-import { MAX_TEAM_MEMBERS } from '@genshin/domain';
 import { Pencil } from 'lucide-react';
 import type { JSX } from 'react';
 import { useRef, useState } from 'react';
@@ -44,7 +43,6 @@ export function TeamPlanner({
   onArtifactPlanChange,
   onEdit,
 }: TeamPlannerProps): JSX.Element {
-  const slots = Array.from({ length: MAX_TEAM_MEMBERS }, (_, i) => members[i]);
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(name);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -110,7 +108,7 @@ export function TeamPlanner({
       </div>
 
       <div className="gap-4 sm:grid-cols-4 grid grid-cols-2">
-        {slots.map((member, i) => (
+        {members.map((member, i) => (
           <TeamMemberPlanner
             // Team slots are positional and fixed in number, so the index is a
             // stable identity.

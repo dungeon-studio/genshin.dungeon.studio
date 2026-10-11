@@ -24,6 +24,7 @@ function labelFor(code: Status | undefined): string {
   if (code === undefined) return '(unknown)';
   // A numeric enum's reverse mapping is typed `string`, but yields `undefined`
   // for codes google-gax does not know.
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   return Status[code] ?? String(code);
 }
 

@@ -151,4 +151,30 @@ describe('useCollection mutations', () => {
     await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
     expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
   });
+
+  it('restores the prior constellation level when the update fails', async () => {
+    server.use(
+      http.get('http://localhost:8080/characters', () =>
+        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })])),
+      ),
+      http.put(
+        'http://localhost:8080/characters/skirk',
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    const { result } = renderHook(() => useCollection(), {
+      wrapper: createWrapper({ user: fakeUser('user-1') }),
+    });
+
+    await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
+
+    act(() => {
+      result.current.setConstellationLevel(SKIRK, 5);
+    });
+
+    expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(5);
+    await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
+    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+  });
 });

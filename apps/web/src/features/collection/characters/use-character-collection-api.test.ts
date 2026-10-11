@@ -128,4 +128,23 @@ describe('useSetConstellationLevelMutation', () => {
     expect(putBody).toEqual({ constellationLevel: 4 });
     expect(result.current.data?.entry.constellationLevel).toBe(4);
   });
+
+  it('rejects a response that does not hold exactly one character', async () => {
+    server.use(
+      http.put('http://localhost:8080/characters/skirk', () =>
+        HttpResponse.json(charactersDocument([])),
+      ),
+    );
+
+    const { result } = renderHook(() => useSetConstellationLevelMutation(USER_ID), {
+      wrapper: createWrapper(),
+    });
+
+    act(() => {
+      result.current.mutate({ characterId: CHARACTER, level: 4 });
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(result.current.error?.message).toMatch(/expected exactly one item, got 0/);
+  });
 });

@@ -12,7 +12,7 @@ import { CURRENT_VERSION, migratePersistedCollection } from './schemas/index.js'
 export type CharacterCollection = Partial<Record<CharacterId, CollectionCharacter>>;
 
 export function ownedCharacters(collection: CharacterCollection): CollectionCharacter[] {
-  return Object.values(collection).filter((entry) => entry !== undefined);
+  return Object.values(collection);
 }
 
 export function ownedCharacterIds(collection: CharacterCollection): ReadonlySet<CharacterId> {
