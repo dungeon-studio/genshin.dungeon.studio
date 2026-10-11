@@ -7,8 +7,7 @@
 .terraform/
 
 # A lockfile only binds a root module; validating a child module writes one.
-modules/**/.terraform.lock.hcl
-bootstrap/modules/**/.terraform.lock.hcl
+**/modules/**/.terraform.lock.hcl
 
 # Crash log files
 crash.log
