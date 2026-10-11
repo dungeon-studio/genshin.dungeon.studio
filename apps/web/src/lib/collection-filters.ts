@@ -15,6 +15,11 @@ type SortField = (typeof SORT_FIELDS)[number]['value'];
 
 /** Each collection extends this with its own category set. */
 export interface BaseFilterState {
+  /**
+   * Case-insensitive substring match on the name. No Unicode normalization or
+   * accent folding: a diacritic in a name matches only when the query repeats
+   * it. Folding waits for localized display names (#862).
+   */
   search: string;
   rarities: Set<Rarity>;
   ownership: OwnershipFilter;
@@ -83,8 +88,11 @@ function matcher<I extends CollectionItem, F extends BaseFilterState, C>(
     ownershipMatches(ownedIds.has(item.id));
 }
 
-const byName: Comparator<CollectionItem> = (a, b) => a.name.localeCompare(b.name);
-const byId: Comparator<CollectionItem> = (a, b) => a.id.localeCompare(b.id);
+// An explicit locale keeps name order a property of the app, not of the viewer's runtime.
+const nameCollator = new Intl.Collator('en');
+
+const byName: Comparator<CollectionItem> = (a, b) => nameCollator.compare(a.name, b.name);
+const byId: Comparator<CollectionItem> = (a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
 
 function byRelease<I extends CollectionItem>(compareRelease: Comparator<I>): Comparator<I> {
   return (a, b) => compareRelease(a, b) || byName(a, b) || byId(a, b);
