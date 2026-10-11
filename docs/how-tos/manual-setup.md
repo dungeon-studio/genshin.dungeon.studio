@@ -13,11 +13,10 @@ This guide covers setting up the project **without DevContainers**.
 
 ## Prerequisites
 
-The setup script installs most tooling automatically, including pnpm at the
-version `packageManager` names in `package.json`. You only need these on your
-host before running it:
+The setup script installs most tooling, pnpm included. You only need these on
+your host before running it:
 
-- **Node.js** at the version in `.nvmrc`; `nvm install` selects it (`node --version`)
+- **Node.js** at the version in `.nvmrc` (`node --version`)
 - **Java** 21+, required by Firebase emulators (`java -version`)
 - **Firebase CLI** (`firebase --version`)
 - **GitHub CLI** (`gh --version`)

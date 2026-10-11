@@ -47,7 +47,7 @@ The frontend is available at <http://localhost:5173>
 
 ### Without dev containers
 
-See the [Manual Setup Guide](./docs/how-tos/manual-setup.md) for the Node.js and pnpm versions to install and how to set up the project.
+See the [Manual Setup Guide](./docs/how-tos/manual-setup.md).
 
 ## Learn more
 
