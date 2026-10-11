@@ -121,4 +121,23 @@ describe('useSetRefinementLevelMutation', () => {
     expect(patchBody).toEqual({ refinementLevel: 5 });
     expect(result.current.data?.weapon.refinementLevel).toBe(5);
   });
+
+  it('rejects a response that does not hold exactly one weapon', async () => {
+    server.use(
+      http.patch('http://localhost:8080/weapons/weapon-instance-1', () =>
+        HttpResponse.json(weaponsDocument([])),
+      ),
+    );
+
+    const { result } = renderHook(() => useSetRefinementLevelMutation(USER_ID), {
+      wrapper: createWrapper(),
+    });
+
+    act(() => {
+      result.current.mutate({ collectionWeaponId: INSTANCE_ID, level: 3 });
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(result.current.error?.message).toMatch(/expected exactly one item, got 0/);
+  });
 });

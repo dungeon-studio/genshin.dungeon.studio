@@ -4,16 +4,12 @@
 import { randomUUID } from 'node:crypto';
 
 import type { CollectionWeapon, UUID } from '@genshin/domain';
-import { WEAPON_ROSTER } from '@genshin/game-data';
 import { describe, expect, it } from 'vitest';
 
 import { documentRef, newUserId } from '@/test/firestore.js';
+import { OTHER_WEAPON, WEAPON } from '@/test/roster.js';
 
 import { create, get, list, remove, update } from './index.js';
-
-// Two distinct weapons, so a filtered list has something to leave out. Taken
-// from game data, so a roster change cannot strand the suite.
-const [WEAPON, OTHER_WEAPON] = WEAPON_ROSTER;
 
 const REFINEMENT_LEVEL = 1;
 const RAISED_REFINEMENT_LEVEL = 5;

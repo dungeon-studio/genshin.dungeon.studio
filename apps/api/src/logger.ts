@@ -65,7 +65,7 @@ function serialiseError(error: unknown): unknown {
   return {
     ...serialised,
     message: serialised.message.replace(JWT_PATTERN, CENSOR),
-    stack: serialised.stack?.replace(JWT_PATTERN, CENSOR),
+    stack: serialised.stack.replace(JWT_PATTERN, CENSOR),
   };
 }
 

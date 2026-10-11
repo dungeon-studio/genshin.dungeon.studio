@@ -69,12 +69,14 @@ function setupTeamsPage(): UserEvent {
   return user;
 }
 
-async function openFirstEmptyMember(user: UserEvent): Promise<void> {
-  await user.click((await screen.findAllByRole('button', { name: /No character/ }))[0]);
+async function firstEmptyMember() {
+  const [member] = await screen.findAllByRole('button', { name: /No character/ });
+  if (!member) throw new Error('no empty member position');
+  return member;
 }
 
 async function pickWeaponFirst(user: UserEvent, weapon: Weapon): Promise<void> {
-  await openFirstEmptyMember(user);
+  await user.click(await firstEmptyMember());
   await user.click(await screen.findByRole('button', { name: 'Weapons' }));
   await user.click(
     await screen.findByRole('button', { name: `Assign ${weapon.name} to character` }),
@@ -82,7 +84,7 @@ async function pickWeaponFirst(user: UserEvent, weapon: Weapon): Promise<void> {
 }
 
 async function pickCharacterFirst(user: UserEvent, character: Character): Promise<void> {
-  await openFirstEmptyMember(user);
+  await user.click(await firstEmptyMember());
   await user.click(await screen.findByRole('button', { name: `Add ${character.name} to team` }));
 }
 
@@ -120,7 +122,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   it('leaves the character pool unnarrowed when no weapon was picked first', async () => {
     const user = setupTeamsPage();
 
-    await openFirstEmptyMember(user);
+    await user.click(await firstEmptyMember());
 
     expect(
       await screen.findByRole('button', { name: `Add ${BOW_USER.name} to team` }),
@@ -130,7 +132,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   it('offers weapons of any type, filterable, on a member with no character', async () => {
     const user = setupTeamsPage();
 
-    await openFirstEmptyMember(user);
+    await user.click(await firstEmptyMember());
     await user.click(await screen.findByRole('button', { name: 'Weapons' }));
 
     expect(
@@ -244,7 +246,9 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
     });
 
     const teamTwo = screen.getByRole('region', { name: 'Team 2' });
-    await user.click(within(teamTwo).getAllByRole('button', { name: /No character/ })[0]);
+    const [teamTwoMember] = within(teamTwo).getAllByRole('button', { name: /No character/ });
+    if (!teamTwoMember) throw new Error('no empty member position in team 2');
+    await user.click(teamTwoMember);
     await user.click(await screen.findByRole('button', { name: 'Weapons' }));
 
     const card = await screen.findByRole('button', {
@@ -283,7 +287,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
 
     await pickWeaponFirst(user, CLAYMORE);
     await user.click(screen.getByRole('button', { name: 'Close' }));
-    await openFirstEmptyMember(user);
+    await user.click(await firstEmptyMember());
 
     // Reopened on the same member, so a surviving weapon would still be constraining.
     expect(

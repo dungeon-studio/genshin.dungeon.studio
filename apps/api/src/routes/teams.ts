@@ -128,10 +128,10 @@ async function validateComposition(
 
   // Cross-team weapon uniqueness: a weapon instance can only be equipped by one
   // character at a time across all teams (#635).
-  const issues = validateAcrossTeams(slot, members, await Teams.list(userId));
+  const [issue] = validateAcrossTeams(slot, members, await Teams.list(userId));
 
-  if (issues.length > 0) {
-    throw new HTTPException(400, { message: issues[0].message });
+  if (issue) {
+    throw new HTTPException(400, { message: issue.message });
   }
 }
 
@@ -170,9 +170,9 @@ async function validateMembers(userId: string, members: CollectionTeamMember[]):
 
       // Validate artifact plan if provided
       if (member.artifactPlan) {
-        const issues = validateArtifactPlan(member.artifactPlan);
-        if (issues.length > 0) {
-          throw new HTTPException(400, { message: issues[0].message });
+        const [issue] = validateArtifactPlan(member.artifactPlan);
+        if (issue) {
+          throw new HTTPException(400, { message: issue.message });
         }
       }
     }),
