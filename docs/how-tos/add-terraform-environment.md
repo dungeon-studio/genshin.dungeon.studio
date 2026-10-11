@@ -85,10 +85,6 @@ Then set/update GitHub secrets from `github_secrets_setup` output.
 
 ---
 
-## 7) Validate and open pull request
+## 7) Open a pull request
 
-After making changes:
-
-1. Run `terraform fmt -recursive` in changed Terraform directories
-2. Run `terraform init -backend=false && terraform validate` where relevant
-3. Commit updates and open a pull request to `develop`
+Commit and open a pull request to `develop`.

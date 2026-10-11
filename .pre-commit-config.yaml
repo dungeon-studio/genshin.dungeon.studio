@@ -80,8 +80,8 @@ repos:
       - id: terraform_fmt
         args: [--args=-recursive]
       - id: terraform_validate
-        # Validation is static, so it needs neither the GCS backend nor
-        # credentials.
+        # Validate never reads state, so it skips the GCS backend and the
+        # credentials it needs.
         args: [--tf-init-args=-backend=false]
       - id: terraform_trivy
         args:
