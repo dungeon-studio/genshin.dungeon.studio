@@ -3,8 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { CHARACTER_ROSTER } from './characters.js';
-import { compareVersions, GAME_DATA_VERSION } from './versions.js';
+import { compareVersions, latestVersion } from './versions.js';
 
 describe('compareVersions', () => {
   describe('numeric versions', () => {
@@ -51,19 +50,6 @@ describe('compareVersions', () => {
     });
   });
 
-  describe('GAME_DATA_VERSION', () => {
-    it('is a valid version string for compareVersions', () => {
-      expect(() => compareVersions(GAME_DATA_VERSION, '1.0')).not.toThrow();
-    });
-
-    it('is >= the latest version in the character roster', () => {
-      const maxCharacterVersion = CHARACTER_ROSTER.map((c) => c.version).reduce((max, version) =>
-        compareVersions(version, max) > 0 ? version : max,
-      );
-      expect(compareVersions(GAME_DATA_VERSION, maxCharacterVersion)).toBeGreaterThanOrEqual(0);
-    });
-  });
-
   describe('invalid versions', () => {
     it('throws for non-numeric strings', () => {
       expect(() => compareVersions('abc', '1.0')).toThrow('Invalid version string: "abc"');
@@ -80,5 +66,12 @@ describe('compareVersions', () => {
     it('throws for extra segments', () => {
       expect(() => compareVersions('1.2.3', '1.0')).toThrow('Invalid version string: "1.2.3"');
     });
+  });
+});
+
+describe('latestVersion', () => {
+  it('picks the newest in game order, not string order', () => {
+    expect(latestVersion(['5.9', '5.10'])).toBe('5.10');
+    expect(latestVersion(['6.1', 'Luna I'])).toBe('6.1');
   });
 });

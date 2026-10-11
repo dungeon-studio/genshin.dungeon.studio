@@ -29,10 +29,6 @@ Confirm the gates pass:
 pnpm turbo run typecheck test lint --filter @genshin/game-data
 ```
 
-When the roster gains a newer patch than `GAME_DATA_VERSION`, raise that
-constant in `packages/game-data/src/versions.ts` to match. A test fails until
-you do, and the site footer reads it.
-
 ## Add a release date for a new character
 
 `genshin-db` carries no release date, so `generate characters` aborts on any

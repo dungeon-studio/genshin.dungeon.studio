@@ -1,9 +1,6 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-/** The game version the static data in this package covers. */
-export const GAME_DATA_VERSION = '7.1';
-
 // Luna versions map to [major, minor] tuples in the 6.x series (after 5.x, the last numeric era).
 const LUNA_VERSIONS = new Map<string, readonly [number, number]>([
   ['Luna I', [6, 0]],
@@ -51,4 +48,14 @@ export function compareVersions(a: string, b: string): number {
   const [aMajor, aMinor] = versionTuple(a);
   const [bMajor, bMinor] = versionTuple(b);
   return aMajor - bMajor || aMinor - bMinor;
+}
+
+/**
+ * @throws TypeError on an empty list.
+ * @throws Error on a string {@link compareVersions} rejects.
+ */
+export function latestVersion(versions: readonly string[]): string {
+  return versions.reduce((latest, version) =>
+    compareVersions(version, latest) > 0 ? version : latest,
+  );
 }
