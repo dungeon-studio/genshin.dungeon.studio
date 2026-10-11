@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { firstBannerDates, renderFirstBannerDates, toCharacterBanners } from './paimon-moe.js';
+import { firstBannerDates, serializeFirstBannerDates, toCharacterBanners } from './paimon-moe.js';
 
 describe('toCharacterBanners', () => {
   it('rejects a module whose banners lack a featured list', () => {
@@ -24,23 +24,15 @@ describe('firstBannerDates', () => {
   });
 });
 
-describe('renderFirstBannerDates', () => {
-  const rendered = renderFirstBannerDates(
-    new Map([
-      ['kaedehara-kazuha', '2021-06-29'],
-      ['albedo', '2020-12-23'],
-    ]),
-  );
-
-  it('credits paimon-moe in the SPDX header', () => {
-    // REUSE-IgnoreStart
-    expect(rendered).toMatch(/^\/\/ SPDX-FileCopyrightText: 2021 Made Baruna$/m);
-    // REUSE-IgnoreEnd
-  });
-
+describe('serializeFirstBannerDates', () => {
   it('sorts by id and quotes only the keys Prettier would', () => {
-    expect(rendered).toContain(
-      "= {\n  albedo: '2020-12-23',\n  'kaedehara-kazuha': '2021-06-29',\n};",
+    const entries = serializeFirstBannerDates(
+      new Map([
+        ['kaedehara-kazuha', '2021-06-29'],
+        ['albedo', '2020-12-23'],
+      ]),
     );
+
+    expect(entries).toEqual(["  albedo: '2020-12-23',", "  'kaedehara-kazuha': '2021-06-29',"]);
   });
 });
