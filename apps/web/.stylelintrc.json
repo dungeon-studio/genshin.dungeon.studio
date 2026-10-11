@@ -10,7 +10,7 @@
     "at-rule-prelude-no-invalid": [
       true,
       {
-        "ignoreAtRules": ["apply"]
+        "ignoreAtRules": ["apply", "media"]
       }
     ],
     "value-keyword-case": [
