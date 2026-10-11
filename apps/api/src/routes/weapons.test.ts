@@ -85,7 +85,8 @@ describe('Weapon routes', () => {
 
       const res = await app.request(authedRequest('GET', '/weapons'));
 
-      expect(unroutedHrefs((await res.json()) as CollectionDocument)).toEqual([]);
+      const body = (await res.json()) as CollectionDocument;
+      expect(unroutedHrefs(body)).toEqual([]);
     });
 
     it('returns 500 when repository throws', async () => {
@@ -132,7 +133,8 @@ describe('Weapon routes', () => {
         authedRequest('GET', '/weapons?weaponId=mistsplitter-reforged'),
       );
 
-      expect(unroutedHrefs((await res.json()) as CollectionDocument)).toEqual([]);
+      const body = (await res.json()) as CollectionDocument;
+      expect(unroutedHrefs(body)).toEqual([]);
     });
 
     it('returns 400 for unknown weapon ID', async () => {

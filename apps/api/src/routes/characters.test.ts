@@ -109,7 +109,8 @@ describe('Character routes', () => {
 
       const res = await app.request(authedRequest('GET', '/characters'));
 
-      expect(unroutedHrefs((await res.json()) as CollectionDocument)).toEqual([]);
+      const body = (await res.json()) as CollectionDocument;
+      expect(unroutedHrefs(body)).toEqual([]);
     });
 
     it('returns 500 when repository throws', async () => {
