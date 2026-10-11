@@ -1,0 +1,17 @@
+// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+// SPDX-License-Identifier: MIT
+
+import type { GrpcStatus } from 'firebase-admin/firestore';
+
+import type { FirestoreError } from '@/repositories/firestore/error.js';
+
+/**
+ * A Firestore rejection in the shape the client library produces: a plain
+ * `Error` with the gRPC status attached, not an instance of any library class.
+ *
+ * The emulator can't be made to exhaust a quota or go unavailable on demand, so
+ * the transient codes reach the unit suite through this fixture instead.
+ */
+export function firestoreError(code: GrpcStatus, message = 'firestore said no'): FirestoreError {
+  return Object.assign(new Error(message), { code });
+}
