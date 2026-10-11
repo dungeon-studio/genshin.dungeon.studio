@@ -39,11 +39,6 @@ Each icon has two variants:
 
 File names follow the pattern `{name}-light.png` / `{name}-dark.png`.
 
-Provenance files sit outside `apps/web/public/` because Vite publishes
-everything in that directory. Each provenance file captures the final prompts,
-generation date, and post-processing notes for both variants of the accepted
-icon.
-
 ## Color palette
 
 ### Elements
