@@ -8,15 +8,14 @@ import { Link, useLocation } from 'react-router-dom';
 import { Container } from '@/components/chrome/container';
 import { useAuth } from '@/features/auth';
 import { buildBugReportUrl } from '@/lib/debug-info';
-
-const GITHUB_REPO = 'https://github.com/dungeon-studio/genshin.dungeon.studio';
+import { REPOSITORY_URL } from '@/lib/repository';
 
 export function Footer(): JSX.Element {
   const auth = useAuth();
   const location = useLocation();
 
   const pageUrl = window.location.origin + location.pathname + location.search + location.hash;
-  const reportUrl = buildBugReportUrl(`${GITHUB_REPO}/issues/new`, pageUrl, {
+  const reportUrl = buildBugReportUrl(`${REPOSITORY_URL}/issues/new`, pageUrl, {
     appVersion: __APP_VERSION__,
     buildSha: __BUILD_SHA__,
     gameDataVersion: GAME_DATA_VERSION,
@@ -45,7 +44,7 @@ export function Footer(): JSX.Element {
             </li>
             <li>
               <a
-                href={`${GITHUB_REPO}/issues/new?template=feature-request.yml`}
+                href={`${REPOSITORY_URL}/issues/new?template=feature-request.yml`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline-offset-4 hover:underline"
@@ -55,7 +54,7 @@ export function Footer(): JSX.Element {
             </li>
             <li>
               <a
-                href={`${GITHUB_REPO}/discussions`}
+                href={`${REPOSITORY_URL}/discussions`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline-offset-4 hover:underline"
@@ -65,7 +64,7 @@ export function Footer(): JSX.Element {
             </li>
             <li>
               <a
-                href={`${GITHUB_REPO}/blob/develop/CHANGELOG.md`}
+                href={`${REPOSITORY_URL}/blob/develop/CHANGELOG.md`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline-offset-4 hover:underline"
@@ -75,7 +74,7 @@ export function Footer(): JSX.Element {
             </li>
             <li>
               <a
-                href={GITHUB_REPO}
+                href={REPOSITORY_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline-offset-4 hover:underline"
