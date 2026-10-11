@@ -5,7 +5,7 @@ import type { Character } from '@genshin/game-data';
 import genshinDb from 'genshin-db';
 import type { Character as DbCharacter } from 'genshin-db';
 
-import { CHARACTER_RELEASE_DATES } from './character-release-dates.js';
+import { debutDate } from './debut-dates.js';
 import { serializeEntry, writeGeneratedModule } from './emit.js';
 import { toElement, toWeaponType } from './genshin-db-enums.js';
 import { queryInEnglish } from './language.js';
@@ -39,13 +39,6 @@ function isRosterMember(record: DbCharacter | undefined): record is DbCharacter 
 function toCharacter(record: DbCharacter): GeneratedCharacter {
   const id = toId(record.name, 'character');
 
-  const releaseDate = CHARACTER_RELEASE_DATES[id];
-  if (!releaseDate) {
-    throw new Error(
-      `No release date for "${id}"; add the debut-banner date to CHARACTER_RELEASE_DATES`,
-    );
-  }
-
   return {
     id,
     name: record.name,
@@ -54,7 +47,7 @@ function toCharacter(record: DbCharacter): GeneratedCharacter {
     rarity: record.rarity,
     region: record.region || UNKNOWN_REGION,
     version: record.version,
-    releaseDate,
+    releaseDate: debutDate(id, record.version),
   };
 }
 
@@ -66,9 +59,7 @@ function byRosterOrder(a: GeneratedCharacter, b: GeneratedCharacter): number {
  * The character roster in emission order, without writing anything.
  *
  * Split from `generateCharacters` so tests can assert on the records rather
- * than on a file. Aborts on a character absent from
- * {@link CHARACTER_RELEASE_DATES}, which is how a new debut is caught rather
- * than emitted with a missing date.
+ * than on a file. Aborts on a debut newer than the first-banner table.
  *
  * @throws Error naming the character that couldn't be built.
  */

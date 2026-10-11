@@ -6,6 +6,7 @@ import { Command } from 'commander';
 
 import { generateArtifactSets } from './artifacts.js';
 import { generateCharacters } from './characters.js';
+import { generateFirstBannerDates } from './paimon-moe.js';
 import { generateWeapons } from './weapons.js';
 
 interface Roster {
@@ -51,4 +52,16 @@ program
     ROSTERS.forEach(regenerate);
   });
 
-program.parse();
+// Fetches from paimon-moe, so `all` leaves it out to keep regeneration offline.
+program
+  .command('first-banner-dates')
+  .description(
+    "Regenerate src/first-banner-dates.generated.ts, which dates debuts, from paimon-moe's banners",
+  )
+  .action(async (): Promise<void> => {
+    console.log(
+      `Dated ${await generateFirstBannerDates()} characters; regenerate characters to apply`,
+    );
+  });
+
+await program.parseAsync();

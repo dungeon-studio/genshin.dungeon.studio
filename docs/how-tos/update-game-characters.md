@@ -32,15 +32,20 @@ Confirm the gates pass:
 pnpm turbo run typecheck test lint --filter @genshin/game-data
 ```
 
-## Add a release date for a new character
+## Date a new character
 
-`genshin-db` carries no release date, so `generate characters` aborts on any
-character missing from `CHARACTER_RELEASE_DATES` in
-`tools/game-data-codegen/src/character-release-dates.ts`. Add the start of the
-character's debut banner from
-[paimon-moe's `banners.js`](https://github.com/MadeBaruna/paimon-moe/blob/main/src/data/banners.js),
-then regenerate. The fandom wiki blocks automated fetches, which is why the
-dates come from paimon-moe.
+`genshin-db` carries no release dates, so `generate characters` dates debuts
+from `tools/game-data-codegen/src/first-banner-dates.generated.ts`, a table
+generated from
+[paimon-moe's `banners.js`](https://github.com/MadeBaruna/paimon-moe/blob/main/src/data/banners.js).
+When a character debuts after the table, generation aborts and names them.
+Regenerate the table, rebuild, then regenerate the roster:
+
+```bash
+pnpm --filter @genshin/game-data-codegen generate first-banner-dates
+pnpm turbo run build --filter @genshin/game-data-codegen
+pnpm --filter @genshin/game-data-codegen generate characters
+```
 
 ## Add a character the generator skips
 
