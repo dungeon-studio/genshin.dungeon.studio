@@ -1,14 +1,8 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# ===================================
-# Node.js & JavaScript/TypeScript
-# ===================================
-
-# Dependencies
 node_modules/
 
-# Logs
 logs
 *.log
 npm-debug.log*
@@ -23,7 +17,6 @@ pids
 *.seed
 *.pid.lock
 
-# TypeScript
 *.tsbuildinfo
 
 # Linter/formatter cache
@@ -36,7 +29,6 @@ pids
 *.tgz
 .pnpm-store/
 
-# Environment variables
 .env
 .env.*
 !.env.example
@@ -46,20 +38,13 @@ pids
 # Optional REPL history
 .node_repl_history
 
-# ===================================
-# Build Tools & Frameworks
-# ===================================
-
-# Build outputs
 build/
 dist/
 out/
 
-# Coverage reports
 coverage/
 coverage-integration/
 
-# Test results
 test-results/
 
 # Stryker mutation testing
@@ -71,47 +56,27 @@ reports/
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-# Turborepo
 .turbo/
 
 # Playwright MCP
 .playwright-mcp/
 
-# ===================================
-# IDEs & Editors
-# ===================================
-
 # VS Code extension testing
 .vscode-test
 
-# JetBrains IDEs
 .idea/
 
-# Vim
 *.swp
 *.swo
 *~
 
-# macOS
 .DS_Store
 
-# ===================================
-# Google Cloud Platform (GCP)
-# ===================================
-
-# GCP service account keys and credentials
 .gcp/
 service-account*.json
 
-# ===================================
 # Claude Code
-# ===================================
-
 .claude/settings.local.json
-
-# ===================================
-# Temporary Files
-# ===================================
 
 temp/
 tmp/

@@ -2,41 +2,33 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# Pre-commit hooks for code quality and consistency
-# See https://pre-commit.com for more information
-
-# Global excludes - never touch these directories with any hook
 exclude: |
   (?x)^(
     \.styles/(?!config)|    # Vale vendor files (exclude all of .styles/ except .styles/config/)
-    node_modules/|          # Dependencies
-    \.pnpm-store/|          # pnpm cache
-    dist/|                  # Build output
-    build/|                 # Build output
-    \.turbo/|               # Turborepo cache
-    pnpm-lock\.yaml         # Package lockfile
+    node_modules/|
+    \.pnpm-store/|
+    dist/|
+    build/|
+    \.turbo/|
+    pnpm-lock\.yaml
   )
 
 repos:
-  # Basic file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
-      # File formatting
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
       - id: end-of-file-fixer
       - id: mixed-line-ending
         args: [--fix=lf]
 
-      # Syntax validation
       - id: check-yaml
         args: [--unsafe] # Allow custom YAML tags
       - id: check-json
         exclude: '\.jsonc$|\.vscode/|tsconfig|\.devcontainer/' # Skip JSONC files and dirs with JSON-with-comments
       - id: check-toml
 
-      # Prevent issues
       - id: check-added-large-files
         args: [--maxkb=1000]
       - id: check-case-conflict
@@ -49,25 +41,21 @@ repos:
       - id: check-executables-have-shebangs
       - id: detect-private-key
 
-      # Git hygiene
       - id: no-commit-to-branch
         args: [--branch, develop, --branch, main]
 
-  # Markdown linting
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.23.3
     hooks:
       - id: markdownlint-cli2
         args: [--fix]
 
-  # YAML linting
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.38.0
     hooks:
       - id: yamllint
         args: [--strict]
 
-  # Shell script linting
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.11.0.1
     hooks:
@@ -76,7 +64,6 @@ repos:
         # unresolvable instead of checking against it.
         args: [-x]
 
-  # Shell script formatting
   - repo: https://github.com/scop/pre-commit-shfmt
     rev: v3.13.1-1
     hooks:
@@ -86,7 +73,6 @@ repos:
         # writes to stdout and exits 0 on files it would have rewritten.
         args: [--write, -i, '2', -ci]
 
-  # Vale - Prose linting
   - repo: https://github.com/errata-ai/vale
     rev: v3.24.0
     hooks:
@@ -94,7 +80,6 @@ repos:
         args: [--config=.vale.ini]
         types: [markdown]
 
-  # Terraform - Infrastructure as Code
   - repo: https://github.com/antonbabenko/pre-commit-terraform
     rev: v1.109.2
     hooks:
@@ -104,7 +89,6 @@ repos:
         args:
           - --args=--severity=HIGH,CRITICAL
 
-  # REUSE - SPDX license compliance
   - repo: https://github.com/fsfe/reuse-tool
     rev: v6.2.0
     hooks:
@@ -128,13 +112,11 @@ repos:
         language: python
         additional_dependencies: [shellcheck-py==0.11.0.1]
 
-  # Dockerfile linting
   - repo: https://github.com/AleksaC/hadolint-py
     rev: v2.15.1
     hooks:
       - id: hadolint
 
-  # Renovate config validation
   - repo: https://github.com/renovatebot/pre-commit-hooks
     rev: 44.145.1
     hooks:
