@@ -22,7 +22,7 @@ interface TeamMemberPlannerProps {
   collectionCharacter?: CollectionCharacter;
   collectionWeapon?: CollectionWeapon;
   selected?: boolean;
-  onSelect?: () => void;
+  onSelect: () => void;
   onArtifactPlanChange?: (plan: ArtifactPlan | undefined) => void;
 }
 
@@ -38,14 +38,6 @@ export function TeamMemberPlanner({
 
   const borderClass = elementBorderClass(character?.element);
 
-  const summary = (
-    <TeamMemberSummary
-      member={member}
-      collectionCharacter={collectionCharacter}
-      collectionWeapon={collectionWeapon}
-    />
-  );
-
   return (
     <Card
       className={cn('border-l-4 transition-colors', borderClass, selected && 'ring-2 ring-primary')}
@@ -53,18 +45,18 @@ export function TeamMemberPlanner({
       <CardHeader className="p-3 pb-1.5">
         {/* Only the header selects: the artifact planner's controls sit outside
             it so their clicks and keypresses never reach onSelect. */}
-        {onSelect ? (
-          <button
-            type="button"
-            onClick={onSelect}
-            aria-pressed={selected}
-            className="w-full cursor-pointer rounded-md text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          >
-            {summary}
-          </button>
-        ) : (
-          summary
-        )}
+        <button
+          type="button"
+          onClick={onSelect}
+          aria-pressed={selected}
+          className="w-full cursor-pointer rounded-md text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
+          <TeamMemberSummary
+            member={member}
+            collectionCharacter={collectionCharacter}
+            collectionWeapon={collectionWeapon}
+          />
+        </button>
       </CardHeader>
 
       {character && member && (
