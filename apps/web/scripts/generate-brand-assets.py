@@ -6,9 +6,9 @@
 # dependencies = ["pillow==11.3.0"]
 # ///
 
-"""Derive the committed brand assets from the two source marks in public/.
+"""Derive the badged favicons and link preview from the source marks in public/.
 
-Run with `uv run`, then commit what it writes. See public/icon-source.md.
+To run it, see docs/how-tos/regenerate-brand-assets.md.
 
 Python rather than the workspace's own toolchain because the favicon is a
 multi-resolution .ico, which Pillow writes directly and the Node imaging
