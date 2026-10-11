@@ -11,7 +11,7 @@ export const ARTIFACT_SET_DATA = {
     version: '7.0',
     bonuses: {
       2: 'ATK +18%.',
-      4: "Increases the equipping character's ATK by 12% for 12s when they trigger a Stellar Glimmer reaction or deal Stellar Glimmer reaction DMG. Also increases Stellar Glimmer reaction DMG dealt by all nearby party members by 50%. The above effects can trigger even when the equipping character is not on the field, and he DMG bonus from multiple Artifact Sets with the same name do not stack.",
+      4: "Increases the equipping character's ATK by 12% for 12s when they trigger a Stellar Glimmer reaction or deal Stellar Glimmer reaction DMG. Also increases Stellar Glimmer reaction DMG dealt by all nearby party members by 50%. The above effects can trigger even when the equipping character is not on the field, and the DMG bonus from multiple Artifact Sets with the same name do not stack.",
     },
   },
   'scarlet-proof': {
@@ -20,7 +20,7 @@ export const ARTIFACT_SET_DATA = {
     version: '7.0',
     bonuses: {
       2: 'ATK +18%.',
-      4: "Increases the equipping character's CRIT Rate by 16%, and their Stellar Swirl reaction dealt by 40%, for 10s after they trigger a Stellar Swirl reaction.",
+      4: "Increases the equipping character's CRIT Rate by 16%, and their Stellar Swirl reaction DMG dealt by 40%, for 10s after they trigger a Stellar Swirl reaction.",
     },
   },
   'celestial-gift': {

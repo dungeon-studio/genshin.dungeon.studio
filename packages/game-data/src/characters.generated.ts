@@ -5,6 +5,26 @@
 // Regenerate with: pnpm --filter @genshin/game-data-codegen generate characters
 
 export const CHARACTER_DATA = {
+  vesna: {
+    id: 'vesna',
+    name: 'Vesna',
+    element: 'Anemo',
+    weaponType: 'Sword',
+    rarity: 5,
+    region: 'Unknown',
+    version: '7.1',
+    releaseDate: '2026-09-23',
+  },
+  vodyanitsa: {
+    id: 'vodyanitsa',
+    name: 'Vodyanitsa',
+    element: 'Hydro',
+    weaponType: 'Catalyst',
+    rarity: 5,
+    region: 'Unknown',
+    version: '7.1',
+    releaseDate: '2026-09-23',
+  },
   odette: {
     id: 'odette',
     name: 'Odette',

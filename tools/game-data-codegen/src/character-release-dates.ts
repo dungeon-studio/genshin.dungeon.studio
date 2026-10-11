@@ -112,6 +112,8 @@ export const CHARACTER_RELEASE_DATES: Record<string, string> = {
   varesa: '2025-03-26',
   varka: '2026-02-25',
   venti: '2020-09-28',
+  vesna: '2026-09-23',
+  vodyanitsa: '2026-09-23',
   wanderer: '2022-12-07',
   wriothesley: '2023-10-17',
   xiangling: '2020-09-28',
