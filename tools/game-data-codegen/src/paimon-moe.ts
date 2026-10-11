@@ -93,15 +93,14 @@ export function serializeFirstBannerDates(dates: ReadonlyMap<string, string>): s
 }
 
 /**
- * Rewrite `first-banner-dates.generated.ts` from paimon-moe's current banner data.
- * Returns the number of characters dated.
+ * The character banners in paimon-moe's current `banners.js`.
  *
- * Evaluates the fetched `banners.js`, which upstream publishes as a module
- * rather than as data.
+ * Evaluates the fetched file, which upstream publishes as a module rather
+ * than as data.
  *
  * @throws Error when the fetch fails or upstream has reshaped the module.
  */
-export async function generateFirstBannerDates(): Promise<number> {
+async function fetchCharacterBanners(): Promise<Banner[]> {
   const response = await fetch(UPSTREAM_BANNERS);
   if (!response.ok) {
     throw new Error(
@@ -110,8 +109,17 @@ export async function generateFirstBannerDates(): Promise<number> {
   }
   const source = Buffer.from(await response.text()).toString('base64');
   const module: unknown = await import(`data:text/javascript;base64,${source}`);
+  return toCharacterBanners(module);
+}
 
-  const dates = firstBannerDates(toCharacterBanners(module));
+/**
+ * Rewrite `first-banner-dates.generated.ts` from paimon-moe's current banner data.
+ * Returns the number of characters dated.
+ *
+ * @throws Error when the fetch fails or upstream has reshaped the module.
+ */
+export async function generateFirstBannerDates(): Promise<number> {
+  const dates = firstBannerDates(await fetchCharacterBanners());
   await writeFile(
     FIRST_BANNER_DATES_MODULE,
     renderModule({
