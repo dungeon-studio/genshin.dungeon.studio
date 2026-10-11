@@ -84,6 +84,7 @@ component_management:
     - component_id: game-data-versions
       name: 'Game Data: Versions'
       paths:
+        - packages/game-data/src/game-data-version.ts
         - packages/game-data/src/versions.ts
       flag_regexes:
         - game-data

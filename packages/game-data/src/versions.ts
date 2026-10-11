@@ -51,9 +51,8 @@ export function compareVersions(a: string, b: string): number {
 }
 
 /**
- * The newest of the given versions, by {@link compareVersions}.
- *
  * @throws TypeError on an empty list.
+ * @throws Error on a string {@link compareVersions} rejects.
  */
 export function latestVersion(versions: readonly string[]): string {
   return versions.reduce((latest, version) =>
