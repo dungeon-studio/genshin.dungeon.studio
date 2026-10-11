@@ -13,7 +13,8 @@ const LAUNCH = { version: '1.0', date: '2020-09-28' };
 export type DebutDate = (id: string, version: string) => string;
 
 /**
- * Date each character by the first banner featuring them, keyed by roster id.
+ * Date characters from `firstBanner`: the start of the first banner featuring
+ * each, keyed by roster id.
  *
  * @throws Error, from the returned function, naming a post-launch character
  *   no banner features.

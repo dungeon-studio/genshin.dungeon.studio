@@ -47,8 +47,7 @@ function isBanner(value: unknown): value is Banner {
 /**
  * The character banners in an evaluated `banners.js`.
  *
- * @throws Error when upstream has reshaped the module, so a refresh fails
- *   rather than writing a partial table.
+ * @throws Error when upstream has reshaped the module.
  */
 export function toCharacterBanners(module: unknown): Banner[] {
   if (
@@ -85,7 +84,7 @@ function toKey(id: string): string {
   return /^[a-z]\w*$/.test(id) ? id : `'${id}'`;
 }
 
-/** One member per character, sorted by id. */
+/** Sorted by id, so a refresh diffs only the dates that changed. */
 export function serializeFirstBannerDates(dates: ReadonlyMap<string, string>): string[] {
   return [...dates]
     .sort(([a], [b]) => a.localeCompare(b))
