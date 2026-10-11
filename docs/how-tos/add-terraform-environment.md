@@ -45,7 +45,7 @@ Keep secret names aligned with infrastructure environment names.
 Create `infrastructure/terraform/environments/<environment>/` with these files, using `prod/` as the model:
 
 - `backend.tf`: set the state `prefix` to `environments/<environment>`
-- `main.tf`: pin the providers and call `infrastructure/terraform/modules/application_environment` with the environment's domains, web app display name, and Firestore delete protection
+- `main.tf`: pin the providers and call `infrastructure/terraform/modules/application_environment` with the environment's web subdomain, web app display name, and Firestore delete protection
 - `variables.tf` and `terraform.tfvars`: set `project_id`, `common_labels`, and the `enable_*` flags
 - `outputs.tf`: re-export the module outputs the deploy workflow reads
 
