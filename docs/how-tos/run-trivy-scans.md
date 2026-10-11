@@ -33,7 +33,7 @@ trivy config --config .trivy.yaml \
   infrastructure/terraform/environments/dev
 ```
 
-`bootstrap` has no `terraform.tfvars`, so scan it without `--tf-vars`:
+Scan `bootstrap` without `--tf-vars`, since it has no `terraform.tfvars`:
 
 ```bash
 trivy config --config .trivy.yaml infrastructure/terraform/bootstrap

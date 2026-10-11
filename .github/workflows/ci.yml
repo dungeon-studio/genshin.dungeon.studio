@@ -372,9 +372,8 @@ jobs:
         with:
           config: .github/zizmor.yml
 
-  # One scan per root module: Trivy applies a tfvars file to every root module
-  # under the scan path, so a single scan would evaluate each environment with
-  # another's values.
+  # Trivy applies a tfvars file to every root module under the scan path, so
+  # each root scans alone with its own.
   trivy-terraform:
     name: Scan ${{ matrix.root }} Terraform
     runs-on: ubuntu-latest
