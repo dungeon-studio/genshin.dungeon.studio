@@ -83,6 +83,8 @@ breaks on the deployment that drops its version.
 
 Only a medium that expires its own contents, such as a cache TTL or a drained
 queue, reaches that state by itself. Stored payloads have to be rewritten.
+For Firestore, `pnpm --filter @genshin/api documents:sweep` counts every
+document by stored version, and its `--write` flag rewrites the legacy ones.
 
 `schema-compat` refuses to drop a released version regardless of what the
 medium shows, so a retirement means changing the check too.

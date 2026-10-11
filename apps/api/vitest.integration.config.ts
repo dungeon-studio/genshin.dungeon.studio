@@ -23,7 +23,7 @@ export default mergeConfig(
     test: {
       globals: true,
       env: { LOG_LEVEL: 'silent' },
-      include: ['src/**/*.integration.test.ts'],
+      include: ['{src,scripts}/**/*.integration.test.ts'],
       setupFiles: ['./src/test/integration-setup.ts'],
       outputFile: {
         junit: './test-results/integration-junit.xml',
