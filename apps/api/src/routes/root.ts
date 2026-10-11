@@ -20,18 +20,19 @@ import { rootGetResponseV1 } from '@/profiles/json-schema/root/get-response-v1.j
  * through the `profile` parameter on `Content-Type` instead.
  */
 function discoverLinks<E extends Env>(app: HonoApp<E>): Record<string, { href: string }> {
-  const links: Record<string, { href: string }> = {};
+  return Object.fromEntries(
+    app.routes
+      .filter(
+        ({ method, path, handler }) =>
+          method === 'GET' && isTopLevelPath(path) && isRouteHandler(handler),
+      )
+      .map(({ path }): [string, { href: string }] => [path.slice(1), { href: path }]),
+  );
+}
 
-  for (const route of app.routes) {
-    if (route.method !== 'GET') continue;
-    if (!isRouteHandler(route.handler)) continue;
-
-    const match = /^\/([^/:*]+)$/.exec(route.path);
-    if (match?.[1] === undefined) continue;
-    links[match[1]] = { href: route.path };
-  }
-
-  return links;
+/** Whether `path` is a single literal segment, with no parameter or wildcard. */
+function isTopLevelPath(path: string): boolean {
+  return /^\/[^/:*]+$/.test(path);
 }
 
 /**
