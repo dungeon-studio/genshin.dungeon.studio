@@ -10,8 +10,7 @@ processes move data between them, and what each client write does to each copy
 when it succeeds and when it fails.
 
 It's written for a contributor changing a write path, and for whoever settles
-which copy is authoritative, the decision
-[#1133](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133) tracks.
+which copy is authoritative, the decision [#1133] tracks.
 It describes the system as it stands and decides nothing. It doesn't cover
 static game data, which ships in the bundle and is never written, or the
 theme preference, which stays in the browser that set it.
@@ -125,11 +124,8 @@ flows:
 - A successful mutation invalidates its query key (`invalidateUserQuery`),
   which makes 4.0 refetch. No collection or team mutation writes into D2
   directly. Account deletion empties it with `queryClient.clear`.
-- An auth change to anything but signed in makes 5.0's feature hook empty its
-  D1 store.
-
-Every row in D4 lives under `users/{uid}`, so `eraseStoredData` reaches every
-row with one recursive delete.
+- An auth change to anything but signed in makes each feature's 5.0 effect empty
+  its D1 store.
 
 ---
 
@@ -146,9 +142,11 @@ That yields four features: characters, weapons, teams, and the account. Artifact
 plans travel inside a team save, so they share the team path.
 
 Each feature's hook is the only writer to its store and the only caller of its
-mutations, and each feature reads from its zustand store, never from the
-cache. What differs is
-what the hook does on the way in and on the way back.
+mutations, and each feature reads from its zustand store, never from the cache.
+Each hook also runs its own 5.0: an effect that copies the refetched cache into
+D1 whenever the query data changes. [Divergences](#divergences) compares the
+features side by side, so the sections below cover only what that table
+can't.
 
 ### Characters
 
@@ -163,7 +161,7 @@ sequenceDiagram
   participant API as 3.0 API
   participant FS as D4 Firestore
   participant Cache as D2 cache
-  participant Bridge as useServerSync
+  participant Reconcile as 5.0 useServerSync
 
   Hook->>Store: addCharacter / removeCharacter / setConstellationLevel
   opt signed in
@@ -180,8 +178,8 @@ sequenceDiagram
         API-->>Hook: saved character
         Hook->>Store: applyMutationResult (constellation level only)
       end
-      Cache-->>Bridge: refetched collection
-      Bridge->>Store: mergeCollections, then replaceCharacters
+      Cache-->>Reconcile: refetched collection
+      Reconcile->>Store: mergeCollections, then replaceCharacters
     else failure
       API-->>Hook: problem detail
       alt store still holds this write's value
@@ -194,16 +192,17 @@ sequenceDiagram
 
 Signed out, the write stops at D1, and 6.0 carries it to D3.
 
-The first time the query resolves for a user, `useServerSync` also pushes. It
-merges D1 into the server collection, then sends a `PUT` for every entry the
-server lacks or holds at a lower constellation. A failed push only toasts: the
-merged value stays in D1, and nothing reverts it.
+The first time the query resolves for a signed-in user, `useServerSync` also
+makes the sign-in push. It merges D1 into the server collection, then sends a
+`PUT` for every entry the server lacks or holds at a lower constellation. A
+failed push only toasts: the merged value stays in D1, and nothing reverts
+it.
 
 ### Weapons
 
 `useWeaponCollection` in `use-weapon-collection.ts`. The server mints the
-instance identifier, so adding isn't optimistic, and every action is a no-op
-signed out.
+instance identifier, which is why adding can't be optimistic and why nothing
+works signed out: there's no identifier to record locally.
 
 ```mermaid
 sequenceDiagram
@@ -236,7 +235,7 @@ sequenceDiagram
       Hook->>Store: restore previous value
     end
   end
-  Cache-->>Store: refetched weapons, setWeapons (replace)
+  Cache-->>Store: 5.0 effect: refetched weapons, setWeapons (replace)
 ```
 
 `ensureWeapon` keeps a set of in-flight weapon IDs so repeated clicks during
@@ -267,7 +266,7 @@ sequenceDiagram
     end
     alt success
       Hook->>Cache: invalidate
-      Cache-->>Store: collectionTeamsToStore over initialTeams, then setTeams (replace)
+      Cache-->>Store: 5.0 effect: collectionTeamsToStore, then setTeams (replace)
     else failure and slot unchanged since send
       Hook->>Store: restore snapshot
       Hook->>Hook: toast
@@ -275,10 +274,7 @@ sequenceDiagram
   end
 ```
 
-Nothing applies a save's response to D1, unlike `applyMutationResult` for
-characters.
-Signed out, teams live only in D1 and vanish on reload. A `beforeunload`
-prompt guards an in-flight save.
+A `beforeunload` prompt guards an in-flight save.
 
 ### Account
 
@@ -305,8 +301,9 @@ sequenceDiagram
   end
 ```
 
-Firestore goes first so a failure between the two leaves an identity that can
-retry, not data with no owner.
+Every row in D4 lives under `users/{uid}`, so `eraseStoredData` reaches every
+row with one recursive delete. Firestore goes first so a failure between the
+two leaves an identity that can retry, not data with no owner.
 
 ---
 
@@ -321,7 +318,7 @@ Inbound, every feature runs the same chain:
 3. The query layer asserts the document and converts each item with
    `deserialiseCharacter`, `deserialiseWeapon`, or `deserialiseTeam`.
 4. The query layer folds the items into its cache shape.
-5. The bridge turns the cache shape into the store shape.
+5. Process 5.0 turns the cache shape into the store shape.
 
 | Feature    | Cache shape, step 4                                    | Store shape, step 5                                      |
 | ---------- | ------------------------------------------------------ | -------------------------------------------------------- |
@@ -332,8 +329,8 @@ Inbound, every feature runs the same chain:
 Teams reads with `apiGet`, one page. Characters and weapons follow `next`
 links through `apiGetAllItems`.
 
-Outbound has no shared conversion function. Each mutation builds its request body as an object
-literal: `{ constellationLevel }`, `{ weaponId, refinementLevel }`,
+Outbound has no shared conversion function. Each mutation builds its request
+body as an object literal: `{ constellationLevel }`, `{ weaponId, refinementLevel }`,
 `{ refinementLevel }`, or, for teams, `teamToSavePayload`, which passes the
 domain `CollectionTeamMembers` through unchanged. `apiPut`, `apiPost`, and
 `apiPatch` send it as plain JSON. 3.0 validates the body against the request
@@ -360,8 +357,8 @@ Conversions done in more than one layer:
 
 ## Divergences
 
-Each feature answers the same question differently. This section records the
-answers as they stand, not as defects.
+Each feature answers the same question differently. The table records the
+answers as they stand.
 
 | Question                                   | Characters                             | Weapons                     | Teams                         |
 | ------------------------------------------ | -------------------------------------- | --------------------------- | ----------------------------- |
@@ -370,32 +367,40 @@ answers as they stand, not as defects.
 | Applies the mutation response to D1?       | Constellation level only               | Whole instance, replaced    | No                            |
 | How a refetch reaches D1                   | Additive merge                         | Replace                     | Replace, filled to four slots |
 | Can a refetch overwrite an edit in flight? | Raise or add, no. Lower or remove, yes | Yes                         | Yes                           |
-| What a removal elsewhere does to D1        | Survives the merge, see below          | Disappears on refetch       | Disappears on refetch         |
+| What a removal elsewhere does to D1        | Survives the merge, see [#1741]        | Disappears on refetch       | Disappears on refetch         |
 
-Things that follow from those choices, observed in the current code:
+Two consequences follow from those choices:
 
 - **The character merge protects only upward edits.** `preferHigherConstellation`
   keeps the server's entry whenever the local level isn't higher. A refetch that
   lands before a lowering or removing request completes restores the old value
   in D1, even though the comment on `useServerSync` says refetches don't
   overwrite optimistic state.
-
-- **A removal on another device comes back.** `mergeCollections` can't remove
-  a character, by design, so a character removed elsewhere stays in this
-  device's D1. `mergedForUser`, which stops a second push, is a `useRef`, so it
-  resets whenever `useCollection` mounts again, as it does on navigating between the
-  characters and teams pages. That mount's first-resolution push then sends
-  the removed character back to the server. Tracked in
-  [#1741](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1741).
-- **The signed-out collection doesn't survive a page load.** Auth starts as
-  `loading`, and `signedInUid` returns `undefined` until it settles. The clear
-  effect in `useServerSync` reads that as signed out, empties D1, and 6.0
-  writes the empty collection to D3. A visitor's collection therefore reaches
-  the first-resolution merge only if they sign in without reloading. The hook
-  tests start already signed in, so they never exercise it. Tracked in
-  [#1740](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1740).
 - **Teams depend on the other two features.** The server rejects a team that
   names a character or weapon instance missing from the collection. An
   optimistic character add still in flight can therefore fail a team save that
   depends on it, and the team rolls back. Removing a character or weapon
   doesn't touch the teams that name it: no layer cascades.
+
+---
+
+## Known defects
+
+Two character paths don't do what their own comments say. Each has an issue.
+
+- **A removal on another device comes back.** `mergeCollections` can't remove
+  a character, by design, so a character removed elsewhere stays in this
+  device's D1. `mergedForUser`, which stops a second push, is a `useRef`, so
+  it resets whenever `useCollection` mounts again, as it does on navigating
+  between the characters and teams pages. That mount's sign-in push then sends
+  the removed character back to the server. Tracked in [#1741].
+- **The signed-out collection doesn't survive a page load.** Auth starts as
+  `loading`, and `signedInUid` returns `undefined` until it settles. The clear
+  effect in `useServerSync` reads that as signed out, empties D1, and 6.0
+  writes the empty collection to D3. A visitor's collection therefore reaches
+  the sign-in push only if they sign in without reloading. The hook
+  tests start already signed in, so they never exercise it. Tracked in [#1740].
+
+[#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
+[#1740]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1740
+[#1741]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1741
