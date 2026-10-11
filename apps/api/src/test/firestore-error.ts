@@ -12,6 +12,6 @@ import type { FirestoreError } from '@/repositories/firestore/error.js';
  * The emulator can't be made to exhaust a quota or go unavailable on demand, so
  * the transient codes reach the unit suite through this fixture instead.
  */
-export function firestoreError(code: GrpcStatus, message = 'firestore said no'): FirestoreError {
-  return Object.assign(new Error(message), { code });
+export function firestoreError(code: GrpcStatus): FirestoreError {
+  return Object.assign(new Error('firestore said no'), { code });
 }

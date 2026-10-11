@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { GrpcStatus as Status } from 'firebase-admin/firestore';
+import { GrpcStatus } from 'firebase-admin/firestore';
 import { HTTPException } from 'hono/http-exception';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
 
@@ -10,25 +10,21 @@ import { logger } from '@/logger.js';
 
 // Firestore gRPC errors are internal failures from the user's perspective.
 // Only transient conditions get non-500 status codes to enable client retry.
-const GRPC_TO_HTTP: Partial<Record<Status, ContentfulStatusCode>> = {
-  [Status.RESOURCE_EXHAUSTED]: 429,
-  [Status.UNAVAILABLE]: 503,
+const GRPC_TO_HTTP: Partial<Record<GrpcStatus, ContentfulStatusCode>> = {
+  [GrpcStatus.RESOURCE_EXHAUSTED]: 429,
+  [GrpcStatus.UNAVAILABLE]: 503,
 };
 
-function httpStatusFor(code: Status): ContentfulStatusCode {
-  return GRPC_TO_HTTP[code] ?? 500;
-}
-
-function labelFor(code: Status): string {
+function labelFor(code: GrpcStatus): string {
   // A numeric enum's reverse mapping is typed `string`, but yields `undefined`
   // for codes Firestore does not know.
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  return Status[code] ?? String(code);
+  return GrpcStatus[code] ?? String(code);
 }
 
 /** A rejection from a Firestore call: an `Error` carrying a gRPC status code. */
 export interface FirestoreError extends Error {
-  code: Status;
+  code: GrpcStatus;
 }
 
 /**
@@ -54,5 +50,5 @@ export function isFirestoreError(err: unknown): err is FirestoreError {
  */
 export function toHttpException(err: FirestoreError): HTTPException {
   logger.error({ grpcCode: labelFor(err.code), grpcMessage: err.message }, 'firestore call failed');
-  return new HTTPException(httpStatusFor(err.code), { message: INTERNAL_ERROR_DETAIL });
+  return new HTTPException(GRPC_TO_HTTP[err.code] ?? 500, { message: INTERNAL_ERROR_DETAIL });
 }

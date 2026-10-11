@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { ProblemDetail } from '@genshin/domain';
-import { GrpcStatus as Status } from 'firebase-admin/firestore';
+import { GrpcStatus } from 'firebase-admin/firestore';
 import { HTTPException } from 'hono/http-exception';
 import { beforeAll, describe, expect, it } from 'vitest';
 
@@ -13,13 +13,13 @@ import { app } from './app.js';
 
 beforeAll(() => {
   app.get('/__test/resource-exhausted', () => {
-    throw firestoreError(Status.RESOURCE_EXHAUSTED);
+    throw firestoreError(GrpcStatus.RESOURCE_EXHAUSTED);
   });
   app.get('/__test/unavailable', () => {
-    throw firestoreError(Status.UNAVAILABLE);
+    throw firestoreError(GrpcStatus.UNAVAILABLE);
   });
   app.get('/__test/permission-denied', () => {
-    throw firestoreError(Status.PERMISSION_DENIED);
+    throw firestoreError(GrpcStatus.PERMISSION_DENIED);
   });
   app.get('/__test/http-exception', () => {
     throw new HTTPException(503, { message: 'service unavailable' });
