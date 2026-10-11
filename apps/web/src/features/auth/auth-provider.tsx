@@ -7,21 +7,21 @@ import type { JSX, ReactNode } from 'react';
 
 import { auth } from '@/lib/firebase';
 
-import type { AuthUser } from './auth-context';
+import type { AuthState } from './auth-context';
 import { AuthContext } from './auth-context';
 
 export function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState<AuthState>({ status: 'loading' });
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-      setLoading(false);
+      setState(
+        firebaseUser ? { status: 'signed-in', user: firebaseUser } : { status: 'signed-out' },
+      );
     });
 
     return unsubscribe;
   }, []);
 
-  return <AuthContext value={{ user, loading }}>{children}</AuthContext>;
+  return <AuthContext value={state}>{children}</AuthContext>;
 }

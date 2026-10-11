@@ -12,7 +12,7 @@ import { buildBugReportUrl } from '@/lib/debug-info';
 const GITHUB_REPO = 'https://github.com/dungeon-studio/genshin.dungeon.studio';
 
 export function Footer(): JSX.Element {
-  const { user } = useAuth();
+  const auth = useAuth();
   const location = useLocation();
 
   const pageUrl = window.location.origin + location.pathname + location.search + location.hash;
@@ -20,7 +20,7 @@ export function Footer(): JSX.Element {
     appVersion: __APP_VERSION__,
     buildSha: __BUILD_SHA__,
     gameDataVersion: GAME_DATA_VERSION,
-    authenticated: user !== null,
+    authenticated: auth.status === 'signed-in',
     userAgent: navigator.userAgent,
     platform: navigator.platform,
     screenWidth: window.screen.width,

@@ -7,12 +7,12 @@ import type { JSX, ReactNode } from 'react';
 
 import type { AuthUser } from '@/features/auth';
 import { AuthContext } from '@/features/auth/auth-context';
+import { settledAuth } from '@/test/auth';
 
 interface TestProvidersProps {
   children: ReactNode;
   queryClient: QueryClient;
   user?: AuthUser | null;
-  loading?: boolean;
 }
 
 /**
@@ -25,11 +25,10 @@ export function TestProviders({
   children,
   queryClient,
   user = null,
-  loading = false,
 }: TestProvidersProps): JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthContext value={{ user, loading }}>{children}</AuthContext>
+      <AuthContext value={settledAuth(user)}>{children}</AuthContext>
     </QueryClientProvider>
   );
 }

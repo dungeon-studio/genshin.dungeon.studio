@@ -43,8 +43,8 @@ export interface SaveResult {
  * Merges an update into a slot, reporting whether the record was new so the
  * route can answer 201 rather than 200.
  *
- * Reads then writes without a transaction, so two concurrent saves to one slot
- * resolve last-writer-wins rather than merging.
+ * Concurrent saves to an empty slot create it once: exactly one result reports
+ * `created`, and every result carries the stored `createdAt`.
  */
 export async function save(
   userId: string,
@@ -52,14 +52,19 @@ export async function save(
   updates: TeamUpdates,
 ): Promise<SaveResult> {
   const docRef = collectionRef(userId).doc(String(slot));
-  const existing = readSnapshot(await docRef.get(), (data) => fromDocument(slot, data));
-  const now = new Date().toISOString() as ISOTimestamp;
 
-  const team = nextTeam(slot, updates, existing, now);
+  return db.runTransaction(async (transaction) => {
+    const existing = readSnapshot(await transaction.get(docRef), (data) =>
+      fromDocument(slot, data),
+    );
+    const now = new Date().toISOString() as ISOTimestamp;
 
-  await docRef.set(toDocument(team));
+    const team = nextTeam(slot, updates, existing, now);
 
-  return { team, created: existing === null };
+    transaction.set(docRef, toDocument(team));
+
+    return { team, created: existing === null };
+  });
 }
 
 /** Succeeds whether or not the slot was saved, so absence isn't reported. */
