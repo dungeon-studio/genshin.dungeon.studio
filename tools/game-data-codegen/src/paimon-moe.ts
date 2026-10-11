@@ -13,7 +13,6 @@ const UPSTREAM_BANNERS =
 
 const BANNER_SNAPSHOT = new URL('../vendor/paimon-moe/banners.js', import.meta.url);
 
-/** Character event banners from the vendored paimon-moe snapshot. */
 export const characterBanners: readonly Banner[] = banners.characters;
 
 /** Replace the vendored snapshot with paimon-moe's current banner data. */

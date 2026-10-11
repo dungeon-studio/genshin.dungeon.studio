@@ -14,7 +14,6 @@ const LAUNCH = { version: '1.0', date: '2020-09-28' };
 /** Resolves a character's ISO 8601 debut date from its id and genshin-db version. */
 export type DebutDate = (id: string, version: string) => string;
 
-/** The start date of the first banner rating up each character, by roster id. */
 function firstRateUps(banners: readonly Banner[]): Map<string, string> {
   const firstRateUp = new Map<string, string>();
   for (const banner of banners) {
@@ -29,8 +28,7 @@ function firstRateUps(banners: readonly Banner[]): Map<string, string> {
 }
 
 /**
- * Date each character by the start of the first banner that rates them up,
- * featured or four-star, falling back to release day for launch characters.
+ * Date each character by their first rate-up banner, five-star or four-star.
  *
  * @throws Error, from the returned function, naming a post-launch character no
  *   banner rates up.

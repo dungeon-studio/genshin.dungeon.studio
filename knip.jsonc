@@ -27,8 +27,8 @@
       }
     },
     "tools/game-data-codegen": {
-      // Types the vendored banners.js for tsc; knip follows the import to the
-      // .js, so the declaration beside it has no importer of its own.
+      // knip resolves the import to the vendored .js, so its type declaration
+      // has no importer.
       "ignoreFiles": ["vendor/paimon-moe/banners.d.ts"]
     },
     "apps/web": {

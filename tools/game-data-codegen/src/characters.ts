@@ -59,9 +59,7 @@ function byRosterOrder(a: GeneratedCharacter, b: GeneratedCharacter): number {
  * The character roster in emission order, without writing anything.
  *
  * Split from `generateCharacters` so tests can assert on the records rather
- * than on a file. Aborts on a character the banner snapshot can't date, which
- * is how a debut newer than the snapshot is caught rather than emitted with a
- * missing date.
+ * than on a file. Aborts on a debut newer than the banner snapshot.
  *
  * @throws Error naming the character that couldn't be built.
  */

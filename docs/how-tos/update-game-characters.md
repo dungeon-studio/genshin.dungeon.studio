@@ -34,13 +34,11 @@ pnpm turbo run typecheck test lint --filter @genshin/game-data
 
 ## Date a new character
 
-`genshin-db` carries no release date, so `generate characters` dates each
-character by the start of the first banner that rates them up, read from a
-committed snapshot of
+`genshin-db` carries no release dates, so `generate characters` dates debuts
+from a committed snapshot of
 [paimon-moe's `banners.js`](https://github.com/MadeBaruna/paimon-moe/blob/main/src/data/banners.js).
-Launch characters take release day instead. Generation aborts, naming the
-character, when the snapshot predates their debut. Refresh the snapshot, then
-regenerate:
+When a character debuts after the snapshot, generation aborts and names them.
+Refresh the snapshot, then regenerate:
 
 ```bash
 pnpm --filter @genshin/game-data-codegen generate fetch-banners
