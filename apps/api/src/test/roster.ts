@@ -10,8 +10,8 @@ function rosterEntry<T>(roster: readonly T[], index: number): T {
   return entry;
 }
 
-// Any entry satisfies the repository suites. Taking them from game data keeps a
-// roster change from stranding a suite on one that no longer exists.
+// Any entry satisfies the repository suites, so they take one from game data
+// rather than hard-code an id the roster might drop.
 export const CHARACTER = rosterEntry(CHARACTER_ROSTER, 0);
 export const WEAPON = rosterEntry(WEAPON_ROSTER, 0);
 

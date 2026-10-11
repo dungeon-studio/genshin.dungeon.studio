@@ -81,8 +81,8 @@ function typeAwareRules(packageDir) {
       // Both from `stylisticTypeChecked`, whose remaining rules overlap Prettier.
       '@typescript-eslint/prefer-nullish-coalescing': 'error',
       '@typescript-eslint/prefer-optional-chain': 'error',
-      // Sound only because `noUncheckedIndexedAccess` types a lookup as
-      // possibly `undefined`; without it, every guard on one reads as dead.
+      // Depends on `noUncheckedIndexedAccess` in `@genshin/tsconfig`: without
+      // it, the rule reports every guard on an index lookup as dead code.
       '@typescript-eslint/no-unnecessary-condition': 'error',
     },
   };
