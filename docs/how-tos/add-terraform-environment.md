@@ -42,19 +42,16 @@ Keep secret names aligned with infrastructure environment names.
 
 ## 3) Scaffold the environment folder
 
-Copy `infrastructure/terraform/environments/dev/` to `infrastructure/terraform/environments/<environment>/`, then update values.
+Create `infrastructure/terraform/environments/<environment>/` with these files, using `prod/` as the model:
 
-Keep these files in the new folder:
+- `backend.tf`: set the state `prefix` to `environments/<environment>`
+- `main.tf`: pin the providers and call `infrastructure/terraform/modules/application_environment` with the environment's domains, web app display name, and Firestore delete protection
+- `variables.tf` and `terraform.tfvars`: set `project_id`, `common_labels`, and the `enable_*` flags
+- `outputs.tf`: re-export the module outputs the deploy workflow reads
 
-- `backend.tf`
-- `main.tf`
-- `variables.tf`
-- `terraform.tfvars`
-- `outputs.tf`
+Leave the `enable_*` flags off until `core` publishes the environment's DNS records and the first deploy has created the API service.
 
-Update project IDs, project numbers, and any environment-specific variable values.
-
-For early scaffolding, `outputs.tf` can remain empty except SPDX headers until useful outputs exist.
+The first apply fails until you store the Google OAuth client ID and secret in the new project's Secret Manager containers. Seed them, then re-run the apply.
 
 ---
 
