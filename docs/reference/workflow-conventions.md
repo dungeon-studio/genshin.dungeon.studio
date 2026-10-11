@@ -5,9 +5,23 @@ SPDX-License-Identifier: MIT
 
 # Workflow conventions
 
-Conventions for GitHub Actions workflows in `.github/workflows/`. For conventions covering the project's source, see [code conventions](code-conventions.md).
+Conventions for GitHub Actions workflows in `.github/workflows/` and the pre-commit hooks they run. For conventions covering the project's source, see [code conventions](code-conventions.md).
 
 ---
+
+## Where a check runs
+
+A check whose result depends only on the working tree is a pre-commit hook: linters, formatters, type checks, and static scans. A commit and a CI run over the same tree then give the same answer. Adding a hook needs no workflow change.
+
+A check that needs more than the working tree is a workflow job:
+
+- Execution: tests, end-to-end runs, and container builds.
+- Another revision: coverage and schema compatibility, which compare with the base branch.
+- The network or a credential: online workflow audits, verified secret scanning, and external links.
+
+A tool whose checks fall on both sides runs in both places. zizmor audits offline in a hook and online in `ci.yml`. lychee checks internal links in a hook and external links in `weekly.yml`.
+
+Prefer a hook whose tool pre-commit installs. A hook calling a tool from `PATH` makes every contributor and the `pre-commit` job install it. Avoid Docker hooks: when the daemon is down, they abort the whole pre-commit run.
 
 ## Naming
 
