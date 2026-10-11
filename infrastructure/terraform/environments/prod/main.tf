@@ -33,3 +33,21 @@ locals {
   base_domain = "genshin.dungeon.studio"
   web_domain  = local.base_domain
 }
+
+module "application_environment" {
+  source = "../../modules/application_environment"
+
+  project_id    = var.project_id
+  common_labels = var.common_labels
+
+  base_domain          = local.base_domain
+  web_domain           = local.web_domain
+  web_app_display_name = "Genshin Planner"
+
+  enable_api_domain_mapping = var.enable_api_domain_mapping
+  enable_api_public_invoker = var.enable_api_public_invoker
+  enable_web_custom_domain  = var.enable_web_custom_domain
+
+  firestore_location_id       = var.firestore_location_id
+  firestore_delete_protection = true
+}

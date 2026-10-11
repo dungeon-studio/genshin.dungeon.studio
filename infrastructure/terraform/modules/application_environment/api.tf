@@ -8,7 +8,7 @@ locals {
   # NOTE: Cloud Run domain mappings expect a bare domain name without a
   # trailing dot. The corresponding DNS CNAME record in core intentionally
   # uses an FQDN with a trailing dot.
-  api_domain_name = "api.${local.web_domain}"
+  api_domain_name = "api.${var.web_domain}"
   api_route_name  = "api"
 }
 
@@ -47,7 +47,7 @@ resource "google_artifact_registry_repository" "api" {
 # Cloud Run custom domain mapping for API service.
 # NOTE: The mapped service route (`api`) is created by CI/CD deploy,
 # so this resource has an external ordering dependency on a successful deploy.
-# Keep this in `dev` to avoid core->dev state dependencies.
+# Keep this out of `core` to avoid core->environment state dependencies.
 resource "google_cloud_run_domain_mapping" "api" {
   count = var.enable_api_domain_mapping ? 1 : 0
 

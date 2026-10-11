@@ -26,7 +26,7 @@ resource "google_identity_platform_config" "default" {
   authorized_domains = [
     "${var.project_id}.firebaseapp.com",
     "${var.project_id}.web.app",
-    local.base_domain,
+    var.base_domain,
   ]
 
   depends_on = [
@@ -34,6 +34,9 @@ resource "google_identity_platform_config" "default" {
     google_project_service.identitytoolkit,
   ]
 }
+
+# NOTE: Terraform creates the secret container but never its version, so the
+# first apply fails here until the OAuth credentials are stored out of band.
 
 # Read the Google OAuth client ID from Secret Manager.
 data "google_secret_manager_secret_version" "firebase_auth_google_client_id" {
