@@ -60,12 +60,12 @@ moved {
 
 moved {
   from = google_secret_manager_secret.firebase_auth_google_client_id
-  to   = module.application_environment.google_secret_manager_secret.firebase_auth_google_client_id
+  to   = module.application_environment.google_secret_manager_secret.firebase_auth_google["client-id"]
 }
 
 moved {
   from = google_secret_manager_secret.firebase_auth_google_client_secret
-  to   = module.application_environment.google_secret_manager_secret.firebase_auth_google_client_secret
+  to   = module.application_environment.google_secret_manager_secret.firebase_auth_google["client-secret"]
 }
 
 moved {

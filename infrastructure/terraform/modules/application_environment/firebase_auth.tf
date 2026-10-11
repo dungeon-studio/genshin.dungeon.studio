@@ -38,17 +38,12 @@ resource "google_identity_platform_config" "default" {
 # NOTE: Terraform creates the secret container but never its version, so the
 # first apply fails here until the OAuth credentials are stored out of band.
 
-# Read the Google OAuth client ID from Secret Manager.
-data "google_secret_manager_secret_version" "firebase_auth_google_client_id" {
-  project = var.project_id
-  secret  = google_secret_manager_secret.firebase_auth_google_client_id.secret_id
-  version = "latest"
-}
+# Read the Google OAuth client credentials from Secret Manager.
+data "google_secret_manager_secret_version" "firebase_auth_google" {
+  for_each = google_secret_manager_secret.firebase_auth_google
 
-# Read the Google OAuth client secret from Secret Manager.
-data "google_secret_manager_secret_version" "firebase_auth_google_client_secret" {
   project = var.project_id
-  secret  = google_secret_manager_secret.firebase_auth_google_client_secret.secret_id
+  secret  = each.value.secret_id
   version = "latest"
 }
 
@@ -57,8 +52,8 @@ resource "google_identity_platform_default_supported_idp_config" "google" {
   project = var.project_id
 
   idp_id        = "google.com"
-  client_id     = data.google_secret_manager_secret_version.firebase_auth_google_client_id.secret_data
-  client_secret = data.google_secret_manager_secret_version.firebase_auth_google_client_secret.secret_data
+  client_id     = data.google_secret_manager_secret_version.firebase_auth_google["client-id"].secret_data
+  client_secret = data.google_secret_manager_secret_version.firebase_auth_google["client-secret"].secret_data
 
   enabled = true
 
