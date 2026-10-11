@@ -83,10 +83,4 @@ document's `og:url` and `og:image` point at whichever origin serves them.
 
 ## Regenerating
 
-```shell
-uv run apps/web/scripts/generate-brand-assets.py
-```
-
-Rerun after changing a source mark or adding an environment, and commit the
-result. Badge suffixes and colors come from `src/lib/environments.ts`, which
-the script duplicates. Nothing checks that the colors still agree.
+See [How to regenerate brand assets](../../../docs/how-tos/regenerate-brand-assets.md).

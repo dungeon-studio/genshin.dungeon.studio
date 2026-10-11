@@ -32,14 +32,15 @@ Each icon has two variants:
 
 ## File locations
 
-| Category     | Directory                       | Companion files |
-| ------------ | ------------------------------- | --------------- |
-| Elements     | `apps/web/public/elements/`     | `{element}.md`  |
-| Weapon types | `apps/web/public/weapon-types/` | `{type}.md`     |
+| Category     | Images                          | Companion files                              |
+| ------------ | ------------------------------- | -------------------------------------------- |
+| Elements     | `apps/web/public/elements/`     | `apps/web/provenance/elements/{element}.md`  |
+| Weapon types | `apps/web/public/weapon-types/` | `apps/web/provenance/weapon-types/{type}.md` |
 
 File names follow the pattern `{name}-light.png` / `{name}-dark.png`.
 
-Each companion `.md` file captures the final prompts, generation date, and
+Companion files sit outside `apps/web/public/` because Vite publishes
+everything in that directory. Each companion `.md` file captures the final prompts, generation date, and
 post-processing notes for both variants of the accepted icon.
 
 ## Color palette

@@ -23,8 +23,8 @@ style guidelines, color tables, and prompt templates.
 
 Look up the icon's prompt in its companion `.md` file:
 
-- Elements: `apps/web/public/elements/{element}.md`
-- Weapon types: `apps/web/public/weapon-types/{type}.md`
+- Elements: `apps/web/provenance/elements/{element}.md`
+- Weapon types: `apps/web/provenance/weapon-types/{type}.md`
 
 Each companion file contains the full prompt text for both light and dark
 variants.
