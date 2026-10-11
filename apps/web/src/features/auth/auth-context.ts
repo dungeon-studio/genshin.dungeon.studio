@@ -6,9 +6,7 @@ import { createContext } from 'react';
 
 export type AuthUser = User;
 
-export interface AuthContextValue {
-  user: AuthUser | null;
-  loading: boolean;
-}
+export type AuthState =
+  { status: 'loading' } | { status: 'signed-out' } | { status: 'signed-in'; user: AuthUser };
 
-export const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+export const AuthContext = createContext<AuthState | undefined>(undefined);

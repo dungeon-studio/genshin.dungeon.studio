@@ -3,19 +3,18 @@
 
 import { use } from 'react';
 
-import type { AuthContextValue } from './auth-context';
+import type { AuthState } from './auth-context';
 import { AuthContext } from './auth-context';
 
 /**
- * The signed-in user, or `null` once auth has settled and nobody is signed in.
+ * Who is signed in, once Firebase has restored any existing session.
  *
- * `loading` is true until Firebase has restored any existing session, so a
- * caller that treats a null user as signed out before then flashes the wrong
- * state on every reload.
+ * The state stays `loading` until then, so a caller that treats it as signed
+ * out flashes the wrong state on every reload.
  *
  * @throws Error when called outside an `AuthProvider`.
  */
-export function useAuth(): AuthContextValue {
+export function useAuth(): AuthState {
   const context = use(AuthContext);
 
   if (context === undefined) {

@@ -120,8 +120,9 @@ function useOptimisticEdits(
  * that will silently do nothing.
  */
 export function useWeaponCollection(): UseWeaponCollectionResult {
-  const { user, loading: authLoading } = useAuth();
-  const isAuthenticated = user !== null;
+  const auth = useAuth();
+  const uid = auth.status === 'signed-in' ? auth.user.uid : undefined;
+  const isAuthenticated = uid !== undefined;
 
   const weapons = useWeaponCollectionStore((s) => s.weapons);
   const storeSetWeapons = useWeaponCollectionStore((s) => s.setWeapons);
@@ -132,11 +133,11 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     data: apiWeapons,
     error: queryError,
     isLoading: queryLoading,
-  } = useWeaponCollectionQuery(user?.uid);
+  } = useWeaponCollectionQuery(uid);
 
-  const { mutate: addWeaponApi } = useAddWeaponMutation(user?.uid);
-  const { mutate: removeWeaponApi } = useRemoveWeaponMutation(user?.uid);
-  const { mutate: setRefinementLevelApi } = useSetRefinementLevelMutation(user?.uid);
+  const { mutate: addWeaponApi } = useAddWeaponMutation(uid);
+  const { mutate: removeWeaponApi } = useRemoveWeaponMutation(uid);
+  const { mutate: setRefinementLevelApi } = useSetRefinementLevelMutation(uid);
 
   const applyMutationResult = useCallback(
     ({ weapon }: WeaponMutationResult) => {
@@ -146,10 +147,10 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   );
 
   useEffect(() => {
-    if (!user) {
+    if (!isAuthenticated) {
       clearWeapons();
     }
-  }, [user, clearWeapons]);
+  }, [isAuthenticated, clearWeapons]);
 
   useEffect(() => {
     if (!apiWeapons) return;
@@ -223,7 +224,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     removeWeapon,
     setRefinementLevel,
     getWeaponsByWeaponId,
-    isLoading: authLoading || (isAuthenticated && queryLoading),
+    isLoading: auth.status === 'loading' || (isAuthenticated && queryLoading),
     error,
   };
 }

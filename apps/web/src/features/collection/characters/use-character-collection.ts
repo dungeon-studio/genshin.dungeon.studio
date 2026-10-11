@@ -223,8 +223,9 @@ function useOptimisticActions(
  * first sign-in.
  */
 export function useCollection(): UseCollectionResult {
-  const { user, loading: authLoading } = useAuth();
-  const isAuthenticated = user !== null;
+  const auth = useAuth();
+  const uid = auth.status === 'signed-in' ? auth.user.uid : undefined;
+  const isAuthenticated = uid !== undefined;
 
   // Zustand store — always the read layer
   const characters = useCollectionStore((s) => s.characters);
@@ -235,11 +236,11 @@ export function useCollection(): UseCollectionResult {
     data: apiCharacters,
     error: queryError,
     isLoading: queryLoading,
-  } = useCharacterCollectionQuery(user?.uid);
+  } = useCharacterCollectionQuery(uid);
 
-  const { mutate: addCharacterApi } = useAddCharacterMutation(user?.uid);
-  const { mutate: removeCharacterApi } = useRemoveCharacterMutation(user?.uid);
-  const { mutate: setConstellationLevelApi } = useSetConstellationLevelMutation(user?.uid);
+  const { mutate: addCharacterApi } = useAddCharacterMutation(uid);
+  const { mutate: removeCharacterApi } = useRemoveCharacterMutation(uid);
+  const { mutate: setConstellationLevelApi } = useSetConstellationLevelMutation(uid);
 
   // Patch zustand with confirmed server data
   const applyMutationResult = useCallback(
@@ -249,7 +250,7 @@ export function useCollection(): UseCollectionResult {
     [storeSetConstellationLevel],
   );
 
-  useServerSync(user?.uid, apiCharacters, setConstellationLevelApi, applyMutationResult);
+  useServerSync(uid, apiCharacters, setConstellationLevelApi, applyMutationResult);
 
   const { addCharacter, removeCharacter, setConstellationLevel } = useOptimisticActions(
     isAuthenticated,
@@ -269,7 +270,7 @@ export function useCollection(): UseCollectionResult {
     setConstellationLevel,
     isOwned,
     getCharacter,
-    isLoading: authLoading || (isAuthenticated && queryLoading),
+    isLoading: auth.status === 'loading' || (isAuthenticated && queryLoading),
     error,
   };
 }

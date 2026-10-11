@@ -185,17 +185,18 @@ function useTeamActions(
  * plan a team before deciding to sign in. Signing out discards it.
  */
 export function useTeams(): UseTeamsResult {
-  const { user, loading: authLoading } = useAuth();
-  const isAuthenticated = user !== null;
+  const auth = useAuth();
+  const uid = auth.status === 'signed-in' ? auth.user.uid : undefined;
+  const isAuthenticated = uid !== undefined;
 
   const teams = useTeamStore((s) => s.teams);
   const storeSetTeams = useTeamStore((s) => s.setTeams);
   const storeResetTeams = useTeamStore((s) => s.resetTeams);
 
-  const { data: apiTeams, error: queryError, isLoading: queryLoading } = useTeamsQuery(user?.uid);
+  const { data: apiTeams, error: queryError, isLoading: queryLoading } = useTeamsQuery(uid);
 
-  const { mutate: saveTeamApi, isPending: isSavePending } = useSaveTeamMutation(user?.uid);
-  const { mutate: deleteTeamApi, isPending: isDeletePending } = useDeleteTeamMutation(user?.uid);
+  const { mutate: saveTeamApi, isPending: isSavePending } = useSaveTeamMutation(uid);
+  const { mutate: deleteTeamApi, isPending: isDeletePending } = useDeleteTeamMutation(uid);
 
   const isSaving = isSavePending || isDeletePending;
 
@@ -203,10 +204,10 @@ export function useTeams(): UseTeamsResult {
 
   // Reset store on logout
   useEffect(() => {
-    if (!user) {
+    if (!isAuthenticated) {
       storeResetTeams();
     }
-  }, [user, storeResetTeams]);
+  }, [isAuthenticated, storeResetTeams]);
 
   // Populate store from API data
   useEffect(() => {
@@ -232,7 +233,7 @@ export function useTeams(): UseTeamsResult {
     getTeam,
     isCharacterInTeam,
     isSaving,
-    isLoading: authLoading || (isAuthenticated && queryLoading),
+    isLoading: auth.status === 'loading' || (isAuthenticated && queryLoading),
     error,
   };
 }
