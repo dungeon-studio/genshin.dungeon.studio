@@ -4,7 +4,6 @@
 locals {
   firestore_database_name = "(default)"
   firestore_location_id   = "eur3"
-  firestore_database      = one(concat(google_firestore_database.protected, google_firestore_database.unprotected))
 }
 
 # Enable Firestore API

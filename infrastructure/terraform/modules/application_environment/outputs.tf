@@ -1,36 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-output "web_hosting_site_id" {
-  description = "Firebase Hosting site ID for the web application"
-  value       = google_firebase_hosting_site.web.site_id
-  sensitive   = false
-}
-
-output "api_artifact_repository_id" {
-  description = "Artifact Registry repository used for API container images (full resource ID)"
-  value       = google_artifact_registry_repository.api.id
-  sensitive   = false
-}
-
-output "firestore_database_name" {
-  description = "Firestore database name"
-  value       = local.firestore_database.name
-  sensitive   = false
-}
-
-output "firestore_location_id" {
-  description = "Firestore location ID"
-  value       = local.firestore_database.location_id
-  sensitive   = false
-}
-
-output "firebase_auth_config_name" {
-  description = "Identity Platform config resource name"
-  value       = google_identity_platform_config.default.name
-  sensitive   = false
-}
-
 output "firebase_web_app_config" {
   description = "Firebase Web App SDK config for the frontend build"
   value = {
