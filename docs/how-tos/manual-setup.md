@@ -16,7 +16,9 @@ This guide covers setting up the project **without DevContainers**.
 The setup script installs most tooling automatically. You only need these
 on your host before running it:
 
-- **Node.js** v20+ (`node --version`)
+- **Node.js** at the exact version in `.nvmrc` (`node --version`). Run
+  `nvm install` to select it. The setup script then installs the pnpm version
+  named by `packageManager` in `package.json` through corepack.
 - **Java** 21+, required by Firebase emulators (`java -version`)
 - **Firebase CLI** (`firebase --version`)
 - **GitHub CLI** (`gh --version`)
