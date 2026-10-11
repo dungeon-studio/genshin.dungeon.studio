@@ -23,12 +23,14 @@ from __future__ import annotations
 
 import io
 import json
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-WEB = Path(__file__).resolve().parent.parent
+REPO = Path(__file__).resolve().parents[3]
+WEB = REPO / "apps" / "web"
 PUBLIC = WEB / "public"
 ENVIRONMENTS = WEB / "src" / "lib" / "environments.json"
 
@@ -68,22 +70,16 @@ def load_badges() -> list[Badge]:
     ]
 
 
-def save(image: Image.Image, name: str, **params: object) -> bool:
-    """Write the asset only when its bytes change, and report it as stale.
-
-    Returns whether it was stale, so the caller can say how to recover.
-    """
-    path = PUBLIC / name
+def encode(name: str, image: Image.Image, **params: object) -> tuple[str, bytes]:
+    """Encode in the format the name's extension implies."""
     buffer = io.BytesIO()
-    image.save(buffer, format=Image.registered_extensions()[path.suffix], **params)
-    encoded = buffer.getvalue()
+    image.save(buffer, format=Image.registered_extensions()[Path(name).suffix], **params)
+    return name, buffer.getvalue()
 
-    if path.exists() and path.read_bytes() == encoded:
-        return False
 
-    path.write_bytes(encoded)
-    print(f"{path.relative_to(WEB.parent.parent)} was stale and has been regenerated")
-    return True
+def committed(name: str) -> bytes | None:
+    path = PUBLIC / name
+    return path.read_bytes() if path.exists() else None
 
 
 def variant(name: str, suffix: str) -> str:
@@ -125,30 +121,27 @@ def apply_badge(mark: Image.Image, badge: Badge) -> Image.Image:
     return badged
 
 
-def write_badged_icons() -> bool:
+def badged_icons() -> Iterator[tuple[str, bytes]]:
     light = Image.open(PUBLIC / "icon-512x512.png")
     dark = Image.open(PUBLIC / "favicon-32x32-dark.png")
-    stale = False
 
     for badge in load_badges():
         badged_light = apply_badge(light, badge)
 
-        stale |= save(
-            badged_light.resize(FAVICON_SIZE, Image.LANCZOS),
+        yield encode(
             variant("favicon-32x32.png", badge.suffix),
+            badged_light.resize(FAVICON_SIZE, Image.LANCZOS),
         )
-        stale |= save(
-            badged_light,
+        yield encode(
             variant("favicon.ico", badge.suffix),
+            badged_light,
             sizes=ICO_SIZES,
         )
         # The dark mark exists only at its display size, so it is badged there.
-        stale |= save(
-            apply_badge(dark, badge),
+        yield encode(
             variant("favicon-32x32-dark.png", badge.suffix),
+            apply_badge(dark, badge),
         )
-
-    return stale
 
 
 def fit_font(draw: ImageDraw.ImageDraw, text: str, size: int, max_width: int) -> ImageFont.FreeTypeFont:
@@ -175,7 +168,7 @@ def draw_centered_line(
     )
 
 
-def write_og_image() -> bool:
+def og_image() -> tuple[str, bytes]:
     """A link preview is read at thumbnail size, so it carries mark and name only."""
     canvas = Image.new("RGB", OG_SIZE, BRAND_TEAL)
 
@@ -187,18 +180,32 @@ def write_og_image() -> bool:
     draw_centered_line(draw, "Genshin Planner", 428, 88, "#ffffff")
     draw_centered_line(draw, "Plan your teams and manage your collection.", 518, 36, "#a8d5d1")
 
-    return save(canvas, "og-image.png")
+    return encode("og-image.png", canvas)
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """Rewrite only the assets whose bytes changed and name each one.
+
+    The pre-commit hook fails on any rewrite, so this listing is the message a
+    contributor sees when an asset has gone stale.
+    """
     if not FONT.exists():
         raise SystemExit(f"{FONT} is missing; install the DejaVu fonts and retry")
 
-    stale = write_badged_icons()
-    stale |= write_og_image()
+    assets = dict([*badged_icons(), og_image()])
+    stale = {name: data for name, data in assets.items() if committed(name) != data}
+
+    for name, data in stale.items():
+        path = PUBLIC / name
+        path.write_bytes(data)
+        print(f"{path.relative_to(REPO)} was stale and has been regenerated")
 
     if stale:
         print(
             "Commit the regenerated assets. To rebuild them locally, run "
             "`uv run apps/web/scripts/generate-brand-assets.py`."
         )
+
+
+if __name__ == "__main__":
+    main()
