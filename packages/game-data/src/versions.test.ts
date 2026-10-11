@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { compareVersions } from './versions.js';
+import { compareVersions, latestVersion } from './versions.js';
 
 describe('compareVersions', () => {
   describe('numeric versions', () => {
@@ -66,5 +66,12 @@ describe('compareVersions', () => {
     it('throws for extra segments', () => {
       expect(() => compareVersions('1.2.3', '1.0')).toThrow('Invalid version string: "1.2.3"');
     });
+  });
+});
+
+describe('latestVersion', () => {
+  it('picks the newest in game order, not string order', () => {
+    expect(latestVersion(['5.9', '5.10'])).toBe('5.10');
+    expect(latestVersion(['6.1', 'Luna I'])).toBe('6.1');
   });
 });
