@@ -20,8 +20,8 @@ Input: **$ARGUMENTS**
    development, feature request for a user-journey capability, or bug report for
    broken behavior. Fill every required field and follow the title guidance the
    template states.
-3. Apply labels from the repository's current set (`gh label list`); don't
-   guess names. Use at least one category and one area label when applicable.
+3. Set the issue type the template names. Apply area labels from the
+   repository's current set (`gh label list`); don't guess names.
 4. Assign the active milestone when the issue fits its scope.
 5. Link dependencies with native GitHub relationships (blocked by, is blocking),
    not body text or comments.

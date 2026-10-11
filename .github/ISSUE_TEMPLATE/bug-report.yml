@@ -3,7 +3,7 @@
 ---
 name: Bug report
 description: Report incorrect behavior so it can be fixed.
-labels: [bug]
+type: Bug
 body:
   - type: markdown
     attributes:

@@ -149,6 +149,7 @@ header describes the layout they sit in. Read both before adding a line.
 - At session start, check `git status` for pre-existing modified files outside the task's scope; don't attribute their breakage to the current change.
 - Commit message format is in [`CONTRIBUTING.md`](CONTRIBUTING.md); the pull request title carries it, since squash merge makes that title the commit.
 - Fixes after hook failures should be new commits; squash merge handles cleanup.
+- Classify an issue with its native issue type (`Bug`, `Feature`, or `Task`), never a type label. Type labels such as `bug`, `enhancement`, `documentation`, and `chore` belong to pull requests, where Release Drafter reads them.
 - Track issue dependencies only with native GitHub issue relationships (`blocked by` and `is blocking`), not issue body text or comments.
 - Prefer filing follow-up issues for out-of-scope concerns over expanding a pull request.
 - Evaluate automated review suggestions critically. Verify a suggestion actually solves the stated problem before applying it.

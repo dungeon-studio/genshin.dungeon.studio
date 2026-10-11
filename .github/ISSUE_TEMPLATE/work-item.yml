@@ -3,7 +3,7 @@
 ---
 name: Work item
 description: Planned development work with a clear definition of done.
-labels: [enhancement]
+type: Task
 body:
   - type: markdown
     attributes:
