@@ -8,7 +8,7 @@ import type { JSX } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Container } from '@/components/chrome/container';
-import { GITHUB_REPO } from '@/lib/repository';
+import { REPOSITORY_URL } from '@/lib/repository';
 
 const EFFECTIVE_DATE = '3 July 2026';
 
@@ -91,7 +91,7 @@ export function TermsOfServicePage(): JSX.Element {
         <p className="mt-4 leading-relaxed">
           Questions about these terms? Reach us through our{' '}
           <a
-            href={`${GITHUB_REPO}/issues/new/choose`}
+            href={`${REPOSITORY_URL}/issues/new/choose`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-foreground underline underline-offset-4 hover:no-underline"
