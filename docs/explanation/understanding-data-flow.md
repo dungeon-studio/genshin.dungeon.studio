@@ -90,7 +90,8 @@ flowchart LR
 
   firebaseAuth -->|ID token| send
   firebaseAuth -->|ID token| fetch
-  send -->|request body| serve
+  send -->|request body and ID token| serve
+  fetch -->|ID token| serve
   serve -->|saved record| send
   send -->|write outcome| edit
 
@@ -122,7 +123,8 @@ Two signals drive this diagram but carry no data, so they don't appear as
 flows:
 
 - A successful mutation invalidates its query key (`invalidateUserQuery`),
-  which makes 4.0 refetch. No mutation writes into D2 directly.
+  which makes 4.0 refetch. No collection or team mutation writes into D2
+  directly. Account deletion empties it with `queryClient.clear`.
 - An auth change to anything but signed in makes 5.0's feature hook empty its
   D1 store.
 
@@ -143,8 +145,9 @@ because sinks are finite and searchable:
 That yields four features: characters, weapons, teams, and the account. Artifact
 plans travel inside a team save, so they share the team path.
 
-Each feature's hook is the only caller of its store and its mutations, and each
-feature reads from its zustand store, never from the cache. What differs is
+Each feature's hook is the only writer to its store and the only caller of its
+mutations, and each feature reads from its zustand store, never from the
+cache. What differs is
 what the hook does on the way in and on the way back.
 
 ### Characters
@@ -164,12 +167,19 @@ sequenceDiagram
 
   Hook->>Store: addCharacter / removeCharacter / setConstellationLevel
   opt signed in
-    Hook->>API: PUT or DELETE /characters/{id}
-    API->>FS: transaction: read, nextCharacter, set
+    alt add or set level
+      Hook->>API: PUT /characters/{id}
+      API->>FS: transaction: read, nextCharacter, set
+    else remove
+      Hook->>API: DELETE /characters/{id}
+      API->>FS: delete
+    end
     alt success
-      API-->>Hook: saved character
-      Hook->>Store: applyMutationResult (constellation level only)
       Hook->>Cache: invalidate
+      opt PUT
+        API-->>Hook: saved character
+        Hook->>Store: applyMutationResult (constellation level only)
+      end
       Cache-->>Bridge: refetched collection
       Bridge->>Store: mergeCollections, then replaceCharacters
     else failure
@@ -207,6 +217,7 @@ sequenceDiagram
     Hook->>API: POST /weapons
     API->>FS: create with minted instance ID
     alt success
+      Hook->>Cache: invalidate
       API-->>Hook: saved weapon
       Hook->>Store: addWeapon (upsert)
     else failure
@@ -215,12 +226,17 @@ sequenceDiagram
   else remove or set refinement
     Hook->>Store: removeWeapon / setRefinementLevel
     Hook->>API: DELETE or PATCH /weapons/{instanceId}
-    alt failure and store still holds this write's value
+    alt success
+      Hook->>Cache: invalidate
+      opt PATCH
+        API-->>Hook: saved weapon
+        Hook->>Store: addWeapon (replaces the instance)
+      end
+    else failure and store still holds this write's value
       Hook->>Store: restore previous value
     end
   end
-  Hook->>Cache: invalidate on success
-  Cache-->>Store: setWeapons (replace)
+  Cache-->>Store: refetched weapons, setWeapons (replace)
 ```
 
 `ensureWeapon` keeps a set of in-flight weapon IDs so repeated clicks during
@@ -241,9 +257,14 @@ sequenceDiagram
 
   Hook->>Store: snapshot slot, then edit
   opt signed in
-    Hook->>API: PUT /teams/{slot} (whole team) or DELETE
-    API->>FS: validate members against characters, weapons, other teams
-    API->>FS: nextTeam, then set
+    alt edit
+      Hook->>API: PUT /teams/{slot} (whole team)
+      API->>FS: read characters, weapons, other teams to validate members
+      API->>FS: transaction: read, nextTeam, set
+    else clear
+      Hook->>API: DELETE /teams/{slot}
+      API->>FS: delete
+    end
     alt success
       Hook->>Cache: invalidate
       Cache-->>Store: collectionTeamsToStore over initialTeams, then setTeams (replace)
@@ -321,14 +342,16 @@ the repository's `toDocument` stamps the current schema version.
 
 Conversions done in more than one layer:
 
-- **Timestamps.** The server mints `createdAt` and `updatedAt` in
-  `nextCharacter` and `nextTeam`. The client mints its own in the character
-  store's `addCharacter` and `setConstellationLevel`, in
-  `preferHigherConstellation`, and in `createEmptyTeam`. A character keeps the
-  client's values until a refetch replaces them, because `applyMutationResult`
-  copies only the constellation level.
-- **Default team.** `createEmptyTeam` names a slot with `defaultTeamName`.
-  The server's `nextTeam` writes the same string from its own template literal.
+- **Timestamps.** The server mints `createdAt` and `updatedAt` in each
+  repository's `save`, for characters, weapons, and teams. The client mints its
+  own in the character store's `addCharacter` and `setConstellationLevel`, in
+  `preferHigherConstellation`, in the team store's edits, and in
+  `createEmptyTeam`. A character keeps the client's values until a refetch
+  replaces them, because `applyMutationResult` copies only the constellation
+  level.
+- **Default team name.** `createEmptyTeam` and the team store's `setTeamName`,
+  for a blank name, both use `defaultTeamName`. The server's `nextTeam` writes
+  the same string from its own template literal.
 - **Merge rule.** The server's `nextCharacter` keeps the latest write. The
   client's `mergeCollections` keeps the higher constellation. The same pair of
   values resolves differently depending on which side merges.
@@ -340,16 +363,22 @@ Conversions done in more than one layer:
 Each feature answers the same question differently. This section records the
 answers as they stand, not as defects.
 
-| Question                                   | Characters                            | Weapons                     | Teams                         |
-| ------------------------------------------ | ------------------------------------- | --------------------------- | ----------------------------- |
-| Works signed out?                          | Yes, persisted to D3                  | No, every action is a no-op | Yes, in memory only           |
-| Optimistic?                                | All three actions                     | Remove and refine, not add  | Every action                  |
-| Applies the mutation response to D1?       | Constellation level only              | Whole instance, replaced    | No                            |
-| How a refetch reaches D1                   | Additive merge                        | Replace                     | Replace, filled to four slots |
-| Can a refetch overwrite an edit in flight? | No: the merge never lowers or removes | Yes                         | Yes                           |
-| What a removal elsewhere does to D1        | Survives the merge, see below         | Disappears on refetch       | Disappears on refetch         |
+| Question                                   | Characters                             | Weapons                     | Teams                         |
+| ------------------------------------------ | -------------------------------------- | --------------------------- | ----------------------------- |
+| Works signed out?                          | Yes, persisted to D3                   | No, every action is a no-op | Yes, in memory only           |
+| Optimistic?                                | All three actions                      | Remove and refine, not add  | Every action                  |
+| Applies the mutation response to D1?       | Constellation level only               | Whole instance, replaced    | No                            |
+| How a refetch reaches D1                   | Additive merge                         | Replace                     | Replace, filled to four slots |
+| Can a refetch overwrite an edit in flight? | Raise or add, no. Lower or remove, yes | Yes                         | Yes                           |
+| What a removal elsewhere does to D1        | Survives the merge, see below          | Disappears on refetch       | Disappears on refetch         |
 
 Things that follow from those choices, observed in the current code:
+
+- **The character merge protects only upward edits.** `preferHigherConstellation`
+  keeps the server's entry whenever the local level isn't higher. A refetch that
+  lands before a lowering or removing request completes restores the old value
+  in D1, even though the comment on `useServerSync` says refetches don't
+  overwrite optimistic state.
 
 - **A removal on another device comes back.** `mergeCollections` can't remove
   a character, by design, so a character removed elsewhere stays in this
