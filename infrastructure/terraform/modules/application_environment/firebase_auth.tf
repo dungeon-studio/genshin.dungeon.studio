@@ -1,7 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# Enable Firebase Management API for the project.
 resource "google_project_service" "firebase" {
   project = var.project_id
   service = "firebase.googleapis.com"
@@ -9,7 +8,6 @@ resource "google_project_service" "firebase" {
   disable_on_destroy = false
 }
 
-# Enable Identity Toolkit API for Firebase Authentication.
 resource "google_project_service" "identitytoolkit" {
   project = var.project_id
   service = "identitytoolkit.googleapis.com"
@@ -17,7 +15,6 @@ resource "google_project_service" "identitytoolkit" {
   disable_on_destroy = false
 }
 
-# Initialize Identity Platform (Firebase Authentication) project config.
 resource "google_identity_platform_config" "default" {
   project = var.project_id
 
@@ -35,10 +32,8 @@ resource "google_identity_platform_config" "default" {
   ]
 }
 
-# NOTE: Terraform creates the secret container but never its version, so the
-# first apply fails here until the OAuth credentials are stored out of band.
-
-# Read the Google OAuth client credentials from Secret Manager.
+# Terraform creates the secret containers but never their versions, so an
+# environment's first apply fails here until the credentials are stored by hand.
 data "google_secret_manager_secret_version" "firebase_auth_google" {
   for_each = google_secret_manager_secret.firebase_auth_google
 
@@ -47,7 +42,6 @@ data "google_secret_manager_secret_version" "firebase_auth_google" {
   version = "latest"
 }
 
-# Configure Google as a supported identity provider.
 resource "google_identity_platform_default_supported_idp_config" "google" {
   project = var.project_id
 

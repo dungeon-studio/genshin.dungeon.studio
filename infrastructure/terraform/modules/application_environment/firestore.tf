@@ -6,7 +6,6 @@ locals {
   firestore_location_id   = "eur3"
 }
 
-# Enable Firestore API
 resource "google_project_service" "firestore" {
   project = var.project_id
   service = "firestore.googleapis.com"
@@ -14,8 +13,8 @@ resource "google_project_service" "firestore" {
   disable_on_destroy = false
 }
 
-# `prevent_destroy` only accepts a literal, so protection is a choice between
-# two resource blocks rather than a variable on one.
+# `prevent_destroy` accepts only a literal, so protection selects between two
+# blocks.
 resource "google_firestore_database" "protected" {
   count = var.firestore_delete_protection ? 1 : 0
 

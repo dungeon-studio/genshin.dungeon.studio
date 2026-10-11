@@ -1,7 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# Initialize Firebase on the GCP project
 resource "google_firebase_project" "default" {
   provider = google-beta
   project  = var.project_id
@@ -9,7 +8,6 @@ resource "google_firebase_project" "default" {
   depends_on = [google_project_service.firebase]
 }
 
-# Enable Firebase Hosting API
 resource "google_project_service" "firebase_hosting" {
   project = var.project_id
   service = "firebasehosting.googleapis.com"
@@ -19,7 +17,6 @@ resource "google_project_service" "firebase_hosting" {
   depends_on = [google_project_service.firebase]
 }
 
-# Firebase Hosting site for the web application
 resource "google_firebase_hosting_site" "web" {
   provider = google-beta
   project  = var.project_id
@@ -31,7 +28,6 @@ resource "google_firebase_hosting_site" "web" {
   ]
 }
 
-# Custom domain for the Firebase Hosting site
 resource "google_firebase_hosting_custom_domain" "web" {
   count = var.enable_web_custom_domain ? 1 : 0
 
@@ -46,8 +42,6 @@ resource "google_firebase_hosting_custom_domain" "web" {
   depends_on = [google_firebase_hosting_site.web]
 }
 
-# Register a Firebase Web App for the frontend.
-# The SDK config (API key, auth domain, etc.) is derived from this resource.
 resource "google_firebase_web_app" "web" {
   provider     = google-beta
   project      = var.project_id
@@ -56,7 +50,6 @@ resource "google_firebase_web_app" "web" {
   depends_on = [google_firebase_project.default]
 }
 
-# Read the SDK config for the registered web app.
 data "google_firebase_web_app_config" "web" {
   provider   = google-beta
   project    = var.project_id

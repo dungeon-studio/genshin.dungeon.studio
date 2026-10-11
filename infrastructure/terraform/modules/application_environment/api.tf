@@ -5,14 +5,11 @@ locals {
   api_artifact_repository_name     = "api"
   api_artifact_repository_location = "europe-west1"
   api_cloud_run_location           = "europe-west1"
-  # NOTE: Cloud Run domain mappings expect a bare domain name without a
-  # trailing dot. The corresponding DNS CNAME record in core intentionally
-  # uses an FQDN with a trailing dot.
+  # Cloud Run expects a bare name, unlike the trailing-dot FQDN in `core`'s CNAME.
   api_domain_name = "api.${local.web_domain}"
   api_route_name  = "api"
 }
 
-# Enable APIs required for API image storage and runtime deployment
 resource "google_project_service" "artifactregistry" {
   project = var.project_id
   service = "artifactregistry.googleapis.com"
@@ -27,12 +24,9 @@ resource "google_project_service" "cloudrun" {
   disable_on_destroy = false
 }
 
-# NOTE: The Cloud Run service resource is intentionally not managed here.
-# Deploy workflow (`.github/workflows/deploy.yml`) owns service creation and
-# rollout to keep application deploy cadence independent from Terraform applies.
-# Terraform in this module owns only supporting infrastructure.
+# The deploy workflow owns the Cloud Run service itself, so application deploys
+# never wait on a Terraform apply.
 
-# Artifact Registry repository for API container images
 resource "google_artifact_registry_repository" "api" {
   project       = var.project_id
   location      = local.api_artifact_repository_location
@@ -44,10 +38,8 @@ resource "google_artifact_registry_repository" "api" {
   depends_on = [google_project_service.artifactregistry]
 }
 
-# Cloud Run custom domain mapping for API service.
-# NOTE: The mapped service route (`api`) is created by CI/CD deploy,
-# so this resource has an external ordering dependency on a successful deploy.
-# Keep this out of `core` to avoid core->environment state dependencies.
+# Applies only after a deploy has created the `api` route. It lives here, not in
+# `core`, so `core` never reads environment state.
 resource "google_cloud_run_domain_mapping" "api" {
   count = var.enable_api_domain_mapping ? 1 : 0
 
@@ -67,9 +59,7 @@ resource "google_cloud_run_domain_mapping" "api" {
   depends_on = [google_project_service.cloudrun]
 }
 
-# Cloud Run IAM policy binding for public API invocation.
-# NOTE: The Cloud Run service is created by CI/CD deploy, so this resource
-# has an external ordering dependency on a successful deploy.
+# Applies only after a deploy has created the `api` service.
 resource "google_cloud_run_service_iam_member" "api_public_invoker" {
   count = var.enable_api_public_invoker ? 1 : 0
 

@@ -1,8 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# State addresses from before the resources moved into the shared module.
-
 moved {
   from = google_project_service.artifactregistry
   to   = module.application_environment.google_project_service.artifactregistry
