@@ -28,13 +28,27 @@ program
   .name('game-data-codegen')
   .description('Generate @genshin/game-data sources from the offline genshin-db dataset');
 
-for (const { command, label, generate } of ROSTERS) {
+function regenerate({ label, generate }: Roster): void {
+  console.log(`Generated ${generate()} ${label}s into @genshin/game-data`);
+}
+
+for (const roster of ROSTERS) {
   program
-    .command(command)
-    .description(`Regenerate the ${label} roster in @genshin/game-data/src/${command}.generated.ts`)
+    .command(roster.command)
+    .description(
+      `Regenerate the ${roster.label} roster in @genshin/game-data/src/${roster.command}.generated.ts`,
+    )
     .action((): void => {
-      console.log(`Generated ${generate()} ${label}s into @genshin/game-data`);
+      regenerate(roster);
     });
 }
+
+// One process loads genshin-db once, where a run per roster loads it each time.
+program
+  .command('all')
+  .description('Regenerate every roster in @genshin/game-data')
+  .action((): void => {
+    ROSTERS.forEach(regenerate);
+  });
 
 program.parse();
