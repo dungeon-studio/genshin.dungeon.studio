@@ -49,6 +49,23 @@ describe('save', () => {
     expect(second.created).toBe(false);
   });
 
+  // The losing transaction retries after the client's backoff, which starts
+  // near a second, so this case outruns the default timeout.
+  it('creates an unsaved slot exactly once under concurrent saves', async () => {
+    const userId = newUserId();
+
+    const results = await Promise.all([
+      save(userId, SLOT, { name: TEAM_NAME }),
+      save(userId, SLOT, { name: TEAM_NAME }),
+    ]);
+
+    const stored = await get(userId, SLOT);
+    expect(results.filter((result) => result.created)).toHaveLength(1);
+    expect(new Set(results.map((result) => result.team.createdAt))).toEqual(
+      new Set([stored?.createdAt]),
+    );
+  }, 30_000);
+
   it('leaves the fields an update omits as they were', async () => {
     const { userId, team: original } = await userWithTeam({
       name: TEAM_NAME,
