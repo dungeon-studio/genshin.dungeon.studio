@@ -12,13 +12,13 @@ const CHARACTER = CHARACTER_ROSTER[0];
 if (!CHARACTER) throw new Error('no character in game data');
 
 describe('TeamMemberPlanner', () => {
-  it('selects the member from its summary but not from its artifact controls', async () => {
+  it('opens the editor from its summary but not from its artifact controls', async () => {
     const user = userEvent.setup();
-    const onSelect = vi.fn();
+    const onEdit = vi.fn();
     render(
       <TeamMemberPlanner
         member={{ characterId: CHARACTER.id, artifactPlan: { priorityMinorAffixes: ['HP'] } }}
-        onSelect={onSelect}
+        onEdit={onEdit}
         onArtifactPlanChange={vi.fn()}
       />,
     );
@@ -31,10 +31,10 @@ describe('TeamMemberPlanner', () => {
     await user.selectOptions(screen.getByLabelText('Add priority substats'), 'CRIT DMG');
     await user.click(screen.getByRole('button', { name: 'Remove HP' }));
 
-    expect(onSelect).not.toHaveBeenCalled();
+    expect(onEdit).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: new RegExp(CHARACTER.name) }));
 
-    expect(onSelect).toHaveBeenCalledOnce();
+    expect(onEdit).toHaveBeenCalledOnce();
   });
 });

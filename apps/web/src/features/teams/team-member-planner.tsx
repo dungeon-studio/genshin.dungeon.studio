@@ -21,7 +21,7 @@ interface TeamMemberPlannerProps {
   member: CollectionTeamMember | null;
   collectionCharacter?: CollectionCharacter;
   collectionWeapon?: CollectionWeapon;
-  onSelect: () => void;
+  onEdit: () => void;
   onArtifactPlanChange?: (plan: ArtifactPlan | undefined) => void;
 }
 
@@ -29,7 +29,7 @@ export function TeamMemberPlanner({
   member,
   collectionCharacter,
   collectionWeapon,
-  onSelect,
+  onEdit,
   onArtifactPlanChange,
 }: TeamMemberPlannerProps): JSX.Element {
   const character = member ? getCharacterById(member.characterId) : undefined;
@@ -43,7 +43,7 @@ export function TeamMemberPlanner({
             events, portalled popovers included, to any ancestor handler. */}
         <button
           type="button"
-          onClick={onSelect}
+          onClick={onEdit}
           className="w-full cursor-pointer rounded-md text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           <TeamMemberSummary
