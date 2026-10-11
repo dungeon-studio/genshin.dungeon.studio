@@ -68,9 +68,8 @@ function allows<T>(selected: ReadonlySet<T>, value: T): boolean {
 }
 
 /**
- * Case-insensitive substring match. No Unicode normalization or accent
- * folding: a diacritic in a name matches only when the query repeats it.
- * Folding waits for localized display names (#862).
+ * No accent folding or Unicode normalization: a name with a diacritic matches
+ * only a query that spells it the same way. Roster names carry none.
  */
 function searchMatcher(query: string): (name: string) => boolean {
   const queryLower = query.toLowerCase();
@@ -93,7 +92,7 @@ function matcher<I extends CollectionItem, F extends BaseFilterState, C>(
     ownershipMatches(ownedIds.has(item.id));
 }
 
-// An explicit locale keeps name order a property of the app, not of the viewer's runtime.
+// A fixed locale gives every viewer the same name order.
 const nameCollator = new Intl.Collator('en');
 
 const byName: Comparator<CollectionItem> = (a, b) => nameCollator.compare(a.name, b.name);
