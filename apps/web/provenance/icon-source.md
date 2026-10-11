@@ -5,8 +5,8 @@ SPDX-License-Identifier: MIT
 
 # App icon prompts
 
-[How to regenerate brand assets](../../../docs/how-tos/regenerate-brand-assets.md)
-rebuilds the environment variants and the social preview.
+To rebuild the environment variants and the social preview, see
+[How to regenerate brand assets](../../../docs/how-tos/regenerate-brand-assets.md).
 
 ## Light mode variant
 

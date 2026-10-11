@@ -5,12 +5,14 @@ SPDX-License-Identifier: MIT
 
 # How to regenerate brand assets
 
-Regenerate the environment-badged icons and the link preview after changing
-`apps/web/src/lib/environments.json` or a source mark: `icon-512x512.png` or
-`favicon-32x32-dark.png` in `apps/web/public/`. The `brand-assets` pre-commit
-hook fails until you do.
+Regenerate the environment-badged icons and the link preview after changing any
+of these files. The `brand-assets` pre-commit hook fails until you do.
 
-For the prompts behind the source marks, see
+- `apps/web/src/lib/environments.json`
+- `apps/web/public/icon-512x512.png`
+- `apps/web/public/favicon-32x32-dark.png`
+
+For the prompts behind both icons, see
 [`apps/web/provenance/icon-source.md`](../../apps/web/provenance/icon-source.md).
 
 ## Prerequisites
