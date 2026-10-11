@@ -220,7 +220,7 @@ repos:
       # Vite copies apps/web/public/ verbatim into the deployed site, so
       # anything else there is published. Notes about an asset belong in
       # apps/web/provenance/.
-      - id: web-public-assets-only
+      - id: web-public-images-only
         name: only images in apps/web/public
         entry: only .png and .ico files belong in apps/web/public
         language: fail

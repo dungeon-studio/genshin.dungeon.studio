@@ -81,6 +81,6 @@ another environment.
 Every environment shares one 1200×630 link preview, `og-image.png`. The
 document's `og:url` and `og:image` point at whichever origin serves them.
 
-## Regenerating
-
-See [How to regenerate brand assets](../../../docs/how-tos/regenerate-brand-assets.md).
+The environment variants and the social preview come from the brand-asset
+generator; see
+[How to regenerate brand assets](../../../docs/how-tos/regenerate-brand-assets.md).

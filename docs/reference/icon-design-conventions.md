@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 Design conventions for element and weapon type icons. For the step-by-step
 generation workflow, see [How to generate icons](../how-tos/generate-icons.md).
-For final prompts and generation notes, see each icon's companion `.md` file.
+For final prompts and generation notes, see each icon's provenance file.
 
 ## General style
 
@@ -32,16 +32,17 @@ Each icon has two variants:
 
 ## File locations
 
-| Category     | Images                          | Companion files                              |
+| Category     | Images                          | Provenance files                             |
 | ------------ | ------------------------------- | -------------------------------------------- |
 | Elements     | `apps/web/public/elements/`     | `apps/web/provenance/elements/{element}.md`  |
 | Weapon types | `apps/web/public/weapon-types/` | `apps/web/provenance/weapon-types/{type}.md` |
 
 File names follow the pattern `{name}-light.png` / `{name}-dark.png`.
 
-Companion files sit outside `apps/web/public/` because Vite publishes
-everything in that directory. Each companion `.md` file captures the final prompts, generation date, and
-post-processing notes for both variants of the accepted icon.
+Provenance files sit outside `apps/web/public/` because Vite publishes
+everything in that directory. Each provenance file captures the final prompts,
+generation date, and post-processing notes for both variants of the accepted
+icon.
 
 ## Color palette
 

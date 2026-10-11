@@ -21,22 +21,22 @@ style guidelines, color tables, and prompt templates.
 
 ### 1. Choose the icon to generate
 
-Look up the icon's prompt in its companion `.md` file:
+Look up the icon's prompt in its provenance file:
 
 - Elements: `apps/web/provenance/elements/{element}.md`
 - Weapon types: `apps/web/provenance/weapon-types/{type}.md`
 
-Each companion file contains the full prompt text for both light and dark
+Each provenance file contains the full prompt text for both light and dark
 variants.
 
 ### 2. Generate the light mode variant
 
-Copy the light mode prompt from the companion `.md` file into Gemini and
+Copy the light mode prompt from the provenance file into Gemini and
 generate the image.
 
 ### 3. Generate the dark mode variant
 
-Copy the dark mode prompt from the companion `.md` file into Gemini and
+Copy the dark mode prompt from the provenance file into Gemini and
 generate the image.
 
 ### 4. Remove backgrounds and resize with ImageMagick
@@ -84,9 +84,9 @@ edges erode. Start at 10% and adjust as needed.
    variant on light backgrounds, dark variant on dark backgrounds).
 2. Confirm each icon is identifiable at 32px.
 
-### 7. Update the companion file
+### 7. Update the provenance file
 
-Update the corresponding `.md` companion file with the generation date and any
+Update the corresponding provenance file with the generation date and any
 post-processing notes for each variant.
 
 ### 8. Reference in code
