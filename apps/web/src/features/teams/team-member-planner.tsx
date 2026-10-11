@@ -43,8 +43,8 @@ export function TeamMemberPlanner({
       className={cn('border-l-4 transition-colors', borderClass, selected && 'ring-2 ring-primary')}
     >
       <CardHeader className="p-3 pb-1.5">
-        {/* Only the header selects: the artifact planner's controls sit outside
-            it so their clicks and keypresses never reach onSelect. */}
+        {/* Keep the artifact planner out of this button: React bubbles its
+            events, portalled popovers included, to any ancestor handler. */}
         <button
           type="button"
           onClick={onSelect}
