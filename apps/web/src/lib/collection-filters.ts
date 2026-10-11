@@ -15,11 +15,6 @@ type SortField = (typeof SORT_FIELDS)[number]['value'];
 
 /** Each collection extends this with its own category set. */
 export interface BaseFilterState {
-  /**
-   * Case-insensitive substring match on the name. No Unicode normalization or
-   * accent folding: a diacritic in a name matches only when the query repeats
-   * it. Folding waits for localized display names (#862).
-   */
   search: string;
   rarities: Set<Rarity>;
   ownership: OwnershipFilter;
@@ -72,17 +67,27 @@ function allows<T>(selected: ReadonlySet<T>, value: T): boolean {
   return selected.size === 0 || selected.has(value);
 }
 
+/**
+ * Case-insensitive substring match. No Unicode normalization or accent
+ * folding: a diacritic in a name matches only when the query repeats it.
+ * Folding waits for localized display names (#862).
+ */
+function searchMatcher(query: string): (name: string) => boolean {
+  const queryLower = query.toLowerCase();
+  return (name) => name.toLowerCase().includes(queryLower);
+}
+
 function matcher<I extends CollectionItem, F extends BaseFilterState, C>(
   filters: F,
   ownedIds: ReadonlySet<string>,
   config: CollectionFilterConfig<I, F, C>,
 ): (item: I) => boolean {
-  const searchLower = filters.search.toLowerCase();
+  const searchMatches = searchMatcher(filters.search);
   const categories = config.selectedCategories(filters);
   const ownershipMatches = OWNERSHIP_MATCHES[filters.ownership];
 
   return (item) =>
-    item.name.toLowerCase().includes(searchLower) &&
+    searchMatches(item.name) &&
     allows(categories, config.category(item)) &&
     allows(filters.rarities, item.rarity) &&
     ownershipMatches(ownedIds.has(item.id));
@@ -92,7 +97,12 @@ function matcher<I extends CollectionItem, F extends BaseFilterState, C>(
 const nameCollator = new Intl.Collator('en');
 
 const byName: Comparator<CollectionItem> = (a, b) => nameCollator.compare(a.name, b.name);
-const byId: Comparator<CollectionItem> = (a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+const byId: Comparator<CollectionItem> = (a, b) => compareCodeUnits(a.id, b.id);
+
+function compareCodeUnits(a: string, b: string): number {
+  if (a < b) return -1;
+  return a > b ? 1 : 0;
+}
 
 function byRelease<I extends CollectionItem>(compareRelease: Comparator<I>): Comparator<I> {
   return (a, b) => compareRelease(a, b) || byName(a, b) || byId(a, b);
