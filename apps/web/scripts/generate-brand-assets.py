@@ -6,7 +6,7 @@
 # dependencies = ["pillow==11.3.0"]
 # ///
 
-"""Derive the committed brand assets from the two source marks in public/.
+"""Derive the badged favicons and link preview from the source marks in public/.
 
 To run it, see docs/how-tos/regenerate-brand-assets.md.
 
