@@ -47,7 +47,12 @@ resource "google_firebase_web_app" "web" {
   project      = var.project_id
   display_name = var.web_app_display_name
 
-  depends_on = [google_firebase_project.default]
+  # Creating a web app makes Firebase provision the default Hosting site on
+  # demand, which would make the explicit site above fail with a 409.
+  depends_on = [
+    google_firebase_project.default,
+    google_firebase_hosting_site.web,
+  ]
 }
 
 data "google_firebase_web_app_config" "web" {
