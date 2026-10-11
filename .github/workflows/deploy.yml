@@ -106,9 +106,8 @@ jobs:
       CLOUD_RUN_SERVICE_NAME: api
       ARTIFACT_REPOSITORY: api
       FRONTEND_ORIGIN: https://develop.genshin.dungeon.studio
-      # Declared rather than left to the logger's default: the absence of
-      # info-level schema-migration lines is the signal that a legacy version
-      # has drained, so a raised level would fake it.
+      # Schema-migration lines log at info, and their absence signals that a
+      # legacy schema version has drained. A higher level hides them.
       LOG_LEVEL: info
     permissions:
       contents: read
