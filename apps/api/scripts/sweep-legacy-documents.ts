@@ -1,11 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-// Counts the stored documents at each schema version, so a version's parse
-// branch is retired on a census of the database rather than on read traffic,
-// which never reaches cold documents. `--write` also rewrites the legacy ones
-// at the current version. Reads every document, so it runs on demand: after a
-// release that adds a version, and before retiring one.
+// Reads every document, so run it on demand: after a release that adds a
+// schema version, and before retiring one. `--write` rewrites the legacy
+// documents at the current version.
 
 import { parseArgs } from 'node:util';
 
