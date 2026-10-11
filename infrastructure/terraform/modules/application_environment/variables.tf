@@ -11,14 +11,10 @@ variable "common_labels" {
   description = "Common labels applied to all resources"
 }
 
-variable "base_domain" {
+variable "web_subdomain" {
   type        = string
-  description = "Registrable domain Identity Platform trusts for sign-in redirects"
-}
-
-variable "web_domain" {
-  type        = string
-  description = "Hostname serving the web app; the API is served at `api.` under it"
+  description = "Label prefixed to the base domain for the web hostname; null serves the apex"
+  default     = null
 }
 
 variable "web_app_display_name" {
@@ -39,11 +35,6 @@ variable "enable_api_public_invoker" {
 variable "enable_web_custom_domain" {
   type        = bool
   description = "Whether to attach the custom domain to the web Firebase Hosting site"
-}
-
-variable "firestore_location_id" {
-  type        = string
-  description = "Firestore database location"
 }
 
 variable "firestore_delete_protection" {

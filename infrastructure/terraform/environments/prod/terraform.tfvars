@@ -17,5 +17,3 @@ enable_web_custom_domain  = false
 # The invoker binding names a Cloud Run service the deploy workflow creates, so
 # it cannot apply before the first deploy.
 enable_api_public_invoker = false
-
-firestore_location_id = "eur3"

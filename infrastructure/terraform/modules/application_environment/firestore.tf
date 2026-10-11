@@ -3,6 +3,7 @@
 
 locals {
   firestore_database_name = "(default)"
+  firestore_location_id   = "eur3"
   firestore_database      = one(concat(google_firestore_database.protected, google_firestore_database.unprotected))
 }
 
@@ -21,7 +22,7 @@ resource "google_firestore_database" "protected" {
 
   project     = var.project_id
   name        = local.firestore_database_name
-  location_id = var.firestore_location_id
+  location_id = local.firestore_location_id
   type        = "FIRESTORE_NATIVE"
 
   delete_protection_state = "DELETE_PROTECTION_ENABLED"
@@ -38,7 +39,7 @@ resource "google_firestore_database" "unprotected" {
 
   project     = var.project_id
   name        = local.firestore_database_name
-  location_id = var.firestore_location_id
+  location_id = local.firestore_location_id
   type        = "FIRESTORE_NATIVE"
 
   delete_protection_state = "DELETE_PROTECTION_DISABLED"

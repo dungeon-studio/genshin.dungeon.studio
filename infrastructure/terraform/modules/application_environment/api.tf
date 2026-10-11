@@ -8,7 +8,7 @@ locals {
   # NOTE: Cloud Run domain mappings expect a bare domain name without a
   # trailing dot. The corresponding DNS CNAME record in core intentionally
   # uses an FQDN with a trailing dot.
-  api_domain_name = "api.${var.web_domain}"
+  api_domain_name = "api.${local.web_domain}"
   api_route_name  = "api"
 }
 

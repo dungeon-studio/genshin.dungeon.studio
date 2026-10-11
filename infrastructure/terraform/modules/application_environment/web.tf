@@ -38,7 +38,7 @@ resource "google_firebase_hosting_custom_domain" "web" {
   provider      = google-beta
   project       = var.project_id
   site_id       = google_firebase_hosting_site.web.site_id
-  custom_domain = var.web_domain
+  custom_domain = local.web_domain
 
   cert_preference       = "GROUPED"
   wait_dns_verification = false

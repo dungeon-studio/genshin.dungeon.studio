@@ -26,7 +26,7 @@ resource "google_identity_platform_config" "default" {
   authorized_domains = [
     "${var.project_id}.firebaseapp.com",
     "${var.project_id}.web.app",
-    var.base_domain,
+    local.base_domain,
   ]
 
   depends_on = [

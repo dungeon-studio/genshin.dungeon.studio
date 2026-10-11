@@ -33,14 +33,3 @@ variable "enable_web_custom_domain" {
   description = "Whether to attach the custom domain to the web Firebase Hosting site"
   default     = false
 }
-
-variable "firestore_location_id" {
-  type        = string
-  description = "Firestore location for the prod database"
-  default     = "eur3"
-
-  validation {
-    condition     = can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.firestore_location_id)) && length(var.firestore_location_id) >= 3 && length(var.firestore_location_id) <= 32
-    error_message = "firestore_location_id must be a valid Google Cloud location ID format (lowercase letters, digits, hyphens; 3-32 chars; must start with a letter)."
-  }
-}

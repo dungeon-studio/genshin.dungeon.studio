@@ -11,3 +11,10 @@ terraform {
     }
   }
 }
+
+# Identity Platform must trust the registrable domain for sign-in redirects no
+# matter which environment serves, so it stays separate from the hostname.
+locals {
+  base_domain = "genshin.dungeon.studio"
+  web_domain  = join(".", compact([var.web_subdomain, local.base_domain]))
+}
