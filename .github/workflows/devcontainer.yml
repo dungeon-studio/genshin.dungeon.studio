@@ -4,11 +4,8 @@
 
 name: Devcontainer
 
-# A cold devcontainer build is expensive, hence the path gate: it lists only
-# what the image build consumes. Root package.json carries packageManager,
-# engines, and the firebase-tools pin; tools/e2e/package.json carries the
-# Playwright pin the browsers install from. pnpm-lock.yaml stays out because
-# ci.yml already installs from it on every pull request. The anchor keeps both
+# A cold devcontainer build is expensive, so the gate lists only the image's
+# build inputs that ci.yml doesn't already exercise. The anchor keeps both
 # triggers on one list, which two copies would let drift.
 on:
   pull_request:
@@ -16,7 +13,9 @@ on:
       - '.devcontainer/**'
       - 'scripts/install-reuse.sh'
       - '.github/workflows/devcontainer.yml'
+      # packageManager, engines, and the firebase-tools pin.
       - 'package.json'
+      # The Playwright pin the browsers install from.
       - 'tools/e2e/package.json'
   push:
     branches:
@@ -42,12 +41,12 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Build the image and run the checks inside it
+      - name: Build the image and verify its toolchain
         uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
         with:
           imageName: genshin-planner-devcontainer
           push: never
-          # The action starts the container only when runCmd is set, and the
-          # start runs postCreateCommand.sh, whose verify_toolchain is the
-          # check. Project-wide checks belong in .pre-commit-config.yaml.
+          # The action starts the container only when runCmd is set. Starting
+          # it runs postCreateCommand.sh, which verifies the toolchain.
+          # Project-wide checks belong in .pre-commit-config.yaml.
           runCmd: 'true'
