@@ -21,7 +21,6 @@ interface TeamMemberPlannerProps {
   member: CollectionTeamMember | null;
   collectionCharacter?: CollectionCharacter;
   collectionWeapon?: CollectionWeapon;
-  selected?: boolean;
   onSelect: () => void;
   onArtifactPlanChange?: (plan: ArtifactPlan | undefined) => void;
 }
@@ -30,7 +29,6 @@ export function TeamMemberPlanner({
   member,
   collectionCharacter,
   collectionWeapon,
-  selected = false,
   onSelect,
   onArtifactPlanChange,
 }: TeamMemberPlannerProps): JSX.Element {
@@ -39,16 +37,13 @@ export function TeamMemberPlanner({
   const borderClass = elementBorderClass(character?.element);
 
   return (
-    <Card
-      className={cn('border-l-4 transition-colors', borderClass, selected && 'ring-2 ring-primary')}
-    >
+    <Card className={cn('border-l-4 transition-colors', borderClass)}>
       <CardHeader className="p-3 pb-1.5">
         {/* Keep the artifact planner out of this button: React bubbles its
             events, portalled popovers included, to any ancestor handler. */}
         <button
           type="button"
           onClick={onSelect}
-          aria-pressed={selected}
           className="w-full cursor-pointer rounded-md text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           <TeamMemberSummary
