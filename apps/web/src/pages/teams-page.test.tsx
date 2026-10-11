@@ -44,6 +44,12 @@ const OTHER_CLAYMORE_USER = characterWielding('Claymore', CLAYMORE_USER);
 const CLAYMORE_INSTANCE = 'claymore-instance' as CollectionWeaponId;
 const BOW_INSTANCE = 'bow-instance' as CollectionWeaponId;
 
+async function firstEmptyMember() {
+  const [member] = await screen.findAllByRole('button', { name: /No character/ });
+  if (!member) throw new Error('no empty member position');
+  return member;
+}
+
 function setupTeamsPage(): UserEvent {
   const user = userEvent.setup({ delay: null });
   render(
@@ -67,12 +73,6 @@ function setupTeamsPage(): UserEvent {
   });
 
   return user;
-}
-
-async function firstEmptyMember() {
-  const [member] = await screen.findAllByRole('button', { name: /No character/ });
-  if (!member) throw new Error('no empty member position');
-  return member;
 }
 
 async function pickWeaponFirst(user: UserEvent, weapon: Weapon): Promise<void> {
