@@ -8,9 +8,9 @@ import type { JSX } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Container } from '@/components/chrome/container';
+import { GITHUB_REPO } from '@/lib/repository';
 
 const EFFECTIVE_DATE = '3 July 2026';
-const GITHUB_REPO = 'https://github.com/dungeon-studio/genshin.dungeon.studio';
 
 export function TermsOfServicePage(): JSX.Element {
   return (

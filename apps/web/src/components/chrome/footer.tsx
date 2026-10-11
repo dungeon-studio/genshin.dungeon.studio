@@ -8,8 +8,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Container } from '@/components/chrome/container';
 import { useAuth } from '@/features/auth';
 import { buildBugReportUrl } from '@/lib/debug-info';
-
-const GITHUB_REPO = 'https://github.com/dungeon-studio/genshin.dungeon.studio';
+import { GITHUB_REPO } from '@/lib/repository';
 
 export function Footer(): JSX.Element {
   const auth = useAuth();
