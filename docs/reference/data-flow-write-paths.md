@@ -5,6 +5,8 @@
 
 What each client write does to each
 [copy of user data](data-flow.md#level-0), in order, on success and on failure.
+In the sequence diagrams, an `alt` box runs exactly one of its bracketed
+branches, and an `opt` box runs only when its condition holds.
 
 A write path is any code that reaches one of these:
 
@@ -41,13 +43,8 @@ sequenceDiagram
 
   Hook->>Store: addCharacter / removeCharacter / setConstellationLevel
   opt signed in
-    alt add or set level
-      Hook->>API: PUT /characters/{id}
-      API->>FS: transaction: read, nextCharacter, set
-    else remove
-      Hook->>API: DELETE /characters/{id}
-      API->>FS: delete
-    end
+    Hook->>API: PUT or DELETE /characters/{id}
+    API->>FS: PUT: transaction of read, nextCharacter, set<br>DELETE: delete
     alt success
       API-->>Hook: saved character, or no content on DELETE
       Hook->>Cache: invalidate
@@ -123,14 +120,9 @@ sequenceDiagram
 
   Hook->>Store: snapshot slot, then edit
   opt signed in
-    alt edit
-      Hook->>API: PUT /teams/{slot} (whole team)
-      API->>FS: read characters, weapons, other teams to validate members
-      API->>FS: transaction: read, nextTeam, set
-    else clear
-      Hook->>API: DELETE /teams/{slot}
-      API->>FS: delete
-    end
+    Hook->>API: PUT /teams/{slot} with the whole team, or DELETE to clear
+    API->>FS: PUT: read characters, weapons, and other teams<br>to validate members
+    API->>FS: PUT: transaction of read, nextTeam, set<br>DELETE: delete
     alt success
       Hook->>Cache: invalidate
       Cache-->>Store: reconcile effect: collectionTeamsToStore, then setTeams (replace)
