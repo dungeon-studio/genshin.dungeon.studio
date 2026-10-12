@@ -188,7 +188,7 @@ sequenceDiagram
 The first time the query resolves for a signed-in user, `useServerSync` also
 makes the sign-in push. It merges D1 into the server collection, then sends a
 `PUT` for every entry the server lacks or holds at a lower constellation. A
-failed push only toasts; the merged value stays in D1.
+failed push only toasts. The merged value stays in D1.
 
 ### Weapons
 
