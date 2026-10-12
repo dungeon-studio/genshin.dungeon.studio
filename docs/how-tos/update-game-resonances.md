@@ -25,10 +25,10 @@ pnpm turbo run build --filter @genshin/game-data-codegen
 pnpm --filter @genshin/game-data-codegen generate resonances
 ```
 
-To read a newer commit, pass it or a ref to `--commit`:
+To read a newer commit, pass a commit SHA or a ref to `--ref`:
 
 ```bash
-pnpm --filter @genshin/game-data-codegen generate resonances --commit HEAD
+pnpm --filter @genshin/game-data-codegen generate resonances --ref HEAD
 ```
 
 The module and its pin change only when the resonances differ from the shipped

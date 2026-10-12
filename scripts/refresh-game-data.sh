@@ -12,6 +12,6 @@ pnpm --filter @genshin/game-data-codegen update --latest genshin-db
 # formatting pass covers them.
 pnpm exec turbo run build --filter=@genshin/game-data-codegen --output-logs=errors-only
 node tools/game-data-codegen/dist/cli.js first-banner-dates
-node tools/game-data-codegen/dist/cli.js resonances --commit HEAD
+node tools/game-data-codegen/dist/cli.js resonances --ref HEAD
 
 scripts/regenerate-game-data.sh
