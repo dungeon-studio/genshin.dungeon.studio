@@ -3,9 +3,8 @@
 
 # Write paths
 
-What each client write does to each copy of user data, in order, on success and
-on failure. D1 to D4 and 1.0 to 7.0 are the stores and processes in
-[Data flow](data-flow.md#level-0).
+What each client write does to each
+[copy of user data](data-flow.md#level-0), in order, on success and on failure.
 
 A write path is any code that reaches one of these:
 
@@ -18,27 +17,27 @@ travel inside a team save, so they share the team path.
 
 Each feature's hook is the only writer to its store and the only caller of its
 mutations. Each feature reads from its zustand store, never from the cache.
-Each hook also runs its own 5.0: an effect that copies the refetched cache into
-D1 whenever the query data changes.
+Each hook also runs its own reconcile effect, which copies the refetched cache
+into the store whenever the query data changes.
 
 Every optimistic write fails the same way, a guarded rollback. The previous
-value comes back only if D1 still holds the value that write put there, so a
-newer edit stands. A toast shows either way, and nothing retries.
+value comes back only if the store still holds the value that write put there,
+so a newer edit stands. A toast shows either way, and nothing retries.
 
 ## Characters
 
 `useCollection` in `use-character-collection.ts`. Add, remove, and set
-constellation level share one shape: write D1, send, and on failure make a
-guarded rollback.
+constellation level share one shape: write the store, send, and on failure make
+a guarded rollback.
 
 ```mermaid
 sequenceDiagram
   participant Hook as useOptimisticActions
-  participant Store as D1 character store
-  participant API as 3.0 API
-  participant FS as D4 Firestore
-  participant Cache as D2 cache
-  participant Reconcile as 5.0 useServerSync
+  participant Store as character store
+  participant API as API
+  participant FS as Firestore
+  participant Cache as query cache
+  participant Reconcile as reconcile effect (useServerSync)
 
   Hook->>Store: addCharacter / removeCharacter / setConstellationLevel
   opt signed in
@@ -65,9 +64,9 @@ sequenceDiagram
 ```
 
 The first time the query resolves for a signed-in user, `useServerSync` also
-makes the sign-in push. It merges D1 into the server collection, then sends a
-`PUT` for every entry the server lacks or holds at a lower constellation. A
-failed push only toasts. The merged value stays in D1.
+makes the sign-in push. It merges the store into the server collection, then
+sends a `PUT` for every entry the server lacks or holds at a lower
+constellation. A failed push only toasts. The merged value stays in the store.
 
 ## Weapons
 
@@ -78,10 +77,10 @@ out.
 ```mermaid
 sequenceDiagram
   participant Hook as useWeaponCollection
-  participant Store as D1 weapon store
-  participant API as 3.0 API
-  participant FS as D4 Firestore
-  participant Cache as D2 cache
+  participant Store as weapon store
+  participant API as API
+  participant FS as Firestore
+  participant Cache as query cache
 
   alt add or ensure
     Hook->>API: POST /weapons
@@ -106,21 +105,21 @@ sequenceDiagram
       Hook->>Store: guarded rollback
     end
   end
-  Cache-->>Store: 5.0 effect: refetched weapons, setWeapons (replace)
+  Cache-->>Store: reconcile effect: refetched weapons, setWeapons (replace)
 ```
 
 ## Teams
 
 `useTeams` in `use-teams.ts`. Every action goes through `editThenPersist`,
-which snapshots the slot, edits D1, and sends the whole team.
+which snapshots the slot, edits the store, and sends the whole team.
 
 ```mermaid
 sequenceDiagram
   participant Hook as editThenPersist
-  participant Store as D1 team store
-  participant API as 3.0 API
-  participant FS as D4 Firestore
-  participant Cache as D2 cache
+  participant Store as team store
+  participant API as API
+  participant FS as Firestore
+  participant Cache as query cache
 
   Hook->>Store: snapshot slot, then edit
   opt signed in
@@ -134,7 +133,7 @@ sequenceDiagram
     end
     alt success
       Hook->>Cache: invalidate
-      Cache-->>Store: 5.0 effect: collectionTeamsToStore, then setTeams (replace)
+      Cache-->>Store: reconcile effect: collectionTeamsToStore, then setTeams (replace)
     else failure
       Hook->>Store: guarded rollback to the snapshot
     end
@@ -150,11 +149,11 @@ A `beforeunload` prompt guards an in-flight save.
 ```mermaid
 sequenceDiagram
   participant Hook as useDeleteAccount
-  participant API as 3.0 API
-  participant FS as D4 Firestore
+  participant API as API
+  participant FS as Firestore
   participant FA as Firebase Auth
-  participant Cache as D2 cache
-  participant Stores as D1 stores and D3
+  participant Cache as query cache
+  participant Stores as stores and localStorage
 
   Hook->>API: DELETE /account
   API->>FS: eraseStoredData (recursive delete)
@@ -168,22 +167,22 @@ sequenceDiagram
   end
 ```
 
-Every document in D4 lives under `users/{uid}`, so `eraseStoredData` reaches
-all of them with one recursive delete. Firestore goes first so a failure between the
-two leaves an identity that can retry, not data with no owner.
+Every document in Firestore lives under `users/{uid}`, so `eraseStoredData`
+reaches all of them with one recursive delete. Firestore goes first so a failure
+between the two leaves an identity that can retry, not data with no owner.
 
 ## Divergences
 
 Characters, weapons, and teams differ on each of these questions:
 
-| Question                                   | Characters                             | Weapons                     | Teams                         |
-| ------------------------------------------ | -------------------------------------- | --------------------------- | ----------------------------- |
-| Works signed out?                          | Yes, but lost on reload, see [#1740]   | No, every action is a no-op | Yes, in memory only           |
-| Optimistic?                                | All three actions                      | Remove and refine, not add  | Every action                  |
-| Applies the mutation response to D1?       | Constellation level only               | Whole instance, replaced    | No                            |
-| How a refetch reaches D1                   | Additive merge                         | Replace                     | Replace, filled to four slots |
-| Can a refetch overwrite an edit in flight? | Raise or add, no. Lower or remove, yes | Yes                         | Yes                           |
-| What a removal elsewhere does to D1        | Survives the merge, see [#1741]        | Disappears on refetch       | Disappears on refetch         |
+| Question                                    | Characters                             | Weapons                     | Teams                         |
+| ------------------------------------------- | -------------------------------------- | --------------------------- | ----------------------------- |
+| Works signed out?                           | Yes, but lost on reload, see [#1740]   | No, every action is a no-op | Yes, in memory only           |
+| Optimistic?                                 | All three actions                      | Remove and refine, not add  | Every action                  |
+| Applies the mutation response to the store? | Constellation level only               | Whole instance, replaced    | No                            |
+| How a refetch reaches the store             | Additive merge                         | Replace                     | Replace, filled to four slots |
+| Can a refetch overwrite an edit in flight?  | Raise or add, no. Lower or remove, yes | Yes                         | Yes                           |
+| What a removal elsewhere does to the store  | Survives the merge, see [#1741]        | Disappears on refetch       | Disappears on refetch         |
 
 Teams also depend on the other two features. The server rejects a team that
 names a character or weapon instance the user doesn't own, so a team save can

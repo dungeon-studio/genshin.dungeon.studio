@@ -3,22 +3,22 @@
 
 # Data conversions
 
-The representations user data takes between Firestore and the zustand store, and
-the conversions done in more than one layer. D1 to D4 and 1.0 to 7.0 are the
-stores and processes in [Data flow](data-flow.md#level-0).
+The representations user data takes between
+[Firestore and the zustand store](data-flow.md#level-0), and the conversions
+done in more than one layer.
 
 ## Inbound
 
 Every feature runs the same chain:
 
-1. 3.0 reads a document through the repository's `fromDocument`, which migrates
-   it to the current version and asserts domain invariants.
+1. The API reads a document through the repository's `fromDocument`, which
+   migrates it to the current version and asserts domain invariants.
 2. The route serialises it to Collection+JSON with `characterItemDocument`,
    `weaponItemDocument`, or `teamItemDocument`.
 3. The query layer asserts the document and converts each item with
    `deserialiseCharacter`, `deserialiseWeapon`, or `deserialiseTeam`.
 4. The query layer folds the items into its cache shape.
-5. 5.0 turns the cache shape into the store shape.
+5. The reconcile effect turns the cache shape into the store shape.
 
 | Feature    | Cache shape, step 4                                    | Store shape, step 5                                      |
 | ---------- | ------------------------------------------------------ | -------------------------------------------------------- |
@@ -31,15 +31,15 @@ Teams read one page. Characters and weapons follow `next` links to the end.
 ## Outbound
 
 No dedicated layer converts it: each mutation writes its request body inline,
-and teams send the domain members unchanged. 3.0 validates the body against the
-request schema, then the repository's `toDocument` stamps the current schema
+and teams send the domain members unchanged. The API validates the body against
+the request schema, then the repository's `toDocument` stamps the current schema
 version.
 
 ## Conversions in more than one layer
 
 - **Timestamps.** Both sides mint `createdAt` and `updatedAt`: the server on
-  every save, the client on every character and team store edit. D1 shows the
-  client's values until a refetch replaces them.
+  every save, the client on every character and team store edit. The store shows
+  the client's values until a refetch replaces them.
 - **Default team name.** The client calls `defaultTeamName`. The server's
   `nextTeam` writes the same string itself.
 - **Merge rule.** The server keeps the latest write. The client's
