@@ -9,7 +9,6 @@ import { renderModule, resolveGeneratedPath, serializeEntry } from './emit.js';
 
 describe('renderModule', () => {
   const rendered = renderModule({
-    path: 'src/weapons.generated.ts',
     exportName: 'WEAPON_DATA',
     command: 'weapons',
     entries: [serializeEntry('the-catch', ['rarity: 4,'])],
@@ -35,18 +34,27 @@ describe('renderModule', () => {
   it('ends with a newline, so regeneration leaves nothing for the formatter', () => {
     expect(rendered.endsWith('\n')).toBe(true);
   });
+});
 
-  it('records provenance as header comments ahead of the export', () => {
-    const withProvenance = renderModule({
-      path: 'src/resonances.generated.ts',
-      exportName: 'RESONANCE_DATA',
-      command: 'resonances',
-      entries: [],
-      provenance: ['Source: upstream at abc123'],
-    });
+describe('renderModule with upstream data', () => {
+  const rendered = renderModule({
+    exportName: 'FIRST_BANNER_DATES',
+    command: 'first-banner-dates',
+    entries: ["  albedo: '2020-12-23',"],
+    upstream: { copyright: '2021 Made Baruna', source: 'https://github.com/MadeBaruna/paimon-moe' },
+  });
 
-    expect(withProvenance).toContain(
-      'generate resonances\n//\n// Source: upstream at abc123\n\nexport const RESONANCE_DATA',
+  it('credits the upstream copyright ahead of ours', () => {
+    // REUSE-IgnoreStart
+    expect(rendered).toMatch(
+      /^\/\/ SPDX-FileCopyrightText: 2021 Made Baruna\n\/\/ SPDX-FileCopyrightText: 2026 /,
+    );
+    // REUSE-IgnoreEnd
+  });
+
+  it('names the source it was generated from', () => {
+    expect(rendered).toContain(
+      'from https://github.com/MadeBaruna/paimon-moe. Do not edit by hand.',
     );
   });
 });

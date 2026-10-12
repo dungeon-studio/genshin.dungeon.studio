@@ -27,14 +27,13 @@ describe('GET /', () => {
     expect(validateGetSchema(body)).toBe(true);
   });
 
-  it('dynamically includes links to registered resources', async () => {
+  it('links every top-level resource and no descriptor documents', async () => {
     const body = (await res.json()) as { links: Record<string, { href: string }> };
-    expect(body.links).toEqual(
-      expect.objectContaining({
-        characters: { href: '/characters' },
-        weapons: { href: '/weapons' },
-        health: { href: '/health' },
-      }),
-    );
+    expect(body.links).toEqual({
+      characters: { href: '/characters' },
+      health: { href: '/health' },
+      teams: { href: '/teams' },
+      weapons: { href: '/weapons' },
+    });
   });
 });

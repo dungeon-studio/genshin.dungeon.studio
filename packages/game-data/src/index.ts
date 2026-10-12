@@ -56,6 +56,7 @@ export {
 export {
   ARTIFACT_MINOR_AFFIXES,
   ARTIFACT_PIECES,
+  ARTIFACT_SET_IDS,
   ARTIFACT_SET_ROSTER,
   ARTIFACT_SETS,
   CIRCLET_MAIN_AFFIXES,
@@ -72,4 +73,5 @@ export {
 } from './artifacts.js';
 
 // Versions
-export { compareVersions, GAME_DATA_VERSION } from './versions.js';
+export { GAME_DATA_VERSION } from './game-data-version.js';
+export { compareVersions, formatVersion, sameVersion, type GameVersion } from './versions.js';

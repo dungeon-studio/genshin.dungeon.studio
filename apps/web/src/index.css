@@ -26,7 +26,7 @@ body {
   min-height: 100vh;
 }
 
-/* Palette derived from the app icon; see public/icon-source.md. Teal-green
+/* Palette derived from the app icon; see provenance/icon-source.md. Teal-green
    takes the primary role and tints the neutrals, copper stays an accent, so the
    two brand tones never compete for the same job. theme-contrast.test.ts holds
    every pair here to WCAG AA. */

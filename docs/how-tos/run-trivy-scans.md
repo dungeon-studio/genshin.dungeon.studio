@@ -24,8 +24,19 @@ Install Trivy following the
 
 ## Scan Terraform
 
+Scan one environment at a time with its own variable values, as CI does.
+Replace `dev` with `core`, `staging`, or `prod`:
+
 ```bash
-trivy config infrastructure/terraform
+trivy config --config .trivy.yaml \
+  --tf-vars infrastructure/terraform/environments/dev/terraform.tfvars \
+  infrastructure/terraform/environments/dev
+```
+
+Scan `bootstrap` without `--tf-vars`, since it has no `terraform.tfvars`:
+
+```bash
+trivy config --config .trivy.yaml infrastructure/terraform/bootstrap
 ```
 
 ## Scan the API Dockerfile
@@ -36,17 +47,32 @@ trivy config apps/api
 
 ## Scan the API container image
 
+CI reports these findings to the Security tab instead of failing the pull
+request. This command prints the same set:
+
 ```bash
 docker build -t api-local:scan -f apps/api/Dockerfile .
-trivy image api-local:scan
+trivy image --scanners vuln --ignore-unfixed --exit-code 0 --config .trivy.yaml api-local:scan
 ```
 
 ## Scan dependencies
 
-The only scan that blocks a pull request, so match CI exactly:
+The only scans that block a pull request, so match CI exactly. The licence scan
+reads licences from `node_modules`, so run `pnpm install` first:
 
 ```bash
 trivy fs --scanners vuln --config .trivy.yaml pnpm-lock.yaml
+trivy fs --scanners license --severity UNKNOWN,HIGH,CRITICAL --config .trivy.yaml .
 ```
+
+The licence scan fails on licences Trivy rates restricted or forbidden, such as
+GPL and AGPL, and on licences it can't classify. Resolve a licence failure in
+one of three ways:
+
+- Replace the dependency with one under an accepted licence.
+- Add a permissive licence Trivy doesn't classify to `license.permissive` in
+  `.trivy.yaml`.
+- Record an accepted copyleft licence in `.trivyignore.yaml`. The entry exempts
+  that licence in every package.
 
 Record an advisory with no upstream fix in `.trivyignore.yaml`.

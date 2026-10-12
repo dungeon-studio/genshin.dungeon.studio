@@ -3,16 +3,16 @@
 
 import type { QueryClient } from '@tanstack/react-query';
 import { QueryClientProvider } from '@tanstack/react-query';
-import type { User } from 'firebase/auth';
 import type { JSX, ReactNode } from 'react';
 
+import type { AuthUser } from '@/features/auth';
 import { AuthContext } from '@/features/auth/auth-context';
+import { settledAuth } from '@/test/auth';
 
 interface TestProvidersProps {
   children: ReactNode;
   queryClient: QueryClient;
-  user?: User | null;
-  loading?: boolean;
+  user?: AuthUser | null;
 }
 
 /**
@@ -25,11 +25,10 @@ export function TestProviders({
   children,
   queryClient,
   user = null,
-  loading = false,
 }: TestProvidersProps): JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthContext value={{ user, loading }}>{children}</AuthContext>
+      <AuthContext value={settledAuth(user)}>{children}</AuthContext>
     </QueryClientProvider>
   );
 }

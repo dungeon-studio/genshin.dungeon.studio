@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 import type { ArtifactPlan } from '@genshin/domain';
+import { ARTIFACT_SETS } from '@genshin/game-data';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { assert, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { ArtifactPlanner } from './artifact-planner';
 
@@ -123,23 +124,41 @@ describe('ArtifactPlanner', () => {
     expect(substatNames('Secondary substats')).toEqual(['Energy Recharge']);
   });
 
-  it('selects, replaces, and clears artifact sets', async () => {
+  const obsidianCodex = ARTIFACT_SETS['obsidian-codex'];
+  const unfinishedReverie = ARTIFACT_SETS['unfinished-reverie'];
+
+  // Opening the set popover mounts the full roster, so each test opens it at
+  // most once.
+  it('selects a first artifact set', async () => {
     const user = userEvent.setup({ pointerEventsCheck: 0 });
     render(<Harness />);
 
-    // Choose a first set; a second search only appears once a first is set.
     await user.click(screen.getByRole('combobox', { name: 'Search artifact set...' }));
-    await user.click(await screen.findByRole('option', { name: 'Obsidian Codex' }));
-    expect(screen.getByText('Obsidian Codex')).toBeInTheDocument();
+    await user.click(await screen.findByRole('option', { name: obsidianCodex.name }));
 
-    // Choose a second set from the now-visible second search.
+    expect(screen.getByText(obsidianCodex.name)).toBeInTheDocument();
+  });
+
+  it('selects a second artifact set once a first is chosen', async () => {
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
+    render(<Harness initial={{ sets: [obsidianCodex.id] }} />);
+
     await user.click(screen.getByRole('combobox', { name: 'Optional second 2-piece set...' }));
-    await user.click(await screen.findByRole('option', { name: 'Unfinished Reverie' }));
-    expect(screen.getByText('Unfinished Reverie')).toBeInTheDocument();
+    await user.click(await screen.findByRole('option', { name: unfinishedReverie.name }));
 
-    // Clearing the first set drops both selections.
-    await user.click(screen.getAllByRole('button', { name: 'Clear selection' })[0]);
-    expect(screen.queryByText('Obsidian Codex')).not.toBeInTheDocument();
-    expect(screen.queryByText('Unfinished Reverie')).not.toBeInTheDocument();
+    expect(screen.getByText(obsidianCodex.name)).toBeInTheDocument();
+    expect(screen.getByText(unfinishedReverie.name)).toBeInTheDocument();
+  });
+
+  it('clears both artifact sets when the first is cleared', async () => {
+    const user = userEvent.setup();
+    render(<Harness initial={{ sets: [obsidianCodex.id, unfinishedReverie.id] }} />);
+
+    const [clearFirst] = screen.getAllByRole('button', { name: 'Clear selection' });
+    assert.isDefined(clearFirst);
+    await user.click(clearFirst);
+
+    expect(screen.queryByText(obsidianCodex.name)).not.toBeInTheDocument();
+    expect(screen.queryByText(unfinishedReverie.name)).not.toBeInTheDocument();
   });
 });

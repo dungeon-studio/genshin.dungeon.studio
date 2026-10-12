@@ -13,8 +13,8 @@ import {
 } from '@genshin/domain';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import type { FromSchema } from 'json-schema-to-ts';
 
+import { negotiatedJson } from '@/http/negotiated-response.js';
 import { auth } from '@/middleware/auth.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
@@ -45,8 +45,6 @@ teams.use('*', auth);
 
 teams.use('*', negotiateContent([{ mediaType: COLLECTION_JSON, profile: teamItemV1 }]));
 
-type UpdateTeamBody = FromSchema<typeof teamPutRequestV1.schema>;
-
 function parseSlot(param: string): TeamSlot {
   const slot = Number(param);
 
@@ -63,9 +61,7 @@ teams.get('/', async (c) => {
   const items = await Teams.list(userId);
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(JSON.stringify(teamListDocument(items, baseUrl)), {
-    headers: { 'Content-Type': c.get('negotiatedMediaType') },
-  });
+  return negotiatedJson(c, teamListDocument(items, baseUrl));
 });
 
 // GET /teams/:slot — Get specific team
@@ -81,9 +77,7 @@ teams.get('/:slot', async (c) => {
 
   const baseUrl = new URL(c.req.url).origin;
 
-  return c.body(JSON.stringify(teamItemDocument(team, baseUrl)), {
-    headers: { 'Content-Type': c.get('negotiatedMediaType') },
-  });
+  return negotiatedJson(c, teamItemDocument(team, baseUrl));
 });
 
 // PUT /teams/:slot — Create or update team composition (idempotent upsert)
@@ -94,7 +88,7 @@ teams.put(
   async (c) => {
     const userId = c.get('user').uid;
     const slot = parseSlot(c.req.param('slot'));
-    const body = c.get('validatedBody') as UpdateTeamBody;
+    const body = c.get('validatedBody');
     const members = body.members && deserialiseCollectionTeamMembers(body.members);
 
     if (members) {
@@ -105,10 +99,7 @@ teams.put(
 
     const baseUrl = new URL(c.req.url).origin;
 
-    return c.body(JSON.stringify(teamItemDocument(team, baseUrl)), {
-      status: created ? 201 : 200,
-      headers: { 'Content-Type': c.get('negotiatedMediaType') },
-    });
+    return negotiatedJson(c, teamItemDocument(team, baseUrl), created ? 201 : 200);
   },
 );
 
@@ -137,10 +128,10 @@ async function validateComposition(
 
   // Cross-team weapon uniqueness: a weapon instance can only be equipped by one
   // character at a time across all teams (#635).
-  const issues = validateAcrossTeams(slot, members, await Teams.list(userId));
+  const [issue] = validateAcrossTeams(slot, members, await Teams.list(userId));
 
-  if (issues.length > 0) {
-    throw new HTTPException(400, { message: issues[0].message });
+  if (issue) {
+    throw new HTTPException(400, { message: issue.message });
   }
 }
 
@@ -179,9 +170,9 @@ async function validateMembers(userId: string, members: CollectionTeamMember[]):
 
       // Validate artifact plan if provided
       if (member.artifactPlan) {
-        const issues = validateArtifactPlan(member.artifactPlan);
-        if (issues.length > 0) {
-          throw new HTTPException(400, { message: issues[0].message });
+        const [issue] = validateArtifactPlan(member.artifactPlan);
+        if (issue) {
+          throw new HTTPException(400, { message: issue.message });
         }
       }
     }),

@@ -10,9 +10,11 @@ SPDX-License-Identifier: MIT
 
 `genshin-db` carries no resonance data, so this generator reads the game's own
 tables, as extracted from the game client by
-[AnimeGameData](https://github.com/DimbreathBot/AnimeGameData). It fetches them over the network at the commit pinned in
-`ANIME_GAME_DATA` in `tools/game-data-codegen/src/resonances.ts`. The generated
-file's header records that commit and the upstream paths.
+[AnimeGameData](https://github.com/DimbreathBot/AnimeGameData). It fetches
+them over the network at the commit pinned in `ANIME_GAME_DATA` in
+`tools/game-data-codegen/src/resonances.ts`, and the generated file's header
+names the repository at that commit. Because it fetches, `generate all` leaves
+it out.
 
 ## Regenerate the resonances
 

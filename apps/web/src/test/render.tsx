@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import { QueryClient } from '@tanstack/react-query';
-import type { User } from 'firebase/auth';
 import type { ReactNode } from 'react';
 
+import type { AuthUser } from '@/features/auth';
 import { TestProviders } from '@/test/providers';
 
-// The composite hooks only read `user.uid`; a partial User is sufficient.
-export function fakeUser(uid: string): User {
-  return { uid } as User;
+// The composite hooks only read `user.uid`; a partial `AuthUser` is sufficient.
+export function fakeUser(uid: string): AuthUser {
+  return { uid } as AuthUser;
 }
 
 export function createTestQueryClient(): QueryClient {
@@ -23,8 +23,7 @@ export function createTestQueryClient(): QueryClient {
 }
 
 interface WrapperOptions {
-  user?: User | null;
-  loading?: boolean;
+  user?: AuthUser | null;
   queryClient?: QueryClient;
 }
 
@@ -32,11 +31,11 @@ interface WrapperOptions {
 export function createWrapper(
   options: WrapperOptions = {},
 ): (props: { children: ReactNode }) => ReactNode {
-  const { user = null, loading = false, queryClient = createTestQueryClient() } = options;
+  const { user = null, queryClient = createTestQueryClient() } = options;
 
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
-      <TestProviders queryClient={queryClient} user={user} loading={loading}>
+      <TestProviders queryClient={queryClient} user={user}>
         {children}
       </TestProviders>
     );

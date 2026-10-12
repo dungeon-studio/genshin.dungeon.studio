@@ -84,8 +84,9 @@ function toCondition(record: UpstreamResonance, name: string): ResonanceConditio
   }
 
   const [pair] = required;
-  if (record.cond === PAIR_COND && required.length === 1 && pair?.[1] === 2) {
-    return { trigger: 'PAIR', element: ELEMENT_COUNT_FIELDS[pair[0]] };
+  const element = pair ? ELEMENT_COUNT_FIELDS[pair[0]] : undefined;
+  if (record.cond === PAIR_COND && required.length === 1 && pair?.[1] === 2 && element) {
+    return { trigger: 'PAIR', element };
   }
 
   throw new Error(
@@ -186,14 +187,9 @@ export async function generateResonances(): Promise<number> {
     exportName: 'RESONANCE_DATA',
     command: 'resonances',
     entries: resonances.map(serializeResonance),
-    provenance: [
-      `Source: https://github.com/${ANIME_GAME_DATA.repository} at ${ANIME_GAME_DATA.commit}`,
-      `  ${ANIME_GAME_DATA.resonances}`,
-      `  ${ANIME_GAME_DATA.textMap}`,
-      'Names and effect text are HoYoverse in-game English, extracted from the',
-      'game client. Bump the commit in tools/game-data-codegen/src/resonances.ts',
-      'to pick up a rebalance.',
-    ],
+    upstream: {
+      source: `https://github.com/${ANIME_GAME_DATA.repository}/tree/${ANIME_GAME_DATA.commit}`,
+    },
   });
 
   return resonances.length;

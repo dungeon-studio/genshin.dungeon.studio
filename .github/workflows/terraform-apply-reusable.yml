@@ -16,11 +16,11 @@ permissions:
 
 env:
   # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
-  TERRAFORM_VERSION: '1.16.0'
+  TERRAFORM_VERSION: '1.16.5'
 
 jobs:
   terraform-apply:
-    name: Apply
+    name: Run terraform apply
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: ${{ inputs.environment }}

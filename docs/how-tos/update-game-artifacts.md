@@ -19,6 +19,9 @@ Optionally pull newer game data first:
 pnpm --filter @genshin/game-data-codegen up genshin-db
 ```
 
+Newer game data changes every roster, so after pulling it run `generate all`
+in place of the single roster below. A commit fails while any roster is stale.
+
 Build the generator and run it:
 
 ```bash

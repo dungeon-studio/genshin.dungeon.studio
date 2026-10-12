@@ -172,7 +172,8 @@ function SortControl<F extends BaseFilterState>({
 
   function cycleField() {
     const currentIndex = sortFields.findIndex((f) => f.value === filters.sortField);
-    onChange({ ...filters, sortField: sortFields[(currentIndex + 1) % sortFields.length].value });
+    const next = sortFields[(currentIndex + 1) % sortFields.length];
+    if (next) onChange({ ...filters, sortField: next.value });
   }
 
   function toggleDirection() {
