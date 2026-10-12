@@ -113,10 +113,10 @@ flowchart LR
 
 Two control signals carry no data:
 
-- A successful mutation invalidates its query, which makes Fetch records (4.0)
-  run again. No collection or team mutation writes into the query cache (D2)
-  directly. Account deletion empties it.
+- A successful mutation invalidates its query, which makes Fetch records run
+  again. No collection or team mutation writes into the query cache directly.
+  Account deletion empties it.
 - An auth change to anything but signed in makes each feature's reconcile effect
-  (5.0) empty its store (D1).
+  empty its zustand store.
 
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
