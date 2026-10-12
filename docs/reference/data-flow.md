@@ -8,21 +8,16 @@ User data has up to four copies: the Firestore document, the TanStack Query
 cache, a zustand store, and, for characters only, the browser's `localStorage`.
 Out of scope: static game data, which is never written, and the theme
 preference, which never leaves the browser. Which copy should be authoritative
-is [#1133].
-
-Two companion references use this page's store and process numbers:
-
-- [Write paths](data-flow-write-paths.md): what each client write does to each
-  copy, in order, on success and on failure.
-- [Data conversions](data-flow-conversions.md): the representation data takes
-  at each hop between Firestore and the store.
+is [#1133]. What each client write does to each copy is in
+[Write paths](data-flow-write-paths.md), and the representation data takes at
+each hop is in [Data conversions](data-flow-conversions.md).
 
 ---
 
 ## Context
 
-The whole system is process `0`. Firebase Auth and the operator sit outside it
-because the system exchanges data with them but doesn't control them.
+Firebase Auth and the operator exchange data with the system, which doesn't
+control them.
 
 ```mermaid
 flowchart LR
@@ -45,8 +40,8 @@ flowchart LR
 
 ## Level 0
 
-Opening process `0` shows the four copies as data stores. Each labelled box is
-a trust boundary:
+The system runs seven processes over four data stores, D1 to D4, across three
+trust boundaries:
 
 - The browser runs on hardware the user controls.
 - The API and Firestore run in the project's Google Cloud project.
@@ -116,8 +111,7 @@ flowchart LR
   sweep -->|version census| operator
 ```
 
-Two signals drive this diagram but carry no data, so they don't appear as
-flows:
+Two control signals carry no data:
 
 - A successful mutation invalidates its query, which makes 4.0 refetch. No
   collection or team mutation writes into D2 directly. Account deletion

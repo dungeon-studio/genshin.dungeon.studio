@@ -4,9 +4,8 @@
 # Write paths
 
 What each client write does to each copy of user data, in order, on success and
-on failure. Sequence diagrams carry the order and failure that a data flow
-diagram can't. Store and process numbers, D1 to D4 and 1.0 to 7.0, are the ones
-in [Data flow](data-flow.md#level-0).
+on failure. D1 to D4 and 1.0 to 7.0 are the stores and processes in
+[Data flow](data-flow.md#level-0).
 
 A write path is any code that reaches one of these:
 
@@ -15,14 +14,12 @@ A write path is any code that reaches one of these:
 - A TanStack Query mutation or cache call.
 
 Four features do: characters, weapons, teams, and the account. Artifact plans
-travel inside a team save, so they share the team path. A new write path
-belongs in this document.
+travel inside a team save, so they share the team path.
 
 Each feature's hook is the only writer to its store and the only caller of its
 mutations. Each feature reads from its zustand store, never from the cache.
 Each hook also runs its own 5.0: an effect that copies the refetched cache into
-D1 whenever the query data changes. [Divergences](#divergences) compares the
-features side by side.
+D1 whenever the query data changes.
 
 Every optimistic write fails the same way, a guarded rollback. The previous
 value comes back only if D1 still holds the value that write put there, so a

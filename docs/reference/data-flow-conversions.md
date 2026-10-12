@@ -4,8 +4,8 @@
 # Data conversions
 
 The representations user data takes between Firestore and the zustand store, and
-the conversions done in more than one layer. Store and process numbers are the
-ones in [Data flow](data-flow.md#level-0).
+the conversions done in more than one layer. D1 to D4 and 1.0 to 7.0 are the
+stores and processes in [Data flow](data-flow.md#level-0).
 
 ## Inbound
 
