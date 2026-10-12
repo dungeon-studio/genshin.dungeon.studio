@@ -31,7 +31,7 @@ value comes back only if the store still holds the value that write put there,
 so a newer edit stands. A toast shows either way, and nothing retries.
 
 A write that fails after a later write from the same hook has started gets
-neither rollback nor toast, see [#1757].
+neither rollback nor toast, see [#1534].
 
 ## Characters
 
@@ -193,4 +193,4 @@ the teams that name it unchanged.
 
 [#1740]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1740
 [#1741]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1741
-[#1757]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1757
+[#1534]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1534
