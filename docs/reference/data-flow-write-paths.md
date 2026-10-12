@@ -23,12 +23,15 @@ mutations. Each feature reads from its zustand store, never from the cache.
 A write skips both client copies: the hook edits the store and calls the API
 directly. The server's state comes back the other way, through a refetch into
 the query cache and then the hook's own reconcile effect into the store.
-Characters and weapons also apply part of the mutation response to the store
-directly.
+Characters also apply the saved constellation level from the mutation response
+to the store directly, and weapons the whole saved instance.
 
 Every optimistic write fails the same way, a guarded rollback. The previous
 value comes back only if the store still holds the value that write put there,
-so a newer edit stands. A toast shows either way, and nothing retries.
+so a newer edit stands. A toast shows either way, and nothing retries. Both run
+in per-call mutation callbacks, which fire only for the latest call on each
+mutation hook. A write that fails after a later one from the same hook has
+started gets no rollback and no toast, see [#1757].
 
 ## Characters
 
@@ -62,10 +65,11 @@ sequenceDiagram
   end
 ```
 
-The first time the query resolves for a signed-in user, the reconcile effect,
-`useServerSync`, also makes the sign-in push. It merges the store into the server collection, then
+Each time `useCollection` mounts for a signed-in user and the query resolves,
+the reconcile effect, `useServerSync`, also makes the sign-in push, see [#1741]. It merges the store into the server collection, then
 sends a `PUT` for every entry the server lacks or holds at a lower
-constellation. A failed push only toasts. The merged value stays in the store.
+constellation. A failed push only toasts, and only for the last entry sent. The
+merged value stays in the store.
 
 ## Weapons
 
@@ -95,6 +99,7 @@ sequenceDiagram
   else remove or set refinement
     Hook->>Store: removeWeapon / setRefinementLevel
     Hook->>API: DELETE or PATCH /weapons/{instanceId}
+    API->>FS: PATCH: read, then set, no transaction<br>DELETE: delete
     alt success
       API-->>Hook: saved weapon, or no content on DELETE
       Hook->>Cache: invalidate
@@ -105,8 +110,10 @@ sequenceDiagram
       Hook->>Store: guarded rollback
     end
   end
-  Cache-->>Reconcile: refetched weapons
-  Reconcile->>Store: setWeapons (replace)
+  opt either branch succeeded
+    Cache-->>Reconcile: refetched weapons
+    Reconcile->>Store: setWeapons (replace)
+  end
 ```
 
 ## Teams
@@ -137,7 +144,7 @@ sequenceDiagram
   end
 ```
 
-A `beforeunload` prompt guards an in-flight save.
+On the teams page, a `beforeunload` prompt guards the latest in-flight save.
 
 ## Account
 
@@ -158,9 +165,9 @@ sequenceDiagram
   alt success
     Hook->>FA: signOut
     Hook->>Cache: clear
-    Note over Stores: emptied on the auth change
+    Note over Stores: emptied when a page using them next mounts
   else failure
-    Hook->>Hook: toast the problem detail
+    Hook->>Hook: toast the problem detail, or a generic error
   end
 ```
 
@@ -172,14 +179,14 @@ between the two leaves an identity that can retry, not data with no owner.
 
 Characters, weapons, and teams differ on each of these questions:
 
-| Question                                    | Characters                             | Weapons                     | Teams                         |
-| ------------------------------------------- | -------------------------------------- | --------------------------- | ----------------------------- |
-| Works signed out?                           | Yes, but lost on reload, see [#1740]   | No, every action is a no-op | Yes, in memory only           |
-| Optimistic?                                 | All three actions                      | Remove and refine, not add  | Every action                  |
-| Applies the mutation response to the store? | Constellation level only               | Whole instance, replaced    | No                            |
-| How a refetch reaches the store             | Additive merge                         | Replace                     | Replace, filled to four slots |
-| Can a refetch overwrite an edit in flight?  | Raise or add, no. Lower or remove, yes | Yes                         | Yes                           |
-| What a removal elsewhere does to the store  | Survives the merge, see [#1741]        | Disappears on refetch       | Disappears on refetch         |
+| Question                                    | Characters                                  | Weapons                     | Teams                               |
+| ------------------------------------------- | ------------------------------------------- | --------------------------- | ----------------------------------- |
+| Works signed out?                           | Yes, but cleared on each mount, see [#1740] | No, every action is a no-op | Yes, in memory, reset on each mount |
+| Optimistic?                                 | All three actions                           | Remove and refine, not add  | Every action                        |
+| Applies the mutation response to the store? | Constellation level only                    | Whole instance, replaced    | No                                  |
+| How a refetch reaches the store             | Additive merge                              | Replace                     | Replace, filled to four slots       |
+| Can a refetch overwrite an edit in flight?  | Raise or add, no. Lower or remove, yes      | Yes                         | Yes                                 |
+| What a removal elsewhere does to the store  | Survives the merge, see [#1741]             | Disappears on refetch       | Disappears on refetch               |
 
 Teams also depend on the other two features. The server rejects a team that
 names a character or weapon instance the user doesn't own, so a team save can
@@ -188,3 +195,4 @@ the teams that name it unchanged.
 
 [#1740]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1740
 [#1741]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1741
+[#1757]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1757

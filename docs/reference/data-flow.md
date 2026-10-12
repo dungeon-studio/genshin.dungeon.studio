@@ -6,9 +6,12 @@
 Where each copy of user data lives and which processes move data between them.
 User data has up to four copies: the Firestore document, the TanStack Query
 cache, a zustand store, and, for characters only, the browser's `localStorage`.
-Out of scope: static game data, which is never written, and the theme
-preference, which never leaves the browser. Which copy should be authoritative
-is [#1133].
+Which copy should be authoritative is [#1133]. Out of scope:
+
+- Static game data, which is never written.
+- The theme preference, which never leaves the browser.
+- The signed-in session the Firebase Auth SDK keeps in IndexedDB, which
+  Firebase owns.
 
 What each client write does to each copy is in
 [Write paths](data-flow-write-paths.md). The representation data takes at each
@@ -32,7 +35,7 @@ flowchart LR
   user -->|edit| system
   system -->|rendered state| user
   firebaseAuth -->|ID token| system
-  firebaseAuth -->|token signing keys| system
+  firebaseAuth -->|signing keys and revocation status| system
   system -->|identity to delete| firebaseAuth
   operator -->|sweep command| system
   system -->|version census| operator
@@ -89,18 +92,18 @@ flowchart TB
   serve -->|saved record| send
   send -->|write outcome| edit
 
-  firebaseAuth -->|token signing keys| serve
+  firebaseAuth -->|signing keys and revocation status| serve
   serve -->|identity to delete| firebaseAuth
   firestore -->|stored document| serve
-  serve -->|current-version document| firestore
+  serve -->|current-version document or delete| firestore
 
   serve -->|record list| fetch
   fetch -->|server collection| cache
 
   cache -->|server collection| reconcile
-  store -->|local entities| reconcile
+  store -->|local characters| reconcile
   reconcile -->|reconciled entities| store
-  reconcile -->|entries the server lacks| send
+  reconcile -->|characters the server lacks| send
 
   store -->|characters| persistCharacters
   persistCharacters -->|versioned collection| local
@@ -109,7 +112,7 @@ flowchart TB
 
   operator -->|sweep command| sweep
   firestore -->|stored document| sweep
-  sweep -->|current-version document| firestore
+  sweep -->|migrated legacy document, when writing| firestore
   sweep -->|version census| operator
 ```
 
@@ -117,8 +120,12 @@ Two control signals carry no data:
 
 - A successful mutation invalidates its query, which makes Fetch records run
   again. No collection or team mutation writes into the query cache directly.
-  Account deletion empties it.
-- An auth change to anything but signed in makes each feature's reconcile effect
-  empty its zustand store.
+  Account deletion empties it. A plain sign-out leaves the previous user's
+  entries, keyed by user ID, until garbage collection.
+- While auth is anything but signed in, a separate effect in each feature hook
+  empties its zustand store whenever the hook mounts. Teams reset to empty
+  slots. Auth starts out loading on every page load, so this also runs before
+  sign-in settles, see [#1740].
 
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
+[#1740]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1740
