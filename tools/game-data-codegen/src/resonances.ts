@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { isDeepStrictEqual } from 'node:util';
 
@@ -27,7 +28,25 @@ const ANIME_GAME_DATA = {
 
 const RESONANCES_MODULE = 'src/resonances.generated.ts';
 
-const SOURCE_PREFIX = `https://github.com/${ANIME_GAME_DATA.repository}/tree/`;
+const REPOSITORY_URL = `https://github.com/${ANIME_GAME_DATA.repository}`;
+
+const SOURCE_PREFIX = `${REPOSITORY_URL}/tree/`;
+
+const COMMIT_PATTERN = /^[0-9a-f]{40}$/;
+
+/** A full commit SHA passes through; anything else resolves as a ref, such as `HEAD`. */
+function resolveCommit(ref: string): string {
+  if (COMMIT_PATTERN.test(ref)) return ref;
+
+  const [commit] = execFileSync('git', ['ls-remote', REPOSITORY_URL, ref], {
+    encoding: 'utf8',
+  }).split('\t');
+  if (!commit) {
+    throw new Error(`${ANIME_GAME_DATA.repository} has no ref "${ref}"`);
+  }
+
+  return commit;
+}
 
 /**
  * The generated module's header names the commit it was built from, which
@@ -214,16 +233,19 @@ function serializeResonance({ id, name, condition, description }: GeneratedReson
 
 /**
  * Regenerate `@genshin/game-data`'s `resonances.generated.ts` from
- * AnimeGameData at `commit`, defaulting to the pinned one.
+ * AnimeGameData at `ref`, a commit or a ref such as `HEAD`, defaulting to the
+ * pinned commit.
  *
  * Records matching the shipped ones leave the module, and so the pin,
  * untouched, which keeps a commit that changes nothing out of review.
  *
- * @throws Error when a fetch fails or upstream has reshaped either file.
+ * @throws Error when `ref` doesn't resolve, a fetch fails, or upstream has
+ *   reshaped either file.
  */
 export async function generateResonances(
-  commit: string = pinnedCommit(),
+  ref: string = pinnedCommit(),
 ): Promise<{ count: number; written: boolean }> {
+  const commit = resolveCommit(ref);
   const [records, textMap] = await Promise.all([
     fetchJson(commit, ANIME_GAME_DATA.resonances),
     fetchJson(commit, ANIME_GAME_DATA.textMap),

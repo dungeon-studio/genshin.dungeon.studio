@@ -72,8 +72,8 @@ program
     'Regenerate the elemental resonance roster in @genshin/game-data/src/resonances.generated.ts',
   )
   .option(
-    '--commit <sha>',
-    'AnimeGameData commit to read, kept only when its resonances differ (default: the pinned one)',
+    '--commit <ref>',
+    'AnimeGameData commit, or a ref such as HEAD, to read; kept only when its resonances differ (default: the pinned commit)',
   )
   .action(async ({ commit }: { commit?: string }): Promise<void> => {
     const { count, written } = await generateResonances(commit);
