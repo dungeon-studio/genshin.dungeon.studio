@@ -18,7 +18,7 @@ export function toGameVersion(value: string, subject: string): GameVersion {
   return { major: Number(match[1]), minor: Number(match[2]) };
 }
 
-/** The `version` field as the generated modules spell it. */
+/** A version as an object literal in the generated modules. */
 export function serializeVersion(version: GameVersion): string {
-  return `version: { major: ${version.major}, minor: ${version.minor} },`;
+  return `{ major: ${version.major}, minor: ${version.minor} }`;
 }

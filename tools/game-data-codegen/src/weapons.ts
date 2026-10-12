@@ -95,7 +95,7 @@ function serializeWeapon(weapon: GeneratedWeapon): string {
     `type: '${weapon.type}',`,
     `rarity: ${weapon.rarity},`,
     `baseATK: ${weapon.baseATK},`,
-    serializeVersion(weapon.version),
+    `version: ${serializeVersion(weapon.version)},`,
   ];
 
   if (weapon.subStat) {

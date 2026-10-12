@@ -66,7 +66,7 @@ export function buildArtifactSets(): GeneratedArtifactSet[] {
 function serializeArtifactSet(set: GeneratedArtifactSet): string {
   return serializeEntry(set.id, [
     `name: ${JSON.stringify(set.name)},`,
-    serializeVersion(set.version),
+    `version: ${serializeVersion(set.version)},`,
     'bonuses: {',
     `  2: ${JSON.stringify(set.bonuses[2])},`,
     `  4: ${JSON.stringify(set.bonuses[4])},`,

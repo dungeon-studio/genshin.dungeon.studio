@@ -83,7 +83,7 @@ function serializeCharacter(character: GeneratedCharacter): string {
     `weaponType: '${character.weaponType}',`,
     `rarity: ${character.rarity},`,
     `region: ${JSON.stringify(character.region)},`,
-    serializeVersion(character.version),
+    `version: ${serializeVersion(character.version)},`,
     `releaseDate: '${character.releaseDate}',`,
   ]);
 }
