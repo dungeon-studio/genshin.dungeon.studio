@@ -69,7 +69,7 @@ function allows<T>(selected: ReadonlySet<T>, value: T): boolean {
 
 /**
  * No accent folding or Unicode normalization: a name with a diacritic matches
- * only a query that spells it the same way. Roster names carry none.
+ * only a query that spells it the same way.
  */
 function searchMatcher(query: string): (name: string) => boolean {
   const queryLower = query.toLowerCase();
