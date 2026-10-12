@@ -19,8 +19,12 @@ travel inside a team save, so they share the team path.
 
 Each feature's hook is the only writer to its store and the only caller of its
 mutations. Each feature reads from its zustand store, never from the cache.
-Each hook also runs its own reconcile effect, which copies the refetched cache
-into the store whenever the query data changes.
+
+A write skips both client copies: the hook edits the store and calls the API
+directly. The server's state comes back the other way, through a refetch into
+the query cache and then the hook's own reconcile effect into the store.
+Characters and weapons also apply part of the mutation response to the store
+directly.
 
 Every optimistic write fails the same way, a guarded rollback. The previous
 value comes back only if the store still holds the value that write put there,
