@@ -7,6 +7,7 @@ import { Command } from 'commander';
 import { generateArtifactSets } from './artifacts.js';
 import { generateCharacters } from './characters.js';
 import { generateFirstBannerDates } from './paimon-moe.js';
+import { generateResonances } from './resonances.js';
 import { generateWeapons } from './weapons.js';
 
 interface Roster {
@@ -47,7 +48,7 @@ for (const roster of ROSTERS) {
 // genshin-db is slow to load, so one process serves every roster.
 program
   .command('all')
-  .description('Regenerate every roster in @genshin/game-data')
+  .description('Regenerate every genshin-db roster in @genshin/game-data')
   .action((): void => {
     ROSTERS.forEach(regenerate);
   });
@@ -61,6 +62,18 @@ program
   .action(async (): Promise<void> => {
     console.log(
       `Dated ${await generateFirstBannerDates()} characters; regenerate characters to apply`,
+    );
+  });
+
+// Fetches from AnimeGameData, so `all` leaves it out to keep regeneration offline.
+program
+  .command('resonances')
+  .description(
+    'Regenerate the elemental resonance roster in @genshin/game-data/src/resonances.generated.ts',
+  )
+  .action(async (): Promise<void> => {
+    console.log(
+      `Generated ${await generateResonances()} elemental resonances into @genshin/game-data`,
     );
   });
 

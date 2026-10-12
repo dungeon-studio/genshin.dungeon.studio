@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * Structured game data for Genshin Impact: characters, weapons, elements, and
- * artifact sets.
+ * Structured game data for Genshin Impact: characters, weapons, elements,
+ * elemental resonances, and artifact sets.
  */
 
 // Elements
@@ -15,6 +15,17 @@ export {
   type Element,
   type ReactionType,
 } from './elements.js';
+
+// Resonances
+export {
+  ELEMENTAL_RESONANCES,
+  getActiveResonances,
+  RESONANCE_TRIGGERS,
+  type ElementalResonance,
+  type ResonanceCondition,
+  type ResonanceId,
+  type ResonanceTrigger,
+} from './resonances.js';
 
 // Rarities
 export type { Rarity } from './rarities.js';

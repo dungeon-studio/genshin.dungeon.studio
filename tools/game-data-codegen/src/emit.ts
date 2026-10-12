@@ -16,10 +16,11 @@ export interface GeneratedModule {
   /** Serialized members, one string per record, in roster order. */
   entries: readonly string[];
   /**
-   * Third-party data the module carries: its SPDX `FileCopyrightText` value,
-   * credited in the header, and where it came from.
+   * Third-party data the module carries: where it came from, and its SPDX
+   * `FileCopyrightText` value, credited in the header. Omit `copyright` for a
+   * source that grants no license, since the MIT header would claim one.
    */
-  upstream?: { copyright: string; source: string };
+  upstream?: { copyright?: string; source: string };
 }
 
 /**
@@ -55,7 +56,7 @@ export function renderModule({
 }: Omit<GeneratedModule, 'path'>): string {
   // REUSE-IgnoreStart
   const header = [
-    ...(upstream ? [`// SPDX-FileCopyrightText: ${upstream.copyright}`] : []),
+    ...(upstream?.copyright ? [`// SPDX-FileCopyrightText: ${upstream.copyright}`] : []),
     '// SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>',
     '// SPDX-License-Identifier: MIT',
   ];
