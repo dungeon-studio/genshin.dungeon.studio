@@ -12,7 +12,8 @@
     "test:integration": "firebase emulators:exec --only firestore --project demo-dungeon-studio-genshin-dev \"vitest run --coverage --config vitest.integration.config.ts\"",
     "typecheck": "tsc --noEmit && tsc --project tsconfig.scripts.json --noEmit",
     "schemas:export": "tsx scripts/export-schemas.ts",
-    "schemas:check": "tsx scripts/check-schema-compat.ts"
+    "schemas:check": "tsx scripts/check-schema-compat.ts",
+    "documents:sweep": "tsx scripts/sweep-legacy-documents.ts"
   },
   "dependencies": {
     "@genshin/collection-json": "workspace:*",
@@ -22,12 +23,11 @@
     "ajv": "8.20.0",
     "content-type": "3.1.1",
     "firebase-admin": "14.5.0",
-    "google-gax": "6.12.0",
     "hono": "4.13.13",
     "negotiator": "1.1.0",
     "pino": "10.4.0",
     "verzod": "0.5.1",
-    "zod": "4.5.4"
+    "zod": "4.6.5"
   },
   "devDependencies": {
     "@genshin/eslint-config": "workspace:*",
@@ -36,7 +36,7 @@
     "@types/negotiator": "0.6.5",
     "@types/node": "24.19.2",
     "@typescript/native": "npm:typescript@7.0.2",
-    "@vitest/coverage-v8": "4.1.11",
+    "@vitest/coverage-v8": "5.0.3",
     "eslint": "10.12.0",
     "fast-check": "4.10.2",
     "globals": "17.13.0",
@@ -45,6 +45,6 @@
     "tsc-alias": "1.9.7",
     "tsx": "4.23.15",
     "typescript": "npm:@typescript/typescript6@6.0.2",
-    "vitest": "4.1.11"
+    "vitest": "5.0.3"
   }
 }

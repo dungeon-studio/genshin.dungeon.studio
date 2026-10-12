@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { ARTIFACT_SET_DATA } from './artifacts.generated.js';
+import type { GameVersion } from './versions.js';
 
 /**
  * The five slots a set fills, keyed for code and valued with the name players
@@ -34,7 +35,7 @@ type ArtifactSetId = keyof typeof ARTIFACT_SET_DATA;
 export interface ArtifactSet {
   id: ArtifactSetId;
   name: string;
-  version: string; // Release version (e.g., "1.0", "3.0", "4.3")
+  version: GameVersion;
   bonuses: Record<2 | 4, string>; // 2-piece and 4-piece bonus descriptions
 }
 

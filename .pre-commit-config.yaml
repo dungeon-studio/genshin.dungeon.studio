@@ -79,6 +79,10 @@ repos:
     hooks:
       - id: terraform_fmt
         args: [--args=-recursive]
+      - id: terraform_validate
+        # Validate never reads state, so it skips the GCS backend and the
+        # credentials it needs.
+        args: [--tf-init-args=-backend=false]
       - id: terraform_trivy
         args:
           - --args=--severity=HIGH,CRITICAL
@@ -110,7 +114,7 @@ repos:
       - id: hadolint
 
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 44.145.3
+    rev: 44.148.4
     hooks:
       - id: renovate-config-validator
         args: [--strict, --no-global]
@@ -227,4 +231,12 @@ repos:
             src/lib/environments\.json|
             public/(favicon|icon|og-image)[^/]*\.(png|ico)
           )$
+        pass_filenames: false
+
+      # The generators import @genshin/game-data, so its sources are inputs too.
+      - id: game-data
+        name: game data (regenerate from genshin-db)
+        entry: scripts/regenerate-game-data.sh
+        language: script
+        files: ^(tools/game-data-codegen/|packages/game-data/src/|scripts/regenerate-game-data\.sh$)
         pass_filenames: false

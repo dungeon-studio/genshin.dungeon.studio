@@ -106,6 +106,9 @@ jobs:
       CLOUD_RUN_SERVICE_NAME: api
       ARTIFACT_REPOSITORY: api
       FRONTEND_ORIGIN: https://develop.genshin.dungeon.studio
+      # Schema-migration lines log at info, and their absence signals that a
+      # legacy schema version has drained. A higher level hides them.
+      LOG_LEVEL: info
     permissions:
       contents: read
       id-token: write
@@ -197,6 +200,7 @@ jobs:
           env_vars: |
             FRONTEND_ORIGIN=${{ env.FRONTEND_ORIGIN }}
             APP_GIT_SHA=${{ github.sha }}
+            LOG_LEVEL=${{ env.LOG_LEVEL }}
 
       - name: Verify Public Health
         continue-on-error: true

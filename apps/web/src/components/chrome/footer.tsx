@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { GAME_DATA_VERSION } from '@genshin/game-data';
+import { formatVersion, GAME_DATA_VERSION } from '@genshin/game-data';
 import type { JSX } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -13,12 +13,13 @@ import { REPOSITORY_URL } from '@/lib/repository';
 export function Footer(): JSX.Element {
   const auth = useAuth();
   const location = useLocation();
+  const gameDataVersion = formatVersion(GAME_DATA_VERSION);
 
   const pageUrl = window.location.origin + location.pathname + location.search + location.hash;
   const reportUrl = buildBugReportUrl(`${REPOSITORY_URL}/issues/new`, pageUrl, {
     appVersion: __APP_VERSION__,
     buildSha: __BUILD_SHA__,
-    gameDataVersion: GAME_DATA_VERSION,
+    gameDataVersion,
     authenticated: auth.status === 'signed-in',
     userAgent: navigator.userAgent,
     platform: navigator.platform,
@@ -95,7 +96,7 @@ export function Footer(): JSX.Element {
           </ul>
         </nav>
         <p className="mt-4 text-xs text-muted-foreground/70">
-          Game data current as of {GAME_DATA_VERSION}
+          Game data current as of {gameDataVersion}
         </p>
         <p className="mt-1 text-xs text-muted-foreground/70">© 2026 Dungeon Studio</p>
         <p className="mt-1 text-xs text-muted-foreground/70">
