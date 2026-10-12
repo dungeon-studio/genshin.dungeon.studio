@@ -103,7 +103,7 @@ Content-Type: application/json; profile="/schemas/team/get/1.0.0.json"
 
 This mirrors the client-side mechanism: clients send `Accept: application/json; profile="..."` to request a specific schema version, and the server responds with `Content-Type: application/json; profile="..."` to confirm which schema describes the response. Both directions use the same RFC 6906 `profile` semantics on the standard content negotiation headers.
 
-No registry defines this parameter for `application/json`. The registration in [RFC 8259 §11](https://www.rfc-editor.org/rfc/rfc8259#section-11) defines no optional parameters. [RFC 6906 §3.1](https://www.rfc-editor.org/rfc/rfc6906#section-3.1) recommends that a media type define a `profile` parameter, but it doesn't add one to media types that lack it. The meaning of `profile` on this API therefore comes from this DSGEP, not from a specification a generic client already implements. A client unaware of the convention still parses the body as JSON, but the parameter tells it nothing.
+No registry defines this parameter: the `application/json` registration in [RFC 8259 §11](https://www.rfc-editor.org/rfc/rfc8259#section-11) has no parameters. [RFC 6906 §3.1](https://www.rfc-editor.org/rfc/rfc6906#section-3.1) recommends that a media type define `profile`, but it doesn't add one to media types that lack it. Only clients that implement this DSGEP know what `profile` means here.
 
 This approach:
 
@@ -183,9 +183,9 @@ Inline schemas that embed `$schema` references in every response bloat payloads 
 
 ### Why `profile` parameter over `Link` headers
 
-The API keeps `profile` because it carries negotiation, not only discovery. A client requests a schema version with `profile` on `Accept`, and `Link` has no request-side counterpart. Using `profile` on `Content-Type` in the response confirms that choice on the same parameter, so both directions share one mechanism on the standard content negotiation headers.
+The API uses `profile` because it carries negotiation as well as discovery. A client requests a schema version with `profile` on `Accept`, and `Link` has no request-side counterpart. Using `profile` on `Content-Type` in the response confirms that choice on the same parameter, so both directions share one mechanism on the standard content negotiation headers.
 
-The cost falls on generic clients. RFC 8288 `Link` headers with the registered `rel="describedby"` relation are a common discovery mechanism, and [JSON Schema 2020-12](https://json-schema.org/draft/2020-12/json-schema-core) §9.5.1.1 recommends them for linking an instance to its schema. The `profile` parameter has no registration on `application/json`, as [section 3](#3-discovery-mechanism-profile-media-type-parameter) records. A client that only wants to find the schema gives up the standard path `describedby` would offer. The clients that negotiate versions already depend on this DSGEP.
+The cost falls on generic clients. RFC 8288 `Link` headers with the registered `rel="describedby"` relation are a common discovery mechanism, and [JSON Schema 2020-12](https://json-schema.org/draft/2020-12/json-schema-core) §9.5.1.1 recommends them for linking an instance to its schema. The `profile` parameter has [no registration on `application/json`](#3-discovery-mechanism-profile-media-type-parameter), so a client that only wants to find the schema gives up the standard path `describedby` would offer. The clients that negotiate versions already depend on this DSGEP.
 
 ### Why serve from the API rather than a separate host
 
@@ -336,5 +336,4 @@ app.get('/schemas/:module/:name.json', async (c) => {
 
 ## Revision history
 
-- 2026-10-12: Accounted for `application/json` registering no `profile` parameter per #1729
 - 2026-03-01: Initial draft (DSGEP-003)
