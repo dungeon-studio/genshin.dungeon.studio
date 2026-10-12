@@ -37,7 +37,7 @@ sequenceDiagram
   participant API as API
   participant FS as Firestore
   participant Cache as query cache
-  participant Reconcile as reconcile effect (useServerSync)
+  participant Reconcile as useServerSync
 
   Hook->>Store: addCharacter / removeCharacter / setConstellationLevel
   opt signed in
@@ -161,7 +161,7 @@ sequenceDiagram
   alt success
     Hook->>FA: signOut
     Hook->>Cache: clear
-    Note over Stores: each feature hook empties its store on the auth change
+    Note over Stores: emptied on the auth change
   else failure
     Hook->>Hook: toast the problem detail
   end

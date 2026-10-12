@@ -49,7 +49,7 @@ trust boundaries:
   credentials.
 
 ```mermaid
-flowchart LR
+flowchart TB
   user[User]
   firebaseAuth[Firebase Auth]
   operator[Operator]
