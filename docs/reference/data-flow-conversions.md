@@ -35,13 +35,15 @@ a weapon add, `weaponListDocument`.
 
 ## Outbound
 
-Characters and weapons write their request body inline. Teams convert the
-store's team with `teamToSavePayload` and send the domain members unchanged. The
-API validates the body against the request schema. The teams route then parses
-the members and checks them against the user's characters, weapons, and other
-teams. The repository merges the body into the stored record with
-`nextCharacter` or `nextTeam`, and `toDocument` stamps the current schema
-version.
+1. The client builds the request body. Characters and weapons write it inline.
+   Teams convert the store's team with `teamToSavePayload`, which sends the
+   domain members unchanged.
+2. The API validates the body against the request schema.
+3. For teams, the route parses the members and checks them against the user's
+   characters, weapons, and other teams.
+4. For characters and teams, the repository merges the body into the stored
+   record with `nextCharacter` or `nextTeam`.
+5. The repository's `toDocument` stamps the current schema version.
 
 ## Conversions in more than one layer
 
@@ -57,7 +59,8 @@ version.
   when it's blank. The server doesn't trim and accepts 1 to 50 characters, a
   limit the client doesn't enforce.
 - **Team composition rules.** The client ignores a duplicate character in a
-  team, and the server rejects one. Both the planner UI and the server enforce artifact plan limits. Only the server checks weapon uniqueness across teams.
+  team, and the server rejects one. Both the planner UI and the server enforce
+  artifact plan limits. Only the server checks weapon uniqueness across teams.
 - **Domain invariants.** Asserted by the repository's `fromDocument`, by the
   client's `deserialise*` functions, and by the persisted character store's
   migration.

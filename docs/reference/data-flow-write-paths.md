@@ -28,10 +28,10 @@ to the store directly, and weapons the whole saved instance.
 
 Every optimistic write fails the same way, a guarded rollback. The previous
 value comes back only if the store still holds the value that write put there,
-so a newer edit stands. A toast shows either way, and nothing retries. Both run
-in per-call mutation callbacks, which fire only for the latest call on each
-mutation hook. A write that fails after a later one from the same hook has
-started gets no rollback and no toast, see [#1757].
+so a newer edit stands. A toast shows either way, and nothing retries.
+
+A write that fails after a later write from the same hook has started gets
+neither rollback nor toast, see [#1757].
 
 ## Characters
 
@@ -66,10 +66,10 @@ sequenceDiagram
 ```
 
 Each time `useCollection` mounts for a signed-in user and the query resolves,
-the reconcile effect, `useServerSync`, also makes the sign-in push, see [#1741]. It merges the store into the server collection, then
-sends a `PUT` for every entry the server lacks or holds at a lower
-constellation. A failed push only toasts, and only for the last entry sent. The
-merged value stays in the store.
+the reconcile effect, `useServerSync`, also makes the sign-in push, see [#1741].
+It merges the store into the server collection, then sends a `PUT` for every
+entry the server lacks or holds at a lower constellation. A failed push only
+toasts, and only for the last entry sent. The merged value stays in the store.
 
 ## Weapons
 
@@ -172,12 +172,10 @@ sequenceDiagram
 ```
 
 Every document in Firestore lives under `users/{uid}`, so `eraseStoredData`
-reaches all of them with one recursive delete. Firestore goes first so a failure
-between the two leaves an identity that can retry, not data with no owner.
+reaches all of them with one recursive delete. Firestore goes first, so a
+failure between the two never orphans data: the identity remains and can retry.
 
 ## Divergences
-
-Characters, weapons, and teams differ on each of these questions:
 
 | Question                                    | Characters                                  | Weapons                     | Teams                               |
 | ------------------------------------------- | ------------------------------------------- | --------------------------- | ----------------------------------- |
