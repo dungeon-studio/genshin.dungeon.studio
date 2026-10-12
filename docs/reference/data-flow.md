@@ -142,11 +142,15 @@ Each hook also runs its own 5.0: an effect that copies the refetched cache into
 D1 whenever the query data changes. [Divergences](#divergences) compares the
 features side by side.
 
+Every optimistic write fails the same way, called a guarded rollback below: it
+restores the previous value only if D1 still holds the value that write put
+there, so a newer edit stands, and it toasts either way. Nothing retries.
+
 ### Characters
 
 `useCollection` in `use-character-collection.ts`. Add, remove, and set
-constellation level share one shape: write D1, send, and on failure roll back
-only if D1 still holds the value this write put there.
+constellation level share one shape: write D1, send, and on failure make a
+guarded rollback.
 
 ```mermaid
 sequenceDiagram
@@ -167,19 +171,16 @@ sequenceDiagram
       API->>FS: delete
     end
     alt success
+      API-->>Hook: saved character, or no content on DELETE
       Hook->>Cache: invalidate
       opt PUT
-        API-->>Hook: saved character
         Hook->>Store: applyMutationResult (constellation level only)
       end
       Cache-->>Reconcile: refetched collection
       Reconcile->>Store: mergeCollections, then replaceCharacters
     else failure
       API-->>Hook: problem detail
-      alt store still holds this write's value
-        Hook->>Store: restore previous value
-      end
-      Hook->>Hook: toast, no retry
+      Hook->>Store: guarded rollback
     end
   end
 ```
@@ -208,8 +209,8 @@ sequenceDiagram
     Hook->>API: POST /weapons
     API->>FS: create with minted instance ID
     alt success
-      Hook->>Cache: invalidate
       API-->>Hook: saved weapon
+      Hook->>Cache: invalidate
       Hook->>Store: addWeapon (upsert)
     else failure
       Hook->>Hook: toast, store untouched
@@ -218,13 +219,13 @@ sequenceDiagram
     Hook->>Store: removeWeapon / setRefinementLevel
     Hook->>API: DELETE or PATCH /weapons/{instanceId}
     alt success
+      API-->>Hook: saved weapon, or no content on DELETE
       Hook->>Cache: invalidate
       opt PATCH
-        API-->>Hook: saved weapon
         Hook->>Store: addWeapon (replaces the instance)
       end
-    else failure and store still holds this write's value
-      Hook->>Store: restore previous value
+    else failure
+      Hook->>Store: guarded rollback
     end
   end
   Cache-->>Store: 5.0 effect: refetched weapons, setWeapons (replace)
@@ -256,9 +257,8 @@ sequenceDiagram
     alt success
       Hook->>Cache: invalidate
       Cache-->>Store: 5.0 effect: collectionTeamsToStore, then setTeams (replace)
-    else failure and slot unchanged since send
-      Hook->>Store: restore snapshot
-      Hook->>Hook: toast
+    else failure
+      Hook->>Store: guarded rollback to the snapshot
     end
   end
 ```
@@ -307,7 +307,7 @@ Inbound, every feature runs the same chain:
 3. The query layer asserts the document and converts each item with
    `deserialiseCharacter`, `deserialiseWeapon`, or `deserialiseTeam`.
 4. The query layer folds the items into its cache shape.
-5. Process 5.0 turns the cache shape into the store shape.
+5. 5.0 turns the cache shape into the store shape.
 
 | Feature    | Cache shape, step 4                                    | Store shape, step 5                                      |
 | ---------- | ------------------------------------------------------ | -------------------------------------------------------- |
@@ -348,15 +348,10 @@ Characters, weapons, and teams differ on each of these questions:
 | Can a refetch overwrite an edit in flight? | Raise or add, no. Lower or remove, yes | Yes                         | Yes                           |
 | What a removal elsewhere does to D1        | Survives the merge, see [#1741]        | Disappears on refetch       | Disappears on refetch         |
 
-Two consequences follow from those choices:
-
-- **The character merge protects only upward edits.** A refetch that lands
-  before a lowering or removing request completes restores the old value in
-  D1.
-- **Teams depend on the other two features.** The server rejects a team that
-  names a character or weapon instance the user doesn't own, so a team save can
-  fail on a character add still in flight. Removing a character or weapon
-  leaves the teams that name it unchanged.
+Teams also depend on the other two features. The server rejects a team that
+names a character or weapon instance the user doesn't own, so a team save can
+fail on a character add still in flight. Removing a character or weapon leaves
+the teams that name it unchanged.
 
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
 [#1740]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1740
