@@ -137,14 +137,14 @@ travel inside a team save, so they share the team path. A new write path
 belongs in this document.
 
 Each feature's hook is the only writer to its store and the only caller of its
-mutations, and each feature reads from its zustand store, never from the cache.
+mutations. Each feature reads from its zustand store, never from the cache.
 Each hook also runs its own 5.0: an effect that copies the refetched cache into
 D1 whenever the query data changes. [Divergences](#divergences) compares the
 features side by side.
 
-Every optimistic write fails the same way, called a guarded rollback below: it
-restores the previous value only if D1 still holds the value that write put
-there, so a newer edit stands, and it toasts either way. Nothing retries.
+Every optimistic write fails the same way, a guarded rollback. The previous
+value comes back only if D1 still holds the value that write put there, so a
+newer edit stands. A toast shows either way, and nothing retries.
 
 ### Characters
 
@@ -188,14 +188,13 @@ sequenceDiagram
 The first time the query resolves for a signed-in user, `useServerSync` also
 makes the sign-in push. It merges D1 into the server collection, then sends a
 `PUT` for every entry the server lacks or holds at a lower constellation. A
-failed push only toasts: the merged value stays in D1, and nothing reverts
-it.
+failed push only toasts; the merged value stays in D1.
 
 ### Weapons
 
 `useWeaponCollection` in `use-weapon-collection.ts`. The server mints the
-instance identifier, which is why adding can't be optimistic and why nothing
-works signed out: there's no identifier to record locally.
+instance identifier, so adding can't be optimistic and nothing works signed
+out.
 
 ```mermaid
 sequenceDiagram
@@ -290,8 +289,8 @@ sequenceDiagram
   end
 ```
 
-Every row in D4 lives under `users/{uid}`, so `eraseStoredData` reaches every
-row with one recursive delete. Firestore goes first so a failure between the
+Every document in D4 lives under `users/{uid}`, so `eraseStoredData` reaches
+all of them with one recursive delete. Firestore goes first so a failure between the
 two leaves an identity that can retry, not data with no owner.
 
 ---
