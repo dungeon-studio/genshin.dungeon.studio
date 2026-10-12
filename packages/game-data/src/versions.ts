@@ -17,6 +17,11 @@ export function compareVersions(a: GameVersion, b: GameVersion): number {
   return a.major - b.major || a.minor - b.minor;
 }
 
+/** Whether two versions name the same release. */
+export function sameVersion(a: GameVersion, b: GameVersion): boolean {
+  return compareVersions(a, b) === 0;
+}
+
 /** @throws TypeError on an empty list. */
 export function latestVersion(versions: readonly GameVersion[]): GameVersion {
   return versions.reduce((latest, version) =>

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { compareVersions } from './versions.js';
+import { sameVersion } from './versions.js';
 import type { GameVersion } from './versions.js';
 
 /** The seven elements, keyed for code and valued with the name players see. */
@@ -175,8 +175,8 @@ export const ELEMENT_REACTION_TYPES: Record<string, ReactionInfo> = {
  */
 export function getReactionsByVersion(version: GameVersion): Record<string, ReactionInfo> {
   return Object.fromEntries(
-    Object.entries(ELEMENT_REACTION_TYPES).filter(
-      ([, reaction]) => compareVersions(reaction.version, version) === 0,
+    Object.entries(ELEMENT_REACTION_TYPES).filter(([, reaction]) =>
+      sameVersion(reaction.version, version),
     ),
   );
 }

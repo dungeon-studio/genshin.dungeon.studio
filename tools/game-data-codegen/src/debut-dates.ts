@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { compareVersions } from '@genshin/game-data';
+import { sameVersion } from '@genshin/game-data';
 import type { GameVersion } from '@genshin/game-data';
 
 import { FIRST_BANNER_DATES } from './first-banner-dates.generated.js';
@@ -24,7 +24,7 @@ export type DebutDate = (id: string, version: GameVersion) => string;
  */
 export function debutDates(firstBanner: Readonly<Record<string, string>>): DebutDate {
   return (id, version) => {
-    if (compareVersions(version, LAUNCH.version) === 0) return LAUNCH.date;
+    if (sameVersion(version, LAUNCH.version)) return LAUNCH.date;
 
     const date = firstBanner[id];
     if (!date) {
