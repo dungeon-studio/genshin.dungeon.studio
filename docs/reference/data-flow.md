@@ -1,19 +1,14 @@
 <!-- SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com> -->
 <!-- SPDX-License-Identifier: MIT -->
 
-# Understanding data flow
+# Data flow
 
-User data in this system has up to four copies at once: the Firestore
-document, the TanStack Query cache, a zustand store, and, for characters only,
-the browser's `localStorage`. This document maps where each copy lives, which
-processes move data between them, and what each client write does to each copy
-when it succeeds and when it fails.
-
-It's for contributors changing a write path, and for the decision in [#1133]
-on which copy is authoritative. It describes the system as it stands and
-decides nothing. It doesn't cover
-static game data, which ships in the bundle and is never written, or the
-theme preference, which stays in the browser that set it.
+Where each copy of user data lives, which processes move data between them, and
+what each client write does to each copy on success and on failure. User data
+has up to four copies: the Firestore document, the TanStack Query cache, a
+zustand store, and, for characters only, the browser's `localStorage`. Out of
+scope: static game data, which is never written, and the theme preference,
+which never leaves the browser. Which copy should be authoritative is [#1133].
 
 The data flow diagrams show where data goes. The sequence diagrams under
 [Write paths](#write-paths) show order and failure, which a data flow diagram
@@ -346,7 +341,7 @@ Characters, weapons, and teams differ on each of these questions:
 
 | Question                                   | Characters                             | Weapons                     | Teams                         |
 | ------------------------------------------ | -------------------------------------- | --------------------------- | ----------------------------- |
-| Works signed out?                          | Yes, persisted to D3                   | No, every action is a no-op | Yes, in memory only           |
+| Works signed out?                          | Yes, but lost on reload, see [#1740]   | No, every action is a no-op | Yes, in memory only           |
 | Optimistic?                                | All three actions                      | Remove and refine, not add  | Every action                  |
 | Applies the mutation response to D1?       | Constellation level only               | Whole instance, replaced    | No                            |
 | How a refetch reaches D1                   | Additive merge                         | Replace                     | Replace, filled to four slots |
@@ -362,20 +357,6 @@ Two consequences follow from those choices:
   names a character or weapon instance the user doesn't own, so a team save can
   fail on a character add still in flight. Removing a character or weapon
   leaves the teams that name it unchanged.
-
----
-
-## Known defects
-
-Two character paths lose or resurrect data. Remove an entry here when its
-issue closes.
-
-- **A removal on another device comes back.** The sign-in push repeats each
-  time `useCollection` mounts, such as on navigating between pages, and sends
-  the removed character back to the server. Tracked in [#1741].
-- **The signed-out collection doesn't survive a page load.** While auth loads,
-  the hook reads the user as signed out and empties D1, and 6.0 persists the
-  empty collection to D3. Tracked in [#1740].
 
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
 [#1740]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1740
