@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { compareVersions, formatVersion, latestVersion } from './versions.js';
+import { compareVersions, formatVersion, latestVersion, sameVersion } from './versions.js';
 
 describe('compareVersions', () => {
   it('orders by major before minor', () => {
@@ -16,6 +16,13 @@ describe('compareVersions', () => {
 
   it('returns zero for equal versions', () => {
     expect(compareVersions({ major: 3, minor: 2 }, { major: 3, minor: 2 })).toBe(0);
+  });
+});
+
+describe('sameVersion', () => {
+  it('tells apart versions that share a major', () => {
+    expect(sameVersion({ major: 5, minor: 1 }, { major: 5, minor: 10 })).toBe(false);
+    expect(sameVersion({ major: 5, minor: 1 }, { major: 5, minor: 1 })).toBe(true);
   });
 });
 

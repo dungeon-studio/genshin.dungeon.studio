@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { toGameVersion } from './version.js';
+import { serializeVersion, toGameVersion } from './version.js';
 
 describe('toGameVersion', () => {
   it('reads a multi-digit minor as a number', () => {
@@ -12,5 +12,11 @@ describe('toGameVersion', () => {
 
   it.each(['Luna I', '6', '6.0.1', ''])('names the record behind "%s"', (value) => {
     expect(() => toGameVersion(value, 'Mavuika')).toThrow('Mavuika');
+  });
+});
+
+describe('serializeVersion', () => {
+  it('spells the literal as Prettier formats it', () => {
+    expect(serializeVersion({ major: 5, minor: 10 })).toBe('{ major: 5, minor: 10 }');
   });
 });
