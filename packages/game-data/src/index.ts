@@ -63,4 +63,4 @@ export {
 
 // Versions
 export { GAME_DATA_VERSION } from './game-data-version.js';
-export { compareVersions } from './versions.js';
+export { compareVersions, formatVersion, type GameVersion } from './versions.js';

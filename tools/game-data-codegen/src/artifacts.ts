@@ -9,6 +9,7 @@ import { serializeEntry, writeGeneratedModule } from './emit.js';
 import { queryInEnglish } from './language.js';
 import { byVersionThenName } from './roster-order.js';
 import { toId } from './slug.js';
+import { serializeVersion, toGameVersion } from './version.js';
 
 /** Only sets with 5-star pieces are tracked; the rest are leveling fodder. */
 const ENDGAME_RARITY = 5;
@@ -37,7 +38,7 @@ function toArtifactSet(record: DbArtifact): GeneratedArtifactSet {
   return {
     id: toId(record.name, 'artifact set'),
     name: record.name,
-    version: record.version,
+    version: toGameVersion(record.version, record.name),
     bonuses: { 2: record.effect2Pc, 4: record.effect4Pc },
   };
 }
@@ -65,7 +66,7 @@ export function buildArtifactSets(): GeneratedArtifactSet[] {
 function serializeArtifactSet(set: GeneratedArtifactSet): string {
   return serializeEntry(set.id, [
     `name: ${JSON.stringify(set.name)},`,
-    `version: '${set.version}',`,
+    serializeVersion(set.version),
     'bonuses: {',
     `  2: ${JSON.stringify(set.bonuses[2])},`,
     `  4: ${JSON.stringify(set.bonuses[4])},`,
