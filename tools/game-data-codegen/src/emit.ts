@@ -17,8 +17,8 @@ export interface GeneratedModule {
   entries: readonly string[];
   /**
    * Third-party data the module carries: where it came from, and its SPDX
-   * `FileCopyrightText` value, credited in the header. A source that grants no
-   * license has no holder to credit, so it names the source alone.
+   * `FileCopyrightText` value, credited in the header. Omit `copyright` for a
+   * source that grants no license, since the MIT header would claim one.
    */
   upstream?: { copyright?: string; source: string };
 }

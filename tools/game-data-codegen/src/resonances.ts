@@ -9,13 +9,11 @@ import { toId } from './slug.js';
 
 /**
  * genshin-db has no resonance data, so this generator reads the game's own
- * tables from the AnimeGameData datamine instead.
+ * tables from the AnimeGameData datamine.
  *
- * The repository carries no license. What it holds is extracted from the game
- * client, so the names and effect text are HoYoverse's in-game English, as
- * genshin-db's are. The generator fetches the two files it needs at a pinned
- * commit and nothing from the repository is vendored. Bumping `commit` and
- * regenerating is how a rebalance reaches `@genshin/game-data`.
+ * The repository carries no license. Its content is extracted from the game
+ * client, so the text is HoYoverse's, as genshin-db's is, and nothing from the
+ * repository is vendored.
  */
 const ANIME_GAME_DATA = {
   repository: 'DimbreathBot/AnimeGameData',
@@ -39,7 +37,7 @@ export type TextMap = Readonly<Record<string, unknown>>;
 
 type GeneratedResonance = Omit<ElementalResonance, 'id'> & { id: string };
 
-/** Upstream's internal element names, as they prefix each `*AvatarCount` field. */
+/** Upstream's count fields use internal element names, such as `grass` for Dendro. */
 const ELEMENT_BY_COUNT_FIELD: ReadonlyMap<string, Element> = new Map([
   ['fireAvatarCount', ELEMENTS.PYRO],
   ['waterAvatarCount', ELEMENTS.HYDRO],
@@ -82,9 +80,8 @@ function lookUp(textMap: TextMap, hash: number, what: string): string {
 }
 
 /**
- * Reads the trigger from the per-element avatar counts. A pair resonance
- * names exactly one element with a count of two; Protective Canopy names none
- * and keys off `cond` instead.
+ * Upstream gives a pair resonance one element count of two and Protective
+ * Canopy no counts, marking it through `cond` instead.
  */
 function toCondition(record: UpstreamResonance, name: string): ResonanceCondition {
   const counts = Object.entries(record).filter(
@@ -110,8 +107,8 @@ function toCondition(record: UpstreamResonance, name: string): ResonanceConditio
 }
 
 /**
- * Every element has one pair resonance and Protective Canopy covers the
- * all-different party. Anything else means upstream changed the game rule the
+ * Each element has one pair resonance, and Protective Canopy covers the
+ * all-different party. Anything else means the game changed a rule the
  * condition union encodes.
  */
 function assertComplete(resonances: readonly GeneratedResonance[]): void {
@@ -133,12 +130,12 @@ function assertComplete(resonances: readonly GeneratedResonance[]): void {
 }
 
 /**
- * The resonance roster in upstream id order, without fetching or writing
- * anything. Takes upstream's JSON as parsed, so every field it reads is
- * checked here.
+ * The resonance roster in upstream id order, built from upstream's parsed JSON
+ * without fetching, so tests run offline.
  *
- * @throws Error naming the record that doesn't fit the condition union, or
- *   when the roster isn't one resonance per element plus Protective Canopy.
+ * @throws Error when upstream has reshaped either file, a record lacks English
+ *   text or fits no condition, or the roster isn't one resonance per element
+ *   plus Protective Canopy.
  */
 export function buildResonances(records: unknown, textMap: unknown): GeneratedResonance[] {
   if (!Array.isArray(records) || !records.every(isUpstreamResonance)) {

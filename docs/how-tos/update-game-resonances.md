@@ -10,17 +10,15 @@ SPDX-License-Identifier: MIT
 
 `genshin-db` carries no resonance data, so this generator reads the game's own
 tables, as extracted from the game client by
-[AnimeGameData](https://github.com/DimbreathBot/AnimeGameData). It fetches
-them over the network at the commit pinned in `ANIME_GAME_DATA` in
-`tools/game-data-codegen/src/resonances.ts`, and the generated file's header
-names the repository at that commit. Because it fetches, `generate all` leaves
-it out.
+[AnimeGameData](https://github.com/DimbreathBot/AnimeGameData), fetched over
+the network at a pinned commit. Because it fetches, `generate all` leaves it
+out.
 
 ## Regenerate the resonances
 
-To pick up a balance change, first set `ANIME_GAME_DATA.commit` to a newer
-AnimeGameData commit. A regeneration at the same commit rewrites the same
-file.
+To pick up a balance change, first set `ANIME_GAME_DATA.commit` in
+`tools/game-data-codegen/src/resonances.ts` to a newer AnimeGameData commit.
+Without a new commit, regeneration changes nothing.
 
 Build the generator and run it:
 

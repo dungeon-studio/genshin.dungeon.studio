@@ -4,15 +4,8 @@
 import type { Element } from './elements.js';
 import { RESONANCE_DATA } from './resonances.generated.js';
 
-/**
- * Party size at which elemental resonance activates. Resonance is inert in an
- * incomplete party no matter how the elements line up.
- */
 const RESONANCE_PARTY_SIZE = 4;
 
-/**
- * How a resonance's element requirement is expressed
- */
 export const RESONANCE_TRIGGERS = {
   PAIR: 'PAIR',
   UNIQUE_ELEMENTS: 'UNIQUE_ELEMENTS',
@@ -21,9 +14,8 @@ export const RESONANCE_TRIGGERS = {
 export type ResonanceTrigger = (typeof RESONANCE_TRIGGERS)[keyof typeof RESONANCE_TRIGGERS];
 
 /**
- * A discriminated union rather than an optional element, because Protective
- * Canopy keys off distinct-element count while the others key off a
- * duplicated element.
+ * Protective Canopy needs every element in the party to differ; each other
+ * resonance needs one element twice.
  */
 export type ResonanceCondition =
   | { trigger: typeof RESONANCE_TRIGGERS.PAIR; element: Element }
@@ -40,18 +32,18 @@ export interface ElementalResonance {
 }
 
 /**
- * The seven pair resonances and Protective Canopy, generated from the game's
- * own tables. Keyed so a repeated ID is a `tsc` error (TS1117), not a silent
- * overwrite.
+ * The seven pair resonances and Protective Canopy.
+ *
+ * Keyed so a repeated ID is a `tsc` error (TS1117), not a silent overwrite.
  */
 export const ELEMENTAL_RESONANCES: Readonly<Record<ResonanceId, ElementalResonance>> =
   RESONANCE_DATA;
 
 /**
- * Resonances active for a party's elements
+ * The resonances a party's elements activate, in any order.
  *
- * Elements may repeat and arrive in any order; a party short of
- * {@link RESONANCE_PARTY_SIZE} members resonates with nothing.
+ * Resonance needs a full party of {@link RESONANCE_PARTY_SIZE}, so a smaller
+ * one activates nothing.
  */
 export function getActiveResonances(elements: Element[]): ElementalResonance[] {
   if (elements.length !== RESONANCE_PARTY_SIZE) return [];
