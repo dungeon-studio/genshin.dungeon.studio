@@ -1,10 +1,13 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { ELEMENTS, RESONANCE_TRIGGERS } from '@genshin/game-data';
+import { readFileSync } from 'node:fs';
+import { isDeepStrictEqual } from 'node:util';
+
+import { ELEMENTAL_RESONANCES, ELEMENTS, RESONANCE_TRIGGERS } from '@genshin/game-data';
 import type { Element, ElementalResonance, ResonanceCondition } from '@genshin/game-data';
 
-import { serializeEntry, writeGeneratedModule } from './emit.js';
+import { resolveGeneratedPath, serializeEntry, writeGeneratedModule } from './emit.js';
 import { toId } from './slug.js';
 
 /**
@@ -17,11 +20,28 @@ import { toId } from './slug.js';
  */
 const ANIME_GAME_DATA = {
   repository: 'DimbreathBot/AnimeGameData',
-  commit: '433284d22ef1a704e9d49ae22fb96cf7a245828e',
   resonances: 'ExcelBinOutput/TeamResonanceExcelConfigData.json',
   // The main `TextMapEN.json` doesn't carry resonance strings; the medium one does.
   textMap: 'TextMap/TextMap_MediumEN.json',
 } as const;
+
+const RESONANCES_MODULE = 'src/resonances.generated.ts';
+
+const SOURCE_PREFIX = `https://github.com/${ANIME_GAME_DATA.repository}/tree/`;
+
+/**
+ * The generated module's header names the commit it was built from, which
+ * makes the module its own pin: the commit moves only when the data does.
+ */
+function pinnedCommit(): string {
+  const module = readFileSync(resolveGeneratedPath(RESONANCES_MODULE), 'utf8');
+  const commit = new RegExp(`${SOURCE_PREFIX}([0-9a-f]{40})`).exec(module)?.[1];
+  if (!commit) {
+    throw new Error(`${RESONANCES_MODULE} names no ${ANIME_GAME_DATA.repository} commit`);
+  }
+
+  return commit;
+}
 
 /** The fields of one `TeamResonanceExcelConfigData` record this generator reads. */
 export interface UpstreamResonance {
@@ -163,8 +183,8 @@ export function buildResonances(records: unknown, textMap: unknown): GeneratedRe
   return resonances;
 }
 
-async function fetchJson(path: string): Promise<unknown> {
-  const url = `https://raw.githubusercontent.com/${ANIME_GAME_DATA.repository}/${ANIME_GAME_DATA.commit}/${path}`;
+async function fetchJson(commit: string, path: string): Promise<unknown> {
+  const url = `https://raw.githubusercontent.com/${ANIME_GAME_DATA.repository}/${commit}/${path}`;
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`Fetching ${url} failed: ${response.status} ${response.statusText}`);
@@ -188,26 +208,33 @@ function serializeResonance({ id, name, condition, description }: GeneratedReson
 
 /**
  * Regenerate `@genshin/game-data`'s `resonances.generated.ts` from
- * AnimeGameData. Returns the number of resonances written.
+ * AnimeGameData at `commit`, defaulting to the pinned one.
+ *
+ * Records matching the shipped ones leave the module, and so the pin,
+ * untouched, which keeps a commit that changes nothing out of review.
  *
  * @throws Error when a fetch fails or upstream has reshaped either file.
  */
-export async function generateResonances(): Promise<number> {
+export async function generateResonances(
+  commit: string = pinnedCommit(),
+): Promise<{ count: number; written: boolean }> {
   const [records, textMap] = await Promise.all([
-    fetchJson(ANIME_GAME_DATA.resonances),
-    fetchJson(ANIME_GAME_DATA.textMap),
+    fetchJson(commit, ANIME_GAME_DATA.resonances),
+    fetchJson(commit, ANIME_GAME_DATA.textMap),
   ]);
   const resonances = buildResonances(records, textMap);
 
+  if (isDeepStrictEqual(resonances, Object.values(ELEMENTAL_RESONANCES))) {
+    return { count: resonances.length, written: false };
+  }
+
   writeGeneratedModule({
-    path: 'src/resonances.generated.ts',
+    path: RESONANCES_MODULE,
     exportName: 'RESONANCE_DATA',
     command: 'resonances',
     entries: resonances.map(serializeResonance),
-    upstream: {
-      source: `https://github.com/${ANIME_GAME_DATA.repository}/tree/${ANIME_GAME_DATA.commit}`,
-    },
+    upstream: { source: `${SOURCE_PREFIX}${commit}` },
   });
 
-  return resonances.length;
+  return { count: resonances.length, written: true };
 }
