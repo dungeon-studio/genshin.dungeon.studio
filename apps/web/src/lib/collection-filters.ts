@@ -99,8 +99,7 @@ const byName: Comparator<CollectionItem> = (a, b) => nameCollator.compare(a.name
 const byId: Comparator<CollectionItem> = (a, b) => compareCodeUnits(a.id, b.id);
 
 function compareCodeUnits(a: string, b: string): number {
-  if (a < b) return -1;
-  return a > b ? 1 : 0;
+  return Number(a > b) - Number(a < b);
 }
 
 function byRelease<I extends CollectionItem>(compareRelease: Comparator<I>): Comparator<I> {
