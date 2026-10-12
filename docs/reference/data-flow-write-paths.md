@@ -32,15 +32,13 @@ so a newer edit stands. A toast shows either way, and nothing retries.
 
 ## Characters
 
-`useCollection` in `use-character-collection.ts`. Add, remove, and set
-constellation level share one shape: write the store, send, and on failure make
-a guarded rollback.
+`useCollection` in `use-character-collection.ts`.
 
 ```mermaid
 sequenceDiagram
   participant Hook as useOptimisticActions
   participant Store as character store
-  participant Reconcile as useServerSync
+  participant Reconcile as reconcile effect
   participant Cache as query cache
   participant API as API
   participant FS as Firestore
@@ -64,8 +62,8 @@ sequenceDiagram
   end
 ```
 
-The first time the query resolves for a signed-in user, `useServerSync` also
-makes the sign-in push. It merges the store into the server collection, then
+The first time the query resolves for a signed-in user, the reconcile effect,
+`useServerSync`, also makes the sign-in push. It merges the store into the server collection, then
 sends a `PUT` for every entry the server lacks or holds at a lower
 constellation. A failed push only toasts. The merged value stays in the store.
 
@@ -79,6 +77,7 @@ out.
 sequenceDiagram
   participant Hook as useWeaponCollection
   participant Store as weapon store
+  participant Reconcile as reconcile effect
   participant Cache as query cache
   participant API as API
   participant FS as Firestore
@@ -106,18 +105,19 @@ sequenceDiagram
       Hook->>Store: guarded rollback
     end
   end
-  Cache-->>Store: reconcile effect: refetched weapons, setWeapons (replace)
+  Cache-->>Reconcile: refetched weapons
+  Reconcile->>Store: setWeapons (replace)
 ```
 
 ## Teams
 
-`useTeams` in `use-teams.ts`. Every action goes through `editThenPersist`,
-which snapshots the slot, edits the store, and sends the whole team.
+`useTeams` in `use-teams.ts`. Every action goes through `editThenPersist`.
 
 ```mermaid
 sequenceDiagram
   participant Hook as editThenPersist
   participant Store as team store
+  participant Reconcile as reconcile effect
   participant Cache as query cache
   participant API as API
   participant FS as Firestore
@@ -129,7 +129,8 @@ sequenceDiagram
     API->>FS: PUT: transaction of read, nextTeam, set<br>DELETE: delete
     alt success
       Hook->>Cache: invalidate
-      Cache-->>Store: reconcile effect: collectionTeamsToStore, then setTeams (replace)
+      Cache-->>Reconcile: refetched teams
+      Reconcile->>Store: collectionTeamsToStore, then setTeams (replace)
     else failure
       Hook->>Store: guarded rollback to the snapshot
     end

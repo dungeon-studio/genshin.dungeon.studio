@@ -30,7 +30,7 @@ Teams read one page. Characters and weapons follow `next` links to the end.
 
 ## Outbound
 
-No dedicated layer converts it: each mutation writes its request body inline,
+No dedicated layer converts outbound data: each mutation writes its request body inline,
 and teams send the domain members unchanged. The API validates the body against
 the request schema, then the repository's `toDocument` stamps the current schema
 version.

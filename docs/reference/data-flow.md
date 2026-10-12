@@ -8,9 +8,11 @@ User data has up to four copies: the Firestore document, the TanStack Query
 cache, a zustand store, and, for characters only, the browser's `localStorage`.
 Out of scope: static game data, which is never written, and the theme
 preference, which never leaves the browser. Which copy should be authoritative
-is [#1133]. What each client write does to each copy is in
-[Write paths](data-flow-write-paths.md), and the representation data takes at
-each hop is in [Data conversions](data-flow-conversions.md).
+is [#1133].
+
+What each client write does to each copy is in
+[Write paths](data-flow-write-paths.md). The representation data takes at each
+hop is in [Data conversions](data-flow-conversions.md).
 
 ---
 
