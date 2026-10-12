@@ -34,10 +34,10 @@ a guarded rollback.
 sequenceDiagram
   participant Hook as useOptimisticActions
   participant Store as character store
+  participant Reconcile as useServerSync
+  participant Cache as query cache
   participant API as API
   participant FS as Firestore
-  participant Cache as query cache
-  participant Reconcile as useServerSync
 
   Hook->>Store: addCharacter / removeCharacter / setConstellationLevel
   opt signed in
@@ -78,9 +78,9 @@ out.
 sequenceDiagram
   participant Hook as useWeaponCollection
   participant Store as weapon store
+  participant Cache as query cache
   participant API as API
   participant FS as Firestore
-  participant Cache as query cache
 
   alt add or ensure
     Hook->>API: POST /weapons
@@ -117,9 +117,9 @@ which snapshots the slot, edits the store, and sends the whole team.
 sequenceDiagram
   participant Hook as editThenPersist
   participant Store as team store
+  participant Cache as query cache
   participant API as API
   participant FS as Firestore
-  participant Cache as query cache
 
   Hook->>Store: snapshot slot, then edit
   opt signed in
@@ -149,11 +149,11 @@ A `beforeunload` prompt guards an in-flight save.
 ```mermaid
 sequenceDiagram
   participant Hook as useDeleteAccount
+  participant Stores as stores and localStorage
+  participant Cache as query cache
   participant API as API
   participant FS as Firestore
   participant FA as Firebase Auth
-  participant Cache as query cache
-  participant Stores as stores and localStorage
 
   Hook->>API: DELETE /account
   API->>FS: eraseStoredData (recursive delete)
