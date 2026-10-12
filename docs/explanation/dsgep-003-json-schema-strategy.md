@@ -39,6 +39,7 @@ The `apps/api` application is early stage, built on Hono with a small number of 
 - [RFC 8288](https://www.rfc-editor.org/rfc/rfc8288): Web Linking, which defines `Link` header syntax and relation types
 - [RFC 6906](https://www.rfc-editor.org/rfc/rfc6906): The `profile` link relation type
 - [RFC 6838](https://www.rfc-editor.org/rfc/rfc6838): Media type registration, referenced by Principle 4
+- [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259): JSON, which registers `application/json`
 
 ## Decision
 
@@ -101,6 +102,8 @@ Content-Type: application/json; profile="/schemas/team/get/1.0.0.json"
 ```
 
 This mirrors the client-side mechanism: clients send `Accept: application/json; profile="..."` to request a specific schema version, and the server responds with `Content-Type: application/json; profile="..."` to confirm which schema describes the response. Both directions use the same RFC 6906 `profile` semantics on the standard content negotiation headers.
+
+No registry defines this parameter for `application/json`. The registration in [RFC 8259 §11](https://www.rfc-editor.org/rfc/rfc8259#section-11) defines no optional parameters. [RFC 6906 §3.1](https://www.rfc-editor.org/rfc/rfc6906#section-3.1) recommends that a media type define a `profile` parameter, but it doesn't add one to media types that lack it. The meaning of `profile` on this API therefore comes from this DSGEP, not from a specification a generic client already implements. A client unaware of the convention still parses the body as JSON, but the parameter tells it nothing.
 
 This approach:
 
@@ -180,7 +183,9 @@ Inline schemas that embed `$schema` references in every response bloat payloads 
 
 ### Why `profile` parameter over `Link` headers
 
-RFC 8288 `Link` headers with `rel="describedby"` are a common discovery mechanism, but they exist outside the content negotiation model. Since clients already use `profile` on `Accept` to request a specific schema version, using `profile` on `Content-Type` in the response creates symmetric negotiation. Both directions use the same parameter on the standard content negotiation headers, making the protocol easier to understand and implement.
+RFC 8288 `Link` headers with `rel="describedby"` are a common discovery mechanism, and [JSON Schema 2020-12](https://json-schema.org/draft/2020-12/json-schema-core) §9.5.1.1 recommends them for linking an instance to its schema. `describedby` is a registered relation type, so a generic client can follow it without knowing this API. The `profile` parameter has no such standing: `application/json` registers no parameters, so only clients written to this DSGEP know what it means.
+
+The API keeps `profile` because it carries negotiation, not only discovery. A client requests a schema version with `profile` on `Accept`, and `Link` has no request-side counterpart. Using `profile` on `Content-Type` in the response confirms that choice on the same parameter, so both directions share one mechanism on the standard content negotiation headers. The clients that negotiate versions already depend on this convention. A generic client that only wants to find the schema gives up the standard path `describedby` would offer.
 
 ### Why serve from the API rather than a separate host
 
@@ -240,6 +245,7 @@ Versioning every schema from initial publication ensures consistency: clients al
 - Asymmetric: clients would use `profile` on `Accept` but the server would use a different mechanism, the `Link` header, in the response
 - `Link` headers exist outside the content negotiation model, adding a separate discovery channel
 - The `profile` parameter on `Content-Type` directly mirrors the `profile` parameter on `Accept`, creating a simpler and more consistent protocol
+- IANA registers `describedby` but no `profile` parameter on `application/json`; even so, `Link` can't express a version request, so the API would still need the unregistered parameter on `Accept`
 
 ### Alternative 4: Ad-hoc schema naming without versions
 
@@ -325,9 +331,11 @@ app.get('/schemas/:module/:name.json', async (c) => {
 - [RFC 8594: The Sunset HTTP Header Field](https://www.rfc-editor.org/rfc/rfc8594): `Sunset` header for communicating deprecation timelines
 - [RFC 6906: The `profile` Link Relation Type](https://www.rfc-editor.org/rfc/rfc6906): `profile` parameter semantics for schema discovery
 - [RFC 6838: Media Type Registration](https://www.rfc-editor.org/rfc/rfc6838): Media type conventions
+- [RFC 8259: The JavaScript Object Notation (JSON) Data Interchange Format](https://www.rfc-editor.org/rfc/rfc8259): `application/json` registration, which defines no parameters
 - [Semantic Versioning 2.0.0](https://semver.org/): Schema version numbering convention
 - [dsgep-001-wif-architecture.md](dsgep-001-wif-architecture.md): Related DSGEP
 
 ## Revision history
 
+- 2026-10-12: Accounted for `application/json` registering no `profile` parameter per #1729
 - 2026-03-01: Initial draft (DSGEP-003)
