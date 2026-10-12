@@ -73,7 +73,7 @@ program
   )
   .option(
     '--commit <ref>',
-    'AnimeGameData commit, or a ref such as HEAD, to read; kept only when its resonances differ (default: the pinned commit)',
+    'AnimeGameData commit or ref, such as HEAD; the pin moves only if resonances change (default: the pin)',
   )
   .action(async ({ commit }: { commit?: string }): Promise<void> => {
     const { count, written } = await generateResonances(commit);

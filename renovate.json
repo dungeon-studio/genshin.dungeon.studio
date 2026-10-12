@@ -45,7 +45,7 @@
       "groupName": "{{depName}}"
     },
     {
-      "description": "Leave genshin-db to the daily game data refresh, which bumps it in the same pull request as the data it regenerates",
+      "description": "Leave genshin-db updates to the daily game data refresh",
       "matchDepNames": ["genshin-db"],
       "enabled": false
     },

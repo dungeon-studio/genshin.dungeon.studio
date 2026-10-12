@@ -34,7 +34,6 @@ const SOURCE_PREFIX = `${REPOSITORY_URL}/tree/`;
 
 const COMMIT_PATTERN = /^[0-9a-f]{40}$/;
 
-/** A full commit SHA passes through; anything else resolves as a ref, such as `HEAD`. */
 function resolveCommit(ref: string): string {
   if (COMMIT_PATTERN.test(ref)) return ref;
 
@@ -48,10 +47,7 @@ function resolveCommit(ref: string): string {
   return commit;
 }
 
-/**
- * The generated module's header names the commit it was built from, which
- * makes the module its own pin: the commit moves only when the data does.
- */
+/** The pin is the commit the generated module's header names, so it can't drift from the data. */
 function pinnedCommit(): string {
   const module = readFileSync(resolveGeneratedPath(RESONANCES_MODULE), 'utf8');
   const commit = new RegExp(`${SOURCE_PREFIX}([0-9a-f]{40})`).exec(module)?.[1];
@@ -234,10 +230,8 @@ function serializeResonance({ id, name, condition, description }: GeneratedReson
 /**
  * Regenerate `@genshin/game-data`'s `resonances.generated.ts` from
  * AnimeGameData at `ref`, a commit or a ref such as `HEAD`, defaulting to the
- * pinned commit.
- *
- * Records matching the shipped ones leave the module, and so the pin,
- * untouched, which keeps a commit that changes nothing out of review.
+ * pin. Writes nothing when the records match the shipped ones, so the pin
+ * moves only with the data.
  *
  * @throws Error when `ref` doesn't resolve, a fetch fails, or upstream has
  *   reshaped either file.

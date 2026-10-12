@@ -7,9 +7,9 @@ set -x
 
 pnpm --filter @genshin/game-data-codegen update --latest genshin-db
 
-# A new character aborts `generate all` until the debut table dates them, so
-# the table refreshes first. regenerate-game-data.sh then rebuilds the codegen
-# around it and formats every generated module, resonances included.
+# The debut table refreshes before `generate all`, which aborts on an undated
+# character. Resonances generate before regenerate-game-data.sh so its
+# formatting pass covers them.
 pnpm exec turbo run build --filter=@genshin/game-data-codegen --output-logs=errors-only
 node tools/game-data-codegen/dist/cli.js first-banner-dates
 node tools/game-data-codegen/dist/cli.js resonances --commit HEAD
