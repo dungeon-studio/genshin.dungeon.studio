@@ -15,27 +15,22 @@ const COUNT_FIELDS = [
   'rockAvatarCount',
 ];
 
-function pair(id: number, field: string): UpstreamResonance {
+/** One upstream record, with a count of two on `pairField` and zero elsewhere. */
+function record(id: number, cond: string, pairField?: string): UpstreamResonance {
   return {
     teamResonanceId: id,
-    cond: 'TEAM_RESONANCE_COND_NONE',
+    cond,
     nameTextMapHash: id,
     descTextMapHash: id + 1000,
-    ...Object.fromEntries(COUNT_FIELDS.map((f) => [f, f === field ? 2 : 0])),
+    ...Object.fromEntries(COUNT_FIELDS.map((field) => [field, field === pairField ? 2 : 0])),
   };
 }
 
 /** The shape upstream ships: one pair per element plus Protective Canopy. */
 function upstream(): UpstreamResonance[] {
   return [
-    ...COUNT_FIELDS.map((field, index) => pair(index + 1, field)),
-    {
-      teamResonanceId: 99,
-      cond: 'TEAM_RESONANCE_COND_ALL_DIFFERENT',
-      nameTextMapHash: 99,
-      descTextMapHash: 1099,
-      ...Object.fromEntries(COUNT_FIELDS.map((f) => [f, 0])),
-    },
+    ...COUNT_FIELDS.map((field, index) => record(index + 1, 'TEAM_RESONANCE_COND_NONE', field)),
+    record(99, 'TEAM_RESONANCE_COND_ALL_DIFFERENT'),
   ];
 }
 
@@ -70,8 +65,17 @@ describe('buildResonances', () => {
     });
   });
 
+  it('rejects records upstream has reshaped', () => {
+    const records = upstream().map(({ nameTextMapHash: _, ...rest }) => rest);
+
+    expect(() => buildResonances(records, {})).toThrow(/no longer holds records/);
+  });
+
   it('rejects an element count field it has no mapping for', () => {
-    const records = [...upstream(), { ...pair(50, 'fireAvatarCount'), moonAvatarCount: 2 }];
+    const records = [
+      ...upstream(),
+      { ...record(50, 'TEAM_RESONANCE_COND_NONE', 'fireAvatarCount'), moonAvatarCount: 2 },
+    ];
 
     expect(() => buildResonances(records, textMapFor(records))).toThrow(/moonAvatarCount/);
   });
@@ -92,8 +96,7 @@ describe('buildResonances', () => {
 
   it('rejects a record with no English text', () => {
     const records = upstream();
-    const textMap = { ...textMapFor(records) };
-    delete textMap['1001'];
+    const { '1001': _, ...textMap } = textMapFor(records);
 
     expect(() => buildResonances(records, textMap)).toThrow(/No English text/);
   });

@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { Element, ResonanceCondition } from '@genshin/game-data';
+import { ELEMENTS, RESONANCE_TRIGGERS } from '@genshin/game-data';
+import type { Element, ElementalResonance, ResonanceCondition } from '@genshin/game-data';
 
 import { serializeEntry, writeGeneratedModule } from './emit.js';
 import { toId } from './slug.js';
@@ -11,10 +12,10 @@ import { toId } from './slug.js';
  * tables from the AnimeGameData datamine instead.
  *
  * The repository carries no license. What it holds is extracted from the game
- * client, so the names and effect text are HoYoverse's, as genshin-db's are.
- * The generator fetches the two files it needs at a pinned commit and nothing
- * from the repository is vendored. Bumping `commit` and regenerating is how a
- * rebalance reaches `@genshin/game-data`.
+ * client, so the names and effect text are HoYoverse's in-game English, as
+ * genshin-db's are. The generator fetches the two files it needs at a pinned
+ * commit and nothing from the repository is vendored. Bumping `commit` and
+ * regenerating is how a rebalance reaches `@genshin/game-data`.
  */
 const ANIME_GAME_DATA = {
   repository: 'DimbreathBot/AnimeGameData',
@@ -34,32 +35,48 @@ export interface UpstreamResonance {
 }
 
 /** English strings keyed by the decimal text map hash. */
-export type TextMap = Readonly<Record<string, string>>;
+export type TextMap = Readonly<Record<string, unknown>>;
 
-export interface GeneratedResonance {
-  id: string;
-  name: string;
-  condition: ResonanceCondition;
-  description: string;
-}
+type GeneratedResonance = Omit<ElementalResonance, 'id'> & { id: string };
 
 /** Upstream's internal element names, as they prefix each `*AvatarCount` field. */
-const ELEMENT_COUNT_FIELDS: Readonly<Record<string, Element>> = {
-  fireAvatarCount: 'Pyro',
-  waterAvatarCount: 'Hydro',
-  windAvatarCount: 'Anemo',
-  electricAvatarCount: 'Electro',
-  grassAvatarCount: 'Dendro',
-  iceAvatarCount: 'Cryo',
-  rockAvatarCount: 'Geo',
-};
+const ELEMENT_BY_COUNT_FIELD: ReadonlyMap<string, Element> = new Map([
+  ['fireAvatarCount', ELEMENTS.PYRO],
+  ['waterAvatarCount', ELEMENTS.HYDRO],
+  ['windAvatarCount', ELEMENTS.ANEMO],
+  ['electricAvatarCount', ELEMENTS.ELECTRO],
+  ['grassAvatarCount', ELEMENTS.DENDRO],
+  ['iceAvatarCount', ELEMENTS.CRYO],
+  ['rockAvatarCount', ELEMENTS.GEO],
+]);
 
 const PAIR_COND = 'TEAM_RESONANCE_COND_NONE';
 const UNIQUE_ELEMENTS_COND = 'TEAM_RESONANCE_COND_ALL_DIFFERENT';
 
+function isUpstreamResonance(value: unknown): value is UpstreamResonance {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'teamResonanceId' in value &&
+    typeof value.teamResonanceId === 'number' &&
+    'cond' in value &&
+    typeof value.cond === 'string' &&
+    'nameTextMapHash' in value &&
+    typeof value.nameTextMapHash === 'number' &&
+    'descTextMapHash' in value &&
+    typeof value.descTextMapHash === 'number'
+  );
+}
+
+function isTextMap(value: unknown): value is TextMap {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 function lookUp(textMap: TextMap, hash: number, what: string): string {
   const text = textMap[String(hash)];
-  if (!text) throw new Error(`No English text for ${what} (hash ${hash})`);
+  if (typeof text !== 'string' || !text) {
+    throw new Error(`No English text for ${what} (hash ${hash})`);
+  }
 
   return text;
 }
@@ -70,27 +87,25 @@ function lookUp(textMap: TextMap, hash: number, what: string): string {
  * and keys off `cond` instead.
  */
 function toCondition(record: UpstreamResonance, name: string): ResonanceCondition {
-  const required = Object.entries(record).filter(
-    ([field, value]) => field.endsWith('AvatarCount') && value !== 0,
+  const counts = Object.entries(record).filter(
+    ([field, count]) => field.endsWith('AvatarCount') && count !== 0,
   );
 
-  const unmapped = required.filter(([field]) => !Object.hasOwn(ELEMENT_COUNT_FIELDS, field));
+  const unmapped = counts.filter(([field]) => !ELEMENT_BY_COUNT_FIELD.has(field));
   if (unmapped.length > 0) {
     throw new Error(`Unmapped element count for "${name}": ${JSON.stringify(unmapped)}`);
   }
 
-  if (record.cond === UNIQUE_ELEMENTS_COND && required.length === 0) {
-    return { trigger: 'UNIQUE_ELEMENTS' };
+  if (record.cond === UNIQUE_ELEMENTS_COND && counts.length === 0) {
+    return { trigger: RESONANCE_TRIGGERS.UNIQUE_ELEMENTS };
   }
 
-  const [pair] = required;
-  const element = pair ? ELEMENT_COUNT_FIELDS[pair[0]] : undefined;
-  if (record.cond === PAIR_COND && required.length === 1 && pair?.[1] === 2 && element) {
-    return { trigger: 'PAIR', element };
-  }
+  const pair = record.cond === PAIR_COND && counts.length === 1 ? counts[0] : undefined;
+  const element = pair?.[1] === 2 ? ELEMENT_BY_COUNT_FIELD.get(pair[0]) : undefined;
+  if (element) return { trigger: RESONANCE_TRIGGERS.PAIR, element };
 
   throw new Error(
-    `Unrecognised trigger for "${name}": cond ${record.cond}, counts ${JSON.stringify(required)}`,
+    `Unrecognised trigger for "${name}": cond ${record.cond}, counts ${JSON.stringify(counts)}`,
   );
 }
 
@@ -101,12 +116,13 @@ function toCondition(record: UpstreamResonance, name: string): ResonanceConditio
  */
 function assertComplete(resonances: readonly GeneratedResonance[]): void {
   const pairs = resonances.flatMap(({ condition }) =>
-    condition.trigger === 'PAIR' ? [condition.element] : [],
+    condition.trigger === RESONANCE_TRIGGERS.PAIR ? [condition.element] : [],
   );
-  const unique = resonances.filter(({ condition }) => condition.trigger === 'UNIQUE_ELEMENTS');
-  const elements = Object.values(ELEMENT_COUNT_FIELDS);
+  const unique = resonances.filter(
+    ({ condition }) => condition.trigger === RESONANCE_TRIGGERS.UNIQUE_ELEMENTS,
+  );
 
-  const missing = elements.filter((element) => !pairs.includes(element));
+  const missing = Object.values(ELEMENTS).filter((element) => !pairs.includes(element));
   const repeated = pairs.filter((element, index) => pairs.indexOf(element) !== index);
 
   if (missing.length > 0 || repeated.length > 0 || unique.length !== 1) {
@@ -118,15 +134,20 @@ function assertComplete(resonances: readonly GeneratedResonance[]): void {
 
 /**
  * The resonance roster in upstream id order, without fetching or writing
- * anything.
+ * anything. Takes upstream's JSON as parsed, so every field it reads is
+ * checked here.
  *
  * @throws Error naming the record that doesn't fit the condition union, or
  *   when the roster isn't one resonance per element plus Protective Canopy.
  */
-export function buildResonances(
-  records: readonly UpstreamResonance[],
-  textMap: TextMap,
-): GeneratedResonance[] {
+export function buildResonances(records: unknown, textMap: unknown): GeneratedResonance[] {
+  if (!Array.isArray(records) || !records.every(isUpstreamResonance)) {
+    throw new Error(`${ANIME_GAME_DATA.resonances} no longer holds records in a known shape`);
+  }
+  if (!isTextMap(textMap)) {
+    throw new Error(`${ANIME_GAME_DATA.textMap} is no longer a hash-to-text object`);
+  }
+
   const resonances = [...records]
     .sort((a, b) => a.teamResonanceId - b.teamResonanceId)
     .map((record) => {
@@ -145,22 +166,21 @@ export function buildResonances(
   return resonances;
 }
 
-function rawUrl(path: string): string {
-  return `https://raw.githubusercontent.com/${ANIME_GAME_DATA.repository}/${ANIME_GAME_DATA.commit}/${path}`;
-}
-
 async function fetchJson(path: string): Promise<unknown> {
-  const response = await fetch(rawUrl(path));
-  if (!response.ok) throw new Error(`GET ${rawUrl(path)}: ${response.status}`);
+  const url = `https://raw.githubusercontent.com/${ANIME_GAME_DATA.repository}/${ANIME_GAME_DATA.commit}/${path}`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Fetching ${url} failed: ${response.status} ${response.statusText}`);
+  }
 
   return response.json();
 }
 
 function serializeResonance({ id, name, condition, description }: GeneratedResonance): string {
   const trigger =
-    condition.trigger === 'PAIR'
-      ? `{ trigger: 'PAIR', element: '${condition.element}' }`
-      : `{ trigger: 'UNIQUE_ELEMENTS' }`;
+    condition.trigger === RESONANCE_TRIGGERS.PAIR
+      ? `{ trigger: '${condition.trigger}', element: '${condition.element}' }`
+      : `{ trigger: '${condition.trigger}' }`;
 
   return serializeEntry(id, [
     `name: ${JSON.stringify(name)},`,
@@ -172,15 +192,15 @@ function serializeResonance({ id, name, condition, description }: GeneratedReson
 /**
  * Regenerate `@genshin/game-data`'s `resonances.generated.ts` from
  * AnimeGameData. Returns the number of resonances written.
+ *
+ * @throws Error when a fetch fails or upstream has reshaped either file.
  */
 export async function generateResonances(): Promise<number> {
   const [records, textMap] = await Promise.all([
     fetchJson(ANIME_GAME_DATA.resonances),
     fetchJson(ANIME_GAME_DATA.textMap),
   ]);
-  // Both files are upstream's own export format; buildResonances checks every
-  // field it reads, so a shape change fails there rather than here.
-  const resonances = buildResonances(records as UpstreamResonance[], textMap as TextMap);
+  const resonances = buildResonances(records, textMap);
 
   writeGeneratedModule({
     path: 'src/resonances.generated.ts',
