@@ -1,12 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-/**
- * A game release.
- *
- * The game brands its 6.x releases `Luna I` onward, but this package records
- * them numerically like every other release.
- */
+/** Numeric even for the 6.x releases the game brands `Luna I` onward. */
 export interface GameVersion {
   readonly major: number;
   readonly minor: number;
@@ -17,7 +12,6 @@ export function compareVersions(a: GameVersion, b: GameVersion): number {
   return a.major - b.major || a.minor - b.minor;
 }
 
-/** Whether two versions name the same release. */
 export function sameVersion(a: GameVersion, b: GameVersion): boolean {
   return compareVersions(a, b) === 0;
 }
