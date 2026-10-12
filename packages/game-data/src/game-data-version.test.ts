@@ -9,6 +9,8 @@ const ROSTERS = [
   { module: './artifacts.js', roster: 'ARTIFACT_SET_ROSTER' },
 ];
 
+const NEWER = { major: 99, minor: 0 };
+
 describe('GAME_DATA_VERSION', () => {
   afterEach(() => {
     for (const { module } of ROSTERS) vi.doUnmock(module);
@@ -18,11 +20,11 @@ describe('GAME_DATA_VERSION', () => {
   it.each(ROSTERS)('rises to a newer patch in $roster', async ({ module, roster }) => {
     vi.doMock(module, async (importOriginal) => ({
       ...(await importOriginal<Record<string, unknown>>()),
-      [roster]: [{ version: '99.0' }],
+      [roster]: [{ version: NEWER }],
     }));
 
     const { GAME_DATA_VERSION } = await import('./game-data-version.js');
 
-    expect(GAME_DATA_VERSION).toBe('99.0');
+    expect(GAME_DATA_VERSION).toBe(NEWER);
   });
 });

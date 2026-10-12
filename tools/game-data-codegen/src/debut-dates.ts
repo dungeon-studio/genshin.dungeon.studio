@@ -1,16 +1,19 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { sameVersion } from '@genshin/game-data';
+import type { GameVersion } from '@genshin/game-data';
+
 import { FIRST_BANNER_DATES } from './first-banner-dates.generated.js';
 
 /**
  * Launch characters are dated to release day: the standard pool had them from
  * the start, so the first banner featuring them, if any, came later.
  */
-const LAUNCH = { version: '1.0', date: '2020-09-28' };
+const LAUNCH = { version: { major: 1, minor: 0 }, date: '2020-09-28' };
 
-/** Resolves a character's ISO 8601 debut date from its id and genshin-db version. */
-export type DebutDate = (id: string, version: string) => string;
+/** Resolves a character's ISO 8601 debut date from its id and release version. */
+export type DebutDate = (id: string, version: GameVersion) => string;
 
 /**
  * Date characters from `firstBanner`: the start of the first banner featuring
@@ -21,7 +24,7 @@ export type DebutDate = (id: string, version: string) => string;
  */
 export function debutDates(firstBanner: Readonly<Record<string, string>>): DebutDate {
   return (id, version) => {
-    if (version === LAUNCH.version) return LAUNCH.date;
+    if (sameVersion(version, LAUNCH.version)) return LAUNCH.date;
 
     const date = firstBanner[id];
     if (!date) {

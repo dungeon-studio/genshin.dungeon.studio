@@ -11,6 +11,7 @@ import { toElement, toWeaponType } from './genshin-db-enums.js';
 import { queryInEnglish } from './language.js';
 import { byVersionThenName } from './roster-order.js';
 import { toId, toKebabCase } from './slug.js';
+import { serializeVersion, toGameVersion } from './version.js';
 
 /** genshin-db leaves `region` blank for characters with no established homeland. */
 const UNKNOWN_REGION = 'Unknown';
@@ -38,6 +39,7 @@ function isRosterMember(record: DbCharacter | undefined): record is DbCharacter 
 
 function toCharacter(record: DbCharacter): GeneratedCharacter {
   const id = toId(record.name, 'character');
+  const version = toGameVersion(record.version, record.name);
 
   return {
     id,
@@ -46,8 +48,8 @@ function toCharacter(record: DbCharacter): GeneratedCharacter {
     weaponType: toWeaponType(record.weaponType, record.name),
     rarity: record.rarity,
     region: record.region || UNKNOWN_REGION,
-    version: record.version,
-    releaseDate: debutDate(id, record.version),
+    version,
+    releaseDate: debutDate(id, version),
   };
 }
 
@@ -81,7 +83,7 @@ function serializeCharacter(character: GeneratedCharacter): string {
     `weaponType: '${character.weaponType}',`,
     `rarity: ${character.rarity},`,
     `region: ${JSON.stringify(character.region)},`,
-    `version: '${character.version}',`,
+    `version: ${serializeVersion(character.version)},`,
     `releaseDate: '${character.releaseDate}',`,
   ]);
 }
