@@ -2,16 +2,15 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * Identifiers in this workspace that hold a credential or a personal datum,
- * since object shorthand turns a variable name into a log key. The logger
- * redacts them, and `eslint.config.js` rejects log calls that read one into a
- * key the redaction cannot reach.
+ * Identifiers in this workspace that hold a credential or a personal datum.
+ * Object shorthand turns a variable name into a log key, so the list names
+ * identifiers rather than fields.
  *
- * A decoded Firebase ID token is sensitive whole — its custom claims are an
- * open index signature, so naming its fields could never be complete — which is
- * why `user`, the container, is on the list rather than the claims inside it.
+ * A decoded Firebase ID token is sensitive whole: its custom claims are an open
+ * index signature, so the list names the container `user` rather than its
+ * claims.
  *
- * Imported by `eslint.config.js` through Node's type stripping, so this module
- * imports nothing.
+ * Keep this module free of imports. `eslint.config.js` loads it through Node's
+ * type stripping, which resolves neither the `@/` alias nor `.js` specifiers.
  */
 export const SENSITIVE_KEYS = ['authorization', 'token', 'idToken', 'user', 'uid', 'email'];

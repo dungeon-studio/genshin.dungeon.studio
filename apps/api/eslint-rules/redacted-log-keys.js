@@ -11,8 +11,6 @@ const LOG_METHODS = new Set(['trace', 'debug', 'info', 'warn', 'error', 'fatal',
 const REDACTED_DEPTH = 2;
 
 /**
- * The method a call such as `receiver.method(...)` invokes.
- *
  * @param {import('eslint').Rule.Node} node
  * @returns {string | undefined}
  */
@@ -23,7 +21,7 @@ function calledMethod(node) {
 }
 
 /**
- * The name a context lookup `c.get('<name>')` reads.
+ * The key a Hono context lookup `c.get('<key>')` reads.
  *
  * @param {import('eslint').Rule.Node} node
  * @returns {string | undefined}
@@ -37,8 +35,7 @@ function contextLookup(node) {
 }
 
 /**
- * The name a node reads its value from: a variable or property, or a context
- * lookup.
+ * The variable, property, or context entry a node reads.
  *
  * @param {import('eslint').Rule.Node} node
  * @returns {string | undefined}
@@ -119,8 +116,7 @@ export const redactedLogKeys = {
     const report = (node, messageId, name) => context.report({ node, messageId, data: { name } });
 
     /**
-     * Report every read of a sensitive name in an expression whose value is
-     * logged as is.
+     * For an expression logged as is, outside any redacted key.
      *
      * @param {import('eslint').Rule.Node} node
      */
@@ -138,8 +134,8 @@ export const redactedLogKeys = {
     }
 
     /**
-     * Check a value pino merges into the line: an object literal's keys are
-     * redacted down to `REDACTED_DEPTH`, anything else is logged as is.
+     * An object literal's keys are redacted down to `REDACTED_DEPTH`; any other
+     * value is logged as is.
      *
      * @param {import('eslint').Rule.Node} node
      * @param {number} depth - the level the node's own keys sit at.
