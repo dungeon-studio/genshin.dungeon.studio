@@ -43,10 +43,15 @@ function pinnedCommit(): string {
   return commit;
 }
 
-/** The fields of one `TeamResonanceExcelConfigData` record this generator reads. */
+/**
+ * The fields of one `TeamResonanceExcelConfigData` record this generator reads.
+ *
+ * Upstream omits a field holding its default, so an absent `cond` is
+ * {@link PAIR_COND} and an absent element count is zero.
+ */
 export interface UpstreamResonance {
   teamResonanceId: number;
-  cond: string;
+  cond?: string;
   nameTextMapHash: number;
   descTextMapHash: number;
   [field: string]: unknown;
@@ -77,8 +82,7 @@ function isUpstreamResonance(value: unknown): value is UpstreamResonance {
     value !== null &&
     'teamResonanceId' in value &&
     typeof value.teamResonanceId === 'number' &&
-    'cond' in value &&
-    typeof value.cond === 'string' &&
+    (!('cond' in value) || typeof value.cond === 'string') &&
     'nameTextMapHash' in value &&
     typeof value.nameTextMapHash === 'number' &&
     'descTextMapHash' in value &&
@@ -113,16 +117,18 @@ function toCondition(record: UpstreamResonance, name: string): ResonanceConditio
     throw new Error(`Unmapped element count for "${name}": ${JSON.stringify(unmapped)}`);
   }
 
-  if (record.cond === UNIQUE_ELEMENTS_COND && counts.length === 0) {
+  const cond = record.cond ?? PAIR_COND;
+
+  if (cond === UNIQUE_ELEMENTS_COND && counts.length === 0) {
     return { trigger: RESONANCE_TRIGGERS.UNIQUE_ELEMENTS };
   }
 
-  const pair = record.cond === PAIR_COND && counts.length === 1 ? counts[0] : undefined;
+  const pair = cond === PAIR_COND && counts.length === 1 ? counts[0] : undefined;
   const element = pair?.[1] === 2 ? ELEMENT_BY_COUNT_FIELD.get(pair[0]) : undefined;
   if (element) return { trigger: RESONANCE_TRIGGERS.PAIR, element };
 
   throw new Error(
-    `Unrecognised trigger for "${name}": cond ${record.cond}, counts ${JSON.stringify(counts)}`,
+    `Unrecognised trigger for "${name}": cond ${cond}, counts ${JSON.stringify(counts)}`,
   );
 }
 
