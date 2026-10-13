@@ -41,7 +41,7 @@
     "eslint": "10.12.0",
     "firebase-tools": "15.33.0",
     "knip": "6.41.0",
-    "prettier": "3.9.9",
+    "prettier": "3.9.10",
     "prettier-plugin-tailwindcss": "0.8.1",
     "stylelint": "17.16.0",
     "syncpack": "15.3.3",
