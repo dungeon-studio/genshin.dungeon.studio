@@ -243,10 +243,10 @@ importers:
         version: 10.4.0
       verzod:
         specifier: 0.5.1
-        version: 0.5.1(zod@4.6.5)
+        version: 0.5.1(zod@4.6.6)
       zod:
-        specifier: 4.6.5
-        version: 4.6.5
+        specifier: 4.6.6
+        version: 4.6.6
     devDependencies:
       '@genshin/eslint-config':
         specifier: workspace:*
@@ -360,8 +360,8 @@ importers:
         specifier: 3.7.0
         version: 3.7.0
       zod:
-        specifier: 4.6.5
-        version: 4.6.5
+        specifier: 4.6.6
+        version: 4.6.6
       zustand:
         specifier: 5.0.15
         version: 5.0.15(@types/react@19.3.0)(react@19.3.0)
@@ -7704,6 +7704,9 @@ packages:
   zod@4.6.5:
     resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
 
+  zod@4.6.6:
+    resolution: {integrity: sha512-4UmzQUF5fxvfcYHlbjBmejU+w+hbDnWFx4aS8kBx7nPBHcO2SqPbpAG8snbdg+Xse4pRefR98hgjFgIMCI/UhA==}
+
   zustand@5.0.15:
     resolution: {integrity: sha512-MpSEjRiBkA9crSYeOUH32rJC7SVqAbm0Fqcqge/bUi2PPoLcBWKOsG+C8mevmpr8TwXHBVkChbbJiyvkE+i/3A==}
     engines: {node: '>=12.20.0'}
@@ -8388,7 +8391,7 @@ snapshots:
       '@typescript-eslint/utils': 8.71.1(@typescript/typescript6@6.0.2)(eslint@10.12.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
       ts-pattern: 5.9.0
       typescript: '@typescript/typescript6@6.0.2'
-      zod: 4.6.5
+      zod: 4.6.6
     optionalDependencies:
       eslint: 10.12.0(jiti@2.7.0)(supports-color@10.2.2)
     transitivePeerDependencies:
@@ -11267,8 +11270,8 @@ snapshots:
       '@babel/parser': 7.29.9
       eslint: 10.12.0(jiti@2.7.0)(supports-color@10.2.2)
       hermes-parser: 0.25.1
-      zod: 4.6.5
-      zod-validation-error: 4.0.2(zod@4.6.5)
+      zod: 4.6.6
+      zod-validation-error: 4.0.2(zod@4.6.6)
     transitivePeerDependencies:
       - supports-color
 
@@ -14874,9 +14877,9 @@ snapshots:
 
   verkit@0.5.0: {}
 
-  verzod@0.5.1(zod@4.6.5):
+  verzod@0.5.1(zod@4.6.6):
     dependencies:
-      zod: 4.6.5
+      zod: 4.6.6
 
   vite@8.3.4(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1):
     dependencies:
@@ -15136,13 +15139,15 @@ snapshots:
     dependencies:
       zod: 4.6.5
 
-  zod-validation-error@4.0.2(zod@4.6.5):
+  zod-validation-error@4.0.2(zod@4.6.6):
     dependencies:
-      zod: 4.6.5
+      zod: 4.6.6
 
   zod@3.25.76: {}
 
   zod@4.6.5: {}
+
+  zod@4.6.6: {}
 
   zustand@5.0.15(@types/react@19.3.0)(react@19.3.0):
     optionalDependencies:
