@@ -41,7 +41,7 @@
     "fast-check": "4.10.2",
     "globals": "17.13.0",
     "json-schema-to-ts": "3.1.1",
-    "jsoncompat": "0.4.3",
+    "jsoncompat": "0.5.0",
     "tsc-alias": "1.9.7",
     "tsx": "4.23.15",
     "typescript": "npm:@typescript/typescript6@6.0.2",
