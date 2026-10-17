@@ -20,6 +20,7 @@ import { usePendingWeapon } from '@/features/teams/use-pending-weapon';
 import type { UseTeamsResult } from '@/features/teams/use-teams';
 import { useTeams } from '@/features/teams/use-teams';
 import { WeaponPool } from '@/features/teams/weapon-pool';
+import { cn } from '@/lib/class-names';
 
 type SheetTab = 'characters' | 'weapons';
 
@@ -251,11 +252,12 @@ function TabButton({ tab, activeTab, onSelect, children }: TabButtonProps): JSX.
   return (
     <button
       type="button"
-      className={`px-1 pb-2 text-sm font-semibold border-b-2 ${
+      className={cn(
+        'px-1 pb-2 text-sm font-semibold border-b-2',
         active
           ? 'border-primary text-foreground'
-          : 'border-transparent text-muted-foreground hover:text-foreground'
-      }`}
+          : 'border-transparent text-muted-foreground hover:text-foreground',
+      )}
       aria-current={active ? 'page' : undefined}
       onClick={() => onSelect(tab)}
     >
