@@ -71,9 +71,16 @@ program
   .description(
     'Regenerate the elemental resonance roster in @genshin/game-data/src/resonances.generated.ts',
   )
-  .action(async (): Promise<void> => {
+  .option(
+    '--ref <ref>',
+    'AnimeGameData ref, such as HEAD, or commit SHA; the pin moves only if resonances change (default: the pin)',
+  )
+  .action(async ({ ref }: { ref?: string }): Promise<void> => {
+    const { count, written } = await generateResonances(ref);
     console.log(
-      `Generated ${await generateResonances()} elemental resonances into @genshin/game-data`,
+      written
+        ? `Generated ${count} elemental resonances into @genshin/game-data`
+        : `${count} elemental resonances unchanged; kept the pinned commit`,
     );
   });
 

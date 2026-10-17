@@ -45,6 +45,11 @@
       "groupName": "{{depName}}"
     },
     {
+      "description": "Leave genshin-db updates to the daily game data refresh",
+      "matchDepNames": ["genshin-db"],
+      "enabled": false
+    },
+    {
       "description": "Move engines and @types/node to a new Node.js major only once it reaches LTS",
       "matchDepNames": ["node", "@types/node"],
       "matchManagers": ["npm"],
