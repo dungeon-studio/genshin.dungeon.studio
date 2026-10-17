@@ -15,7 +15,7 @@
     },
     "ghcr.io/devcontainers/features/terraform:1": {
       // renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
-      "version": "1.16.5"
+      "version": "1.16.6"
     },
     "ghcr.io/devcontainers-extra/features/pre-commit:2": {},
     "ghcr.io/shinepukur/devcontainer-features/vale:1": {
