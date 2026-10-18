@@ -418,7 +418,7 @@ jobs:
           trivy-config: .trivy.yaml
 
       - name: Upload Terraform SARIF
-        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         if: always()
         with:
           sarif_file: terraform-results.sarif
@@ -448,7 +448,7 @@ jobs:
           trivy-config: .trivy.yaml
 
       - name: Upload Dockerfile SARIF
-        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         if: always()
         with:
           sarif_file: dockerfile-results.sarif
@@ -537,7 +537,7 @@ jobs:
           trivy-config: .trivy.yaml
 
       - name: Upload Container SARIF
-        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         if: always()
         with:
           sarif_file: container-results.sarif
