@@ -36,13 +36,13 @@ discards a team response.
 
 ## Outbound
 
-| Hop             | Characters                                 | Weapons                                                                 | Teams                                                           | [Layer](data-flow-layers.md#level-1)                                |
-| --------------- | ------------------------------------------ | ----------------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------- |
-| Store entity    | `CollectionCharacter`                      | `CollectionWeapon`                                                      | `CollectionTeam`                                                | 1.0 Edit and render state                                           |
-| Request body    | `{ constellationLevel }`                   | `{ weaponId, refinementLevel }` to add, `{ refinementLevel }` to refine | `SaveTeamPayload` from `teamToSavePayload`, sent without `slot` | 2.2 Build request. For teams, 2.1 Dispatch write builds the payload |
-| Validated input | `SaveCharacterBody`                        | `CreateWeaponBody` or `UpdateWeaponBody`                                | `FromSchema` of `teamPutRequestV1`                              | 3.2 Validate request body                                           |
-| Domain object   | `CollectionCharacter` from `nextCharacter` | `CollectionWeapon` built by `create` or `update`                        | `CollectionTeam` from `nextTeam`, over `TeamUpdates`            | 3.3 Route request narrows IDs and members, 3.4 builds               |
-| Stored document | `V1Character`                              | `V1Weapon`                                                              | `V1Team`                                                        | 3.5 Convert stored documents, `toDocument`                          |
+| Hop             | Characters                                 | Weapons                                                                 | Teams                                                           | [Layer](data-flow-layers.md#stack)                          |
+| --------------- | ------------------------------------------ | ----------------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------- |
+| Store entity    | `CollectionCharacter`                      | `CollectionWeapon`                                                      | `CollectionTeam`                                                | Store                                                       |
+| Request body    | `{ constellationLevel }`                   | `{ weaponId, refinementLevel }` to add, `{ refinementLevel }` to refine | `SaveTeamPayload` from `teamToSavePayload`, sent without `slot` | Query layer. For teams, the feature hook builds the payload |
+| Validated input | `SaveCharacterBody`                        | `CreateWeaponBody` or `UpdateWeaponBody`                                | `FromSchema` of `teamPutRequestV1`                              | Middleware                                                  |
+| Domain object   | `CollectionCharacter` from `nextCharacter` | `CollectionWeapon` built by `create` or `update`                        | `CollectionTeam` from `nextTeam`, over `TeamUpdates`            | Route narrows IDs and members, repository builds            |
+| Stored document | `V1Character`                              | `V1Weapon`                                                              | `V1Team`                                                        | Document, `toDocument`                                      |
 
 - Characters and weapons build the body from the action's arguments, not the
   store entity, so only the level and the weapon ID leave the browser. Teams

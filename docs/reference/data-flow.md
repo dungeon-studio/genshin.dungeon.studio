@@ -19,8 +19,8 @@ Companion pages:
   copy.
 - [Data conversions](data-flow-conversions.md): the representation data takes
   at each hop.
-- [Layers](data-flow-layers.md): the layers inside sending writes and the API,
-  and the jobs each does.
+- [Layers](data-flow-layers.md): the browser and API layer stacks, where the
+  code skips a layer, and the jobs each layer does.
 - [Lifecycles](data-flow-lifecycles.md): the states each entity's store copy
   moves through.
 
