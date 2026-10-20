@@ -17,7 +17,6 @@ interface TeamResonanceProps {
 }
 
 interface BadgeAppearance {
-  /** The element whose fill the badge takes; absent for a neutral badge. */
   tint?: Element;
   elements: Element[];
 }
@@ -29,7 +28,10 @@ function partyElements(members: CollectionTeam['members']): Element[] {
     .filter((element) => element !== undefined);
 }
 
-/** Protective Canopy is the whole party's doing, so it wears the party's elements, untinted. */
+/**
+ * A pair resonance shows its element on that element's fill. Protective Canopy
+ * shows every party element on a neutral badge.
+ */
 function badgeAppearance(resonance: ElementalResonance, party: Element[]): BadgeAppearance {
   const { condition } = resonance;
 
