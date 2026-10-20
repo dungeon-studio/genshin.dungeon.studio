@@ -4,12 +4,12 @@
 # Lifecycles
 
 The states one entity's copy in the
-[zustand store, D1](data-flow.md#level-0), moves through, per feature. Each
+[zustand store, D1](data-flow.md#level-0) moves through, per feature. Each
 diagram follows one character, one weapon instance, or one team slot. Whether
 the features should share one state machine is [#1133]. What a request carries
 from each copy is in [Data conversions](data-flow-conversions.md#outbound).
 
-The states the features share:
+The features share five states:
 
 - **Local only:** in the store, never sent.
 - **Sent:** edited in the store, with a request in flight.
@@ -17,7 +17,7 @@ The states the features share:
 - **Rolled back:** restored to its value before a rejected request.
 - **Overwritten:** replaced by a refetch while a request is still in flight.
 
-Two rules apply to every diagram:
+In every feature:
 
 - From every state, the store empties when its hook mounts, or auth changes,
   while not signed in. A team slot resets to Default instead.

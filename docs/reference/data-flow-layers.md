@@ -6,18 +6,16 @@
 The layers inside [Send writes and Serve and store records](data-flow.md#level-0),
 and which jobs each layer does. Whether those layers should merge is [#1133].
 
-| Process                      | Code                                                                                 |
-| ---------------------------- | ------------------------------------------------------------------------------------ |
-| 2.1 Dispatch write           | `useOptimisticActions`, `useWeaponCollection`, `editThenPersist`, `useDeleteAccount` |
-| 2.2 Build request            | `use-character-collection-api.ts`, `use-weapon-collection-api.ts`, `use-team-api.ts` |
-| 2.3 Call the API             | `apps/web/src/lib/api.ts`                                                            |
-| 3.1 Authenticate caller      | `apps/api/src/middleware/auth.ts`                                                    |
-| 3.2 Validate request body    | `negotiateRequestSchema` and `validateRequestBody` under `apps/api/src/middleware/`  |
-| 3.3 Route request            | `apps/api/src/routes/`                                                               |
-| 3.4 Read and write records   | `index.ts` and `merge.ts` under each `apps/api/src/repositories/` feature            |
-| 3.5 Convert stored documents | `document.ts` and `schemas/` under each repository feature, and `schema-version.ts`  |
-
-`useDeleteAccount` dispatches and builds its request in one hook.
+| Process                      | Code                                                                                                     |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------- |
+| 2.1 Dispatch write           | `useOptimisticActions`, `useWeaponCollection`, `editThenPersist`, `useDeleteAccount`                     |
+| 2.2 Build request            | `use-character-collection-api.ts`, `use-weapon-collection-api.ts`, `use-team-api.ts`, `useDeleteAccount` |
+| 2.3 Call the API             | `apps/web/src/lib/api.ts`                                                                                |
+| 3.1 Authenticate caller      | `apps/api/src/middleware/auth.ts`                                                                        |
+| 3.2 Validate request body    | `negotiateRequestSchema` and `validateRequestBody` under `apps/api/src/middleware/`                      |
+| 3.3 Route request            | `apps/api/src/routes/`                                                                                   |
+| 3.4 Read and write records   | `index.ts` and `merge.ts` under each `apps/api/src/repositories/` feature                                |
+| 3.5 Convert stored documents | `document.ts` and `schemas/` under each repository feature, and `schema-version.ts`                      |
 
 ## Level 1
 
@@ -51,7 +49,7 @@ flowchart TB
 ```
 
 The sign-in push enters at 2.2 because the reconcile effect calls the mutation
-directly. Its outcome returns through the hook's `applyMutationResult`.
+directly.
 
 ### 3.0 Serve and store records
 
@@ -91,14 +89,11 @@ flowchart TB
 ```
 
 A team save also reads the user's characters, weapons, and other teams through
-3.4 before writing, to check its members. A delete, including the account's
-recursive delete, never passes through 3.5.
+3.4 before writing, to check its members.
 
 ## Jobs by layer
 
-A dash means the layer doesn't do that job. A cell that names an overlap links
-to it: another layer does the same job. Rows numbered 1.0, 5.0, and 6.0 are
-[Level 0](data-flow.md#level-0) processes.
+Processes 1.0, 5.0, and 6.0 sit outside 2.0 and 3.0 but do the same jobs.
 
 | Layer                            | Validation                                                                                                                                                                 | Invariants                                                                     | Timestamps                                                    | Identity                                                                     | Defaults                                                                                         | Schema versioning                                                             | Merging                                                                                                 |
 | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
@@ -116,6 +111,8 @@ to it: another layer does the same job. Rows numbered 1.0, 5.0, and 6.0 are
 
 ## Overlaps
 
+Each overlap is a job more than one layer does.
+
 ### Timestamps
 
 The server mints `createdAt` and `updatedAt` on every save and keeps the stored
@@ -132,8 +129,7 @@ The server requires the field and has no default.
 ### Empty team
 
 `createEmptyTeam` on the client and `nextTeam` on the server each define the
-default name and the four empty member slots. `nextTeam` writes `Team ${slot}`
-itself rather than calling `defaultTeamName`. `fromDocument` pads a stored
+default name and the four empty member slots. `fromDocument` pads a stored
 `members` array shorter than four.
 
 ### Team name rules

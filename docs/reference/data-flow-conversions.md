@@ -35,10 +35,7 @@ a weapon add, `weaponListDocument`.
 
 ## Outbound
 
-Each hop's type by feature, and the [layer](data-flow-layers.md#level-1) that
-produces it.
-
-| Hop             | Characters                                 | Weapons                                                                 | Teams                                                           | Layer                                                               |
+| Hop             | Characters                                 | Weapons                                                                 | Teams                                                           | [Layer](data-flow-layers.md#level-1)                                |
 | --------------- | ------------------------------------------ | ----------------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------- |
 | Store entity    | `CollectionCharacter`                      | `CollectionWeapon`                                                      | `CollectionTeam`                                                | 1.0 Edit and render state                                           |
 | Request body    | `{ constellationLevel }`                   | `{ weaponId, refinementLevel }` to add, `{ refinementLevel }` to refine | `SaveTeamPayload` from `teamToSavePayload`, sent without `slot` | 2.2 Build request. For teams, 2.1 Dispatch write builds the payload |
@@ -50,9 +47,4 @@ produces it.
   store entity, so only the level and the weapon ID leave the browser. Teams
   send the store's whole team except `slot` and the timestamps. The slot, the
   character ID, and the instance ID travel in the path.
-- The route narrows a character or weapon ID with `requireCharacterId` or
-  `requireWeaponId`, and rebuilds team members with
-  `deserialiseCollectionTeamMembers` before checking them against the user's
-  characters, weapons, and other teams.
-- A delete sends no body. The route calls the repository, which deletes the
-  document without building a domain object.
+- A delete sends no body and builds no domain object.
