@@ -30,6 +30,10 @@ In every feature:
   settles after the user leaves its page, reaches the store only through a
   refetch, see [#1534]. One that settles after sign-out still writes to the
   emptied store, see [#1843]. The diagrams draw the latest request.
+- Requests of different kinds through one hook settle in any order, so a
+  response can undo a newer edit. The response to an add can put the minimum
+  level back over a raise, and a refinement's response can put an instance back
+  after a removal.
 
 ## Characters
 
@@ -68,17 +72,17 @@ stateDiagram-v2
   hook before sign-in settles empties the store, and `localStorage` with it, see
   [#1740].
 - Confirmed by a response: only the saved level reaches the store, which mints a
-  new `updatedAt`, see [#1841]. A refetch brings the server's `createdAt`, and
-  its `updatedAt` only where the server's level is at least the local one. The response to an add can land after a raise and apply the minimum level until the
-  raise's response or a refetch.
+  new `updatedAt`, see [#1841].
+- Confirmed by a refetch: the store takes the server's `createdAt`, and its
+  `updatedAt` only where the server's level is at least the local one.
 - Rolled back: a rolled-back removal returns with new client timestamps.
 - Overwritten: a refetch merges additively, so a raise or an add in flight
   survives it.
 - Held only locally: a copy ahead of the server, which lacks it or holds a lower
-  level. A failed sign-in push or a rejected add with a raised level only toasts,
-  so each leaves one, see [#1840]. The
-  merge keeps the copy until the store empties, and an edit or a sign-in push
-  writes it back to the server, see [#1741].
+  level. A failed sign-in push or a rejected add with a raised level only
+  toasts, so each leaves one, see [#1840]. The merge keeps the copy until the
+  store empties, and an edit or a sign-in push writes it back to the server, see
+  [#1741].
 
 ## Weapons
 
@@ -101,13 +105,12 @@ stateDiagram-v2
 ```
 
 - No local-only state: every action is a no-op while not signed in, and an add
-  reaches the store only from the server's response.
+  reaches the store only from the server.
 - Confirmed by a response: the saved instance replaces the copy, server
   timestamps included.
 - Rolled back: a rolled-back removal returns the exact instance it removed.
 - Overwritten: a refetch replaces the whole store, so any edit in flight is
-  overwritten. A refinement's response can also land after a removal and put the
-  instance back.
+  overwritten.
 
 ## Teams
 
