@@ -27,16 +27,16 @@ function partyOf(...elements: (Element | null)[]): CollectionTeam['members'] {
   }) as CollectionTeam['members'];
 }
 
+const fervent = ELEMENTAL_RESONANCES['fervent-flames'];
+const soothing = ELEMENTAL_RESONANCES['soothing-water'];
+const pyroHydroPairs = partyOf('Pyro', 'Pyro', 'Hydro', 'Hydro');
+
 describe('TeamResonance', () => {
   it('names the resonances a filled party triggers', () => {
-    render(<TeamResonance members={partyOf('Pyro', 'Pyro', 'Hydro', 'Hydro')} />);
+    render(<TeamResonance members={pyroHydroPairs} />);
 
-    expect(
-      screen.getByRole('button', { name: ELEMENTAL_RESONANCES['fervent-flames'].name }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: ELEMENTAL_RESONANCES['soothing-water'].name }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: fervent.name })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: soothing.name })).toBeInTheDocument();
   });
 
   it('renders nothing while the party is still filling', () => {
@@ -49,14 +49,10 @@ describe('TeamResonance', () => {
 
   it('describes the bonus when a badge is pressed', async () => {
     const user = userEvent.setup();
-    render(<TeamResonance members={partyOf('Pyro', 'Pyro', 'Hydro', 'Hydro')} />);
+    render(<TeamResonance members={pyroHydroPairs} />);
 
-    await user.click(
-      screen.getByRole('button', { name: ELEMENTAL_RESONANCES['fervent-flames'].name }),
-    );
+    await user.click(screen.getByRole('button', { name: fervent.name }));
 
-    expect(
-      await screen.findByText(ELEMENTAL_RESONANCES['fervent-flames'].description),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(fervent.description)).toBeInTheDocument();
   });
 });
