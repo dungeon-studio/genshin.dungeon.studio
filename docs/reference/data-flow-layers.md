@@ -6,16 +6,16 @@
 The layers inside [Send writes and Serve and store records](data-flow.md#level-0),
 and which jobs each layer does. Whether those layers should merge is [#1133].
 
-| Process                        | Code                                                                                 |
-| ------------------------------ | ------------------------------------------------------------------------------------ |
-| 2.1 Dispatch write             | `useOptimisticActions`, `useWeaponCollection`, `editThenPersist`, `useDeleteAccount` |
-| 2.2 Build request              | `use-character-collection-api.ts`, `use-weapon-collection-api.ts`, `use-team-api.ts` |
-| 2.3 Call the API               | `apps/web/src/lib/api.ts`                                                            |
-| 3.1 Authenticate caller        | `apps/api/src/middleware/auth.ts`                                                    |
-| 3.2 Validate request body      | `negotiateRequestSchema` and `validateRequestBody` under `apps/api/src/middleware/`  |
-| 3.3 Route request              | `apps/api/src/routes/`                                                               |
-| 3.4 Read and write records     | `index.ts` and `merge.ts` under each `apps/api/src/repositories/` feature            |
-| 3.5 Convert and migrate stored | `document.ts` and `schemas/` under each repository feature, and `schema-version.ts`  |
+| Process                      | Code                                                                                 |
+| ---------------------------- | ------------------------------------------------------------------------------------ |
+| 2.1 Dispatch write           | `useOptimisticActions`, `useWeaponCollection`, `editThenPersist`, `useDeleteAccount` |
+| 2.2 Build request            | `use-character-collection-api.ts`, `use-weapon-collection-api.ts`, `use-team-api.ts` |
+| 2.3 Call the API             | `apps/web/src/lib/api.ts`                                                            |
+| 3.1 Authenticate caller      | `apps/api/src/middleware/auth.ts`                                                    |
+| 3.2 Validate request body    | `negotiateRequestSchema` and `validateRequestBody` under `apps/api/src/middleware/`  |
+| 3.3 Route request            | `apps/api/src/routes/`                                                               |
+| 3.4 Read and write records   | `index.ts` and `merge.ts` under each `apps/api/src/repositories/` feature            |
+| 3.5 Convert stored documents | `document.ts` and `schemas/` under each repository feature, and `schema-version.ts`  |
 
 `useDeleteAccount` dispatches and builds its request in one hook.
 
@@ -69,7 +69,7 @@ flowchart TB
     validateBody(3.2 Validate request body)
     route(3.3 Route request)
     repository(3.4 Read and write records)
-    convert(3.5 Convert and migrate stored)
+    convert(3.5 Convert stored documents)
   end
 
   send -->|request body and ID token| authenticate
@@ -96,60 +96,91 @@ recursive delete, never passes through 3.5.
 
 ## Jobs by layer
 
-"Overlap" and a number in a cell name an entry under [Overlaps](#overlaps):
-another layer does the same job. A dash means the layer doesn't do that job. Rows outside 2.0
-and 3.0 carry their [Level 0](data-flow.md#level-0) process number.
+A dash means the layer doesn't do that job. A cell that names an overlap links
+to it: another layer does the same job. Rows numbered 1.0, 5.0, and 6.0 are
+[Level 0](data-flow.md#level-0) processes.
 
-| Layer                   | Validation                                                                                                                   | Invariants                                                  | Timestamps                                        | Identity                                                                     | Defaults                                                                      | Schema versioning                                            | Merging                                                                                     |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| Store actions, 1.0      | Skips an owned add, overlap 6. Ignores a bad member index and a duplicate character, overlap 5. Trims a team name, overlap 4 | —                                                           | Characters and teams on every edit, overlap 1     | —                                                                            | Minimum constellation, overlap 2. Empty teams and the default name, overlap 3 | —                                                            | —                                                                                           |
-| 2.1 Dispatch write      | Skips an owned add, overlap 6. Skips an unchanged level or refinement, and an `ensureWeapon` already in flight               | —                                                           | —                                                 | —                                                                            | —                                                                             | —                                                            | Guarded rollback. Applies a response: characters' level, weapons' whole instance. Overlap 9 |
-| 2.2 Build request       | Asserts a character or weapon response is Collection+JSON with one item. Team mutations discard theirs                       | `deserialise*` on character and weapon responses, overlap 7 | —                                                 | Puts the character ID, instance ID, or slot in the path                      | Minimum constellation and refinement in add bodies, overlap 2                 | —                                                            | —                                                                                           |
-| 2.3 Call the API        | None: trusts a problem document on its content type                                                                          | —                                                           | —                                                 | Attaches the signed-in user's ID token                                       | —                                                                             | —                                                            | —                                                                                           |
-| 3.1 Authenticate caller | Rejects a missing or malformed `Authorization` header                                                                        | —                                                           | —                                                 | Verifies the ID token. Its user ID keys all storage                          | —                                                                             | —                                                            | —                                                                                           |
-| 3.2 Validate request    | Types, ranges, lengths, member count, artifact plan fields. Overlaps 4 and 5                                                 | —                                                           | —                                                 | —                                                                            | —                                                                             | Picks the request schema from the `profile`, overlap 8       | —                                                                                           |
-| 3.3 Route request       | Catalogue check on IDs, slot range, team composition and ownership, overlap 5                                                | `deserialiseCollectionTeamMembers`, overlap 7               | —                                                 | Takes the character ID or slot from the path. Casts an instance ID unchecked | —                                                                             | —                                                            | —                                                                                           |
-| 3.4 Read and write      | Reports a missing weapon instance on update                                                                                  | —                                                           | Mints both, keeps a stored `createdAt`. Overlap 1 | Mints the weapon instance ID                                                 | `nextTeam`'s name and empty members, overlap 3                                | —                                                            | `nextCharacter`, the weapon update, `nextTeam`. Overlap 9                                   |
-| 3.5 Convert and migrate | Rejects a document no version accepts                                                                                        | `assertCollection*` after migrating, overlap 7              | —                                                 | Takes the ID from the document key                                           | Pads a short `members` array to four, overlap 3                               | Migrates on read. `toDocument` stamps the version. Overlap 8 | —                                                                                           |
-| Reconcile, 5.0          | —                                                                                                                            | —                                                           | Character merge and unsaved team slots, overlap 1 | —                                                                            | Fills unsaved team slots with empty teams, overlap 3                          | —                                                            | Characters additive, higher constellation wins. Weapons and teams replace. Overlap 9        |
-| Persisted store, 6.0    | Drops a stored collection that doesn't parse                                                                                 | `assertCollectionCharacter` per entry, overlap 7            | —                                                 | —                                                                            | —                                                                             | zustand `persist` version, overlap 8                         | —                                                                                           |
+| Layer                            | Validation                                                                                                                                                                 | Invariants                                                                     | Timestamps                                                    | Identity                                                                     | Defaults                                                                                         | Schema versioning                                                             | Merging                                                                                                 |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| 1.0 Edit and render state        | Skips an owned add. Ignores a bad member index and a duplicate character. Trims a team name. Overlaps [owned-character guard], [team composition rules], [team name rules] | —                                                                              | Characters and teams on every edit. Overlaps [timestamps]     | —                                                                            | Minimum constellation, empty teams, and the default name. Overlaps [initial level], [empty team] | —                                                                             | —                                                                                                       |
+| 2.1 Dispatch write               | Skips an owned add, an unchanged level or refinement, and an `ensureWeapon` already in flight. Overlaps [owned-character guard]                                            | —                                                                              | —                                                             | —                                                                            | —                                                                                                | —                                                                             | Guarded rollback. Applies a response: characters' level, weapons' whole instance. Overlaps [merge rule] |
+| 2.2 Build request                | Asserts a character or weapon response is Collection+JSON with one item. Team mutations discard theirs                                                                     | `deserialise*` on character and weapon responses. Overlaps [domain invariants] | —                                                             | Puts the character ID, instance ID, or slot in the path                      | Minimum constellation and refinement in add bodies. Overlaps [initial level]                     | —                                                                             | —                                                                                                       |
+| 2.3 Call the API                 | None: trusts a problem document on its content type                                                                                                                        | —                                                                              | —                                                             | Attaches the signed-in user's ID token                                       | —                                                                                                | —                                                                             | —                                                                                                       |
+| 3.1 Authenticate caller          | Rejects a missing or malformed `Authorization` header                                                                                                                      | —                                                                              | —                                                             | Verifies the ID token. Its user ID keys all storage                          | —                                                                                                | —                                                                             | —                                                                                                       |
+| 3.2 Validate request body        | Types, ranges, lengths, member count, artifact plan fields. Overlaps [team name rules], [team composition rules]                                                           | —                                                                              | —                                                             | —                                                                            | —                                                                                                | Picks the request schema from the `profile`. Overlaps [schema versions]       | —                                                                                                       |
+| 3.3 Route request                | Catalogue check on IDs, slot range, team composition and ownership. Overlaps [team composition rules]                                                                      | `deserialiseCollectionTeamMembers`. Overlaps [domain invariants]               | —                                                             | Takes the character ID or slot from the path. Casts an instance ID unchecked | —                                                                                                | —                                                                             | —                                                                                                       |
+| 3.4 Read and write records       | Reports a missing weapon instance on update                                                                                                                                | —                                                                              | Mints both, keeps a stored `createdAt`. Overlaps [timestamps] | Mints the weapon instance ID                                                 | `nextTeam`'s name and empty members. Overlaps [empty team]                                       | —                                                                             | `nextCharacter`, the weapon update, `nextTeam`. Overlaps [merge rule]                                   |
+| 3.5 Convert stored documents     | Rejects a document no version accepts                                                                                                                                      | `assertCollection*` after migrating. Overlaps [domain invariants]              | —                                                             | Takes the ID from the document key                                           | Pads a short `members` array to four. Overlaps [empty team]                                      | Migrates on read. `toDocument` stamps the version. Overlaps [schema versions] | —                                                                                                       |
+| 5.0 Reconcile store with cache   | —                                                                                                                                                                          | —                                                                              | Character merge and unsaved team slots. Overlaps [timestamps] | —                                                                            | Fills unsaved team slots with empty teams. Overlaps [empty team]                                 | —                                                                             | Characters additive, higher constellation wins. Weapons and teams replace. Overlaps [merge rule]        |
+| 6.0 Persist character collection | Drops a stored collection that doesn't parse                                                                                                                               | `assertCollectionCharacter` per entry. Overlaps [domain invariants]            | —                                                             | —                                                                            | —                                                                                                | zustand `persist` version. Overlaps [schema versions]                         | —                                                                                                       |
 
 ## Overlaps
 
-1. **Timestamps.** The server mints `createdAt` and `updatedAt` on every save
-   and keeps the stored `createdAt`. The client mints them on every character
-   and team store edit, on every character merge, and for every unsaved team
-   slot. Applying a saved character level mints a new `updatedAt` too, because
-   it goes through the store's `setConstellationLevel`. The weapon store never
-   mints them. Weapons show the server's values as soon as a write succeeds.
-   Teams show them after a refetch. Characters show them only where the
-   server's level is at least the local one.
-2. **Initial level.** The character store and the add mutation each pick
-   `MIN_CONSTELLATION_LEVEL`. The server requires the field and has no default.
-3. **Empty team.** `createEmptyTeam` on the client and `nextTeam` on the server
-   each define the default name and the four empty member slots. `nextTeam`
-   writes `Team ${slot}` itself rather than calling `defaultTeamName`.
-   `fromDocument` pads a stored `members` array shorter than four.
-4. **Team name rules.** The client trims a name and falls back to the default
-   when it's blank. The server doesn't trim and accepts 1 to 50 characters, a
-   limit the client doesn't enforce.
-5. **Team composition rules.** The client ignores a duplicate character in a
-   team, and the server rejects one. The planner UI, the request schema, and
-   the route's `validateArtifactPlan` each enforce part of the artifact plan
-   limits. Only the server checks ownership and weapon uniqueness across teams.
-6. **Owned-character guard.** `useOptimisticActions` and the store's
-   `addCharacter` each skip adding a character the store already holds.
-7. **Domain invariants.** Asserted by the client's `deserialise*` functions, by
-   the route's `deserialiseCollectionTeamMembers`, by the repository's
-   `fromDocument`, and by the persisted character store's migration.
-8. **Schema versions.** Request schemas, Firestore documents, and the
-   `localStorage` collection each carry their own version. The client sends no
-   `profile` parameter, so the server validates against its latest request
-   schema.
-9. **Merge rule.** The server keeps the latest write for characters and
-   weapons. For teams it keeps any stored field the body omits. The client's
-   `mergeCollections` keeps the higher constellation, so the same two character
-   values resolve differently depending on which side merges. The hook's
-   guarded rollback keeps a newer local edit over the rollback.
+### Timestamps
+
+The server mints `createdAt` and `updatedAt` on every save and keeps the stored
+`createdAt`. The client mints them on every character and team store edit, on
+every character merge, and for every unsaved team slot. The weapon store never
+mints them. When the server's values reach each store is in
+[Lifecycles](data-flow-lifecycles.md).
+
+### Initial level
+
+The character store and the add mutation each pick `MIN_CONSTELLATION_LEVEL`.
+The server requires the field and has no default.
+
+### Empty team
+
+`createEmptyTeam` on the client and `nextTeam` on the server each define the
+default name and the four empty member slots. `nextTeam` writes `Team ${slot}`
+itself rather than calling `defaultTeamName`. `fromDocument` pads a stored
+`members` array shorter than four.
+
+### Team name rules
+
+The client trims a name and falls back to the default when it's blank. The
+server doesn't trim and accepts 1 to 50 characters, a limit the client doesn't
+enforce.
+
+### Team composition rules
+
+The client ignores a duplicate character in a team, and the server rejects one.
+The planner UI, the request schema, and the route's `validateArtifactPlan` each
+enforce part of the artifact plan limits. Only the server checks ownership and
+weapon uniqueness across teams.
+
+### Owned-character guard
+
+`useOptimisticActions` and the store's `addCharacter` each skip adding a
+character the store already holds.
+
+### Domain invariants
+
+Asserted by the client's `deserialise*` functions, by the route's
+`deserialiseCollectionTeamMembers`, by the repository's `fromDocument`, and by
+the persisted character store's migration.
+
+### Schema versions
+
+Request schemas, Firestore documents, and the `localStorage` collection each
+carry their own version. The client sends no `profile` parameter, so the server
+validates against its latest request schema.
+
+### Merge rule
+
+The server keeps the latest write for characters and weapons. For teams it
+keeps any stored field the body omits. The client's `mergeCollections` keeps the
+higher constellation, so the same two character values resolve differently
+depending on which side merges. The hook's guarded rollback keeps a newer local
+edit over the rollback.
 
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
+[domain invariants]: #domain-invariants
+[empty team]: #empty-team
+[initial level]: #initial-level
+[merge rule]: #merge-rule
+[owned-character guard]: #owned-character-guard
+[schema versions]: #schema-versions
+[team composition rules]: #team-composition-rules
+[team name rules]: #team-name-rules
+[timestamps]: #timestamps

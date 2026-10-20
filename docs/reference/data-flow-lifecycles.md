@@ -6,7 +6,8 @@
 The states one entity's copy in the
 [zustand store, D1](data-flow.md#level-0), moves through, per feature. Each
 diagram follows one character, one weapon instance, or one team slot. Whether
-the features should share one state machine is [#1133].
+the features should share one state machine is [#1133]. What a request carries
+from each copy is in [Data conversions](data-flow-conversions.md#outbound).
 
 The states the features share:
 
@@ -16,8 +17,13 @@ The states the features share:
 - **Rolled back:** restored to its value before a rejected request.
 - **Overwritten:** replaced by a refetch while a request is still in flight.
 
-A refetch runs after any successful mutation in the same feature, on window
-focus, on reconnect, and when a hook mounts, so it can land while any request is in flight.
+Two rules apply to every diagram:
+
+- From every state, the store empties when its hook mounts, or auth changes,
+  while not signed in. A team slot resets to Default instead.
+- A refetch runs after any successful mutation in the same feature, on window
+  focus, on reconnect, and when a hook mounts. It can land while any request is
+  in flight.
 
 ## Characters
 
@@ -25,7 +31,7 @@ focus, on reconnect, and when a hook mounts, so it can land while any request is
 stateDiagram-v2
   state "Local only" as LocalOnly
   state "Rolled back" as RolledBack
-  state "Held only locally" as Orphaned
+  state "Held only locally" as HeldLocally
 
   [*] --> LocalOnly: add while not signed in
   [*] --> LocalOnly: restore from localStorage
@@ -40,31 +46,28 @@ stateDiagram-v2
   Sent --> [*]: add rejected, store still at the minimum level
   Sent --> RolledBack: rejected, store still holds the sent value
   Sent --> Overwritten: refetch during a lowering or a removal
-  Sent --> Orphaned: sign-in push fails
+  Sent --> HeldLocally: sign-in push fails
   Overwritten --> Confirmed: PUT succeeds, or the request fails
-  Overwritten --> Orphaned: DELETE succeeds
+  Overwritten --> HeldLocally: DELETE succeeds
   Confirmed --> Sent: edit while signed in
-  Confirmed --> Orphaned: removed on another device, merge keeps it
-  Orphaned --> Sent: edit, or the sign-in push on a signed-in remount
+  Confirmed --> HeldLocally: removed on another device, merge keeps it
+  HeldLocally --> Sent: edit, or the sign-in push on a signed-in remount
   RolledBack --> Sent: edit
   RolledBack --> Confirmed: next refetch
 ```
 
-From every state, the store empties when the hook mounts, or auth changes, while
-not signed in. Auth starts out loading on every page load, so the store drops an
-entry restored from `localStorage` before sign-in settles, see [#1740].
-
-- Sent: the request carries only the level, never the entry's timestamps.
+- Local only: auth starts out loading on every page load, so the store drops an
+  entry restored from `localStorage` before sign-in settles, see [#1740].
 - Confirmed by a response: only the saved level reaches the store, which mints a
-  new `updatedAt`, see [#1841]. The server's timestamps arrive only through a refetch where
-  the server's level is at least the local one.
+  new `updatedAt`, see [#1841]. The server's timestamps arrive only through a
+  refetch where the server's level is at least the local one.
 - Rolled back: a rolled-back removal returns with new client timestamps.
 - Overwritten: a refetch merges additively, so a raise or an add in flight
   survives it.
 - Held only locally: a copy ahead of the server, which lacks it or holds a lower
-  level. A failed sign-in push only toasts, so it leaves one, see [#1840]. The merge keeps the
-  copy until the store empties, and an edit or a sign-in push writes it back to
-  the server, see [#1741].
+  level. A failed sign-in push only toasts, so it leaves one, see [#1840]. The
+  merge keeps the copy until the store empties, and an edit or a sign-in push
+  writes it back to the server, see [#1741].
 
 ## Weapons
 
@@ -86,10 +89,10 @@ stateDiagram-v2
   RolledBack --> Confirmed: next refetch
 ```
 
-From every state, the store empties when auth isn't signed in.
-
 - No local-only state: every action is a no-op while not signed in, and an add
   reaches the store only from the server's response.
+- Confirmed by a response: the saved instance replaces the copy, so the
+  server's timestamps arrive as soon as a write succeeds.
 - Rolled back: a rolled-back removal returns the exact instance it removed.
 - Overwritten: a refetch replaces the whole store, so any edit in flight is
   overwritten.
@@ -120,15 +123,12 @@ stateDiagram-v2
   RolledBack --> Confirmed: next refetch
 ```
 
-From every state, the slot resets to Default when the hook mounts, or auth
-changes, while not signed in.
-
 - Default: `createEmptyTeam`, with the default name, four empty positions, and
   client-minted timestamps. A refetch rebuilds it with new timestamps whenever
   the server holds nothing for the slot.
 - Local only: in memory only. Signing in replaces it rather than merging it.
 - Confirmed: a response never reaches the store. Only the refetch the save
-  triggers confirms it.
+  triggers confirms it, server timestamps included.
 - Sent by a clear: the store keeps the team's name and empties its positions.
   The server deletes the record, so the refetch brings back the default name,
   see [#1839].
