@@ -62,8 +62,8 @@ export function TeamPlanner({
 
   return (
     <div>
-      <div className="mb-3 gap-2 flex items-center">
-        <h2 className="text-xl font-semibold text-foreground">
+      <div className="mb-3 gap-2 flex flex-wrap items-center">
+        <h2 className="text-xl font-semibold whitespace-nowrap text-foreground">
           {editing ? (
             <Input
               ref={inputRef}

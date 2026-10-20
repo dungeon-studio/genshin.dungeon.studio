@@ -47,15 +47,26 @@ export function TeamResonance({ members }: TeamResonanceProps): JSX.Element | nu
                   tint ? ELEMENT_BG_COLORS[tint] : 'bg-muted text-muted-foreground',
                 )}
               >
-                {icons.map((element) => (
-                  <ThemedIcon
-                    key={element}
-                    lightSrc={getElementIconPath(element, 'light')}
-                    darkSrc={getElementIconPath(element, 'dark')}
-                    alt=""
-                    className="h-3.5 w-3.5"
-                  />
-                ))}
+                {icons.map((element) =>
+                  // A tinted badge is dark in either theme, so it takes the dark-theme icon.
+                  tint ? (
+                    <img
+                      key={element}
+                      src={getElementIconPath(element, 'dark')}
+                      alt=""
+                      aria-hidden="true"
+                      className="h-3.5 w-3.5"
+                    />
+                  ) : (
+                    <ThemedIcon
+                      key={element}
+                      lightSrc={getElementIconPath(element, 'light')}
+                      darkSrc={getElementIconPath(element, 'dark')}
+                      alt=""
+                      className="h-3.5 w-3.5"
+                    />
+                  ),
+                )}
                 {resonance.name}
               </PopoverTrigger>
               <PopoverContent className="text-sm" side="bottom" align="start">
