@@ -4,8 +4,8 @@
 # Data conversions
 
 The representations user data takes between
-[Firestore and the zustand store](data-flow.md#level-0), and the conversions
-done in more than one layer.
+[Firestore and the zustand store](data-flow.md#level-0). The jobs each layer
+does, and where layers overlap, are in [Layers](data-flow-layers.md).
 
 ## Inbound
 
@@ -35,38 +35,24 @@ a weapon add, `weaponListDocument`.
 
 ## Outbound
 
-1. The client builds the request body. Characters and weapons write it inline.
-   Teams convert the store's team with `teamToSavePayload`, which sends the
-   domain members unchanged.
-2. The API validates the body against the request schema.
-3. For teams, the route parses the members and checks them against the user's
-   characters, weapons, and other teams.
-4. For characters and teams, the repository merges the body into the stored
-   record with `nextCharacter` or `nextTeam`.
-5. The repository's `toDocument` stamps the current schema version.
+Each hop's type by feature, and the [layer](data-flow-layers.md#level-1) that
+produces it.
 
-## Conversions in more than one layer
+| Hop             | Characters                                 | Weapons                                                                 | Teams                                                           | Layer                                                               |
+| --------------- | ------------------------------------------ | ----------------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Store entity    | `CollectionCharacter`                      | `CollectionWeapon`                                                      | `CollectionTeam`                                                | Store actions, 1.0                                                  |
+| Request body    | `{ constellationLevel }`                   | `{ weaponId, refinementLevel }` to add, `{ refinementLevel }` to refine | `SaveTeamPayload` from `teamToSavePayload`, sent without `slot` | 2.2 Build request. For teams, 2.1 Dispatch write builds the payload |
+| Validated input | `SaveCharacterBody`                        | `CreateWeaponBody` or `UpdateWeaponBody`                                | `FromSchema` of `teamPutRequestV1`                              | 3.2 Validate request body                                           |
+| Domain object   | `CollectionCharacter` from `nextCharacter` | `CollectionWeapon` built by `create` or `update`                        | `CollectionTeam` from `nextTeam`, over `TeamUpdates`            | 3.3 Route request narrows IDs and members, 3.4 builds               |
+| Stored document | `V1Character`                              | `V1Weapon`                                                              | `V1Team`                                                        | 3.5 Convert and migrate stored, `toDocument`                        |
 
-- **Timestamps.** The server mints `createdAt` and `updatedAt` on every save
-  and keeps the stored `createdAt`. The client mints them on every character and
-  team store edit, on every character merge, and for every unsaved team slot.
-  The weapon store never mints them. Weapons show the server's values as soon as
-  a write succeeds. Teams show them after a refetch. Characters show them only
-  where the server's level is at least the local one.
-- **Empty team defaults.** The client's `createEmptyTeam` and the server's
-  `nextTeam` each define the default name and the four empty member slots.
-- **Team name rules.** The client trims a name and falls back to the default
-  when it's blank. The server doesn't trim and accepts 1 to 50 characters, a
-  limit the client doesn't enforce.
-- **Team composition rules.** The client ignores a duplicate character in a
-  team, and the server rejects one. Both the planner UI and the server enforce
-  artifact plan limits. Only the server checks weapon uniqueness across teams.
-- **Domain invariants.** Asserted by the repository's `fromDocument`, by the
-  client's `deserialise*` functions, and by the persisted character store's
-  migration.
-- **Schema versions.** Firestore documents and the `localStorage` collection
-  each carry their own version and migration.
-- **Merge rule.** The server keeps the latest write for characters and weapons.
-  For teams it keeps any stored field the body omits. The client's
-  `mergeCollections` keeps the higher constellation. The same two character
-  values resolve differently depending on which side merges.
+- Characters and weapons build the body from the action's arguments, not the
+  store entity, so only the level and the weapon ID leave the browser. Teams
+  send the store's whole team except `slot` and the timestamps. The slot, the
+  character ID, and the instance ID travel in the path.
+- The route narrows a character or weapon ID with `requireCharacterId` or
+  `requireWeaponId`, and rebuilds team members with
+  `deserialiseCollectionTeamMembers` before checking them against the user's
+  characters, weapons, and other teams.
+- A delete sends no body. The route calls the repository, which deletes the
+  document without building a domain object.

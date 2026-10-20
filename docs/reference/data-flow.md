@@ -13,9 +13,16 @@ Which copy should be authoritative is [#1133]. Out of scope:
 - The signed-in session the Firebase Auth SDK keeps in IndexedDB, which
   Firebase owns.
 
-What each client write does to each copy is in
-[Write paths](data-flow-write-paths.md). The representation data takes at each
-hop is in [Data conversions](data-flow-conversions.md).
+Companion pages:
+
+- [Write paths](data-flow-write-paths.md): what each client write does to each
+  copy.
+- [Data conversions](data-flow-conversions.md): the representation data takes
+  at each hop.
+- [Layers](data-flow-layers.md): the layers inside sending writes and the API,
+  and the jobs each does.
+- [Lifecycles](data-flow-lifecycles.md): the states each entity's store copy
+  moves through.
 
 ---
 
@@ -95,7 +102,8 @@ flowchart TB
   firebaseAuth -->|signing keys and revocation status| serve
   serve -->|identity to delete| firebaseAuth
   firestore -->|stored document| serve
-  serve -->|current-version document or delete| firestore
+  serve -->|current-version document| firestore
+  serve -->|delete| firestore
 
   serve -->|record list| fetch
   fetch -->|server collection| cache
