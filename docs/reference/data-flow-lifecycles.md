@@ -24,12 +24,12 @@ In every feature:
 - While signed in, a refetch runs after any successful mutation in the same
   feature, on window focus, on reconnect, and when a hook mounts. A mount first
   applies the cached result. A refetch changes the store only when its result
-  differs, and it can land while any request is in flight.
+  differs. It can land while any request is in flight.
 - Only the latest request of each kind through a hook gets its response
   handling: confirm, rollback, and toast. An earlier request, or one that
   settles after the user leaves its page, reaches the store only through a
   refetch, see [#1534]. One that settles after sign-out still writes to the
-  emptied store, see [#1843]. The diagrams draw the latest request.
+  emptied store, see [#1843].
 - Requests of different kinds through one hook settle in any order, so a
   response can undo a newer edit. The response to an add can put the minimum
   level back over a raise, and a refinement's response can put an instance back

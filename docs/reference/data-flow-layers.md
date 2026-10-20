@@ -21,7 +21,7 @@ and which jobs each layer does. Whether those layers should merge is [#1133].
 
 ### 2.0 Send writes
 
-Every process here runs in the browser.
+2.1 to 2.3 run in the browser.
 
 ```mermaid
 flowchart TB
@@ -48,12 +48,11 @@ flowchart TB
   dispatch -->|write outcome| edit
 ```
 
-The sign-in push enters at 2.2 because the reconcile effect calls the mutation
-directly.
+The reconcile effect sends the sign-in push straight to 2.2, skipping the hook.
 
 ### 3.0 Serve and store records
 
-Every process here runs in the Google Cloud project.
+3.1 to 3.5 run in the Google Cloud project.
 
 ```mermaid
 flowchart TB
