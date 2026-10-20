@@ -56,13 +56,13 @@ entry restored from `localStorage` before sign-in settles, see [#1740].
 
 - Sent: the request carries only the level, never the entry's timestamps.
 - Confirmed by a response: only the saved level reaches the store, which mints a
-  new `updatedAt`. The server's timestamps arrive only through a refetch where
+  new `updatedAt`, see [#1841]. The server's timestamps arrive only through a refetch where
   the server's level is at least the local one.
 - Rolled back: a rolled-back removal returns with new client timestamps.
 - Overwritten: a refetch merges additively, so a raise or an add in flight
   survives it.
 - Held only locally: a copy ahead of the server, which lacks it or holds a lower
-  level. A failed sign-in push only toasts, so it leaves one. The merge keeps the
+  level. A failed sign-in push only toasts, so it leaves one, see [#1840]. The merge keeps the
   copy until the store empties, and an edit or a sign-in push writes it back to
   the server, see [#1741].
 
@@ -130,10 +130,14 @@ changes, while not signed in.
 - Confirmed: a response never reaches the store. Only the refetch the save
   triggers confirms it.
 - Sent by a clear: the store keeps the team's name and empties its positions.
-  The server deletes the record, so the refetch brings back the default name.
+  The server deletes the record, so the refetch brings back the default name,
+  see [#1839].
 - Overwritten: a refetch replaces all four slots, so a save in one slot
   overwrites an edit in flight in another.
 
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
 [#1740]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1740
 [#1741]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1741
+[#1839]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1839
+[#1840]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1840
+[#1841]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1841
