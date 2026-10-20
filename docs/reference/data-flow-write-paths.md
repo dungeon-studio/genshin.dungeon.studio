@@ -131,7 +131,7 @@ sequenceDiagram
 
   Hook->>Store: snapshot slot, then edit
   opt signed in
-    Hook->>API: PUT /teams/{slot} with the whole team, or DELETE to clear
+    Hook->>API: PUT /teams/{slot} with name, members, and description,<br>or DELETE to clear
     API->>FS: PUT: read characters, weapons, and other teams<br>to validate members
     API->>FS: PUT: transaction of read, nextTeam, set<br>DELETE: delete
     alt success

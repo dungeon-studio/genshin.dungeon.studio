@@ -27,11 +27,12 @@ Every feature runs the same chain:
 | Weapons    | `toWeaponRecord`: record keyed by instance ID          | identity: `setWeapons` stores the cache shape            |
 | Teams      | `parseTeamsResponse`: array of `CollectionTeam`        | `collectionTeamsToStore`: four slots over `initialTeams` |
 
-Teams read one page. Characters and weapons follow `next` links to the end.
+`GET /teams` isn't paged. Characters and weapons follow `next` links to the end.
 
-A mutation response skips step 1. The repository builds it in memory, and the
-route serialises it with `characterItemDocument`, `weaponItemDocument`, or, for
-a weapon add, `weaponListDocument`.
+The repository builds a mutation response in memory rather than reading it back.
+The route serialises it with `characterItemDocument`, `weaponItemDocument`,
+`teamItemDocument`, or, for a weapon add, `weaponListDocument`. The client
+discards a team response.
 
 ## Outbound
 

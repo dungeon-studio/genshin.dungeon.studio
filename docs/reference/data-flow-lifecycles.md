@@ -19,11 +19,17 @@ The features share five states:
 
 In every feature:
 
-- From every state, the store empties when its hook mounts, or auth changes,
-  while not signed in. A team slot resets to Default instead.
-- A refetch runs after any successful mutation in the same feature, on window
-  focus, on reconnect, and when a hook mounts. It can land while any request is
-  in flight.
+- From every state, the store empties when its hook mounts while not signed in,
+  and on sign-out. A team slot resets to Default instead.
+- While signed in, a refetch runs after any successful mutation in the same
+  feature, on window focus, on reconnect, and when a hook mounts. A mount first
+  applies the cached result. A refetch changes the store only when its result
+  differs, and it can land while any request is in flight.
+- Only the latest request of each kind through a hook gets its response
+  handling: confirm, rollback, and toast. An earlier request, or one that
+  settles after the user leaves its page, reaches the store only through a
+  refetch, see [#1534]. One that settles after sign-out still writes to the
+  emptied store, see [#1843]. The diagrams draw the latest request.
 
 ## Characters
 
@@ -37,6 +43,7 @@ stateDiagram-v2
   [*] --> LocalOnly: restore from localStorage
   [*] --> Sent: add while signed in
   [*] --> Confirmed: refetch brings an entry the store lacks
+  LocalOnly --> Sent: edit after sign-in, before the first fetch lands
   LocalOnly --> Sent: sign-in merge, server lacks it or holds a lower level
   LocalOnly --> Confirmed: sign-in merge, server holds an equal or higher level
   LocalOnly --> [*]: remove while not signed in
@@ -47,25 +54,29 @@ stateDiagram-v2
   Sent --> RolledBack: rejected, store still holds the sent value
   Sent --> Overwritten: refetch during a lowering or a removal
   Sent --> HeldLocally: sign-in push fails
+  Sent --> HeldLocally: add rejected after a raise
   Overwritten --> Confirmed: PUT succeeds, or the request fails
   Overwritten --> HeldLocally: DELETE succeeds
   Confirmed --> Sent: edit while signed in
-  Confirmed --> HeldLocally: removed on another device, merge keeps it
+  Confirmed --> HeldLocally: lowered or removed on another device, merge keeps it
   HeldLocally --> Sent: edit, or the sign-in push on a signed-in remount
   RolledBack --> Sent: edit
   RolledBack --> Confirmed: next refetch
 ```
 
-- Local only: auth starts out loading on every page load, so the store drops an
-  entry restored from `localStorage` before sign-in settles, see [#1740].
+- Local only: auth starts out loading on every page load. A page that mounts the
+  hook before sign-in settles empties the store, and `localStorage` with it, see
+  [#1740].
 - Confirmed by a response: only the saved level reaches the store, which mints a
-  new `updatedAt`, see [#1841]. The server's timestamps arrive only through a
-  refetch where the server's level is at least the local one.
+  new `updatedAt`, see [#1841]. A refetch brings the server's `createdAt`, and
+  its `updatedAt` only where the server's level is at least the local one. The response to an add can land after a raise and apply the minimum level until the
+  raise's response or a refetch.
 - Rolled back: a rolled-back removal returns with new client timestamps.
 - Overwritten: a refetch merges additively, so a raise or an add in flight
   survives it.
 - Held only locally: a copy ahead of the server, which lacks it or holds a lower
-  level. A failed sign-in push only toasts, so it leaves one, see [#1840]. The
+  level. A failed sign-in push or a rejected add with a raised level only toasts,
+  so each leaves one, see [#1840]. The
   merge keeps the copy until the store empties, and an edit or a sign-in push
   writes it back to the server, see [#1741].
 
@@ -91,11 +102,12 @@ stateDiagram-v2
 
 - No local-only state: every action is a no-op while not signed in, and an add
   reaches the store only from the server's response.
-- Confirmed by a response: the saved instance replaces the copy, so the
-  server's timestamps arrive as soon as a write succeeds.
+- Confirmed by a response: the saved instance replaces the copy, server
+  timestamps included.
 - Rolled back: a rolled-back removal returns the exact instance it removed.
 - Overwritten: a refetch replaces the whole store, so any edit in flight is
-  overwritten.
+  overwritten. A refinement's response can also land after a removal and put the
+  instance back.
 
 ## Teams
 
@@ -103,41 +115,46 @@ stateDiagram-v2
 stateDiagram-v2
   state "Local only" as LocalOnly
   state "Rolled back" as RolledBack
+  state "Default" as DefaultTeam
 
-  [*] --> Default: store created
-  Default --> LocalOnly: edit while not signed in
-  Default --> Sent: edit while signed in
-  Default --> Confirmed: refetch brings a saved team for the slot
+  [*] --> DefaultTeam: store created
+  DefaultTeam --> LocalOnly: edit while not signed in
+  DefaultTeam --> Sent: edit while signed in
+  DefaultTeam --> Confirmed: refetch brings a saved team for the slot
   LocalOnly --> Confirmed: sign in, refetch brings a saved team
-  LocalOnly --> Default: sign in with the slot unsaved, or the hook mounts
+  LocalOnly --> Sent: edit after sign-in, before the first fetch lands
+  LocalOnly --> DefaultTeam: sign in with the slot unsaved, or the hook mounts
   Sent --> Sent: newer edit to the same slot
   Sent --> Confirmed: save succeeds, then its refetch lands
-  Sent --> Default: clear succeeds, then its refetch lands
+  Sent --> DefaultTeam: clear succeeds, then its refetch lands
   Sent --> RolledBack: rejected, slot still holds the sent team
   Sent --> Overwritten: refetch while in flight
   Overwritten --> Confirmed: save succeeds, or the request fails
-  Overwritten --> Default: clear succeeds
+  Overwritten --> DefaultTeam: clear succeeds
   Confirmed --> Sent: edit
-  Confirmed --> Default: refetch lacks the slot
+  Confirmed --> DefaultTeam: refetch lacks the slot
   RolledBack --> Sent: edit
   RolledBack --> Confirmed: next refetch
 ```
 
 - Default: `createEmptyTeam`, with the default name, four empty positions, and
-  client-minted timestamps. A refetch rebuilds it with new timestamps whenever
-  the server holds nothing for the slot.
+  client-minted timestamps. A changed refetch or a mount rebuilds it with new
+  timestamps whenever the server holds nothing for the slot.
 - Local only: in memory only. Signing in replaces it rather than merging it.
 - Confirmed: a response never reaches the store. Only the refetch the save
   triggers confirms it, server timestamps included.
-- Sent by a clear: the store keeps the team's name and empties its positions.
+- Sent by a clear: no component calls `clearTeam`. The store keeps the team's
+  name and empties its positions.
   The server deletes the record, so the refetch brings back the default name,
   see [#1839].
 - Overwritten: a refetch replaces all four slots, so a save in one slot
   overwrites an edit in flight in another.
 
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
+[#1534]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1534
 [#1740]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1740
 [#1741]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1741
 [#1839]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1839
 [#1840]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1840
 [#1841]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1841
+[#1843]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1843
