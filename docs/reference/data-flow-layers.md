@@ -27,7 +27,6 @@ flowchart TB
   subgraph api[API]
     middleware[Middleware<br>user ID and validated body]
     route[Route<br>domain objects]
-    domain[No domain layer]
     repository[Repository<br>domain records]
     document[Document<br>versioned documents]
     firestore[(Firestore, D4)]
@@ -42,8 +41,6 @@ flowchart TB
   query --> fetchWrapper
   fetchWrapper -->|HTTP| middleware
   middleware --> route
-  route ~~~ domain
-  domain ~~~ repository
   repository --> document
   document --> firestore
   middleware --> firebaseAuth
@@ -54,9 +51,6 @@ flowchart TB
   route -.->|4| firebaseAuth
   route -.->|5| repository
   hook -.->|6| fetchWrapper
-
-  classDef missing stroke-dasharray: 5 5
-  class domain missing
 ```
 
 | Layer           | Code                                                                       | Data unit                                                   |
@@ -86,8 +80,8 @@ representations every layer uses.
    mutation, without the hook's actions or their rollback, see [#1847].
 4. **Route to Firebase Auth.** `routes/account.ts` calls `deleteUser`, outside
    the boundaries [#1020] sets.
-5. **Route to repository, with no domain layer.** Routes hold catalogue checks,
-   team composition, and cross-feature reads. Repositories hold merges,
+5. **Route to repository, rules split between them.** Routes hold catalogue
+   checks, team composition, and cross-feature reads. Repositories hold merges,
    timestamps, and instance IDs. See [#1848].
 6. **Feature hook to fetch wrapper.** `useDeleteAccount` defines its own
    mutation and calls `apiDelete`, see [#1849].
