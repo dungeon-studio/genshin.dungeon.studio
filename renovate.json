@@ -35,6 +35,11 @@
       "minimumReleaseAge": null
     },
     {
+      "description": "Open the lock file refresh even when other Renovate pull requests fill the concurrent limit, since it alone carries transitive security fixes",
+      "matchUpdateTypes": ["lockFileMaintenance"],
+      "prConcurrentLimit": 0
+    },
+    {
       "description": "The release_versions endpoint Renovate reads carries no release timestamps, so a release-age bake here would never resolve its renovate/stability-days check under internalChecksFilter:strict",
       "matchDatasources": ["java-version"],
       "minimumReleaseAge": null
