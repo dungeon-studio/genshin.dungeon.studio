@@ -11,35 +11,22 @@ import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { rootGetResponseV1 } from '@/profiles/json-schema/root/get-response-v1.js';
 
 /**
- * Discover top-level resource paths from the app's registered routes.
- * Returns GET-accessible paths that have a discrete handler (e.g.
- * `/characters`, `/health`).
- *
- * Excludes the root path itself, wildcard catch-all routes (like
- * `/profiles/json-schema/*` and `/profiles/alps/*`), and sub-resource
- * paths that contain route parameters.
+ * Links to every top-level resource, keyed by name. Sub-resources and
+ * descriptor documents stay out because clients find them from a resource.
  */
 function discoverLinks<E extends Env>(app: HonoApp<E>): Record<string, { href: string }> {
-  const seen = new Set<string>();
-  const links: Record<string, { href: string }> = {};
+  return Object.fromEntries(
+    app.routes
+      .filter(
+        ({ method, path, handler }) =>
+          method === 'GET' && isTopLevelPath(path) && isRouteHandler(handler),
+      )
+      .map(({ path }): [string, { href: string }] => [path.slice(1), { href: path }]),
+  );
+}
 
-  for (const route of app.routes) {
-    if (route.method !== 'GET') continue;
-    if (!isRouteHandler(route.handler)) continue;
-
-    const path = route.path;
-
-    // Skip root, wildcards, and parameterized sub-resources
-    if (path === '/' || path.includes('*') || path.includes(':')) continue;
-    if (seen.has(path)) continue;
-    seen.add(path);
-
-    const name = path.split('/').filter(Boolean).at(-1);
-    if (name === undefined) continue;
-    links[name] = { href: path };
-  }
-
-  return links;
+function isTopLevelPath(path: string): boolean {
+  return /^\/[^/:*]+$/.test(path);
 }
 
 /**

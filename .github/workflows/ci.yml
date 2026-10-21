@@ -7,6 +7,7 @@ name: CI
 # See docs/reference/workflow-conventions.md.
 on:
   pull_request:
+  merge_group:
   push:
     branches:
       - develop
@@ -277,11 +278,11 @@ jobs:
 
     env:
       # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
-      TERRAFORM_VERSION: '1.16.5'
+      TERRAFORM_VERSION: '1.16.6'
       # renovate: datasource=github-releases depName=lycheeverse/lychee extractVersion=^lychee-v(?<version>.+)$
       LYCHEE_VERSION: '0.24.2'
       # renovate: datasource=github-releases depName=aquasecurity/trivy extractVersion=^v(?<version>.+)$
-      TRIVY_VERSION: '0.75.0'
+      TRIVY_VERSION: '0.76.0'
 
     steps:
       - name: Checkout repository
@@ -344,9 +345,13 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      # The action derives a scan range only for push and pull_request, and
+      # scans the full history on any other event.
       - name: Scan for verified secrets
-        uses: trufflesecurity/trufflehog@005b692bdfd0764e5da402887d9ab9196f8023dc # v3.99.1
+        uses: trufflesecurity/trufflehog@e76dff8a7e57d6df0c60ad8cbf5d5cba505a8fc9 # v3.99.2
         with:
+          base: ${{ github.event.merge_group.base_sha }}
+          head: ${{ github.event.merge_group.head_sha }}
           extra_args: --results=verified
 
   # Online supply-chain audits (impostor commits, known-vulnerable actions)
@@ -368,7 +373,7 @@ jobs:
           persist-credentials: false
 
       - name: Run zizmor
-        uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
+        uses: zizmorcore/zizmor-action@85b2b9fb8e3325e7a23d7d0a9d7ba5ae0f999e3e # v0.7.1
         with:
           config: .github/zizmor.yml
 
@@ -408,7 +413,7 @@ jobs:
           persist-credentials: false
 
       - name: Scan Terraform
-        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e # master
+        uses: aquasecurity/trivy-action@6abccf398f78b4c337599c0656f933d91efb91a0 # master
         with:
           scan-type: config
           scan-ref: ${{ matrix.path }}
@@ -418,7 +423,7 @@ jobs:
           trivy-config: .trivy.yaml
 
       - name: Upload Terraform SARIF
-        uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         if: always()
         with:
           sarif_file: terraform-results.sarif
@@ -439,7 +444,7 @@ jobs:
           persist-credentials: false
 
       - name: Scan Dockerfile
-        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e # master
+        uses: aquasecurity/trivy-action@6abccf398f78b4c337599c0656f933d91efb91a0 # master
         with:
           scan-type: config
           scan-ref: apps/api
@@ -448,7 +453,7 @@ jobs:
           trivy-config: .trivy.yaml
 
       - name: Upload Dockerfile SARIF
-        uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         if: always()
         with:
           sarif_file: dockerfile-results.sarif
@@ -468,7 +473,7 @@ jobs:
       # The lockfile resolves every workspace; scanning the directory would
       # also walk build output and fixtures.
       - name: Scan dependency vulnerabilities
-        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e # master
+        uses: aquasecurity/trivy-action@6abccf398f78b4c337599c0656f933d91efb91a0 # master
         with:
           scan-type: fs
           scan-ref: pnpm-lock.yaml
@@ -482,7 +487,7 @@ jobs:
       # scan. Failing on UNKNOWN forces a decision on any licence Trivy can't
       # classify.
       - name: Scan dependency licences
-        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e # master
+        uses: aquasecurity/trivy-action@6abccf398f78b4c337599c0656f933d91efb91a0 # master
         with:
           scan-type: fs
           scan-ref: .
@@ -526,7 +531,7 @@ jobs:
       # to act on. trivy-action drops a severity input for SARIF unless
       # limit-severities-for-sarif is set.
       - name: Scan Container Image
-        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e # master
+        uses: aquasecurity/trivy-action@6abccf398f78b4c337599c0656f933d91efb91a0 # master
         with:
           image-ref: api:ci
           scanners: vuln
@@ -537,7 +542,7 @@ jobs:
           trivy-config: .trivy.yaml
 
       - name: Upload Container SARIF
-        uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         if: always()
         with:
           sarif_file: container-results.sarif

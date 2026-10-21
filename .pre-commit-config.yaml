@@ -94,7 +94,7 @@ repos:
         always_run: true
 
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.30.1
+    rev: v1.31.1
     hooks:
       - id: zizmor
         # Online audits need a token, so they run in ci.yml's workflows job.
@@ -114,7 +114,7 @@ repos:
       - id: hadolint
 
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 44.145.3
+    rev: 44.166.0
     hooks:
       - id: renovate-config-validator
         args: [--strict, --no-global]
@@ -224,11 +224,19 @@ repos:
         name: brand assets (regenerate from environments)
         entry: python apps/web/scripts/generate-brand-assets.py
         language: python
-        additional_dependencies: [pillow==12.3.0]
+        additional_dependencies: [pillow==13.0.0]
         files: |
           (?x)^apps/web/(
             scripts/generate-brand-assets\.py|
             src/lib/environments\.json|
             public/(favicon|icon|og-image)[^/]*\.(png|ico)
           )$
+        pass_filenames: false
+
+      # The generators import @genshin/game-data, so its sources are inputs too.
+      - id: game-data
+        name: game data (regenerate from genshin-db)
+        entry: scripts/regenerate-game-data.sh
+        language: script
+        files: ^(tools/game-data-codegen/|packages/game-data/src/|scripts/regenerate-game-data\.sh$)
         pass_filenames: false

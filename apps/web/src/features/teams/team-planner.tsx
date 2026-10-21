@@ -17,6 +17,7 @@ import { useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 
 import { TeamMemberPlanner } from './team-member-planner';
+import { TeamResonance } from './team-resonance';
 
 interface TeamPlannerProps {
   slot: TeamSlot;
@@ -61,8 +62,8 @@ export function TeamPlanner({
 
   return (
     <div>
-      <div className="mb-3 gap-2 flex items-center">
-        <h2 className="text-xl font-semibold text-foreground">
+      <div className="mb-3 gap-2 flex flex-wrap items-center">
+        <h2 className="text-xl font-semibold whitespace-nowrap text-foreground">
           {editing ? (
             <Input
               ref={inputRef}
@@ -92,6 +93,8 @@ export function TeamPlanner({
             </button>
           )}
         </h2>
+
+        <TeamResonance members={members} />
 
         {onEdit && (
           <button

@@ -24,7 +24,7 @@ permissions:
 
 env:
   # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
-  TERRAFORM_VERSION: '1.16.5'
+  TERRAFORM_VERSION: '1.16.6'
 
 # Only one deploy per ref at a time. Cloud Run and the `:develop` image tag
 # are single mutable targets, so concurrent runs race: an older run's health
@@ -106,6 +106,9 @@ jobs:
       CLOUD_RUN_SERVICE_NAME: api
       ARTIFACT_REPOSITORY: api
       FRONTEND_ORIGIN: https://develop.genshin.dungeon.studio
+      # Schema-migration lines log at info, and their absence signals that a
+      # legacy schema version has drained. A higher level hides them.
+      LOG_LEVEL: info
     permissions:
       contents: read
       id-token: write
@@ -197,6 +200,7 @@ jobs:
           env_vars: |
             FRONTEND_ORIGIN=${{ env.FRONTEND_ORIGIN }}
             APP_GIT_SHA=${{ github.sha }}
+            LOG_LEVEL=${{ env.LOG_LEVEL }}
 
       - name: Verify Public Health
         continue-on-error: true

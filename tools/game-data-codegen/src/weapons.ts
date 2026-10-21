@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { Rarity, WeaponStatType, WeaponType } from '@genshin/game-data';
+import type { GameVersion, Rarity, WeaponStatType, WeaponType } from '@genshin/game-data';
 import genshinDb from 'genshin-db';
 import type { Weapon as DbWeapon } from 'genshin-db';
 
@@ -10,6 +10,7 @@ import { toWeaponStatType, toWeaponType } from './genshin-db-enums.js';
 import { queryInEnglish } from './language.js';
 import { byVersionThenName } from './roster-order.js';
 import { toId } from './slug.js';
+import { serializeVersion, toGameVersion } from './version.js';
 
 /** Lowest rarity included in the roster; 1–3 star weapons are fodder for team building. */
 const MINIMUM_RARITY = 4;
@@ -27,7 +28,7 @@ export interface GeneratedWeapon {
   type: WeaponType;
   rarity: Rarity;
   baseATK: number;
-  version: string;
+  version: GameVersion;
   subStat?: { type: WeaponStatType; value: number };
   passive?: { name: string; description: string };
 }
@@ -46,7 +47,7 @@ function toWeapon(record: DbWeapon): GeneratedWeapon {
     type: toWeaponType(record.weaponType, record.name),
     rarity: record.rarity,
     baseATK: Math.round(record.baseAtkValue),
-    version: record.version,
+    version: toGameVersion(record.version, record.name),
   };
 
   if (record.mainStatType && record.baseStatText) {
@@ -94,7 +95,7 @@ function serializeWeapon(weapon: GeneratedWeapon): string {
     `type: '${weapon.type}',`,
     `rarity: ${weapon.rarity},`,
     `baseATK: ${weapon.baseATK},`,
-    `version: '${weapon.version}',`,
+    `version: ${serializeVersion(weapon.version)},`,
   ];
 
   if (weapon.subStat) {

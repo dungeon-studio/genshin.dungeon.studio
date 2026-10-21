@@ -73,7 +73,7 @@ describe('filterWeapons', () => {
     const result = filtered({ sortField: 'name', sortDirection: 'asc' });
 
     // `The Catch` leads: its canonical name carries the quotation marks the game
-    // prints around it, and `localeCompare` orders those before letters.
+    // prints around it, and collation orders those before letters.
     expect(idsOf(result)).toEqual(idsOf([THE_CATCH, AMOS_BOW, FAVONIUS_SWORD, STAFF_OF_HOMA]));
   });
 

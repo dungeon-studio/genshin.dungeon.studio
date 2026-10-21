@@ -67,24 +67,40 @@ function allows<T>(selected: ReadonlySet<T>, value: T): boolean {
   return selected.size === 0 || selected.has(value);
 }
 
+/**
+ * No accent folding or Unicode normalization: a name with a diacritic matches
+ * only a query that spells it the same way.
+ */
+function searchMatcher(query: string): (name: string) => boolean {
+  const queryLower = query.toLowerCase();
+  return (name) => name.toLowerCase().includes(queryLower);
+}
+
 function matcher<I extends CollectionItem, F extends BaseFilterState, C>(
   filters: F,
   ownedIds: ReadonlySet<string>,
   config: CollectionFilterConfig<I, F, C>,
 ): (item: I) => boolean {
-  const searchLower = filters.search.toLowerCase();
+  const searchMatches = searchMatcher(filters.search);
   const categories = config.selectedCategories(filters);
   const ownershipMatches = OWNERSHIP_MATCHES[filters.ownership];
 
   return (item) =>
-    item.name.toLowerCase().includes(searchLower) &&
+    searchMatches(item.name) &&
     allows(categories, config.category(item)) &&
     allows(filters.rarities, item.rarity) &&
     ownershipMatches(ownedIds.has(item.id));
 }
 
-const byName: Comparator<CollectionItem> = (a, b) => a.name.localeCompare(b.name);
-const byId: Comparator<CollectionItem> = (a, b) => a.id.localeCompare(b.id);
+// A fixed locale gives every viewer the same name order.
+const nameCollator = new Intl.Collator('en');
+
+const byName: Comparator<CollectionItem> = (a, b) => nameCollator.compare(a.name, b.name);
+const byId: Comparator<CollectionItem> = (a, b) => compareCodeUnits(a.id, b.id);
+
+function compareCodeUnits(a: string, b: string): number {
+  return Number(a > b) - Number(a < b);
+}
 
 function byRelease<I extends CollectionItem>(compareRelease: Comparator<I>): Comparator<I> {
   return (a, b) => compareRelease(a, b) || byName(a, b) || byId(a, b);
