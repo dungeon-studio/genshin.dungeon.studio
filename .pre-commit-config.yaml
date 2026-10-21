@@ -224,7 +224,7 @@ repos:
         name: brand assets (regenerate from environments)
         entry: python apps/web/scripts/generate-brand-assets.py
         language: python
-        additional_dependencies: [pillow==12.3.0]
+        additional_dependencies: [pillow==13.0.0]
         files: |
           (?x)^apps/web/(
             scripts/generate-brand-assets\.py|
