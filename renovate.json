@@ -17,7 +17,7 @@
     "addLabels": ["security"]
   },
   "lockFileMaintenance": {
-    "description": "Open the lock file refresh even when other Renovate pull requests fill the concurrent limit, since it alone carries transitive security fixes",
+    "description": "Open the lock file refresh even when other Renovate pull requests fill the concurrent limit, so transitive dependency fixes keep reaching develop",
     "prConcurrentLimit": 0
   },
   "pre-commit": {
