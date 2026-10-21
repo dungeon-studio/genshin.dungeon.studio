@@ -7,6 +7,7 @@ name: CI
 # See docs/reference/workflow-conventions.md.
 on:
   pull_request:
+  merge_group:
   push:
     branches:
       - develop
@@ -344,9 +345,14 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      # The action derives its range for push and pull_request only; on any
+      # other event it scans the full history. Both values are empty outside a
+      # merge group, which leaves that derivation in charge.
       - name: Scan for verified secrets
         uses: trufflesecurity/trufflehog@e76dff8a7e57d6df0c60ad8cbf5d5cba505a8fc9 # v3.99.2
         with:
+          base: ${{ github.event.merge_group.base_sha }}
+          head: ${{ github.event.merge_group.head_sha }}
           extra_args: --results=verified
 
   # Online supply-chain audits (impostor commits, known-vulnerable actions)
