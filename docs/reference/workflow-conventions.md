@@ -26,7 +26,7 @@ A tool whose checks fall on both sides runs in both places. zizmor audits offlin
 
 A workflow file is named for _when_ it runs:
 
-- `ci.yml` holds every check that runs on an integration event: a pull request, or a push to a long-lived branch.
+- `ci.yml` holds every check that runs on an integration event: a pull request, a merge queue run, or a push to a long-lived branch.
 - `daily.yml` and `weekly.yml` hold the scheduled checks, one file per cadence.
 - A path-gated check has its own file. Only a check with expensive setup has a path gate. Its triggers share one `paths:` list through a YAML anchor.
 
@@ -43,6 +43,7 @@ The `develop` ruleset is the authoritative list of checks that block a merge. A 
 - Renaming a required job blocks every pull request until the ruleset names the new check.
 - A path-gated workflow is never required.
 - The GitHub-managed `Analyze` runs aren't required. The ruleset gates code scanning and Code Quality findings through its own rules.
+- A workflow carrying a required check also triggers on `merge_group`, so the merge queue reruns the check on the pull request merged onto the current `develop`. A job that reads pull request metadata skips in a merge group, and the skip satisfies the required check.
 
 ## Push triggers
 
