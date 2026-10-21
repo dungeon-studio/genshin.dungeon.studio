@@ -17,11 +17,11 @@ import { assertCollectionDocument } from '@genshin/collection-json';
 import type { CollectionWeapon, CollectionWeaponId, RefinementLevel } from '@genshin/domain';
 import { deserialiseWeapon, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { apiDelete, apiPatch, apiPost } from '@/lib/api';
 import { apiGetAllItems } from '@/lib/api-collection';
-import { syncUserQuery } from '@/lib/sync-user-query';
+import { useUserQuerySync } from '@/lib/use-user-query-sync';
 import { userScopedKey } from '@/lib/user-scoped-key';
 
 type WeaponRecord = Record<CollectionWeaponId, CollectionWeapon>;
@@ -69,7 +69,7 @@ export function useWeaponCollectionQuery(
 export function useAddWeaponMutation(
   userId: string | undefined,
 ): UseMutationResult<WeaponMutationResult, Error, string> {
-  const queryClient = useQueryClient();
+  const querySync = useUserQuerySync(userId, weaponsKey);
 
   return useMutation({
     mutationFn: async (weaponId: string): Promise<WeaponMutationResult> => {
@@ -79,20 +79,20 @@ export function useAddWeaponMutation(
       });
       return parseSingleWeaponResponse(response);
     },
-    ...syncUserQuery(queryClient, userId, weaponsKey),
+    ...querySync,
   });
 }
 
 export function useRemoveWeaponMutation(
   userId: string | undefined,
 ): UseMutationResult<void, Error, CollectionWeaponId> {
-  const queryClient = useQueryClient();
+  const querySync = useUserQuerySync(userId, weaponsKey);
 
   return useMutation({
     mutationFn: async (collectionWeaponId: CollectionWeaponId) => {
       await apiDelete(`/weapons/${encodeURIComponent(collectionWeaponId)}`);
     },
-    ...syncUserQuery(queryClient, userId, weaponsKey),
+    ...querySync,
   });
 }
 
@@ -104,7 +104,7 @@ export interface SetRefinementLevelVariables {
 export function useSetRefinementLevelMutation(
   userId: string | undefined,
 ): UseMutationResult<WeaponMutationResult, Error, SetRefinementLevelVariables> {
-  const queryClient = useQueryClient();
+  const querySync = useUserQuerySync(userId, weaponsKey);
 
   return useMutation({
     mutationFn: async ({
@@ -116,6 +116,6 @@ export function useSetRefinementLevelMutation(
       });
       return parseSingleWeaponResponse(response);
     },
-    ...syncUserQuery(queryClient, userId, weaponsKey),
+    ...querySync,
   });
 }

@@ -7,6 +7,7 @@ import { http, HttpResponse } from 'msw';
 import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { deferred } from '@/test/deferred';
 import { makeWeapon, weaponsDocument } from '@/test/fixtures';
 import { server } from '@/test/msw/server';
 import { createTestQueryClient, createWrapper, fakeUser } from '@/test/render';
@@ -192,14 +193,8 @@ describe('useWeaponCollection', () => {
     });
 
     it('keeps a change that a refetch started before it would overwrite', async () => {
-      let releaseRefetch: () => void = () => {};
-      const refetchGate = new Promise<void>((resolve) => {
-        releaseRefetch = resolve;
-      });
-      let releaseSecondPatch: () => void = () => {};
-      const secondPatchGate = new Promise<void>((resolve) => {
-        releaseSecondPatch = resolve;
-      });
+      const refetchGate = deferred();
+      const secondPatchGate = deferred();
       const atLevel = (refinementLevel: RefinementLevel) =>
         weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel })]);
       let gets = 0;
@@ -209,13 +204,13 @@ describe('useWeaponCollection', () => {
           gets += 1;
           if (gets === 1) return HttpResponse.json(atLevel(1));
           // Answers with the server's state from before the second change.
-          await refetchGate;
+          await refetchGate.promise;
           return HttpResponse.json(atLevel(2));
         }),
         http.patch('http://localhost:8080/weapons/weapon-instance-1', async () => {
           patches += 1;
           if (patches === 1) return HttpResponse.json(atLevel(2));
-          await secondPatchGate;
+          await secondPatchGate.promise;
           return HttpResponse.json(atLevel(3));
         }),
       );
@@ -236,11 +231,11 @@ describe('useWeaponCollection', () => {
       });
       await waitFor(() => expect(patches).toBe(2));
 
-      releaseRefetch();
+      refetchGate.release();
       await waitFor(() => expect(queryClient.isFetching()).toBe(0));
       expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(3);
 
-      releaseSecondPatch();
+      secondPatchGate.release();
       await waitFor(() => expect(queryClient.isMutating()).toBe(0));
     });
   });

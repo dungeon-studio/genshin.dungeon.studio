@@ -17,11 +17,11 @@ import { assertCollectionDocument } from '@genshin/collection-json';
 import type { CharacterId, CollectionCharacter, ConstellationLevel } from '@genshin/domain';
 import { deserialiseCharacter, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { apiDelete, apiPut } from '@/lib/api';
 import { apiGetAllItems } from '@/lib/api-collection';
-import { syncUserQuery } from '@/lib/sync-user-query';
+import { useUserQuerySync } from '@/lib/use-user-query-sync';
 import { userScopedKey } from '@/lib/user-scoped-key';
 
 import type { CharacterCollection } from './use-character-collection-store';
@@ -73,7 +73,7 @@ export function useCharacterCollectionQuery(
 export function useAddCharacterMutation(
   userId: string | undefined,
 ): UseMutationResult<MutationResult, Error, CharacterId> {
-  const queryClient = useQueryClient();
+  const querySync = useUserQuerySync(userId, charactersKey);
 
   return useMutation({
     mutationFn: async (characterId: CharacterId): Promise<MutationResult> => {
@@ -82,20 +82,20 @@ export function useAddCharacterMutation(
       });
       return parseSingleCharacterResponse(response);
     },
-    ...syncUserQuery(queryClient, userId, charactersKey),
+    ...querySync,
   });
 }
 
 export function useRemoveCharacterMutation(
   userId: string | undefined,
 ): UseMutationResult<void, Error, CharacterId> {
-  const queryClient = useQueryClient();
+  const querySync = useUserQuerySync(userId, charactersKey);
 
   return useMutation({
     mutationFn: async (characterId: CharacterId) => {
       await apiDelete(`/characters/${encodeURIComponent(characterId)}`);
     },
-    ...syncUserQuery(queryClient, userId, charactersKey),
+    ...querySync,
   });
 }
 
@@ -107,7 +107,7 @@ export interface SetConstellationLevelVariables {
 export function useSetConstellationLevelMutation(
   userId: string | undefined,
 ): UseMutationResult<MutationResult, Error, SetConstellationLevelVariables> {
-  const queryClient = useQueryClient();
+  const querySync = useUserQuerySync(userId, charactersKey);
 
   return useMutation({
     mutationFn: async ({
@@ -119,6 +119,6 @@ export function useSetConstellationLevelMutation(
       });
       return parseSingleCharacterResponse(response);
     },
-    ...syncUserQuery(queryClient, userId, charactersKey),
+    ...querySync,
   });
 }

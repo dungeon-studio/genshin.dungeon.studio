@@ -7,6 +7,7 @@ import { http, HttpResponse } from 'msw';
 import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { deferred } from '@/test/deferred';
 import { makeTeam, teamsDocument } from '@/test/fixtures';
 import { server } from '@/test/msw/server';
 import { createTestQueryClient, createWrapper, fakeUser } from '@/test/render';
@@ -74,14 +75,11 @@ describe('useTeams (authenticated)', () => {
   });
 
   it('warns before unload while a save is in flight', async () => {
-    let releasePut: () => void = () => {};
-    const putGate = new Promise<void>((resolve) => {
-      releasePut = resolve;
-    });
+    const putGate = deferred();
     server.use(
       http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([]))),
       http.put('http://localhost:8080/teams/1', async () => {
-        await putGate;
+        await putGate.promise;
         return new HttpResponse(null, { status: 204 });
       }),
     );
@@ -102,19 +100,13 @@ describe('useTeams (authenticated)', () => {
     expect(event.defaultPrevented).toBe(true);
 
     // Let the in-flight save settle so no request outlives the test.
-    releasePut();
+    putGate.release();
     await waitFor(() => expect(result.current.isSaving).toBe(false));
   });
 
   it('keeps an edit that a refetch started before it would overwrite', async () => {
-    let releaseRefetch: () => void = () => {};
-    const refetchGate = new Promise<void>((resolve) => {
-      releaseRefetch = resolve;
-    });
-    let releaseSecondPut: () => void = () => {};
-    const secondPutGate = new Promise<void>((resolve) => {
-      releaseSecondPut = resolve;
-    });
+    const refetchGate = deferred();
+    const secondPutGate = deferred();
     let gets = 0;
     const putBodies: { members: CollectionTeamMembers }[] = [];
     server.use(
@@ -122,12 +114,12 @@ describe('useTeams (authenticated)', () => {
         gets += 1;
         if (gets === 1) return HttpResponse.json(teamsDocument([]));
         // Answers with the server's state from before the second edit.
-        await refetchGate;
+        await refetchGate.promise;
         return HttpResponse.json(teamsDocument([makeTeam(1, { name: 'First' })]));
       }),
       http.put('http://localhost:8080/teams/1', async ({ request }) => {
         putBodies.push((await request.json()) as { members: CollectionTeamMembers });
-        if (putBodies.length === 2) await secondPutGate;
+        if (putBodies.length === 2) await secondPutGate.promise;
         return new HttpResponse(null, { status: 204 });
       }),
     );
@@ -148,7 +140,7 @@ describe('useTeams (authenticated)', () => {
     });
     await waitFor(() => expect(putBodies).toHaveLength(2));
 
-    releaseRefetch();
+    refetchGate.release();
     await waitFor(() => expect(queryClient.isFetching()).toBe(0));
 
     act(() => {
@@ -157,7 +149,7 @@ describe('useTeams (authenticated)', () => {
     await waitFor(() => expect(putBodies).toHaveLength(3));
     expect(putBodies[2]?.members[0]?.characterId).toBe(CHARACTER);
 
-    releaseSecondPut();
+    secondPutGate.release();
     await waitFor(() => expect(result.current.isSaving).toBe(false));
   });
 });

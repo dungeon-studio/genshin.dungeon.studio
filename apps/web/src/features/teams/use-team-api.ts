@@ -16,10 +16,10 @@ import { assertCollectionDocument } from '@genshin/collection-json';
 import type { CollectionTeam, CollectionTeamMembers, TeamSlot } from '@genshin/domain';
 import { deserialiseTeam } from '@genshin/domain';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPut } from '@/lib/api';
-import { syncUserQuery } from '@/lib/sync-user-query';
+import { useUserQuerySync } from '@/lib/use-user-query-sync';
 import { userScopedKey } from '@/lib/user-scoped-key';
 
 export interface SaveTeamPayload {
@@ -50,25 +50,25 @@ export function useTeamsQuery(userId: string | undefined): UseQueryResult<Collec
 export function useSaveTeamMutation(
   userId: string | undefined,
 ): UseMutationResult<void, Error, SaveTeamPayload> {
-  const queryClient = useQueryClient();
+  const querySync = useUserQuerySync(userId, teamsKey);
 
   return useMutation({
     mutationFn: async ({ slot, name, members, description }: SaveTeamPayload) => {
       await apiPut(`/teams/${encodeURIComponent(slot)}`, { name, members, description });
     },
-    ...syncUserQuery(queryClient, userId, teamsKey),
+    ...querySync,
   });
 }
 
 export function useDeleteTeamMutation(
   userId: string | undefined,
 ): UseMutationResult<void, Error, TeamSlot> {
-  const queryClient = useQueryClient();
+  const querySync = useUserQuerySync(userId, teamsKey);
 
   return useMutation({
     mutationFn: async (slot: TeamSlot) => {
       await apiDelete(`/teams/${encodeURIComponent(slot)}`);
     },
-    ...syncUserQuery(queryClient, userId, teamsKey),
+    ...querySync,
   });
 }

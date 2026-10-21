@@ -4,7 +4,7 @@
 /**
  * Build the query key function for a user-scoped collection.
  *
- * A function rather than a key because `syncUserQuery` accepts a
+ * A function rather than a key because `useUserQuerySync` accepts a
  * signed-out `userId`, and so has nothing to key until it knows there is one.
  */
 export function userScopedKey(scope: string): (userId: string) => readonly [string, string] {
