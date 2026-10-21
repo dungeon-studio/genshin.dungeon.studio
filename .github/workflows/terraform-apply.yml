@@ -9,7 +9,9 @@ on:
   push:
     branches: [develop, 'release/**']
     paths:
-      - 'infrastructure/terraform/environments/**'
+      - 'infrastructure/terraform/**'
+      # bootstrap/ is applied by hand.
+      - '!infrastructure/terraform/bootstrap/**'
       - '.github/workflows/terraform-apply.yml'
       - '.github/workflows/terraform-apply-reusable.yml'
 

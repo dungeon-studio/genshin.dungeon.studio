@@ -8,7 +8,9 @@ on:
   pull_request:
     branches: [develop, main, 'release/**']
     paths:
-      - 'infrastructure/terraform/environments/**'
+      - 'infrastructure/terraform/**'
+      # bootstrap/ is applied by hand.
+      - '!infrastructure/terraform/bootstrap/**'
       - '.github/workflows/terraform-plan.yml'
 
 permissions:
