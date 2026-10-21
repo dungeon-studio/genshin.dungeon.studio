@@ -43,7 +43,7 @@ The `develop` ruleset is the authoritative list of checks that block a merge. A 
 - Renaming a required job blocks every pull request until the ruleset names the new check.
 - A path-gated workflow is never required.
 - The GitHub-managed `Analyze` runs aren't required. The ruleset gates code scanning and Code Quality findings through its own rules.
-- A workflow carrying a required check also triggers on `merge_group`, so the merge queue reruns it against the pull request merged onto the current `develop`. A job that reads pull request metadata skips there. A skipped job satisfies a required check.
+- A workflow carrying a required check also triggers on `merge_group`, so the merge queue reruns the check on the pull request merged onto the current `develop`. A job that reads pull request metadata skips in a merge group, and the skip satisfies the required check.
 
 ## Push triggers
 

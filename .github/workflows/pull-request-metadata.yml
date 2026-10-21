@@ -28,8 +28,7 @@ jobs:
     name: Check pull request title
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    # A merge group carries no title. The pull request's own run already
-    # checked it, and the skipped run satisfies the required check.
+    # A merge group carries no title; the pull request's own run checks it.
     if: github.event_name == 'pull_request'
     permissions:
       pull-requests: read
