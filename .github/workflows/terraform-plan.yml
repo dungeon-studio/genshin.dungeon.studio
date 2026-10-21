@@ -8,8 +8,8 @@ on:
   pull_request:
     branches: [develop, main, 'release/**']
     paths:
-      - 'infrastructure/terraform/environments/**'
-      - 'infrastructure/terraform/modules/**'
+      - 'infrastructure/terraform/**'
+      - '!infrastructure/terraform/bootstrap/**'
       - '.github/workflows/terraform-plan.yml'
 
 permissions:
