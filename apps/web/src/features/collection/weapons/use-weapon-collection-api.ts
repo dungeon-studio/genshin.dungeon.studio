@@ -21,7 +21,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiDelete, apiPatch, apiPost } from '@/lib/api';
 import { apiGetAllItems } from '@/lib/api-collection';
-import { invalidateUserQuery } from '@/lib/invalidate-user-query';
+import { syncUserQuery } from '@/lib/sync-user-query';
 import { userScopedKey } from '@/lib/user-scoped-key';
 
 type WeaponRecord = Record<CollectionWeaponId, CollectionWeapon>;
@@ -79,7 +79,7 @@ export function useAddWeaponMutation(
       });
       return parseSingleWeaponResponse(response);
     },
-    onSuccess: invalidateUserQuery(queryClient, userId, weaponsKey),
+    ...syncUserQuery(queryClient, userId, weaponsKey),
   });
 }
 
@@ -92,7 +92,7 @@ export function useRemoveWeaponMutation(
     mutationFn: async (collectionWeaponId: CollectionWeaponId) => {
       await apiDelete(`/weapons/${encodeURIComponent(collectionWeaponId)}`);
     },
-    onSuccess: invalidateUserQuery(queryClient, userId, weaponsKey),
+    ...syncUserQuery(queryClient, userId, weaponsKey),
   });
 }
 
@@ -116,6 +116,6 @@ export function useSetRefinementLevelMutation(
       });
       return parseSingleWeaponResponse(response);
     },
-    onSuccess: invalidateUserQuery(queryClient, userId, weaponsKey),
+    ...syncUserQuery(queryClient, userId, weaponsKey),
   });
 }

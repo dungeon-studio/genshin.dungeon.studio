@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionWeaponId } from '@genshin/domain';
+import type { CollectionWeaponId, RefinementLevel } from '@genshin/domain';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { toast } from 'sonner';
@@ -9,7 +9,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { makeWeapon, weaponsDocument } from '@/test/fixtures';
 import { server } from '@/test/msw/server';
-import { createWrapper, fakeUser } from '@/test/render';
+import { createTestQueryClient, createWrapper, fakeUser } from '@/test/render';
 
 import { useWeaponCollection } from './use-weapon-collection';
 import { useWeaponCollectionStore } from './use-weapon-collection-store';
@@ -189,6 +189,59 @@ describe('useWeaponCollection', () => {
       expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(5);
       await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(2));
       expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+    });
+
+    it('keeps a change that a refetch started before it would overwrite', async () => {
+      let releaseRefetch: () => void = () => {};
+      const refetchGate = new Promise<void>((resolve) => {
+        releaseRefetch = resolve;
+      });
+      let releaseSecondPatch: () => void = () => {};
+      const secondPatchGate = new Promise<void>((resolve) => {
+        releaseSecondPatch = resolve;
+      });
+      const atLevel = (refinementLevel: RefinementLevel) =>
+        weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel })]);
+      let gets = 0;
+      let patches = 0;
+      server.use(
+        http.get('http://localhost:8080/weapons', async () => {
+          gets += 1;
+          if (gets === 1) return HttpResponse.json(atLevel(1));
+          // Answers with the server's state from before the second change.
+          await refetchGate;
+          return HttpResponse.json(atLevel(2));
+        }),
+        http.patch('http://localhost:8080/weapons/weapon-instance-1', async () => {
+          patches += 1;
+          if (patches === 1) return HttpResponse.json(atLevel(2));
+          await secondPatchGate;
+          return HttpResponse.json(atLevel(3));
+        }),
+      );
+
+      const queryClient = createTestQueryClient();
+      const { result } = renderHook(() => useWeaponCollection(), {
+        wrapper: createWrapper({ user: fakeUser('user-1'), queryClient }),
+      });
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(1));
+
+      act(() => {
+        result.current.setRefinementLevel(INSTANCE_ID, 2);
+      });
+      await waitFor(() => expect(gets).toBe(2));
+
+      act(() => {
+        result.current.setRefinementLevel(INSTANCE_ID, 3);
+      });
+      await waitFor(() => expect(patches).toBe(2));
+
+      releaseRefetch();
+      await waitFor(() => expect(queryClient.isFetching()).toBe(0));
+      expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(3);
+
+      releaseSecondPatch();
+      await waitFor(() => expect(queryClient.isMutating()).toBe(0));
     });
   });
 });
