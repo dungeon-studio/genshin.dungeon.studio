@@ -19,14 +19,13 @@ const SIGNED_OUT: UserQuerySync = {
  * The mutation options that keep a user-scoped query in step with writes to
  * it, for spreading into `useMutation`.
  *
- * A refetch that started before a write can answer with data that predates
- * it, so starting a write cancels any refetch in flight, and only the last
- * pending write to succeed refetches. A query without data yet keeps its
- * first fetch, since nothing else would restart it. Signed-out users have no
- * query to sync, so their handlers do nothing.
+ * A refetch that starts before a write can answer with data that predates it.
+ * Starting a write cancels any refetch in flight, and a write that succeeds
+ * while another is pending leaves the refetch to the later one. A first load
+ * is never cancelled, because nothing would restart it.
  *
- * The refetch is deliberately not awaited: returning it would hold the
- * mutation pending until the refetch settled.
+ * The refetch isn't awaited: returning it would hold the mutation pending
+ * until the refetch settled.
  */
 export function useUserQuerySync(
   userId: string | undefined,
