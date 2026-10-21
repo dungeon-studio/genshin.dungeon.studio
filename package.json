@@ -35,7 +35,7 @@
     "vscode-extensions:check": "tsx scripts/check-vscode-extensions.ts"
   },
   "devDependencies": {
-    "@ls-lint/ls-lint": "2.3.1",
+    "@ls-lint/ls-lint": "2.3.2",
     "@turbo/gen": "2.11.9",
     "@types/node": "24.19.2",
     "eslint": "10.13.0",

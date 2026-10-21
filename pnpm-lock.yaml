@@ -167,8 +167,8 @@ importers:
   .:
     devDependencies:
       '@ls-lint/ls-lint':
-        specifier: 2.3.1
-        version: 2.3.1
+        specifier: 2.3.2
+        version: 2.3.2
       '@turbo/gen':
         specifier: 2.11.9
         version: 2.11.9(@types/node@24.19.2)
@@ -1873,8 +1873,8 @@ packages:
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
 
-  '@ls-lint/ls-lint@2.3.1':
-    resolution: {integrity: sha512-vPe6IDByQnQRTxcAYjTxrmga/tSIui50VBFTB5KIJWY3OOFmxE2VtymjeSEfQfiMbhZV/ZPAqYy2lt8pZFQ0Rw==}
+  '@ls-lint/ls-lint@2.3.2':
+    resolution: {integrity: sha512-8GPo2oRjpEEX/soVzWqb692mwrt9iKs3Z9xK7abSonyizmSVsdLwSQWS4OmqPIwwKdungwhNkzsmPwNFg9gSgg==}
     cpu: [x64, arm64, s390x, ppc64le]
     os: [darwin, linux, win32]
     hasBin: true
@@ -8867,7 +8867,7 @@ snapshots:
 
   '@keyv/serialize@1.1.1': {}
 
-  '@ls-lint/ls-lint@2.3.1': {}
+  '@ls-lint/ls-lint@2.3.2': {}
 
   '@microsoft/tsdoc-config@0.18.3':
     dependencies:
