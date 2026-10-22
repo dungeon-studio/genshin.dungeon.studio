@@ -71,7 +71,7 @@ Don't commit `.terraform/` directories.
 
 ## 5) Align GitHub workflows
 
-- In the `terraform-plan` job in `.github/workflows/ci.yml`, add `<environment>` to the matrix and an RO secret to the auth step.
+- In the `terraform-plan` job in `.github/workflows/ci.yml`, add `<environment>` to the matrix and a branch for its RO secret to the auth step's `service_account`.
 - In `.github/workflows/terraform-apply.yml`, copy one job and set job id, `with.environment`, and RW secret. Match the routing in [Infrastructure branch flow](../reference/infrastructure-branch-flow.md).
 - Keep `.github/workflows/terraform-apply-reusable.yml` unchanged.
 
