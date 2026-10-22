@@ -88,9 +88,8 @@ representations every layer uses.
 
 ## Jobs by layer
 
-Each job lists the layers that do it, in stack order. A layer not listed doesn't
-do that job. An overlap is a rule more than one layer implements, named under
-its job.
+Each job lists, in stack order, only the layers that do it. An overlap is a
+rule more than one layer implements.
 
 ### Validation
 
@@ -130,7 +129,8 @@ enforce.
 The client ignores a duplicate character in a team, and the server rejects one.
 The planner UI, the request schema, and the route's `validateArtifactPlan` each
 enforce part of the artifact plan limits. The planner UI offers only owned
-characters and locks a weapon another team holds. The server rejects both.
+characters and locks a weapon another team holds, and the server rejects
+both.
 
 #### Owned-character guard
 
@@ -139,16 +139,17 @@ character the store already holds.
 
 ### Invariants
 
-Every layer listed asserts the same domain invariants, so all of them overlap.
+Each layer below asserts the same domain invariants, an overlap.
 
-- **Persist:** `assertCollectionCharacter` per entry, only on a version change.
-- **Query layer:** `deserialise*` on every item.
-- **Route:** `deserialiseCollectionTeamMembers`.
-- **Document:** `fromDocument` runs `assertCollection*` after migrating.
+- **Persist:** each entry on a version change, through
+  `assertCollectionCharacter`.
+- **Query layer:** every item, through `deserialise*`.
+- **Route:** team members, through `deserialiseCollectionTeamMembers`.
+- **Document:** every document after migrating, through `assertCollection*`.
 
 ### Timestamps
 
-Every layer listed mints `createdAt` and `updatedAt`, so all of them overlap.
+Each layer below mints `createdAt` and `updatedAt`, an overlap.
 When the server's values reach each store is in
 [Lifecycles](data-flow-lifecycles.md).
 
@@ -187,12 +188,11 @@ The server requires the field and has no default.
 #### Empty team
 
 `createEmptyTeam` on the client and `nextTeam` on the server each define the
-default name and the four empty member slots. `fromDocument` pads a stored
-`members` array shorter than four.
+default name and the four empty member slots.
 
 ### Schema versioning
 
-Every layer listed versions its own format, so all of them overlap.
+Each layer below versions its own format, an overlap.
 
 - **Persist:** zustand `persist` version on the `localStorage` collection.
 - **Middleware:** picks the request schema from the `profile`. The client sends
@@ -201,11 +201,10 @@ Every layer listed versions its own format, so all of them overlap.
 
 ### Merging
 
-Both layers listed merge, by different rules, so the same two character values
-resolve differently depending on which side merges.
+The hook and the repository merge by different rules, an overlap. The same two
+character values resolve differently on each side.
 
-- **Feature hook:** guarded rollback, which keeps a newer local edit over the
-  rollback. Applies a response: characters' level, weapons' whole instance.
+- **Feature hook:** [guarded rollback](data-flow-write-paths.md). Applies a response: characters' level, weapons' whole instance.
   Reconciles characters additively with `mergeCollections`, keeping the higher
   constellation, and replaces weapons and teams.
 - **Repository:** `nextCharacter` and the weapon update keep the latest write.

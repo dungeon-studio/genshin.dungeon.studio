@@ -147,9 +147,8 @@ stateDiagram-v2
 - Confirmed: a response never reaches the store. Only the refetch the save
   triggers confirms it, server timestamps included.
 - Sent by a clear: no component calls `clearTeam`. The store keeps the team's
-  name and empties its positions.
-  The server deletes the record, so the refetch brings back the default name,
-  see [#1839].
+  name and empties its positions. The server deletes the record, so the refetch
+  brings back the default name, see [#1839].
 - Overwritten: a refetch replaces all four slots, so a save in one slot
   overwrites an edit in flight in another.
 
