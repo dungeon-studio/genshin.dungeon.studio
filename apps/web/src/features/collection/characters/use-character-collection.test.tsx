@@ -83,6 +83,16 @@ describe('useCollection merge-on-first-login', () => {
 });
 
 describe('useCollection mutations', () => {
+  async function renderOwningSkirkAtC3() {
+    const view = renderHook(() => useCollection(), {
+      wrapper: createWrapper({ user: fakeUser('user-1') }),
+    });
+    await waitFor(() =>
+      expect(view.result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3),
+    );
+    return view;
+  }
+
   it('restores a removed character when the delete fails', async () => {
     server.use(
       http.get('http://localhost:8080/characters', () =>
@@ -94,11 +104,7 @@ describe('useCollection mutations', () => {
       ),
     );
 
-    const { result } = renderHook(() => useCollection(), {
-      wrapper: createWrapper({ user: fakeUser('user-1') }),
-    });
-
-    await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
+    const { result } = await renderOwningSkirkAtC3();
 
     act(() => {
       result.current.removeCharacter(SKIRK);
@@ -108,6 +114,32 @@ describe('useCollection mutations', () => {
     expect(result.current.getCharacter(SKIRK)).toBeUndefined();
     await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
     expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+  });
+
+  it('stores the saved character with the server timestamps', async () => {
+    const saved = makeCharacter(SKIRK, { constellationLevel: 5 });
+    let getCount = 0;
+    server.use(
+      http.get('http://localhost:8080/characters', () => {
+        getCount += 1;
+        // Hold the post-save refetch so only the mutation result can reach the store.
+        if (getCount > 1) return new Promise<never>(() => {});
+        return HttpResponse.json(
+          charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })]),
+        );
+      }),
+      http.put('http://localhost:8080/characters/skirk', () =>
+        HttpResponse.json(charactersDocument([saved])),
+      ),
+    );
+
+    const { result } = await renderOwningSkirkAtC3();
+
+    act(() => {
+      result.current.setConstellationLevel(SKIRK, 5);
+    });
+
+    await waitFor(() => expect(result.current.getCharacter(SKIRK)).toEqual(saved));
   });
 
   it('restores the prior constellation level when the update fails', async () => {
@@ -121,11 +153,7 @@ describe('useCollection mutations', () => {
       ),
     );
 
-    const { result } = renderHook(() => useCollection(), {
-      wrapper: createWrapper({ user: fakeUser('user-1') }),
-    });
-
-    await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
+    const { result } = await renderOwningSkirkAtC3();
 
     act(() => {
       result.current.setConstellationLevel(SKIRK, 5);
