@@ -71,7 +71,7 @@ describe('useTeams (authenticated)', () => {
       result.current.clearTeam(1);
     });
 
-    // The server's timestamp shows the store now holds the refetched team.
+    // The server's timestamp marks the refetch landing in the store.
     await waitFor(() => expect(result.current.getTeam(1).updatedAt).toBe(SAVED_AT));
     expect(result.current.getTeam(1).members[0]).toBeNull();
     expect(result.current.getTeam(1).name).toBe('Abyss');

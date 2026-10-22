@@ -86,7 +86,6 @@ function useTeamActions(
   return useMemo(() => {
     const store = () => useTeamStore.getState();
 
-    /** Turns a store action into one that edits the slot locally, then saves it. */
     const editThenSave =
       <Args extends unknown[]>(action: (s: TeamStore) => (slot: TeamSlot, ...args: Args) => void) =>
       (slot: TeamSlot, ...args: Args) => {
