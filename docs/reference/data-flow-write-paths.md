@@ -165,7 +165,7 @@ sequenceDiagram
   alt success
     Hook->>FA: signOut
     Hook->>Cache: clear
-    Note over Stores: characters and teams emptied on sign-out, weapons when that page next mounts
+    Note over Stores: emptied on sign-out
   else failure
     Hook->>Hook: toast the problem detail, or a generic error
   end

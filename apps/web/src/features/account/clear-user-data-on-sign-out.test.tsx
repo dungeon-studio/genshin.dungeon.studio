@@ -12,10 +12,11 @@ import type { AuthState } from '@/features/auth';
 import { AuthContext } from '@/features/auth/auth-context';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
 import { useCollectionStore } from '@/features/collection/characters/use-character-collection-store';
+import { useWeaponCollectionStore } from '@/features/collection/weapons/use-weapon-collection-store';
 import { useTeamStore } from '@/features/teams/use-team-store';
 import { useTeams } from '@/features/teams/use-teams';
 import { settledAuth } from '@/test/auth';
-import { charactersDocument, makeCharacter } from '@/test/fixtures';
+import { charactersDocument, makeCharacter, makeWeapon } from '@/test/fixtures';
 import { server } from '@/test/msw/server';
 import { createTestQueryClient, fakeUser } from '@/test/render';
 
@@ -28,6 +29,7 @@ const ESCOFFIER = 'escoffier' as CharacterId;
 
 beforeEach(() => {
   useCollectionStore.getState().clearCharacters();
+  useWeaponCollectionStore.getState().clearWeapons();
   useTeamStore.getState().resetTeams();
 });
 
@@ -86,13 +88,15 @@ describe('ClearUserDataOnSignOut', () => {
     await waitFor(() => expect(firstUser.current.getCharacter(SKIRK)).toBeDefined());
     unmount();
 
-    // Signed out on another page, where neither hook is mounted.
+    // Signed out on another page, where none of the hooks is mounted.
+    useWeaponCollectionStore.getState().addWeapon(makeWeapon('weapon-1', 'mistsplitter-reforged'));
     useTeamStore.getState().assignCharacter(1, 0, SKIRK);
     const { rerender, unmount: leave } = renderHook(() => null, { wrapper });
     auth.current = settledAuth(null);
     rerender();
 
     expect(useCollectionStore.getState().characters).toEqual({});
+    expect(useWeaponCollectionStore.getState().weapons).toEqual({});
     expect(useTeamStore.getState().teams[1].members[0]).toBeNull();
 
     serverCharacters = charactersDocument([makeCharacter(ESCOFFIER, { constellationLevel: 2 })]);

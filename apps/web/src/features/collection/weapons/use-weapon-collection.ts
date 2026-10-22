@@ -128,7 +128,6 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   const weapons = useWeaponCollectionStore((s) => s.weapons);
   const storeSetWeapons = useWeaponCollectionStore((s) => s.setWeapons);
   const storeAddWeapon = useWeaponCollectionStore((s) => s.addWeapon);
-  const clearWeapons = useWeaponCollectionStore((s) => s.clearWeapons);
 
   const {
     data: apiWeapons,
@@ -146,12 +145,6 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     },
     [storeAddWeapon],
   );
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      clearWeapons();
-    }
-  }, [isAuthenticated, clearWeapons]);
 
   useEffect(() => {
     if (!apiWeapons) return;

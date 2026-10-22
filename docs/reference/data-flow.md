@@ -123,9 +123,7 @@ Two control signals carry no data:
   Account deletion empties it. A plain sign-out leaves the previous user's
   entries, keyed by user ID, until garbage collection.
 - When a signed-in user signs out, `ClearUserDataOnSignOut` empties the
-  character and team stores, and teams reset to empty slots. It renders
-  outside the routes, so it sees a sign-out on any page. The weapon hook
-  empties its own store whenever it mounts while auth is anything but signed
-  in.
+  character, weapon, and team stores, and teams reset to empty slots. It
+  renders outside the routes, so it sees a sign-out on any page.
 
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
