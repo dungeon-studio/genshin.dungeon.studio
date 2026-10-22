@@ -42,7 +42,7 @@
     "globals": "17.13.0",
     "json-schema-to-ts": "3.1.1",
     "jsoncompat": "0.5.0",
-    "tsc-alias": "1.9.7",
+    "tsc-alias": "1.9.8",
     "tsx": "4.23.15",
     "typescript": "npm:@typescript/typescript6@6.0.2",
     "vitest": "5.0.5"
