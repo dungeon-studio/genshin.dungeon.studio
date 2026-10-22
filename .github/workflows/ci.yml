@@ -477,8 +477,8 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-  # GitHub evaluates `if:` before the matrix, so a matrix reference here
-  # shows unexpanded on a skip; GitHub appends the environment instead.
+  # A skipped job never expands its matrix, so a matrix reference in the
+  # name would show raw. GitHub appends the environment to each run's name.
   terraform-plan:
     name: Plan environment infrastructure
     needs: terraform-changes
