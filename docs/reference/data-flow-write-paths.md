@@ -165,7 +165,7 @@ sequenceDiagram
   alt success
     Hook->>FA: signOut
     Hook->>Cache: clear
-    Note over Stores: emptied when a page using them next mounts
+    Note over Stores: characters and teams emptied on sign-out, weapons when that page next mounts
   else failure
     Hook->>Hook: toast the problem detail, or a generic error
   end
@@ -177,20 +177,19 @@ failure between the two never orphans data: the identity remains and can retry.
 
 ## Divergences
 
-| Question                                    | Characters                                  | Weapons                     | Teams                               |
-| ------------------------------------------- | ------------------------------------------- | --------------------------- | ----------------------------------- |
-| Works signed out?                           | Yes, but cleared on each mount, see [#1740] | No, every action is a no-op | Yes, in memory, reset on each mount |
-| Optimistic?                                 | All three actions                           | Remove and refine, not add  | Every action                        |
-| Applies the mutation response to the store? | Constellation level only                    | Whole instance, replaced    | No                                  |
-| How a refetch reaches the store             | Additive merge                              | Replace                     | Replace, filled to four slots       |
-| Can a refetch overwrite an edit in flight?  | Raise or add, no. Lower or remove, yes      | Yes                         | Yes                                 |
-| What a removal elsewhere does to the store  | Survives the merge, see [#1741]             | Disappears on refetch       | Disappears on refetch               |
+| Question                                    | Characters                             | Weapons                     | Teams                                 |
+| ------------------------------------------- | -------------------------------------- | --------------------------- | ------------------------------------- |
+| Works signed out?                           | Yes, persisted until sign-in merges it | No, every action is a no-op | Yes, in memory until the page reloads |
+| Optimistic?                                 | All three actions                      | Remove and refine, not add  | Every action                          |
+| Applies the mutation response to the store? | Constellation level only               | Whole instance, replaced    | No                                    |
+| How a refetch reaches the store             | Additive merge                         | Replace                     | Replace, filled to four slots         |
+| Can a refetch overwrite an edit in flight?  | Raise or add, no. Lower or remove, yes | Yes                         | Yes                                   |
+| What a removal elsewhere does to the store  | Survives the merge, see [#1741]        | Disappears on refetch       | Disappears on refetch                 |
 
 Teams also depend on the other two features. The server rejects a team that
 names a character or weapon instance the user doesn't own, so a team save can
 fail on a character add still in flight. Removing a character or weapon leaves
 the teams that name it unchanged.
 
-[#1740]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1740
 [#1741]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1741
 [#1757]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1757

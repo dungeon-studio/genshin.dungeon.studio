@@ -122,10 +122,9 @@ Two control signals carry no data:
   again. No collection or team mutation writes into the query cache directly.
   Account deletion empties it. A plain sign-out leaves the previous user's
   entries, keyed by user ID, until garbage collection.
-- While auth is anything but signed in, a separate effect in each feature hook
-  empties its zustand store whenever the hook mounts. Teams reset to empty
-  slots. Auth starts out loading on every page load, so this also runs before
-  sign-in settles, see [#1740].
+- When a signed-in user signs out, `ClearUserDataOnSignOut` empties the
+  character and team stores, and teams reset to empty slots. It renders outside the
+  routes, so it sees a sign-out on any page. The weapon hook empties its own
+  store whenever it mounts while auth is anything but signed in.
 
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
-[#1740]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1740
