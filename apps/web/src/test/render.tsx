@@ -4,7 +4,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 
-import type { AuthUser } from '@/features/auth';
+import type { AuthState, AuthUser } from '@/features/auth';
 import { settledAuth } from '@/test/auth';
 import { TestProviders } from '@/test/providers';
 
@@ -37,6 +37,20 @@ export function createWrapper(
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
       <TestProviders queryClient={queryClient} auth={settledAuth(user)}>
+        {children}
+      </TestProviders>
+    );
+  };
+}
+
+/** Auth arrives through `auth.current`, so a test can sign out between `rerender()` calls. */
+export function createSwitchableWrapper(
+  auth: { current: AuthState },
+  queryClient: QueryClient,
+): (props: { children: ReactNode }) => ReactNode {
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return (
+      <TestProviders queryClient={queryClient} auth={auth.current}>
         {children}
       </TestProviders>
     );

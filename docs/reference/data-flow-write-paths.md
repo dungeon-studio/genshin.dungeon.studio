@@ -33,6 +33,11 @@ so a newer edit stands. A toast shows either way, and nothing retries.
 A write that fails after a later write from the same hook has started gets
 neither rollback nor toast, see [#1757].
 
+A collection write that settles after its sender signs out, or after another
+account signs in, changes nothing and shows no toast. Each hook wraps its
+mutations in `useSenderBoundMutate`, which drops a late call's callbacks, so a
+rollback never lands in the next user's store.
+
 ## Characters
 
 `useCollection` in `use-character-collection.ts`.
