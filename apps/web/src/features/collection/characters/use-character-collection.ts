@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 
 import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
+import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
 import type {
   MutationResult,
@@ -236,9 +237,12 @@ export function useCollection(): UseCollectionResult {
     isLoading: queryLoading,
   } = useCharacterCollectionQuery(uid);
 
-  const { mutate: addCharacterApi } = useAddCharacterMutation(uid);
-  const { mutate: removeCharacterApi } = useRemoveCharacterMutation(uid);
-  const { mutate: setConstellationLevelApi } = useSetConstellationLevelMutation(uid);
+  const addCharacterApi = useSenderBoundMutate(uid, useAddCharacterMutation(uid).mutate);
+  const removeCharacterApi = useSenderBoundMutate(uid, useRemoveCharacterMutation(uid).mutate);
+  const setConstellationLevelApi = useSenderBoundMutate(
+    uid,
+    useSetConstellationLevelMutation(uid).mutate,
+  );
 
   // Patch zustand with confirmed server data
   const applyMutationResult = useCallback(

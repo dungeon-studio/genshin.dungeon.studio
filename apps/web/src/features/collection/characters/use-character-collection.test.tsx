@@ -8,8 +8,9 @@ import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { charactersDocument, makeCharacter } from '@/test/fixtures';
+import { holdResponse } from '@/test/msw/held-response';
 import { server } from '@/test/msw/server';
-import { createWrapper, fakeUser } from '@/test/render';
+import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
@@ -133,5 +134,29 @@ describe('useCollection mutations', () => {
     expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(5);
     await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
     expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+  });
+
+  it('leaves the store alone when a removal fails after sign-out', async () => {
+    const deleteFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
+    server.use(
+      http.get('http://localhost:8080/characters', () =>
+        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })])),
+      ),
+      http.delete('http://localhost:8080/characters/skirk', deleteFailure.resolver),
+    );
+
+    const { result, queryClient, signOut } = renderHookSignedIn(() => useCollection(), 'user-1');
+    await waitFor(() => expect(result.current.getCharacter(SKIRK)).toBeDefined());
+
+    act(() => {
+      result.current.removeCharacter(SKIRK);
+    });
+    signOut();
+    await waitFor(() => expect(queryClient.isMutating()).toBe(1));
+    deleteFailure.release();
+
+    await waitFor(() => expect(queryClient.isMutating()).toBe(0));
+    expect(useCollectionStore.getState().characters[SKIRK]).toBeUndefined();
+    expect(toast.error).not.toHaveBeenCalled();
   });
 });

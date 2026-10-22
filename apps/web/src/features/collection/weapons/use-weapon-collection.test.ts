@@ -8,8 +8,9 @@ import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { makeWeapon, weaponsDocument } from '@/test/fixtures';
+import { holdResponse } from '@/test/msw/held-response';
 import { server } from '@/test/msw/server';
-import { createWrapper, fakeUser } from '@/test/render';
+import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
 
 import { useWeaponCollection } from './use-weapon-collection';
 import { useWeaponCollectionStore } from './use-weapon-collection-store';
@@ -79,6 +80,34 @@ describe('useWeaponCollection', () => {
 
       await waitFor(() => expect(result.current.weapons[SECOND_INSTANCE_ID]).toBeDefined());
       expect(result.current.weapons[INSTANCE_ID]).toBeDefined();
+    });
+
+    it('leaves the store alone when the add settles after sign-out', async () => {
+      const addConfirmation = holdResponse(() =>
+        HttpResponse.json(
+          weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 })]),
+        ),
+      );
+      server.use(
+        http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument([]))),
+        http.post('http://localhost:8080/weapons', addConfirmation.resolver),
+      );
+
+      const { result, queryClient, signOut } = renderHookSignedIn(
+        () => useWeaponCollection(),
+        'user-1',
+      );
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      act(() => {
+        result.current.addWeapon(WEAPON_ID);
+      });
+      signOut();
+      await waitFor(() => expect(queryClient.isMutating()).toBe(1));
+      addConfirmation.release();
+
+      await waitFor(() => expect(queryClient.isMutating()).toBe(0));
+      expect(useWeaponCollectionStore.getState().weapons).toEqual({});
     });
   });
 
