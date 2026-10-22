@@ -14,11 +14,13 @@
   "osvVulnerabilityAlerts": true,
   "vulnerabilityAlerts": {
     "description": "Add the security label to vulnerability-driven pull requests",
-    "addLabels": ["security"]
+    "addLabels": ["security"],
+    "automerge": false
   },
   "lockFileMaintenance": {
-    "description": "Open the lock file refresh even when other Renovate pull requests fill the concurrent limit, so transitive dependency fixes keep reaching develop",
-    "prConcurrentLimit": 0
+    "description": "Open the lock file refresh even when other Renovate pull requests fill the concurrent limit, and merge it once CI passes, so transitive dependency fixes keep reaching develop",
+    "prConcurrentLimit": 0,
+    "automerge": true
   },
   "pre-commit": {
     "enabled": true
@@ -37,6 +39,17 @@
         "replacement"
       ],
       "minimumReleaseAge": null
+    },
+    {
+      "description": "Merge baked development dependency patch and minor updates once CI passes",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true
+    },
+    {
+      "description": "Merge digest updates once CI passes",
+      "matchUpdateTypes": ["digest"],
+      "automerge": true
     },
     {
       "description": "The release_versions endpoint Renovate reads carries no release timestamps, so a release-age bake here would never resolve its renovate/stability-days check under internalChecksFilter:strict",
