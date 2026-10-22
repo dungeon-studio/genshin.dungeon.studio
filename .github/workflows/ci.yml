@@ -448,17 +448,19 @@ jobs:
           # The pull request's merge commit, whose first parent is the base.
           fetch-depth: 2
 
-      # bootstrap/ is applied by hand, and no plan below targets prod.
+      # bootstrap/ is applied by hand, and no plan below targets prod. A failed
+      # diff reports a change, so an error runs the plans rather than skipping.
       - name: Diff against the base
         id: diff
         run: |
-          files=$(git diff --name-only HEAD^1 HEAD)
-          matched=$(grep -E '^(infrastructure/terraform/|\.github/workflows/ci\.yml$)' <<<"$files" |
-            grep -Ev '^infrastructure/terraform/(bootstrap|environments/prod)/' || true)
-          if [[ -n "$matched" ]]; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          else
+          if git diff --quiet HEAD^1 HEAD -- \
+            infrastructure/terraform \
+            ':!infrastructure/terraform/bootstrap' \
+            ':!infrastructure/terraform/environments/prod' \
+            .github/workflows/ci.yml; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
   terraform-plan:
