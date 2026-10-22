@@ -477,8 +477,10 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
+  # A skipped job never expands its matrix, so a matrix reference in the
+  # name would show raw. GitHub appends the environment to each run's name.
   terraform-plan:
-    name: Plan ${{ matrix.environment }} infrastructure
+    name: Plan environment infrastructure
     needs: terraform-changes
     if: needs.terraform-changes.outputs.changed == 'true'
     runs-on: ubuntu-latest
