@@ -227,7 +227,7 @@ export function useCollection(): UseCollectionResult {
 
   // Zustand store — always the read layer
   const characters = useCollectionStore((s) => s.characters);
-  const storeSetConstellationLevel = useCollectionStore((s) => s.setConstellationLevel);
+  const storeReplaceCharacter = useCollectionStore((s) => s.replaceCharacter);
 
   // TanStack Query — background sync when authenticated
   const {
@@ -242,10 +242,10 @@ export function useCollection(): UseCollectionResult {
 
   // Patch zustand with confirmed server data
   const applyMutationResult = useCallback(
-    ({ characterId, entry }: MutationResult) => {
-      storeSetConstellationLevel(characterId, entry.constellationLevel);
+    ({ entry }: MutationResult) => {
+      storeReplaceCharacter(entry);
     },
-    [storeSetConstellationLevel],
+    [storeReplaceCharacter],
   );
 
   useServerSync(uid, apiCharacters, setConstellationLevelApi, applyMutationResult);
