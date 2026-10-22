@@ -429,9 +429,9 @@ jobs:
           sarif_file: terraform-results.sarif
           category: trivy-terraform-${{ matrix.root }}
 
-  # Plans run only on a pull request that changes what they read. The skip is a
-  # job rather than a `paths:` gate so `Plan infrastructure` reports on every
-  # pull request and can be required.
+  # A job decides whether to plan, rather than a `paths:` gate, so
+  # `Plan infrastructure` reports on every pull request and a ruleset can
+  # require it.
   terraform-changes:
     name: Detect Terraform changes
     if: github.event_name == 'pull_request'
@@ -445,11 +445,11 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          # The pull request's merge commit, whose first parent is the base.
+          # Reaches the base: the first parent of the pull request's merge commit.
           fetch-depth: 2
 
-      # bootstrap/ is applied by hand, and no plan below targets prod. A failed
-      # diff reports a change, so an error runs the plans rather than skipping.
+      # bootstrap/ is applied by hand, and no plan below targets prod. `git diff`
+      # exits nonzero on error too, so a failed diff runs the plans.
       - name: Diff against the base
         id: diff
         run: |
@@ -492,10 +492,8 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      # Authenticate to GCP using Workload Identity.
-      # Each environment maps to an explicit secret reference so this step
-      # narrows which secret is passed to the action input and avoids dynamic
-      # secret indexing (fixes CodeQL actions/excessive-secrets-exposure).
+      # Each environment maps to an explicit secret, because CodeQL flags
+      # dynamic secret indexing as actions/excessive-secrets-exposure.
       - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
           workload_identity_provider: ${{ secrets.GCP_RO_WORKLOAD_IDENTITY_PROVIDER }}
@@ -530,7 +528,6 @@ jobs:
             const planPath = `${workspaceRoot}/infrastructure/terraform/environments/${environment}/plan.txt`;
             const plan = fs.readFileSync(planPath, 'utf8');
 
-            // Extract summary line from plan output
             const summaryMatch = plan.match(/^(No changes\..+|Plan: .+)$/m);
             const summary = summaryMatch ? summaryMatch[0] : 'Plan generated';
 
@@ -575,9 +572,9 @@ jobs:
               body
             });
 
-  # The matrix reports one context per environment, and none when it skips, so
-  # this job is the one a ruleset requires. A skip passes; a failure upstream,
-  # including in change detection, fails it.
+  # The matrix reports one context per environment and none when it skips, so a
+  # ruleset requires this job instead. It needs change detection too, so a
+  # detection failure can't pass as a skipped plan.
   terraform-plan-result:
     name: Plan infrastructure
     needs: [terraform-changes, terraform-plan]
