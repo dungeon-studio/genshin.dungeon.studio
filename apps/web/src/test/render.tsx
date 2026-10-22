@@ -54,7 +54,6 @@ export function createWrapper(
 
 interface SignedInHook<T> extends RenderHookResult<T, unknown> {
   queryClient: QueryClient;
-  /** Ends the session and re-renders, as Firebase reporting sign-out would. */
   signOut: () => void;
 }
 

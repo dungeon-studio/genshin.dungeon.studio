@@ -10,12 +10,9 @@ type Mutate<TData, TError, TVariables> = (
 ) => void;
 
 /**
- * Wraps `mutate` so each call's `onSuccess` and `onError` run only while the
- * user who sent the request is still the one signed in.
- *
- * A response that settles after sign-out, or after another account signs in,
- * would otherwise write the previous user's result or rollback into the next
- * user's store. `onSettled` still runs, for cleanup that isn't per-user.
+ * Runs each call's `onSuccess` and `onError` only while the user who sent the
+ * request is still signed in, so a late response or rollback never reaches the
+ * next user's store. `onSettled` always runs, for cleanup that isn't per-user.
  */
 export function useSenderBoundMutate<TData, TError, TVariables>(
   userId: string | undefined,
