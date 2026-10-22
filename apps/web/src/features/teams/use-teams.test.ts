@@ -50,6 +50,29 @@ describe('useTeams (authenticated)', () => {
     expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
   });
 
+  it('saves a renamed team', async () => {
+    let putBody: unknown;
+    server.use(
+      http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([]))),
+      http.put('http://localhost:8080/teams/1', async ({ request }) => {
+        putBody = await request.json();
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+
+    const { result } = renderHook(() => useTeams(), {
+      wrapper: createWrapper({ user: fakeUser('user-1') }),
+    });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => {
+      result.current.setTeamName(1, 'Abyss');
+    });
+
+    await waitFor(() => expect(putBody).toMatchObject({ name: 'Abyss' }));
+  });
+
   it("keeps a cleared team's name after the refetch", async () => {
     let stored = makeTeam(1, { name: 'Abyss', members: MEMBERS });
     server.use(
