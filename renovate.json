@@ -4,7 +4,8 @@
     "config:best-practices",
     "security:openssf-scorecard",
     "customManagers:githubActionsVersions",
-    "customManagers:dockerfileVersions"
+    "customManagers:dockerfileVersions",
+    ":automergeDigest"
   ],
   "timezone": "Europe/London",
   "labels": ["dependencies"],
@@ -13,12 +14,14 @@
   "minimumReleaseAge": "3 days",
   "osvVulnerabilityAlerts": true,
   "vulnerabilityAlerts": {
-    "description": "Add the security label to vulnerability-driven pull requests",
-    "addLabels": ["security"]
+    "description": "Label vulnerability-driven pull requests security and leave them for a human to merge, since they skip the release-age bake",
+    "addLabels": ["security"],
+    "automerge": false
   },
   "lockFileMaintenance": {
-    "description": "Open the lock file refresh even when other Renovate pull requests fill the concurrent limit, so transitive dependency fixes keep reaching develop",
-    "prConcurrentLimit": 0
+    "description": "Open the lock file refresh past the concurrent limit and merge it on green CI, so transitive dependency fixes keep reaching develop",
+    "prConcurrentLimit": 0,
+    "automerge": true
   },
   "pre-commit": {
     "enabled": true
@@ -53,6 +56,12 @@
       "matchDepNames": ["node", "@types/node"],
       "matchManagers": ["npm"],
       "versioning": "node"
+    },
+    {
+      "description": "Merge development dependency patch and minor updates on green CI; production dependencies and majors wait for a human",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true
     }
   ],
   "customManagers": [
