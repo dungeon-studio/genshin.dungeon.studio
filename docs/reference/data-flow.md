@@ -122,8 +122,7 @@ Two control signals carry no data:
   again. No collection or team mutation writes into the query cache directly.
   Account deletion empties it. A plain sign-out leaves the previous user's
   entries, keyed by user ID, until garbage collection.
-- When a signed-in user signs out, `ClearUserDataOnSignOut` empties the
-  character, weapon, and team stores, and teams reset to empty slots. It
-  renders outside the routes, so it sees a sign-out on any page.
+- When a signed-in user signs out, `ClearUserDataOnSignOut` empties every
+  per-user store, whichever page is open.
 
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133

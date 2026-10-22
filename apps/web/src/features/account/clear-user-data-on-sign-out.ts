@@ -10,9 +10,8 @@ import { useWeaponCollectionStore } from '@/features/collection/weapons/use-weap
 import { useTeamStore } from '@/features/teams/use-team-store';
 
 /**
- * Empties the character and weapon collections and the team planner when a
- * signed-in user leaves, so the next account to sign in merges only its own
- * data.
+ * Empties every per-user store when a signed-in user leaves, so the next
+ * account to sign in merges only its own data.
  *
  * Mount it once, outside the routes: a page's own hooks see only the sign-outs
  * that happen while that page is open. Auth settling on page load isn't a

@@ -17,8 +17,7 @@ interface TestProvidersProps {
 /**
  * The TanStack Query and auth context the collection and team hooks need.
  *
- * Auth arrives as props so a test can move it, through loading and between
- * users, across `rerender()` calls.
+ * Auth arrives as a prop so a test can change it between `rerender()` calls.
  */
 export function TestProviders({ children, queryClient, auth }: TestProvidersProps): JSX.Element {
   return (
