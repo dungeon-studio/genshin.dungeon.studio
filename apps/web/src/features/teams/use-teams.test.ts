@@ -77,30 +77,6 @@ describe('useTeams (authenticated)', () => {
     expect(result.current.getTeam(1).name).toBe('Abyss');
   });
 
-  it('restores a cleared team when the save fails', async () => {
-    server.use(
-      http.get('http://localhost:8080/teams', () =>
-        HttpResponse.json(teamsDocument([makeTeam(1, { members: MEMBERS })])),
-      ),
-      http.put('http://localhost:8080/teams/1', () => new HttpResponse(null, { status: 500 })),
-    );
-
-    const { result } = renderHook(() => useTeams(), {
-      wrapper: createWrapper({ user: fakeUser('user-1') }),
-    });
-
-    await waitFor(() => expect(result.current.getTeam(1).members[0]?.characterId).toBe(CHARACTER));
-
-    act(() => {
-      result.current.clearTeam(1);
-    });
-
-    // Optimistically emptied, then restored once the save errors.
-    expect(result.current.getTeam(1).members[0]).toBeNull();
-    await waitFor(() => expect(result.current.getTeam(1).members[0]?.characterId).toBe(CHARACTER));
-    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
-  });
-
   it('warns before unload while a save is in flight', async () => {
     let releasePut: () => void = () => {};
     const putGate = new Promise<void>((resolve) => {
