@@ -90,24 +90,95 @@ Jobs done in more than one layer are under [Overlaps](#overlaps).
 
 ## Jobs by layer
 
-| Layer         | Validation                                                                                                                                                                                                                                                                                                     | Invariants                                                                               | Timestamps                                                    | Identity                                                                     | Defaults                                                                                         | Schema versioning                                                             | Merging                                                                                                                                                                                                     |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| View          | Offers only owned characters, locks a weapon another team holds, and caps artifact plan sets and minor affixes. Overlaps [team composition rules]                                                                                                                                                              | —                                                                                        | —                                                             | —                                                                            | —                                                                                                | —                                                                             | —                                                                                                                                                                                                           |
-| Feature hook  | Skips a no-op: an owned add, a removal or level change of something not held, an unchanged level or refinement, and an `ensureWeapon` for a weapon owned or in flight. Overlaps [owned-character guard]                                                                                                        | —                                                                                        | Character merge and unsaved team slots. Overlaps [timestamps] | —                                                                            | Fills unsaved team slots with empty teams. Overlaps [empty team]                                 | —                                                                             | Guarded rollback. Applies a response: characters' level, weapons' whole instance. Reconciles characters additively, keeping the higher constellation, and replaces weapons and teams. Overlaps [merge rule] |
-| Store         | Skips an owned add. Ignores a bad member index, an empty position, and a duplicate character. Trims a team name. Overlaps [owned-character guard], [team composition rules], [team name rules]                                                                                                                 | —                                                                                        | Characters and teams on every edit. Overlaps [timestamps]     | —                                                                            | Minimum constellation, empty teams, and the default name. Overlaps [initial level], [empty team] | —                                                                             | —                                                                                                                                                                                                           |
-| Persist       | On a version change, drops a stored collection that doesn't parse                                                                                                                                                                                                                                              | On a version change, `assertCollectionCharacter` per entry. Overlaps [domain invariants] | —                                                             | —                                                                            | —                                                                                                | zustand `persist` version. Overlaps [schema versions]                         | —                                                                                                                                                                                                           |
-| Query layer   | Asserts every response is Collection+JSON, with one item for a character or weapon mutation. Team mutations discard theirs                                                                                                                                                                                     | `deserialise*` on every item. Overlaps [domain invariants]                               | —                                                             | Puts the character ID, instance ID, or slot in the path                      | Minimum constellation and refinement in add bodies. Overlaps [initial level]                     | —                                                                             | —                                                                                                                                                                                                           |
-| Fetch wrapper | None: trusts a problem document on its content type                                                                                                                                                                                                                                                            | —                                                                                        | —                                                             | Attaches the signed-in user's ID token                                       | —                                                                                                | —                                                                             | —                                                                                                                                                                                                           |
-| Middleware    | Rejects a missing or malformed `Authorization` header, a malformed `Content-Type`, an unknown `profile`, and a body that isn't JSON. Rejects a body that breaks the schema: types, ranges, lengths, member count, artifact plan fields, extra properties. Overlaps [team name rules], [team composition rules] | —                                                                                        | —                                                             | Verifies the ID token. Its user ID keys all storage                          | —                                                                                                | Picks the request schema from the `profile`. Overlaps [schema versions]       | —                                                                                                                                                                                                           |
-| Route         | Catalogue check on IDs and the `weaponId` filter, slot range, team composition and ownership. Overlaps [team composition rules]                                                                                                                                                                                | `deserialiseCollectionTeamMembers`. Overlaps [domain invariants]                         | —                                                             | Takes the character ID or slot from the path. Casts an instance ID unchecked | —                                                                                                | —                                                                             | —                                                                                                                                                                                                           |
-| Repository    | Reports a missing weapon instance on update. Skips a team document whose ID isn't a slot                                                                                                                                                                                                                       | —                                                                                        | Mints both, keeps a stored `createdAt`. Overlaps [timestamps] | Mints the weapon instance ID                                                 | `nextTeam`'s name and empty members. Overlaps [empty team]                                       | —                                                                             | `nextCharacter`, the weapon update, `nextTeam`. Overlaps [merge rule]                                                                                                                                       |
-| Document      | Rejects a document no version accepts                                                                                                                                                                                                                                                                          | `assertCollection*` after migrating. Overlaps [domain invariants]                        | —                                                             | Takes the ID from the document key                                           | Pads a short `members` array to four. Overlaps [empty team]                                      | Migrates on read. `toDocument` stamps the version. Overlaps [schema versions] | —                                                                                                                                                                                                           |
+Each job lists the layers that do it, in stack order. A layer not listed doesn't
+do that job.
+
+### Validation
+
+- **View:** offers only owned characters, locks a weapon another team holds,
+  and caps artifact plan sets and minor affixes. Overlaps
+  [team composition rules].
+- **Feature hook:** skips a no-op: an owned add, a removal or level change of
+  something not held, an unchanged level or refinement, and an `ensureWeapon`
+  for a weapon owned or in flight. Overlaps [owned-character guard].
+- **Store:** skips an owned add. Ignores a bad member index, an empty position,
+  and a duplicate character. Trims a team name. Overlaps
+  [owned-character guard], [team composition rules], [team name rules].
+- **Persist:** on a version change, drops a stored collection that doesn't
+  parse.
+- **Query layer:** asserts every response is Collection+JSON, with one item for
+  a character or weapon mutation. Team mutations discard theirs.
+- **Fetch wrapper:** none. Trusts a problem document on its content type.
+- **Middleware:** rejects a missing or malformed `Authorization` header, a
+  malformed `Content-Type`, an unknown `profile`, and a body that isn't JSON.
+  Rejects a body that breaks the schema: types, ranges, lengths, member count,
+  artifact plan fields, extra properties. Overlaps [team name rules],
+  [team composition rules].
+- **Route:** catalogue check on IDs and the `weaponId` filter, slot range, team
+  composition and ownership. Overlaps [team composition rules].
+- **Repository:** reports a missing weapon instance on update. Skips a team
+  document whose ID isn't a slot.
+- **Document:** rejects a document no version accepts.
+
+### Invariants
+
+- **Persist:** on a version change, `assertCollectionCharacter` per entry.
+  Overlaps [domain invariants].
+- **Query layer:** `deserialise*` on every item. Overlaps [domain invariants].
+- **Route:** `deserialiseCollectionTeamMembers`. Overlaps [domain invariants].
+- **Document:** `assertCollection*` after migrating. Overlaps
+  [domain invariants].
+
+### Timestamps
+
+- **Feature hook:** character merge and unsaved team slots. Overlaps
+  [timestamp minting].
+- **Store:** characters and teams on every edit. Overlaps [timestamp minting].
+- **Repository:** mints both, keeps a stored `createdAt`. Overlaps
+  [timestamp minting].
+
+### Identity
+
+- **Query layer:** puts the character ID, instance ID, or slot in the path.
+- **Fetch wrapper:** attaches the signed-in user's ID token.
+- **Middleware:** verifies the ID token. Its user ID keys all storage.
+- **Route:** takes the character ID or slot from the path. Casts an instance ID
+  unchecked.
+- **Repository:** mints the weapon instance ID.
+- **Document:** takes the ID from the document key.
+
+### Defaults
+
+- **Feature hook:** fills unsaved team slots with empty teams. Overlaps
+  [empty team].
+- **Store:** minimum constellation, empty teams, and the default name. Overlaps
+  [initial level], [empty team].
+- **Query layer:** minimum constellation and refinement in add bodies. Overlaps
+  [initial level].
+- **Repository:** `nextTeam`'s name and empty members. Overlaps [empty team].
+- **Document:** pads a short `members` array to four. Overlaps [empty team].
+
+### Schema versioning
+
+- **Persist:** zustand `persist` version. Overlaps [schema versions].
+- **Middleware:** picks the request schema from the `profile`. Overlaps
+  [schema versions].
+- **Document:** migrates on read. `toDocument` stamps the version. Overlaps
+  [schema versions].
+
+### Merging
+
+- **Feature hook:** guarded rollback. Applies a response: characters' level,
+  weapons' whole instance. Reconciles characters additively, keeping the higher
+  constellation, and replaces weapons and teams. Overlaps [merge rule].
+- **Repository:** `nextCharacter`, the weapon update, `nextTeam`. Overlaps
+  [merge rule].
 
 ## Overlaps
 
 Each overlap is a job more than one layer does.
 
-### Timestamps
+### Timestamp minting
 
 The server mints `createdAt` and `updatedAt` on every save and keeps the stored
 `createdAt`. The client mints both on a character add and for every unsaved
@@ -257,4 +328,4 @@ A team save also reads the user's characters, weapons, and other teams through
 [schema versions]: #schema-versions
 [team composition rules]: #team-composition-rules
 [team name rules]: #team-name-rules
-[timestamps]: #timestamps
+[timestamp minting]: #timestamp-minting
