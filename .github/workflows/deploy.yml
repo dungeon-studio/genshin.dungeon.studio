@@ -14,7 +14,20 @@ on:
       # The apps bundle the workspace packages and resolve their transitive
       # dependencies through the root lockfile.
       - 'packages/**'
+      # Lint and test configuration, which no build reads.
+      - '!packages/eslint-config/**'
+      - '!packages/vitest-config/**'
       - 'pnpm-lock.yaml'
+      # The pnpm and Node versions, install settings, and the task graph and
+      # environment passthrough the builds run under.
+      - 'package.json'
+      - 'pnpm-workspace.yaml'
+      - '.nvmrc'
+      - 'turbo.json'
+      # The API image's build context.
+      - '.dockerignore'
+      # The specs the verify job runs against the deployment.
+      - 'tools/e2e/**'
       - '.github/workflows/deploy.yml'
       - '.github/actions/setup-node-pnpm/**'
       - '.github/actions/setup-playwright/**'
