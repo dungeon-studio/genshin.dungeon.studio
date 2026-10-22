@@ -13,7 +13,7 @@
  */
 
 import { assertCollectionDocument } from '@genshin/collection-json';
-import type { CollectionTeam, CollectionTeamMembers, TeamSlot } from '@genshin/domain';
+import type { CollectionTeam } from '@genshin/domain';
 import { deserialiseTeam } from '@genshin/domain';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -21,13 +21,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiGet, apiPut } from '@/lib/api';
 import { invalidateUserQuery } from '@/lib/invalidate-user-query';
 import { userScopedKey } from '@/lib/user-scoped-key';
-
-export interface SaveTeamPayload {
-  slot: TeamSlot;
-  name: string;
-  members: CollectionTeamMembers;
-  description?: string;
-}
 
 const teamsKey = userScopedKey('teams');
 
@@ -49,11 +42,11 @@ export function useTeamsQuery(userId: string | undefined): UseQueryResult<Collec
 
 export function useSaveTeamMutation(
   userId: string | undefined,
-): UseMutationResult<void, Error, SaveTeamPayload> {
+): UseMutationResult<void, Error, CollectionTeam> {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ slot, name, members, description }: SaveTeamPayload) => {
+    mutationFn: async ({ slot, name, members, description }: CollectionTeam) => {
       await apiPut(`/teams/${encodeURIComponent(slot)}`, { name, members, description });
     },
     onSuccess: invalidateUserQuery(queryClient, userId, teamsKey),

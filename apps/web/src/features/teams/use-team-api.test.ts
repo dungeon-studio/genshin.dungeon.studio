@@ -50,12 +50,7 @@ describe('useSaveTeamMutation', () => {
     const { result } = renderHook(() => useSaveTeamMutation(USER_ID), { wrapper: createWrapper() });
 
     act(() => {
-      result.current.mutate({
-        slot: 2,
-        name: 'Bravo',
-        members: EMPTY_MEMBERS,
-        description: 'notes',
-      });
+      result.current.mutate(makeTeam(2, { name: 'Bravo', description: 'notes' }));
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -81,7 +76,7 @@ describe('useSaveTeamMutation', () => {
     expect(getCount).toBe(1);
 
     act(() => {
-      result.current.save.mutate({ slot: 1, name: 'Alpha', members: EMPTY_MEMBERS });
+      result.current.save.mutate(makeTeam(1));
     });
 
     await waitFor(() => expect(getCount).toBe(2));

@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 
-import type { SaveTeamPayload } from './use-team-api';
 import { useSaveTeamMutation, useTeamsQuery } from './use-team-api';
 import { useTeamStore } from './use-team-store';
 
@@ -46,15 +45,6 @@ function collectionTeamsToStore(apiTeams: CollectionTeam[]): Record<TeamSlot, Co
   }
 
   return teams;
-}
-
-function teamToSavePayload(team: CollectionTeam): SaveTeamPayload {
-  return {
-    slot: team.slot,
-    name: team.name,
-    members: team.members,
-    description: team.description,
-  };
 }
 
 function useWarnOnUnloadWhileSaving(isSaving: boolean): void {
@@ -99,7 +89,7 @@ function useTeamActions(
       edit();
       if (!isAuthenticated) return;
       const optimisticTeam = store().teams[slot];
-      saveTeamApi(teamToSavePayload(optimisticTeam), {
+      saveTeamApi(optimisticTeam, {
         onError: () => {
           if (store().teams[slot] !== optimisticTeam) {
             toast.error('Failed to save team.');
