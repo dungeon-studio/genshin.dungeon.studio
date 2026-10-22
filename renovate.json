@@ -4,7 +4,8 @@
     "config:best-practices",
     "security:openssf-scorecard",
     "customManagers:githubActionsVersions",
-    "customManagers:dockerfileVersions"
+    "customManagers:dockerfileVersions",
+    ":automergeDigest"
   ],
   "timezone": "Europe/London",
   "labels": ["dependencies"],
@@ -60,11 +61,6 @@
       "description": "Merge baked development dependency patch and minor updates once CI passes",
       "matchDepTypes": ["devDependencies"],
       "matchUpdateTypes": ["patch", "minor"],
-      "automerge": true
-    },
-    {
-      "description": "Merge digest updates once CI passes",
-      "matchUpdateTypes": ["digest"],
       "automerge": true
     }
   ],
