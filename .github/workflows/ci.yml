@@ -429,6 +429,20 @@ jobs:
           sarif_file: terraform-results.sarif
           category: trivy-terraform-${{ matrix.root }}
 
+  # The matrix reports one context per root, so a ruleset requires this job
+  # instead and a new root never touches the ruleset.
+  trivy-terraform-result:
+    name: Scan Terraform
+    needs: trivy-terraform
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Fail unless every scan succeeded
+        if: needs.trivy-terraform.result != 'success'
+        run: exit 1
+
   # A job decides whether to plan, rather than a `paths:` gate, so
   # `Plan infrastructure` reports on every pull request and a ruleset can
   # require it.
