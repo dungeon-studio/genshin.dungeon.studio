@@ -6,6 +6,7 @@ import type { Element, ElementalResonance } from '@genshin/game-data';
 import { getActiveResonances, getCharacterById, RESONANCE_TRIGGERS } from '@genshin/game-data';
 import type { JSX } from 'react';
 
+import { GlyphIcon } from '@/components/ui/glyph-icon';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ThemedIcon } from '@/components/ui/themed-icon';
 import { ELEMENT_BG_COLORS } from '@/lib/element-styles';
@@ -43,16 +44,9 @@ function badgeAppearance(resonance: ElementalResonance, party: Element[]): Badge
 function ResonanceIcon({ element, tinted }: { element: Element; tinted: boolean }): JSX.Element {
   const className = 'h-3.5 w-3.5';
 
-  // A tinted badge is dark in either theme, so it takes the dark-theme icon.
+  // A tinted badge is the icon's own color, so the icon takes the label's.
   if (tinted) {
-    return (
-      <img
-        src={getElementIconPath(element, 'dark')}
-        alt=""
-        aria-hidden="true"
-        className={className}
-      />
-    );
+    return <GlyphIcon src={getElementIconPath(element)} className={className} />;
   }
 
   return (

@@ -34,11 +34,14 @@ const soothing = ELEMENTAL_RESONANCES['soothing-water'];
 const canopy = ELEMENTAL_RESONANCES['protective-canopy'];
 const pyroHydroPairs = partyOf('Pyro', 'Pyro', 'Hydro', 'Hydro');
 
-// Decorative icons have no accessible role to query by.
-function iconSources(badgeName: string): (string | null)[] {
-  return [...screen.getByRole('button', { name: badgeName }).querySelectorAll('img')].map((icon) =>
-    icon.getAttribute('src'),
-  );
+// Decorative icons have no accessible role to query by. An image reports its
+// source; a glyph reports its mask.
+function iconSources(badgeName: string): string[] {
+  return [
+    ...screen
+      .getByRole('button', { name: badgeName })
+      .querySelectorAll<HTMLElement>('[aria-hidden="true"]'),
+  ].map((icon) => icon.getAttribute('src') ?? icon.style.maskImage);
 }
 
 describe('TeamResonance', () => {
@@ -57,10 +60,10 @@ describe('TeamResonance', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('shows a pair badge its dark-theme icon in either theme', () => {
+  it('draws a pair badge icon in the label color, not a theme variant', () => {
     render(<TeamResonance members={pyroHydroPairs} />);
 
-    expect(iconSources(fervent.name)).toStrictEqual([getElementIconPath('Pyro', 'dark')]);
+    expect(iconSources(fervent.name)).toStrictEqual([`url("${getElementIconPath('Pyro')}")`]);
   });
 
   it('shows Protective Canopy every party element', () => {

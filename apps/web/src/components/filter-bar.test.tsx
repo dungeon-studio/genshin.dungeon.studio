@@ -64,6 +64,16 @@ function renderBar(
   return { onChange, onToggle };
 }
 
+// Decorative icons have no accessible role to query by. An image reports its
+// source; a glyph reports its mask.
+function iconSources(chipName: string): string[] {
+  return [
+    ...screen
+      .getByRole('button', { name: chipName })
+      .querySelectorAll<HTMLElement>('[aria-hidden="true"]'),
+  ].map((icon) => icon.getAttribute('src') ?? icon.style.maskImage);
+}
+
 describe('FilterBar', () => {
   it('toggles ownership to the picked value', async () => {
     const user = userEvent.setup({ delay: null });
@@ -99,6 +109,18 @@ describe('FilterBar', () => {
     await user.click(screen.getByRole('button', { name: 'Filter by A' }));
 
     expect(onToggle).toHaveBeenCalledWith('A');
+  });
+
+  it('draws an active chip icon in the label color, not a theme variant', () => {
+    renderBar({ category: { selected: new Set(['A']) } });
+
+    expect(iconSources('Filter by A')).toStrictEqual(['url("/icons/A-light.png")']);
+  });
+
+  it('draws an idle chip icon in the page theme variant', () => {
+    renderBar();
+
+    expect(iconSources('Filter by A')).toStrictEqual(['/icons/A-light.png', '/icons/A-dark.png']);
   });
 
   it('cycles the sort field and wraps back to the first', async () => {

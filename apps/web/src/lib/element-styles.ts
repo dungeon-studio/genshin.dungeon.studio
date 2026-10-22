@@ -51,14 +51,15 @@ export const ELEMENT_FOCUS_RINGS: Record<Element, string> = {
   Dendro: 'focus-visible:ring-dendro',
 };
 
+/** Each text color reaches 4.5:1 on its fill, the same in either theme. */
 export const ELEMENT_BG_COLORS: Record<Element, string> = {
   Pyro: 'bg-pyro-dark text-white',
   Hydro: 'bg-hydro-dark text-white',
   Electro: 'bg-electro-dark text-white',
-  Cryo: 'bg-cryo-dark text-white',
-  Anemo: 'bg-anemo-dark text-white',
-  Geo: 'bg-geo-dark text-white',
-  Dendro: 'bg-dendro-dark text-white',
+  Cryo: 'bg-cryo-dark text-black',
+  Anemo: 'bg-anemo-dark text-black',
+  Geo: 'bg-geo-dark text-black',
+  Dendro: 'bg-dendro-dark text-black',
 };
 
 /** The dashed neutral border, rather than no border, when there's no element. */
