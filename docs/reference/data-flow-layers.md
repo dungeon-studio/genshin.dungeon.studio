@@ -86,12 +86,11 @@ representations every layer uses.
 6. **Feature hook to fetch wrapper.** `useDeleteAccount` defines its own
    mutation and calls `apiDelete`, see [#1849].
 
-Jobs done in more than one layer are under [Overlaps](#overlaps).
-
 ## Jobs by layer
 
 Each job lists the layers that do it, in stack order. A layer not listed doesn't
-do that job.
+do that job. An overlap is a rule more than one layer implements, named under
+its job.
 
 ### Validation
 
@@ -120,22 +119,44 @@ do that job.
   document whose ID isn't a slot.
 - **Document:** rejects a document no version accepts.
 
+#### Team name rules
+
+The client trims a name and falls back to the default when it's blank. The
+server doesn't trim and accepts 1 to 50 characters, a limit the client doesn't
+enforce.
+
+#### Team composition rules
+
+The client ignores a duplicate character in a team, and the server rejects one.
+The planner UI, the request schema, and the route's `validateArtifactPlan` each
+enforce part of the artifact plan limits. The planner UI offers only owned
+characters and locks a weapon another team holds. The server rejects both.
+
+#### Owned-character guard
+
+`useOptimisticActions` and the store's `addCharacter` each skip adding a
+character the store already holds.
+
 ### Invariants
 
-- **Persist:** on a version change, `assertCollectionCharacter` per entry.
-  Overlaps [domain invariants].
-- **Query layer:** `deserialise*` on every item. Overlaps [domain invariants].
-- **Route:** `deserialiseCollectionTeamMembers`. Overlaps [domain invariants].
-- **Document:** `assertCollection*` after migrating. Overlaps
-  [domain invariants].
+Every layer listed asserts the same domain invariants, so all of them overlap.
+
+- **Persist:** `assertCollectionCharacter` per entry, only on a version change.
+- **Query layer:** `deserialise*` on every item.
+- **Route:** `deserialiseCollectionTeamMembers`.
+- **Document:** `fromDocument` runs `assertCollection*` after migrating.
 
 ### Timestamps
 
-- **Feature hook:** character merge and unsaved team slots. Overlaps
-  [timestamp minting].
-- **Store:** characters and teams on every edit. Overlaps [timestamp minting].
-- **Repository:** mints both, keeps a stored `createdAt`. Overlaps
-  [timestamp minting].
+Every layer listed mints `createdAt` and `updatedAt`, so all of them overlap.
+When the server's values reach each store is in
+[Lifecycles](data-flow-lifecycles.md).
+
+- **Feature hook:** both for every unsaved team slot. `updatedAt` on a
+  character merge that keeps the local level.
+- **Store:** both on a character add. `updatedAt` on every other character and
+  team edit. The weapon store never mints them.
+- **Repository:** both on every save, keeping a stored `createdAt`.
 
 ### Identity
 
@@ -158,83 +179,37 @@ do that job.
 - **Repository:** `nextTeam`'s name and empty members. Overlaps [empty team].
 - **Document:** pads a short `members` array to four. Overlaps [empty team].
 
-### Schema versioning
-
-- **Persist:** zustand `persist` version. Overlaps [schema versions].
-- **Middleware:** picks the request schema from the `profile`. Overlaps
-  [schema versions].
-- **Document:** migrates on read. `toDocument` stamps the version. Overlaps
-  [schema versions].
-
-### Merging
-
-- **Feature hook:** guarded rollback. Applies a response: characters' level,
-  weapons' whole instance. Reconciles characters additively, keeping the higher
-  constellation, and replaces weapons and teams. Overlaps [merge rule].
-- **Repository:** `nextCharacter`, the weapon update, `nextTeam`. Overlaps
-  [merge rule].
-
-## Overlaps
-
-Each overlap is a job more than one layer does.
-
-### Timestamp minting
-
-The server mints `createdAt` and `updatedAt` on every save and keeps the stored
-`createdAt`. The client mints both on a character add and for every unsaved
-team slot. It mints `updatedAt` on every other character and team store edit,
-and on a character merge that keeps the local level. The weapon store never
-mints them. When the server's values reach each store is in
-[Lifecycles](data-flow-lifecycles.md).
-
-### Initial level
+#### Initial level
 
 The character store and the add mutation each pick `MIN_CONSTELLATION_LEVEL`.
 The server requires the field and has no default.
 
-### Empty team
+#### Empty team
 
 `createEmptyTeam` on the client and `nextTeam` on the server each define the
 default name and the four empty member slots. `fromDocument` pads a stored
 `members` array shorter than four.
 
-### Team name rules
+### Schema versioning
 
-The client trims a name and falls back to the default when it's blank. The
-server doesn't trim and accepts 1 to 50 characters, a limit the client doesn't
-enforce.
+Every layer listed versions its own format, so all of them overlap.
 
-### Team composition rules
+- **Persist:** zustand `persist` version on the `localStorage` collection.
+- **Middleware:** picks the request schema from the `profile`. The client sends
+  no `profile`, so the server validates against its latest request schema.
+- **Document:** migrates on read. `toDocument` stamps the version.
 
-The client ignores a duplicate character in a team, and the server rejects one.
-The planner UI, the request schema, and the route's `validateArtifactPlan` each
-enforce part of the artifact plan limits. The planner UI offers only owned
-characters and locks a weapon another team holds. The server rejects both.
+### Merging
 
-### Owned-character guard
+Both layers listed merge, by different rules, so the same two character values
+resolve differently depending on which side merges.
 
-`useOptimisticActions` and the store's `addCharacter` each skip adding a
-character the store already holds.
-
-### Domain invariants
-
-Asserted by the client's `deserialise*` functions, by the route's
-`deserialiseCollectionTeamMembers`, by the repository's `fromDocument`, and by
-the persisted character store's migration, which runs only on a version change.
-
-### Schema versions
-
-Request schemas, Firestore documents, and the `localStorage` collection each
-carry their own version. The client sends no `profile` parameter, so the server
-validates against its latest request schema.
-
-### Merge rule
-
-The server keeps the latest write for characters and weapons. For teams it
-keeps any stored field the body omits. The client's `mergeCollections` keeps the
-higher constellation, so the same two character values resolve differently
-depending on which side merges. The hook's guarded rollback keeps a newer local
-edit over the rollback.
+- **Feature hook:** guarded rollback, which keeps a newer local edit over the
+  rollback. Applies a response: characters' level, weapons' whole instance.
+  Reconciles characters additively with `mergeCollections`, keeping the higher
+  constellation, and replaces weapons and teams.
+- **Repository:** `nextCharacter` and the weapon update keep the latest write.
+  `nextTeam` keeps any stored field the body omits.
 
 ## Level 1 data flow
 
@@ -320,12 +295,8 @@ A team save also reads the user's characters, weapons, and other teams through
 [#1847]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1847
 [#1848]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1848
 [#1849]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1849
-[domain invariants]: #domain-invariants
 [empty team]: #empty-team
 [initial level]: #initial-level
-[merge rule]: #merge-rule
 [owned-character guard]: #owned-character-guard
-[schema versions]: #schema-versions
 [team composition rules]: #team-composition-rules
 [team name rules]: #team-name-rules
-[timestamp minting]: #timestamp-minting
