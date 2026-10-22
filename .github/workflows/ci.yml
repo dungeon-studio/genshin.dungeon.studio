@@ -526,10 +526,9 @@ jobs:
           script: |
             const fs = require('fs');
             const workspaceRoot = process.env.GITHUB_WORKSPACE;
-            const envPath = '${{ matrix.environment }}';
-            const planPath = `${workspaceRoot}/infrastructure/terraform/environments/${envPath}/plan.txt`;
-            const plan = fs.readFileSync(planPath, 'utf8');
             const environment = '${{ matrix.environment }}';
+            const planPath = `${workspaceRoot}/infrastructure/terraform/environments/${environment}/plan.txt`;
+            const plan = fs.readFileSync(planPath, 'utf8');
 
             // Extract summary line from plan output
             const summaryMatch = plan.match(/^(No changes\..+|Plan: .+)$/m);
