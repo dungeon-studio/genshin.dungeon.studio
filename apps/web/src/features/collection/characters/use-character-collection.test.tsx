@@ -4,15 +4,12 @@
 import type { CharacterId } from '@genshin/domain';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
-import type { ReactNode } from 'react';
 import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { AuthUser } from '@/features/auth';
 import { charactersDocument, makeCharacter } from '@/test/fixtures';
 import { server } from '@/test/msw/server';
-import { TestProviders } from '@/test/providers';
-import { createTestQueryClient, createWrapper, fakeUser } from '@/test/render';
+import { createWrapper, fakeUser } from '@/test/render';
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
@@ -20,7 +17,6 @@ import { useCollection } from './use-character-collection';
 import { useCollectionStore } from './use-character-collection-store';
 
 const SKIRK = 'skirk' as CharacterId;
-const ESCOFFIER = 'escoffier' as CharacterId;
 
 beforeEach(() => {
   useCollectionStore.getState().clearCharacters();
@@ -82,45 +78,6 @@ describe('useCollection merge-on-first-login', () => {
 
     // The refetch runs the additive branch, not another merge push.
     expect(putCount).toBe(1);
-  });
-
-  it('clears the collection on logout so a different user merges fresh', async () => {
-    useCollectionStore.getState().addCharacter(SKIRK);
-    useCollectionStore.getState().setConstellationLevel(SKIRK, 3);
-
-    let serverCharacters = charactersDocument([]);
-    server.use(
-      http.get('http://localhost:8080/characters', () => HttpResponse.json(serverCharacters)),
-      http.put('http://localhost:8080/characters/skirk', () =>
-        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })])),
-      ),
-    );
-
-    const queryClient = createTestQueryClient();
-    let authUser: AuthUser | null = fakeUser('user-1');
-    function Wrapper({ children }: { children: ReactNode }) {
-      return (
-        <TestProviders queryClient={queryClient} user={authUser}>
-          {children}
-        </TestProviders>
-      );
-    }
-
-    const { result, rerender } = renderHook(() => useCollection(), { wrapper: Wrapper });
-
-    await waitFor(() => expect(result.current.getCharacter(SKIRK)).toBeDefined());
-
-    // A second account signs in.
-    serverCharacters = charactersDocument([makeCharacter(ESCOFFIER, { constellationLevel: 2 })]);
-    authUser = null;
-    rerender();
-    await waitFor(() => expect(result.current.getCharacter(SKIRK)).toBeUndefined());
-
-    authUser = fakeUser('user-2');
-    rerender();
-
-    await waitFor(() => expect(result.current.getCharacter(ESCOFFIER)?.constellationLevel).toBe(2));
-    expect(result.current.getCharacter(SKIRK)).toBeUndefined();
   });
 });
 

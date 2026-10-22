@@ -192,7 +192,6 @@ export function useTeams(): UseTeamsResult {
 
   const teams = useTeamStore((s) => s.teams);
   const storeSetTeams = useTeamStore((s) => s.setTeams);
-  const storeResetTeams = useTeamStore((s) => s.resetTeams);
 
   const { data: apiTeams, error: queryError, isLoading: queryLoading } = useTeamsQuery(uid);
 
@@ -202,13 +201,6 @@ export function useTeams(): UseTeamsResult {
   const isSaving = isSavePending || isDeletePending;
 
   useWarnOnUnloadWhileSaving(isSaving);
-
-  // Reset store on logout
-  useEffect(() => {
-    if (!isAuthenticated) {
-      storeResetTeams();
-    }
-  }, [isAuthenticated, storeResetTeams]);
 
   // Populate store from API data
   useEffect(() => {
