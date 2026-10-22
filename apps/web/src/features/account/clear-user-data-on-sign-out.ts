@@ -24,7 +24,8 @@ export function ClearUserDataOnSignOut(): null {
   const previousUid = useRef<string | undefined>(undefined);
 
   useEffect(() => {
-    if (previousUid.current !== undefined && previousUid.current !== uid) {
+    const signedInUserLeft = previousUid.current !== undefined && previousUid.current !== uid;
+    if (signedInUserLeft) {
       useCollectionStore.getState().clearCharacters();
       useWeaponCollectionStore.getState().clearWeapons();
       useTeamStore.getState().resetTeams();
