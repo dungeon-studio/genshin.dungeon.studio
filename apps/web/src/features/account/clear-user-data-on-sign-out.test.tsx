@@ -2,14 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 import type { CharacterId } from '@genshin/domain';
-import { QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { AuthState } from '@/features/auth';
-import { AuthContext } from '@/features/auth/auth-context';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
 import { useCollectionStore } from '@/features/collection/characters/use-character-collection-store';
 import { useWeaponCollectionStore } from '@/features/collection/weapons/use-weapon-collection-store';
@@ -18,6 +16,7 @@ import { useTeams } from '@/features/teams/use-teams';
 import { settledAuth } from '@/test/auth';
 import { charactersDocument, makeCharacter, makeWeapon } from '@/test/fixtures';
 import { server } from '@/test/msw/server';
+import { TestProviders } from '@/test/providers';
 import { createTestQueryClient, fakeUser } from '@/test/render';
 
 import { ClearUserDataOnSignOut } from './clear-user-data-on-sign-out';
@@ -38,12 +37,10 @@ function appWrapper(auth: { current: AuthState }) {
   const queryClient = createTestQueryClient();
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
-      <QueryClientProvider client={queryClient}>
-        <AuthContext value={auth.current}>
-          <ClearUserDataOnSignOut />
-          {children}
-        </AuthContext>
-      </QueryClientProvider>
+      <TestProviders queryClient={queryClient} auth={auth.current}>
+        <ClearUserDataOnSignOut />
+        {children}
+      </TestProviders>
     );
   };
 }
