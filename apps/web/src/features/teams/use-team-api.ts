@@ -18,7 +18,7 @@ import { deserialiseTeam } from '@genshin/domain';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { apiDelete, apiGet, apiPut } from '@/lib/api';
+import { apiGet, apiPut } from '@/lib/api';
 import { invalidateUserQuery } from '@/lib/invalidate-user-query';
 import { userScopedKey } from '@/lib/user-scoped-key';
 
@@ -55,19 +55,6 @@ export function useSaveTeamMutation(
   return useMutation({
     mutationFn: async ({ slot, name, members, description }: SaveTeamPayload) => {
       await apiPut(`/teams/${encodeURIComponent(slot)}`, { name, members, description });
-    },
-    onSuccess: invalidateUserQuery(queryClient, userId, teamsKey),
-  });
-}
-
-export function useDeleteTeamMutation(
-  userId: string | undefined,
-): UseMutationResult<void, Error, TeamSlot> {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (slot: TeamSlot) => {
-      await apiDelete(`/teams/${encodeURIComponent(slot)}`);
     },
     onSuccess: invalidateUserQuery(queryClient, userId, teamsKey),
   });

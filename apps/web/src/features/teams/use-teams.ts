@@ -10,7 +10,7 @@ import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 
 import type { SaveTeamPayload } from './use-team-api';
-import { useDeleteTeamMutation, useSaveTeamMutation, useTeamsQuery } from './use-team-api';
+import { useSaveTeamMutation, useTeamsQuery } from './use-team-api';
 import { useTeamStore } from './use-team-store';
 
 export interface UseTeamsResult {
@@ -90,40 +90,25 @@ type TeamActions = Pick<
 function useTeamActions(
   isAuthenticated: boolean,
   saveTeamApi: ReturnType<typeof useSaveTeamMutation>['mutate'],
-  deleteTeamApi: ReturnType<typeof useDeleteTeamMutation>['mutate'],
 ): TeamActions {
   return useMemo(() => {
     const store = () => useTeamStore.getState();
 
-    const editThenPersist = (
-      slot: TeamSlot,
-      edit: () => void,
-      request: (onError: () => void) => void,
-      failure: string,
-    ) => {
+    const editThenSave = (slot: TeamSlot, edit: () => void) => {
       const previousTeam = { ...store().teams[slot] };
       edit();
       if (!isAuthenticated) return;
       const optimisticTeam = store().teams[slot];
-      request(() => {
-        if (store().teams[slot] !== optimisticTeam) {
-          toast.error(`${failure}.`);
-          return;
-        }
-        store().setTeam(slot, previousTeam);
-        toast.error(`${failure}. Change has been reverted.`);
-      });
-    };
-
-    const editThenSave = (slot: TeamSlot, edit: () => void) => {
-      editThenPersist(
-        slot,
-        edit,
-        (onError) => {
-          saveTeamApi(teamToSavePayload(store().teams[slot]), { onError });
+      saveTeamApi(teamToSavePayload(optimisticTeam), {
+        onError: () => {
+          if (store().teams[slot] !== optimisticTeam) {
+            toast.error('Failed to save team.');
+            return;
+          }
+          store().setTeam(slot, previousTeam);
+          toast.error('Failed to save team. Change has been reverted.');
         },
-        'Failed to save team',
-      );
+      });
     };
 
     return {
@@ -158,19 +143,12 @@ function useTeamActions(
         });
       },
       clearTeam: (slot) => {
-        editThenPersist(
-          slot,
-          () => {
-            store().clearTeam(slot);
-          },
-          (onError) => {
-            deleteTeamApi(slot, { onError });
-          },
-          'Failed to clear team',
-        );
+        editThenSave(slot, () => {
+          store().clearTeam(slot);
+        });
       },
     };
-  }, [isAuthenticated, saveTeamApi, deleteTeamApi]);
+  }, [isAuthenticated, saveTeamApi]);
 }
 
 /**
@@ -196,10 +174,7 @@ export function useTeams(): UseTeamsResult {
 
   const { data: apiTeams, error: queryError, isLoading: queryLoading } = useTeamsQuery(uid);
 
-  const { mutate: saveTeamApi, isPending: isSavePending } = useSaveTeamMutation(uid);
-  const { mutate: deleteTeamApi, isPending: isDeletePending } = useDeleteTeamMutation(uid);
-
-  const isSaving = isSavePending || isDeletePending;
+  const { mutate: saveTeamApi, isPending: isSaving } = useSaveTeamMutation(uid);
 
   useWarnOnUnloadWhileSaving(isSaving);
 
@@ -216,7 +191,7 @@ export function useTeams(): UseTeamsResult {
     storeSetTeams(collectionTeamsToStore(apiTeams));
   }, [apiTeams, storeSetTeams]);
 
-  const actions = useTeamActions(isAuthenticated, saveTeamApi, deleteTeamApi);
+  const actions = useTeamActions(isAuthenticated, saveTeamApi);
 
   const getTeam = useCallback((slot: TeamSlot) => teams[slot], [teams]);
 
