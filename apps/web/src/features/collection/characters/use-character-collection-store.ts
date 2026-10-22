@@ -61,7 +61,7 @@ interface CollectionState {
   setConstellationLevel: (characterId: CharacterId, level: ConstellationLevel) => void;
   isOwned: (characterId: CharacterId) => boolean;
   getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
-  /** Swaps in the server's record for an owned character; a removed one stays removed. */
+  /** Skips a character no longer owned, so a save landing after its removal can't restore it. */
   replaceCharacter: (entry: CollectionCharacter) => void;
   replaceCharacters: (characters: CharacterCollection) => void;
   clearCharacters: () => void;

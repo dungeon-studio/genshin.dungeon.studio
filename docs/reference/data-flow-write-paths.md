@@ -54,7 +54,7 @@ sequenceDiagram
       API-->>Hook: saved character, or no content on DELETE
       Hook->>Cache: invalidate
       opt PUT
-        Hook->>Store: applyMutationResult (saved character)
+        Hook->>Store: replaceCharacter (skipped once removed)
       end
       Cache-->>Reconcile: refetched collection
       Reconcile->>Store: mergeCollections, then replaceCharacters
