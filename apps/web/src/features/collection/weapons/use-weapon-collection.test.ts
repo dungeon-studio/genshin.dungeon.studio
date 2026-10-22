@@ -7,16 +7,10 @@ import { http, HttpResponse } from 'msw';
 import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { AuthState } from '@/features/auth';
-import { settledAuth } from '@/test/auth';
 import { makeWeapon, weaponsDocument } from '@/test/fixtures';
+import { holdResponse } from '@/test/msw/held-response';
 import { server } from '@/test/msw/server';
-import {
-  createSwitchableWrapper,
-  createTestQueryClient,
-  createWrapper,
-  fakeUser,
-} from '@/test/render';
+import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
 
 import { useWeaponCollection } from './use-weapon-collection';
 import { useWeaponCollectionStore } from './use-weapon-collection-store';
@@ -89,38 +83,28 @@ describe('useWeaponCollection', () => {
     });
 
     it('leaves the store alone when the add settles after sign-out', async () => {
-      let confirmAdd = () => {};
-      server.use(
-        http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument([]))),
-        http.post(
-          'http://localhost:8080/weapons',
-          () =>
-            new Promise<Response>((resolve) => {
-              confirmAdd = () => {
-                resolve(
-                  HttpResponse.json(
-                    weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 })]),
-                  ),
-                );
-              };
-            }),
+      const addConfirmation = holdResponse(() =>
+        HttpResponse.json(
+          weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 })]),
         ),
       );
+      server.use(
+        http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument([]))),
+        http.post('http://localhost:8080/weapons', addConfirmation.resolver),
+      );
 
-      const auth: { current: AuthState } = { current: settledAuth(fakeUser('user-1')) };
-      const queryClient = createTestQueryClient();
-      const { result, rerender } = renderHook(() => useWeaponCollection(), {
-        wrapper: createSwitchableWrapper(auth, queryClient),
-      });
+      const { result, queryClient, signOut } = renderHookSignedIn(
+        () => useWeaponCollection(),
+        'user-1',
+      );
       await waitFor(() => expect(result.current.isLoading).toBe(false));
 
       act(() => {
         result.current.addWeapon(WEAPON_ID);
       });
-      auth.current = settledAuth(null);
-      rerender();
+      signOut();
       await waitFor(() => expect(queryClient.isMutating()).toBe(1));
-      confirmAdd();
+      addConfirmation.release();
 
       await waitFor(() => expect(queryClient.isMutating()).toBe(0));
       expect(useWeaponCollectionStore.getState().weapons).toEqual({});

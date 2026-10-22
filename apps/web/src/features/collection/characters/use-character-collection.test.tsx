@@ -7,16 +7,10 @@ import { http, HttpResponse } from 'msw';
 import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { AuthState } from '@/features/auth';
-import { settledAuth } from '@/test/auth';
 import { charactersDocument, makeCharacter } from '@/test/fixtures';
+import { holdResponse } from '@/test/msw/held-response';
 import { server } from '@/test/msw/server';
-import {
-  createSwitchableWrapper,
-  createTestQueryClient,
-  createWrapper,
-  fakeUser,
-} from '@/test/render';
+import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
@@ -143,37 +137,23 @@ describe('useCollection mutations', () => {
   });
 
   it('leaves the store alone when a removal fails after sign-out', async () => {
-    let failDelete = () => {};
+    const deleteFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
     server.use(
       http.get('http://localhost:8080/characters', () =>
         HttpResponse.json(charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })])),
       ),
-      http.delete(
-        'http://localhost:8080/characters/skirk',
-        () =>
-          new Promise<Response>((resolve) => {
-            failDelete = () => {
-              resolve(new HttpResponse(null, { status: 500 }));
-            };
-          }),
-      ),
+      http.delete('http://localhost:8080/characters/skirk', deleteFailure.resolver),
     );
 
-    const auth: { current: AuthState } = { current: settledAuth(fakeUser('user-1')) };
-    const queryClient = createTestQueryClient();
-    const { result, rerender } = renderHook(() => useCollection(), {
-      wrapper: createSwitchableWrapper(auth, queryClient),
-    });
-
+    const { result, queryClient, signOut } = renderHookSignedIn(() => useCollection(), 'user-1');
     await waitFor(() => expect(result.current.getCharacter(SKIRK)).toBeDefined());
 
     act(() => {
       result.current.removeCharacter(SKIRK);
     });
-    auth.current = settledAuth(null);
-    rerender();
+    signOut();
     await waitFor(() => expect(queryClient.isMutating()).toBe(1));
-    failDelete();
+    deleteFailure.release();
 
     await waitFor(() => expect(queryClient.isMutating()).toBe(0));
     expect(useCollectionStore.getState().characters[SKIRK]).toBeUndefined();

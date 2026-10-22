@@ -27,8 +27,8 @@ export function useSenderBoundMutate<TData, TError, TVariables>(
     currentUserId.current = userId;
   }, [userId]);
 
-  return useCallback(
-    (variables: TVariables, options?: MutateOptions<TData, TError, TVariables>) => {
+  return useCallback<Mutate<TData, TError, TVariables>>(
+    (variables, options) => {
       const sender = currentUserId.current;
       const whileSenderSignedIn =
         <A extends unknown[]>(callback: ((...args: A) => void) | undefined) =>
