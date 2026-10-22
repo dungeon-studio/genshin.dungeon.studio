@@ -5,6 +5,7 @@ import { QueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 
 import type { AuthUser } from '@/features/auth';
+import { settledAuth } from '@/test/auth';
 import { TestProviders } from '@/test/providers';
 
 // The composite hooks only read `user.uid`; a partial `AuthUser` is sufficient.
@@ -35,7 +36,7 @@ export function createWrapper(
 
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
-      <TestProviders queryClient={queryClient} user={user}>
+      <TestProviders queryClient={queryClient} auth={settledAuth(user)}>
         {children}
       </TestProviders>
     );

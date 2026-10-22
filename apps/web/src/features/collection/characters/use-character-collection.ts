@@ -45,7 +45,6 @@ function entriesAheadOfServer(
  * The first resolution per signed-in user merges what this browser recorded
  * and pushes the entries the server is behind on. Refetches merge additively,
  * so they don't overwrite optimistic state while those pushes are in flight.
- * Signing out clears the store, so the next account starts from its own data.
  */
 function useServerSync(
   uid: string | undefined,
@@ -54,15 +53,13 @@ function useServerSync(
   applyMutationResult: (result: MutationResult) => void,
 ): void {
   const replaceCharacters = useCollectionStore((s) => s.replaceCharacters);
-  const clearCharacters = useCollectionStore((s) => s.clearCharacters);
   const mergedForUser = useRef<string | null>(null);
 
   useEffect(() => {
     if (uid === undefined) {
       mergedForUser.current = null;
-      clearCharacters();
     }
-  }, [uid, clearCharacters]);
+  }, [uid]);
 
   useEffect(() => {
     if (!apiCharacters) return;

@@ -429,6 +429,166 @@ jobs:
           sarif_file: terraform-results.sarif
           category: trivy-terraform-${{ matrix.root }}
 
+  # The matrix reports one context per root, so a ruleset requires this job
+  # instead and a new root never touches the ruleset.
+  trivy-terraform-result:
+    name: Scan Terraform
+    needs: trivy-terraform
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Fail unless every scan succeeded
+        if: needs.trivy-terraform.result != 'success'
+        run: exit 1
+
+  # A job decides whether to plan, rather than a `paths:` gate, so
+  # `Plan infrastructure` reports on every pull request and a ruleset can
+  # require it.
+  terraform-changes:
+    name: Detect Terraform changes
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Reaches the base: the first parent of the pull request's merge commit.
+          fetch-depth: 2
+
+      # bootstrap/ is applied by hand, and no plan below targets prod. `git diff`
+      # exits nonzero on error too, so a failed diff runs the plans.
+      - name: Diff against the base
+        id: diff
+        run: |
+          if git diff --quiet HEAD^1 HEAD -- \
+            infrastructure/terraform \
+            ':!infrastructure/terraform/bootstrap' \
+            ':!infrastructure/terraform/environments/prod' \
+            .github/workflows/ci.yml; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  # A skipped job never expands its matrix, so a matrix reference in the
+  # name would show raw. GitHub appends the environment to each run's name.
+  terraform-plan:
+    name: Plan environment infrastructure
+    needs: terraform-changes
+    if: needs.terraform-changes.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+
+    env:
+      # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
+      TERRAFORM_VERSION: '1.16.6'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: [core, dev, staging]
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      # Each environment maps to an explicit secret, because CodeQL flags
+      # dynamic secret indexing as actions/excessive-secrets-exposure.
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ secrets.GCP_RO_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: >-
+            ${{
+              matrix.environment == 'core' && secrets.GCP_RO_CORE_SERVICE_ACCOUNT_EMAIL ||
+              matrix.environment == 'dev' && secrets.GCP_RO_DEV_SERVICE_ACCOUNT_EMAIL ||
+              matrix.environment == 'staging' && secrets.GCP_RO_STAGING_SERVICE_ACCOUNT_EMAIL
+            }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+
+      - name: Terraform Init
+        working-directory: infrastructure/terraform/environments/${{ matrix.environment }}
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: infrastructure/terraform/environments/${{ matrix.environment }}
+        run: |
+          terraform plan -lock=false -no-color -out=tfplan
+          terraform show -no-color tfplan > plan.txt
+
+      - name: Comment PR with Plan
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            const workspaceRoot = process.env.GITHUB_WORKSPACE;
+            const environment = '${{ matrix.environment }}';
+            const planPath = `${workspaceRoot}/infrastructure/terraform/environments/${environment}/plan.txt`;
+            const plan = fs.readFileSync(planPath, 'utf8');
+
+            const summaryMatch = plan.match(/^(No changes\..+|Plan: .+)$/m);
+            const summary = summaryMatch ? summaryMatch[0] : 'Plan generated';
+
+            const marker = `<!-- terraform-plan:${environment} -->`;
+            const body = [
+              marker,
+              `## terraform-plan (${environment})`,
+              '',
+              `**${summary}**`,
+              '',
+              '<details>',
+              '<summary>Show full plan output</summary>',
+              '',
+              '```',
+              plan,
+              '```',
+              '</details>'
+            ].join('\n');
+
+            const issue = { ...context.repo, issue_number: context.issue.number };
+            const comments = await github.rest.issues.listComments(issue);
+
+            const existing = comments.data.find(comment => comment.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({ ...context.repo, comment_id: existing.id, body });
+              return;
+            }
+
+            await github.rest.issues.createComment({ ...issue, body });
+
+  # The matrix reports one context per environment and none when it skips, so a
+  # ruleset requires this job instead. It needs change detection too, so a
+  # detection failure can't pass as a skipped plan.
+  terraform-plan-result:
+    name: Plan infrastructure
+    needs: [terraform-changes, terraform-plan]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Fail on a failed or cancelled plan
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
+
   trivy-dockerfile:
     name: Scan Dockerfile
     runs-on: ubuntu-latest
