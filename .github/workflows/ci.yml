@@ -478,7 +478,7 @@ jobs:
           fi
 
   terraform-plan:
-    name: Plan ${{ matrix.environment }} infrastructure
+    name: Plan environment infrastructure
     needs: terraform-changes
     if: needs.terraform-changes.outputs.changed == 'true'
     runs-on: ubuntu-latest
