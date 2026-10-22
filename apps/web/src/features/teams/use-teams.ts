@@ -77,6 +77,8 @@ type TeamActions = Pick<
   | 'setTeamName'
 >;
 
+type TeamStore = ReturnType<typeof useTeamStore.getState>;
+
 function useTeamActions(
   isAuthenticated: boolean,
   saveTeamApi: ReturnType<typeof useSaveTeamMutation>['mutate'],
@@ -84,59 +86,34 @@ function useTeamActions(
   return useMemo(() => {
     const store = () => useTeamStore.getState();
 
-    const editThenSave = (slot: TeamSlot, edit: () => void) => {
-      const previousTeam = { ...store().teams[slot] };
-      edit();
-      if (!isAuthenticated) return;
-      const optimisticTeam = store().teams[slot];
-      saveTeamApi(optimisticTeam, {
-        onError: () => {
-          if (store().teams[slot] !== optimisticTeam) {
-            toast.error('Failed to save team.');
-            return;
-          }
-          store().setTeam(slot, previousTeam);
-          toast.error('Failed to save team. Change has been reverted.');
-        },
-      });
-    };
+    /** Turns a store action into one that edits the slot locally, then saves it. */
+    const editThenSave =
+      <Args extends unknown[]>(action: (s: TeamStore) => (slot: TeamSlot, ...args: Args) => void) =>
+      (slot: TeamSlot, ...args: Args) => {
+        const previousTeam = { ...store().teams[slot] };
+        action(store())(slot, ...args);
+        if (!isAuthenticated) return;
+        const optimisticTeam = store().teams[slot];
+        saveTeamApi(optimisticTeam, {
+          onError: () => {
+            if (store().teams[slot] !== optimisticTeam) {
+              toast.error('Failed to save team.');
+              return;
+            }
+            store().setTeam(slot, previousTeam);
+            toast.error('Failed to save team. Change has been reverted.');
+          },
+        });
+      };
 
     return {
-      assignCharacter: (slot, memberIndex, characterId, collectionWeaponId) => {
-        editThenSave(slot, () => {
-          store().assignCharacter(slot, memberIndex, characterId, collectionWeaponId);
-        });
-      },
-      removeCharacter: (slot, memberIndex) => {
-        editThenSave(slot, () => {
-          store().removeCharacter(slot, memberIndex);
-        });
-      },
-      assignWeapon: (slot, memberIndex, collectionWeaponId) => {
-        editThenSave(slot, () => {
-          store().assignWeapon(slot, memberIndex, collectionWeaponId);
-        });
-      },
-      removeWeapon: (slot, memberIndex) => {
-        editThenSave(slot, () => {
-          store().removeWeapon(slot, memberIndex);
-        });
-      },
-      setArtifactPlan: (slot, memberIndex, plan) => {
-        editThenSave(slot, () => {
-          store().setArtifactPlan(slot, memberIndex, plan);
-        });
-      },
-      setTeamName: (slot, name) => {
-        editThenSave(slot, () => {
-          store().setTeamName(slot, name);
-        });
-      },
-      clearTeam: (slot) => {
-        editThenSave(slot, () => {
-          store().clearTeam(slot);
-        });
-      },
+      assignCharacter: editThenSave((s) => s.assignCharacter),
+      removeCharacter: editThenSave((s) => s.removeCharacter),
+      assignWeapon: editThenSave((s) => s.assignWeapon),
+      removeWeapon: editThenSave((s) => s.removeWeapon),
+      setArtifactPlan: editThenSave((s) => s.setArtifactPlan),
+      setTeamName: editThenSave((s) => s.setTeamName),
+      clearTeam: editThenSave((s) => s.clearTeam),
     };
   }, [isAuthenticated, saveTeamApi]);
 }
