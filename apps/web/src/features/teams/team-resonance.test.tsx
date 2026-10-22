@@ -9,6 +9,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
 import { getElementIconPath } from '@/lib/elements';
+import { iconSources } from '@/test/icons';
 
 import { TeamResonance } from './team-resonance';
 
@@ -33,16 +34,6 @@ const fervent = ELEMENTAL_RESONANCES['fervent-flames'];
 const soothing = ELEMENTAL_RESONANCES['soothing-water'];
 const canopy = ELEMENTAL_RESONANCES['protective-canopy'];
 const pyroHydroPairs = partyOf('Pyro', 'Pyro', 'Hydro', 'Hydro');
-
-// Decorative icons have no accessible role to query by. An image reports its
-// source; a glyph reports its mask.
-function iconSources(badgeName: string): string[] {
-  return [
-    ...screen
-      .getByRole('button', { name: badgeName })
-      .querySelectorAll<HTMLElement>('[aria-hidden="true"]'),
-  ].map((icon) => icon.getAttribute('src') ?? icon.style.maskImage);
-}
 
 describe('TeamResonance', () => {
   it('names the resonances a filled party triggers', () => {

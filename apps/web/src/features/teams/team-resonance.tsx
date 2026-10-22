@@ -6,9 +6,8 @@ import type { Element, ElementalResonance } from '@genshin/game-data';
 import { getActiveResonances, getCharacterById, RESONANCE_TRIGGERS } from '@genshin/game-data';
 import type { JSX } from 'react';
 
-import { GlyphIcon } from '@/components/ui/glyph-icon';
+import { ChipIcon } from '@/components/ui/chip-icon';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ThemedIcon } from '@/components/ui/themed-icon';
 import { ELEMENT_BG_COLORS } from '@/lib/element-styles';
 import { getElementIconPath } from '@/lib/elements';
 import { cn } from '@/lib/utils';
@@ -41,24 +40,6 @@ function badgeAppearance(resonance: ElementalResonance, party: Element[]): Badge
     : { elements: [...new Set(party)] };
 }
 
-function ResonanceIcon({ element, tinted }: { element: Element; tinted: boolean }): JSX.Element {
-  const className = 'h-3.5 w-3.5';
-
-  // A tinted badge is the icon's own color, so the icon takes the label's.
-  if (tinted) {
-    return <GlyphIcon src={getElementIconPath(element)} className={className} />;
-  }
-
-  return (
-    <ThemedIcon
-      lightSrc={getElementIconPath(element, 'light')}
-      darkSrc={getElementIconPath(element, 'dark')}
-      alt=""
-      className={className}
-    />
-  );
-}
-
 function ResonanceBadge({
   resonance,
   party,
@@ -77,7 +58,11 @@ function ResonanceBadge({
         )}
       >
         {elements.map((element) => (
-          <ResonanceIcon key={element} element={element} tinted={tint !== undefined} />
+          <ChipIcon
+            key={element}
+            iconPath={(variant) => getElementIconPath(element, variant)}
+            onFill={tint !== undefined}
+          />
         ))}
         {resonance.name}
       </PopoverTrigger>

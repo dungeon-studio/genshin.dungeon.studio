@@ -13,9 +13,8 @@ import type { JSX } from 'react';
 import { useId, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { GlyphIcon } from '@/components/ui/glyph-icon';
+import { ChipIcon } from '@/components/ui/chip-icon';
 import { Input } from '@/components/ui/input';
-import { ThemedIcon } from '@/components/ui/themed-icon';
 import type { BaseFilterState } from '@/lib/collection-filters';
 import { toggleInSet } from '@/lib/toggle-in-set';
 import { cn } from '@/lib/utils';
@@ -278,17 +277,7 @@ function FilterChips<F extends BaseFilterState, T extends string>({
               aria-pressed={active}
               aria-label={`Filter by ${value}`}
             >
-              {/* An active fill can match the icon's own color, so the icon takes the label's. */}
-              {active ? (
-                <GlyphIcon src={category.iconPath(value, 'light')} className="h-3.5 w-3.5" />
-              ) : (
-                <ThemedIcon
-                  lightSrc={category.iconPath(value, 'light')}
-                  darkSrc={category.iconPath(value, 'dark')}
-                  alt=""
-                  className="h-3.5 w-3.5"
-                />
-              )}
+              <ChipIcon iconPath={(variant) => category.iconPath(value, variant)} onFill={active} />
               {value}
             </button>
           );

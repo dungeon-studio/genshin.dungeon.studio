@@ -7,6 +7,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { BaseFilterState } from '@/lib/collection-filters';
 import { SORT_FIELDS } from '@/lib/collection-filters';
+import { iconSources } from '@/test/icons';
 
 import { FilterBar, type FilterCategoryConfig } from './filter-bar';
 
@@ -62,16 +63,6 @@ function renderBar(
   );
 
   return { onChange, onToggle };
-}
-
-// Decorative icons have no accessible role to query by. An image reports its
-// source; a glyph reports its mask.
-function iconSources(chipName: string): string[] {
-  return [
-    ...screen
-      .getByRole('button', { name: chipName })
-      .querySelectorAll<HTMLElement>('[aria-hidden="true"]'),
-  ].map((icon) => icon.getAttribute('src') ?? icon.style.maskImage);
 }
 
 describe('FilterBar', () => {
