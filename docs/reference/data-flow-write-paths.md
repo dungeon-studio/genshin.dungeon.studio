@@ -30,6 +30,13 @@ Every optimistic write fails the same way, a guarded rollback. The previous
 value comes back only if the store still holds the value that write put there,
 so a newer edit stands. A toast shows either way, and nothing retries.
 
+Every mutation follows one refetch rule, set by `useUserQuerySync`. Starting a
+write cancels any refetch of its query already in flight. A write that succeeds
+while another write to the same query is pending skips its refetch and leaves
+it to the later write. The cancel skips the first load, and it can't reach a
+refetch that starts after the write, such as on window focus or reconnect.
+Either can still overwrite an edit in flight.
+
 A write that fails after a later write from the same hook has started gets
 neither rollback nor toast, see [#1757].
 
@@ -52,11 +59,12 @@ sequenceDiagram
 
   Hook->>Store: addCharacter / removeCharacter / setConstellationLevel
   opt signed in
+    Hook->>Cache: cancel any refetch in flight
     Hook->>API: PUT or DELETE /characters/{id}
     API->>FS: PUT: transaction of read, nextCharacter, set<br>DELETE: delete
     alt success
       API-->>Hook: saved character, or no content on DELETE
-      Hook->>Cache: invalidate
+      Hook->>Cache: invalidate, unless a later write is pending
       opt PUT
         Hook->>Store: replaceCharacter (skipped once removed)
       end
@@ -91,22 +99,24 @@ sequenceDiagram
   participant FS as Firestore
 
   alt add or ensure
+    Hook->>Cache: cancel any refetch in flight
     Hook->>API: POST /weapons
     API->>FS: create with minted instance ID
     alt success
       API-->>Hook: saved weapon
-      Hook->>Cache: invalidate
+      Hook->>Cache: invalidate, unless a later write is pending
       Hook->>Store: addWeapon (upsert)
     else failure
       Hook->>Hook: toast, store untouched
     end
   else remove or set refinement
     Hook->>Store: removeWeapon / setRefinementLevel
+    Hook->>Cache: cancel any refetch in flight
     Hook->>API: DELETE or PATCH /weapons/{instanceId}
     API->>FS: PATCH: read, then set, no transaction<br>DELETE: delete
     alt success
       API-->>Hook: saved weapon, or no content on DELETE
-      Hook->>Cache: invalidate
+      Hook->>Cache: invalidate, unless a later write is pending
       opt PATCH
         Hook->>Store: addWeapon (replaces the instance)
       end
@@ -135,11 +145,12 @@ sequenceDiagram
 
   Hook->>Store: snapshot slot, then edit
   opt signed in
+    Hook->>Cache: cancel any refetch in flight
     Hook->>API: PUT /teams/{slot} with the whole team, or DELETE to clear
     API->>FS: PUT: read characters, weapons, and other teams<br>to validate members
     API->>FS: PUT: transaction of read, nextTeam, set<br>DELETE: delete
     alt success
-      Hook->>Cache: invalidate
+      Hook->>Cache: invalidate, unless a later write is pending
       Cache-->>Reconcile: refetched teams
       Reconcile->>Store: collectionTeamsToStore, then setTeams (replace)
     else failure
@@ -181,14 +192,14 @@ failure between the two never orphans data: the identity remains and can retry.
 
 ## Divergences
 
-| Question                                    | Characters                             | Weapons                     | Teams                                 |
-| ------------------------------------------- | -------------------------------------- | --------------------------- | ------------------------------------- |
-| Works signed out?                           | Yes, persisted until sign-in merges it | No, every action is a no-op | Yes, in memory until the page reloads |
-| Optimistic?                                 | All three actions                      | Remove and refine, not add  | Every action                          |
-| Applies the mutation response to the store? | Constellation level only               | Whole instance, replaced    | No                                    |
-| How a refetch reaches the store             | Additive merge                         | Replace                     | Replace, filled to four slots         |
-| Can a refetch overwrite an edit in flight?  | Raise or add, no. Lower or remove, yes | Yes                         | Yes                                   |
-| What a removal elsewhere does to the store  | Survives the merge, see [#1741]        | Disappears on refetch       | Disappears on refetch                 |
+| Question                                    | Characters                                                          | Weapons                          | Teams                                 |
+| ------------------------------------------- | ------------------------------------------------------------------- | -------------------------------- | ------------------------------------- |
+| Works signed out?                           | Yes, persisted until sign-in merges it                              | No, every action is a no-op      | Yes, in memory until the page reloads |
+| Optimistic?                                 | All three actions                                                   | Remove and refine, not add       | Every action                          |
+| Applies the mutation response to the store? | Constellation level only                                            | Whole instance, replaced         | No                                    |
+| How a refetch reaches the store             | Additive merge                                                      | Replace                          | Replace, filled to four slots         |
+| Can a refetch overwrite an edit in flight?  | Raise or add, no. Lower or remove, only one the write didn't cancel | Only one the write didn't cancel | Only one the write didn't cancel      |
+| What a removal elsewhere does to the store  | Survives the merge, see [#1741]                                     | Disappears on refetch            | Disappears on refetch                 |
 
 Teams also depend on the other two features. The server rejects a team that
 names a character or weapon instance the user doesn't own, so a team save can
