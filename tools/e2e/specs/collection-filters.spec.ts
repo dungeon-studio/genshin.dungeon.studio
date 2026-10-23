@@ -34,6 +34,9 @@ interface CollectionPage<I extends CollectionItem> {
 
 const RARITY: Rarity = 4;
 
+// The app sorts names with this collator, so the expected order has to match it.
+const nameCollator = new Intl.Collator('en');
+
 /** The names of the cards the grid renders, in the order it renders them. */
 async function renderedNames(page: Page, cardName: RegExp): Promise<string[]> {
   const labels = await page
@@ -112,7 +115,7 @@ function describeFilters<I extends CollectionItem>(collection: CollectionPage<I>
       await expect(page.getByRole('button', { name: 'Name' })).toBeVisible();
       await expect
         .poll(() => names(page))
-        .toEqual(namesOf(roster).toSorted((a, b) => b.localeCompare(a)));
+        .toEqual(namesOf(roster).toSorted((a, b) => nameCollator.compare(b, a)));
     });
   });
 }
