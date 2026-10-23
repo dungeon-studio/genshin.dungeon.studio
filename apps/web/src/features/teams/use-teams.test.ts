@@ -107,14 +107,15 @@ describe('useTeams (authenticated)', () => {
       HttpResponse.json(teamsDocument([makeTeam(1, { name: 'First' })])),
     );
     const secondPut = holdResponse(() => new HttpResponse(null, { status: 204 }));
-    let gets = 0;
     const putBodies: { members: CollectionTeamMembers }[] = [];
     server.use(
-      http.get('http://localhost:8080/teams', () => {
-        gets += 1;
-        if (gets === 1) return HttpResponse.json(teamsDocument([]));
-        return staleRefetch.resolver();
+      http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([])), {
+        once: true,
       }),
+      http.get('http://localhost:8080/teams', staleRefetch.resolver, { once: true }),
+      http.get('http://localhost:8080/teams', () =>
+        HttpResponse.json(teamsDocument([makeTeam(1, { name: 'Third', members: MEMBERS })])),
+      ),
       http.put('http://localhost:8080/teams/1', async ({ request }) => {
         putBodies.push((await request.json()) as { members: CollectionTeamMembers });
         if (putBodies.length === 2) return secondPut.resolver();
@@ -128,7 +129,7 @@ describe('useTeams (authenticated)', () => {
     act(() => {
       result.current.setTeamName(1, 'First');
     });
-    await waitFor(() => expect(gets).toBe(2));
+    await waitFor(() => expect(queryClient.isFetching()).toBe(1));
 
     act(() => {
       result.current.assignCharacter(1, 0, CHARACTER);

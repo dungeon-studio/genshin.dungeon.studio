@@ -226,14 +226,13 @@ describe('useWeaponCollection', () => {
       // Answers with the server's state from before the second change.
       const staleRefetch = holdResponse(() => HttpResponse.json(atLevel(2)));
       const secondPatch = holdResponse(() => HttpResponse.json(atLevel(3)));
-      let gets = 0;
       let patches = 0;
       server.use(
-        http.get('http://localhost:8080/weapons', () => {
-          gets += 1;
-          if (gets === 1) return HttpResponse.json(atLevel(1));
-          return staleRefetch.resolver();
+        http.get('http://localhost:8080/weapons', () => HttpResponse.json(atLevel(1)), {
+          once: true,
         }),
+        http.get('http://localhost:8080/weapons', staleRefetch.resolver, { once: true }),
+        http.get('http://localhost:8080/weapons', () => HttpResponse.json(atLevel(3))),
         http.patch('http://localhost:8080/weapons/weapon-instance-1', () => {
           patches += 1;
           if (patches === 1) return HttpResponse.json(atLevel(2));
@@ -247,7 +246,7 @@ describe('useWeaponCollection', () => {
       act(() => {
         result.current.setRefinementLevel(INSTANCE_ID, 2);
       });
-      await waitFor(() => expect(gets).toBe(2));
+      await waitFor(() => expect(queryClient.isFetching()).toBe(1));
 
       act(() => {
         result.current.setRefinementLevel(INSTANCE_ID, 3);
