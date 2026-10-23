@@ -19,8 +19,9 @@ The features share five states:
 
 In every feature:
 
-- From every state, the store empties when its hook mounts while not signed in,
-  and on sign-out. A team slot resets to Default instead.
+- From every state, the store empties when a signed-in user signs out or
+  another account signs in, whichever page is open. A team slot resets to
+  Default instead. Auth settling on page load isn't a sign-out.
 - While signed in, a refetch runs after any successful mutation in the same
   feature, on window focus, on reconnect, and when a hook mounts. A mount first
   applies the cached result. A refetch changes the store only when its result
@@ -28,12 +29,12 @@ In every feature:
 - Only the latest request of each kind through a hook gets its response
   handling: confirm, rollback, and toast. An earlier request, or one that
   settles after the user leaves its page, reaches the store only through a
-  refetch, see [#1534]. One that settles after sign-out still writes to the
-  emptied store, see [#1843].
+  refetch, see [#1534]. A collection request that settles after sign-out
+  leaves the store untouched. A team request can still show its failure toast.
 - Requests of different kinds through one hook settle in any order, so a
   response can undo a newer edit. The response to an add can put the minimum
   level back over a raise, and a refinement's response can put an instance back
-  after a removal.
+  after a removal. A character response never puts back a removed character.
 
 ## Characters
 
@@ -52,7 +53,7 @@ stateDiagram-v2
   LocalOnly --> Confirmed: sign-in merge, server holds an equal or higher level
   LocalOnly --> [*]: remove while not signed in
   Sent --> Sent: newer edit
-  Sent --> Confirmed: PUT succeeds, saved level applied
+  Sent --> Confirmed: PUT succeeds, saved entry replaces the copy
   Sent --> [*]: DELETE succeeds
   Sent --> [*]: add rejected, store still at the minimum level
   Sent --> RolledBack: rejected, store still holds the sent value
@@ -68,11 +69,11 @@ stateDiagram-v2
   RolledBack --> Confirmed: next refetch
 ```
 
-- Local only: auth starts out loading on every page load. A page that mounts the
-  hook before sign-in settles empties the store, and `localStorage` with it, see
-  [#1740].
-- Confirmed by a response: only the saved level reaches the store, which mints a
-  new `updatedAt`, see [#1841].
+- Local only: persisted in `localStorage`, so it survives page loads until the
+  sign-in merge. A session that ends while no tab is open isn't seen as a
+  sign-out, so its characters stay local.
+- Confirmed by a response: the saved entry replaces the copy, server timestamps
+  included. A response for a character removed since is skipped.
 - Confirmed by a refetch: the store takes the server's `createdAt`, and its
   `updatedAt` only where the server's level is at least the local one.
 - Rolled back: a rolled-back removal returns with new client timestamps.
@@ -126,7 +127,7 @@ stateDiagram-v2
   DefaultTeam --> Confirmed: refetch brings a saved team for the slot
   LocalOnly --> Confirmed: sign in, refetch brings a saved team
   LocalOnly --> Sent: edit after sign-in, before the first fetch lands
-  LocalOnly --> DefaultTeam: sign in with the slot unsaved, or the hook mounts
+  LocalOnly --> DefaultTeam: sign in with the slot unsaved
   Sent --> Sent: newer edit to the same slot
   Sent --> Confirmed: save succeeds, then its refetch lands
   Sent --> DefaultTeam: clear succeeds, then its refetch lands
@@ -141,9 +142,11 @@ stateDiagram-v2
 ```
 
 - Default: `createEmptyTeam`, with the default name, four empty positions, and
-  client-minted timestamps. A changed refetch or a mount rebuilds it with new
-  timestamps whenever the server holds nothing for the slot.
-- Local only: in memory only. Signing in replaces it rather than merging it.
+  client-minted timestamps. A changed refetch, a signed-in mount, or a sign-out
+  rebuilds it with new timestamps whenever the server holds nothing for the
+  slot.
+- Local only: in memory, so it survives moving between pages but not a page
+  load. Signing in replaces it rather than merging it.
 - Confirmed: a response never reaches the store. Only the refetch the save
   triggers confirms it, server timestamps included.
 - Sent by a clear: no component calls `clearTeam`. The store keeps the team's
@@ -154,9 +157,6 @@ stateDiagram-v2
 
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
 [#1534]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1534
-[#1740]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1740
 [#1741]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1741
 [#1839]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1839
 [#1840]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1840
-[#1841]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1841
-[#1843]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1843

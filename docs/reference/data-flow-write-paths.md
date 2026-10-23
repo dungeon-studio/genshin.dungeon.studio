@@ -17,14 +17,16 @@ A write path is any code that reaches one of these:
 Four features do: characters, weapons, teams, and the account. Artifact plans
 travel inside a team save, so they share the team path.
 
-Each feature's hook is the only writer to its store and the only caller of its
-mutations. Each feature reads from its zustand store, never from the cache.
+Each feature's hook is the only caller of its mutations. It's also the only
+writer to its store, apart from `ClearUserDataOnSignOut`, which empties every
+store when a signed-in user leaves. Each feature reads from its zustand store,
+never from the cache.
 
 A write skips both client copies: the hook edits the store and calls the API
 directly. The server's state comes back the other way, through a refetch into
 the query cache and then the hook's own reconcile effect into the store.
-Characters also apply the saved constellation level from the mutation response
-to the store directly, and weapons the whole saved instance.
+Characters also put the saved entry from the mutation response in the store,
+unless it was removed meanwhile, and weapons the whole saved instance.
 
 Every optimistic write fails the same way, a guarded rollback. The previous
 value comes back only if the store still holds the value that write put there,
@@ -33,9 +35,10 @@ so a newer edit stands. A toast shows either way, and nothing retries.
 A write that fails after a later write from the same hook has started gets
 neither rollback nor toast, see [#1757].
 
-A collection write that settles after its sender signs out, or after another
-account signs in, changes nothing and shows no toast. Every collection mutation
-goes through `useSenderBoundMutate`, which enforces this.
+A character or weapon write that settles after its sender signs out, or after
+another account signs in, changes nothing and shows no toast. Their mutations go
+through `useSenderBoundMutate`, which enforces this. Team writes don't, so a
+team save that fails after sign-out still toasts.
 
 ## Characters
 
@@ -136,7 +139,7 @@ sequenceDiagram
   Hook->>Store: snapshot slot, then edit
   opt signed in
     Hook->>API: PUT /teams/{slot} with name, members, and description,<br>or DELETE to clear
-    API->>FS: PUT: read characters, weapons, and other teams<br>to validate members
+    API->>FS: PUT with members: read characters, weapons,<br>and other teams to validate them
     API->>FS: PUT: transaction of read, nextTeam, set<br>DELETE: delete
     alt success
       Hook->>Cache: invalidate
@@ -181,14 +184,14 @@ failure between the two never orphans data: the identity remains and can retry.
 
 ## Divergences
 
-| Question                                    | Characters                             | Weapons                     | Teams                                 |
-| ------------------------------------------- | -------------------------------------- | --------------------------- | ------------------------------------- |
-| Works signed out?                           | Yes, persisted until sign-in merges it | No, every action is a no-op | Yes, in memory until the page reloads |
-| Optimistic?                                 | All three actions                      | Remove and refine, not add  | Every action                          |
-| Applies the mutation response to the store? | Constellation level only               | Whole instance, replaced    | No                                    |
-| How a refetch reaches the store             | Additive merge                         | Replace                     | Replace, filled to four slots         |
-| Can a refetch overwrite an edit in flight?  | Raise or add, no. Lower or remove, yes | Yes                         | Yes                                   |
-| What a removal elsewhere does to the store  | Survives the merge, see [#1741]        | Disappears on refetch       | Disappears on refetch                 |
+| Question                                    | Characters                             | Weapons                     | Teams                                    |
+| ------------------------------------------- | -------------------------------------- | --------------------------- | ---------------------------------------- |
+| Works signed out?                           | Yes, persisted until sign-in merges it | No, every action is a no-op | Yes, in memory until a reload or sign-in |
+| Optimistic?                                 | All three actions                      | Remove and refine, not add  | Every action                             |
+| Applies the mutation response to the store? | Whole entry, skipped once removed      | Whole instance, replaced    | No                                       |
+| How a refetch reaches the store             | Additive merge                         | Replace                     | Replace, filled to four slots            |
+| Can a refetch overwrite an edit in flight?  | Raise or add, no. Lower or remove, yes | Yes                         | Yes                                      |
+| What a removal elsewhere does to the store  | Survives the merge, see [#1741]        | Disappears on refetch       | Disappears on refetch                    |
 
 Teams also depend on the other two features. The server rejects a team that
 names a character or weapon instance the user doesn't own, so a team save can

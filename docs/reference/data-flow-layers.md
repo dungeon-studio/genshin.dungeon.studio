@@ -41,16 +41,17 @@ flowchart TB
   query --> fetchWrapper
   fetchWrapper -->|HTTP| middleware
   middleware --> route
+  route --> repository
   repository --> document
   document --> firestore
+  fetchWrapper --> firebaseAuth
   middleware --> firebaseAuth
 
   view -.->|1| store
   query -.->|2| store
   store -.->|3| query
   route -.->|4| firebaseAuth
-  route -.->|5| repository
-  hook -.->|6| fetchWrapper
+  hook -.->|5| fetchWrapper
 ```
 
 | Layer           | Code                                                                       | Data unit                                                   |
@@ -72,19 +73,21 @@ representations every layer uses.
 ## Skips
 
 1. **View to store.** `character-pool.tsx` and `weapon-pool.tsx` read
-   `useTeamStore` instead of `useTeams`, see [#1846].
+   `useTeamStore` instead of `useTeams`, see [#1846]. `ClearUserDataOnSignOut`
+   empties every store on sign-out without a feature hook.
 2. **Query layer to store.** Each hook's reconcile effect copies the cache into
-   the store, so the store has three writers: actions, responses, and
-   reconcile. Which copy owns state is [#1133].
+   the store, so the store has four writers: actions, responses, reconcile,
+   and the sign-out clear. Which copy owns state is [#1133].
 3. **Store to query layer.** The sign-in push sends store entries through the
    mutation, without the hook's actions or their rollback, see [#1847].
 4. **Route to Firebase Auth.** `routes/account.ts` calls `deleteUser`, outside
    the boundaries [#1020] sets.
-5. **Route to repository, rules split between them.** Routes hold catalogue
-   checks, team composition, and cross-feature reads. Repositories hold merges,
-   timestamps, and instance IDs. See [#1848].
-6. **Feature hook to fetch wrapper.** `useDeleteAccount` defines its own
+5. **Feature hook to fetch wrapper.** `useDeleteAccount` defines its own
    mutation and calls `apiDelete`, see [#1849].
+
+Business rules split between two adjacent layers. Routes hold catalogue checks,
+team composition, and cross-feature reads. Repositories hold merges,
+timestamps, and instance IDs. See [#1848].
 
 ## Jobs by layer
 
@@ -93,13 +96,14 @@ rule more than one layer implements.
 
 ### Validation
 
-- **View:** offers only owned characters, locks a weapon another team holds,
-  and caps artifact plan sets and minor affixes. Overlaps
-  [team composition rules].
+- **View:** offers only owned characters not already in the team, locks a
+  weapon another team holds, and caps artifact plan sets and minor affixes.
+  Overlaps [team composition rules].
 - **Feature hook:** skips a no-op: an owned add, a removal or level change of
   something not held, an unchanged level or refinement, and an `ensureWeapon`
   for a weapon owned or in flight. Overlaps [owned-character guard].
-- **Store:** skips an owned add. Ignores a bad member index, an empty position,
+- **Store:** skips an owned add and a response for a character no longer held.
+  Ignores a bad member index, an empty position,
   and a duplicate character. Trims a team name. Overlaps
   [owned-character guard], [team composition rules], [team name rules].
 - **Persist:** on a version change, drops a stored collection that doesn't
@@ -126,7 +130,8 @@ enforce.
 
 #### Team composition rules
 
-The client ignores a duplicate character in a team, and the server rejects one.
+The planner UI disables and the store ignores a duplicate character in a team,
+and the server rejects one.
 The planner UI, the request schema, and the route's `validateArtifactPlan` each
 enforce part of the artifact plan limits. The planner UI offers only owned
 characters and locks a weapon another team holds, and the server rejects
@@ -155,12 +160,17 @@ When the server's values reach each store is in
 
 - **Feature hook:** both for every unsaved team slot. `updatedAt` on a
   character merge that keeps the local level.
-- **Store:** both on a character add. `updatedAt` on every other character and
+- **Store:** both on a character add, and on every team slot at start and on
+  reset. `updatedAt` on every other character and
   team edit. The weapon store never mints them.
 - **Repository:** both on every save, keeping a stored `createdAt`.
 
 ### Identity
 
+- **View:** `ClearUserDataOnSignOut` empties every store when the signed-in user
+  ID changes away from a signed-in user.
+- **Feature hook:** applies a character or weapon response or rollback only
+  while its sender is still signed in.
 - **Query layer:** puts the character ID, instance ID, or slot in the path.
 - **Fetch wrapper:** attaches the signed-in user's ID token.
 - **Middleware:** verifies the ID token. Its user ID keys all storage.
@@ -187,8 +197,8 @@ The server requires the field and has no default.
 
 #### Empty team
 
-`createEmptyTeam` on the client and `nextTeam` on the server each define the
-default name and the four empty member slots.
+`createEmptyTeam` in `@genshin/domain`, used by the client, and `nextTeam` on
+the server each define the default name and the four empty member slots.
 
 ### Schema versioning
 
@@ -204,8 +214,10 @@ Each layer below versions its own format, an overlap.
 The hook and the repository merge by different rules, an overlap. The same two
 character values resolve differently on each side.
 
-- **Feature hook:** [guarded rollback](data-flow-write-paths.md). Applies a response: characters' level, weapons' whole instance.
-  Reconciles characters additively with `mergeCollections`, keeping the higher
+- **Feature hook:** [guarded rollback](data-flow-write-paths.md). Applies a
+  response only while its sender is still signed in: a character's whole record
+  unless it's no longer held, or a weapon's whole instance. Reconciles
+  characters additively with `mergeCollections`, keeping the higher
   constellation, and replaces weapons and teams.
 - **Repository:** `nextCharacter` and the weapon update keep the latest write.
   `nextTeam` keeps any stored field the body omits.
@@ -236,9 +248,10 @@ flowchart TB
 
   edit -->|write request| dispatch
   dispatch -->|mutation variables| build
-  reconcile -->|characters the server lacks| build
+  reconcile -->|characters ahead of the server| build
   build -->|path and request body| callApi
   firebaseAuth -->|ID token| callApi
+  firebaseAuth -->|user ID| dispatch
   callApi -->|request body and ID token| serve
   serve -->|saved record| callApi
   callApi -->|response body or problem| build

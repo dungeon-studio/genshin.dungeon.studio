@@ -14,7 +14,7 @@ Every feature runs the same chain:
 1. The API reads a document through `fromDocument`, which migrates it to the
    current version and asserts domain invariants. For teams it also pads a
    short `members` array to four.
-2. The list route serialises the page to Collection+JSON with
+2. The list route serialises the result to Collection+JSON with
    `characterListDocument`, `weaponListDocument`, or `teamListDocument`.
 3. The query layer asserts the document and converts each item with
    `deserialiseCharacter`, `deserialiseWeapon`, or `deserialiseTeam`.
