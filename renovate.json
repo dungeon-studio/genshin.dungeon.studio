@@ -64,7 +64,7 @@
       "automerge": true
     },
     {
-      "description": "Merge production dependency patch updates on green CI",
+      "description": "Merge non-breaking production dependency patch updates on green CI",
       "matchDepTypes": ["dependencies"],
       "matchUpdateTypes": ["patch"],
       "matchJsonata": ["isBreaking != true"],
