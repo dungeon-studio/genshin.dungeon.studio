@@ -14,7 +14,7 @@
   "minimumReleaseAge": "3 days",
   "osvVulnerabilityAlerts": true,
   "vulnerabilityAlerts": {
-    "description": "Label vulnerability-driven pull requests security and merge them on green CI after a bake matching pnpm's default release-age floor, which extends that guard to ecosystems without one",
+    "description": "Label vulnerability-driven pull requests security and merge them on green CI after a bake as long as pnpm's default release-age floor, so ecosystems outside npm get the same guard",
     "addLabels": ["security"],
     "minimumReleaseAge": "1 day",
     "automerge": true
