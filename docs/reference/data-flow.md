@@ -137,9 +137,9 @@ invalidates its query, which makes Fetch records run again. No mutation writes
 into the query cache directly. Account deletion empties it. A plain sign-out
 leaves the previous user's entries, keyed by user ID, until garbage collection.
 
-Clear user data runs whenever the signed-in user ID changes away from a
-signed-in user, whichever page is open. It empties the character and weapon
-stores and resets teams to their default slots. The emptied character
-collection then persists to D3.
+Clear user data runs when a signed-in user signs out or another account signs
+in, whichever page is open. It empties the character and weapon stores and
+resets teams to their default slots. The emptied character collection then
+persists to D3.
 
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133

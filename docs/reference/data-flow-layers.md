@@ -85,14 +85,14 @@ representations every layer uses.
 5. **Feature hook to fetch wrapper.** `useDeleteAccount` defines its own
    mutation and calls `apiDelete`, see [#1849].
 
-Business rules split between two adjacent layers. Routes hold catalogue checks,
-team composition, and cross-feature reads. Repositories hold merges,
-timestamps, and instance IDs. See [#1848].
-
 ## Jobs by layer
 
 Each job lists, in stack order, only the layers that do it. An overlap is a
 rule more than one layer implements.
+
+Business rules split between the route and the repository. Routes hold
+catalogue checks, team composition, and cross-feature reads. Repositories hold
+merges, timestamps, and instance IDs. See [#1848].
 
 ### Validation
 
@@ -167,8 +167,8 @@ When the server's values reach each store is in
 
 ### Identity
 
-- **View:** `ClearUserDataOnSignOut` empties every store when the signed-in user
-  ID changes away from a signed-in user.
+- **View:** `ClearUserDataOnSignOut` empties every store when a signed-in user
+  signs out or another account signs in.
 - **Feature hook:** applies a character or weapon response or rollback only
   while its sender is still signed in.
 - **Query layer:** puts the character ID, instance ID, or slot in the path.
@@ -215,8 +215,8 @@ The hook and the repository merge by different rules, an overlap. The same two
 character values resolve differently on each side.
 
 - **Feature hook:** [guarded rollback](data-flow-write-paths.md). Applies a
-  response only while its sender is still signed in: a character's whole record
-  unless it's no longer held, or a weapon's whole instance. Reconciles
+  response: a character's whole record unless it's no longer held, or a
+  weapon's whole instance. Reconciles
   characters additively with `mergeCollections`, keeping the higher
   constellation, and replaces weapons and teams.
 - **Repository:** `nextCharacter` and the weapon update keep the latest write.
