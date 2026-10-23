@@ -192,14 +192,14 @@ failure between the two never orphans data: the identity remains and can retry.
 
 ## Divergences
 
-| Question                                    | Characters                                                          | Weapons                          | Teams                                 |
-| ------------------------------------------- | ------------------------------------------------------------------- | -------------------------------- | ------------------------------------- |
-| Works signed out?                           | Yes, persisted until sign-in merges it                              | No, every action is a no-op      | Yes, in memory until the page reloads |
-| Optimistic?                                 | All three actions                                                   | Remove and refine, not add       | Every action                          |
-| Applies the mutation response to the store? | Constellation level only                                            | Whole instance, replaced         | No                                    |
-| How a refetch reaches the store             | Additive merge                                                      | Replace                          | Replace, filled to four slots         |
-| Can a refetch overwrite an edit in flight?  | Raise or add, no. Lower or remove, only one the write didn't cancel | Only one the write didn't cancel | Only one the write didn't cancel      |
-| What a removal elsewhere does to the store  | Survives the merge, see [#1741]                                     | Disappears on refetch            | Disappears on refetch                 |
+| Question                                    | Characters                                                                | Weapons                                | Teams                                  |
+| ------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------- | -------------------------------------- |
+| Works signed out?                           | Yes, persisted until sign-in merges it                                    | No, every action is a no-op            | Yes, in memory until the page reloads  |
+| Optimistic?                                 | All three actions                                                         | Remove and refine, not add             | Every action                           |
+| Applies the mutation response to the store? | Constellation level only                                                  | Whole instance, replaced               | No                                     |
+| How a refetch reaches the store             | Additive merge                                                            | Replace                                | Replace, filled to four slots          |
+| Can a refetch overwrite an edit in flight?  | Raise or add, no. Lower or remove, only a refetch the write didn't cancel | Only a refetch the write didn't cancel | Only a refetch the write didn't cancel |
+| What a removal elsewhere does to the store  | Survives the merge, see [#1741]                                           | Disappears on refetch                  | Disappears on refetch                  |
 
 Teams also depend on the other two features. The server rejects a team that
 names a character or weapon instance the user doesn't own, so a team save can

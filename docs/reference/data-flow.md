@@ -120,9 +120,10 @@ Two control signals carry no data:
 
 - A successful mutation invalidates its query, which makes Fetch records run
   again, unless a later mutation to the same query is still pending. Starting a
-  mutation cancels a refetch already in flight. No collection or team mutation writes into the query cache directly.
-  Account deletion empties it. A plain sign-out leaves the previous user's
-  entries, keyed by user ID, until garbage collection.
+  mutation cancels a refetch already in flight. No collection or team mutation
+  writes into the query cache directly. Account deletion empties it. A plain
+  sign-out leaves the previous user's entries, keyed by user ID, until garbage
+  collection.
 - When a signed-in user signs out, `ClearUserDataOnSignOut` empties every
   per-user store, whichever page is open.
 
