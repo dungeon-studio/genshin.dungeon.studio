@@ -47,7 +47,7 @@ async function renderedNames(page: Page, cardName: RegExp): Promise<string[]> {
 }
 
 function namesOf(items: readonly CollectionItem[]): string[] {
-  return items.map((item) => item.name).toSorted();
+  return items.map((item) => item.name);
 }
 
 function describeFilters<I extends CollectionItem>(collection: CollectionPage<I>): void {
@@ -58,7 +58,7 @@ function describeFilters<I extends CollectionItem>(collection: CollectionPage<I>
   const expectGridOf = (page: Page, matches: (item: I) => boolean) =>
     expect
       .poll(async () => (await names(page)).toSorted())
-      .toEqual(namesOf(roster.filter(matches)));
+      .toEqual(namesOf(roster.filter(matches)).toSorted());
 
   test.describe(`the ${noun} filters`, () => {
     test('search narrows the grid to matching names', async ({ page }) => {
