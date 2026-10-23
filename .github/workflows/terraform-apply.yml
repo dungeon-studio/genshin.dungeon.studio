@@ -23,7 +23,7 @@ permissions:
 jobs:
   core:
     name: Apply core infrastructure
-    if: github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/release/')
+    if: github.ref == 'refs/heads/develop'
     permissions:
       contents: read
       id-token: write
@@ -50,7 +50,6 @@ jobs:
   staging:
     name: Apply staging infrastructure
     if: startsWith(github.ref, 'refs/heads/release/')
-    needs: core
     permissions:
       contents: read
       id-token: write
