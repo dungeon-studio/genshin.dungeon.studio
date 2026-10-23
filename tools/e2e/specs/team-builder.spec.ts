@@ -43,6 +43,21 @@ function unnamedTeam(page: Page, slot: number): Locator {
   return page.getByRole('region', { name: `Team ${slot}` });
 }
 
+/** The first member position in `team` showing `label`: a member's name, or "No character". */
+function memberPosition(team: Locator, label: string): Locator {
+  return team.getByRole('button').filter({ hasText: label }).first();
+}
+
+/**
+ * Run an edit and wait for the team save it triggers.
+ *
+ * Each edit saves the whole team, so awaiting every write keeps a later save
+ * from landing ahead of an earlier one.
+ */
+function saveTeam(page: Page, slot: number, edit: () => Promise<unknown>): Promise<void> {
+  return withApiWrite(page, 'PUT', apiPath.team(slot), edit);
+}
+
 /** Dismiss the member editor sheet and wait for the teams to come back. */
 async function closeTeamEditor(page: Page): Promise<void> {
   await page.keyboard.press('Escape');
@@ -51,13 +66,9 @@ async function closeTeamEditor(page: Page): Promise<void> {
 
 /** Fill the first empty position of `slot` with `member` and close the editor. */
 async function addMember(page: Page, slot: number, member: Character): Promise<void> {
-  await unnamedTeam(page, slot)
-    .getByRole('button')
-    .filter({ hasText: 'No character' })
-    .first()
-    .click();
+  await memberPosition(unnamedTeam(page, slot), 'No character').click();
 
-  await withApiWrite(page, 'PUT', apiPath.team(slot), () =>
+  await saveTeam(page, slot, () =>
     page.getByRole('button', { name: `Add ${member.name} to team` }).click(),
   );
 
@@ -76,7 +87,7 @@ test('a team takes a name, a character, and a weapon that survive a reload', asy
 
   await page.goto('/');
 
-  await withApiWrite(page, 'PUT', apiPath.team(TEAM_SLOT), async () => {
+  await saveTeam(page, TEAM_SLOT, async () => {
     await page.getByRole('button', { name: `Edit name of Team ${TEAM_SLOT}` }).click();
     const nameField = page.getByRole('textbox', { name: `Rename team ${TEAM_SLOT}` });
     await nameField.fill(TEAM_NAME);
@@ -86,15 +97,15 @@ test('a team takes a name, a character, and a weapon that survive a reload', asy
   const team = page.getByRole('region', { name: TEAM_NAME });
   await expect(team).toBeVisible();
 
-  await team.getByRole('button').filter({ hasText: 'No character' }).first().click();
+  await memberPosition(team, 'No character').click();
 
-  await withApiWrite(page, 'PUT', apiPath.team(TEAM_SLOT), () =>
+  await saveTeam(page, TEAM_SLOT, () =>
     page.getByRole('button', { name: `Add ${character.name} to team` }).click(),
   );
 
   await page.getByRole('button', { name: 'Weapons' }).click();
 
-  await withApiWrite(page, 'PUT', apiPath.team(TEAM_SLOT), () =>
+  await saveTeam(page, TEAM_SLOT, () =>
     page.getByRole('button', { name: `Assign ${weapon.name} to character` }).click(),
   );
 
@@ -140,9 +151,9 @@ test('a removed member stays removed through a reload', async ({ signedInPage: p
   await addMember(page, TEAM_SLOT, secondCharacter);
 
   const team = unnamedTeam(page, TEAM_SLOT);
-  await team.getByRole('button').filter({ hasText: character.name }).click();
+  await memberPosition(team, character.name).click();
 
-  await withApiWrite(page, 'PUT', apiPath.team(TEAM_SLOT), () =>
+  await saveTeam(page, TEAM_SLOT, () =>
     page.getByRole('button', { name: `Remove ${character.name} from team` }).click(),
   );
 
@@ -169,10 +180,7 @@ test('an artifact plan survives a reload', async ({ signedInPage: page }) => {
   const artifactSet = team.getByRole('combobox', { name: 'Search artifact set...' });
   const prioritySubstats = team.getByRole('list', { name: 'Priority substats' });
 
-  // Each edit saves the whole team, so awaiting every write keeps a later save
-  // from landing ahead of an earlier one.
-  const save = (edit: () => Promise<unknown>) =>
-    withApiWrite(page, 'PUT', apiPath.team(TEAM_SLOT), edit);
+  const save = (edit: () => Promise<unknown>) => saveTeam(page, TEAM_SLOT, edit);
 
   await save(() => sands.selectOption(SANDS));
   await save(() => goblet.selectOption(GOBLET));
