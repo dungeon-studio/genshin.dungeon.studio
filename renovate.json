@@ -58,13 +58,13 @@
       "versioning": "node"
     },
     {
-      "description": "Merge development dependency patch and minor updates on green CI; majors wait for a human",
+      "description": "Merge development dependency patch and minor updates on green CI",
       "matchDepTypes": ["devDependencies"],
       "matchUpdateTypes": ["patch", "minor"],
       "automerge": true
     },
     {
-      "description": "Merge production dependency patch updates on green CI; production minors and majors wait for a human",
+      "description": "Merge production dependency patch updates on green CI",
       "matchDepTypes": ["dependencies"],
       "matchUpdateTypes": ["patch"],
       "automerge": true
