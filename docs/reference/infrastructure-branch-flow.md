@@ -32,10 +32,10 @@ Plan and apply run only when a change touches `infrastructure/terraform/`, outsi
 | push to `hotfix/*`                                  | applies nothing           |
 | pull requests to `develop`, `release/*`, and `main` | run Terraform plan checks |
 
-`core` holds the DNS records for every environment in one state, so it applies
-from `develop` alone. Applying it from a diverged `release/*` branch too would
-let whichever branch pushed last revert the other's records. A `core` change
-made on a release branch applies once that branch merges back to `develop`.
+A `core` change made on a `release/*` branch applies once that branch merges
+back to `develop`. `core` keeps every environment's DNS records in one state, so
+applying it from a diverged release branch would let whichever branch pushed
+last revert the other's records.
 
 ## Release-branch naming
 
