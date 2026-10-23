@@ -38,21 +38,19 @@ const CIRCLET = 'CRIT Rate' satisfies (typeof CIRCLET_MAIN_AFFIXES)[number];
 const SUBSTAT = 'CRIT DMG' satisfies (typeof ARTIFACT_MINOR_AFFIXES)[number];
 const ARTIFACT_SET = ARTIFACT_SETS['obsidian-codex'];
 
-/** A team still carrying the name it starts with. */
+/** A team still under its default name, `Team <slot>`. */
 function unnamedTeam(page: Page, slot: number): Locator {
   return page.getByRole('region', { name: `Team ${slot}` });
 }
 
-/** The first member position in `team` showing `label`: a member's name, or "No character". */
+/** `label` is a member's name, or "No character" for an empty position. */
 function memberPosition(team: Locator, label: string): Locator {
   return team.getByRole('button').filter({ hasText: label }).first();
 }
 
 /**
- * Run an edit and wait for the team save it triggers.
- *
- * Each edit saves the whole team, so awaiting every write keeps a later save
- * from landing ahead of an earlier one.
+ * Every save sends the whole team, so a save left unawaited can land after a
+ * newer one and undo it.
  */
 function saveTeam(page: Page, slot: number, edit: () => Promise<unknown>): Promise<void> {
   return withApiWrite(page, 'PUT', apiPath.team(slot), edit);
@@ -161,8 +159,8 @@ test('a removed member stays removed through a reload', async ({ signedInPage: p
 
   await page.reload();
 
-  // The member left behind coming back shows the team loaded before the
-  // removed one's absence is asserted.
+  // The remaining member proves the team has loaded, so the absence check
+  // can't pass on an empty page.
   await expect(team.getByText(secondCharacter.name)).toBeVisible();
   await expect(team.getByText(character.name)).toBeHidden();
 });

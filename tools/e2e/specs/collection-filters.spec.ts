@@ -34,10 +34,10 @@ interface CollectionPage<I extends CollectionItem> {
 
 const RARITY: Rarity = 4;
 
-// The app sorts names with this collator, so the expected order has to match it.
+// The collator the app sorts names with.
 const nameCollator = new Intl.Collator('en');
 
-/** The names of the cards the grid renders, in the order it renders them. */
+/** Card names in the order the grid renders them. */
 async function renderedNames(page: Page, cardName: RegExp): Promise<string[]> {
   const labels = await page
     .getByRole('button', { name: cardName })
