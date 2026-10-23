@@ -4,9 +4,8 @@
 import { screen } from '@testing-library/react';
 
 /**
- * What each decorative icon inside the named button draws: an image reports
- * its source, a glyph its mask. Decorative icons have no accessible role to
- * query by.
+ * Lists what each decorative icon in the named button draws: an image's source
+ * or a glyph's mask. Decorative icons have no role to query by.
  */
 export function iconSources(buttonName: string): string[] {
   return [

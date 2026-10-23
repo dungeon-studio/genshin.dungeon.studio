@@ -51,7 +51,7 @@ export const ELEMENT_FOCUS_RINGS: Record<Element, string> = {
   Dendro: 'focus-visible:ring-dendro',
 };
 
-/** Each text color reaches 4.5:1 on its fill, the same in either theme. */
+/** Text colors reach 4.5:1 contrast on their fill in both themes. */
 export const ELEMENT_BG_COLORS: Record<Element, string> = {
   Pyro: 'bg-pyro-dark text-white',
   Hydro: 'bg-hydro-dark text-white',

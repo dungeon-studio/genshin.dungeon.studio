@@ -7,16 +7,14 @@ import { ThemedIcon } from '@/components/ui/themed-icon';
 
 interface ChipIconProps {
   iconPath: (variant: 'light' | 'dark') => string;
-  /** The chip wears a colored fill rather than the page background. */
   onFill: boolean;
 }
 
 const SIZE = 'h-3.5 w-3.5';
 
 /**
- * A decorative chip icon. On a colored fill, which the icon's own colors can
- * match, it takes the label's color and so the label's contrast; elsewhere it
- * follows the page theme.
+ * Decorative. On a colored fill the icon takes the label's color, because its
+ * own colors can match the fill.
  */
 export function ChipIcon({ iconPath, onFill }: ChipIconProps): JSX.Element {
   if (onFill) {
@@ -34,7 +32,7 @@ function GlyphIcon({ src }: { src: string }): JSX.Element {
     <span
       aria-hidden="true"
       className={`${SIZE} inline-block shrink-0 bg-current mask-contain mask-center mask-no-repeat`}
-      // The mask URL varies per icon, which no static utility class can name.
+      // Tailwind generates only classes written out in source, not per-icon URLs.
       style={{ maskImage: `url(${src})` }}
     />
   );
