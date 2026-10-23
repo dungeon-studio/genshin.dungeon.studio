@@ -35,9 +35,9 @@ so a newer edit stands. A toast shows either way, and nothing retries.
 Every mutation follows one refetch rule, set by `useUserQuerySync`. Starting a
 write cancels any refetch of its query already in flight. A write that succeeds
 while another write to the same query is pending skips its refetch and leaves
-it to the later write. The cancel skips the first load, and it can't reach a
-refetch that starts after the write, such as on window focus or reconnect.
-Either can still overwrite an edit in flight.
+it to the write still pending. The cancel skips the first load, and it can't
+reach a refetch that starts after the write, such as on window focus or
+reconnect. Either can still overwrite an edit in flight.
 
 A write that fails after a later write from the same hook has started gets
 neither rollback nor toast, see [#1757].
@@ -66,7 +66,7 @@ sequenceDiagram
     API->>FS: PUT: transaction of read, nextCharacter, set<br>DELETE: delete
     alt success
       API-->>Hook: saved character, or no content on DELETE
-      Hook->>Cache: invalidate, unless a later write is pending
+      Hook->>Cache: invalidate, unless another write is pending
       opt PUT
         Hook->>Store: replaceCharacter (skipped once removed)
       end
@@ -106,7 +106,7 @@ sequenceDiagram
     API->>FS: create with minted instance ID
     alt success
       API-->>Hook: saved weapon
-      Hook->>Cache: invalidate, unless a later write is pending
+      Hook->>Cache: invalidate, unless another write is pending
       Hook->>Store: addWeapon (upsert)
     else failure
       Hook->>Hook: toast, store untouched
@@ -118,7 +118,7 @@ sequenceDiagram
     API->>FS: PATCH: read, then set, no transaction<br>DELETE: delete
     alt success
       API-->>Hook: saved weapon, or no content on DELETE
-      Hook->>Cache: invalidate, unless a later write is pending
+      Hook->>Cache: invalidate, unless another write is pending
       opt PATCH
         Hook->>Store: addWeapon (replaces the instance)
       end
@@ -152,7 +152,7 @@ sequenceDiagram
     API->>FS: PUT with members: read characters, weapons,<br>and other teams to validate them
     API->>FS: PUT: transaction of read, nextTeam, set<br>DELETE: delete
     alt success
-      Hook->>Cache: invalidate, unless a later write is pending
+      Hook->>Cache: invalidate, unless another write is pending
       Cache-->>Reconcile: refetched teams
       Reconcile->>Store: collectionTeamsToStore, then setTeams (replace)
     else failure

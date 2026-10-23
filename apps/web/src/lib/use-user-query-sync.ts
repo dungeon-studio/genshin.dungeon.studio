@@ -21,8 +21,8 @@ const SIGNED_OUT: UserQuerySync = {
  *
  * A refetch that starts before a write can answer with data that predates it.
  * Starting a write cancels any refetch in flight, and a write that succeeds
- * while another is pending leaves the refetch to the later one. A first load
- * is never cancelled, because nothing would restart it.
+ * while another is pending leaves the refetch to the one still pending. A
+ * first load is never cancelled, because nothing would restart it.
  *
  * The refetch isn't awaited: returning it would hold the mutation pending
  * until the refetch settled.

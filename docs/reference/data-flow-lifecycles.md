@@ -28,7 +28,7 @@ In every feature:
   store only when its result differs.
 - Sending a request cancels any refetch already in flight, except the first
   load. The first load, or a refetch that starts after the request, can still
-  land while it's in flight.
+  land before the request settles.
 - Only the latest request of each kind through a hook gets its response
   handling: confirm, rollback, and toast. An earlier request, or one that
   settles after the user leaves its page, reaches the store only through a
@@ -114,8 +114,8 @@ stateDiagram-v2
 - Confirmed by a response: the saved instance replaces the copy, server
   timestamps included.
 - Rolled back: a rolled-back removal returns the exact instance it removed.
-- Overwritten: a refetch replaces the whole store, so one the request didn't
-  cancel overwrites any edit in flight.
+- Overwritten: a refetch replaces the whole store, so a refetch the request
+  didn't cancel overwrites any edit in flight.
 
 ## Teams
 
@@ -153,12 +153,12 @@ stateDiagram-v2
   load. Signing in replaces it rather than merging it.
 - Confirmed: a response never reaches the store. Only a refetch confirms it,
   server timestamps included. A save that succeeds while another team save is
-  pending leaves that refetch to the later save.
+  pending skips its refetch and waits on that save's.
 - Sent by a clear: no component calls `clearTeam`. The store keeps the team's
   name and empties its positions. The server deletes the record, so the refetch
   brings back the default name, see [#1839].
-- Overwritten: a refetch replaces all four slots, so one the request didn't
-  cancel overwrites an edit in flight in any slot.
+- Overwritten: a refetch replaces all four slots, so a refetch the request
+  didn't cancel overwrites an edit in flight in any slot.
 
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
 [#1534]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1534
