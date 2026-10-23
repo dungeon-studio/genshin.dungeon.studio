@@ -35,7 +35,7 @@ In every feature:
 - Requests of different kinds through one hook settle in any order, so a
   response can undo a newer edit. The response to an add can put the minimum
   level back over a raise, and a refinement's response can put an instance back
-  after a removal. A character response never puts back a removed character.
+  after a removal.
 
 ## Characters
 

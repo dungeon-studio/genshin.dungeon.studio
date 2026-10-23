@@ -73,7 +73,7 @@ flowchart TB
     fetch(4.0 Fetch records)
     reconcile(5.0 Reconcile store with cache)
     persistCharacters(6.0 Persist character collection)
-    clearUserData(8.0 Clear user data on sign-out)
+    clearUserData(8.0 Clear user data)
     store[(D1 zustand stores)]
     cache[(D2 Query cache)]
     local[(D3 localStorage genshin-collection)]

@@ -19,8 +19,8 @@ travel inside a team save, so they share the team path.
 
 Each feature's hook is the only caller of its mutations. It's also the only
 writer to its store, apart from `ClearUserDataOnSignOut`, which empties every
-store when a signed-in user leaves. Each feature reads from its zustand store,
-never from the cache.
+store when a signed-in user signs out or another account signs in. Each feature
+reads from its zustand store, never from the cache.
 
 A write skips both client copies: the hook edits the store and calls the API
 directly. The server's state comes back the other way, through a refetch into
@@ -36,9 +36,8 @@ A write that fails after a later write from the same hook has started gets
 neither rollback nor toast, see [#1757].
 
 A character or weapon write that settles after its sender signs out, or after
-another account signs in, changes nothing and shows no toast. Their mutations go
-through `useSenderBoundMutate`, which enforces this. Team writes don't, so a
-team save that fails after sign-out still toasts.
+another account signs in, changes nothing and shows no toast, through
+`useSenderBoundMutate`. A team save that fails after sign-out still toasts.
 
 ## Characters
 
