@@ -22,10 +22,13 @@ In every feature:
 - From every state, the store empties when a signed-in user signs out or
   another account signs in, whichever page is open. A team slot resets to
   Default instead. Auth settling on page load isn't a sign-out.
-- While signed in, a refetch runs after any successful mutation in the same
-  feature, on window focus, on reconnect, and when a hook mounts. A mount first
-  applies the cached result. A refetch changes the store only when its result
-  differs. It can land while any request is in flight.
+- While signed in, a refetch runs on window focus, on reconnect, when a hook
+  mounts, and after a successful mutation in the same feature unless another is
+  still pending. A mount first applies the cached result. A refetch changes the
+  store only when its result differs.
+- Sending a request cancels any refetch already in flight, except the first
+  load. The first load, or a refetch that starts after the request, can still
+  land before the request settles.
 - Only the latest request of each kind through a hook gets its response
   handling: confirm, rollback, and toast. An earlier request, or one that
   settles after the user leaves its page, reaches the store only through a
@@ -101,7 +104,7 @@ stateDiagram-v2
   Sent --> RolledBack: rejected, store still holds the sent value
   Sent --> Overwritten: refetch while in flight
   Overwritten --> Confirmed: PATCH succeeds, or the request fails
-  Overwritten --> [*]: DELETE succeeds, then its refetch drops it
+  Overwritten --> [*]: DELETE succeeds, then a refetch drops it
   RolledBack --> Sent: edit
   RolledBack --> Confirmed: next refetch
 ```
@@ -111,8 +114,8 @@ stateDiagram-v2
 - Confirmed by a response: the saved instance replaces the copy, server
   timestamps included.
 - Rolled back: a rolled-back removal returns the exact instance it removed.
-- Overwritten: a refetch replaces the whole store, so any edit in flight is
-  overwritten.
+- Overwritten: a refetch replaces the whole store, so a refetch the request
+  didn't cancel overwrites any edit in flight.
 
 ## Teams
 
@@ -130,8 +133,8 @@ stateDiagram-v2
   LocalOnly --> Sent: edit after sign-in, before the first fetch lands
   LocalOnly --> DefaultTeam: sign in with the slot unsaved
   Sent --> Sent: newer edit to the same slot
-  Sent --> Confirmed: save succeeds, then its refetch lands
-  Sent --> DefaultTeam: clear succeeds, then its refetch lands
+  Sent --> Confirmed: save succeeds, then a refetch lands
+  Sent --> DefaultTeam: clear succeeds, then a refetch lands
   Sent --> RolledBack: rejected, slot still holds the sent team
   Sent --> Overwritten: refetch while in flight
   Overwritten --> Confirmed: save succeeds, or the request fails
@@ -148,13 +151,14 @@ stateDiagram-v2
   slot.
 - Local only: in memory, so it survives moving between pages but not a page
   load. Signing in replaces it rather than merging it.
-- Confirmed: a response never reaches the store. Only the refetch the save
-  triggers confirms it, server timestamps included.
+- Confirmed: a response never reaches the store. Only a refetch confirms it,
+  server timestamps included. A save that succeeds while another team save is
+  pending skips its refetch and waits on that save's.
 - Sent by a clear: no component calls `clearTeam`. The store keeps the team's
   name and empties its positions. The server deletes the record, so the refetch
   brings back the default name, see [#1839].
-- Overwritten: a refetch replaces all four slots, so a save in one slot
-  overwrites an edit in flight in another.
+- Overwritten: a refetch replaces all four slots, so a refetch the request
+  didn't cancel overwrites an edit in flight in any slot.
 
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
 [#1534]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1534

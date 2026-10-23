@@ -133,9 +133,11 @@ flowchart TB
 ```
 
 A control signal carries no data: a successful collection or team mutation
-invalidates its query, which makes Fetch records run again. No mutation writes
-into the query cache directly. Account deletion empties it. A plain sign-out
-leaves the previous user's entries, keyed by user ID, until garbage collection.
+invalidates its query, which makes Fetch records run again. A mutation that
+succeeds while another to the same query is pending skips the invalidation.
+Starting a mutation cancels a refetch already in flight. No mutation writes into
+the query cache directly. Account deletion empties it. A plain sign-out leaves
+the previous user's entries, keyed by user ID, until garbage collection.
 
 Clear user data runs when a signed-in user signs out or another account signs
 in, whichever page is open. It empties the character and weapon stores and
