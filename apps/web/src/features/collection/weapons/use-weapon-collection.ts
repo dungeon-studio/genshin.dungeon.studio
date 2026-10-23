@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 
 import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
+import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
 import type { WeaponMutationResult } from './use-weapon-collection-api';
 import {
@@ -128,7 +129,6 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   const weapons = useWeaponCollectionStore((s) => s.weapons);
   const storeSetWeapons = useWeaponCollectionStore((s) => s.setWeapons);
   const storeAddWeapon = useWeaponCollectionStore((s) => s.addWeapon);
-  const clearWeapons = useWeaponCollectionStore((s) => s.clearWeapons);
 
   const {
     data: apiWeapons,
@@ -136,9 +136,12 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     isLoading: queryLoading,
   } = useWeaponCollectionQuery(uid);
 
-  const { mutate: addWeaponApi } = useAddWeaponMutation(uid);
-  const { mutate: removeWeaponApi } = useRemoveWeaponMutation(uid);
-  const { mutate: setRefinementLevelApi } = useSetRefinementLevelMutation(uid);
+  const addWeaponApi = useSenderBoundMutate(uid, useAddWeaponMutation(uid).mutate);
+  const removeWeaponApi = useSenderBoundMutate(uid, useRemoveWeaponMutation(uid).mutate);
+  const setRefinementLevelApi = useSenderBoundMutate(
+    uid,
+    useSetRefinementLevelMutation(uid).mutate,
+  );
 
   const applyMutationResult = useCallback(
     ({ weapon }: WeaponMutationResult) => {
@@ -146,12 +149,6 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     },
     [storeAddWeapon],
   );
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      clearWeapons();
-    }
-  }, [isAuthenticated, clearWeapons]);
 
   useEffect(() => {
     if (!apiWeapons) return;

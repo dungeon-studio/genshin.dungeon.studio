@@ -7,10 +7,10 @@ import { http, HttpResponse } from 'msw';
 import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { deferred } from '@/test/deferred';
 import { makeWeapon, weaponsDocument } from '@/test/fixtures';
+import { holdResponse } from '@/test/msw/held-response';
 import { server } from '@/test/msw/server';
-import { createTestQueryClient, createWrapper, fakeUser } from '@/test/render';
+import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
 
 import { useWeaponCollection } from './use-weapon-collection';
 import { useWeaponCollectionStore } from './use-weapon-collection-store';
@@ -80,6 +80,34 @@ describe('useWeaponCollection', () => {
 
       await waitFor(() => expect(result.current.weapons[SECOND_INSTANCE_ID]).toBeDefined());
       expect(result.current.weapons[INSTANCE_ID]).toBeDefined();
+    });
+
+    it('leaves the store alone when the add settles after sign-out', async () => {
+      const addConfirmation = holdResponse(() =>
+        HttpResponse.json(
+          weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 })]),
+        ),
+      );
+      server.use(
+        http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument([]))),
+        http.post('http://localhost:8080/weapons', addConfirmation.resolver),
+      );
+
+      const { result, queryClient, signOut } = renderHookSignedIn(
+        () => useWeaponCollection(),
+        'user-1',
+      );
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      act(() => {
+        result.current.addWeapon(WEAPON_ID);
+      });
+      signOut();
+      await waitFor(() => expect(queryClient.isMutating()).toBe(1));
+      addConfirmation.release();
+
+      await waitFor(() => expect(queryClient.isMutating()).toBe(0));
+      expect(useWeaponCollectionStore.getState().weapons).toEqual({});
     });
   });
 
@@ -193,32 +221,27 @@ describe('useWeaponCollection', () => {
     });
 
     it('keeps a change that a refetch started before it would overwrite', async () => {
-      const refetchGate = deferred();
-      const secondPatchGate = deferred();
       const atLevel = (refinementLevel: RefinementLevel) =>
         weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel })]);
+      // Answers with the server's state from before the second change.
+      const staleRefetch = holdResponse(() => HttpResponse.json(atLevel(2)));
+      const secondPatch = holdResponse(() => HttpResponse.json(atLevel(3)));
       let gets = 0;
       let patches = 0;
       server.use(
-        http.get('http://localhost:8080/weapons', async () => {
+        http.get('http://localhost:8080/weapons', () => {
           gets += 1;
           if (gets === 1) return HttpResponse.json(atLevel(1));
-          // Answers with the server's state from before the second change.
-          await refetchGate.promise;
-          return HttpResponse.json(atLevel(2));
+          return staleRefetch.resolver();
         }),
-        http.patch('http://localhost:8080/weapons/weapon-instance-1', async () => {
+        http.patch('http://localhost:8080/weapons/weapon-instance-1', () => {
           patches += 1;
           if (patches === 1) return HttpResponse.json(atLevel(2));
-          await secondPatchGate.promise;
-          return HttpResponse.json(atLevel(3));
+          return secondPatch.resolver();
         }),
       );
 
-      const queryClient = createTestQueryClient();
-      const { result } = renderHook(() => useWeaponCollection(), {
-        wrapper: createWrapper({ user: fakeUser('user-1'), queryClient }),
-      });
+      const { result, queryClient } = renderHookSignedIn(() => useWeaponCollection(), 'user-1');
       await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(1));
 
       act(() => {
@@ -231,11 +254,11 @@ describe('useWeaponCollection', () => {
       });
       await waitFor(() => expect(patches).toBe(2));
 
-      refetchGate.release();
+      staleRefetch.release();
       await waitFor(() => expect(queryClient.isFetching()).toBe(0));
       expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(3);
 
-      secondPatchGate.release();
+      secondPatch.release();
       await waitFor(() => expect(queryClient.isMutating()).toBe(0));
     });
   });

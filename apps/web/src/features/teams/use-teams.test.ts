@@ -7,10 +7,10 @@ import { http, HttpResponse } from 'msw';
 import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { deferred } from '@/test/deferred';
 import { makeTeam, teamsDocument } from '@/test/fixtures';
+import { holdResponse } from '@/test/msw/held-response';
 import { server } from '@/test/msw/server';
-import { createTestQueryClient, createWrapper, fakeUser } from '@/test/render';
+import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
 
 import { useTeamStore } from './use-team-store';
 import { useTeams } from './use-teams';
@@ -75,13 +75,10 @@ describe('useTeams (authenticated)', () => {
   });
 
   it('warns before unload while a save is in flight', async () => {
-    const putGate = deferred();
+    const put = holdResponse(() => new HttpResponse(null, { status: 204 }));
     server.use(
       http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([]))),
-      http.put('http://localhost:8080/teams/1', async () => {
-        await putGate.promise;
-        return new HttpResponse(null, { status: 204 });
-      }),
+      http.put('http://localhost:8080/teams/1', put.resolver),
     );
 
     const { result } = renderHook(() => useTeams(), {
@@ -100,34 +97,32 @@ describe('useTeams (authenticated)', () => {
     expect(event.defaultPrevented).toBe(true);
 
     // Let the in-flight save settle so no request outlives the test.
-    putGate.release();
+    put.release();
     await waitFor(() => expect(result.current.isSaving).toBe(false));
   });
 
   it('keeps an edit that a refetch started before it would overwrite', async () => {
-    const refetchGate = deferred();
-    const secondPutGate = deferred();
+    // Answers with the server's state from before the second edit.
+    const staleRefetch = holdResponse(() =>
+      HttpResponse.json(teamsDocument([makeTeam(1, { name: 'First' })])),
+    );
+    const secondPut = holdResponse(() => new HttpResponse(null, { status: 204 }));
     let gets = 0;
     const putBodies: { members: CollectionTeamMembers }[] = [];
     server.use(
-      http.get('http://localhost:8080/teams', async () => {
+      http.get('http://localhost:8080/teams', () => {
         gets += 1;
         if (gets === 1) return HttpResponse.json(teamsDocument([]));
-        // Answers with the server's state from before the second edit.
-        await refetchGate.promise;
-        return HttpResponse.json(teamsDocument([makeTeam(1, { name: 'First' })]));
+        return staleRefetch.resolver();
       }),
       http.put('http://localhost:8080/teams/1', async ({ request }) => {
         putBodies.push((await request.json()) as { members: CollectionTeamMembers });
-        if (putBodies.length === 2) await secondPutGate.promise;
+        if (putBodies.length === 2) return secondPut.resolver();
         return new HttpResponse(null, { status: 204 });
       }),
     );
 
-    const queryClient = createTestQueryClient();
-    const { result } = renderHook(() => useTeams(), {
-      wrapper: createWrapper({ user: fakeUser('user-1'), queryClient }),
-    });
+    const { result, queryClient } = renderHookSignedIn(() => useTeams(), 'user-1');
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     act(() => {
@@ -140,7 +135,7 @@ describe('useTeams (authenticated)', () => {
     });
     await waitFor(() => expect(putBodies).toHaveLength(2));
 
-    refetchGate.release();
+    staleRefetch.release();
     await waitFor(() => expect(queryClient.isFetching()).toBe(0));
 
     act(() => {
@@ -149,7 +144,7 @@ describe('useTeams (authenticated)', () => {
     await waitFor(() => expect(putBodies).toHaveLength(3));
     expect(putBodies[2]?.members[0]?.characterId).toBe(CHARACTER);
 
-    secondPutGate.release();
+    secondPut.release();
     await waitFor(() => expect(result.current.isSaving).toBe(false));
   });
 });

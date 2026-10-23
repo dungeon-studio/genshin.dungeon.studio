@@ -27,7 +27,6 @@ import { userScopedKey } from '@/lib/user-scoped-key';
 import type { CharacterCollection } from './use-character-collection-store';
 
 export interface MutationResult {
-  characterId: CharacterId;
   entry: CollectionCharacter;
 }
 
@@ -51,11 +50,7 @@ function parseSingleCharacterResponse(response: unknown): MutationResult {
   if (items.length !== 1 || item === undefined) {
     throw new Error(`Invalid API response: expected exactly one item, got ${items.length}`);
   }
-  const character = deserialiseCharacter(item);
-  return {
-    characterId: character.characterId,
-    entry: character,
-  };
+  return { entry: deserialiseCharacter(item) };
 }
 
 export function useCharacterCollectionQuery(
