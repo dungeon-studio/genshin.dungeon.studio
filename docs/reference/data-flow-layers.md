@@ -74,7 +74,7 @@ representations every layer uses.
 
 1. **View to store.** `character-pool.tsx` and `weapon-pool.tsx` read
    `useTeamStore` instead of `useTeams`, see [#1846]. `ClearUserDataOnSignOut`
-   empties every store on sign-out without a feature hook.
+   empties every store on sign-out without a feature hook, see [#1889].
 2. **Query layer to store.** Each hook's reconcile effect copies the cache into
    the store, so the store has four writers: actions, responses, reconcile,
    and the sign-out clear. Which copy owns state is [#1133].
@@ -307,6 +307,7 @@ A team save also reads the user's characters, weapons, and other teams through
 [#1847]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1847
 [#1848]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1848
 [#1849]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1849
+[#1889]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1889
 [empty team]: #empty-team
 [initial level]: #initial-level
 [owned-character guard]: #owned-character-guard
