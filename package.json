@@ -35,23 +35,23 @@
     "vscode-extensions:check": "tsx scripts/check-vscode-extensions.ts"
   },
   "devDependencies": {
-    "@ls-lint/ls-lint": "2.3.1",
-    "@turbo/gen": "2.11.8",
+    "@ls-lint/ls-lint": "2.3.2",
+    "@turbo/gen": "2.11.9",
     "@types/node": "24.19.2",
-    "eslint": "10.12.0",
+    "eslint": "10.13.0",
     "firebase-tools": "15.34.0",
-    "knip": "6.41.0",
+    "knip": "6.42.1",
     "prettier": "3.9.10",
     "prettier-plugin-tailwindcss": "0.8.1",
     "stylelint": "17.16.0",
     "syncpack": "15.3.3",
     "tsx": "4.23.15",
-    "turbo": "2.11.8",
+    "turbo": "2.11.9",
     "typescript": "npm:@typescript/typescript6@6.0.2",
     "vitest": "5.0.5"
   },
   "packageManager": "pnpm@12.14.0",
   "engines": {
-    "node": "24.22.0"
+    "node": "24.22.1"
   }
 }

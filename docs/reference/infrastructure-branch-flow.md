@@ -23,6 +23,8 @@ normal release train, which is why a `hotfix/*` push applies nothing.
 
 ## Terraform workflow routing
 
+Plan and apply run only when a change touches `infrastructure/terraform/`, outside `bootstrap/`, or the Terraform workflows themselves.
+
 | Trigger                                             | Action                        |
 | --------------------------------------------------- | ----------------------------- |
 | push to `develop`                                   | applies `core` then `dev`     |

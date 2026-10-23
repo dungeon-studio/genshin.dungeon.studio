@@ -7,6 +7,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { BaseFilterState } from '@/lib/collection-filters';
 import { SORT_FIELDS } from '@/lib/collection-filters';
+import { iconSources } from '@/test/icons';
 
 import { FilterBar, type FilterCategoryConfig } from './filter-bar';
 
@@ -99,6 +100,18 @@ describe('FilterBar', () => {
     await user.click(screen.getByRole('button', { name: 'Filter by A' }));
 
     expect(onToggle).toHaveBeenCalledWith('A');
+  });
+
+  it('draws an active chip icon in the label color, not a theme variant', () => {
+    renderBar({ category: { selected: new Set(['A']) } });
+
+    expect(iconSources('Filter by A')).toStrictEqual(['url("/icons/A-light.png")']);
+  });
+
+  it('draws an idle chip icon in the page theme variant', () => {
+    renderBar();
+
+    expect(iconSources('Filter by A')).toStrictEqual(['/icons/A-light.png', '/icons/A-dark.png']);
   });
 
   it('cycles the sort field and wraps back to the first', async () => {

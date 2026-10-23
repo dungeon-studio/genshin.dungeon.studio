@@ -11,6 +11,7 @@ name: Pull Request Metadata
 on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
+  merge_group:
 
 permissions:
   contents: read
@@ -27,6 +28,8 @@ jobs:
     name: Check pull request title
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    # A merge group carries no title; the pull request's own run checks it.
+    if: github.event_name == 'pull_request'
     permissions:
       pull-requests: read
 
