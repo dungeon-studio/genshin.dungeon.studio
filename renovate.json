@@ -67,6 +67,7 @@
       "description": "Merge production dependency patch updates on green CI",
       "matchDepTypes": ["dependencies"],
       "matchUpdateTypes": ["patch"],
+      "matchJsonata": ["isBreaking != true"],
       "automerge": true
     }
   ],
