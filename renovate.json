@@ -14,7 +14,7 @@
   "minimumReleaseAge": "3 days",
   "osvVulnerabilityAlerts": true,
   "vulnerabilityAlerts": {
-    "description": "Label vulnerability-driven pull requests security and merge them on green CI after a 1-day bake, short enough to land a fix fast and long enough for a compromised release to be yanked",
+    "description": "Label vulnerability-driven pull requests security and merge them on green CI after a bake matching pnpm's default release-age floor, which extends that guard to ecosystems without one",
     "addLabels": ["security"],
     "minimumReleaseAge": "1 day",
     "automerge": true
