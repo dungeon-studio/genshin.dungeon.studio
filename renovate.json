@@ -14,9 +14,10 @@
   "minimumReleaseAge": "3 days",
   "osvVulnerabilityAlerts": true,
   "vulnerabilityAlerts": {
-    "description": "Label vulnerability-driven pull requests security and leave them for a human to merge, since they skip the release-age bake",
+    "description": "Label vulnerability-driven pull requests security and merge them on green CI after a 1-day bake, short enough to land a fix fast and long enough for a compromised release to be yanked",
     "addLabels": ["security"],
-    "automerge": false
+    "minimumReleaseAge": "1 day",
+    "automerge": true
   },
   "lockFileMaintenance": {
     "description": "Open the lock file refresh past the concurrent limit and merge it on green CI, so transitive dependency fixes keep reaching develop",
