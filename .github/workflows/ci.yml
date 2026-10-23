@@ -563,9 +563,9 @@ jobs:
             ].join('\n');
 
             const issue = { ...context.repo, issue_number: context.issue.number };
-            const comments = await github.rest.issues.listComments(issue);
+            const comments = await github.paginate(github.rest.issues.listComments, { ...issue, per_page: 100 });
 
-            const existing = comments.data.find(comment => comment.body.includes(marker));
+            const existing = comments.find(comment => comment.body.includes(marker));
 
             if (existing) {
               await github.rest.issues.updateComment({ ...context.repo, comment_id: existing.id, body });
