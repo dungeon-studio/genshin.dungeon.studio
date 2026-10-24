@@ -5,13 +5,43 @@
 // Regenerate with: pnpm --filter @genshin/game-data-codegen generate weapons
 
 export const WEAPON_DATA = {
+  'beyond-the-chrysalis': {
+    id: 'beyond-the-chrysalis',
+    name: 'Beyond the Chrysalis',
+    type: 'Sword',
+    rarity: 5,
+    baseATK: 48,
+    version: { major: 7, minor: 1 },
+    subStat: {
+      type: 'CRIT DMG',
+      value: 9.6,
+    },
+    passiveName: 'Dance of Wings Unbound',
+    passiveDescription:
+      "Each time the equipping character uses their Elemental Skill or Elemental Burst, they gain one of the following three effects in sequence:\nWinds of Devotion: Increases the equipping character's CRIT DMG by 56% for 10s;\nWinds of Defiance: Increases Stellar Swirl reaction DMG dealt by the equipping character by 36% for 10s; and\nWinds of Plenty: Regenerates 5 Elemental Energy for the equipping character. Up to 5 Elemental Energy can be regenerated in this way every 4s.\nThe aforementioned effects are removed and the sequence is reset when the equipping character leaves the field.",
+  },
+  'hymn-of-the-maelstrom': {
+    id: 'hymn-of-the-maelstrom',
+    name: 'Hymn of the Maelstrom',
+    type: 'Catalyst',
+    rarity: 5,
+    baseATK: 44,
+    version: { major: 7, minor: 1 },
+    subStat: {
+      type: 'HP%',
+      value: 14.4,
+    },
+    passiveName: 'Rondo of Slumber',
+    passiveDescription:
+      'Increases Healing Bonus by 4%.\nWhen performing healing, the equipping character gains the "Vatsamonga\'s Vatic Vintage" effect, which increases Max HP by 4% as well as increases the currently active party member\'s ATK by 0.4% for every 1,000 Max HP the equipping character has over 40,000. A maximum of 8% ATK can be gained in this way. This effect lasts 10s, max 3 stacks.\nWhen a nearby party member triggers a Frozen or Stellar Swirl reaction, the aforementioned Max HP and ATK boosts will be further increased by 75% for the next 5s.\nThe aforementioned effects can still trigger even when the equipping character is not on the field.',
+  },
   'exaiphanes-blade': {
     id: 'exaiphanes-blade',
     name: 'Exaiphanes Blade',
     type: 'Sword',
     rarity: 5,
     baseATK: 46,
-    version: '7.0',
+    version: { major: 7, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 7.2,
@@ -26,7 +56,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 5,
     baseATK: 48,
-    version: '7.0',
+    version: { major: 7, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 4.8,
@@ -41,7 +71,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 5,
     baseATK: 48,
-    version: '6.7',
+    version: { major: 6, minor: 7 },
     subStat: {
       type: 'CRIT DMG',
       value: 9.6,
@@ -56,7 +86,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 49,
-    version: '6.6',
+    version: { major: 6, minor: 6 },
     subStat: {
       type: 'ATK%',
       value: 3.6,
@@ -71,7 +101,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 5,
     baseATK: 48,
-    version: '6.6',
+    version: { major: 6, minor: 6 },
     subStat: {
       type: 'CRIT Rate',
       value: 4.8,
@@ -86,7 +116,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 5,
     baseATK: 44,
-    version: '6.5',
+    version: { major: 6, minor: 5 },
     subStat: {
       type: 'CRIT DMG',
       value: 19.2,
@@ -101,7 +131,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 5,
     baseATK: 46,
-    version: '6.4',
+    version: { major: 6, minor: 4 },
     subStat: {
       type: 'CRIT Rate',
       value: 7.2,
@@ -116,7 +146,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 5,
     baseATK: 44,
-    version: '6.3',
+    version: { major: 6, minor: 3 },
     subStat: {
       type: 'CRIT DMG',
       value: 19.2,
@@ -131,7 +161,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 44,
-    version: '6.3',
+    version: { major: 6, minor: 3 },
     subStat: {
       type: 'CRIT DMG',
       value: 19.2,
@@ -146,7 +176,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 5,
     baseATK: 46,
-    version: '6.2',
+    version: { major: 6, minor: 2 },
     subStat: {
       type: 'CRIT Rate',
       value: 7.2,
@@ -161,7 +191,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 5,
     baseATK: 48,
-    version: '6.2',
+    version: { major: 6, minor: 2 },
     subStat: {
       type: 'CRIT DMG',
       value: 9.6,
@@ -176,7 +206,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 44,
-    version: '6.1',
+    version: { major: 6, minor: 1 },
     subStat: {
       type: 'CRIT DMG',
       value: 19.2,
@@ -191,7 +221,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 5,
     baseATK: 48,
-    version: '6.0',
+    version: { major: 6, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 4.8,
@@ -206,7 +236,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 44,
-    version: '6.0',
+    version: { major: 6, minor: 0 },
     subStat: {
       type: 'Elemental Mastery',
       value: 58,
@@ -221,7 +251,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 5,
     baseATK: 46,
-    version: '5.8',
+    version: { major: 5, minor: 8 },
     subStat: {
       type: 'CRIT DMG',
       value: 14.4,
@@ -236,7 +266,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 5,
     baseATK: 48,
-    version: '5.7',
+    version: { major: 5, minor: 7 },
     subStat: {
       type: 'CRIT Rate',
       value: 4.8,
@@ -251,7 +281,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 5,
     baseATK: 46,
-    version: '5.6',
+    version: { major: 5, minor: 6 },
     subStat: {
       type: 'CRIT DMG',
       value: 14.4,
@@ -266,7 +296,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 48,
-    version: '5.5',
+    version: { major: 5, minor: 5 },
     subStat: {
       type: 'CRIT DMG',
       value: 9.6,
@@ -281,7 +311,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 44,
-    version: '5.4',
+    version: { major: 5, minor: 4 },
     subStat: {
       type: 'Elemental Mastery',
       value: 58,
@@ -296,7 +326,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 5,
     baseATK: 49,
-    version: '5.3',
+    version: { major: 5, minor: 3 },
     subStat: {
       type: 'CRIT Rate',
       value: 2.4,
@@ -311,7 +341,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 44,
-    version: '5.3',
+    version: { major: 5, minor: 3 },
     subStat: {
       type: 'Elemental Mastery',
       value: 58,
@@ -326,7 +356,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 5,
     baseATK: 46,
-    version: '5.2',
+    version: { major: 5, minor: 2 },
     subStat: {
       type: 'CRIT DMG',
       value: 14.4,
@@ -341,7 +371,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 5,
     baseATK: 44,
-    version: '5.1',
+    version: { major: 5, minor: 1 },
     subStat: {
       type: 'DEF%',
       value: 18,
@@ -356,7 +386,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 5,
     baseATK: 49,
-    version: '5.0',
+    version: { major: 5, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 2.4,
@@ -371,7 +401,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 44,
-    version: '5.0',
+    version: { major: 5, minor: 0 },
     subStat: {
       type: 'CRIT DMG',
       value: 19.2,
@@ -386,7 +416,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 5,
     baseATK: 46,
-    version: '4.8',
+    version: { major: 4, minor: 8 },
     subStat: {
       type: 'CRIT Rate',
       value: 7.2,
@@ -401,7 +431,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 5,
     baseATK: 48,
-    version: '4.7',
+    version: { major: 4, minor: 7 },
     subStat: {
       type: 'CRIT DMG',
       value: 9.6,
@@ -416,7 +446,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 5,
     baseATK: 44,
-    version: '4.7',
+    version: { major: 4, minor: 7 },
     subStat: {
       type: 'HP%',
       value: 14.4,
@@ -431,7 +461,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 5,
     baseATK: 48,
-    version: '4.6',
+    version: { major: 4, minor: 6 },
     subStat: {
       type: 'CRIT Rate',
       value: 4.8,
@@ -446,7 +476,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 5,
     baseATK: 44,
-    version: '4.5',
+    version: { major: 4, minor: 5 },
     subStat: {
       type: 'CRIT DMG',
       value: 19.2,
@@ -461,7 +491,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 49,
-    version: '4.4',
+    version: { major: 4, minor: 4 },
     subStat: {
       type: 'ATK%',
       value: 3.6,
@@ -476,7 +506,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 5,
     baseATK: 48,
-    version: '4.3',
+    version: { major: 4, minor: 3 },
     subStat: {
       type: 'CRIT Rate',
       value: 4.8,
@@ -491,7 +521,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 5,
     baseATK: 44,
-    version: '4.2',
+    version: { major: 4, minor: 2 },
     subStat: {
       type: 'CRIT DMG',
       value: 19.2,
@@ -506,7 +536,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 48,
-    version: '4.1',
+    version: { major: 4, minor: 1 },
     subStat: {
       type: 'CRIT Rate',
       value: 4.8,
@@ -521,7 +551,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 44,
-    version: '4.1',
+    version: { major: 4, minor: 1 },
     subStat: {
       type: 'CRIT DMG',
       value: 19.2,
@@ -536,7 +566,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 5,
     baseATK: 46,
-    version: '4.0',
+    version: { major: 4, minor: 0 },
     subStat: {
       type: 'CRIT DMG',
       value: 14.4,
@@ -551,7 +581,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 46,
-    version: '3.6',
+    version: { major: 3, minor: 6 },
     subStat: {
       type: 'HP%',
       value: 10.8,
@@ -566,7 +596,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 5,
     baseATK: 46,
-    version: '3.5',
+    version: { major: 3, minor: 5 },
     subStat: {
       type: 'CRIT Rate',
       value: 7.2,
@@ -581,7 +611,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 5,
     baseATK: 44,
-    version: '3.4',
+    version: { major: 3, minor: 4 },
     subStat: {
       type: 'CRIT DMG',
       value: 19.2,
@@ -596,7 +626,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 48,
-    version: '3.3',
+    version: { major: 3, minor: 3 },
     subStat: {
       type: 'CRIT DMG',
       value: 9.6,
@@ -611,7 +641,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 44,
-    version: '3.2',
+    version: { major: 3, minor: 2 },
     subStat: {
       type: 'Elemental Mastery',
       value: 58,
@@ -626,7 +656,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 5,
     baseATK: 44,
-    version: '3.1',
+    version: { major: 3, minor: 1 },
     subStat: {
       type: 'HP%',
       value: 14.4,
@@ -641,7 +671,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 5,
     baseATK: 44,
-    version: '3.1',
+    version: { major: 3, minor: 1 },
     subStat: {
       type: 'CRIT Rate',
       value: 9.6,
@@ -656,7 +686,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 5,
     baseATK: 44,
-    version: '3.0',
+    version: { major: 3, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 9.6,
@@ -671,7 +701,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 5,
     baseATK: 44,
-    version: '2.7',
+    version: { major: 2, minor: 7 },
     subStat: {
       type: 'CRIT DMG',
       value: 19.2,
@@ -686,7 +716,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 5,
     baseATK: 46,
-    version: '2.6',
+    version: { major: 2, minor: 6 },
     subStat: {
       type: 'CRIT Rate',
       value: 7.2,
@@ -701,7 +731,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 46,
-    version: '2.5',
+    version: { major: 2, minor: 5 },
     subStat: {
       type: 'CRIT DMG',
       value: 14.4,
@@ -716,7 +746,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 5,
     baseATK: 49,
-    version: '2.4',
+    version: { major: 2, minor: 4 },
     subStat: {
       type: 'ATK%',
       value: 3.6,
@@ -731,7 +761,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 5,
     baseATK: 44,
-    version: '2.3',
+    version: { major: 2, minor: 3 },
     subStat: {
       type: 'CRIT DMG',
       value: 19.2,
@@ -746,7 +776,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 5,
     baseATK: 46,
-    version: '2.2',
+    version: { major: 2, minor: 2 },
     subStat: {
       type: 'CRIT Rate',
       value: 7.2,
@@ -761,7 +791,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 5,
     baseATK: 46,
-    version: '2.1',
+    version: { major: 2, minor: 1 },
     subStat: {
       type: 'Energy Recharge',
       value: 12,
@@ -776,7 +806,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 46,
-    version: '2.1',
+    version: { major: 2, minor: 1 },
     subStat: {
       type: 'HP%',
       value: 10.8,
@@ -791,7 +821,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 5,
     baseATK: 48,
-    version: '2.0',
+    version: { major: 2, minor: 0 },
     subStat: {
       type: 'CRIT DMG',
       value: 9.6,
@@ -806,7 +836,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 5,
     baseATK: 46,
-    version: '2.0',
+    version: { major: 2, minor: 0 },
     subStat: {
       type: 'CRIT DMG',
       value: 14.4,
@@ -821,7 +851,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 5,
     baseATK: 46,
-    version: '1.6',
+    version: { major: 1, minor: 6 },
     subStat: {
       type: 'Elemental Mastery',
       value: 43,
@@ -836,7 +866,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 5,
     baseATK: 49,
-    version: '1.5',
+    version: { major: 1, minor: 5 },
     subStat: {
       type: 'Physical DMG Bonus',
       value: 4.5,
@@ -851,7 +881,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 5,
     baseATK: 46,
-    version: '1.4',
+    version: { major: 1, minor: 4 },
     subStat: {
       type: 'Energy Recharge',
       value: 12,
@@ -866,7 +896,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 5,
     baseATK: 44,
-    version: '1.3',
+    version: { major: 1, minor: 3 },
     subStat: {
       type: 'CRIT Rate',
       value: 9.6,
@@ -881,7 +911,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 5,
     baseATK: 46,
-    version: '1.3',
+    version: { major: 1, minor: 3 },
     subStat: {
       type: 'CRIT DMG',
       value: 14.4,
@@ -896,7 +926,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 5,
     baseATK: 46,
-    version: '1.2',
+    version: { major: 1, minor: 2 },
     subStat: {
       type: 'ATK%',
       value: 10.8,
@@ -911,7 +941,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 46,
-    version: '1.1',
+    version: { major: 1, minor: 1 },
     subStat: {
       type: 'ATK%',
       value: 10.8,
@@ -926,7 +956,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 5,
     baseATK: 46,
-    version: '1.1',
+    version: { major: 1, minor: 1 },
     subStat: {
       type: 'ATK%',
       value: 10.8,
@@ -941,7 +971,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 5,
     baseATK: 46,
-    version: '1.1',
+    version: { major: 1, minor: 1 },
     subStat: {
       type: 'ATK%',
       value: 10.8,
@@ -956,7 +986,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 5,
     baseATK: 46,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 10.8,
@@ -971,7 +1001,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 5,
     baseATK: 48,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Physical DMG Bonus',
       value: 9,
@@ -986,7 +1016,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 46,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 7.2,
@@ -1001,7 +1031,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 5,
     baseATK: 48,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 4.8,
@@ -1016,7 +1046,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 5,
     baseATK: 48,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 7.2,
@@ -1031,7 +1061,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 5,
     baseATK: 46,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 12,
@@ -1046,7 +1076,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 5,
     baseATK: 48,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 4.8,
@@ -1061,7 +1091,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 5,
     baseATK: 48,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 8,
@@ -1076,7 +1106,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 5,
     baseATK: 48,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 8,
@@ -1091,7 +1121,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 5,
     baseATK: 46,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 10.8,
@@ -1100,13 +1130,73 @@ export const WEAPON_DATA = {
     passiveDescription:
       "Increases ATK by 20%. On hit, attacks against opponents with less than 30% HP increase all party members' ATK by 40% for 12s. Can only occur once every 30s.",
   },
+  'breezeborne-refrain': {
+    id: 'breezeborne-refrain',
+    name: 'Breezeborne Refrain',
+    type: 'Bow',
+    rarity: 4,
+    baseATK: 42,
+    version: { major: 7, minor: 1 },
+    subStat: {
+      type: 'CRIT Rate',
+      value: 6,
+    },
+    passiveName: "Viper's Ballad",
+    passiveDescription:
+      'Increases Energy Recharge by 20%. When the equipping character hits the opponent with their Elemental Skill or Elemental Burst, they gain a stack of "Hymn of the Pure." This effect can trigger once every 0.03s, max 3 stacks, and at 3 stacks, all instances of "Hymn of the Pure" are cleared to give the equipping character "Thus Lied the Viper" instead. This grants nearby party members a 24% Stellar Glimmer reaction DMG boost for 12s, during which no stacks of "Hymn of the Pure" can be obtained. The aforementioned effects can still trigger even when the equipping character is not on the field.',
+  },
+  'new-bough': {
+    id: 'new-bough',
+    name: 'New Bough',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: { major: 7, minor: 1 },
+    subStat: {
+      type: 'CRIT DMG',
+      value: 12,
+    },
+    passiveName: 'Wildgrowth',
+    passiveDescription:
+      'When the equipping character hits the opponent with an attack within 12s after using the Elemental Skill, they gain the "Verdant" effect, which increases their ATK by 4% and their Elemental Mastery by 20. This effect lasts 6s and can trigger once every second. Max 3 stacks. The aforementioned effects can still trigger even when the equipping character is not on the field.\nRadiance: Stellar Glimmer: The effect of "Verdant" is changed to: Increases ATK by 6% as well as Stellar Glimmer reaction DMG dealt by the equipping character by 8%.',
+  },
+  'silver-light': {
+    id: 'silver-light',
+    name: 'Silver Light',
+    type: 'Sword',
+    rarity: 4,
+    baseATK: 42,
+    version: { major: 7, minor: 1 },
+    subStat: {
+      type: 'ATK%',
+      value: 9,
+    },
+    passiveName: 'Radiance on the Water',
+    passiveDescription:
+      "Increases Elemental Mastery by 52 for 12s after Elemental Skill use. Max 2 stacks, and each stack's duration is independent of the others.",
+  },
+  'winters-heavy-heart': {
+    id: 'winters-heavy-heart',
+    name: "Winter's Heavy Heart",
+    type: 'Catalyst',
+    rarity: 4,
+    baseATK: 42,
+    version: { major: 7, minor: 1 },
+    subStat: {
+      type: 'CRIT DMG',
+      value: 12,
+    },
+    passiveName: 'Secrets of Frost',
+    passiveDescription:
+      'The equipping character gains "Silver-Tinged Blood Pact": The equipping character\'s Elemental Mastery is increased by 24 for every Cryo character present in the party. For every Electro character present in the party, the equipping character\'s ATK is increased by 4.8%. Up to 4 Cryo or Electro characters can provide the above buffs.\nRadiance: Stellar Glimmer: The effect of Silver-Tinged Blood Pact is changed to: For every Cryo or Electro character present in the party, the equipping character gains a 20-point Elemental Mastery boost and deals 6% increased Stellar Glimmer reaction DMG.',
+  },
   'blade-of-atonement': {
     id: 'blade-of-atonement',
     name: 'Blade of Atonement',
     type: 'Claymore',
     rarity: 4,
     baseATK: 44,
-    version: '7.0',
+    version: { major: 7, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -1121,7 +1211,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 42,
-    version: '7.0',
+    version: { major: 7, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 6,
@@ -1136,7 +1226,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 42,
-    version: '7.0',
+    version: { major: 7, minor: 0 },
     subStat: {
       type: 'DEF%',
       value: 11.3,
@@ -1151,7 +1241,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 44,
-    version: '7.0',
+    version: { major: 7, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -1166,7 +1256,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 42,
-    version: '7.0',
+    version: { major: 7, minor: 0 },
     subStat: {
       type: 'Elemental Mastery',
       value: 36,
@@ -1181,7 +1271,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 42,
-    version: '7.0',
+    version: { major: 7, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 6,
@@ -1196,7 +1286,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 42,
-    version: '7.0',
+    version: { major: 7, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 10,
@@ -1211,7 +1301,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 42,
-    version: '7.0',
+    version: { major: 7, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 6,
@@ -1226,7 +1316,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 42,
-    version: '7.0',
+    version: { major: 7, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 6,
@@ -1241,7 +1331,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 44,
-    version: '7.0',
+    version: { major: 7, minor: 0 },
     subStat: {
       type: 'Elemental Mastery',
       value: 24,
@@ -1256,7 +1346,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 42,
-    version: '6.2',
+    version: { major: 6, minor: 2 },
     subStat: {
       type: 'Energy Recharge',
       value: 10,
@@ -1271,7 +1361,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 42,
-    version: '6.1',
+    version: { major: 6, minor: 1 },
     subStat: {
       type: 'CRIT DMG',
       value: 12,
@@ -1286,7 +1376,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 45,
-    version: '6.1',
+    version: { major: 6, minor: 1 },
     subStat: {
       type: 'CRIT Rate',
       value: 2,
@@ -1301,7 +1391,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 41,
-    version: '6.0',
+    version: { major: 6, minor: 0 },
     subStat: {
       type: 'Elemental Mastery',
       value: 48,
@@ -1316,7 +1406,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 42,
-    version: '6.0',
+    version: { major: 6, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 10,
@@ -1331,7 +1421,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 41,
-    version: '6.0',
+    version: { major: 6, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 13.3,
@@ -1346,7 +1436,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 44,
-    version: '6.0',
+    version: { major: 6, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -1361,7 +1451,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 42,
-    version: '6.0',
+    version: { major: 6, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 9,
@@ -1376,7 +1466,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 41,
-    version: '6.0',
+    version: { major: 6, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 13.3,
@@ -1391,7 +1481,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 41,
-    version: '6.0',
+    version: { major: 6, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 13.3,
@@ -1406,7 +1496,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 42,
-    version: '5.8',
+    version: { major: 5, minor: 8 },
     subStat: {
       type: 'Elemental Mastery',
       value: 36,
@@ -1421,7 +1511,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 42,
-    version: '5.6',
+    version: { major: 5, minor: 6 },
     subStat: {
       type: 'HP%',
       value: 9,
@@ -1436,7 +1526,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 44,
-    version: '5.4',
+    version: { major: 5, minor: 4 },
     subStat: {
       type: 'Energy Recharge',
       value: 6.7,
@@ -1451,7 +1541,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 44,
-    version: '5.2',
+    version: { major: 5, minor: 2 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -1466,7 +1556,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 42,
-    version: '5.2',
+    version: { major: 5, minor: 2 },
     subStat: {
       type: 'ATK%',
       value: 9,
@@ -1481,7 +1571,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 41,
-    version: '5.2',
+    version: { major: 5, minor: 2 },
     subStat: {
       type: 'Energy Recharge',
       value: 13.3,
@@ -1496,7 +1586,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 44,
-    version: '5.1',
+    version: { major: 5, minor: 1 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -1511,7 +1601,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 44,
-    version: '5.1',
+    version: { major: 5, minor: 1 },
     subStat: {
       type: 'Energy Recharge',
       value: 6.7,
@@ -1526,7 +1616,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 44,
-    version: '5.1',
+    version: { major: 5, minor: 1 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -1541,7 +1631,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 42,
-    version: '5.0',
+    version: { major: 5, minor: 0 },
     subStat: {
       type: 'HP%',
       value: 9,
@@ -1556,7 +1646,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 44,
-    version: '5.0',
+    version: { major: 5, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -1571,7 +1661,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 44,
-    version: '5.0',
+    version: { major: 5, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -1586,7 +1676,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 41,
-    version: '5.0',
+    version: { major: 5, minor: 0 },
     subStat: {
       type: 'DEF%',
       value: 15,
@@ -1600,7 +1690,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 42,
-    version: '5.0',
+    version: { major: 5, minor: 0 },
     subStat: {
       type: 'DEF%',
       value: 11.3,
@@ -1614,7 +1704,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 42,
-    version: '5.0',
+    version: { major: 5, minor: 0 },
     subStat: {
       type: 'HP%',
       value: 9,
@@ -1629,7 +1719,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 42,
-    version: '4.7',
+    version: { major: 4, minor: 7 },
     subStat: {
       type: 'Elemental Mastery',
       value: 36,
@@ -1644,7 +1734,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 42,
-    version: '4.5',
+    version: { major: 4, minor: 5 },
     subStat: {
       type: 'HP%',
       value: 9,
@@ -1659,7 +1749,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 44,
-    version: '4.3',
+    version: { major: 4, minor: 3 },
     subStat: {
       type: 'Energy Recharge',
       value: 6.7,
@@ -1674,7 +1764,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 42,
-    version: '4.2',
+    version: { major: 4, minor: 2 },
     subStat: {
       type: 'ATK%',
       value: 9,
@@ -1689,7 +1779,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 44,
-    version: '4.1',
+    version: { major: 4, minor: 1 },
     subStat: {
       type: 'Energy Recharge',
       value: 6.7,
@@ -1704,7 +1794,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 41,
-    version: '4.1',
+    version: { major: 4, minor: 1 },
     subStat: {
       type: 'HP%',
       value: 12,
@@ -1719,7 +1809,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 44,
-    version: '4.1',
+    version: { major: 4, minor: 1 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -1734,7 +1824,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 44,
-    version: '4.1',
+    version: { major: 4, minor: 1 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -1749,7 +1839,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 42,
-    version: '4.1',
+    version: { major: 4, minor: 1 },
     subStat: {
       type: 'HP%',
       value: 9,
@@ -1764,7 +1854,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 42,
-    version: '4.0',
+    version: { major: 4, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 6,
@@ -1779,7 +1869,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 44,
-    version: '4.0',
+    version: { major: 4, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -1794,7 +1884,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 42,
-    version: '4.0',
+    version: { major: 4, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 10,
@@ -1809,7 +1899,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 44,
-    version: '4.0',
+    version: { major: 4, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -1824,7 +1914,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 44,
-    version: '4.0',
+    version: { major: 4, minor: 0 },
     subStat: {
       type: 'HP%',
       value: 6,
@@ -1839,7 +1929,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 41,
-    version: '4.0',
+    version: { major: 4, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 8,
@@ -1854,7 +1944,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 44,
-    version: '4.0',
+    version: { major: 4, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 4,
@@ -1869,7 +1959,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 42,
-    version: '4.0',
+    version: { major: 4, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 9,
@@ -1884,7 +1974,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 44,
-    version: '4.0',
+    version: { major: 4, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 4,
@@ -1899,7 +1989,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 42,
-    version: '4.0',
+    version: { major: 4, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 9,
@@ -1914,7 +2004,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 42,
-    version: '4.0',
+    version: { major: 4, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 6,
@@ -1929,7 +2019,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 44,
-    version: '3.7',
+    version: { major: 3, minor: 7 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -1944,7 +2034,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 44,
-    version: '3.5',
+    version: { major: 3, minor: 5 },
     subStat: {
       type: 'Elemental Mastery',
       value: 24,
@@ -1959,7 +2049,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 42,
-    version: '3.3',
+    version: { major: 3, minor: 3 },
     subStat: {
       type: 'Elemental Mastery',
       value: 36,
@@ -1974,7 +2064,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 42,
-    version: '3.1',
+    version: { major: 3, minor: 1 },
     subStat: {
       type: 'Elemental Mastery',
       value: 36,
@@ -1989,7 +2079,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 42,
-    version: '3.1',
+    version: { major: 3, minor: 1 },
     subStat: {
       type: 'ATK%',
       value: 9,
@@ -2004,7 +2094,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 42,
-    version: '3.1',
+    version: { major: 3, minor: 1 },
     subStat: {
       type: 'Elemental Mastery',
       value: 36,
@@ -2019,7 +2109,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 42,
-    version: '3.1',
+    version: { major: 3, minor: 1 },
     subStat: {
       type: 'Elemental Mastery',
       value: 36,
@@ -2034,7 +2124,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 42,
-    version: '3.0',
+    version: { major: 3, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 10,
@@ -2049,7 +2139,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 44,
-    version: '3.0',
+    version: { major: 3, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 6.7,
@@ -2064,7 +2154,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 42,
-    version: '3.0',
+    version: { major: 3, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 10,
@@ -2079,7 +2169,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 41,
-    version: '3.0',
+    version: { major: 3, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 12,
@@ -2094,7 +2184,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 44,
-    version: '3.0',
+    version: { major: 3, minor: 0 },
     subStat: {
       type: 'Elemental Mastery',
       value: 24,
@@ -2109,7 +2199,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 44,
-    version: '3.0',
+    version: { major: 3, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 6.7,
@@ -2124,7 +2214,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 42,
-    version: '2.8',
+    version: { major: 2, minor: 8 },
     subStat: {
       type: 'ATK%',
       value: 9,
@@ -2139,7 +2229,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 44,
-    version: '2.7',
+    version: { major: 2, minor: 7 },
     subStat: {
       type: 'Energy Recharge',
       value: 6.7,
@@ -2154,7 +2244,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 44,
-    version: '2.5',
+    version: { major: 2, minor: 5 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -2168,7 +2258,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 41,
-    version: '2.3',
+    version: { major: 2, minor: 3 },
     subStat: {
       type: 'DEF%',
       value: 15,
@@ -2183,7 +2273,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 42,
-    version: '2.2',
+    version: { major: 2, minor: 2 },
     subStat: {
       type: 'ATK%',
       value: 9,
@@ -2198,7 +2288,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 44,
-    version: '2.2',
+    version: { major: 2, minor: 2 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -2213,7 +2303,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 45,
-    version: '2.2',
+    version: { major: 2, minor: 2 },
     subStat: {
       type: 'ATK%',
       value: 3,
@@ -2228,7 +2318,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 42,
-    version: '2.1',
+    version: { major: 2, minor: 1 },
     subStat: {
       type: 'Energy Recharge',
       value: 10,
@@ -2242,7 +2332,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 41,
-    version: '2.1',
+    version: { major: 2, minor: 1 },
     subStat: {
       type: 'ATK%',
       value: 12,
@@ -2257,7 +2347,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 42,
-    version: '2.1',
+    version: { major: 2, minor: 1 },
     subStat: {
       type: 'ATK%',
       value: 9,
@@ -2272,7 +2362,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 41,
-    version: '2.0',
+    version: { major: 2, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 12,
@@ -2287,7 +2377,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 44,
-    version: '2.0',
+    version: { major: 2, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 6.7,
@@ -2302,7 +2392,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 41,
-    version: '2.0',
+    version: { major: 2, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 12,
@@ -2317,7 +2407,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 42,
-    version: '2.0',
+    version: { major: 2, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 10,
@@ -2332,7 +2422,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 44,
-    version: '2.0',
+    version: { major: 2, minor: 0 },
     subStat: {
       type: 'Elemental Mastery',
       value: 24,
@@ -2347,7 +2437,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 41,
-    version: '1.6',
+    version: { major: 1, minor: 6 },
     subStat: {
       type: 'ATK%',
       value: 12,
@@ -2362,7 +2452,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 42,
-    version: '1.6',
+    version: { major: 1, minor: 6 },
     subStat: {
       type: 'Physical DMG Bonus',
       value: 11.3,
@@ -2377,7 +2467,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 44,
-    version: '1.4',
+    version: { major: 1, minor: 4 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -2392,7 +2482,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 45,
-    version: '1.4',
+    version: { major: 1, minor: 4 },
     subStat: {
       type: 'Elemental Mastery',
       value: 12,
@@ -2407,7 +2497,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 42,
-    version: '1.4',
+    version: { major: 1, minor: 4 },
     subStat: {
       type: 'Elemental Mastery',
       value: 36,
@@ -2422,7 +2512,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 44,
-    version: '1.4',
+    version: { major: 1, minor: 4 },
     subStat: {
       type: 'Energy Recharge',
       value: 6.7,
@@ -2437,7 +2527,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 42,
-    version: '1.3',
+    version: { major: 1, minor: 3 },
     subStat: {
       type: 'ATK%',
       value: 9,
@@ -2452,7 +2542,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 44,
-    version: '1.3',
+    version: { major: 1, minor: 3 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -2467,7 +2557,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 41,
-    version: '1.2',
+    version: { major: 1, minor: 2 },
     subStat: {
       type: 'Physical DMG Bonus',
       value: 15,
@@ -2482,7 +2572,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 42,
-    version: '1.2',
+    version: { major: 1, minor: 2 },
     subStat: {
       type: 'Energy Recharge',
       value: 10,
@@ -2496,7 +2586,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 42,
-    version: '1.2',
+    version: { major: 1, minor: 2 },
     subStat: {
       type: 'ATK%',
       value: 9,
@@ -2511,7 +2601,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 44,
-    version: '1.2',
+    version: { major: 1, minor: 2 },
     subStat: {
       type: 'Physical DMG Bonus',
       value: 7.5,
@@ -2526,7 +2616,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 44,
-    version: '1.1',
+    version: { major: 1, minor: 1 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -2541,7 +2631,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'CRIT DMG',
       value: 12,
@@ -2556,7 +2646,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 44,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'CRIT DMG',
       value: 8,
@@ -2571,7 +2661,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'CRIT DMG',
       value: 12,
@@ -2586,7 +2676,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'CRIT DMG',
       value: 12,
@@ -2601,7 +2691,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 44,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'CRIT DMG',
       value: 8,
@@ -2616,7 +2706,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 41,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Physical DMG Bonus',
       value: 15,
@@ -2631,7 +2721,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 44,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Physical DMG Bonus',
       value: 7.5,
@@ -2646,7 +2736,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 41,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 8,
@@ -2661,7 +2751,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 41,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Elemental Mastery',
       value: 48,
@@ -2675,7 +2765,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 41,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 12,
@@ -2690,7 +2780,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 10,
@@ -2705,7 +2795,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 41,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 13.3,
@@ -2720,7 +2810,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 44,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 6.7,
@@ -2735,7 +2825,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 41,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 13.3,
@@ -2750,7 +2840,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 41,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 13.3,
@@ -2765,7 +2855,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Elemental Mastery',
       value: 36,
@@ -2780,7 +2870,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 9,
@@ -2794,7 +2884,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 44,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Elemental Mastery',
       value: 24,
@@ -2809,7 +2899,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'HP%',
       value: 9,
@@ -2824,7 +2914,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 44,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -2839,7 +2929,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 9,
@@ -2854,7 +2944,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 44,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Physical DMG Bonus',
       value: 7.5,
@@ -2869,7 +2959,7 @@ export const WEAPON_DATA = {
     type: 'Polearm',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 10,
@@ -2884,7 +2974,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Elemental Mastery',
       value: 36,
@@ -2898,7 +2988,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 9,
@@ -2913,7 +3003,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 44,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -2928,7 +3018,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 44,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 6,
@@ -2943,7 +3033,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 9,
@@ -2958,7 +3048,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 9,
@@ -2973,7 +3063,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 44,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 6.7,
@@ -2988,7 +3078,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 41,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Elemental Mastery',
       value: 48,
@@ -3003,7 +3093,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 44,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 6.7,
@@ -3018,7 +3108,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 41,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Energy Recharge',
       value: 13.3,
@@ -3033,7 +3123,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 6,
@@ -3048,7 +3138,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 6,
@@ -3063,7 +3153,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 39,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 7.7,
@@ -3078,7 +3168,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'HP%',
       value: 9,
@@ -3093,7 +3183,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 6,
@@ -3108,7 +3198,7 @@ export const WEAPON_DATA = {
     type: 'Sword',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'ATK%',
       value: 9,
@@ -3123,7 +3213,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'Elemental Mastery',
       value: 36,
@@ -3137,7 +3227,7 @@ export const WEAPON_DATA = {
     type: 'Bow',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'CRIT Rate',
       value: 6,
@@ -3152,7 +3242,7 @@ export const WEAPON_DATA = {
     type: 'Catalyst',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'CRIT DMG',
       value: 12,
@@ -3167,7 +3257,7 @@ export const WEAPON_DATA = {
     type: 'Claymore',
     rarity: 4,
     baseATK: 42,
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     subStat: {
       type: 'DEF%',
       value: 11.3,

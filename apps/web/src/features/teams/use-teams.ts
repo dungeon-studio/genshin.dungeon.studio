@@ -6,6 +6,7 @@ import { initialTeams } from '@genshin/domain';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { toast } from 'sonner';
 
+import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 
 import type { SaveTeamPayload } from './use-team-api';
@@ -185,28 +186,21 @@ function useTeamActions(
  * plan a team before deciding to sign in. Signing out discards it.
  */
 export function useTeams(): UseTeamsResult {
-  const { user, loading: authLoading } = useAuth();
-  const isAuthenticated = user !== null;
+  const auth = useAuth();
+  const uid = signedInUid(auth);
+  const isAuthenticated = uid !== undefined;
 
   const teams = useTeamStore((s) => s.teams);
   const storeSetTeams = useTeamStore((s) => s.setTeams);
-  const storeResetTeams = useTeamStore((s) => s.resetTeams);
 
-  const { data: apiTeams, error: queryError, isLoading: queryLoading } = useTeamsQuery(user?.uid);
+  const { data: apiTeams, error: queryError, isLoading: queryLoading } = useTeamsQuery(uid);
 
-  const { mutate: saveTeamApi, isPending: isSavePending } = useSaveTeamMutation(user?.uid);
-  const { mutate: deleteTeamApi, isPending: isDeletePending } = useDeleteTeamMutation(user?.uid);
+  const { mutate: saveTeamApi, isPending: isSavePending } = useSaveTeamMutation(uid);
+  const { mutate: deleteTeamApi, isPending: isDeletePending } = useDeleteTeamMutation(uid);
 
   const isSaving = isSavePending || isDeletePending;
 
   useWarnOnUnloadWhileSaving(isSaving);
-
-  // Reset store on logout
-  useEffect(() => {
-    if (!user) {
-      storeResetTeams();
-    }
-  }, [user, storeResetTeams]);
 
   // Populate store from API data
   useEffect(() => {
@@ -232,7 +226,7 @@ export function useTeams(): UseTeamsResult {
     getTeam,
     isCharacterInTeam,
     isSaving,
-    isLoading: authLoading || (isAuthenticated && queryLoading),
+    isLoading: awaitingUserData(auth, queryLoading),
     error,
   };
 }

@@ -96,7 +96,7 @@ describe('filterCharacters', () => {
 
   it('orders same-version characters by their release date', () => {
     // The pair exercises the date comparison only while it shares a version.
-    expect(NEUVILLETTE.version).toBe(WRIOTHESLEY.version);
+    expect(NEUVILLETTE.version).toEqual(WRIOTHESLEY.version);
 
     const result = filterCharacters(
       [WRIOTHESLEY, NEUVILLETTE],

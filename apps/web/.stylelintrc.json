@@ -7,6 +7,12 @@
         "ignoreAtRules": ["tailwind", "apply", "layer", "config", "source"]
       }
     ],
+    "at-rule-prelude-no-invalid": [
+      true,
+      {
+        "ignoreAtRules": ["apply", "media"]
+      }
+    ],
     "value-keyword-case": [
       "lower",
       {

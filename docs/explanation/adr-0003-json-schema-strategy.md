@@ -31,6 +31,7 @@ Relevant standards:
 - [RFC 8288](https://www.rfc-editor.org/rfc/rfc8288), Web Linking, which defines `Link` header syntax and relation types
 - [RFC 6906](https://www.rfc-editor.org/rfc/rfc6906), the `profile` link relation type
 - [RFC 6838](https://www.rfc-editor.org/rfc/rfc6838), media type registration, referenced by Principle 4
+- [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259), JSON, which registers `application/json`
 
 ## Decision drivers
 
@@ -110,6 +111,8 @@ Content-Type: application/json; profile="/schemas/team/get/1.0.0.json"
 ```
 
 This mirrors the client-side mechanism: clients send `Accept: application/json; profile="..."` to request a specific schema version, and the server responds with `Content-Type: application/json; profile="..."` to confirm which schema describes the response. Both directions use the same RFC 6906 `profile` semantics on the standard content negotiation headers.
+
+No registry defines this parameter: the `application/json` registration in [RFC 8259 §11](https://www.rfc-editor.org/rfc/rfc8259#section-11) has no parameters. [RFC 6906 §3.1](https://www.rfc-editor.org/rfc/rfc6906#section-3.1) recommends that a media type define `profile`, but it doesn't add one to media types that lack it. Only clients that implement this record know what `profile` means here.
 
 This approach:
 
@@ -197,7 +200,8 @@ This creates symmetric content negotiation: clients declare the schema they expe
 ### Dedicated endpoints with `profile` discovery and semantic versions
 
 - Good, because dedicated endpoints keep schemas independently cacheable, addressable, and reusable across documentation and tooling. Inline `$schema` references in every response would bloat payloads and mix data with metadata.
-- Good, because `profile` on `Content-Type` mirrors `profile` on `Accept`, so both directions of content negotiation use the same parameter.
+- Good, because `profile` carries both negotiation and discovery. A client requests a schema version with `profile` on `Accept`, and `Link` has no request-side counterpart. `profile` on `Content-Type` confirms that choice on the same parameter, so both directions share one mechanism.
+- Bad, because the cost falls on generic clients. `profile` has [no registration on `application/json`](#discovery-via-the-profile-media-type-parameter), so a client that only wants to find the schema gives up the standard `describedby` path. The clients that negotiate versions already depend on this record.
 - Good, because co-hosting with the API keeps the `$id` and the retrieval address identical, avoids cross-origin complexity, and deploys schemas atomically with the code they describe. Schema files live alongside the route handlers, so updating both together is natural.
 - Good, because versioning every schema from first publication means clients always compare version numbers the same way, and the major, minor, or patch bump says what kind of change happened.
 
@@ -221,7 +225,9 @@ Define schemas exclusively in an OpenAPI document and derive everything from it.
 
 Use `Link: </schemas/team/get/1.0.0.json>; rel="describedby"` headers on responses instead of the `profile` parameter on `Content-Type`.
 
-- Bad, because it's asymmetric: clients would use `profile` on `Accept` but the server would answer through a `Link` header.
+- Good, because `describedby` is a registered relation and a common discovery mechanism, and [JSON Schema 2020-12](https://json-schema.org/draft/2020-12/json-schema-core) §9.5.1.1 recommends it for linking an instance to its schema.
+
+- Bad, because it's asymmetric: clients would use `profile` on `Accept` but the server would answer through a `Link` header. `Link` can't express a version request, so the unregistered `profile` parameter stays on `Accept` regardless.
 - Bad, because `Link` headers exist outside the content negotiation model, adding a separate discovery channel.
 
 ### Unversioned schema naming
@@ -306,5 +312,6 @@ app.get('/schemas/:module/:name.json', async (c) => {
 - [RFC 8594, The Sunset HTTP Header Field](https://www.rfc-editor.org/rfc/rfc8594), the `Sunset` header for communicating deprecation timelines
 - [RFC 6906, The `profile` Link Relation Type](https://www.rfc-editor.org/rfc/rfc6906), for `profile` parameter semantics for schema discovery
 - [RFC 6838, Media Type Registration](https://www.rfc-editor.org/rfc/rfc6838), for media type conventions
+- [RFC 8259, The JavaScript Object Notation (JSON) Data Interchange Format](https://www.rfc-editor.org/rfc/rfc8259), the `application/json` registration, which defines no parameters
 - [Semantic Versioning 2.0.0](https://semver.org/), the schema version numbering convention
 - [ADR-0005](adr-0005-schema-direction-segment.md), which amends this record's path convention
