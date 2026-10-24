@@ -34,15 +34,16 @@ export function checkSnapshotCompat(repoRoot: string, baseRef: string): string[]
       const match = SNAPSHOT_PATH.exec(path);
       if (match === null) return [];
       const [, name, version] = match;
+      const file = join(repoRoot, path);
 
-      if (!existsSync(join(repoRoot, path))) {
+      if (!existsSync(file)) {
         return [
           `${path} shipped on the base branch but is gone. Restore ${name} ${version} in its schema registry and re-export; removing it orphans data still stored under it.`,
         ];
       }
 
       const base = git(['show', `${baseRef}:${path}`], repoRoot);
-      const head = readFileSync(join(repoRoot, path), 'utf8');
+      const head = readFileSync(file, 'utf8');
 
       // "deserializer" mode passes when the new schema accepts everything the old one did.
       if (check_compat(base, head, 'deserializer')) return [];
