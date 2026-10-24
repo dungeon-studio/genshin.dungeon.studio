@@ -15,8 +15,8 @@ import { assertOptionalString, assertOptionalStringArray } from '../assertions.j
  * What a team member intends to equip.
  *
  * Every field is optional because planning is incremental: a user who knows the
- * main affixes but not the sets records only those, and later refinement or
- * AI-assisted optimisation fills the rest. An empty plan is therefore valid.
+ * main affixes but not the sets records only those and fills the rest in
+ * later. An empty plan is therefore valid.
  *
  * The flower and plume carry fixed main affixes, so only the three pieces a
  * user chooses appear here. Set and affix identifiers come from

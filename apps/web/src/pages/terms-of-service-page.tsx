@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-// Draft terms describing the service as of HEAD. Needs a legal review pass
-// and a dedicated contact address before the 1.0.0 tag; see #647.
+// Draft terms describing the service. No lawyer has reviewed them, and they
+// have no dedicated contact address.
 
 import type { JSX } from 'react';
 import { Link } from 'react-router-dom';
