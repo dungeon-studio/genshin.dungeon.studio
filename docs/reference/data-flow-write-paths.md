@@ -80,9 +80,8 @@ sequenceDiagram
 ```
 
 The first time the query resolves after a sign-in, the reconcile effect,
-`useServerSync`, also makes the sign-in push. `localStorage` records which user
-it ran for, so a remount or a page load skips it until the user signs out. It
-merges the store into the server collection, then sends a `PUT` for every
+`useServerSync`, also makes the sign-in push. It runs once per sign-in, so a
+remount or a page load skips it. It merges the store into the server collection, then sends a `PUT` for every
 entry the server lacks or holds at a lower constellation. A failed push only
 toasts, and only for the last entry sent. The merged value stays in the store.
 
@@ -202,7 +201,7 @@ failure between the two never orphans data: the identity remains and can retry.
 | Applies the mutation response to the store? | Whole entry, skipped once removed                                         | Whole instance, replaced               | No                                       |
 | How a refetch reaches the store             | Additive merge                                                            | Replace                                | Replace, filled to four slots            |
 | Can a refetch overwrite an edit in flight?  | Raise or add, no. Lower or remove, only a refetch the write didn't cancel | Only a refetch the write didn't cancel | Only a refetch the write didn't cancel   |
-| What a removal elsewhere does to the store  | Survives the merge, unsent until the next sign-in                         | Disappears on refetch                  | Disappears on refetch                    |
+| What a removal elsewhere does to the store  | Survives the merge                                                        | Disappears on refetch                  | Disappears on refetch                    |
 
 Teams also depend on the other two features. The server rejects a team that
 names a character or weapon instance the user doesn't own, so a team save can

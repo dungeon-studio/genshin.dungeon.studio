@@ -40,13 +40,14 @@ function entriesAheadOfServer(
     .map((entry) => ({ characterId: entry.characterId, level: entry.constellationLevel }));
 }
 
+// Where storage is blocked, the record always reads as absent, so the sign-in
+// push runs on every mount.
 const PUSHED_FOR_KEY = 'genshin-collection-pushed-for';
 
 function pushedForUid(): string | null {
   try {
     return localStorage.getItem(PUSHED_FOR_KEY);
   } catch {
-    // Storage access blocked (privacy mode / sandboxed iframe)
     return null;
   }
 }
@@ -55,7 +56,7 @@ function recordPushFor(uid: string): void {
   try {
     localStorage.setItem(PUSHED_FOR_KEY, uid);
   } catch {
-    // Storage access blocked (privacy mode / sandboxed iframe)
+    // Blocked storage, see PUSHED_FOR_KEY.
   }
 }
 
@@ -63,7 +64,7 @@ function clearPushRecord(): void {
   try {
     localStorage.removeItem(PUSHED_FOR_KEY);
   } catch {
-    // Storage access blocked (privacy mode / sandboxed iframe)
+    // Blocked storage, see PUSHED_FOR_KEY.
   }
 }
 
@@ -71,14 +72,15 @@ function clearPushRecord(): void {
  * Reconciles the local store with the server's collection whenever the query
  * resolves.
  *
- * The first resolution per sign-in merges what this browser recorded and
- * pushes the entries the server is behind on. Refetches merge additively, so
- * they don't overwrite optimistic state while those pushes are in flight.
+ * The first resolution per sign-in merges what this browser holds and pushes
+ * the entries the server is behind on. Refetches merge additively, so they
+ * don't overwrite optimistic state while those pushes are in flight.
  *
- * Which user the push ran for is saved beside the persisted collection, so a
- * remount or reload doesn't push again and re-add a character removed on
- * another device. Signed in, every write goes to the server, so nothing new
- * can be waiting to push until the user signs out.
+ * The push runs once per sign-in, not per mount or page load, so a stale copy
+ * can't re-add a character removed on another device. Skipping it loses
+ * nothing, because a signed-in write goes straight to the server. The record
+ * clears whenever auth settles signed out, which also catches a session that
+ * ended with no tab open.
  */
 function useServerSync(
   auth: AuthState,

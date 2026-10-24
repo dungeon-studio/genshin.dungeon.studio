@@ -68,7 +68,7 @@ stateDiagram-v2
   Overwritten --> HeldLocally: DELETE succeeds
   Confirmed --> Sent: edit while signed in
   Confirmed --> HeldLocally: lowered or removed on another device, merge keeps it
-  HeldLocally --> Sent: edit, or the next sign-in push
+  HeldLocally --> Sent: edit, or sign-in after an unseen sign-out
   RolledBack --> Sent: edit
   RolledBack --> Confirmed: next refetch
 ```
@@ -86,8 +86,9 @@ stateDiagram-v2
 - Held only locally: a copy ahead of the server, which lacks it or holds a lower
   level. A failed sign-in push or a rejected add with a raised level only
   toasts, so each leaves one, see [#1840]. The merge keeps the copy until the
-  store empties. An edit writes it back to the server, and so does the push on
-  the next sign-in.
+  store empties. An edit writes it back to the server. So does the sign-in push
+  after a session that ended with no tab open, since that leaves the store
+  intact.
 
 ## Weapons
 
