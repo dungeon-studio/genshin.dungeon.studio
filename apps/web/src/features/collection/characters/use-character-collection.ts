@@ -244,7 +244,6 @@ export function useCollection(): UseCollectionResult {
     useSetConstellationLevelMutation(uid).mutate,
   );
 
-  // Patch zustand with confirmed server data
   const applyMutationResult = useCallback(
     ({ entry }: MutationResult) => {
       storeReplaceCharacter(entry);
