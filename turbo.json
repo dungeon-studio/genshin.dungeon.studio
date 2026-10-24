@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "agentGuidance": false,
   "globalDependencies": ["**/.env*", "pnpm-lock.yaml", "pnpm-workspace.yaml"],
   "tasks": {
     "build": {
@@ -33,7 +34,8 @@
         "package.json",
         "vite.config.*",
         "vitest.config.*",
-        "tsconfig*.json"
+        "tsconfig*.json",
+        "$TURBO_ROOT$/packages/vitest-config/index.js"
       ],
       "env": ["FAST_CHECK_SEED"]
     },

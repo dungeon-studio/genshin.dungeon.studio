@@ -1,0 +1,8 @@
+{
+  // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+  // SPDX-License-Identifier: MIT
+  "config": {
+    // A pull request body sits below its title, so it starts without a heading.
+    "MD041": false,
+  },
+}

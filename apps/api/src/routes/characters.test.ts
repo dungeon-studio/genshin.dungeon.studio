@@ -2,8 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
-import { MAX_CONSTELLATION_LEVEL, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import {
+  characterItemDocument,
+  characterListDocument,
+  MAX_CONSTELLATION_LEVEL,
+  MIN_CONSTELLATION_LEVEL,
+} from '@genshin/domain';
 import { makeCharacter } from '@genshin/domain/testing';
+import type * as GameData from '@genshin/game-data';
 import { getCharacterById } from '@genshin/game-data';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -13,6 +19,7 @@ import { toMediaTypeString } from '@/middleware/negotiate-content.js';
 import { characterItemV1 } from '@/profiles/alps/character/item-v1.js';
 import * as Characters from '@/repositories/characters/index.js';
 import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
+import { unroutedHrefs } from '@/test/hrefs.js';
 
 vi.mock('@/firebase/auth.js', () => ({
   verifyToken: vi.fn(),
@@ -25,15 +32,19 @@ vi.mock('@/repositories/characters/index.js', () => ({
   remove: vi.fn(),
 }));
 
-vi.mock('@genshin/game-data', () => ({
+// Keeps the real exports, which the app's request schemas read at import.
+vi.mock('@genshin/game-data', async (importOriginal) => ({
+  ...(await importOriginal<typeof GameData>()),
   getCharacterById: vi.fn(),
 }));
 
 const FAKE_CHARACTER = makeCharacter('albedo', { constellationLevel: 2 });
 
+const BASE_URL = 'http://localhost';
+
 const EXPECTED_CONTENT_TYPE = toMediaTypeString(
   { mediaType: COLLECTION_JSON, profile: characterItemV1 },
-  'http://localhost',
+  BASE_URL,
 );
 
 describe('Character routes', () => {
@@ -76,7 +87,7 @@ describe('Character routes', () => {
     let body: CollectionDocument;
 
     beforeEach(async () => {
-      vi.mocked(Characters.list).mockResolvedValue([FAKE_CHARACTER]);
+      vi.mocked(Characters.list).mockResolvedValue({ items: [FAKE_CHARACTER] });
       res = await app.request(authedRequest('GET', '/characters'));
       body = (await res.json()) as CollectionDocument;
     });
@@ -89,26 +100,17 @@ describe('Character routes', () => {
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
-    it('returns one item per character', () => {
-      expect(body.collection.items).toHaveLength(1);
+    it('returns the stored characters as the list document', () => {
+      expect(body).toEqual(characterListDocument([FAKE_CHARACTER], BASE_URL));
     });
 
-    it('includes character domain data', () => {
-      expect(body.collection.items[0].data).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ name: 'characterId', value: 'albedo' }),
-          expect.objectContaining({ name: 'constellationLevel', value: 2 }),
-        ]),
-      );
-    });
-
-    it('returns empty items when no characters exist', async () => {
-      vi.mocked(Characters.list).mockResolvedValue([]);
+    it('links only to paths the app routes as GET', async () => {
+      vi.mocked(Characters.list).mockResolvedValue({ items: [FAKE_CHARACTER], next: 'last-id' });
 
       const res = await app.request(authedRequest('GET', '/characters'));
 
       const body = (await res.json()) as CollectionDocument;
-      expect(body.collection.items).toEqual([]);
+      expect(unroutedHrefs(body)).toEqual([]);
     });
 
     it('returns 500 when repository throws', async () => {
@@ -119,6 +121,29 @@ describe('Character routes', () => {
       expect(res.status).toBe(500);
       const body = (await res.json()) as { detail: string };
       expect(body.detail).toBe('An unexpected error occurred');
+    });
+
+    it('passes the page request through and links the next page', async () => {
+      vi.mocked(Characters.list).mockResolvedValue({ items: [], next: 'last-id' });
+      const cursor = Buffer.from('prev-id').toString('base64url');
+
+      const res = await app.request(authedRequest('GET', `/characters?limit=2&cursor=${cursor}`));
+
+      expect(Characters.list).toHaveBeenCalledWith(FAKE_TOKEN.uid, { limit: 2, after: 'prev-id' });
+      const body = (await res.json()) as CollectionDocument;
+      expect(body.collection.links).toEqual([
+        expect.objectContaining({
+          rel: 'next',
+          href: expect.stringContaining('limit=2') as string,
+        }),
+      ]);
+    });
+
+    it('returns a 400 problem document for a limit above the maximum', async () => {
+      const res = await app.request(authedRequest('GET', '/characters?limit=101'));
+
+      expect(res.status).toBe(400);
+      expect(res.headers.get('content-type')).toBe('application/problem+json');
     });
   });
 
@@ -140,17 +165,12 @@ describe('Character routes', () => {
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
-    it('returns single-item collection', () => {
-      expect(body.collection.items).toHaveLength(1);
+    it('returns the stored character as an item document', () => {
+      expect(body).toEqual(characterItemDocument(FAKE_CHARACTER, BASE_URL));
     });
 
-    it('includes character domain data', () => {
-      expect(body.collection.items[0].data).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ name: 'characterId', value: 'albedo' }),
-          expect.objectContaining({ name: 'constellationLevel', value: 2 }),
-        ]),
-      );
+    it('links only to paths the app routes as GET', () => {
+      expect(unroutedHrefs(body)).toEqual([]);
     });
 
     it('returns 404 when character not in collection', async () => {
@@ -190,17 +210,8 @@ describe('Character routes', () => {
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
-    it('returns single-item collection', () => {
-      expect(body.collection.items).toHaveLength(1);
-    });
-
-    it('includes character domain data', () => {
-      expect(body.collection.items[0].data).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ name: 'characterId', value: 'albedo' }),
-          expect.objectContaining({ name: 'constellationLevel', value: 2 }),
-        ]),
-      );
+    it('returns the saved character as an item document', () => {
+      expect(body).toEqual(characterItemDocument(FAKE_CHARACTER, BASE_URL));
     });
 
     it('returns 201 when character is newly added', () => {

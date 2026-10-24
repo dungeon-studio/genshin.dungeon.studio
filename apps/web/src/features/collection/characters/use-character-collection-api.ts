@@ -12,30 +12,30 @@
  * `useCollection` is what a component reaches for; these are its parts.
  */
 
+import type { Item } from '@genshin/collection-json';
 import { assertCollectionDocument } from '@genshin/collection-json';
 import type { CharacterId, CollectionCharacter, ConstellationLevel } from '@genshin/domain';
 import { deserialiseCharacter, MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { apiDelete, apiGet, apiPut } from '@/lib/api';
-import { invalidateUserQuery } from '@/lib/invalidate-user-query';
+import { apiDelete, apiPut } from '@/lib/api';
+import { apiGetAllItems } from '@/lib/api-collection';
+import { useUserQuerySync } from '@/lib/use-user-query-sync';
 import { userScopedKey } from '@/lib/user-scoped-key';
 
 import type { CharacterCollection } from './use-character-collection-store';
 
 export interface MutationResult {
-  characterId: CharacterId;
   entry: CollectionCharacter;
 }
 
 const charactersKey = userScopedKey('characters');
 
-function parseCollectionResponse(response: unknown): CharacterCollection {
-  assertCollectionDocument(response);
+function toCharacterCollection(items: Item[]): CharacterCollection {
   const record: CharacterCollection = {};
 
-  for (const item of response.collection.items) {
+  for (const item of items) {
     const character = deserialiseCharacter(item);
     record[character.characterId] = character;
   }
@@ -45,16 +45,12 @@ function parseCollectionResponse(response: unknown): CharacterCollection {
 
 function parseSingleCharacterResponse(response: unknown): MutationResult {
   assertCollectionDocument(response);
-  if (response.collection.items.length !== 1) {
-    throw new Error(
-      `Invalid API response: expected exactly one item, got ${response.collection.items.length}`,
-    );
+  const { items } = response.collection;
+  const [item] = items;
+  if (items.length !== 1 || item === undefined) {
+    throw new Error(`Invalid API response: expected exactly one item, got ${items.length}`);
   }
-  const character = deserialiseCharacter(response.collection.items[0]);
-  return {
-    characterId: character.characterId,
-    entry: character,
-  };
+  return { entry: deserialiseCharacter(item) };
 }
 
 export function useCharacterCollectionQuery(
@@ -63,8 +59,7 @@ export function useCharacterCollectionQuery(
   return useQuery({
     queryKey: charactersKey(userId ?? ''),
     queryFn: async () => {
-      const response = await apiGet('/characters');
-      return parseCollectionResponse(response);
+      return toCharacterCollection(await apiGetAllItems('/characters'));
     },
     enabled: userId !== undefined,
   });
@@ -73,7 +68,7 @@ export function useCharacterCollectionQuery(
 export function useAddCharacterMutation(
   userId: string | undefined,
 ): UseMutationResult<MutationResult, Error, CharacterId> {
-  const queryClient = useQueryClient();
+  const querySync = useUserQuerySync(userId, charactersKey);
 
   return useMutation({
     mutationFn: async (characterId: CharacterId): Promise<MutationResult> => {
@@ -82,20 +77,20 @@ export function useAddCharacterMutation(
       });
       return parseSingleCharacterResponse(response);
     },
-    onSuccess: invalidateUserQuery(queryClient, userId, charactersKey),
+    ...querySync,
   });
 }
 
 export function useRemoveCharacterMutation(
   userId: string | undefined,
 ): UseMutationResult<void, Error, CharacterId> {
-  const queryClient = useQueryClient();
+  const querySync = useUserQuerySync(userId, charactersKey);
 
   return useMutation({
     mutationFn: async (characterId: CharacterId) => {
       await apiDelete(`/characters/${encodeURIComponent(characterId)}`);
     },
-    onSuccess: invalidateUserQuery(queryClient, userId, charactersKey),
+    ...querySync,
   });
 }
 
@@ -107,7 +102,7 @@ export interface SetConstellationLevelVariables {
 export function useSetConstellationLevelMutation(
   userId: string | undefined,
 ): UseMutationResult<MutationResult, Error, SetConstellationLevelVariables> {
-  const queryClient = useQueryClient();
+  const querySync = useUserQuerySync(userId, charactersKey);
 
   return useMutation({
     mutationFn: async ({
@@ -119,6 +114,6 @@ export function useSetConstellationLevelMutation(
       });
       return parseSingleCharacterResponse(response);
     },
-    onSuccess: invalidateUserQuery(queryClient, userId, charactersKey),
+    ...querySync,
   });
 }
