@@ -74,6 +74,54 @@ describe('useTeams (authenticated)', () => {
     expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
   });
 
+  it('rolls back a failed save while another team saves', async () => {
+    const firstPut = holdResponse(() => new HttpResponse(null, { status: 500 }));
+    server.use(
+      http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([]))),
+      http.put('http://localhost:8080/teams/1', firstPut.resolver),
+      http.put('http://localhost:8080/teams/2', () => new HttpResponse(null, { status: 204 })),
+    );
+
+    const { result } = renderHookSignedIn(() => useTeams(), 'user-1');
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => {
+      result.current.assignCharacter(1, 0, CHARACTER);
+    });
+    act(() => {
+      result.current.assignCharacter(2, 0, CHARACTER);
+    });
+
+    firstPut.release();
+    await waitFor(() => expect(result.current.getTeam(1).members[0]).toBeNull());
+    expect(result.current.getTeam(2).members[0]?.characterId).toBe(CHARACTER);
+    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+  });
+
+  it('reports a failed save that a newer edit to the same team superseded', async () => {
+    const firstPut = holdResponse(() => new HttpResponse(null, { status: 500 }));
+    server.use(
+      http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([]))),
+      http.put('http://localhost:8080/teams/1', firstPut.resolver, { once: true }),
+      http.put('http://localhost:8080/teams/1', () => new HttpResponse(null, { status: 204 })),
+    );
+
+    const { result } = renderHookSignedIn(() => useTeams(), 'user-1');
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => {
+      result.current.assignCharacter(1, 0, CHARACTER);
+    });
+    act(() => {
+      result.current.setTeamName(1, 'Newer');
+    });
+
+    firstPut.release();
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Failed to save team.'));
+    expect(result.current.getTeam(1).name).toBe('Newer');
+    expect(result.current.getTeam(1).members[0]?.characterId).toBe(CHARACTER);
+  });
+
   it('warns before unload while a save is in flight', async () => {
     const put = holdResponse(() => new HttpResponse(null, { status: 204 }));
     server.use(

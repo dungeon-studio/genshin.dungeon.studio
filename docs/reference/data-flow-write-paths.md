@@ -39,8 +39,8 @@ it to the write still pending. The cancel skips the first load, and it can't
 reach a refetch that starts after the write, such as on window focus or
 reconnect. Either can still overwrite an edit in flight.
 
-A write that fails after a later write from the same hook has started gets
-neither rollback nor toast, see [#1757].
+A character or weapon write that fails after a later write from the same hook
+has started gets neither rollback nor toast, see [#1534].
 
 A character or weapon write that settles after its sender signs out, or after
 another account signs in, changes nothing and shows no toast, through
@@ -208,4 +208,4 @@ names a character or weapon instance the user doesn't own, so a team save can
 fail on a character add still in flight. Removing a character or weapon leaves
 the teams that name it unchanged.
 
-[#1757]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1757
+[#1534]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1534
