@@ -46,11 +46,6 @@ const OTHER_CLAYMORE_USER = characterWielding('Claymore', CLAYMORE_USER);
 const CLAYMORE_INSTANCE = 'claymore-instance' as CollectionWeaponId;
 const BOW_INSTANCE = 'bow-instance' as CollectionWeaponId;
 
-interface RenderOptions {
-  seeded?: boolean;
-  loading?: boolean;
-}
-
 async function firstEmptyMember() {
   const [member] = await screen.findAllByRole('button', { name: /No character/ });
   if (!member) throw new Error('no empty member position');
@@ -65,18 +60,17 @@ function AuthLoading({ children }: { children: ReactNode }) {
   );
 }
 
-function setupTeamsPage({ seeded = true, loading = false }: RenderOptions = {}): UserEvent {
-  const user = userEvent.setup({ delay: null });
+function renderTeamsPage(wrapper = createWrapper()): void {
   render(
     <MemoryRouter>
       <TeamsPage />
     </MemoryRouter>,
-    { wrapper: loading ? AuthLoading : createWrapper() },
+    { wrapper },
   );
+}
 
-  if (!seeded) return user;
-
-  // Seeded after mount: the hooks clear their stores on finding no signed-in user.
+// Seeded after mount: the hooks clear their stores on finding no signed-in user.
+function seedCollections(): void {
   act(() => {
     useCollectionStore
       .getState()
@@ -88,7 +82,12 @@ function setupTeamsPage({ seeded = true, loading = false }: RenderOptions = {}):
       [BOW_INSTANCE]: makeWeapon(BOW_INSTANCE, BOW_WEAPON.id),
     });
   });
+}
 
+function setupTeamsPage(): UserEvent {
+  const user = userEvent.setup({ delay: null });
+  renderTeamsPage();
+  seedCollections();
   return user;
 }
 
@@ -316,7 +315,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
 
 describe('TeamsPage empty collection', () => {
   it('points the user at the characters page', () => {
-    setupTeamsPage({ seeded: false });
+    renderTeamsPage();
 
     expect(screen.getByRole('link', { name: 'Go to Characters' })).toHaveAttribute(
       'href',
@@ -325,13 +324,14 @@ describe('TeamsPage empty collection', () => {
   });
 
   it('withholds the prompt until the collection has loaded', () => {
-    setupTeamsPage({ seeded: false, loading: true });
+    renderTeamsPage(AuthLoading);
 
     expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
   });
 
   it('shows no prompt once the user owns a character', () => {
-    setupTeamsPage();
+    renderTeamsPage();
+    seedCollections();
 
     expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
   });
