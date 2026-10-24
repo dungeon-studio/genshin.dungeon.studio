@@ -10,13 +10,13 @@ SPDX-License-Identifier: MIT
 
 Regeneration fetches from
 [AnimeGameData](https://github.com/DimbreathBot/AnimeGameData) at a pinned
-commit, so it needs network access and `generate all` skips it.
+commit, so it needs network access and `generate all` skips it. The pin is the
+commit named in the generated module's header.
+
+The daily workflow's `Refresh game data` job picks up new commits. Regenerate by
+hand after changing the generator.
 
 ## Regenerate the resonances
-
-Set `ANIME_GAME_DATA.commit` in `tools/game-data-codegen/src/resonances.ts` to
-the [AnimeGameData commit](https://github.com/DimbreathBot/AnimeGameData/commits)
-to pick up.
 
 Build the generator and run it:
 
@@ -24,6 +24,15 @@ Build the generator and run it:
 pnpm turbo run build --filter @genshin/game-data-codegen
 pnpm --filter @genshin/game-data-codegen generate resonances
 ```
+
+To read a newer commit, pass a commit SHA or a ref to `--ref`:
+
+```bash
+pnpm --filter @genshin/game-data-codegen generate resonances --ref HEAD
+```
+
+The module and its pin change only when the resonances differ from the shipped
+ones.
 
 Confirm the gates pass:
 

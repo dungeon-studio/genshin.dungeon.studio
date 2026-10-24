@@ -65,6 +65,21 @@ describe('buildResonances', () => {
     });
   });
 
+  it('reads records that omit default-valued fields', () => {
+    const records = upstream();
+    const sparse = records.map((r) =>
+      Object.fromEntries(
+        Object.entries(r).filter(
+          ([, value]) => value !== 0 && value !== 'TEAM_RESONANCE_COND_NONE',
+        ),
+      ),
+    );
+
+    expect(buildResonances(sparse, textMapFor(records))).toEqual(
+      buildResonances(records, textMapFor(records)),
+    );
+  });
+
   it('rejects records upstream has reshaped', () => {
     const records = upstream().map(({ nameTextMapHash: _, ...rest }) => rest);
 
