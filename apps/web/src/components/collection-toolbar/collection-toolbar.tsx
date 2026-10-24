@@ -50,7 +50,7 @@ export function CollectionToolbar<F extends BaseFilterState, T extends string>({
 
   return (
     <div className="space-y-1.5">
-      {/* Wraps rather than squeezing the search box below its placeholder on ~320px screens. */}
+      {/* Wraps so the search box keeps room for its placeholder on ~320px screens. */}
       <div className="gap-1.5 flex flex-wrap items-center">
         <SearchField
           value={filters.search}
@@ -58,7 +58,7 @@ export function CollectionToolbar<F extends BaseFilterState, T extends string>({
           label={searchLabel}
         />
 
-        {/* Held together so the slack falls before the pair, not between them. */}
+        {/* Grouped so free space never separates the summary from the sort control. */}
         <div className="gap-1.5 ml-auto flex shrink-0 items-center">
           <FilterSummary noun={noun} showOwnership={showOwnership} {...counts} />
           <SortControl filters={filters} onChange={onChange} />
@@ -93,7 +93,7 @@ export function CollectionToolbar<F extends BaseFilterState, T extends string>({
   );
 }
 
-/** Sorting reorders rather than narrows, so it never counts. */
+/** Sorting never counts: it reorders without narrowing. */
 function countActiveFilters(
   filters: BaseFilterState,
   selectedCategoryCount: number,
