@@ -42,6 +42,7 @@
     "@codecov/vite-plugin": "2.0.1",
     "@eslint-react/eslint-plugin": "5.28.4",
     "@genshin/eslint-config": "workspace:*",
+    "@genshin/schema-snapshots": "workspace:*",
     "@genshin/tsconfig": "workspace:*",
     "@genshin/vitest-config": "workspace:*",
     "@tailwindcss/postcss": "4.3.3",

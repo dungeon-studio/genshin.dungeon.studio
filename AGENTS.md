@@ -29,6 +29,7 @@ config for another tool follows the pattern in
 - `packages/domain`: Shared domain model: types, invariants, and wire format representations.
 - `packages/collection-json`, `packages/validation`: Wire format and schema validation.
 - `tools/game-data-codegen`: CLI that generates `game-data` sources like `weapons.generated.ts` from `genshin-db`. Never hand-edit generated files.
+- `tools/schema-snapshots`: Snapshot export and base-branch compatibility check for persisted schemas.
 - `tools/e2e`: Playwright end-to-end specs.
 - `infrastructure`: Terraform.
 - `docs`: Diátaxis-organized how-tos, references, and explanations.
