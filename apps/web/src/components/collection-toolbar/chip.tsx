@@ -3,7 +3,7 @@
 
 import type { JSX, ReactNode } from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/class-names';
 
 interface ChipProps {
   pressed: boolean;

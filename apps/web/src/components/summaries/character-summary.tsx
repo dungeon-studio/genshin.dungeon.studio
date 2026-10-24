@@ -5,8 +5,8 @@ import type { Character } from '@genshin/game-data';
 import type { JSX } from 'react';
 
 import { ThemedIcon } from '@/components/ui/themed-icon';
+import { cn } from '@/lib/class-names';
 import { getElementIconPath } from '@/lib/elements';
-import { cn } from '@/lib/utils';
 
 import { EmptyItemIcon } from './empty-item-icon';
 import { ICON_SLOT, ItemSummary } from './item-summary';

@@ -6,6 +6,7 @@ import { initialTeams } from '@genshin/domain';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { toast } from 'sonner';
 
+import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 
 import type { SaveTeamPayload } from './use-team-api';
@@ -31,7 +32,6 @@ export interface UseTeamsResult {
   clearTeam: (slot: TeamSlot) => void;
   setTeamName: (slot: TeamSlot, name: string) => void;
   getTeam: (slot: TeamSlot) => CollectionTeam;
-  isCharacterInTeam: (slot: TeamSlot, characterId: string) => boolean;
   isSaving: boolean;
   isLoading: boolean;
   error: Error | null;
@@ -182,33 +182,26 @@ function useTeamActions(
  * same slot again, their newer edit stands and they get an error toast instead.
  *
  * Signed out, the actions still work and nothing is persisted, so a visitor can
- * plan a team before deciding to sign in. Signing out discards it.
+ * plan a team before deciding to sign in. Signing out empties the teams, through
+ * `ClearUserDataOnSignOut` rather than this hook.
  */
 export function useTeams(): UseTeamsResult {
-  const { user, loading: authLoading } = useAuth();
-  const isAuthenticated = user !== null;
+  const auth = useAuth();
+  const uid = signedInUid(auth);
+  const isAuthenticated = uid !== undefined;
 
   const teams = useTeamStore((s) => s.teams);
   const storeSetTeams = useTeamStore((s) => s.setTeams);
-  const storeResetTeams = useTeamStore((s) => s.resetTeams);
 
-  const { data: apiTeams, error: queryError, isLoading: queryLoading } = useTeamsQuery(user?.uid);
+  const { data: apiTeams, error: queryError, isLoading: queryLoading } = useTeamsQuery(uid);
 
-  const { mutate: saveTeamApi, isPending: isSavePending } = useSaveTeamMutation(user?.uid);
-  const { mutate: deleteTeamApi, isPending: isDeletePending } = useDeleteTeamMutation(user?.uid);
+  const { mutate: saveTeamApi, isPending: isSavePending } = useSaveTeamMutation(uid);
+  const { mutate: deleteTeamApi, isPending: isDeletePending } = useDeleteTeamMutation(uid);
 
   const isSaving = isSavePending || isDeletePending;
 
   useWarnOnUnloadWhileSaving(isSaving);
 
-  // Reset store on logout
-  useEffect(() => {
-    if (!user) {
-      storeResetTeams();
-    }
-  }, [user, storeResetTeams]);
-
-  // Populate store from API data
   useEffect(() => {
     if (!apiTeams) return;
     storeSetTeams(collectionTeamsToStore(apiTeams));
@@ -218,21 +211,12 @@ export function useTeams(): UseTeamsResult {
 
   const getTeam = useCallback((slot: TeamSlot) => teams[slot], [teams]);
 
-  const isCharacterInTeam = useCallback(
-    (slot: TeamSlot, characterId: string) =>
-      teams[slot].members.some((m) => m?.characterId === characterId),
-    [teams],
-  );
-
-  const error = isAuthenticated ? (queryError ?? null) : null;
-
   return {
     teams,
     ...actions,
     getTeam,
-    isCharacterInTeam,
     isSaving,
-    isLoading: authLoading || (isAuthenticated && queryLoading),
-    error,
+    isLoading: awaitingUserData(auth, queryLoading),
+    error: isAuthenticated ? (queryError ?? null) : null,
   };
 }

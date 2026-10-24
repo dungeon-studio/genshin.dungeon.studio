@@ -68,11 +68,12 @@ export function deserialiseCollectionTeamMembers(
     );
   }
 
-  const [first, second, third, fourth] = value.map((member: unknown, index: number) =>
-    member === null ? null : deserialiseCollectionTeamMember(member, `${path}[${index}]`),
-  );
+  const memberAt = (index: number): CollectionTeamMember | null => {
+    const raw: unknown = value[index];
+    return raw === null ? null : deserialiseCollectionTeamMember(raw, `${path}[${index}]`);
+  };
 
-  return [first, second, third, fourth];
+  return [memberAt(0), memberAt(1), memberAt(2), memberAt(3)];
 }
 
 /**

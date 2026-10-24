@@ -4,6 +4,7 @@
 import type { CollectionWeapon, CollectionWeaponId, TeamSlot } from '@genshin/domain';
 import { TEAM_SLOTS } from '@genshin/domain';
 import { getCharacterById, getWeaponById } from '@genshin/game-data';
+import { Users } from 'lucide-react';
 import type { JSX, ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -12,14 +13,18 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
 import type { CharacterCollection } from '@/features/collection/characters/use-character-collection-store';
+import { ownedCharacters } from '@/features/collection/characters/use-character-collection-store';
+import { EmptyCollection } from '@/features/collection/empty-collection';
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
 import { CharacterPool } from '@/features/teams/character-pool';
 import { TeamPlanner } from '@/features/teams/team-planner';
+import { TeamResonance } from '@/features/teams/team-resonance';
 import { TeamStrip } from '@/features/teams/team-strip';
 import { usePendingWeapon } from '@/features/teams/use-pending-weapon';
 import type { UseTeamsResult } from '@/features/teams/use-teams';
 import { useTeams } from '@/features/teams/use-teams';
 import { WeaponPool } from '@/features/teams/weapon-pool';
+import { cn } from '@/lib/class-names';
 
 type SheetTab = 'characters' | 'weapons';
 
@@ -137,8 +142,10 @@ function useMemberEditor(
 type MemberEditor = ReturnType<typeof useMemberEditor>;
 
 export function TeamsPage(): JSX.Element {
-  const { characters, getCharacter } = useCollection();
+  const { characters, getCharacter, isLoading: collectionLoading } = useCollection();
   const { weapons } = useWeaponCollection();
+
+  const collectionEmpty = !collectionLoading && ownedCharacters(characters).length === 0;
 
   const collectionWeapons = useMemo(() => Object.values(weapons), [weapons]);
 
@@ -171,6 +178,8 @@ export function TeamsPage(): JSX.Element {
     <Container className="py-12">
       <h1 className="sr-only">Teams</h1>
 
+      {collectionEmpty && <EmptyCollectionPrompt />}
+
       <div className="space-y-4">
         {TEAM_SLOTS.map((slot) => (
           <section key={slot} aria-label={teams[slot].name} className="p-4">
@@ -183,7 +192,7 @@ export function TeamsPage(): JSX.Element {
               onNameChange={(name) => setTeamName(slot, name)}
               onArtifactPlanChange={(memberIndex, plan) => setArtifactPlan(slot, memberIndex, plan)}
               onEdit={() => editor.select(slot, null)}
-              onMemberSelect={(memberIndex) => editor.select(slot, memberIndex)}
+              onMemberEdit={(memberIndex) => editor.select(slot, memberIndex)}
             />
           </section>
         ))}
@@ -205,6 +214,8 @@ export function TeamsPage(): JSX.Element {
           {selectedSlot !== null && selectedTeam && (
             <>
               <SheetHeader className="pt-6">
+                <TeamResonance members={selectedTeam.members} />
+
                 <TeamStrip
                   members={selectedTeam.members}
                   selectedMemberIndex={selectedMemberIndex}
@@ -239,6 +250,23 @@ export function TeamsPage(): JSX.Element {
   );
 }
 
+/**
+ * Leaves the team rows in place: a user who removes every character still sees the teams
+ * that reference them.
+ */
+function EmptyCollectionPrompt(): JSX.Element {
+  return (
+    <EmptyCollection
+      icon={Users}
+      title="No characters in your collection"
+      description="Add the characters you own to start building teams."
+      to="/characters"
+      action="Go to Characters"
+      className="mb-8 rounded-lg border border-border"
+    />
+  );
+}
+
 interface TabButtonProps {
   tab: SheetTab;
   activeTab: SheetTab;
@@ -251,11 +279,12 @@ function TabButton({ tab, activeTab, onSelect, children }: TabButtonProps): JSX.
   return (
     <button
       type="button"
-      className={`px-1 pb-2 text-sm font-semibold border-b-2 ${
+      className={cn(
+        'px-1 pb-2 text-sm font-semibold border-b-2',
         active
           ? 'border-primary text-foreground'
-          : 'border-transparent text-muted-foreground hover:text-foreground'
-      }`}
+          : 'border-transparent text-muted-foreground hover:text-foreground',
+      )}
       aria-current={active ? 'page' : undefined}
       onClick={() => onSelect(tab)}
     >

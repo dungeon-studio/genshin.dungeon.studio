@@ -4,8 +4,8 @@
 import type { JSX } from 'react';
 import { useId, useState } from 'react';
 
+import { cn } from '@/lib/class-names';
 import type { BaseFilterState } from '@/lib/collection-filters';
-import { cn } from '@/lib/utils';
 
 import { FilterChips } from './filter-chips';
 import { FilterSummary } from './filter-summary';

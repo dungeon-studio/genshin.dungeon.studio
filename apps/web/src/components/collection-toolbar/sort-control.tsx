@@ -21,7 +21,8 @@ export function SortControl<F extends BaseFilterState>({
   const ascending = filters.sortDirection === 'asc';
 
   function cycleField() {
-    onChange({ ...filters, sortField: SORT_FIELDS[(fieldIndex + 1) % SORT_FIELDS.length].value });
+    const next = SORT_FIELDS[(fieldIndex + 1) % SORT_FIELDS.length];
+    if (next) onChange({ ...filters, sortField: next.value });
   }
 
   function toggleDirection() {
@@ -31,7 +32,7 @@ export function SortControl<F extends BaseFilterState>({
   return (
     <div className="flex items-center">
       <Button variant="outline" size="sm" onClick={cycleField} className="rounded-r-none">
-        {SORT_FIELDS[fieldIndex].label}
+        {SORT_FIELDS[fieldIndex]?.label}
       </Button>
       <Button
         variant="outline"

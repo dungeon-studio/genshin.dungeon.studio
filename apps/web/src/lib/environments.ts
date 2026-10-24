@@ -8,6 +8,8 @@
  * top of it. A null `badge` is what makes an environment production.
  */
 
+import table from './environments.json';
+
 /** The one origin serving the real site; anything telling production from the rest compares against it. */
 export const PRODUCTION_ORIGIN = 'https://genshin.dungeon.studio';
 
@@ -34,31 +36,14 @@ export interface Environment {
 /**
  * A new environment has to look unmistakably unlike production and unlike its
  * siblings, in a hue the palette does not already give a meaning to.
+ *
+ * The values live in `environments.json` because the brand-asset generator
+ * reads the same table.
  */
 export const ENVIRONMENTS: Readonly<Record<EnvironmentName, Environment>> = {
-  dev: {
-    name: 'dev',
-    themeColor: '#752f93',
-    badge: {
-      label: 'Alpha',
-      glyph: 'α',
-      iconSuffix: 'alpha',
-    },
-  },
-  staging: {
-    name: 'staging',
-    themeColor: '#1c5392',
-    badge: {
-      label: 'Beta',
-      glyph: 'β',
-      iconSuffix: 'beta',
-    },
-  },
-  prod: {
-    name: 'prod',
-    themeColor: '#1f514e',
-    badge: null,
-  },
+  dev: { name: 'dev', ...table.dev },
+  staging: { name: 'staging', ...table.staging },
+  prod: { name: 'prod', ...table.prod },
 };
 
 export function isEnvironmentName(value: string | undefined): value is EnvironmentName {

@@ -6,6 +6,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { BaseFilterState } from '@/lib/collection-filters';
+import { iconSources } from '@/test/icons';
 
 import { CollectionToolbar } from './collection-toolbar';
 import type { FilterCategoryConfig } from './types';
@@ -79,7 +80,7 @@ describe('CollectionToolbar', () => {
 
     await user.click(screen.getByRole('button', { name: 'Filter by 5-star' }));
 
-    expect(onChange.mock.calls[0][0].rarities.has(5)).toBe(true);
+    expect(onChange.mock.calls[0]?.[0].rarities.has(5)).toBe(true);
   });
 
   it('removes a rarity that was already selected', async () => {
@@ -88,7 +89,7 @@ describe('CollectionToolbar', () => {
 
     await user.click(screen.getByRole('button', { name: 'Filter by 5-star' }));
 
-    expect(onChange.mock.calls[0][0].rarities.has(5)).toBe(false);
+    expect(onChange.mock.calls[0]?.[0].rarities.has(5)).toBe(false);
   });
 
   it('delegates category toggles to the config', async () => {
@@ -98,6 +99,18 @@ describe('CollectionToolbar', () => {
     await user.click(screen.getByRole('button', { name: 'Filter by A' }));
 
     expect(onToggle).toHaveBeenCalledWith('A');
+  });
+
+  it('draws an active chip icon in the label color, not a theme variant', () => {
+    renderToolbar({ category: { selected: new Set(['A']) } });
+
+    expect(iconSources('Filter by A')).toStrictEqual(['url("/icons/A-light.png")']);
+  });
+
+  it('draws an idle chip icon in the page theme variant', () => {
+    renderToolbar();
+
+    expect(iconSources('Filter by A')).toStrictEqual(['/icons/A-light.png', '/icons/A-dark.png']);
   });
 
   it('cycles the sort field and wraps back to the first', async () => {

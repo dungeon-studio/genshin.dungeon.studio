@@ -6,6 +6,9 @@
 *.tfstate.*
 .terraform/
 
+# A lockfile only binds a root module; validating a child module writes one.
+**/modules/**/.terraform.lock.hcl
+
 # Crash log files
 crash.log
 crash.*.log

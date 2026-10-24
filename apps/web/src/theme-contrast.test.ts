@@ -41,11 +41,10 @@ function themeTokens(selector: string): Map<string, string> {
   const blocks = css.matchAll(new RegExp(`${escaped}\\s*\\{([^}]*)\\}`, 'g'));
 
   const tokens = new Map(
-    [...blocks].flatMap(([, body]) =>
-      [...body.matchAll(/--([\w-]+):\s*([^;]+);/g)].map(([, name, value]): [string, string] => [
-        name,
-        value.trim(),
-      ]),
+    [...blocks].flatMap(([, body = '']) =>
+      [...body.matchAll(/--([\w-]+):\s*([^;]+);/g)].map(
+        ([, name = '', value = '']): [string, string] => [name, value.trim()],
+      ),
     ),
   );
 
@@ -54,15 +53,18 @@ function themeTokens(selector: string): Map<string, string> {
   return tokens;
 }
 
+function isFiniteTriple(parts: number[]): parts is [number, number, number] {
+  return parts.length === 3 && parts.every((part) => Number.isFinite(part));
+}
+
 /** The bare `H S% L%` triple Tailwind wraps in `hsl(var(--token))`. */
 function parseHsl(value: string): Hsl {
   const parts = value.split(/\s+/).map((part) => Number.parseFloat(part));
-  if (parts.length !== 3 || !parts.every((part) => Number.isFinite(part))) {
+  if (!isFiniteTriple(parts)) {
     throw new Error(`expected an "H S% L%" triple, got: ${value}`);
   }
 
-  const [hue, saturation, lightness] = parts;
-  return [hue, saturation, lightness];
+  return parts;
 }
 
 /** HSL to sRGB channels in 0–1, per the CSS Color Module Level 4 conversion. */

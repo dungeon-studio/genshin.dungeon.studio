@@ -8,12 +8,11 @@ import type {
   CollectionWeapon,
   CollectionWeaponId,
 } from '@genshin/domain';
-import { MAX_TEAM_MEMBERS } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
 import type { JSX } from 'react';
 
+import { cn } from '@/lib/class-names';
 import { elementBorderClass } from '@/lib/element-styles';
-import { cn } from '@/lib/utils';
 
 import { TeamMemberSummary } from './team-member-summary';
 
@@ -32,11 +31,9 @@ export function TeamStrip({
   getCharacter,
   getCollectionWeapon,
 }: TeamStripProps): JSX.Element {
-  const slots = Array.from({ length: MAX_TEAM_MEMBERS }, (_, i) => members[i]);
-
   return (
     <div className="gap-2 sm:grid-cols-4 grid grid-cols-2">
-      {slots.map((member, i) => {
+      {members.map((member, i) => {
         const character = member ? getCharacterById(member.characterId) : undefined;
 
         const selected = selectedMemberIndex === i;

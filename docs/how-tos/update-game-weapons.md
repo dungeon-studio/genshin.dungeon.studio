@@ -16,6 +16,9 @@ Optionally pull newer game data first:
 pnpm --filter @genshin/game-data-codegen up genshin-db
 ```
 
+Newer game data changes every roster, so after pulling it run `generate all`
+in place of the single roster below. A commit fails while any roster is stale.
+
 Build the generator and run it:
 
 ```bash
@@ -44,3 +47,4 @@ with no mapping. To add one:
 - [Regenerate Genshin Impact Characters](update-game-characters.md)
 - [Update Elemental Reactions](update-game-reactions.md)
 - [Update Genshin Impact Artifact Sets](update-game-artifacts.md)
+- [Regenerate Genshin Impact Elemental Resonances](update-game-resonances.md)

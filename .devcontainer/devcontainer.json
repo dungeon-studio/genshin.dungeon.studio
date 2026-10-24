@@ -8,17 +8,19 @@
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers-extra/features/act:1": {},
     "ghcr.io/devcontainers/features/node:2": {
-      "version": "24.20.0"
+      "version": "24.22.1"
     },
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       "moby": false
     },
-    "ghcr.io/devcontainers/features/terraform:1": {},
+    "ghcr.io/devcontainers/features/terraform:1": {
+      // renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
+      "version": "1.16.6"
+    },
     "ghcr.io/devcontainers-extra/features/pre-commit:2": {},
     "ghcr.io/shinepukur/devcontainer-features/vale:1": {
       "version": "3.14.1"
     },
-    "ghcr.io/devcontainers-extra/features/firebase-cli:2": {},
     "ghcr.io/devcontainers/features/java:1": {
       "version": "21",
       "installGradle": false,

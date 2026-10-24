@@ -4,7 +4,7 @@
 import type { Rarity } from '@genshin/game-data';
 import type { JSX } from 'react';
 
-import { ThemedIcon } from '@/components/ui/themed-icon';
+import { ChipIcon } from '@/components/ui/chip-icon';
 import type { BaseFilterState } from '@/lib/collection-filters';
 import { toggleInSet } from '@/lib/toggle-in-set';
 
@@ -54,7 +54,7 @@ export function FilterChips<F extends BaseFilterState, T extends string>({
           key={rarity}
           pressed={filters.rarities.has(rarity)}
           onClick={() => toggleRarity(rarity)}
-          pressedClassName="text-white bg-geo-dark"
+          pressedClassName="text-black bg-geo-dark"
           label={`Filter by ${rarity}-star`}
         >
           {rarity}★
@@ -64,24 +64,23 @@ export function FilterChips<F extends BaseFilterState, T extends string>({
       {showCategory && <ChipDivider />}
 
       {showCategory &&
-        category.values.map((value) => (
-          <Chip
-            key={value}
-            pressed={category.selected.has(value)}
-            onClick={() => category.onToggle(value)}
-            className="gap-1.5 inline-flex items-center"
-            pressedClassName={category.activeClassName(value)}
-            label={`Filter by ${value}`}
-          >
-            <ThemedIcon
-              lightSrc={category.iconPath(value, 'light')}
-              darkSrc={category.iconPath(value, 'dark')}
-              alt=""
-              className="h-3.5 w-3.5"
-            />
-            {value}
-          </Chip>
-        ))}
+        category.values.map((value) => {
+          const active = category.selected.has(value);
+
+          return (
+            <Chip
+              key={value}
+              pressed={active}
+              onClick={() => category.onToggle(value)}
+              className="gap-1.5 inline-flex items-center"
+              pressedClassName={category.activeClassName(value)}
+              label={`Filter by ${value}`}
+            >
+              <ChipIcon iconPath={(variant) => category.iconPath(value, variant)} onFill={active} />
+              {value}
+            </Chip>
+          );
+        })}
     </div>
   );
 }

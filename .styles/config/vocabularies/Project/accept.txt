@@ -31,6 +31,7 @@ Cloud Run
 Cloud Storage
 Codecov
 CodeQL
+commitlint
 Copilot
 corepack
 Dependabot
@@ -66,16 +67,17 @@ Verzod
 Vite
 Vitest
 yamllint
+zizmor
 Zod
 zustand
 
 # Standards, formats, and acronyms
+ADR
 API
 APIs
 camelCase
 CI/CD
 CLI
-DSGEP
 ESM
 HMR
 HTTP
@@ -129,8 +131,10 @@ SRECon
 [Nn]amespace
 [Oo]ptionalslop
 [Pp]arseable
+[Rr]efetch(es|ed)?
 [Rr]epo
 [Rr]ollouts
+[Rr]uleset
 [Ss]erializer
 [Ss]uperset
 [Tt]oolchain

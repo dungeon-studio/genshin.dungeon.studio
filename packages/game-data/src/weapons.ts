@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { Rarity } from './rarities.js';
+import type { GameVersion } from './versions.js';
 import { WEAPON_DATA } from './weapons.generated.js';
 
 /**
@@ -62,7 +63,7 @@ export interface Weapon {
   type: WeaponType;
   rarity: Rarity;
   baseATK: number;
-  version: string; // Release version (e.g., "1.0", "2.1", "4.3")
+  version: GameVersion;
   subStat?: {
     type: WeaponStatType;
     value: number;
