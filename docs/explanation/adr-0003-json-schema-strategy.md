@@ -114,12 +114,6 @@ This mirrors the client-side mechanism: clients send `Accept: application/json; 
 
 No registry defines this parameter: the `application/json` registration in [RFC 8259 §11](https://www.rfc-editor.org/rfc/rfc8259#section-11) has no parameters. [RFC 6906 §3.1](https://www.rfc-editor.org/rfc/rfc6906#section-3.1) recommends that a media type define `profile`, but it doesn't add one to media types that lack it. Only clients that implement this record know what `profile` means here.
 
-This approach:
-
-- Provides symmetric content negotiation: `profile` on `Accept` for requests and `Content-Type` for responses
-- Keeps schema discovery within the standard content negotiation mechanism
-- Works with HTTP's existing `Accept`/`Content-Type` negotiation model
-
 Examples in this document use relative URI references for readability. Implementations use absolute URIs matching the `$id` of the schema.
 
 ### Stability contract
