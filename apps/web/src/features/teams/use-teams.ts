@@ -10,7 +10,12 @@ import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 
 import type { SaveTeamPayload } from './use-team-api';
-import { useDeleteTeamMutation, useSaveTeamMutation, useTeamsQuery } from './use-team-api';
+import {
+  useDeleteTeamMutation,
+  useSaveTeamMutation,
+  useTeamsQuery,
+  useTeamWritePending,
+} from './use-team-api';
 import { useTeamStore } from './use-team-store';
 
 export interface UseTeamsResult {
@@ -193,7 +198,13 @@ export function useTeams(): UseTeamsResult {
   const teams = useTeamStore((s) => s.teams);
   const storeSetTeams = useTeamStore((s) => s.setTeams);
 
-  const { data: apiTeams, error: queryError, isLoading: queryLoading } = useTeamsQuery(uid);
+  const {
+    data: apiTeams,
+    dataUpdatedAt,
+    error: queryError,
+    isLoading: queryLoading,
+  } = useTeamsQuery(uid);
+  const isWritePending = useTeamWritePending(uid);
 
   const { mutate: saveTeamApi, isPending: isSavePending } = useSaveTeamMutation(uid);
   const { mutate: deleteTeamApi, isPending: isDeletePending } = useDeleteTeamMutation(uid);
@@ -202,10 +213,13 @@ export function useTeams(): UseTeamsResult {
 
   useWarnOnUnloadWhileSaving(isSaving);
 
+  // An answer that lands while a write is pending predates it, so the store
+  // keeps its edits and waits for the refetch the last write starts.
+  // `dataUpdatedAt` reruns this when that refetch matches the answer skipped.
   useEffect(() => {
-    if (!apiTeams) return;
+    if (!apiTeams || isWritePending()) return;
     storeSetTeams(collectionTeamsToStore(apiTeams));
-  }, [apiTeams, storeSetTeams]);
+  }, [apiTeams, dataUpdatedAt, isWritePending, storeSetTeams]);
 
   const actions = useTeamActions(isAuthenticated, saveTeamApi, deleteTeamApi);
 

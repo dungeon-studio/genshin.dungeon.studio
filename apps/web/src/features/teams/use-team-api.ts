@@ -16,7 +16,8 @@ import { assertCollectionDocument } from '@genshin/collection-json';
 import type { CollectionTeam, CollectionTeamMembers, TeamSlot } from '@genshin/domain';
 import { deserialiseTeam } from '@genshin/domain';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 
 import { apiDelete, apiGet, apiPut } from '@/lib/api';
 import { useUserQuerySync } from '@/lib/use-user-query-sync';
@@ -45,6 +46,18 @@ export function useTeamsQuery(userId: string | undefined): UseQueryResult<Collec
     },
     enabled: userId !== undefined,
   });
+}
+
+/**
+ * Whether a team save or delete is still waiting on the server, read when
+ * called rather than at render, so an effect sees writes started since.
+ */
+export function useTeamWritePending(userId: string | undefined): () => boolean {
+  const queryClient = useQueryClient();
+  return useCallback(
+    () => userId !== undefined && queryClient.isMutating({ mutationKey: teamsKey(userId) }) > 0,
+    [queryClient, userId],
+  );
 }
 
 export function useSaveTeamMutation(
