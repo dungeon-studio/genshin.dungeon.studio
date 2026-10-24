@@ -16,10 +16,6 @@ import { issue, prefixPaths } from '@genshin/validation';
 import type { CollectionTeamMembers, TeamSlot } from './collection-team.js';
 import { validateArtifactPlan } from '../artifact/artifact-plan-validation.js';
 
-/**
- * What the user owns. The web fills it from zustand and TanStack Query state,
- * the API from Firestore.
- */
 export interface TeamValidationContext {
   ownedCharacterIds: ReadonlySet<string>;
   ownedWeaponInstanceIds: ReadonlySet<string>;
@@ -29,8 +25,7 @@ export interface TeamValidationContext {
  * Checks one team without looking at the user's other teams; conflicts between
  * teams are {@link validateAcrossTeams}'s job.
  *
- * @param context - omitting it skips the ownership checks, which is how the web
- * validates before it knows the collection.
+ * @param context - omitting it skips the ownership checks.
  */
 export function validateTeam(
   team: { name: string; members: CollectionTeamMembers; description?: string },
