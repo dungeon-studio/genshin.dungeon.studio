@@ -15,9 +15,9 @@ import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChipIcon } from '@/components/ui/chip-icon';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/class-names';
 import type { BaseFilterState } from '@/lib/collection-filters';
 import { toggleInSet } from '@/lib/toggle-in-set';
-import { cn } from '@/lib/utils';
 
 /** Configures the one filter row that differs between collection types. */
 export interface FilterCategoryConfig<T extends string> {

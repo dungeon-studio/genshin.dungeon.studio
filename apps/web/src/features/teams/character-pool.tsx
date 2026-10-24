@@ -17,8 +17,8 @@ import type { CharacterCollection } from '@/features/collection/characters/use-c
 import { ownedCharacterIds } from '@/features/collection/characters/use-character-collection-store';
 import { EmptyCollection } from '@/features/collection/empty-collection';
 import { useTeamStore } from '@/features/teams/use-team-store';
+import { cn } from '@/lib/class-names';
 import { ELEMENT_BORDER_COLORS, ELEMENT_SELECTED_RINGS } from '@/lib/element-styles';
-import { cn } from '@/lib/utils';
 
 function poolFilterState(): CharacterFilterState {
   return { ...initialFilterState(), ownership: 'owned' };

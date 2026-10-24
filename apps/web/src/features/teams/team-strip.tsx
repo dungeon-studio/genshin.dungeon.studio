@@ -11,8 +11,8 @@ import type {
 import { getCharacterById } from '@genshin/game-data';
 import type { JSX } from 'react';
 
+import { cn } from '@/lib/class-names';
 import { elementBorderClass } from '@/lib/element-styles';
-import { cn } from '@/lib/utils';
 
 import { TeamMemberSummary } from './team-member-summary';
 

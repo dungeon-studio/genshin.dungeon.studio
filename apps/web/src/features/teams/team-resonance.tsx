@@ -8,9 +8,9 @@ import type { JSX } from 'react';
 
 import { ChipIcon } from '@/components/ui/chip-icon';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/class-names';
 import { ELEMENT_BG_COLORS } from '@/lib/element-styles';
 import { getElementIconPath } from '@/lib/elements';
-import { cn } from '@/lib/utils';
 
 interface TeamResonanceProps {
   members: CollectionTeam['members'];
