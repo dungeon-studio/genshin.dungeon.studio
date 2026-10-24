@@ -32,15 +32,16 @@ change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&'
 
 # Strip the conventional-commit prefix from each bullet; the category heading
-# already conveys the type, so 'feat: add X' reads as 'add X'.
+# already conveys the type, so 'feat: add X' reads as 'add X'. The title check
+# in pull-request-metadata.yml owns the type list.
 replacers:
-  - search: '/^(\s*-\s)(?:feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(?:\([^)]*\))?!?:\s+/gim'
+  - search: '/^(\s*-\s)\w+(?:\([^)]*\))?!?:\s+/gim'
     replace: '$1'
 
 version-resolver:
   major:
     labels:
-      - 'breaking-change'
+      - 'breaking change'
   minor:
     labels:
       - 'enhancement'
@@ -56,6 +57,11 @@ version-resolver:
 # Apply category labels from conventional-commit PR titles so the categories
 # above are driven by commit prefixes without manual labeling. A breaking-change
 # marker (type!:) adds the major-bump label on top of the type label.
+#
+# A retitled PR changes category instead of collecting a second one. Any label
+# named below is removed when no rule selects it, even one applied by hand.
+sync-labels: true
+
 autolabeler:
   - label: 'enhancement'
     title:
@@ -65,18 +71,22 @@ autolabeler:
       - '/^fix(\(.+\))?!?:/i'
   - label: 'documentation'
     title:
-      - '/^docs(\(.+\))?:/i'
+      - '/^docs(\(.+\))?!?:/i'
+  # Renovate labels vulnerability PRs itself; matching its [security] title
+  # suffix keeps sync-labels from removing that label.
   - label: 'security'
     title:
-      - '/^(feat|fix|chore)\(security\)/i'
+      - '/^\w+\(security\)/i'
+      - '/\[security\]$/i'
   - label: 'dependencies'
     title:
-      - '/^(chore|build|fix)\(deps(-dev)?\)/i'
+      - '/^\w+\(deps(-dev)?\)/i'
+  # Catch-all for types without a category; the excluded types mirror the rules
+  # above.
   - label: 'chore'
     title:
-      - '/^(chore|build)(?!\(deps)(\(.+\))?:/i'
-      - '/^(ci|style|refactor|test|perf|revert)(\(.+\))?:/i'
-  - label: 'breaking-change'
+      - '/^(?!(feat|fix|docs)\b)\w+(?!\(deps)(\(.+\))?!?:/i'
+  - label: 'breaking change'
     title:
       - '/^\w+(\(.+\))?!:/'
   # Component labels from the changed file paths, so a PR is tagged by the part

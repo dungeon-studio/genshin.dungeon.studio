@@ -2,29 +2,24 @@
 // SPDX-License-Identifier: MIT
 
 import type { ProblemDetail } from '@genshin/domain';
-import { GoogleError, Status } from 'google-gax';
+import { GrpcStatus } from 'firebase-admin/firestore';
 import { HTTPException } from 'hono/http-exception';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { ProblemException } from '@/http/problem.js';
+import { firestoreError } from '@/test/firestore-error.js';
 
 import { app } from './app.js';
 
-function googleError(code: Status): GoogleError {
-  const err = new GoogleError('firestore blew up');
-  err.code = code;
-  return err;
-}
-
 beforeAll(() => {
   app.get('/__test/resource-exhausted', () => {
-    throw googleError(Status.RESOURCE_EXHAUSTED);
+    throw firestoreError(GrpcStatus.RESOURCE_EXHAUSTED);
   });
   app.get('/__test/unavailable', () => {
-    throw googleError(Status.UNAVAILABLE);
+    throw firestoreError(GrpcStatus.UNAVAILABLE);
   });
   app.get('/__test/permission-denied', () => {
-    throw googleError(Status.PERMISSION_DENIED);
+    throw firestoreError(GrpcStatus.PERMISSION_DENIED);
   });
   app.get('/__test/http-exception', () => {
     throw new HTTPException(503, { message: 'service unavailable' });

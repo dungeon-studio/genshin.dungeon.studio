@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: MIT
 
 import { render, screen } from '@testing-library/react';
-import type { User as FirebaseUser } from 'firebase/auth';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
+import type { AuthUser } from '@/features/auth';
 import { AuthContext } from '@/features/auth/auth-context';
+import { settledAuth } from '@/test/auth';
 
 vi.mock('@/lib/firebase', () => ({
   auth: { currentUser: null },
@@ -15,13 +16,10 @@ vi.mock('@/lib/firebase', () => ({
 
 const { Footer } = await import('./footer');
 
-function renderFooter(
-  user: FirebaseUser | null = null,
-  initialRoute = '/',
-): ReturnType<typeof render> {
+function renderFooter(user: AuthUser | null = null, initialRoute = '/'): ReturnType<typeof render> {
   const wrapper = ({ children }: { children: ReactNode }): ReactNode => (
     <MemoryRouter initialEntries={[initialRoute]}>
-      <AuthContext value={{ user, loading: false }}>{children}</AuthContext>
+      <AuthContext value={settledAuth(user)}>{children}</AuthContext>
     </MemoryRouter>
   );
 
@@ -57,7 +55,7 @@ describe('Footer', () => {
   });
 
   it('pre-fills the bug report link with page and auth state', () => {
-    renderFooter({ uid: 'signed-in-user' } as FirebaseUser, '/weapons');
+    renderFooter({ uid: 'signed-in-user' } as AuthUser, '/weapons');
 
     const href = screen.getByRole('link', { name: 'Report an issue' }).getAttribute('href') ?? '';
     const params = new URL(href).searchParams;
@@ -68,7 +66,7 @@ describe('Footer', () => {
   });
 
   it('never leaks the signed-in user identity into the link', () => {
-    renderFooter({ uid: 'secret-uid-xyz', email: 'reporter@example.com' } as FirebaseUser, '/');
+    renderFooter({ uid: 'secret-uid-xyz', email: 'reporter@example.com' } as AuthUser, '/');
 
     const href = screen.getByRole('link', { name: 'Report an issue' }).getAttribute('href') ?? '';
 

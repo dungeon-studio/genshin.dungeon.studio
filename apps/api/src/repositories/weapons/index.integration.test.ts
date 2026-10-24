@@ -4,16 +4,12 @@
 import { randomUUID } from 'node:crypto';
 
 import type { CollectionWeapon, UUID } from '@genshin/domain';
-import { WEAPON_ROSTER } from '@genshin/game-data';
 import { describe, expect, it } from 'vitest';
 
 import { documentRef, newUserId } from '@/test/firestore.js';
+import { OTHER_WEAPON, WEAPON } from '@/test/roster.js';
 
 import { create, get, list, remove, update } from './index.js';
-
-// Two distinct weapons, so a filtered list has something to leave out. Taken
-// from game data, so a roster change cannot strand the suite.
-const [WEAPON, OTHER_WEAPON] = WEAPON_ROSTER;
 
 const REFINEMENT_LEVEL = 1;
 const RAISED_REFINEMENT_LEVEL = 5;
@@ -36,13 +32,42 @@ describe('list', () => {
     await create(userId, WEAPON.id, REFINEMENT_LEVEL);
     await create(userId, OTHER_WEAPON.id, REFINEMENT_LEVEL);
 
-    const instances = await list(userId, WEAPON.id);
+    const { items: instances } = await list(userId, { limit: 10 }, WEAPON.id);
 
     expect(instances).toHaveLength(2);
     expect(instances.map((instance) => instance.weaponId)).toEqual([WEAPON.id, WEAPON.id]);
     expect(instances.map((instance) => instance.weaponInstanceId)).toContain(
       wanted.weaponInstanceId,
     );
+  });
+
+  it('yields every filtered instance exactly once when walked page by page', async () => {
+    const userId = newUserId();
+    const created = await Promise.all(
+      Array.from({ length: 5 }, () => create(userId, WEAPON.id, REFINEMENT_LEVEL)),
+    );
+    await create(userId, OTHER_WEAPON.id, REFINEMENT_LEVEL);
+
+    const walked: string[] = [];
+    let after: string | undefined;
+    do {
+      const page = await list(userId, { limit: 2, after }, WEAPON.id);
+      walked.push(...page.items.map((instance) => instance.weaponInstanceId));
+      after = page.next;
+    } while (after !== undefined);
+
+    expect(walked.sort()).toEqual(created.map((instance) => instance.weaponInstanceId).sort());
+  });
+
+  it('reports no next page when the last page is exactly full', async () => {
+    const userId = newUserId();
+    await create(userId, WEAPON.id, REFINEMENT_LEVEL);
+    await create(userId, WEAPON.id, REFINEMENT_LEVEL);
+
+    const page = await list(userId, { limit: 2 });
+
+    expect(page.items).toHaveLength(2);
+    expect(page.next).toBeUndefined();
   });
 });
 

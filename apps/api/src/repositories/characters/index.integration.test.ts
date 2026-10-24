@@ -1,16 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { CHARACTER_ROSTER } from '@genshin/game-data';
 import { describe, expect, it } from 'vitest';
 
 import { documentRef, newUserId } from '@/test/firestore.js';
+import { CHARACTER } from '@/test/roster.js';
 
 import { get, remove, save } from './index.js';
-
-// Any character satisfies these; taking the first keeps a roster change from
-// stranding the suite on one that no longer exists.
-const CHARACTER = CHARACTER_ROSTER[0];
 
 const CREATED_AT = '2026-01-01T00:00:00.000Z';
 const UPDATED_AT = '2026-01-02T00:00:00.000Z';

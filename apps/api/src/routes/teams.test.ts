@@ -3,6 +3,7 @@
 
 import { COLLECTION_JSON, type CollectionDocument } from '@genshin/collection-json';
 import type { CollectionTeam, CollectionTeamMember } from '@genshin/domain';
+import { teamItemDocument, teamListDocument } from '@genshin/domain';
 import { makeCharacter, makeTeam, makeWeapon } from '@genshin/domain/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -14,6 +15,7 @@ import * as Characters from '@/repositories/characters/index.js';
 import * as Teams from '@/repositories/teams/index.js';
 import * as Weapons from '@/repositories/weapons/index.js';
 import { FAKE_TOKEN, authedRequest } from '@/test/auth-requests.js';
+import { unroutedHrefs } from '@/test/hrefs.js';
 
 vi.mock('@/firebase/auth.js', () => ({
   verifyToken: vi.fn(),
@@ -49,9 +51,11 @@ const FAKE_TEAM = makeTeam(1, {
 
 const FAKE_EMPTY_TEAM = makeTeam(2);
 
+const BASE_URL = 'http://localhost';
+
 const EXPECTED_CONTENT_TYPE = toMediaTypeString(
   { mediaType: COLLECTION_JSON, profile: teamItemV1 },
-  'http://localhost',
+  BASE_URL,
 );
 
 function mockCharacterOwned() {
@@ -89,26 +93,12 @@ describe('Team routes', () => {
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
-    it('returns one item per team', () => {
-      expect(body.collection.items).toHaveLength(2);
+    it('returns the stored teams as the list document', () => {
+      expect(body).toEqual(teamListDocument([FAKE_TEAM, FAKE_EMPTY_TEAM], BASE_URL));
     });
 
-    it('includes team domain data', () => {
-      expect(body.collection.items[0].data).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ name: 'slot', value: 1 }),
-          expect.objectContaining({ name: 'name', value: 'Team 1' }),
-        ]),
-      );
-    });
-
-    it('returns empty items when no teams exist', async () => {
-      vi.mocked(Teams.list).mockResolvedValue([]);
-
-      const res = await app.request(authedRequest('GET', '/teams'));
-
-      const body = (await res.json()) as CollectionDocument;
-      expect(body.collection.items).toEqual([]);
+    it('links only to paths the app routes as GET', () => {
+      expect(unroutedHrefs(body)).toEqual([]);
     });
 
     it('returns 500 when repository throws', async () => {
@@ -140,17 +130,12 @@ describe('Team routes', () => {
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
-    it('returns single-item collection', () => {
-      expect(body.collection.items).toHaveLength(1);
+    it('returns the stored team as an item document', () => {
+      expect(body).toEqual(teamItemDocument(FAKE_TEAM, BASE_URL));
     });
 
-    it('includes team domain data', () => {
-      expect(body.collection.items[0].data).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ name: 'slot', value: 1 }),
-          expect.objectContaining({ name: 'name', value: 'Team 1' }),
-        ]),
-      );
+    it('links only to paths the app routes as GET', () => {
+      expect(unroutedHrefs(body)).toEqual([]);
     });
 
     it('returns 404 when team not found', async () => {
@@ -218,17 +203,8 @@ describe('Team routes', () => {
       expect(res.headers.get('content-type')).toBe(EXPECTED_CONTENT_TYPE);
     });
 
-    it('returns single-item collection', () => {
-      expect(body.collection.items).toHaveLength(1);
-    });
-
-    it('includes team domain data', () => {
-      expect(body.collection.items[0].data).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ name: 'slot', value: 1 }),
-          expect.objectContaining({ name: 'name', value: 'Team 1' }),
-        ]),
-      );
+    it('returns the saved team as an item document', () => {
+      expect(body).toEqual(teamItemDocument(FAKE_TEAM, BASE_URL));
     });
 
     it('returns 201 when team is newly created', () => {
@@ -482,7 +458,7 @@ describe('Team routes', () => {
         expect(res.status).toBe(200);
       });
 
-      it('returns 400 for unknown artifact set', async () => {
+      it('returns 422 for unknown artifact set', async () => {
         const res = await app.request(
           authedRequest('PUT', '/teams/1', {
             members: [
@@ -505,9 +481,9 @@ describe('Team routes', () => {
           }),
         );
 
-        expect(res.status).toBe(400);
+        expect(res.status).toBe(422);
         const body = (await res.json()) as { detail: string };
-        expect(body.detail).toContain('Unknown artifact set');
+        expect(body.detail).toContain('/members/0/artifactPlan/sets/0');
       });
 
       it('returns 400 when priority and secondary minor affixes overlap', async () => {

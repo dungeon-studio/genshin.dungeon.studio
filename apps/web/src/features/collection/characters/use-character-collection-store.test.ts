@@ -81,6 +81,14 @@ describe('useCollectionStore', () => {
     });
   });
 
+  describe('replaceCharacter', () => {
+    it('does not restore a character no longer in the collection', () => {
+      useCollectionStore.getState().replaceCharacter(makeCharacter(UNOWNED));
+
+      expect(useCollectionStore.getState().characters[UNOWNED]).toBeUndefined();
+    });
+  });
+
   describe('replaceCharacters', () => {
     it('replaces the entire collection', () => {
       useCollectionStore.getState().addCharacter('amber');

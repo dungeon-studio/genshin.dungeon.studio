@@ -30,8 +30,10 @@ function agentRules(robots: string): Record<string, string> {
     robots
       .split('\n\n')
       .map((group) => group.split('\n').filter((line) => !line.startsWith('#')))
-      .filter((lines) => lines[0]?.startsWith('User-agent: '))
-      .map((lines) => [lines[0].replace('User-agent: ', ''), lines[1]]),
+      .flatMap(([agent, rule]): [string, string][] => {
+        if (!agent?.startsWith('User-agent: ') || rule === undefined) return [];
+        return [[agent.replace('User-agent: ', ''), rule]];
+      }),
   );
 }
 
