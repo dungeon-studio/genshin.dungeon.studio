@@ -114,42 +114,16 @@ A minimal bootstrap creates WIF, then a second bootstrap creates projects.
 ### Bootstrap process
 
 1. Create the state bucket. Run `infrastructure/scripts/bootstrap-terraform-state.sh` to create the shared project (`dungeon-studio-genshin-shared`) and state bucket (`dungeon-studio-genshin-tfstate`). Then import the project into Terraform state to resolve the circular dependency, since bootstrap needs the state bucket but also manages the shared project.
-2. Run `terraform apply` in `infrastructure/terraform/bootstrap/`. This creates:
-   - The core project (`dungeon-studio-genshin-core`)
-   - The dev project (`dungeon-studio-genshin-dev`)
-   - Service accounts for each project, read-write for `terraform-apply` and read-only for `terraform-plan`
-   - The WIF pool and OIDC provider in the shared project
-   - IAM bindings connecting service accounts to WIF
-   - Cross-project permissions, such as dev read-only access to core
+2. Run `terraform apply` in `infrastructure/terraform/bootstrap/` to create the remaining projects, their service accounts, the WIF pool and provider, and the bindings between them.
 3. GitHub Actions workflows authenticate via WIF and deploy environment-specific resources. The `terraform-apply-dev` job declares `needs: terraform-apply-core`, so environments apply in sequence.
 
-### Attribute condition
+### Security boundaries
 
-The OIDC provider restricts tokens to a single repository:
-
-```hcl
-attribute_condition = "assertion.repository == 'dungeon-studio/genshin.dungeon.studio'"
-```
-
-Only workflows from this repository can impersonate service accounts, even if someone compromises the WIF pool ID.
-
-### Cross-project permissions
-
-The dev environment has read-only access to core project resources:
-
-```hcl
-# In bootstrap/dev.tf
-resource "google_project_iam_member" "dev_ro_to_core" {
-  project = module.core.project_id
-  role    = "roles/viewer"
-  member  = "serviceAccount:${module.dev.github_deployer_ro_email}"
-}
-```
-
-Dev workflows can reference core resources like DNS zones without write access.
+- The OIDC provider's attribute condition accepts tokens from this repository only, so other repositories' workflows can't impersonate the service accounts even with the pool ID.
+- Dev's read-only service account holds `roles/viewer` on core, so dev workflows can read core resources like DNS zones without write access.
 
 ### Related documents
 
 - [Bootstrap Terraform configuration](../../infrastructure/terraform/bootstrap/)
 - [GitHub Actions workflows](../../.github/workflows/)
-- [How to update game data](../how-tos/update-game-characters.md), an example workflow using WIF
+- [How to add a Terraform environment](../how-tos/add-terraform-environment.md), which extends bootstrap for a new project

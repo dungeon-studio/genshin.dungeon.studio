@@ -112,7 +112,7 @@ Keep `/schemas/{module}/{name}/{version}.json`, where `get` implicitly means the
 
 ## More information
 
-- [ADR-0003](adr-0003-json-schema-strategy.md), the base decision this record amends
+- [ADR-0003](adr-0003-json-schema-strategy.md), the schema presentation and discovery decision
 - [`schema-versioning.md`](../reference/schema-versioning.md), for how `v{n}` in these paths relates to the repository's wider versioning model
 - [Issue #479](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/479), Schema paths include request/response direction segment
 - [PR #478 discussion](https://github.com/dungeon-studio/genshin.dungeon.studio/pull/478#discussion_r2935894001), where the ambiguity surfaced

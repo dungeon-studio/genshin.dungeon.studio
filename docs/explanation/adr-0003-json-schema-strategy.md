@@ -11,7 +11,7 @@ amended-by: ADR-0005
 
 <!-- vale Microsoft.HeadingAcronyms = YES -->
 
-[ADR-0005](adr-0005-schema-direction-segment.md) replaces this record's schema path convention and source file layout.
+[ADR-0005](adr-0005-schema-direction-segment.md) sets the current schema path convention and source file layout.
 
 ## Context and problem statement
 
@@ -23,7 +23,7 @@ The REST API conventions in `rest-api-conventions.md`, specifically [Principle 4
 - What stability guarantees published schemas carry
 - What constitutes a breaking versus non-breaking schema change
 
-The `apps/api` application is early stage, built on Hono with a small number of routes defined in `apps/api/src/main.ts`. The codebase has begun organizing domain modules: `profile` exists with a `json/` subdirectory, but modules such as `team` and `teams` aren't yet present. This record uses the target module structure in examples and implementation notes. The REST conventions reference JSON Schema 2020-12 and content negotiation via `Accept` and `Content-Type` headers.
+The `apps/api` application is early stage, built on Hono with a small number of routes defined in `apps/api/src/main.ts`. The codebase has begun organizing domain modules: `profile` exists with a `json/` subdirectory, but modules such as `team` and `teams` aren't yet present. The REST conventions reference JSON Schema 2020-12 and content negotiation via `Accept` and `Content-Type` headers.
 
 Relevant standards:
 
@@ -112,9 +112,9 @@ Content-Type: application/json; profile="/schemas/team/get/1.0.0.json"
 
 This mirrors the client-side mechanism: clients send `Accept: application/json; profile="..."` to request a specific schema version, and the server responds with `Content-Type: application/json; profile="..."` to confirm which schema describes the response. Both directions use the same RFC 6906 `profile` semantics on the standard content negotiation headers.
 
-No registry defines this parameter: the `application/json` registration in [RFC 8259 §11](https://www.rfc-editor.org/rfc/rfc8259#section-11) has no parameters. [RFC 6906 §3.1](https://www.rfc-editor.org/rfc/rfc6906#section-3.1) recommends that a media type define `profile`, but it doesn't add one to media types that lack it. Only clients that implement this record know what `profile` means here.
+No registry defines this parameter: the `application/json` registration in [RFC 8259 §11](https://www.rfc-editor.org/rfc/rfc8259#section-11) has no parameters. [RFC 6906 §3.1](https://www.rfc-editor.org/rfc/rfc6906#section-3.1) recommends that a media type define `profile`, but it doesn't add one to media types that lack it. Only clients built for this API know what `profile` means on it.
 
-Examples in this document use relative URI references for readability. Implementations use absolute URIs matching the `$id` of the schema.
+Implementations use absolute URIs matching each schema `$id`. The examples shorten them to relative references.
 
 ### Stability contract
 
@@ -187,7 +187,7 @@ This creates symmetric content negotiation: clients declare the schema they expe
 - Bad, because every response needs a `profile` parameter on `Content-Type`, requiring middleware that maps routes to schema versions.
 - Bad, because each request and response shape needs a hand-authored schema file kept in sync with the implementation.
 - Bad, because major version bumps require publishing a new version file and managing a transition period for the previous version.
-- Neutral, because this record covers schema publication and discovery only. Whether the API validates incoming requests against schemas at runtime is a separate decision.
+- Neutral, because runtime validation of incoming requests against schemas stays a separate decision.
 
 ## Pros and cons of the options
 
@@ -195,7 +195,7 @@ This creates symmetric content negotiation: clients declare the schema they expe
 
 - Good, because dedicated endpoints keep schemas independently cacheable, addressable, and reusable across documentation and tooling. Inline `$schema` references in every response would bloat payloads and mix data with metadata.
 - Good, because `profile` carries both negotiation and discovery. A client requests a schema version with `profile` on `Accept`, and `Link` has no request-side counterpart. `profile` on `Content-Type` confirms that choice on the same parameter, so both directions share one mechanism.
-- Bad, because the cost falls on generic clients. `profile` has [no registration on `application/json`](#discovery-via-the-profile-media-type-parameter), so a client that only wants to find the schema gives up the standard `describedby` path. The clients that negotiate versions already depend on this record.
+- Bad, because the cost falls on generic clients. `profile` has [no registration on `application/json`](#discovery-via-the-profile-media-type-parameter), so a client that only wants to find the schema gives up the standard `describedby` path. The clients that negotiate versions already depend on this API's convention.
 - Good, because co-hosting with the API keeps the `$id` and the retrieval address identical, avoids cross-origin complexity, and deploys schemas atomically with the code they describe. Schema files live alongside the route handlers, so updating both together is natural.
 - Good, because versioning every schema from first publication means clients always compare version numbers the same way, and the major, minor, or patch bump says what kind of change happened.
 
@@ -308,4 +308,4 @@ app.get('/schemas/:module/:name.json', async (c) => {
 - [RFC 6838, Media Type Registration](https://www.rfc-editor.org/rfc/rfc6838), for media type conventions
 - [RFC 8259, The JavaScript Object Notation (JSON) Data Interchange Format](https://www.rfc-editor.org/rfc/rfc8259), the `application/json` registration, which defines no parameters
 - [Semantic Versioning 2.0.0](https://semver.org/), the schema version numbering convention
-- [ADR-0005](adr-0005-schema-direction-segment.md), which amends this record's path convention
+- [ADR-0005](adr-0005-schema-direction-segment.md), which sets the current path convention

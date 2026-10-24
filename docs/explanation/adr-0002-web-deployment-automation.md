@@ -10,7 +10,7 @@ decision-makers: Alex Brandt
 
 Deploying the web application to Google Cloud Storage takes coordinated steps: build, upload, set cache headers, and verify. Manual deployments are error-prone and leave inconsistent deployment states. How should a pipeline triggered by merge to `develop` verify, cache, and sequence a deployment?
 
-[ADR-0004](adr-0004-firebase-hosting-migration.md) moved hosting to Firebase Hosting and kept the verification and cache decisions recorded here.
+[ADR-0004](adr-0004-firebase-hosting-migration.md) moved hosting to Firebase Hosting. The verification and cache decisions carried over unchanged.
 
 ## Decision drivers
 
@@ -19,8 +19,6 @@ Deploying the web application to Google Cloud Storage takes coordinated steps: b
 - Checks that survive framework upgrades and cache strategy changes
 
 ## Considered options
-
-Three decisions, each with its own options:
 
 - Verification: layered structural and commit hash checks, content validation, HTTP header validation, or none
 - Caching: `ETag` revalidation with `stale-while-revalidate`, time-based `max-age`, no cache, or a service worker
