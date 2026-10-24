@@ -20,8 +20,8 @@ const SNAPSHOT_PATH = /^[^/]+\/[^/]+\/schema-snapshots\/([^/]+)\/(v\d+)\.json$/;
  * returning one message per violation (empty when compatible).
  *
  * A released version's schema may only widen, so data a released build already
- * persisted keeps reading. Drives off the base branch's snapshots: versions the
- * working tree adds beyond the base carry no constraint. Trusts the drift hook
+ * persisted keeps reading. Only the base branch's snapshots constrain the check:
+ * versions the working tree adds carry no constraint. Trusts the drift hook
  * to keep snapshots faithful to their Zod source, so this is a JSON-vs-JSON diff
  * needing no workspace build.
  */
