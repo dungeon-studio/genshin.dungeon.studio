@@ -15,7 +15,7 @@ import type { CharacterFilterState } from '@/features/collection/characters/filt
 import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
 import type { CharacterCollection } from '@/features/collection/characters/use-character-collection-store';
 import { ownedCharacterIds } from '@/features/collection/characters/use-character-collection-store';
-import { EmptyPool } from '@/features/teams/empty-pool';
+import { EmptyCollection } from '@/features/collection/empty-collection';
 import { useTeamStore } from '@/features/teams/use-team-store';
 import { ELEMENT_BORDER_COLORS, ELEMENT_SELECTED_RINGS } from '@/lib/element-styles';
 import { cn } from '@/lib/utils';
@@ -82,12 +82,12 @@ export function CharacterPool({
 
   if (ownedCount === 0) {
     return (
-      <EmptyPool
+      <EmptyCollection
         icon={Users}
-        heading="No characters in your collection"
-        body="Visit the characters page to add characters to your collection."
-        ctaLabel="Go to Characters"
+        title="No characters in your collection"
+        description="Visit the characters page to add characters to your collection."
         to="/characters"
+        action="Go to Characters"
       />
     );
   }

@@ -19,7 +19,7 @@ Security sections, since they then describe deltas from a shipped release.
 
 - Character collection page with compact card tiles, element icons, filters, search, and sort.
 - Weapon collection page with ownership tracking and visual distinction between owned and unowned items.
-- Prompts to get started when character or weapon collections are empty.
+- Prompts to get started when character or weapon collections are empty, including on the team builder landing page.
 - Team builder as the default landing page with four teams of up to four character slots each.
 - Character assignment to team slots from the owned collection.
 - Per-character weapon assignment with conflict prevention when a weapon is already equipped on another team.

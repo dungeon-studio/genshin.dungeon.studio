@@ -14,6 +14,7 @@ import type { JSX } from 'react';
 import { useId, useMemo, useState } from 'react';
 
 import { WeaponSummary } from '@/components/summaries/weapon-summary';
+import { EmptyCollection } from '@/features/collection/empty-collection';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
 import {
@@ -21,7 +22,6 @@ import {
   weaponIdsOf,
 } from '@/features/collection/weapons/use-weapon-collection-store';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
-import { EmptyPool } from '@/features/teams/empty-pool';
 import { useTeamStore } from '@/features/teams/use-team-store';
 import { RARITY_BORDER_COLORS, RARITY_SELECTED_RINGS } from '@/lib/rarity-styles';
 import { cn } from '@/lib/utils';
@@ -111,8 +111,8 @@ export function WeaponPool({
 
   const instancesByWeaponId = useMemo(() => groupByWeapon(collectionWeapons), [collectionWeapons]);
 
-  if (ownedCount === 0) return <EmptyWeaponPool />;
-  if (!hasWeaponsOfType) return <EmptyWeaponPool weaponType={weaponType} />;
+  if (ownedCount === 0) return <EmptyPool />;
+  if (!hasWeaponsOfType) return <EmptyPool weaponType={weaponType} />;
 
   return (
     <div className="min-h-0 gap-3 flex flex-1 flex-col">
@@ -164,15 +164,15 @@ export function WeaponPool({
 }
 
 /** Points at the weapons page, filtered to `weaponType` when the member needs one. */
-function EmptyWeaponPool({ weaponType }: { weaponType?: WeaponType }): JSX.Element {
+function EmptyPool({ weaponType }: { weaponType?: WeaponType }): JSX.Element {
   const kind = weaponType ? `${weaponType} weapons` : 'weapons';
   return (
-    <EmptyPool
+    <EmptyCollection
       icon={Swords}
-      heading={`No ${kind} in your collection`}
-      body={`Visit the weapons page to add ${kind} to your collection.`}
-      ctaLabel="Go to Weapons"
+      title={`No ${kind} in your collection`}
+      description={`Visit the weapons page to add ${kind} to your collection.`}
       to={weaponType ? `/weapons?type=${weaponType}` : '/weapons'}
+      action="Go to Weapons"
     />
   );
 }
