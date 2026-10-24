@@ -38,10 +38,10 @@ export function FilterChips<F extends BaseFilterState, T extends string>({
         (['all', 'owned', 'unowned'] as const).map((value) => (
           <Chip
             key={value}
-            pressed={filters.ownership === value}
+            active={filters.ownership === value}
             onClick={() => onChange({ ...filters, ownership: value })}
             className="capitalize"
-            pressedClassName="bg-foreground text-background"
+            activeClassName="bg-foreground text-background"
           >
             {value}
           </Chip>
@@ -52,10 +52,10 @@ export function FilterChips<F extends BaseFilterState, T extends string>({
       {RARITY_VALUES.map((rarity) => (
         <Chip
           key={rarity}
-          pressed={filters.rarities.has(rarity)}
+          active={filters.rarities.has(rarity)}
           onClick={() => toggleRarity(rarity)}
-          pressedClassName="text-black bg-geo-dark"
-          label={`Filter by ${rarity}-star`}
+          activeClassName="text-black bg-geo-dark"
+          ariaLabel={`Filter by ${rarity}-star`}
         >
           {rarity}★
         </Chip>
@@ -70,11 +70,11 @@ export function FilterChips<F extends BaseFilterState, T extends string>({
           return (
             <Chip
               key={value}
-              pressed={active}
+              active={active}
               onClick={() => category.onToggle(value)}
               className="gap-1.5 inline-flex items-center"
-              pressedClassName={category.activeClassName(value)}
-              label={`Filter by ${value}`}
+              activeClassName={category.activeClassName(value)}
+              ariaLabel={`Filter by ${value}`}
             >
               <ChipIcon iconPath={(variant) => category.iconPath(value, variant)} onFill={active} />
               {value}

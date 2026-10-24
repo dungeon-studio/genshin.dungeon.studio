@@ -6,20 +6,20 @@ import type { JSX, ReactNode } from 'react';
 import { cn } from '@/lib/class-names';
 
 interface ChipProps {
-  pressed: boolean;
+  active: boolean;
   onClick: () => void;
-  pressedClassName: string;
+  activeClassName: string;
   className?: string;
-  label?: string;
+  ariaLabel?: string;
   children: ReactNode;
 }
 
 export function Chip({
-  pressed,
+  active,
   onClick,
-  pressedClassName,
+  activeClassName,
   className,
-  label,
+  ariaLabel,
   children,
 }: ChipProps): JSX.Element {
   return (
@@ -29,10 +29,10 @@ export function Chip({
       className={cn(
         'px-2.5 py-1 text-xs font-medium rounded-full transition-colors',
         className,
-        pressed ? pressedClassName : 'bg-muted text-muted-foreground hover:bg-muted/80',
+        active ? activeClassName : 'bg-muted text-muted-foreground hover:bg-muted/80',
       )}
-      aria-pressed={pressed}
-      aria-label={label}
+      aria-pressed={active}
+      aria-label={ariaLabel}
     >
       {children}
     </button>
