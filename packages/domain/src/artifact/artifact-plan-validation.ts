@@ -16,8 +16,6 @@ import type { ArtifactPlan } from './artifact-plan.js';
 
 /**
  * Checks that no minor affix appears in both the priority and secondary lists.
- *
- * @returns every issue found, empty when the plan is valid.
  */
 export function validateArtifactPlan(plan: ArtifactPlan): ValidationIssue[] {
   const { priorityMinorAffixes: priority, secondaryMinorAffixes: secondary } = plan;
