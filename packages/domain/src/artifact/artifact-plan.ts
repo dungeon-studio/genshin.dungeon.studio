@@ -15,8 +15,8 @@ import { assertOptionalString, assertOptionalStringArray } from '../assertions.j
  * What a team member intends to equip.
  *
  * Every field is optional because planning is incremental: a user who knows the
- * main affixes but not the sets records only those, and later refinement or
- * AI-assisted optimisation fills the rest. An empty plan is therefore valid.
+ * main affixes but not the sets records only those and fills the rest in
+ * later. An empty plan is therefore valid.
  *
  * The flower and plume carry fixed main affixes, so only the three pieces a
  * user chooses appear here. Set and affix identifiers come from
@@ -43,9 +43,8 @@ const MIN_MINOR_AFFIXES = 0;
 const MAX_MINOR_AFFIXES = 3;
 
 /**
- * Structural check only. Affix names and set IDs are validated against
- * game-data by `validateArtifactPlan`, which collects every problem instead of
- * throwing on the first.
+ * Structural check only. The API's request schema checks affix names and set
+ * IDs against game data.
  *
  * @param path - prefix for the field names in a failure, so a guard over an
  * enclosing structure reports the position that broke.

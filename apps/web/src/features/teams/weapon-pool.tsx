@@ -12,10 +12,9 @@ import { getCharacterById, getWeaponById, WEAPON_ROSTER } from '@genshin/game-da
 import { Lock, Swords } from 'lucide-react';
 import type { JSX } from 'react';
 import { useId, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 import { WeaponSummary } from '@/components/summaries/weapon-summary';
-import { Button } from '@/components/ui/button';
+import { EmptyCollection } from '@/features/collection/empty-collection';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
 import { weaponIdsOf } from '@/features/collection/weapons/use-weapon-collection-store';
@@ -175,18 +174,13 @@ export function WeaponPool({
 function EmptyPool({ weaponType }: { weaponType?: WeaponType }): JSX.Element {
   const kind = weaponType ? `${weaponType} weapons` : 'weapons';
   return (
-    <div className="gap-4 py-12 flex flex-1 flex-col items-center justify-center">
-      <Swords className="h-10 w-10 text-muted-foreground" aria-hidden="true" focusable={false} />
-      <div className="text-center">
-        <p className="font-medium">No {kind} in your collection</p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Visit the weapons page to add {kind} to your collection.
-        </p>
-      </div>
-      <Button asChild>
-        <Link to={weaponType ? `/weapons?type=${weaponType}` : '/weapons'}>Go to Weapons</Link>
-      </Button>
-    </div>
+    <EmptyCollection
+      icon={Swords}
+      title={`No ${kind} in your collection`}
+      description={`Visit the weapons page to add ${kind} to your collection.`}
+      to={weaponType ? `/weapons?type=${weaponType}` : '/weapons'}
+      action="Go to Weapons"
+    />
   );
 }
 
@@ -227,8 +221,8 @@ function PoolWeaponCard({ weapon, refinementLevel, selected, lock, onClick }: Po
       disabled={equipped}
       className={cn(
         'gap-1 p-3 shadow-sm flex w-full flex-col rounded-lg border border-l-4 border-border bg-card text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
-        RARITY_BORDER_COLORS[weapon.rarity] ?? 'border-l-border',
-        selected && `ring-2 ring-inset ${RARITY_SELECTED_RINGS[weapon.rarity] ?? 'ring-border'}`,
+        RARITY_BORDER_COLORS[weapon.rarity],
+        selected && `ring-2 ring-inset ${RARITY_SELECTED_RINGS[weapon.rarity]}`,
         equipped ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-accent/50',
       )}
       aria-label={weaponCardLabel(weapon, lock, selected)}

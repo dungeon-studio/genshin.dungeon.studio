@@ -10,6 +10,10 @@
 
 import {
   buildItem,
+  itemData,
+  serialiseCollection,
+  serialiseItemDocument,
+  type CollectionDocument,
   type CollectionJsonRepresentation,
   type Item,
   type Template,
@@ -55,6 +59,25 @@ export function serialiseCharacter(character: CollectionCharacter, baseUrl: stri
   ]);
 }
 
+export function characterListDocument(
+  characters: CollectionCharacter[],
+  baseUrl: string,
+): CollectionDocument {
+  return serialiseCollection(
+    characterRepresentation,
+    characterCollectionHref(baseUrl),
+    characters,
+    baseUrl,
+  );
+}
+
+export function characterItemDocument(
+  character: CollectionCharacter,
+  baseUrl: string,
+): CollectionDocument {
+  return serialiseItemDocument(characterRepresentation, character, baseUrl);
+}
+
 /**
  * Reads an owned character back out of a Collection+JSON item.
  *
@@ -64,9 +87,14 @@ export function serialiseCharacter(character: CollectionCharacter, baseUrl: stri
  * @throws TypeError naming the field that failed.
  */
 export function deserialiseCharacter(item: Item): CollectionCharacter {
-  const data = Object.fromEntries(item.data.map((d) => [d.name, d.value]));
+  const data = itemData(item);
   assertCollectionCharacter(data);
-  return data;
+  return {
+    characterId: data.characterId,
+    constellationLevel: data.constellationLevel,
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+  };
 }
 
 /** What the generic collection helpers consume for this resource. */

@@ -21,6 +21,7 @@ const ISO_8601_DATE_TIME = /^(\d{4}-\d{2}-\d{2})T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z
 // shorter but maps years 0-99 into the 1900s.
 function isRealCalendarDate(date: string): boolean {
   const [year, month, day] = date.split('-').map(Number);
+  if (year === undefined || month === undefined || day === undefined) return false;
 
   const roundTrip = new Date(0);
   roundTrip.setUTCFullYear(year, month - 1, day);
@@ -38,10 +39,10 @@ function isRealCalendarDate(date: string): boolean {
 export function isISOTimestamp(value: unknown): value is ISOTimestamp {
   if (typeof value !== 'string') return false;
 
-  const parts = ISO_8601_DATE_TIME.exec(value);
-  if (parts === null || Number.isNaN(Date.parse(value))) return false;
+  const date = ISO_8601_DATE_TIME.exec(value)?.[1];
+  if (date === undefined || Number.isNaN(Date.parse(value))) return false;
 
-  return isRealCalendarDate(parts[1]);
+  return isRealCalendarDate(date);
 }
 
 /** The current instant in UTC, to millisecond precision. */

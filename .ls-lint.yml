@@ -49,6 +49,7 @@ ignore:
   - '**/.vite-temp'
   - '**/.tmp'
   - '**/test-results'
+  - '**/.terraform'
   - .git
   # Tool-convention directories (names dictated by external tooling):
   - .claude

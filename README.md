@@ -24,7 +24,7 @@ By [Alex Brandt](https://github.com/alunduil) · [Repository](https://github.com
 
 ## About
 
-Build Genshin Impact teams without the spreadsheets. Genshin Planner lets you track your character and weapon collection, assemble team compositions, and plan your roster. AI-powered team recommendations are planned for a future release.
+Build Genshin Impact teams without the spreadsheets. Genshin Planner lets you track your character and weapon collection, assemble team compositions, and plan your roster.
 
 ## Who's it for
 
@@ -47,7 +47,7 @@ The frontend is available at <http://localhost:5173>
 
 ### Without dev containers
 
-See the [Manual Setup Guide](./docs/how-tos/manual-setup.md) for Node.js 20+ and pnpm 9+ setup.
+See the [Manual Setup Guide](./docs/how-tos/manual-setup.md).
 
 ## Learn more
 

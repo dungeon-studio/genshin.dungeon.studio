@@ -2,15 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import type { CollectionTeamMembers, TeamSlot } from '@genshin/domain';
-import { CHARACTER_ROSTER } from '@genshin/game-data';
 import { describe, expect, it } from 'vitest';
 
 import { documentRef, newUserId } from '@/test/firestore.js';
+import { CHARACTER } from '@/test/roster.js';
 
 import { get, list, remove, save } from './index.js';
 
 const SLOT: TeamSlot = 1;
-const CHARACTER = CHARACTER_ROSTER[0];
 const TEAM_NAME = 'Vaporise';
 const RENAMED = 'Melt';
 const DESCRIPTION = 'Opens with the hydro application';
@@ -49,6 +48,23 @@ describe('save', () => {
     expect(first.created).toBe(true);
     expect(second.created).toBe(false);
   });
+
+  // A contended transaction retries after the client's backoff, so this case
+  // outruns the default timeout.
+  it('creates an unsaved slot exactly once under concurrent saves', async () => {
+    const userId = newUserId();
+
+    const results = await Promise.all([
+      save(userId, SLOT, { name: TEAM_NAME }),
+      save(userId, SLOT, { name: TEAM_NAME }),
+    ]);
+
+    const stored = await get(userId, SLOT);
+    expect(results.filter((result) => result.created)).toHaveLength(1);
+    expect(new Set(results.map((result) => result.team.createdAt))).toEqual(
+      new Set([stored?.createdAt]),
+    );
+  }, 30_000);
 
   it('leaves the fields an update omits as they were', async () => {
     const { userId, team: original } = await userWithTeam({

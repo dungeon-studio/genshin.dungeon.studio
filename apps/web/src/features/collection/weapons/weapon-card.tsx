@@ -29,7 +29,7 @@ export function WeaponCard({
       onClick={() => onClick?.(weapon.id)}
       className={cn(
         'gap-3 p-3 shadow-sm relative flex w-full items-center rounded-lg border border-l-4 border-border bg-card text-left transition-colors',
-        owned ? (RARITY_BORDER_COLORS[weapon.rarity] ?? 'border-l-border') : 'border-l-border',
+        owned ? RARITY_BORDER_COLORS[weapon.rarity] : 'border-l-border',
         selected && 'ring-2 ring-primary ring-offset-2 ring-offset-background',
         'cursor-pointer hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
       )}

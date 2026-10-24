@@ -1,16 +1,16 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-// Draft terms describing the service as of HEAD. Needs a legal review pass
-// and a dedicated contact address before the 1.0.0 tag; see #647.
+// Draft terms describing the service. No lawyer has reviewed them, and they
+// have no dedicated contact address.
 
 import type { JSX } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Container } from '@/components/chrome/container';
+import { REPOSITORY_URL } from '@/lib/repository';
 
 const EFFECTIVE_DATE = '3 July 2026';
-const GITHUB_REPO = 'https://github.com/dungeon-studio/genshin.dungeon.studio';
 
 export function TermsOfServicePage(): JSX.Element {
   return (
@@ -91,7 +91,7 @@ export function TermsOfServicePage(): JSX.Element {
         <p className="mt-4 leading-relaxed">
           Questions about these terms? Reach us through our{' '}
           <a
-            href={`${GITHUB_REPO}/issues/new/choose`}
+            href={`${REPOSITORY_URL}/issues/new/choose`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-foreground underline underline-offset-4 hover:no-underline"
