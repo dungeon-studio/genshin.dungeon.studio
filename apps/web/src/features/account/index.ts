@@ -2,3 +2,4 @@
 // SPDX-License-Identifier: MIT
 
 export { AccountMenu } from './account-menu';
+export { ClearUserDataOnSignOut } from './clear-user-data-on-sign-out';

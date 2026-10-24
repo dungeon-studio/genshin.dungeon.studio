@@ -6,7 +6,9 @@ import type { Weapon } from '@genshin/game-data';
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
+import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
+import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
 import type { WeaponMutationResult } from './use-weapon-collection-api';
 import {
@@ -120,23 +122,26 @@ function useOptimisticEdits(
  * that will silently do nothing.
  */
 export function useWeaponCollection(): UseWeaponCollectionResult {
-  const { user, loading: authLoading } = useAuth();
-  const isAuthenticated = user !== null;
+  const auth = useAuth();
+  const uid = signedInUid(auth);
+  const isAuthenticated = uid !== undefined;
 
   const weapons = useWeaponCollectionStore((s) => s.weapons);
   const storeSetWeapons = useWeaponCollectionStore((s) => s.setWeapons);
   const storeAddWeapon = useWeaponCollectionStore((s) => s.addWeapon);
-  const clearWeapons = useWeaponCollectionStore((s) => s.clearWeapons);
 
   const {
     data: apiWeapons,
     error: queryError,
     isLoading: queryLoading,
-  } = useWeaponCollectionQuery(user?.uid);
+  } = useWeaponCollectionQuery(uid);
 
-  const { mutate: addWeaponApi } = useAddWeaponMutation(user?.uid);
-  const { mutate: removeWeaponApi } = useRemoveWeaponMutation(user?.uid);
-  const { mutate: setRefinementLevelApi } = useSetRefinementLevelMutation(user?.uid);
+  const addWeaponApi = useSenderBoundMutate(uid, useAddWeaponMutation(uid).mutate);
+  const removeWeaponApi = useSenderBoundMutate(uid, useRemoveWeaponMutation(uid).mutate);
+  const setRefinementLevelApi = useSenderBoundMutate(
+    uid,
+    useSetRefinementLevelMutation(uid).mutate,
+  );
 
   const applyMutationResult = useCallback(
     ({ weapon }: WeaponMutationResult) => {
@@ -144,12 +149,6 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     },
     [storeAddWeapon],
   );
-
-  useEffect(() => {
-    if (!user) {
-      clearWeapons();
-    }
-  }, [user, clearWeapons]);
 
   useEffect(() => {
     if (!apiWeapons) return;
@@ -223,7 +222,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     removeWeapon,
     setRefinementLevel,
     getWeaponsByWeaponId,
-    isLoading: authLoading || (isAuthenticated && queryLoading),
+    isLoading: awaitingUserData(auth, queryLoading),
     error,
   };
 }

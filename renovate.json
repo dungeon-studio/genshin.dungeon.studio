@@ -4,7 +4,8 @@
     "config:best-practices",
     "security:openssf-scorecard",
     "customManagers:githubActionsVersions",
-    "customManagers:dockerfileVersions"
+    "customManagers:dockerfileVersions",
+    ":automergeDigest"
   ],
   "timezone": "Europe/London",
   "labels": ["dependencies"],
@@ -13,8 +14,15 @@
   "minimumReleaseAge": "3 days",
   "osvVulnerabilityAlerts": true,
   "vulnerabilityAlerts": {
-    "description": "Add the security label to vulnerability-driven pull requests",
-    "addLabels": ["security"]
+    "description": "Label vulnerability-driven pull requests security and merge them on green CI after a bake as long as pnpm's default release-age floor, so ecosystems outside npm get the same guard",
+    "addLabels": ["security"],
+    "minimumReleaseAge": "1 day",
+    "automerge": true
+  },
+  "lockFileMaintenance": {
+    "description": "Open the lock file refresh past the concurrent limit and merge it on green CI, so transitive dependency fixes keep reaching develop",
+    "prConcurrentLimit": 0,
+    "automerge": true
   },
   "pre-commit": {
     "enabled": true
@@ -40,29 +48,34 @@
       "minimumReleaseAge": null
     },
     {
-      "description": "Move the Terraform CLI in one pull request across the bootstrap and dev required_version constraints and the TERRAFORM_VERSION pins in four workflows",
-      "matchDepNames": ["hashicorp/terraform"],
-      "groupName": "terraform cli"
+      "description": "Move each dependency in one pull request across all of its pins, so develop never holds two versions of it",
+      "matchDepNames": [
+        "hashicorp/terraform",
+        "fsfe/reuse-tool",
+        "lycheeverse/lychee",
+        "node",
+        "errata-ai/vale"
+      ],
+      "groupName": "{{depName}}"
     },
     {
-      "description": "Move reuse in one pull request across the pre-commit rev and the REUSE_VERSION pin in scripts/install-reuse.sh",
-      "matchDepNames": ["fsfe/reuse-tool"],
-      "groupName": "reuse"
+      "description": "Move engines and @types/node to a new Node.js major only once it reaches LTS",
+      "matchDepNames": ["node", "@types/node"],
+      "matchManagers": ["npm"],
+      "versioning": "node"
     },
     {
-      "description": "Move the lychee binary in one pull request across the ci.yml pin and the devcontainer bootstrap script; lycheeverse/lychee-action versions separately and stays out of the group",
-      "matchDepNames": ["lycheeverse/lychee"],
-      "groupName": "lychee"
+      "description": "Merge development dependency patch and minor updates on green CI",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true
     },
     {
-      "description": "Move Node in one pull request across .nvmrc, the API runtime image, the devcontainer feature, and the package.json engines field",
-      "matchDepNames": ["node"],
-      "groupName": "node"
-    },
-    {
-      "description": "Move Vale in one pull request across the pre-commit rev and the devcontainer feature's version option",
-      "matchDepNames": ["errata-ai/vale"],
-      "groupName": "vale"
+      "description": "Merge non-breaking production dependency patch updates on green CI",
+      "matchDepTypes": ["dependencies"],
+      "matchUpdateTypes": ["patch"],
+      "matchJsonata": ["isBreaking != true"],
+      "automerge": true
     }
   ],
   "customManagers": [
@@ -76,10 +89,10 @@
     },
     {
       "customType": "regex",
-      "description": "Track annotated version options of devcontainer features",
+      "description": "Track annotated feature versions in devcontainer.json that the devcontainer manager doesn't map to a datasource",
       "managerFilePatterns": [".devcontainer/devcontainer.json"],
       "matchStrings": [
-        "// renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s+\"version\":\\s*\"(?<currentValue>[^\"]+)\""
+        "// renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s+\"version\": \"(?<currentValue>[^\"]+)\""
       ]
     }
   ]

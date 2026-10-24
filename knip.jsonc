@@ -14,7 +14,7 @@
       // These run at the repo root via pre-commit, which knip can't see. eslint
       // hides from knip's eslint plugin too: the flat configs live in each
       // workspace, so the plugin never activates at the root to claim it.
-      "ignoreDependencies": ["stylelint", "syncpack", "eslint"]
+      "ignoreDependencies": ["@ls-lint/ls-lint", "stylelint", "syncpack", "eslint"]
     },
     "apps/api": {
       // verify-deployment.ts is invoked from deploy.yml, so knip can't see it.

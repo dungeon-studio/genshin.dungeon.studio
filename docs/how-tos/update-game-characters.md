@@ -16,6 +16,9 @@ Optionally pull newer game data first:
 pnpm --filter @genshin/game-data-codegen up genshin-db
 ```
 
+Newer game data changes every roster, so after pulling it run `generate all`
+in place of the single roster below. A commit fails while any roster is stale.
+
 Build the generator and run it:
 
 ```bash
@@ -29,19 +32,20 @@ Confirm the gates pass:
 pnpm turbo run typecheck test lint --filter @genshin/game-data
 ```
 
-When the roster gains a newer patch than `GAME_DATA_VERSION`, raise that
-constant in `packages/game-data/src/versions.ts` to match. A test fails until
-you do, and the site footer reads it.
+## Date a new character
 
-## Add a release date for a new character
+`genshin-db` carries no release dates, so `generate characters` dates debuts
+from `tools/game-data-codegen/src/first-banner-dates.generated.ts`, a table
+generated from
+[paimon-moe's `banners.js`](https://github.com/MadeBaruna/paimon-moe/blob/main/src/data/banners.js).
+When a character debuts after the table, generation aborts and names them.
+Regenerate the table, rebuild, then regenerate the roster:
 
-`genshin-db` carries no release date, so `generate characters` aborts on any
-character missing from `CHARACTER_RELEASE_DATES` in
-`tools/game-data-codegen/src/character-release-dates.ts`. Add the start of the
-character's debut banner from
-[paimon-moe's `banners.js`](https://github.com/MadeBaruna/paimon-moe/blob/main/src/data/banners.js),
-then regenerate. The fandom wiki blocks automated fetches, which is why the
-dates come from paimon-moe.
+```bash
+pnpm --filter @genshin/game-data-codegen generate first-banner-dates
+pnpm turbo run build --filter @genshin/game-data-codegen
+pnpm --filter @genshin/game-data-codegen generate characters
+```
 
 ## Add a character the generator skips
 
@@ -55,3 +59,4 @@ Widening the roster means relaxing one of those two rules.
 - [Update Elemental Reactions](update-game-reactions.md)
 - [Update Genshin Impact Game Weapons](update-game-weapons.md)
 - [Update Genshin Impact Artifact Sets](update-game-artifacts.md)
+- [Regenerate Genshin Impact Elemental Resonances](update-game-resonances.md)

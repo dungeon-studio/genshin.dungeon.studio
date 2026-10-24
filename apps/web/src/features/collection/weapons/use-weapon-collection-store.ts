@@ -1,8 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
-import { isValidRefinementLevel } from '@genshin/domain';
+import type { CollectionWeapon, CollectionWeaponId, RefinementLevel } from '@genshin/domain';
 import type { Weapon, WeaponId } from '@genshin/game-data';
 import { create } from 'zustand';
 
@@ -11,13 +10,21 @@ interface WeaponCollectionState {
   setWeapons: (weapons: Record<CollectionWeaponId, CollectionWeapon>) => void;
   addWeapon: (weapon: CollectionWeapon) => void;
   removeWeapon: (collectionWeaponId: CollectionWeaponId) => void;
-  setRefinementLevel: (collectionWeaponId: CollectionWeaponId, level: number) => void;
+  setRefinementLevel: (collectionWeaponId: CollectionWeaponId, level: RefinementLevel) => void;
   getWeaponsByWeaponId: (weaponId: Weapon['id']) => CollectionWeapon[];
   clearWeapons: () => void;
 }
 
 export function weaponIdsOf(instances: Iterable<CollectionWeapon>): ReadonlySet<WeaponId> {
   return new Set(Array.from(instances, (instance) => instance.weaponId));
+}
+
+export function groupByWeapon(
+  instances: readonly CollectionWeapon[],
+): ReadonlyMap<WeaponId, readonly CollectionWeapon[]> {
+  return new Map(
+    Array.from(weaponIdsOf(instances), (id) => [id, instances.filter((i) => i.weaponId === id)]),
+  );
 }
 
 /**
@@ -56,8 +63,6 @@ export const useWeaponCollectionStore = create<WeaponCollectionState>()((set, ge
   },
 
   setRefinementLevel: (collectionWeaponId, level) => {
-    if (!isValidRefinementLevel(level)) return;
-
     const entry = get().weapons[collectionWeaponId];
     if (!entry) return;
 

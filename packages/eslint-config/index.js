@@ -41,7 +41,7 @@ const FILES_OUTSIDE_ANY_PROJECT = ['vitest.*config.ts', 'scripts/**/*.ts'];
 
 /** Paths allowed to import `devDependencies`. */
 const DEV_DEPENDENCY_FILES = [
-  '**/*.{test,spec}.{ts,tsx}',
+  '**/*.{test,spec}.{ts,tsx,js}',
   '**/test/**',
   '**/scripts/**',
   'eslint.config.js',
@@ -77,10 +77,13 @@ function typeAwareRules(packageDir) {
         tsconfigRootDir: packageDir,
       },
     },
-    // Both from `stylisticTypeChecked`, whose remaining rules overlap Prettier.
     rules: {
+      // Both from `stylisticTypeChecked`, whose remaining rules overlap Prettier.
       '@typescript-eslint/prefer-nullish-coalescing': 'error',
       '@typescript-eslint/prefer-optional-chain': 'error',
+      // Depends on `noUncheckedIndexedAccess` in `@genshin/tsconfig`: without
+      // it, the rule reports every guard on an index lookup as dead code.
+      '@typescript-eslint/no-unnecessary-condition': 'error',
     },
   };
 }

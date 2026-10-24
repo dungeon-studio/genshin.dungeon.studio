@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { getApp, getApps, initializeApp } from 'firebase/app';
-import { connectAuthEmulator, getAuth } from 'firebase/auth';
+import { getApp, getApps, initializeApp } from '@firebase/app';
+import { connectAuthEmulator, getAuth } from '@firebase/auth';
 
 const EMULATOR_PROJECT_ID = 'demo-dungeon-studio-genshin-dev';
 
