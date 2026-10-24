@@ -12,7 +12,6 @@
     "test:integration": "firebase emulators:exec --only firestore --project demo-dungeon-studio-genshin-dev \"vitest run --coverage --config vitest.integration.config.ts\"",
     "typecheck": "tsc --noEmit && tsc --project tsconfig.scripts.json --noEmit",
     "schemas:export": "tsx scripts/export-schemas.ts",
-    "schemas:check": "tsx scripts/check-schema-compat.ts",
     "documents:sweep": "tsx scripts/sweep-legacy-documents.ts"
   },
   "dependencies": {
@@ -31,6 +30,7 @@
   },
   "devDependencies": {
     "@genshin/eslint-config": "workspace:*",
+    "@genshin/schema-snapshots": "workspace:*",
     "@genshin/tsconfig": "workspace:*",
     "@genshin/vitest-config": "workspace:*",
     "@types/negotiator": "0.6.5",
@@ -41,7 +41,6 @@
     "fast-check": "4.10.2",
     "globals": "17.13.0",
     "json-schema-to-ts": "3.1.1",
-    "jsoncompat": "0.5.0",
     "tsc-alias": "1.9.8",
     "tsx": "4.23.15",
     "typescript": "npm:@typescript/typescript6@6.0.2",

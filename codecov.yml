@@ -48,6 +48,9 @@ flag_management:
     - name: game-data-codegen
       paths:
         - tools/game-data-codegen/src/**
+    - name: schema-snapshots
+      paths:
+        - tools/schema-snapshots/src/**
     - name: web
       paths:
         - apps/web/src/**
@@ -130,3 +133,9 @@ component_management:
         - tools/game-data-codegen/src/**
       flag_regexes:
         - game-data-codegen
+    - component_id: schema-snapshots
+      name: Schema Snapshots
+      paths:
+        - tools/schema-snapshots/src/**
+      flag_regexes:
+        - schema-snapshots
