@@ -19,7 +19,8 @@
     },
     "ghcr.io/devcontainers-extra/features/pre-commit:2": {},
     "ghcr.io/shinepukur/devcontainer-features/vale:1": {
-      "version": "3.14.1"
+      // renovate: datasource=github-tags depName=errata-ai/vale extractVersion=^v(?<version>.+)$
+      "version": "3.24.0"
     },
     "ghcr.io/devcontainers/features/java:1": {
       "version": "21",

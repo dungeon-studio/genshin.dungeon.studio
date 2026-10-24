@@ -49,7 +49,13 @@
     },
     {
       "description": "Move each dependency in one pull request across all of its pins, so develop never holds two versions of it",
-      "matchDepNames": ["hashicorp/terraform", "fsfe/reuse-tool", "lycheeverse/lychee", "node"],
+      "matchDepNames": [
+        "hashicorp/terraform",
+        "fsfe/reuse-tool",
+        "lycheeverse/lychee",
+        "node",
+        "errata-ai/vale"
+      ],
       "groupName": "{{depName}}"
     },
     {
