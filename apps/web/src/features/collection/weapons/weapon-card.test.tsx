@@ -14,7 +14,7 @@ const SWORD = {
   type: 'Sword',
   rarity: 4,
   baseATK: 41,
-  version: '1.0',
+  version: { major: 1, minor: 0 },
 } satisfies Weapon;
 
 describe('WeaponCard', () => {

@@ -7,6 +7,7 @@ name: CI
 # See docs/reference/workflow-conventions.md.
 on:
   pull_request:
+  merge_group:
   push:
     branches:
       - develop
@@ -135,7 +136,7 @@ jobs:
       - name: Check schema compatibility
         env:
           SCHEMA_COMPAT_BASE: origin/${{ github.base_ref }}
-        run: pnpm --filter @genshin/api schemas:check
+        run: pnpm --filter @genshin/schema-snapshots schemas:check
 
   # Smoke-tests the root `pnpm dev` script — the one command a contributor runs
   # to bring up the whole stack (web, API, Firebase emulators). The e2e job below
@@ -262,7 +263,7 @@ jobs:
 
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: playwright-report
           path: /tmp/genshin-e2e
@@ -277,11 +278,11 @@ jobs:
 
     env:
       # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
-      TERRAFORM_VERSION: '1.16.0'
+      TERRAFORM_VERSION: '1.16.6'
       # renovate: datasource=github-releases depName=lycheeverse/lychee extractVersion=^lychee-v(?<version>.+)$
       LYCHEE_VERSION: '0.24.2'
       # renovate: datasource=github-releases depName=aquasecurity/trivy extractVersion=^v(?<version>.+)$
-      TRIVY_VERSION: '0.74.0'
+      TRIVY_VERSION: '0.76.0'
 
     steps:
       - name: Checkout repository
@@ -291,6 +292,7 @@ jobs:
 
       - uses: ./.github/actions/setup-node-pnpm
 
+      # Hooks call the tools below from PATH.
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
@@ -343,9 +345,13 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      # The action derives a scan range only for push and pull_request, and
+      # scans the full history on any other event.
       - name: Scan for verified secrets
-        uses: trufflesecurity/trufflehog@20652fbbdefffcdaa493a5bf57ab2ac6b1db715b # v3.97.1
+        uses: trufflesecurity/trufflehog@e63326d6545de8f425d93ce24078c6e68d83f70e # v3.99.3
         with:
+          base: ${{ github.event.merge_group.base_sha }}
+          head: ${{ github.event.merge_group.head_sha }}
           extra_args: --results=verified
 
   # Online supply-chain audits (impostor commits, known-vulnerable actions)
@@ -367,17 +373,38 @@ jobs:
           persist-credentials: false
 
       - name: Run zizmor
-        uses: zizmorcore/zizmor-action@70fb788f84895a7701f5643d103d587e460b5c99 # v0.6.3
+        uses: zizmorcore/zizmor-action@85b2b9fb8e3325e7a23d7d0a9d7ba5ae0f999e3e # v0.7.1
         with:
           config: .github/zizmor.yml
 
+  # Trivy applies a tfvars file to every root module under the scan path, so
+  # each root scans alone with its own.
   trivy-terraform:
-    name: Scan Terraform
+    name: Scan ${{ matrix.root }} Terraform
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: read
       security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - root: bootstrap
+            path: infrastructure/terraform/bootstrap
+          - root: core
+            path: infrastructure/terraform/environments/core
+            tf-vars: infrastructure/terraform/environments/core/terraform.tfvars
+          - root: dev
+            path: infrastructure/terraform/environments/dev
+            tf-vars: infrastructure/terraform/environments/dev/terraform.tfvars
+          - root: staging
+            path: infrastructure/terraform/environments/staging
+            tf-vars: infrastructure/terraform/environments/staging/terraform.tfvars
+          - root: prod
+            path: infrastructure/terraform/environments/prod
+            tf-vars: infrastructure/terraform/environments/prod/terraform.tfvars
 
     steps:
       - name: Checkout repository
@@ -386,20 +413,181 @@ jobs:
           persist-credentials: false
 
       - name: Scan Terraform
-        uses: aquasecurity/trivy-action@d2a0b60797ff03db6132bd4e2b293f9b37081297 # master
+        uses: aquasecurity/trivy-action@8f28faec26515256b6d22074d1d2a8986f4cbd87 # master
         with:
           scan-type: config
-          scan-ref: infrastructure/terraform
+          scan-ref: ${{ matrix.path }}
+          tf-vars: ${{ matrix.tf-vars }}
           format: sarif
           output: terraform-results.sarif
           trivy-config: .trivy.yaml
 
       - name: Upload Terraform SARIF
-        uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         if: always()
         with:
           sarif_file: terraform-results.sarif
-          category: trivy-terraform
+          category: trivy-terraform-${{ matrix.root }}
+
+  # The matrix reports one context per root, so a ruleset requires this job
+  # instead and a new root never touches the ruleset.
+  trivy-terraform-result:
+    name: Scan Terraform
+    needs: trivy-terraform
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Fail unless every scan succeeded
+        if: needs.trivy-terraform.result != 'success'
+        run: exit 1
+
+  # A job decides whether to plan, rather than a `paths:` gate, so
+  # `Plan infrastructure` reports on every pull request and a ruleset can
+  # require it.
+  terraform-changes:
+    name: Detect Terraform changes
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Reaches the base: the first parent of the pull request's merge commit.
+          fetch-depth: 2
+
+      # bootstrap/ is applied by hand, and no plan below targets prod. `git diff`
+      # exits nonzero on error too, so a failed diff runs the plans.
+      - name: Diff against the base
+        id: diff
+        run: |
+          if git diff --quiet HEAD^1 HEAD -- \
+            infrastructure/terraform \
+            ':!infrastructure/terraform/bootstrap' \
+            ':!infrastructure/terraform/environments/prod' \
+            .github/workflows/ci.yml; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  # A skipped job never expands its matrix, so a matrix reference in the
+  # name would show raw. GitHub appends the environment to each run's name.
+  terraform-plan:
+    name: Plan environment infrastructure
+    needs: terraform-changes
+    if: needs.terraform-changes.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+
+    env:
+      # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
+      TERRAFORM_VERSION: '1.16.6'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: [core, dev, staging]
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      # Each environment maps to an explicit secret, because CodeQL flags
+      # dynamic secret indexing as actions/excessive-secrets-exposure.
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ secrets.GCP_RO_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: >-
+            ${{
+              matrix.environment == 'core' && secrets.GCP_RO_CORE_SERVICE_ACCOUNT_EMAIL ||
+              matrix.environment == 'dev' && secrets.GCP_RO_DEV_SERVICE_ACCOUNT_EMAIL ||
+              matrix.environment == 'staging' && secrets.GCP_RO_STAGING_SERVICE_ACCOUNT_EMAIL
+            }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+
+      - name: Terraform Init
+        working-directory: infrastructure/terraform/environments/${{ matrix.environment }}
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: infrastructure/terraform/environments/${{ matrix.environment }}
+        run: |
+          terraform plan -lock=false -no-color -out=tfplan
+          terraform show -no-color tfplan > plan.txt
+
+      - name: Comment PR with Plan
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            const workspaceRoot = process.env.GITHUB_WORKSPACE;
+            const environment = '${{ matrix.environment }}';
+            const planPath = `${workspaceRoot}/infrastructure/terraform/environments/${environment}/plan.txt`;
+            const plan = fs.readFileSync(planPath, 'utf8');
+
+            const summaryMatch = plan.match(/^(No changes\..+|Plan: .+)$/m);
+            const summary = summaryMatch ? summaryMatch[0] : 'Plan generated';
+
+            const marker = `<!-- terraform-plan:${environment} -->`;
+            const body = [
+              marker,
+              `## terraform-plan (${environment})`,
+              '',
+              `**${summary}**`,
+              '',
+              '<details>',
+              '<summary>Show full plan output</summary>',
+              '',
+              '```',
+              plan,
+              '```',
+              '</details>'
+            ].join('\n');
+
+            const issue = { ...context.repo, issue_number: context.issue.number };
+            const comments = await github.paginate(github.rest.issues.listComments, { ...issue, per_page: 100 });
+
+            const existing = comments.find(comment => comment.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({ ...context.repo, comment_id: existing.id, body });
+              return;
+            }
+
+            await github.rest.issues.createComment({ ...issue, body });
+
+  # The matrix reports one context per environment and none when it skips, so a
+  # ruleset requires this job instead. It needs change detection too, so a
+  # detection failure can't pass as a skipped plan.
+  terraform-plan-result:
+    name: Plan infrastructure
+    needs: [terraform-changes, terraform-plan]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Fail on a failed or cancelled plan
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
 
   trivy-dockerfile:
     name: Scan Dockerfile
@@ -416,7 +604,7 @@ jobs:
           persist-credentials: false
 
       - name: Scan Dockerfile
-        uses: aquasecurity/trivy-action@d2a0b60797ff03db6132bd4e2b293f9b37081297 # master
+        uses: aquasecurity/trivy-action@8f28faec26515256b6d22074d1d2a8986f4cbd87 # master
         with:
           scan-type: config
           scan-ref: apps/api
@@ -425,15 +613,12 @@ jobs:
           trivy-config: .trivy.yaml
 
       - name: Upload Dockerfile SARIF
-        uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         if: always()
         with:
           sarif_file: dockerfile-results.sarif
           category: trivy-dockerfile
 
-  # No SARIF here: trivy-action unsets TRIVY_SEVERITY whenever the format is
-  # sarif, which would discard the severity floor .trivy.yaml sets and fail
-  # this gate on every advisory in the tree.
   trivy-dependencies:
     name: Scan dependencies
     runs-on: ubuntu-latest
@@ -447,8 +632,8 @@ jobs:
 
       # The lockfile resolves every workspace; scanning the directory would
       # also walk build output and fixtures.
-      - name: Scan dependencies
-        uses: aquasecurity/trivy-action@d2a0b60797ff03db6132bd4e2b293f9b37081297 # master
+      - name: Scan dependency vulnerabilities
+        uses: aquasecurity/trivy-action@8f28faec26515256b6d22074d1d2a8986f4cbd87 # master
         with:
           scan-type: fs
           scan-ref: pnpm-lock.yaml
@@ -456,9 +641,23 @@ jobs:
           exit-code: '1'
           trivy-config: .trivy.yaml
 
-  # One build feeds both the scan and the smoke test. The scan goes first
-  # because trivy-action defaults to exit-code 0 and reports through SARIF, so
-  # a smoke-test failure cannot cost us its results.
+      - uses: ./.github/actions/setup-node-pnpm
+
+      # Licences come from node_modules, which Trivy reads only on a directory
+      # scan. Failing on UNKNOWN forces a decision on any licence Trivy can't
+      # classify.
+      - name: Scan dependency licences
+        uses: aquasecurity/trivy-action@8f28faec26515256b6d22074d1d2a8986f4cbd87 # master
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: license
+          severity: UNKNOWN,HIGH,CRITICAL
+          exit-code: '1'
+          trivy-config: .trivy.yaml
+
+  # The scan runs before the smoke test so a smoke-test failure cannot skip
+  # the upload.
   container:
     name: Scan and smoke-test container
     runs-on: ubuntu-latest
@@ -474,10 +673,10 @@ jobs:
           persist-credentials: false
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
       - name: Build image
-        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
           file: ./apps/api/Dockerfile
@@ -487,16 +686,23 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      # Base-image fixes arrive on the upstream digest's schedule, so findings
+      # report without blocking. A finding with no upgrade path leaves nothing
+      # to act on. trivy-action drops a severity input for SARIF unless
+      # limit-severities-for-sarif is set.
       - name: Scan Container Image
-        uses: aquasecurity/trivy-action@d2a0b60797ff03db6132bd4e2b293f9b37081297 # master
+        uses: aquasecurity/trivy-action@8f28faec26515256b6d22074d1d2a8986f4cbd87 # master
         with:
           image-ref: api:ci
+          scanners: vuln
+          ignore-unfixed: true
+          exit-code: '0'
           format: sarif
           output: container-results.sarif
           trivy-config: .trivy.yaml
 
       - name: Upload Container SARIF
-        uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         if: always()
         with:
           sarif_file: container-results.sarif

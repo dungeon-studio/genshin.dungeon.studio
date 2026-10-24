@@ -66,7 +66,7 @@ export async function withApiWrite(
   page: Page,
   method: string,
   pathFragment: string,
-  action: () => Promise<void>,
+  action: () => Promise<unknown>,
 ): Promise<void> {
   const settled = Promise.race([
     page.waitForResponse(

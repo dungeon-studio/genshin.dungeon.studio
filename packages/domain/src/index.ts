@@ -45,7 +45,9 @@ export { isISOTimestamp, nowTimestamp, type ISOTimestamp } from './iso-timestamp
 export type { ProblemDetail } from './problem-detail.js';
 export {
   characterCollectionHref,
+  characterItemDocument,
   characterItemHref,
+  characterListDocument,
   characterRepresentation,
   deserialiseCharacter,
   serialiseCharacter,
@@ -63,8 +65,11 @@ export {
   deserialiseWeapon,
   serialiseWeapon,
   weaponCollectionHref,
+  weaponItemDocument,
   weaponItemHref,
+  weaponListDocument,
   weaponRepresentation,
+  weaponsOfDocument,
   weaponsOfHref,
 } from './representations/collection-json/weapons.js';
 export {

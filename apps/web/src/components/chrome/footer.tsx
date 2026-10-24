@@ -1,26 +1,26 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { GAME_DATA_VERSION } from '@genshin/game-data';
+import { formatVersion, GAME_DATA_VERSION } from '@genshin/game-data';
 import type { JSX } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { Container } from '@/components/chrome/container';
 import { useAuth } from '@/features/auth';
 import { buildBugReportUrl } from '@/lib/debug-info';
-
-const GITHUB_REPO = 'https://github.com/dungeon-studio/genshin.dungeon.studio';
+import { REPOSITORY_URL } from '@/lib/repository';
 
 export function Footer(): JSX.Element {
-  const { user } = useAuth();
+  const auth = useAuth();
   const location = useLocation();
+  const gameDataVersion = formatVersion(GAME_DATA_VERSION);
 
   const pageUrl = window.location.origin + location.pathname + location.search + location.hash;
-  const reportUrl = buildBugReportUrl(`${GITHUB_REPO}/issues/new`, pageUrl, {
+  const reportUrl = buildBugReportUrl(`${REPOSITORY_URL}/issues/new`, pageUrl, {
     appVersion: __APP_VERSION__,
     buildSha: __BUILD_SHA__,
-    gameDataVersion: GAME_DATA_VERSION,
-    authenticated: user !== null,
+    gameDataVersion,
+    authenticated: auth.status === 'signed-in',
     userAgent: navigator.userAgent,
     platform: navigator.platform,
     screenWidth: window.screen.width,
@@ -45,7 +45,7 @@ export function Footer(): JSX.Element {
             </li>
             <li>
               <a
-                href={`${GITHUB_REPO}/issues/new?template=feature-request.yml`}
+                href={`${REPOSITORY_URL}/issues/new?template=feature-request.yml`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline-offset-4 hover:underline"
@@ -55,7 +55,7 @@ export function Footer(): JSX.Element {
             </li>
             <li>
               <a
-                href={`${GITHUB_REPO}/discussions`}
+                href={`${REPOSITORY_URL}/discussions`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline-offset-4 hover:underline"
@@ -65,7 +65,7 @@ export function Footer(): JSX.Element {
             </li>
             <li>
               <a
-                href={`${GITHUB_REPO}/blob/develop/CHANGELOG.md`}
+                href={`${REPOSITORY_URL}/blob/develop/CHANGELOG.md`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline-offset-4 hover:underline"
@@ -75,7 +75,7 @@ export function Footer(): JSX.Element {
             </li>
             <li>
               <a
-                href={GITHUB_REPO}
+                href={REPOSITORY_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline-offset-4 hover:underline"
@@ -96,7 +96,7 @@ export function Footer(): JSX.Element {
           </ul>
         </nav>
         <p className="mt-4 text-xs text-muted-foreground/70">
-          Game data current as of {GAME_DATA_VERSION}
+          Game data current as of {gameDataVersion}
         </p>
         <p className="mt-1 text-xs text-muted-foreground/70">© 2026 Dungeon Studio</p>
         <p className="mt-1 text-xs text-muted-foreground/70">

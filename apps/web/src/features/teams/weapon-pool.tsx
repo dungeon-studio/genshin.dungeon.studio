@@ -12,13 +12,15 @@ import { getCharacterById, getWeaponById, WEAPON_ROSTER } from '@genshin/game-da
 import { Lock, Swords } from 'lucide-react';
 import type { JSX } from 'react';
 import { useId, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 import { WeaponSummary } from '@/components/summaries/weapon-summary';
-import { Button } from '@/components/ui/button';
+import { EmptyCollection } from '@/features/collection/empty-collection';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
-import { weaponIdsOf } from '@/features/collection/weapons/use-weapon-collection-store';
+import {
+  groupByWeapon,
+  weaponIdsOf,
+} from '@/features/collection/weapons/use-weapon-collection-store';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
 import { useTeamStore } from '@/features/teams/use-team-store';
 import { RARITY_BORDER_COLORS, RARITY_SELECTED_RINGS } from '@/lib/rarity-styles';
@@ -90,14 +92,12 @@ export function WeaponPool({
 
   const ownedCount = ownedWeaponIds.size;
 
-  const hasWeaponsOfType = useMemo(() => {
-    if (!weaponType) return true;
-    for (const id of ownedWeaponIds) {
-      const weapon = getWeaponById(id);
-      if (weapon?.type === weaponType) return true;
-    }
-    return false;
-  }, [ownedWeaponIds, weaponType]);
+  const hasWeaponsOfType = useMemo(
+    () =>
+      !weaponType ||
+      collectionWeapons.some((cw) => getWeaponById(cw.weaponId)?.type === weaponType),
+    [collectionWeapons, weaponType],
+  );
 
   const { filteredWeapons, filteredOwnedCount } = useMemo(() => {
     if (ownedWeaponIds.size === 0 || !hasWeaponsOfType)
@@ -109,18 +109,10 @@ export function WeaponPool({
     };
   }, [filters, ownedWeaponIds, hasWeaponsOfType]);
 
-  const instancesByWeaponId = useMemo(() => {
-    const map = new Map<string, CollectionWeapon[]>();
-    for (const cw of collectionWeapons) {
-      const list = map.get(cw.weaponId) ?? [];
-      list.push(cw);
-      map.set(cw.weaponId, list);
-    }
-    return map;
-  }, [collectionWeapons]);
+  const instancesByWeaponId = useMemo(() => groupByWeapon(collectionWeapons), [collectionWeapons]);
 
   if (ownedCount === 0) return <EmptyPool />;
-  if (weaponType && !hasWeaponsOfType) return <EmptyPool weaponType={weaponType} />;
+  if (!hasWeaponsOfType) return <EmptyPool weaponType={weaponType} />;
 
   return (
     <div className="min-h-0 gap-3 flex flex-1 flex-col">
@@ -175,18 +167,13 @@ export function WeaponPool({
 function EmptyPool({ weaponType }: { weaponType?: WeaponType }): JSX.Element {
   const kind = weaponType ? `${weaponType} weapons` : 'weapons';
   return (
-    <div className="gap-4 py-12 flex flex-1 flex-col items-center justify-center">
-      <Swords className="h-10 w-10 text-muted-foreground" aria-hidden="true" focusable={false} />
-      <div className="text-center">
-        <p className="font-medium">No {kind} in your collection</p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Visit the weapons page to add {kind} to your collection.
-        </p>
-      </div>
-      <Button asChild>
-        <Link to={weaponType ? `/weapons?type=${weaponType}` : '/weapons'}>Go to Weapons</Link>
-      </Button>
-    </div>
+    <EmptyCollection
+      icon={Swords}
+      title={`No ${kind} in your collection`}
+      description={`Visit the weapons page to add ${kind} to your collection.`}
+      to={weaponType ? `/weapons?type=${weaponType}` : '/weapons'}
+      action="Go to Weapons"
+    />
   );
 }
 
@@ -227,8 +214,8 @@ function PoolWeaponCard({ weapon, refinementLevel, selected, lock, onClick }: Po
       disabled={equipped}
       className={cn(
         'gap-1 p-3 shadow-sm flex w-full flex-col rounded-lg border border-l-4 border-border bg-card text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
-        RARITY_BORDER_COLORS[weapon.rarity] ?? 'border-l-border',
-        selected && `ring-2 ring-inset ${RARITY_SELECTED_RINGS[weapon.rarity] ?? 'ring-border'}`,
+        RARITY_BORDER_COLORS[weapon.rarity],
+        selected && `ring-2 ring-inset ${RARITY_SELECTED_RINGS[weapon.rarity]}`,
         equipped ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-accent/50',
       )}
       aria-label={weaponCardLabel(weapon, lock, selected)}

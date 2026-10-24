@@ -32,7 +32,7 @@ changes with it. A stored payload carries it in band, because the medium holds
 nothing but the payload. HTTP carries it out of band, in a media type
 parameter, because the protocol already negotiates representations and an
 inline schema reference would mix data with metadata—see
-[DSGEP-003](dsgep-003-json-schema-strategy.md).
+[ADR-0003](adr-0003-json-schema-strategy.md).
 
 ---
 
@@ -82,7 +82,8 @@ before the payloads are gone—a document nobody opens is still a document that
 breaks on the deployment that drops its version.
 
 Only a medium that expires its own contents, such as a cache TTL or a drained
-queue, reaches that state by itself. Stored payloads have to be rewritten.
+queue, reaches that state by itself. Stored payloads have to be rewritten. For
+Firestore, see [Drain a legacy schema version](../how-tos/drain-a-legacy-schema-version.md).
 
 `schema-compat` refuses to drop a released version regardless of what the
 medium shows, so a retirement means changing the check too.
