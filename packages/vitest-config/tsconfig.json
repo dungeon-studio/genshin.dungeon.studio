@@ -1,0 +1,4 @@
+{
+  "extends": "@genshin/tsconfig/no-emit.json",
+  "include": ["index.d.ts"]
+}

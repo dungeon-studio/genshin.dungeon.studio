@@ -51,9 +51,9 @@ export function SetConfiguration({
       {sets && sets.length >= 1 && (
         <ArtifactSetSearch
           label="Optional second 2-piece set..."
-          value={sets?.[1]}
+          value={sets[1]}
           onChange={handleSecondChange}
-          onClear={sets?.[1] ? handleClearSecond : undefined}
+          onClear={sets[1] ? handleClearSecond : undefined}
         />
       )}
     </div>

@@ -69,13 +69,12 @@ Terraform, or workflow. Read it from an environment variable.
 - Every workspace `tsconfig.json` extends `@genshin/tsconfig` and never re-declares a strictness flag; those belong in the shared config. Keep local only the options TypeScript resolves relative to the declaring file (`outDir`, `rootDir`, `paths`, `include`) and the platform axis (`module`, `moduleResolution`, `lib`, `types`, `jsx`).
 - The API uses `tsconfig.json` (includes tests) for typechecking and `tsconfig.build.json` (excludes tests) for emit. The build config extends `tsconfig.json`, so compiler options stay in sync automatically; only the exclude patterns differ.
 - When `tsconfig.json` uses project references, type-check with `tsc -b --noEmit`. Plain `tsc --noEmit` won't follow references.
-- A new project-wide check belongs in `.pre-commit-config.yaml`, which `ci.yml` runs over the whole tree. The `runCmd` chain in `devcontainer.yml` exercises the built image's toolchain instead, so it takes a command only when nothing else in the chain runs that tool.
+- [Where a check runs](docs/reference/workflow-conventions.md#where-a-check-runs) decides whether a new check is a pre-commit hook or a workflow job.
 
 ## API design rules
 
 - Use the [REST API conventions reference](docs/reference/rest-api-conventions.md) for route shape, methods, status codes, error format, pagination, and auth handling.
 - All error responses use RFC 9457 Problem Details (`application/problem+json`) via `apps/api/src/http/problem.ts`. Always include a `detail` field, even for generic errors, to keep a stable schema for clients.
-- List endpoints use cursor-based pagination (`limit` and `cursor`).
 - Prefer explicit types over type munging. For example, define `ProfileUpdate` rather than using `Partial<Pick<UserProfile, 'name'>>` inline.
 - Keep route handlers thin, compose middleware, and validate inputs at the boundary.
 
@@ -112,7 +111,7 @@ writing tests.
 - Root `package.json` is the source of truth for shared tooling: turbo, TypeScript, ESLint, Prettier, and Stylelint. Workspace `package.json` holds app-specific dependencies, and a tool appearing in both keeps identical versions.
 - Declare every direct import explicitly, even when the same package exists at the root. Enforced by `import-x/no-extraneous-dependencies` in every workspace `eslint.config.js`; `devDependencies` may appear in test files (`*.test.ts`, `**/test/**`) and tooling configs (`eslint.config.js`, `*.config.{ts,js}`) but never in production source.
 - Classify packages correctly: `dependencies` for runtime code shipped to production, `devDependencies` for build tools, plugins, type definitions, and local tooling.
-- `pnpm-workspace.yaml` declares workspace package globs and engine constraints only; don't use it for version overrides.
+- Don't use `pnpm-workspace.yaml` for version overrides.
 - Run `pnpm install` and commit `pnpm-lock.yaml` after dependency changes. Use `pnpm why <package>` to detect duplicate transitive versions. Restart any running dev server too, for the reason in [Quick start commands](CONTRIBUTING.md#quick-start-commands).
 - New workspace packages should match the root `package.json` metadata fields (`description`, `keywords`, `author`, `homepage`, `bugs`, `license`).
 - ESLint uses flat config via workspace-local `eslint.config.js` files; configure ignore patterns with `ignores`, not `.eslintignore`.

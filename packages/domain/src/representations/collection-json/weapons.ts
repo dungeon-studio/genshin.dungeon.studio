@@ -10,6 +10,10 @@
 
 import {
   buildItem,
+  itemData,
+  serialiseCollection,
+  serialiseItemDocument,
+  type CollectionDocument,
   type CollectionJsonRepresentation,
   type Item,
   type Link,
@@ -75,6 +79,31 @@ export function serialiseWeapon(weapon: CollectionWeapon, baseUrl: string): Item
   );
 }
 
+export function weaponListDocument(
+  weapons: CollectionWeapon[],
+  baseUrl: string,
+): CollectionDocument {
+  return serialiseCollection(weaponRepresentation, weaponCollectionHref(baseUrl), weapons, baseUrl);
+}
+
+/** The user's copies of one weapon. */
+export function weaponsOfDocument(
+  weaponId: string,
+  weapons: CollectionWeapon[],
+  baseUrl: string,
+): CollectionDocument {
+  return serialiseCollection(
+    weaponRepresentation,
+    weaponsOfHref(baseUrl, weaponId),
+    weapons,
+    baseUrl,
+  );
+}
+
+export function weaponItemDocument(weapon: CollectionWeapon, baseUrl: string): CollectionDocument {
+  return serialiseItemDocument(weaponRepresentation, weapon, baseUrl);
+}
+
 /**
  * Reads one owned weapon back out of a Collection+JSON item.
  *
@@ -84,9 +113,15 @@ export function serialiseWeapon(weapon: CollectionWeapon, baseUrl: string): Item
  * @throws TypeError naming the field that failed.
  */
 export function deserialiseWeapon(item: Item): CollectionWeapon {
-  const data = Object.fromEntries(item.data.map((d) => [d.name, d.value]));
+  const data = itemData(item);
   assertCollectionWeapon(data);
-  return data;
+  return {
+    weaponInstanceId: data.weaponInstanceId,
+    weaponId: data.weaponId,
+    refinementLevel: data.refinementLevel,
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+  };
 }
 
 /** What the generic collection helpers consume for this resource. */

@@ -26,7 +26,9 @@ Security sections, since they then describe deltas from a shipped release.
 - Holder names on weapons equipped by another team, with a hint on an empty slot to pick that character first.
 - Per-character artifact plan configuration with set and affix selection.
 - Team composition validation.
+- Elemental resonance badges on full teams; tapping one shows its bonus.
 - Responsive team editing sheet for small screens.
+- Phone-width layout for the header and team slots.
 - Team persistence so compositions survive across sessions.
 - Offline collection management that syncs when back online.
 - Anonymous-to-authenticated collection merge on sign-in.

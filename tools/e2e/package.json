@@ -12,14 +12,14 @@
   },
   "dependencies": {
     "@genshin/game-data": "workspace:*",
-    "@playwright/test": "1.62.1"
+    "@playwright/test": "1.64.1"
   },
   "devDependencies": {
     "@genshin/eslint-config": "workspace:*",
     "@genshin/tsconfig": "workspace:*",
-    "@types/node": "25.9.5",
+    "@types/node": "24.19.2",
     "@typescript/native": "npm:typescript@7.0.2",
-    "eslint": "10.9.1",
+    "eslint": "10.13.0",
     "typescript": "npm:@typescript/typescript6@6.0.2"
   }
 }

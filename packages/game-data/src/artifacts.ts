@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import { ARTIFACT_SET_DATA } from './artifacts.generated.js';
+import type { GameVersion } from './versions.js';
 
 /**
  * The five slots a set fills, keyed for code and valued with the name players
@@ -34,7 +35,7 @@ type ArtifactSetId = keyof typeof ARTIFACT_SET_DATA;
 export interface ArtifactSet {
   id: ArtifactSetId;
   name: string;
-  version: string; // Release version (e.g., "1.0", "3.0", "4.3")
+  version: GameVersion;
   bonuses: Record<2 | 4, string>; // 2-piece and 4-piece bonus descriptions
 }
 
@@ -48,6 +49,9 @@ export const ARTIFACT_SETS: Readonly<Record<ArtifactSetId, ArtifactSet>> = ARTIF
 
 /** Display order, as the generator writes it: newest release first. */
 export const ARTIFACT_SET_ROSTER: readonly ArtifactSet[] = Object.values(ARTIFACT_SETS);
+
+/** Every set ID, newest release first. */
+export const ARTIFACT_SET_IDS: readonly ArtifactSetId[] = ARTIFACT_SET_ROSTER.map((set) => set.id);
 
 /**
  * Valid main affixes for Sands of Eon

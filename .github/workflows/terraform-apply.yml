@@ -9,7 +9,11 @@ on:
   push:
     branches: [develop, 'release/**']
     paths:
-      - 'infrastructure/terraform/environments/**'
+      - 'infrastructure/terraform/**'
+      # bootstrap/ is applied by hand.
+      - '!infrastructure/terraform/bootstrap/**'
+      # No job below applies prod.
+      - '!infrastructure/terraform/environments/prod/**'
       - '.github/workflows/terraform-apply.yml'
       - '.github/workflows/terraform-apply-reusable.yml'
 
@@ -18,8 +22,8 @@ permissions:
 
 jobs:
   core:
-    name: Core
-    if: github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/release/')
+    name: Apply core infrastructure
+    if: github.ref == 'refs/heads/develop'
     permissions:
       contents: read
       id-token: write
@@ -32,7 +36,7 @@ jobs:
     secrets: inherit
 
   dev:
-    name: Dev
+    name: Apply dev infrastructure
     if: github.ref == 'refs/heads/develop'
     needs: core
     permissions:
@@ -44,9 +48,8 @@ jobs:
     secrets: inherit
 
   staging:
-    name: Staging
+    name: Apply staging infrastructure
     if: startsWith(github.ref, 'refs/heads/release/')
-    needs: core
     permissions:
       contents: read
       id-token: write
