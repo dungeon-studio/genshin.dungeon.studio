@@ -69,7 +69,7 @@ function renderTeamsPage(wrapper = createWrapper()): void {
   );
 }
 
-// Seeded after mount: the hooks clear their stores on finding no signed-in user.
+// Call after rendering: the hooks clear their stores on finding no signed-in user.
 function seedCollections(): void {
   act(() => {
     useCollectionStore
