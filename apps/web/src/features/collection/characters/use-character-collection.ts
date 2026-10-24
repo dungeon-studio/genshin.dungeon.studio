@@ -3,9 +3,10 @@
 
 import type { CharacterId, CollectionCharacter, ConstellationLevel } from '@genshin/domain';
 import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 
+import type { AuthState } from '@/features/auth/auth-context';
 import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
@@ -39,28 +40,57 @@ function entriesAheadOfServer(
     .map((entry) => ({ characterId: entry.characterId, level: entry.constellationLevel }));
 }
 
+const PUSHED_FOR_KEY = 'genshin-collection-pushed-for';
+
+function readPushedFor(): string | null {
+  try {
+    return localStorage.getItem(PUSHED_FOR_KEY);
+  } catch {
+    // Storage access blocked (privacy mode / sandboxed iframe)
+    return null;
+  }
+}
+
+function writePushedFor(uid: string | null): void {
+  try {
+    if (uid === null) {
+      localStorage.removeItem(PUSHED_FOR_KEY);
+    } else {
+      localStorage.setItem(PUSHED_FOR_KEY, uid);
+    }
+  } catch {
+    // Storage access blocked (privacy mode / sandboxed iframe)
+  }
+}
+
 /**
  * Reconciles the local store with the server's collection whenever the query
  * resolves.
  *
- * The first resolution per signed-in user merges what this browser recorded
- * and pushes the entries the server is behind on. Refetches merge additively,
- * so they don't overwrite optimistic state while those pushes are in flight.
+ * The first resolution per sign-in merges what this browser recorded and
+ * pushes the entries the server is behind on. Refetches merge additively, so
+ * they don't overwrite optimistic state while those pushes are in flight.
+ *
+ * Which user the push ran for is saved beside the persisted collection, so a
+ * remount or reload doesn't push again and re-add a character removed on
+ * another device. Signed in, every write goes to the server, so nothing new
+ * can be waiting to push until the user signs out.
  */
 function useServerSync(
-  uid: string | undefined,
+  auth: AuthState,
   apiCharacters: CharacterCollection | undefined,
   setConstellationLevelApi: ReturnType<typeof useSetConstellationLevelMutation>['mutate'],
   applyMutationResult: (result: MutationResult) => void,
 ): void {
   const replaceCharacters = useCollectionStore((s) => s.replaceCharacters);
-  const mergedForUser = useRef<string | null>(null);
+  const uid = signedInUid(auth);
+  const signedOut = auth.status === 'signed-out';
 
   useEffect(() => {
-    if (uid === undefined) {
-      mergedForUser.current = null;
+    if (signedOut) {
+      writePushedFor(null);
     }
-  }, [uid]);
+  }, [signedOut]);
 
   useEffect(() => {
     if (!apiCharacters) return;
@@ -68,7 +98,7 @@ function useServerSync(
     const merged = mergeCollections(useCollectionStore.getState().characters, apiCharacters);
     replaceCharacters(merged);
 
-    if (uid === undefined || mergedForUser.current === uid) return;
+    if (uid === undefined || readPushedFor() === uid) return;
 
     const diffs = entriesAheadOfServer(merged, apiCharacters);
 
@@ -85,7 +115,7 @@ function useServerSync(
       toast.success(`Merged ${diffs.length} character(s) from your local collection.`);
     }
 
-    mergedForUser.current = uid;
+    writePushedFor(uid);
   }, [apiCharacters, uid, replaceCharacters, setConstellationLevelApi, applyMutationResult]);
 }
 
@@ -251,7 +281,7 @@ export function useCollection(): UseCollectionResult {
     [storeReplaceCharacter],
   );
 
-  useServerSync(uid, apiCharacters, setConstellationLevelApi, applyMutationResult);
+  useServerSync(auth, apiCharacters, setConstellationLevelApi, applyMutationResult);
 
   const { addCharacter, removeCharacter, setConstellationLevel } = useOptimisticActions(
     isAuthenticated,
