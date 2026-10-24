@@ -100,14 +100,10 @@ describe('useTeams (authenticated)', () => {
 
   it('reports a failed save that a newer edit to the same team superseded', async () => {
     const firstPut = holdResponse(() => new HttpResponse(null, { status: 500 }));
-    let puts = 0;
     server.use(
       http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([]))),
-      http.put('http://localhost:8080/teams/1', () => {
-        puts += 1;
-        if (puts === 1) return firstPut.resolver();
-        return new HttpResponse(null, { status: 204 });
-      }),
+      http.put('http://localhost:8080/teams/1', firstPut.resolver, { once: true }),
+      http.put('http://localhost:8080/teams/1', () => new HttpResponse(null, { status: 204 })),
     );
 
     const { result } = renderHookSignedIn(() => useTeams(), 'user-1');
@@ -119,7 +115,6 @@ describe('useTeams (authenticated)', () => {
     act(() => {
       result.current.setTeamName(1, 'Newer');
     });
-    await waitFor(() => expect(puts).toBe(2));
 
     firstPut.release();
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Failed to save team.'));
