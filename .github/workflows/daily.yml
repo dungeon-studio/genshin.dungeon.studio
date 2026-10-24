@@ -120,7 +120,7 @@ jobs:
           The Playwright report is the \`playwright-report\` artifact on [the run](${RUN_URL}).
           EOF
 
-      - name: Report the failure
+      - name: Report failing end-to-end tests
         if: steps.e2e.outcome == 'failure'
         uses: ./.github/actions/report-issue
         with:
