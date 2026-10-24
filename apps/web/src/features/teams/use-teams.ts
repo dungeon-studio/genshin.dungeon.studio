@@ -104,8 +104,8 @@ function useTeamActions(
       edit();
       if (!isAuthenticated) return;
       const optimisticTeam = store().teams[slot];
-      // Rolls back on this request's own promise: `mutate`'s per-call `onError`
-      // fires only for the latest call, dropping a save still in flight.
+      // Each request needs its own promise: `mutate`'s per-call `onError` fires
+      // only for the latest call.
       request().catch(() => {
         if (store().teams[slot] !== optimisticTeam) {
           toast.error(`${failure}.`);
