@@ -13,7 +13,7 @@ export default {
         pyro: {
           light: '#FF9E5A',
           DEFAULT: '#FF6B35',
-          dark: '#D94A1A',
+          dark: '#C4401A',
         },
         hydro: {
           light: '#6BB6FF',

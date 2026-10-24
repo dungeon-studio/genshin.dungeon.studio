@@ -28,6 +28,8 @@ data array structure and sort order.
    - Weapons: [`update-game-weapons.md`](../../docs/how-tos/update-game-weapons.md)
    - Artifacts:
      [`update-game-artifacts.md`](../../docs/how-tos/update-game-artifacts.md)
+   - Resonances:
+     [`update-game-resonances.md`](../../docs/how-tos/update-game-resonances.md)
 2. Maintain alphabetical sort order within the data arrays.
 3. Use the existing type definitions; don't change type shapes without
    discussion.

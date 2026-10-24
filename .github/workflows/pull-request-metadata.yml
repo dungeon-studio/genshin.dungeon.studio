@@ -11,6 +11,7 @@ name: Pull Request Metadata
 on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
+  merge_group:
 
 permissions:
   contents: read
@@ -27,6 +28,8 @@ jobs:
     name: Check pull request title
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    # A merge group carries no title; the pull request's own run checks it.
+    if: github.event_name == 'pull_request'
     permissions:
       pull-requests: read
 
@@ -35,8 +38,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # The same set .github/release-drafter.yml strips from release note
-          # bullets; the two lists have to move together.
+          # The authoritative type list: commitlint's config-conventional set.
+          # CONTRIBUTING.md mirrors it for contributors.
+          # https://github.com/conventional-changelog/commitlint/tree/master/@commitlint/config-conventional
           types: |
             feat
             fix

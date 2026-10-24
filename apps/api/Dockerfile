@@ -4,8 +4,10 @@
 # renovate: datasource=npm depName=corepack
 ARG COREPACK_VERSION=0.36.0
 
+FROM node:24.22.0-slim@sha256:91acba91b842bec0bf7ea6f5e09c644c7ccad72c4996ed9616d861d1c7cd60d4 AS base
+
 # Build stage
-FROM node:24.20.0-slim@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e AS builder
+FROM base AS builder
 
 ARG COREPACK_VERSION
 
@@ -41,7 +43,7 @@ RUN pnpm turbo run build --filter=@genshin/api && \
     pnpm install --prod --frozen-lockfile
 
 # Production stage
-FROM node:24.20.0-slim@sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e
+FROM base
 
 WORKDIR /app
 

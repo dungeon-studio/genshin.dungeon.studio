@@ -7,9 +7,9 @@
 import type { JSX } from 'react';
 
 import { Container } from '@/components/chrome/container';
+import { REPOSITORY_URL } from '@/lib/repository';
 
 const EFFECTIVE_DATE = '3 July 2026';
-const GITHUB_REPO = 'https://github.com/dungeon-studio/genshin.dungeon.studio';
 
 export function PrivacyPolicyPage(): JSX.Element {
   return (
@@ -76,7 +76,7 @@ export function PrivacyPolicyPage(): JSX.Element {
           characters, weapons, and teams along with your sign-in. We cannot undo it. To access or
           correct your data, or to ask any question about your privacy, reach us through our{' '}
           <a
-            href={`${GITHUB_REPO}/issues/new/choose`}
+            href={`${REPOSITORY_URL}/issues/new/choose`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-foreground underline underline-offset-4 hover:no-underline"

@@ -103,6 +103,9 @@ for (const { prefix, sourceFor } of SNAPSHOT_ROOTS) {
       .slice(`${prefix}/`.length)
       .replace(/\.json$/, '')
       .split('/');
+    if (repository === undefined || version === undefined) {
+      throw new Error(`unexpected snapshot path: ${path}`);
+    }
     const source = sourceFor(repository, version);
 
     let head: string;

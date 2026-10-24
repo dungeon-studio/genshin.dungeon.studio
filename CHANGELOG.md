@@ -17,14 +17,16 @@ single `### Added` bucket in `[Unreleased]`.
 
 - Character collection page with compact card tiles, element icons, filters, search, and sort.
 - Weapon collection page with ownership tracking and visual distinction between owned and unowned items.
-- Prompts to get started when character or weapon collections are empty.
+- Prompts to get started when character or weapon collections are empty, including on the team builder landing page.
 - Team builder as the default landing page with four teams of up to four character slots each.
 - Character assignment to team slots from the owned collection.
 - Per-character weapon assignment with conflict prevention when a weapon is already equipped on another team.
 - Holder names on weapons equipped by another team, with a hint on an empty slot to pick that character first.
 - Per-character artifact plan configuration with set and affix selection.
 - Team composition validation.
+- Elemental resonance badges on full teams; tapping one shows its bonus.
 - Responsive team editing sheet for small screens.
+- Phone-width layout for the header and team slots.
 - Team persistence so compositions survive across sessions.
 - Offline collection management that syncs when back online.
 - Anonymous-to-authenticated collection merge on sign-in.

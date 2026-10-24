@@ -36,3 +36,4 @@ hand. Update it when the game adds a reaction or changes what triggers one.
 - [Regenerate Genshin Impact Characters](update-game-characters.md)
 - [Update Genshin Impact Game Weapons](update-game-weapons.md)
 - [Update Genshin Impact Artifact Sets](update-game-artifacts.md)
+- [Regenerate Genshin Impact Elemental Resonances](update-game-resonances.md)

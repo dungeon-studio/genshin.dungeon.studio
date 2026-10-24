@@ -1,15 +1,16 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionWeaponId } from '@genshin/domain';
+import type { CollectionWeaponId, RefinementLevel } from '@genshin/domain';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { makeWeapon, weaponsDocument } from '@/test/fixtures';
+import { holdResponse } from '@/test/msw/held-response';
 import { server } from '@/test/msw/server';
-import { createWrapper, fakeUser } from '@/test/render';
+import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
 
 import { useWeaponCollection } from './use-weapon-collection';
 import { useWeaponCollectionStore } from './use-weapon-collection-store';
@@ -79,6 +80,34 @@ describe('useWeaponCollection', () => {
 
       await waitFor(() => expect(result.current.weapons[SECOND_INSTANCE_ID]).toBeDefined());
       expect(result.current.weapons[INSTANCE_ID]).toBeDefined();
+    });
+
+    it('leaves the store alone when the add settles after sign-out', async () => {
+      const addConfirmation = holdResponse(() =>
+        HttpResponse.json(
+          weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 })]),
+        ),
+      );
+      server.use(
+        http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument([]))),
+        http.post('http://localhost:8080/weapons', addConfirmation.resolver),
+      );
+
+      const { result, queryClient, signOut } = renderHookSignedIn(
+        () => useWeaponCollection(),
+        'user-1',
+      );
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      act(() => {
+        result.current.addWeapon(WEAPON_ID);
+      });
+      signOut();
+      await waitFor(() => expect(queryClient.isMutating()).toBe(1));
+      addConfirmation.release();
+
+      await waitFor(() => expect(queryClient.isMutating()).toBe(0));
+      expect(useWeaponCollectionStore.getState().weapons).toEqual({});
     });
   });
 
@@ -189,6 +218,47 @@ describe('useWeaponCollection', () => {
       expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(5);
       await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(2));
       expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+    });
+
+    it('keeps a change that a refetch started before it would overwrite', async () => {
+      const atLevel = (refinementLevel: RefinementLevel) =>
+        weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel })]);
+      // Answers with the server's state from before the second change.
+      const staleRefetch = holdResponse(() => HttpResponse.json(atLevel(2)));
+      const secondPatch = holdResponse(() => HttpResponse.json(atLevel(3)));
+      let patches = 0;
+      server.use(
+        http.get('http://localhost:8080/weapons', () => HttpResponse.json(atLevel(1)), {
+          once: true,
+        }),
+        http.get('http://localhost:8080/weapons', staleRefetch.resolver, { once: true }),
+        http.get('http://localhost:8080/weapons', () => HttpResponse.json(atLevel(3))),
+        http.patch('http://localhost:8080/weapons/weapon-instance-1', () => {
+          patches += 1;
+          if (patches === 1) return HttpResponse.json(atLevel(2));
+          return secondPatch.resolver();
+        }),
+      );
+
+      const { result, queryClient } = renderHookSignedIn(() => useWeaponCollection(), 'user-1');
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(1));
+
+      act(() => {
+        result.current.setRefinementLevel(INSTANCE_ID, 2);
+      });
+      await waitFor(() => expect(queryClient.isFetching()).toBe(1));
+
+      act(() => {
+        result.current.setRefinementLevel(INSTANCE_ID, 3);
+      });
+      await waitFor(() => expect(patches).toBe(2));
+
+      staleRefetch.release();
+      await waitFor(() => expect(queryClient.isFetching()).toBe(0));
+      expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(3);
+
+      secondPatch.release();
+      await waitFor(() => expect(queryClient.isMutating()).toBe(0));
     });
   });
 });
