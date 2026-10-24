@@ -17,7 +17,10 @@ import { WeaponSummary } from '@/components/summaries/weapon-summary';
 import { EmptyCollection } from '@/features/collection/empty-collection';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
-import { weaponIdsOf } from '@/features/collection/weapons/use-weapon-collection-store';
+import {
+  groupByWeapon,
+  weaponIdsOf,
+} from '@/features/collection/weapons/use-weapon-collection-store';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
 import { useTeamStore } from '@/features/teams/use-team-store';
 import { RARITY_BORDER_COLORS, RARITY_SELECTED_RINGS } from '@/lib/rarity-styles';
@@ -89,14 +92,12 @@ export function WeaponPool({
 
   const ownedCount = ownedWeaponIds.size;
 
-  const hasWeaponsOfType = useMemo(() => {
-    if (!weaponType) return true;
-    for (const id of ownedWeaponIds) {
-      const weapon = getWeaponById(id);
-      if (weapon?.type === weaponType) return true;
-    }
-    return false;
-  }, [ownedWeaponIds, weaponType]);
+  const hasWeaponsOfType = useMemo(
+    () =>
+      !weaponType ||
+      collectionWeapons.some((cw) => getWeaponById(cw.weaponId)?.type === weaponType),
+    [collectionWeapons, weaponType],
+  );
 
   const { filteredWeapons, filteredOwnedCount } = useMemo(() => {
     if (ownedWeaponIds.size === 0 || !hasWeaponsOfType)
@@ -108,18 +109,10 @@ export function WeaponPool({
     };
   }, [filters, ownedWeaponIds, hasWeaponsOfType]);
 
-  const instancesByWeaponId = useMemo(() => {
-    const map = new Map<string, CollectionWeapon[]>();
-    for (const cw of collectionWeapons) {
-      const list = map.get(cw.weaponId) ?? [];
-      list.push(cw);
-      map.set(cw.weaponId, list);
-    }
-    return map;
-  }, [collectionWeapons]);
+  const instancesByWeaponId = useMemo(() => groupByWeapon(collectionWeapons), [collectionWeapons]);
 
   if (ownedCount === 0) return <EmptyPool />;
-  if (weaponType && !hasWeaponsOfType) return <EmptyPool weaponType={weaponType} />;
+  if (!hasWeaponsOfType) return <EmptyPool weaponType={weaponType} />;
 
   return (
     <div className="min-h-0 gap-3 flex flex-1 flex-col">
