@@ -34,8 +34,8 @@ In every feature:
   that settles after the user leaves its page, reaches the store only through a
   refetch, see [#1534]. A character or weapon request that settles after
   sign-out leaves the store untouched. Every team request gets its rollback and
-  toast, including one that settles after the user leaves the teams page or
-  signs out.
+  toast, even after the user leaves the teams page. One that fails after
+  sign-out shows only its toast.
 - Requests of different kinds through one hook settle in any order, so a
   response can undo a newer edit. The response to an add can put the minimum
   level back over a raise, and a refinement's response can put an instance back
