@@ -5,6 +5,26 @@
 // Regenerate with: pnpm --filter @genshin/game-data-codegen generate characters
 
 export const CHARACTER_DATA = {
+  vesna: {
+    id: 'vesna',
+    name: 'Vesna',
+    element: 'Anemo',
+    weaponType: 'Sword',
+    rarity: 5,
+    region: 'Unknown',
+    version: { major: 7, minor: 1 },
+    releaseDate: '2026-09-23',
+  },
+  vodyanitsa: {
+    id: 'vodyanitsa',
+    name: 'Vodyanitsa',
+    element: 'Hydro',
+    weaponType: 'Catalyst',
+    rarity: 5,
+    region: 'Unknown',
+    version: { major: 7, minor: 1 },
+    releaseDate: '2026-09-23',
+  },
   odette: {
     id: 'odette',
     name: 'Odette',
@@ -12,7 +32,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 5,
     region: 'Unknown',
-    version: '7.0',
+    version: { major: 7, minor: 0 },
     releaseDate: '2026-08-12',
   },
   sandrone: {
@@ -22,7 +42,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 5,
     region: 'Unknown',
-    version: '6.7',
+    version: { major: 6, minor: 7 },
     releaseDate: '2026-07-01',
   },
   lohen: {
@@ -32,7 +52,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 5,
     region: 'Mondstadt',
-    version: '6.6',
+    version: { major: 6, minor: 6 },
     releaseDate: '2026-06-09',
   },
   nicole: {
@@ -42,7 +62,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Unknown',
-    version: '6.6',
+    version: { major: 6, minor: 6 },
     releaseDate: '2026-05-20',
   },
   linnea: {
@@ -52,7 +72,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 5,
     region: 'Nod-Krai',
-    version: '6.5',
+    version: { major: 6, minor: 5 },
     releaseDate: '2026-04-08',
   },
   varka: {
@@ -62,7 +82,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 5,
     region: 'Mondstadt',
-    version: '6.4',
+    version: { major: 6, minor: 4 },
     releaseDate: '2026-02-25',
   },
   columbina: {
@@ -72,7 +92,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Nod-Krai',
-    version: '6.3',
+    version: { major: 6, minor: 3 },
     releaseDate: '2026-01-14',
   },
   zibai: {
@@ -82,7 +102,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 5,
     region: 'Unknown',
-    version: '6.3',
+    version: { major: 6, minor: 3 },
     releaseDate: '2026-02-03',
   },
   durin: {
@@ -92,7 +112,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 5,
     region: 'Mondstadt',
-    version: '6.2',
+    version: { major: 6, minor: 2 },
     releaseDate: '2025-12-03',
   },
   nefer: {
@@ -102,7 +122,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Nod-Krai',
-    version: '6.1',
+    version: { major: 6, minor: 1 },
     releaseDate: '2025-10-22',
   },
   flins: {
@@ -112,7 +132,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 5,
     region: 'Nod-Krai',
-    version: '6.0',
+    version: { major: 6, minor: 0 },
     releaseDate: '2025-09-30',
   },
   lauma: {
@@ -122,7 +142,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Nod-Krai',
-    version: '6.0',
+    version: { major: 6, minor: 0 },
     releaseDate: '2025-09-10',
   },
   ineffa: {
@@ -132,7 +152,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 5,
     region: 'Nod-Krai',
-    version: '5.8',
+    version: { major: 5, minor: 8 },
     releaseDate: '2025-07-30',
   },
   skirk: {
@@ -142,7 +162,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 5,
     region: 'Unknown',
-    version: '5.7',
+    version: { major: 5, minor: 7 },
     releaseDate: '2025-06-18',
   },
   escoffier: {
@@ -152,7 +172,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 5,
     region: 'Fontaine',
-    version: '5.6',
+    version: { major: 5, minor: 6 },
     releaseDate: '2025-05-07',
   },
   varesa: {
@@ -162,7 +182,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Natlan',
-    version: '5.5',
+    version: { major: 5, minor: 5 },
     releaseDate: '2025-03-26',
   },
   'yumemizuki-mizuki': {
@@ -172,7 +192,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Inazuma',
-    version: '5.4',
+    version: { major: 5, minor: 4 },
     releaseDate: '2025-02-12',
   },
   citlali: {
@@ -182,7 +202,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Natlan',
-    version: '5.3',
+    version: { major: 5, minor: 3 },
     releaseDate: '2025-01-01',
   },
   mavuika: {
@@ -192,7 +212,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 5,
     region: 'Natlan',
-    version: '5.3',
+    version: { major: 5, minor: 3 },
     releaseDate: '2025-01-01',
   },
   chasca: {
@@ -202,7 +222,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 5,
     region: 'Natlan',
-    version: '5.2',
+    version: { major: 5, minor: 2 },
     releaseDate: '2024-11-20',
   },
   xilonen: {
@@ -212,7 +232,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 5,
     region: 'Natlan',
-    version: '5.1',
+    version: { major: 5, minor: 1 },
     releaseDate: '2024-10-09',
   },
   kinich: {
@@ -222,7 +242,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 5,
     region: 'Natlan',
-    version: '5.0',
+    version: { major: 5, minor: 0 },
     releaseDate: '2024-09-17',
   },
   mualani: {
@@ -232,7 +252,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Natlan',
-    version: '5.0',
+    version: { major: 5, minor: 0 },
     releaseDate: '2024-08-28',
   },
   emilie: {
@@ -242,7 +262,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 5,
     region: 'Fontaine',
-    version: '4.8',
+    version: { major: 4, minor: 8 },
     releaseDate: '2024-08-06',
   },
   clorinde: {
@@ -252,7 +272,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 5,
     region: 'Fontaine',
-    version: '4.7',
+    version: { major: 4, minor: 7 },
     releaseDate: '2024-06-05',
   },
   sigewinne: {
@@ -262,7 +282,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 5,
     region: 'Fontaine',
-    version: '4.7',
+    version: { major: 4, minor: 7 },
     releaseDate: '2024-06-25',
   },
   arlecchino: {
@@ -272,7 +292,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 5,
     region: 'Snezhnaya',
-    version: '4.6',
+    version: { major: 4, minor: 6 },
     releaseDate: '2024-04-24',
   },
   chiori: {
@@ -282,7 +302,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 5,
     region: 'Inazuma',
-    version: '4.5',
+    version: { major: 4, minor: 5 },
     releaseDate: '2024-03-13',
   },
   xianyun: {
@@ -292,7 +312,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Liyue',
-    version: '4.4',
+    version: { major: 4, minor: 4 },
     releaseDate: '2024-01-31',
   },
   navia: {
@@ -302,7 +322,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 5,
     region: 'Fontaine',
-    version: '4.3',
+    version: { major: 4, minor: 3 },
     releaseDate: '2023-12-20',
   },
   furina: {
@@ -312,7 +332,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 5,
     region: 'Fontaine',
-    version: '4.2',
+    version: { major: 4, minor: 2 },
     releaseDate: '2023-11-08',
   },
   neuvillette: {
@@ -322,7 +342,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Fontaine',
-    version: '4.1',
+    version: { major: 4, minor: 1 },
     releaseDate: '2023-09-27',
   },
   wriothesley: {
@@ -332,7 +352,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Fontaine',
-    version: '4.1',
+    version: { major: 4, minor: 1 },
     releaseDate: '2023-10-17',
   },
   lyney: {
@@ -342,7 +362,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 5,
     region: 'Fontaine',
-    version: '4.0',
+    version: { major: 4, minor: 0 },
     releaseDate: '2023-08-16',
   },
   baizhu: {
@@ -352,7 +372,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Liyue',
-    version: '3.6',
+    version: { major: 3, minor: 6 },
     releaseDate: '2023-05-02',
   },
   dehya: {
@@ -362,7 +382,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 5,
     region: 'Sumeru',
-    version: '3.5',
+    version: { major: 3, minor: 5 },
     releaseDate: '2023-03-01',
   },
   alhaitham: {
@@ -372,7 +392,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 5,
     region: 'Sumeru',
-    version: '3.4',
+    version: { major: 3, minor: 4 },
     releaseDate: '2023-01-18',
   },
   wanderer: {
@@ -382,7 +402,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Sumeru',
-    version: '3.3',
+    version: { major: 3, minor: 3 },
     releaseDate: '2022-12-07',
   },
   nahida: {
@@ -392,7 +412,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Sumeru',
-    version: '3.2',
+    version: { major: 3, minor: 2 },
     releaseDate: '2022-11-02',
   },
   cyno: {
@@ -402,7 +422,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 5,
     region: 'Sumeru',
-    version: '3.1',
+    version: { major: 3, minor: 1 },
     releaseDate: '2022-09-28',
   },
   nilou: {
@@ -412,7 +432,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 5,
     region: 'Sumeru',
-    version: '3.1',
+    version: { major: 3, minor: 1 },
     releaseDate: '2022-10-14',
   },
   tighnari: {
@@ -422,7 +442,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 5,
     region: 'Sumeru',
-    version: '3.0',
+    version: { major: 3, minor: 0 },
     releaseDate: '2022-08-24',
   },
   yelan: {
@@ -432,7 +452,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 5,
     region: 'Liyue',
-    version: '2.7',
+    version: { major: 2, minor: 7 },
     releaseDate: '2022-05-31',
   },
   'kamisato-ayato': {
@@ -442,7 +462,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 5,
     region: 'Inazuma',
-    version: '2.6',
+    version: { major: 2, minor: 6 },
     releaseDate: '2022-03-30',
   },
   'yae-miko': {
@@ -452,7 +472,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Inazuma',
-    version: '2.5',
+    version: { major: 2, minor: 5 },
     releaseDate: '2022-02-16',
   },
   shenhe: {
@@ -462,7 +482,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 5,
     region: 'Liyue',
-    version: '2.4',
+    version: { major: 2, minor: 4 },
     releaseDate: '2022-01-05',
   },
   'arataki-itto': {
@@ -472,7 +492,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 5,
     region: 'Inazuma',
-    version: '2.3',
+    version: { major: 2, minor: 3 },
     releaseDate: '2021-12-14',
   },
   'raiden-shogun': {
@@ -482,7 +502,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 5,
     region: 'Inazuma',
-    version: '2.1',
+    version: { major: 2, minor: 1 },
     releaseDate: '2021-09-01',
   },
   'sangonomiya-kokomi': {
@@ -492,7 +512,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Inazuma',
-    version: '2.1',
+    version: { major: 2, minor: 1 },
     releaseDate: '2021-09-21',
   },
   'kamisato-ayaka': {
@@ -502,7 +522,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 5,
     region: 'Inazuma',
-    version: '2.0',
+    version: { major: 2, minor: 0 },
     releaseDate: '2021-07-21',
   },
   yoimiya: {
@@ -512,7 +532,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 5,
     region: 'Inazuma',
-    version: '2.0',
+    version: { major: 2, minor: 0 },
     releaseDate: '2021-08-10',
   },
   'kaedehara-kazuha': {
@@ -522,7 +542,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 5,
     region: 'Inazuma',
-    version: '1.6',
+    version: { major: 1, minor: 6 },
     releaseDate: '2021-06-29',
   },
   eula: {
@@ -532,7 +552,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 5,
     region: 'Mondstadt',
-    version: '1.5',
+    version: { major: 1, minor: 5 },
     releaseDate: '2021-05-18',
   },
   'hu-tao': {
@@ -542,7 +562,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 5,
     region: 'Liyue',
-    version: '1.3',
+    version: { major: 1, minor: 3 },
     releaseDate: '2021-03-02',
   },
   xiao: {
@@ -552,7 +572,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 5,
     region: 'Liyue',
-    version: '1.3',
+    version: { major: 1, minor: 3 },
     releaseDate: '2021-02-03',
   },
   albedo: {
@@ -562,7 +582,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 5,
     region: 'Mondstadt',
-    version: '1.2',
+    version: { major: 1, minor: 2 },
     releaseDate: '2020-12-23',
   },
   ganyu: {
@@ -572,7 +592,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 5,
     region: 'Liyue',
-    version: '1.2',
+    version: { major: 1, minor: 2 },
     releaseDate: '2021-01-12',
   },
   tartaglia: {
@@ -582,7 +602,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 5,
     region: 'Snezhnaya',
-    version: '1.1',
+    version: { major: 1, minor: 1 },
     releaseDate: '2020-11-11',
   },
   zhongli: {
@@ -592,7 +612,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 5,
     region: 'Liyue',
-    version: '1.1',
+    version: { major: 1, minor: 1 },
     releaseDate: '2020-12-01',
   },
   diluc: {
@@ -602,7 +622,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 5,
     region: 'Mondstadt',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   jean: {
@@ -612,7 +632,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 5,
     region: 'Mondstadt',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   keqing: {
@@ -622,7 +642,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 5,
     region: 'Liyue',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   klee: {
@@ -632,7 +652,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Mondstadt',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   mona: {
@@ -642,7 +662,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 5,
     region: 'Mondstadt',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   qiqi: {
@@ -652,7 +672,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 5,
     region: 'Liyue',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   venti: {
@@ -662,7 +682,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 5,
     region: 'Mondstadt',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   alyosha: {
@@ -672,7 +692,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 4,
     region: 'Unknown',
-    version: '7.0',
+    version: { major: 7, minor: 0 },
     releaseDate: '2026-08-12',
   },
   prune: {
@@ -682,7 +702,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 4,
     region: 'Mondstadt',
-    version: '6.6',
+    version: { major: 6, minor: 6 },
     releaseDate: '2026-05-20',
   },
   illuga: {
@@ -692,7 +712,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 4,
     region: 'Nod-Krai',
-    version: '6.3',
+    version: { major: 6, minor: 3 },
     releaseDate: '2026-02-03',
   },
   jahoda: {
@@ -702,7 +722,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 4,
     region: 'Nod-Krai',
-    version: '6.2',
+    version: { major: 6, minor: 2 },
     releaseDate: '2025-12-03',
   },
   aino: {
@@ -712,7 +732,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 4,
     region: 'Nod-Krai',
-    version: '6.0',
+    version: { major: 6, minor: 0 },
     releaseDate: '2025-09-30',
   },
   dahlia: {
@@ -722,7 +742,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 4,
     region: 'Mondstadt',
-    version: '5.7',
+    version: { major: 5, minor: 7 },
     releaseDate: '2025-06-18',
   },
   ifa: {
@@ -732,7 +752,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 4,
     region: 'Natlan',
-    version: '5.6',
+    version: { major: 5, minor: 6 },
     releaseDate: '2025-05-07',
   },
   iansan: {
@@ -742,7 +762,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 4,
     region: 'Natlan',
-    version: '5.5',
+    version: { major: 5, minor: 5 },
     releaseDate: '2025-03-26',
   },
   'lan-yan': {
@@ -752,7 +772,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 4,
     region: 'Liyue',
-    version: '5.3',
+    version: { major: 5, minor: 3 },
     releaseDate: '2025-01-21',
   },
   ororon: {
@@ -762,7 +782,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 4,
     region: 'Natlan',
-    version: '5.2',
+    version: { major: 5, minor: 2 },
     releaseDate: '2024-11-20',
   },
   kachina: {
@@ -772,7 +792,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 4,
     region: 'Natlan',
-    version: '5.0',
+    version: { major: 5, minor: 0 },
     releaseDate: '2024-08-28',
   },
   sethos: {
@@ -782,7 +802,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 4,
     region: 'Sumeru',
-    version: '4.7',
+    version: { major: 4, minor: 7 },
     releaseDate: '2024-06-05',
   },
   gaming: {
@@ -792,7 +812,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 4,
     region: 'Liyue',
-    version: '4.4',
+    version: { major: 4, minor: 4 },
     releaseDate: '2024-01-31',
   },
   chevreuse: {
@@ -802,7 +822,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 4,
     region: 'Fontaine',
-    version: '4.3',
+    version: { major: 4, minor: 3 },
     releaseDate: '2024-01-09',
   },
   charlotte: {
@@ -812,7 +832,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 4,
     region: 'Fontaine',
-    version: '4.2',
+    version: { major: 4, minor: 2 },
     releaseDate: '2023-11-08',
   },
   freminet: {
@@ -822,7 +842,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 4,
     region: 'Fontaine',
-    version: '4.0',
+    version: { major: 4, minor: 0 },
     releaseDate: '2023-09-05',
   },
   lynette: {
@@ -832,7 +852,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 4,
     region: 'Fontaine',
-    version: '4.0',
+    version: { major: 4, minor: 0 },
     releaseDate: '2023-08-16',
   },
   kirara: {
@@ -842,7 +862,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 4,
     region: 'Inazuma',
-    version: '3.7',
+    version: { major: 3, minor: 7 },
     releaseDate: '2023-05-24',
   },
   kaveh: {
@@ -852,7 +872,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 4,
     region: 'Sumeru',
-    version: '3.6',
+    version: { major: 3, minor: 6 },
     releaseDate: '2023-05-02',
   },
   mika: {
@@ -862,7 +882,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 4,
     region: 'Mondstadt',
-    version: '3.5',
+    version: { major: 3, minor: 5 },
     releaseDate: '2023-03-21',
   },
   yaoyao: {
@@ -872,7 +892,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 4,
     region: 'Liyue',
-    version: '3.4',
+    version: { major: 3, minor: 4 },
     releaseDate: '2023-01-18',
   },
   faruzan: {
@@ -882,7 +902,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 4,
     region: 'Sumeru',
-    version: '3.3',
+    version: { major: 3, minor: 3 },
     releaseDate: '2022-12-07',
   },
   layla: {
@@ -892,7 +912,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 4,
     region: 'Sumeru',
-    version: '3.2',
+    version: { major: 3, minor: 2 },
     releaseDate: '2022-11-18',
   },
   candace: {
@@ -902,7 +922,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 4,
     region: 'Sumeru',
-    version: '3.1',
+    version: { major: 3, minor: 1 },
     releaseDate: '2022-09-28',
   },
   collei: {
@@ -912,7 +932,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 4,
     region: 'Sumeru',
-    version: '3.0',
+    version: { major: 3, minor: 0 },
     releaseDate: '2022-08-24',
   },
   dori: {
@@ -922,7 +942,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 4,
     region: 'Sumeru',
-    version: '3.0',
+    version: { major: 3, minor: 0 },
     releaseDate: '2022-09-09',
   },
   'shikanoin-heizou': {
@@ -932,7 +952,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 4,
     region: 'Inazuma',
-    version: '2.8',
+    version: { major: 2, minor: 8 },
     releaseDate: '2022-07-13',
   },
   'kuki-shinobu': {
@@ -942,7 +962,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 4,
     region: 'Inazuma',
-    version: '2.7',
+    version: { major: 2, minor: 7 },
     releaseDate: '2022-06-21',
   },
   'yun-jin': {
@@ -952,7 +972,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 4,
     region: 'Liyue',
-    version: '2.4',
+    version: { major: 2, minor: 4 },
     releaseDate: '2022-01-05',
   },
   gorou: {
@@ -962,7 +982,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 4,
     region: 'Inazuma',
-    version: '2.3',
+    version: { major: 2, minor: 3 },
     releaseDate: '2021-12-14',
   },
   thoma: {
@@ -972,7 +992,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 4,
     region: 'Inazuma',
-    version: '2.2',
+    version: { major: 2, minor: 2 },
     releaseDate: '2021-11-02',
   },
   'kujou-sara': {
@@ -982,7 +1002,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 4,
     region: 'Inazuma',
-    version: '2.1',
+    version: { major: 2, minor: 1 },
     releaseDate: '2021-09-01',
   },
   sayu: {
@@ -992,7 +1012,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 4,
     region: 'Inazuma',
-    version: '2.0',
+    version: { major: 2, minor: 0 },
     releaseDate: '2021-08-10',
   },
   yanfei: {
@@ -1002,7 +1022,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 4,
     region: 'Liyue',
-    version: '1.5',
+    version: { major: 1, minor: 5 },
     releaseDate: '2021-04-28',
   },
   rosaria: {
@@ -1012,7 +1032,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 4,
     region: 'Mondstadt',
-    version: '1.4',
+    version: { major: 1, minor: 4 },
     releaseDate: '2021-04-06',
   },
   diona: {
@@ -1022,7 +1042,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 4,
     region: 'Mondstadt',
-    version: '1.1',
+    version: { major: 1, minor: 1 },
     releaseDate: '2020-11-11',
   },
   xinyan: {
@@ -1032,7 +1052,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 4,
     region: 'Liyue',
-    version: '1.1',
+    version: { major: 1, minor: 1 },
     releaseDate: '2020-12-01',
   },
   amber: {
@@ -1042,7 +1062,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 4,
     region: 'Mondstadt',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   barbara: {
@@ -1052,7 +1072,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 4,
     region: 'Mondstadt',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   beidou: {
@@ -1062,7 +1082,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 4,
     region: 'Liyue',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   bennett: {
@@ -1072,7 +1092,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 4,
     region: 'Mondstadt',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   chongyun: {
@@ -1082,7 +1102,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 4,
     region: 'Liyue',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   fischl: {
@@ -1092,7 +1112,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Bow',
     rarity: 4,
     region: 'Mondstadt',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   kaeya: {
@@ -1102,7 +1122,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 4,
     region: 'Mondstadt',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   lisa: {
@@ -1112,7 +1132,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 4,
     region: 'Mondstadt',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   ningguang: {
@@ -1122,7 +1142,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 4,
     region: 'Liyue',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   noelle: {
@@ -1132,7 +1152,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 4,
     region: 'Mondstadt',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   razor: {
@@ -1142,7 +1162,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Claymore',
     rarity: 4,
     region: 'Mondstadt',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   sucrose: {
@@ -1152,7 +1172,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Catalyst',
     rarity: 4,
     region: 'Mondstadt',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   xiangling: {
@@ -1162,7 +1182,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Polearm',
     rarity: 4,
     region: 'Liyue',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
   xingqiu: {
@@ -1172,7 +1192,7 @@ export const CHARACTER_DATA = {
     weaponType: 'Sword',
     rarity: 4,
     region: 'Liyue',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     releaseDate: '2020-09-28',
   },
 } as const;

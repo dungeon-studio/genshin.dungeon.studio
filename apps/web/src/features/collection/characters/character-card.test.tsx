@@ -16,7 +16,7 @@ const AMBER = {
   weaponType: 'Bow',
   rarity: 4,
   region: 'Mondstadt',
-  version: '1.0',
+  version: { major: 1, minor: 0 },
   releaseDate: '2020-09-28',
 } satisfies Character;
 

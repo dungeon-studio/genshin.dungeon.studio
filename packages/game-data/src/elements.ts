@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import { sameVersion } from './versions.js';
+import type { GameVersion } from './versions.js';
+
 /** The seven elements, keyed for code and valued with the name players see. */
 export const ELEMENTS = {
   PYRO: 'Pyro',
@@ -22,9 +25,13 @@ export type Element = (typeof ELEMENTS)[keyof typeof ELEMENTS];
  * `ELEMENT_REACTION_TYPES` holds the reactions themselves.
  */
 export const REACTION_TYPES = {
+  /** Multiplies the damage of the triggering hit. */
   AMPLIFYING: 'AMPLIFYING',
+  /** Deals its own damage, scaling with level and Elemental Mastery. */
   TRANSFORMATIVE: 'TRANSFORMATIVE',
+  /** Adds flat damage to the triggering hit. */
   ADDITIVE: 'ADDITIVE',
+  /** Deals damage through Dendro Cores. */
   DENDRO_CORE: 'DENDRO_CORE',
   STATUS: 'STATUS',
   LUNAR: 'LUNAR',
@@ -44,7 +51,7 @@ interface ReactionInfo {
   elements?: Element[];
   note?: string;
   requirement?: string;
-  version: string; // Release version when reaction was introduced or significantly changed
+  version: GameVersion;
 }
 
 /**
@@ -57,103 +64,105 @@ interface ReactionInfo {
  * @see https://genshin-impact.fandom.com/wiki/Elemental_Reaction
  */
 export const ELEMENT_REACTION_TYPES: Record<string, ReactionInfo> = {
-  // Amplifying Reactions (damage multipliers) - version 1.0
   VAPORIZE: {
     type: REACTION_TYPES.AMPLIFYING,
     elements: [ELEMENTS.PYRO, ELEMENTS.HYDRO],
-    version: '1.0',
+    version: { major: 1, minor: 0 },
   },
   MELT: {
     type: REACTION_TYPES.AMPLIFYING,
     elements: [ELEMENTS.PYRO, ELEMENTS.CRYO],
-    version: '1.0',
+    version: { major: 1, minor: 0 },
   },
 
-  // Transformative Reactions (fixed damage + EM scaling) - version 1.0 base
   OVERLOADED: {
     type: REACTION_TYPES.TRANSFORMATIVE,
     elements: [ELEMENTS.PYRO, ELEMENTS.ELECTRO],
-    version: '1.0',
+    version: { major: 1, minor: 0 },
   },
   SUPERCONDUCT: {
     type: REACTION_TYPES.TRANSFORMATIVE,
     elements: [ELEMENTS.CRYO, ELEMENTS.ELECTRO],
-    version: '1.0',
+    version: { major: 1, minor: 0 },
   },
   ELECTROCHARGED: {
     type: REACTION_TYPES.TRANSFORMATIVE,
     elements: [ELEMENTS.HYDRO, ELEMENTS.ELECTRO],
-    version: '1.0',
+    version: { major: 1, minor: 0 },
   },
   SHATTER: {
     type: REACTION_TYPES.TRANSFORMATIVE,
     note: 'Triggered by hitting Frozen',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
   },
-  SWIRL: { type: REACTION_TYPES.TRANSFORMATIVE, elements: [ELEMENTS.ANEMO], version: '1.0' },
+  SWIRL: {
+    type: REACTION_TYPES.TRANSFORMATIVE,
+    elements: [ELEMENTS.ANEMO],
+    version: { major: 1, minor: 0 },
+  },
   BURNING: {
     type: REACTION_TYPES.TRANSFORMATIVE,
     elements: [ELEMENTS.PYRO, ELEMENTS.DENDRO],
-    version: '3.0',
+    version: { major: 3, minor: 0 },
   },
 
-  // Additive Reactions (flat damage bonus to triggering attack) - version 3.0
   AGGRAVATE: {
     type: REACTION_TYPES.ADDITIVE,
     elements: [ELEMENTS.ELECTRO, ELEMENTS.DENDRO],
-    version: '3.0',
+    version: { major: 3, minor: 0 },
   },
   SPREAD: {
     type: REACTION_TYPES.ADDITIVE,
     elements: [ELEMENTS.DENDRO, ELEMENTS.ELECTRO],
-    version: '3.0',
+    version: { major: 3, minor: 0 },
   },
 
-  // Dendro Core Reactions (create Dendro Cores that burst) - version 3.0
   BLOOM: {
     type: REACTION_TYPES.DENDRO_CORE,
     elements: [ELEMENTS.HYDRO, ELEMENTS.DENDRO],
-    version: '3.0',
+    version: { major: 3, minor: 0 },
   },
   HYPERBLOOM: {
     type: REACTION_TYPES.DENDRO_CORE,
     elements: [ELEMENTS.ELECTRO],
     requirement: 'Bloom active',
-    version: '3.0',
+    version: { major: 3, minor: 0 },
   },
   BURGEON: {
     type: REACTION_TYPES.DENDRO_CORE,
     elements: [ELEMENTS.PYRO],
     requirement: 'Bloom active',
-    version: '3.0',
+    version: { major: 3, minor: 0 },
   },
 
-  // Special/Status Reactions - version 1.0
   FROZEN: {
     type: REACTION_TYPES.STATUS,
     elements: [ELEMENTS.HYDRO, ELEMENTS.CRYO],
-    version: '1.0',
+    version: { major: 1, minor: 0 },
   },
-  CRYSTALLIZE: { type: REACTION_TYPES.STATUS, elements: [ELEMENTS.GEO], version: '1.0' },
+  CRYSTALLIZE: {
+    type: REACTION_TYPES.STATUS,
+    elements: [ELEMENTS.GEO],
+    version: { major: 1, minor: 0 },
+  },
 
-  // Lunar Reactions (version 5.1+ content, Fontaine region) - version 5.1
   LUNAR_CHARGED: {
     type: REACTION_TYPES.LUNAR,
     elements: [ELEMENTS.HYDRO, ELEMENTS.ELECTRO],
     note: 'Enhanced Electro-Charged with bonus scaling',
-    version: '5.1',
+    version: { major: 5, minor: 1 },
   },
   LUNAR_BLOOM: {
     type: REACTION_TYPES.LUNAR,
     elements: [ELEMENTS.HYDRO, ELEMENTS.DENDRO],
     note: 'Enhanced Bloom variant',
-    version: '5.1',
+    version: { major: 5, minor: 1 },
   },
   LUNAR_CRYSTALLIZE: {
     type: REACTION_TYPES.LUNAR,
     elements: [ELEMENTS.GEO, ELEMENTS.HYDRO],
     note: 'Enhanced Crystallize with Moondrifts',
-    version: '5.1',
+    version: { major: 5, minor: 1 },
   },
 } as const;
 
@@ -161,11 +170,13 @@ export const ELEMENT_REACTION_TYPES: Record<string, ReactionInfo> = {
  * The reactions a given game version introduced.
  *
  * Not the reactions available at that version: an exact match on the recorded
- * version, so asking for `'3.0'` returns Burning, Aggravate, Spread, and the
+ * version, so asking for 3.0 returns Burning, Aggravate, Spread, and the
  * Dendro Core reactions, and nothing from 1.0.
  */
-export function getReactionsByVersion(version: string): Record<string, ReactionInfo> {
+export function getReactionsByVersion(version: GameVersion): Record<string, ReactionInfo> {
   return Object.fromEntries(
-    Object.entries(ELEMENT_REACTION_TYPES).filter(([, reaction]) => reaction.version === version),
+    Object.entries(ELEMENT_REACTION_TYPES).filter(([, reaction]) =>
+      sameVersion(reaction.version, version),
+    ),
   );
 }

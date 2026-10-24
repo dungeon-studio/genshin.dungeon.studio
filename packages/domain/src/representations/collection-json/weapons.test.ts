@@ -3,7 +3,14 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { deserialiseWeapon, serialiseWeapon } from './weapons.js';
+import {
+  deserialiseWeapon,
+  serialiseWeapon,
+  weaponItemDocument,
+  weaponListDocument,
+  weaponRepresentation,
+  weaponsOfDocument,
+} from './weapons.js';
 import type { ISOTimestamp } from '../../iso-timestamp.js';
 import type { CollectionWeapon } from '../../weapon/collection-weapon.js';
 
@@ -37,7 +44,7 @@ describe('weapon serialisation round-trip', () => {
     if (links === undefined) {
       throw new Error('expected item to have links');
     }
-    expect(links[0].rel).toBe('collection');
+    expect(links[0]?.rel).toBe('collection');
   });
 
   it('preserves refinement level through round-trip', () => {
@@ -45,5 +52,74 @@ describe('weapon serialisation round-trip', () => {
     const item = serialiseWeapon(weapon, BASE_URL);
     const result = deserialiseWeapon(item);
     expect(result.refinementLevel).toBe(5);
+  });
+});
+
+describe('deserialiseWeapon sanitisation', () => {
+  it('strips unknown data entries off the deserialised weapon', () => {
+    const item = serialiseWeapon(VALID_WEAPON, BASE_URL);
+    const injected = { ...item, data: [...item.data, { name: 'injected', value: 'evil' }] };
+    expect(deserialiseWeapon(injected)).toEqual(VALID_WEAPON);
+  });
+});
+
+describe('weaponListDocument', () => {
+  it('addresses the collection URL', () => {
+    const document = weaponListDocument([VALID_WEAPON], BASE_URL);
+    expect(document.collection.href).toBe(`${BASE_URL}/weapons`);
+  });
+
+  it('holds one item per weapon in order', () => {
+    const other: CollectionWeapon = { ...VALID_WEAPON, weaponInstanceId: 'wep-002' };
+    const document = weaponListDocument([VALID_WEAPON, other], BASE_URL);
+    expect(document.collection.items.map((item) => item.href)).toEqual([
+      `${BASE_URL}/weapons/wep-001`,
+      `${BASE_URL}/weapons/wep-002`,
+    ]);
+  });
+
+  it('carries the weapon template', () => {
+    const document = weaponListDocument([], BASE_URL);
+    expect(document.collection.template).toEqual(weaponRepresentation.template);
+  });
+});
+
+describe('weaponsOfDocument', () => {
+  it("addresses the weapon's filtered collection URL", () => {
+    const document = weaponsOfDocument('mistsplitter-reforged', [VALID_WEAPON], BASE_URL);
+    expect(document.collection.href).toBe(`${BASE_URL}/weapons?weaponId=mistsplitter-reforged`);
+  });
+
+  it('holds one item per weapon in order', () => {
+    const other: CollectionWeapon = { ...VALID_WEAPON, weaponInstanceId: 'wep-002' };
+    const document = weaponsOfDocument('mistsplitter-reforged', [VALID_WEAPON, other], BASE_URL);
+    expect(document.collection.items.map((item) => item.href)).toEqual([
+      `${BASE_URL}/weapons/wep-001`,
+      `${BASE_URL}/weapons/wep-002`,
+    ]);
+  });
+
+  it('carries the weapon template', () => {
+    const document = weaponsOfDocument('mistsplitter-reforged', [], BASE_URL);
+    expect(document.collection.template).toEqual(weaponRepresentation.template);
+  });
+});
+
+describe('weaponItemDocument', () => {
+  it("addresses the weapon's own URL", () => {
+    const document = weaponItemDocument(VALID_WEAPON, BASE_URL);
+    expect(document.collection.href).toBe(`${BASE_URL}/weapons/wep-001`);
+  });
+
+  it('holds only that weapon', () => {
+    const document = weaponItemDocument(VALID_WEAPON, BASE_URL);
+    expect(document.collection.items.map((item) => item.href)).toEqual([
+      `${BASE_URL}/weapons/wep-001`,
+    ]);
+  });
+
+  it('carries the weapon template', () => {
+    const document = weaponItemDocument(VALID_WEAPON, BASE_URL);
+    expect(document.collection.template).toEqual(weaponRepresentation.template);
   });
 });

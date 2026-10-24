@@ -21,8 +21,7 @@ interface TeamMemberPlannerProps {
   member: CollectionTeamMember | null;
   collectionCharacter?: CollectionCharacter;
   collectionWeapon?: CollectionWeapon;
-  selected?: boolean;
-  onSelect?: () => void;
+  onEdit: () => void;
   onArtifactPlanChange?: (plan: ArtifactPlan | undefined) => void;
 }
 
@@ -30,8 +29,7 @@ export function TeamMemberPlanner({
   member,
   collectionCharacter,
   collectionWeapon,
-  selected = false,
-  onSelect,
+  onEdit,
   onArtifactPlanChange,
 }: TeamMemberPlannerProps): JSX.Element {
   const character = member ? getCharacterById(member.characterId) : undefined;
@@ -39,34 +37,21 @@ export function TeamMemberPlanner({
   const borderClass = elementBorderClass(character?.element);
 
   return (
-    <Card
-      className={cn(
-        'border-l-4 transition-colors',
-        borderClass,
-        onSelect && 'cursor-pointer',
-        selected && 'ring-2 ring-primary',
-      )}
-      onClick={onSelect}
-      role={onSelect ? 'button' : undefined}
-      tabIndex={onSelect ? 0 : undefined}
-      aria-pressed={onSelect ? selected : undefined}
-      onKeyDown={
-        onSelect
-          ? (e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onSelect();
-              }
-            }
-          : undefined
-      }
-    >
+    <Card className={cn('border-l-4 transition-colors', borderClass)}>
       <CardHeader className="p-3 pb-1.5">
-        <TeamMemberSummary
-          member={member}
-          collectionCharacter={collectionCharacter}
-          collectionWeapon={collectionWeapon}
-        />
+        {/* Keep the artifact planner out of this button: React bubbles its
+            events, portalled popovers included, to any ancestor handler. */}
+        <button
+          type="button"
+          onClick={onEdit}
+          className="w-full cursor-pointer rounded-md text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
+          <TeamMemberSummary
+            member={member}
+            collectionCharacter={collectionCharacter}
+            collectionWeapon={collectionWeapon}
+          />
+        </button>
       </CardHeader>
 
       {character && member && (

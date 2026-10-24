@@ -5,12 +5,13 @@ import type { Character } from '@genshin/game-data';
 import genshinDb from 'genshin-db';
 import type { Character as DbCharacter } from 'genshin-db';
 
-import { CHARACTER_RELEASE_DATES } from './character-release-dates.js';
+import { debutDate } from './debut-dates.js';
 import { serializeEntry, writeGeneratedModule } from './emit.js';
 import { toElement, toWeaponType } from './genshin-db-enums.js';
 import { queryInEnglish } from './language.js';
 import { byVersionThenName } from './roster-order.js';
 import { toId, toKebabCase } from './slug.js';
+import { serializeVersion, toGameVersion } from './version.js';
 
 /** genshin-db leaves `region` blank for characters with no established homeland. */
 const UNKNOWN_REGION = 'Unknown';
@@ -38,13 +39,7 @@ function isRosterMember(record: DbCharacter | undefined): record is DbCharacter 
 
 function toCharacter(record: DbCharacter): GeneratedCharacter {
   const id = toId(record.name, 'character');
-
-  const releaseDate = CHARACTER_RELEASE_DATES[id];
-  if (!releaseDate) {
-    throw new Error(
-      `No release date for "${id}"; add the debut-banner date to CHARACTER_RELEASE_DATES`,
-    );
-  }
+  const version = toGameVersion(record.version, record.name);
 
   return {
     id,
@@ -53,8 +48,8 @@ function toCharacter(record: DbCharacter): GeneratedCharacter {
     weaponType: toWeaponType(record.weaponType, record.name),
     rarity: record.rarity,
     region: record.region || UNKNOWN_REGION,
-    version: record.version,
-    releaseDate,
+    version,
+    releaseDate: debutDate(id, version),
   };
 }
 
@@ -66,9 +61,7 @@ function byRosterOrder(a: GeneratedCharacter, b: GeneratedCharacter): number {
  * The character roster in emission order, without writing anything.
  *
  * Split from `generateCharacters` so tests can assert on the records rather
- * than on a file. Aborts on a character absent from
- * {@link CHARACTER_RELEASE_DATES}, which is how a new debut is caught rather
- * than emitted with a missing date.
+ * than on a file. Aborts on a debut newer than the first-banner table.
  *
  * @throws Error naming the character that couldn't be built.
  */
@@ -90,7 +83,7 @@ function serializeCharacter(character: GeneratedCharacter): string {
     `weaponType: '${character.weaponType}',`,
     `rarity: ${character.rarity},`,
     `region: ${JSON.stringify(character.region)},`,
-    `version: '${character.version}',`,
+    `version: ${serializeVersion(character.version)},`,
     `releaseDate: '${character.releaseDate}',`,
   ]);
 }

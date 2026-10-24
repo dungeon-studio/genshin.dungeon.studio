@@ -6,7 +6,9 @@ import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
+import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
+import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
 import type {
   MutationResult,
@@ -44,7 +46,6 @@ function entriesAheadOfServer(
  * The first resolution per signed-in user merges what this browser recorded
  * and pushes the entries the server is behind on. Refetches merge additively,
  * so they don't overwrite optimistic state while those pushes are in flight.
- * Signing out clears the store, so the next account starts from its own data.
  */
 function useServerSync(
   uid: string | undefined,
@@ -53,15 +54,13 @@ function useServerSync(
   applyMutationResult: (result: MutationResult) => void,
 ): void {
   const replaceCharacters = useCollectionStore((s) => s.replaceCharacters);
-  const clearCharacters = useCollectionStore((s) => s.clearCharacters);
   const mergedForUser = useRef<string | null>(null);
 
   useEffect(() => {
     if (uid === undefined) {
       mergedForUser.current = null;
-      clearCharacters();
     }
-  }, [uid, clearCharacters]);
+  }, [uid]);
 
   useEffect(() => {
     if (!apiCharacters) return;
@@ -195,7 +194,7 @@ function useOptimisticActions(
             onSuccess: applyMutationResult,
             onError: () => {
               const currentLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
-              if (previousLevel !== undefined && currentLevel === level) {
+              if (currentLevel === level) {
                 storeSetConstellationLevel(id, previousLevel);
                 toast.error('Failed to update constellation level. Change has been reverted.');
               } else {
@@ -223,33 +222,37 @@ function useOptimisticActions(
  * first sign-in.
  */
 export function useCollection(): UseCollectionResult {
-  const { user, loading: authLoading } = useAuth();
-  const isAuthenticated = user !== null;
+  const auth = useAuth();
+  const uid = signedInUid(auth);
+  const isAuthenticated = uid !== undefined;
 
   // Zustand store — always the read layer
   const characters = useCollectionStore((s) => s.characters);
-  const storeSetConstellationLevel = useCollectionStore((s) => s.setConstellationLevel);
+  const storeReplaceCharacter = useCollectionStore((s) => s.replaceCharacter);
 
   // TanStack Query — background sync when authenticated
   const {
     data: apiCharacters,
     error: queryError,
     isLoading: queryLoading,
-  } = useCharacterCollectionQuery(user?.uid);
+  } = useCharacterCollectionQuery(uid);
 
-  const { mutate: addCharacterApi } = useAddCharacterMutation(user?.uid);
-  const { mutate: removeCharacterApi } = useRemoveCharacterMutation(user?.uid);
-  const { mutate: setConstellationLevelApi } = useSetConstellationLevelMutation(user?.uid);
+  const addCharacterApi = useSenderBoundMutate(uid, useAddCharacterMutation(uid).mutate);
+  const removeCharacterApi = useSenderBoundMutate(uid, useRemoveCharacterMutation(uid).mutate);
+  const setConstellationLevelApi = useSenderBoundMutate(
+    uid,
+    useSetConstellationLevelMutation(uid).mutate,
+  );
 
   // Patch zustand with confirmed server data
   const applyMutationResult = useCallback(
-    ({ characterId, entry }: MutationResult) => {
-      storeSetConstellationLevel(characterId, entry.constellationLevel);
+    ({ entry }: MutationResult) => {
+      storeReplaceCharacter(entry);
     },
-    [storeSetConstellationLevel],
+    [storeReplaceCharacter],
   );
 
-  useServerSync(user?.uid, apiCharacters, setConstellationLevelApi, applyMutationResult);
+  useServerSync(uid, apiCharacters, setConstellationLevelApi, applyMutationResult);
 
   const { addCharacter, removeCharacter, setConstellationLevel } = useOptimisticActions(
     isAuthenticated,
@@ -269,7 +272,7 @@ export function useCollection(): UseCollectionResult {
     setConstellationLevel,
     isOwned,
     getCharacter,
-    isLoading: authLoading || (isAuthenticated && queryLoading),
+    isLoading: awaitingUserData(auth, queryLoading),
     error,
   };
 }
