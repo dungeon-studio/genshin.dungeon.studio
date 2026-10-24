@@ -210,14 +210,12 @@ export function useTeams(): UseTeamsResult {
 
   const getTeam = useCallback((slot: TeamSlot) => teams[slot], [teams]);
 
-  const error = isAuthenticated ? (queryError ?? null) : null;
-
   return {
     teams,
     ...actions,
     getTeam,
     isSaving,
     isLoading: awaitingUserData(auth, queryLoading),
-    error,
+    error: isAuthenticated ? (queryError ?? null) : null,
   };
 }
