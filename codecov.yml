@@ -1,10 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 ---
-# Inert and awaiting deletion in #879, so no tests are written for it.
-ignore:
-  - 'apps/api/src/repositories/profile/index.ts'
-
 coverage:
   status:
     project:
@@ -79,12 +75,6 @@ component_management:
         - apps/api/src/middleware/**
       flag_regexes:
         - api
-    - component_id: api-representations
-      name: 'API: Representations'
-      paths:
-        - apps/api/src/representations/**
-      flag_regexes:
-        - api
     - component_id: api-firebase
       name: 'API: Firebase'
       paths:
@@ -94,6 +84,7 @@ component_management:
     - component_id: game-data-versions
       name: 'Game Data: Versions'
       paths:
+        - packages/game-data/src/game-data-version.ts
         - packages/game-data/src/versions.ts
       flag_regexes:
         - game-data

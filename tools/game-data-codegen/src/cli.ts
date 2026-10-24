@@ -6,6 +6,8 @@ import { Command } from 'commander';
 
 import { generateArtifactSets } from './artifacts.js';
 import { generateCharacters } from './characters.js';
+import { generateFirstBannerDates } from './paimon-moe.js';
+import { generateResonances } from './resonances.js';
 import { generateWeapons } from './weapons.js';
 
 interface Roster {
@@ -28,13 +30,51 @@ program
   .name('game-data-codegen')
   .description('Generate @genshin/game-data sources from the offline genshin-db dataset');
 
-for (const { command, label, generate } of ROSTERS) {
+function regenerate({ label, generate }: Roster): void {
+  console.log(`Generated ${generate()} ${label}s into @genshin/game-data`);
+}
+
+for (const roster of ROSTERS) {
   program
-    .command(command)
-    .description(`Regenerate the ${label} roster in @genshin/game-data/src/${command}.generated.ts`)
+    .command(roster.command)
+    .description(
+      `Regenerate the ${roster.label} roster in @genshin/game-data/src/${roster.command}.generated.ts`,
+    )
     .action((): void => {
-      console.log(`Generated ${generate()} ${label}s into @genshin/game-data`);
+      regenerate(roster);
     });
 }
 
-program.parse();
+// genshin-db is slow to load, so one process serves every roster.
+program
+  .command('all')
+  .description('Regenerate every genshin-db roster in @genshin/game-data')
+  .action((): void => {
+    ROSTERS.forEach(regenerate);
+  });
+
+// Fetches from paimon-moe, so `all` leaves it out to keep regeneration offline.
+program
+  .command('first-banner-dates')
+  .description(
+    "Regenerate src/first-banner-dates.generated.ts, which dates debuts, from paimon-moe's banners",
+  )
+  .action(async (): Promise<void> => {
+    console.log(
+      `Dated ${await generateFirstBannerDates()} characters; regenerate characters to apply`,
+    );
+  });
+
+// Fetches from AnimeGameData, so `all` leaves it out to keep regeneration offline.
+program
+  .command('resonances')
+  .description(
+    'Regenerate the elemental resonance roster in @genshin/game-data/src/resonances.generated.ts',
+  )
+  .action(async (): Promise<void> => {
+    console.log(
+      `Generated ${await generateResonances()} elemental resonances into @genshin/game-data`,
+    );
+  });
+
+await program.parseAsync();

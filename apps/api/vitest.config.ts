@@ -3,30 +3,23 @@
 
 import { fileURLToPath } from 'node:url';
 
-import { configDefaults, defineConfig } from 'vitest/config';
+import baseConfig from '@genshin/vitest-config';
+import { defineConfig, mergeConfig } from 'vitest/config';
 
-export default defineConfig({
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+export default mergeConfig(
+  baseConfig,
+  defineConfig({
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+      },
     },
-  },
-  test: {
-    globals: true,
-    // Error-path suites log by design; silence keeps the run readable.
-    env: { LOG_LEVEL: 'silent' },
-    // Spread the defaults: assigning `exclude` replaces them, which would drop
-    // node_modules and dist from the ignore list.
-    exclude: [...configDefaults.exclude, '**/*.integration.test.ts'],
-    setupFiles: ['./src/test/setup.ts'],
-    reporters: ['default', 'junit'],
-    outputFile: {
-      junit: './test-results/junit.xml',
+    test: {
+      globals: true,
+      // Error-path suites log by design; silence keeps the run readable.
+      env: { LOG_LEVEL: 'silent' },
+      exclude: ['**/*.integration.test.ts'],
+      setupFiles: ['./src/test/setup.ts'],
     },
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'lcov'],
-      reportsDirectory: './coverage',
-    },
-  },
-});
+  }),
+);

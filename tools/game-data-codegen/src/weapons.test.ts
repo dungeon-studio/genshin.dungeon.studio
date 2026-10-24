@@ -4,6 +4,7 @@
 import { compareVersions } from '@genshin/game-data';
 import { describe, expect, it } from 'vitest';
 
+import { outOfOrder } from './test/out-of-order.js';
 import { buildWeapons } from './weapons.js';
 
 type BuiltWeapon = ReturnType<typeof buildWeapons>[number];
@@ -36,10 +37,6 @@ describe('buildWeapons', () => {
   });
 
   it('sorts by rarity descending, then version descending', () => {
-    const outOfOrder = weapons
-      .slice(1)
-      .filter((current, index) => !precedes(weapons[index], current));
-
-    expect(outOfOrder).toEqual([]);
+    expect(outOfOrder(weapons, precedes)).toEqual([]);
   });
 });

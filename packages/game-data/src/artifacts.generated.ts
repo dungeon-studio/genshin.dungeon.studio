@@ -8,25 +8,25 @@ export const ARTIFACT_SET_DATA = {
   'heart-of-the-furnace': {
     id: 'heart-of-the-furnace',
     name: 'Heart of the Furnace',
-    version: '7.0',
+    version: { major: 7, minor: 0 },
     bonuses: {
       2: 'ATK +18%.',
-      4: "Increases the equipping character's ATK by 12% for 12s when they trigger a Stellar Glimmer reaction or deal Stellar Glimmer reaction DMG. Also increases Stellar Glimmer reaction DMG dealt by all nearby party members by 50%. The above effects can trigger even when the equipping character is not on the field, and he DMG bonus from multiple Artifact Sets with the same name do not stack.",
+      4: "Increases the equipping character's ATK by 12% for 12s when they trigger a Stellar Glimmer reaction or deal Stellar Glimmer reaction DMG. Also increases Stellar Glimmer reaction DMG dealt by all nearby party members by 50%. The above effects can trigger even when the equipping character is not on the field, and the DMG bonus from multiple Artifact Sets with the same name do not stack.",
     },
   },
   'scarlet-proof': {
     id: 'scarlet-proof',
     name: 'Scarlet Proof',
-    version: '7.0',
+    version: { major: 7, minor: 0 },
     bonuses: {
       2: 'ATK +18%.',
-      4: "Increases the equipping character's CRIT Rate by 16%, and their Stellar Swirl reaction dealt by 40%, for 10s after they trigger a Stellar Swirl reaction.",
+      4: "Increases the equipping character's CRIT Rate by 16%, and their Stellar Swirl reaction DMG dealt by 40%, for 10s after they trigger a Stellar Swirl reaction.",
     },
   },
   'celestial-gift': {
     id: 'celestial-gift',
     name: 'Celestial Gift',
-    version: '6.6',
+    version: { major: 6, minor: 6 },
     bonuses: {
       2: 'Energy Recharge +20%.',
       4: "If the equipping character has completed Witch's Homework, after they use an Elemental Skill, they gain \"Light's Guidance\" for 20s: All nearby party members gain a 20% Elemental DMG Bonus corresponding to the equipping character's Elemental Type. The equipping character can trigger this effect while off-field. DMG Bonuses provided by Artifact Sets with the same name do not stack.\n· When your party has the Hexerei: Secret Rite effect, Light's Guidance is upgraded to \"Mortal Hymn\": All nearby party members gain a 40% Elemental DMG Bonus corresponding to both the equipping character and the current active party member's Elemental Type instead. If both characters have the same Elemental Type, these bonuses will not stack.",
@@ -35,7 +35,7 @@ export const ARTIFACT_SET_DATA = {
   'disenchantment-in-deep-shadow': {
     id: 'disenchantment-in-deep-shadow',
     name: 'Disenchantment in Deep Shadow',
-    version: '6.6',
+    version: { major: 6, minor: 6 },
     bonuses: {
       2: 'ATK +18%.',
       4: "Increases Superconduct Reaction DMG by 80% and Stellar-Conduct Reaction DMG by 40%. When the wielder attacks opponents affected by Superconduct or Stellar-Conduct, this attack's CRIT Rate is increased by 16%.",
@@ -44,7 +44,7 @@ export const ARTIFACT_SET_DATA = {
   'a-day-carved-from-rising-winds': {
     id: 'a-day-carved-from-rising-winds',
     name: 'A Day Carved From Rising Winds',
-    version: '6.3',
+    version: { major: 6, minor: 3 },
     bonuses: {
       2: 'ATK +18%.',
       4: "After a Normal Attack, Charged Attack, Elemental Skill, or Elemental Burst hits an opponent, gain the Blessing of Pastoral Winds effect for 6s: ATK is increased by 25%. If the equipping character has completed Witch's Homework, Blessing of Pastoral Winds will be upgraded to Resolve of Pastoral Winds, which additionally increases the CRIT Rate of the equipping character by 20%. This effect can be triggered even when the character is off-field.",
@@ -53,7 +53,7 @@ export const ARTIFACT_SET_DATA = {
   'aubade-of-morningstar-and-moon': {
     id: 'aubade-of-morningstar-and-moon',
     name: 'Aubade of Morningstar and Moon',
-    version: '6.3',
+    version: { major: 6, minor: 3 },
     bonuses: {
       2: 'Increases Elemental Mastery by 80.',
       4: "When the equipping character is off-field, Lunar Reaction DMG is increased by 20%. When the party's Moonsign Level is at least Ascendant Gleam, Lunar Reaction DMG will be further increased by 40%. This effect will disappear after the equipping character is active for 3s.",
@@ -62,7 +62,7 @@ export const ARTIFACT_SET_DATA = {
   'night-of-the-skys-unveiling': {
     id: 'night-of-the-skys-unveiling',
     name: "Night of the Sky's Unveiling",
-    version: '6.0',
+    version: { major: 6, minor: 0 },
     bonuses: {
       2: 'Increases Elemental Mastery by 80.',
       4: "When nearby party members trigger Lunar Reactions, if the equipping character is on the field, gain the Gleaming Moon: Intent effect for 4s: Increases CRIT Rate by 15%/30% when the party's Moonsign is Nascent Gleam/Ascendant Gleam. All party members' Lunar Reaction DMG is increased by 10% for each different Gleaming Moon effect that party members have. Effects from Gleaming Moon cannot stack.",
@@ -71,7 +71,7 @@ export const ARTIFACT_SET_DATA = {
   'silken-moons-serenade': {
     id: 'silken-moons-serenade',
     name: "Silken Moon's Serenade",
-    version: '6.0',
+    version: { major: 6, minor: 0 },
     bonuses: {
       2: 'Energy Recharge +20%.',
       4: "When dealing Elemental DMG, gain the Gleaming Moon: Devotion effect for 8s: Increases all party members' Elemental Mastery by 60/120 when the party's Moonsign is Nascent Gleam/Ascendant Gleam. The equipping character can trigger this effect while off-field. All party members' Lunar Reaction DMG is increased by 10% for each different Gleaming Moon effect that party members have. Effects from Gleaming Moon cannot stack.",
@@ -80,7 +80,7 @@ export const ARTIFACT_SET_DATA = {
   'finale-of-the-deep-galleries': {
     id: 'finale-of-the-deep-galleries',
     name: 'Finale of the Deep Galleries',
-    version: '5.5',
+    version: { major: 5, minor: 5 },
     bonuses: {
       2: 'Cryo DMG Bonus +15%',
       4: 'When the equipping character has 0 Elemental Energy, Normal Attack DMG is increased by 60% and Elemental Burst DMG is increased by 60%. After the equipping character deals Normal Attack DMG, the aforementioned Elemental Burst effect will stop applying for 6s. After the equipping character deals Elemental Burst DMG, the aforementioned Normal Attack effect will stop applying for 6s. This effect can trigger even if the equipping character is off the field.',
@@ -89,7 +89,7 @@ export const ARTIFACT_SET_DATA = {
   'long-nights-oath': {
     id: 'long-nights-oath',
     name: "Long Night's Oath",
-    version: '5.5',
+    version: { major: 5, minor: 5 },
     bonuses: {
       2: 'Plunging Attack DMG increased by 25%.',
       4: 'After the equipping character\'s Plunging Attack/Charged Attack/Elemental Skill hits an opponent, they will gain 1/2/2 stack(s) of "Radiance Everlasting." Plunging Attacks, Charged Attacks, or Elemental Skills can each trigger this effect once every 1s. Radiance Everlasting: Plunging Attacks deal 15% increased DMG for 6s. Max 5 stacks. Each stack\'s duration is counted independently.',
@@ -98,7 +98,7 @@ export const ARTIFACT_SET_DATA = {
   'obsidian-codex': {
     id: 'obsidian-codex',
     name: 'Obsidian Codex',
-    version: '5.0',
+    version: { major: 5, minor: 0 },
     bonuses: {
       2: "While the equipping character is in Nightsoul's Blessing and is on the field, their DMG dealt is increased by 15%.",
       4: 'After the equipping character consumes 1 Nightsoul point while on the field, CRIT Rate increases by 40% for 6s. This effect can trigger once every second.',
@@ -107,7 +107,7 @@ export const ARTIFACT_SET_DATA = {
   'scroll-of-the-hero-of-cinder-city': {
     id: 'scroll-of-the-hero-of-cinder-city',
     name: 'Scroll of the Hero of Cinder City',
-    version: '5.0',
+    version: { major: 5, minor: 0 },
     bonuses: {
       2: 'When a nearby party member triggers a Nightsoul Burst, the equipping character regenerates 6 Elemental Energy.',
       4: "After the equipping character triggers a reaction related to their Elemental Type, all nearby party members gain a 12% Elemental DMG Bonus for the Elemental Types involved in the elemental reaction for 15s. If the equipping character is in the Nightsoul's Blessing state when triggering this effect, all nearby party members gain an additional 28% Elemental DMG Bonus for the Elemental Types involved in the elemental reaction for 20s. The equipping character can trigger this effect while off-field, and the DMG bonus from Artifact Sets with the same name do not stack.",
@@ -116,7 +116,7 @@ export const ARTIFACT_SET_DATA = {
   'fragment-of-harmonic-whimsy': {
     id: 'fragment-of-harmonic-whimsy',
     name: 'Fragment of Harmonic Whimsy',
-    version: '4.6',
+    version: { major: 4, minor: 6 },
     bonuses: {
       2: 'ATK +18%.',
       4: 'When the value of a Bond of Life increases or decreases, this character deals 18% increased DMG for 6s. Max 3 stacks.',
@@ -125,7 +125,7 @@ export const ARTIFACT_SET_DATA = {
   'unfinished-reverie': {
     id: 'unfinished-reverie',
     name: 'Unfinished Reverie',
-    version: '4.6',
+    version: { major: 4, minor: 6 },
     bonuses: {
       2: 'ATK +18%.',
       4: 'After leaving combat for 3s, DMG dealt increased by 50%. In combat, if no Burning opponents are nearby for more than 6s, this DMG Bonus will decrease by 10% per second until it reaches 0%. When a Burning opponent exists, it will increase by 10% instead until it reaches 50%. This effect still triggers if the equipping character is off-field.',
@@ -134,7 +134,7 @@ export const ARTIFACT_SET_DATA = {
   'nighttime-whispers-in-the-echoing-woods': {
     id: 'nighttime-whispers-in-the-echoing-woods',
     name: 'Nighttime Whispers in the Echoing Woods',
-    version: '4.3',
+    version: { major: 4, minor: 3 },
     bonuses: {
       2: 'ATK +18%.',
       4: 'After using an Elemental Skill, gain a 20% Geo DMG Bonus for 10s. When under a shield granted by the Crystallize reaction, or when Moondrifts formed by Lunar-Crystallize reactions are nearby, the above effect is increased by 150%. When these conditions are no longer met, this additional increase disappears after 1s.',
@@ -143,7 +143,7 @@ export const ARTIFACT_SET_DATA = {
   'song-of-days-past': {
     id: 'song-of-days-past',
     name: 'Song of Days Past',
-    version: '4.3',
+    version: { major: 4, minor: 3 },
     bonuses: {
       2: 'Healing Bonus +15%.',
       4: 'When the equipping character heals a party member, the Yearning effect will be created for 6s, which records the total amount of healing provided (including overflow healing). When the duration expires, the Yearning effect will be transformed into the "Waves of Days Past" effect: When your active party member hits an opponent with a Normal Attack, Charged Attack, Plunging Attack, Elemental Skill, or Elemental Burst, the DMG dealt will be increased by 8% of the total healing amount recorded by the Yearning effect. The "Waves of Days Past" effect is removed after it has taken effect 5 times or after 10s. A single instance of the Yearning effect can record up to 15,000 healing, and only a single instance can exist at once, but it can record the healing from multiple equipping characters. Equipping characters on standby can still trigger this effect.',
@@ -152,7 +152,7 @@ export const ARTIFACT_SET_DATA = {
   'golden-troupe': {
     id: 'golden-troupe',
     name: 'Golden Troupe',
-    version: '4.0',
+    version: { major: 4, minor: 0 },
     bonuses: {
       2: 'Increases Elemental Skill DMG by 20%.',
       4: 'Increases Elemental Skill DMG by 25%. Additionally, when not on the field, Elemental Skill DMG will be further increased by 25%. This effect will be cleared 2s after taking the field.',
@@ -161,7 +161,7 @@ export const ARTIFACT_SET_DATA = {
   'marechaussee-hunter': {
     id: 'marechaussee-hunter',
     name: 'Marechaussee Hunter',
-    version: '4.0',
+    version: { major: 4, minor: 0 },
     bonuses: {
       2: 'Normal and Charged Attack DMG +15%',
       4: 'When current HP increases or decreases, CRIT Rate will be increased by 12% for 5s. Max 3 stacks.',
@@ -170,7 +170,7 @@ export const ARTIFACT_SET_DATA = {
   'nymphs-dream': {
     id: 'nymphs-dream',
     name: "Nymph's Dream",
-    version: '3.6',
+    version: { major: 3, minor: 6 },
     bonuses: {
       2: 'Hydro DMG Bonus +15%',
       4: 'After Normal, Charged, and Plunging Attacks, Elemental Skills, and Elemental Bursts hit opponents, 1 stack of Mirrored Nymph will be triggered, lasting 8s. When under the effect of 1, 2, or 3 or more Mirrored Nymph stacks, ATK will be increased by 7%/16%/25%, and Hydro DMG Bonus will be increased by 4%/9%/15%. Mirrored Nymph stacks created by Normal, Charged, and Plunging Attacks, Elemental Skills, and Elemental Bursts exist independently.',
@@ -179,7 +179,7 @@ export const ARTIFACT_SET_DATA = {
   'vourukashas-glow': {
     id: 'vourukashas-glow',
     name: "Vourukasha's Glow",
-    version: '3.6',
+    version: { major: 3, minor: 6 },
     bonuses: {
       2: 'HP +20%',
       4: 'Elemental Skill and Elemental Burst DMG will be increased by 10%. After the equipping character takes DMG, the aforementioned DMG Bonus is increased by 80% for 5s. This effect increase can have 5 stacks. The duration of each stack is counted independently. These effects can be triggered even when the equipping character is not on the field.',
@@ -188,7 +188,7 @@ export const ARTIFACT_SET_DATA = {
   'desert-pavilion-chronicle': {
     id: 'desert-pavilion-chronicle',
     name: 'Desert Pavilion Chronicle',
-    version: '3.3',
+    version: { major: 3, minor: 3 },
     bonuses: {
       2: 'Anemo DMG Bonus +15%',
       4: "When Charged Attacks hit opponents, the equipping character's Normal Attack SPD will increase by 10% while Normal, Charged, and Plunging Attack DMG will increase by 40% for 15s.",
@@ -197,7 +197,7 @@ export const ARTIFACT_SET_DATA = {
   'flower-of-paradise-lost': {
     id: 'flower-of-paradise-lost',
     name: 'Flower of Paradise Lost',
-    version: '3.3',
+    version: { major: 3, minor: 3 },
     bonuses: {
       2: 'Increases Elemental Mastery by 80.',
       4: "The equipping character's Bloom, Hyperbloom, and Burgeon reaction DMG are increased by 40%, and their Lunar-Bloom reaction DMG is increased by 10%. Additionally, after the equipping character triggers Bloom, Hyperbloom, Lunar-Bloom, or Burgeon, they will gain another 25% bonus to the effects mentioned prior. Each stack of this lasts 10s. Max 4 stacks simultaneously. This effect can only be triggered once per second. The character who equips this can still trigger its effects when not on the field.",
@@ -206,7 +206,7 @@ export const ARTIFACT_SET_DATA = {
   'deepwood-memories': {
     id: 'deepwood-memories',
     name: 'Deepwood Memories',
-    version: '3.0',
+    version: { major: 3, minor: 0 },
     bonuses: {
       2: 'Dendro DMG Bonus +15%.',
       4: "After Elemental Skills or Bursts hit opponents, the targets' Dendro RES will be decreased by 30% for 8s. This effect can be triggered even if the equipping character is not on the field.",
@@ -215,7 +215,7 @@ export const ARTIFACT_SET_DATA = {
   'gilded-dreams': {
     id: 'gilded-dreams',
     name: 'Gilded Dreams',
-    version: '3.0',
+    version: { major: 3, minor: 0 },
     bonuses: {
       2: 'Increases Elemental Mastery by 80.',
       4: 'Within 8s of triggering an Elemental Reaction, the character equipping this will obtain buffs based on the Elemental Type of the other party members. ATK is increased by 14% for each party member whose Elemental Type is the same as the equipping character, and Elemental Mastery is increased by 50 for every party member with a different Elemental Type. Each of the aforementioned buffs will count up to 3 characters. This effect can be triggered once every 8s. The character who equips this can still trigger its effects when not on the field.',
@@ -224,7 +224,7 @@ export const ARTIFACT_SET_DATA = {
   'echoes-of-an-offering': {
     id: 'echoes-of-an-offering',
     name: 'Echoes of an Offering',
-    version: '2.6',
+    version: { major: 2, minor: 6 },
     bonuses: {
       2: 'ATK +18%.',
       4: 'When Normal Attacks hit opponents, there is a 36% chance that it will trigger Valley Rite, which will increase Normal Attack DMG by 70% of ATK. This effect will be dispelled 0.05s after a Normal Attack deals DMG. If a Normal Attack fails to trigger Valley Rite, the odds of it triggering the next time will increase by 20%. This trigger can occur once every 0.2s.',
@@ -233,7 +233,7 @@ export const ARTIFACT_SET_DATA = {
   'vermillion-hereafter': {
     id: 'vermillion-hereafter',
     name: 'Vermillion Hereafter',
-    version: '2.6',
+    version: { major: 2, minor: 6 },
     bonuses: {
       2: 'ATK +18%.',
       4: "After using an Elemental Burst, this character will gain the Nascent Light effect, increasing their ATK by 8% for 16s. When the character's HP decreases, their ATK will further increase by 10%. This further increase can occur this way a maximum of 4 times. This effect can be triggered once every 0.8s. Nascent Light will be dispelled when the character leaves the field. If an Elemental Burst is used again during the duration of Nascent Light, the original Nascent Light will be dispelled.",
@@ -242,7 +242,7 @@ export const ARTIFACT_SET_DATA = {
   'husk-of-opulent-dreams': {
     id: 'husk-of-opulent-dreams',
     name: 'Husk of Opulent Dreams',
-    version: '2.3',
+    version: { major: 2, minor: 3 },
     bonuses: {
       2: 'DEF +30%',
       4: 'A character equipped with this Artifact set will obtain the Curiosity effect in the following conditions: When on the field, the character gains 1 stack after hitting an opponent with a Geo attack, triggering a maximum of once every 0.3s. When off the field, the character gains 1 stack every 3s. Curiosity can stack up to 4 times, each providing 6% DEF and a 6% Geo DMG Bonus. When 6 seconds pass without gaining a Curiosity stack, 1 stack is lost.',
@@ -251,7 +251,7 @@ export const ARTIFACT_SET_DATA = {
   'ocean-hued-clam': {
     id: 'ocean-hued-clam',
     name: 'Ocean-Hued Clam',
-    version: '2.3',
+    version: { major: 2, minor: 3 },
     bonuses: {
       2: 'Healing Bonus +15%.',
       4: 'When the character equipping this artifact set heals a character in the party, a Sea-Dyed Foam will appear for 3 seconds, accumulating the amount of HP recovered from healing (including overflow healing). At the end of the duration, the Sea-Dyed Foam will explode, dealing DMG to nearby opponents based on 90% of the accumulated healing. (This DMG is calculated similarly to Reactions such as Electro-Charged, and Superconduct, but is not affected by Elemental Mastery, Character Levels, or Reaction DMG Bonuses). Only one Sea-Dyed Foam can be produced every 3.5 seconds. Each Sea-Dyed Foam can accumulate up to 30,000 HP (including overflow healing). There can be no more than one Sea-Dyed Foam active at any given time. This effect can still be triggered even when the character who is using this artifact set is not on the field.',
@@ -260,7 +260,7 @@ export const ARTIFACT_SET_DATA = {
   'emblem-of-severed-fate': {
     id: 'emblem-of-severed-fate',
     name: 'Emblem of Severed Fate',
-    version: '2.0',
+    version: { major: 2, minor: 0 },
     bonuses: {
       2: 'Energy Recharge +20%',
       4: 'Increases Elemental Burst DMG by 25% of Energy Recharge. A maximum of 75% bonus DMG can be obtained in this way.',
@@ -269,7 +269,7 @@ export const ARTIFACT_SET_DATA = {
   'shimenawas-reminiscence': {
     id: 'shimenawas-reminiscence',
     name: "Shimenawa's Reminiscence",
-    version: '2.0',
+    version: { major: 2, minor: 0 },
     bonuses: {
       2: 'ATK +18%.',
       4: 'When casting an Elemental Skill, if the character has 15 or more Energy, they lose 15 Energy and Normal/Charged/Plunging Attack DMG is increased by 50% for 10s. This effect will not trigger again during that duration.',
@@ -278,7 +278,7 @@ export const ARTIFACT_SET_DATA = {
   'pale-flame': {
     id: 'pale-flame',
     name: 'Pale Flame',
-    version: '1.5',
+    version: { major: 1, minor: 5 },
     bonuses: {
       2: 'Physical DMG is increased by 25%.',
       4: 'When an Elemental Skill hits an opponent, ATK is increased by 9% for 7s. This effect stacks up to 2 times and can be triggered once every 0.3s. Once 2 stacks are reached, the 2-set effect is increased by 100%.',
@@ -287,7 +287,7 @@ export const ARTIFACT_SET_DATA = {
   'tenacity-of-the-millelith': {
     id: 'tenacity-of-the-millelith',
     name: 'Tenacity of the Millelith',
-    version: '1.5',
+    version: { major: 1, minor: 5 },
     bonuses: {
       2: 'HP +20%',
       4: 'When an Elemental Skill hits an opponent, the ATK of all nearby party members is increased by 20% and their Shield Strength is increased by 30% for 3s. This effect can be triggered once every 0.5s. This effect can still be triggered even when the character who is using this artifact set is not on the field.',
@@ -296,7 +296,7 @@ export const ARTIFACT_SET_DATA = {
   'blizzard-strayer': {
     id: 'blizzard-strayer',
     name: 'Blizzard Strayer',
-    version: '1.2',
+    version: { major: 1, minor: 2 },
     bonuses: {
       2: 'Cryo DMG Bonus +15%',
       4: 'When a character attacks an opponent affected by Cryo, their CRIT Rate is increased by 20%. If the opponent is Frozen, CRIT Rate is increased by an additional 20%.',
@@ -305,7 +305,7 @@ export const ARTIFACT_SET_DATA = {
   'heart-of-depth': {
     id: 'heart-of-depth',
     name: 'Heart of Depth',
-    version: '1.2',
+    version: { major: 1, minor: 2 },
     bonuses: {
       2: 'Hydro DMG Bonus +15%',
       4: 'After using Elemental Skill, increases Normal Attack and Charged Attack DMG by 30% for 15s.',
@@ -314,7 +314,7 @@ export const ARTIFACT_SET_DATA = {
   'archaic-petra': {
     id: 'archaic-petra',
     name: 'Archaic Petra',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     bonuses: {
       2: 'Gain a 15% Geo DMG Bonus.',
       4: 'Upon obtaining an Elemental Shard created through Crystallize or triggering a Lunar-Crystallize reaction, all party members gain a 35% DMG Bonus for that particular element for 10s. Only one form of Elemental DMG Bonus can be gained in this manner at any one time.',
@@ -323,7 +323,7 @@ export const ARTIFACT_SET_DATA = {
   'bloodstained-chivalry': {
     id: 'bloodstained-chivalry',
     name: 'Bloodstained Chivalry',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     bonuses: {
       2: 'Physical DMG +25%',
       4: 'After defeating an opponent, increases Charged Attack DMG by 50%, and reduces its Stamina cost to 0 for 10s.',
@@ -332,7 +332,7 @@ export const ARTIFACT_SET_DATA = {
   'crimson-witch-of-flames': {
     id: 'crimson-witch-of-flames',
     name: 'Crimson Witch of Flames',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     bonuses: {
       2: 'Pyro DMG Bonus +15%',
       4: 'Increases Overloaded, Burning, and Burgeon DMG by 40%. Increases Vaporize and Melt DMG by 15%. Using Elemental Skill increases the 2-Piece Set Bonus by 50% of its starting value for 10s. Max 3 stacks.',
@@ -341,7 +341,7 @@ export const ARTIFACT_SET_DATA = {
   'gladiators-finale': {
     id: 'gladiators-finale',
     name: "Gladiator's Finale",
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     bonuses: {
       2: 'ATK +18%.',
       4: 'If the wielder of this artifact set uses a Sword, Claymore or Polearm, increases their Normal Attack DMG by 35%.',
@@ -350,7 +350,7 @@ export const ARTIFACT_SET_DATA = {
   lavawalker: {
     id: 'lavawalker',
     name: 'Lavawalker',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     bonuses: {
       2: 'Pyro RES increased by 40%.',
       4: 'Increases DMG against opponents affected by Pyro by 35%.',
@@ -359,7 +359,7 @@ export const ARTIFACT_SET_DATA = {
   'maiden-beloved': {
     id: 'maiden-beloved',
     name: 'Maiden Beloved',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     bonuses: {
       2: 'Character Healing Effectiveness +15%',
       4: 'Using an Elemental Skill or Burst increases healing received by all party members by 20% for 10s.',
@@ -368,7 +368,7 @@ export const ARTIFACT_SET_DATA = {
   'noblesse-oblige': {
     id: 'noblesse-oblige',
     name: 'Noblesse Oblige',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     bonuses: {
       2: 'Elemental Burst DMG +20%',
       4: "Using an Elemental Burst increases all party members' ATK by 20% for 12s. This effect cannot stack.",
@@ -377,7 +377,7 @@ export const ARTIFACT_SET_DATA = {
   'retracing-bolide': {
     id: 'retracing-bolide',
     name: 'Retracing Bolide',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     bonuses: {
       2: 'Increases Shield Strength by 35%.',
       4: 'While protected by a shield, gain an additional 40% Normal and Charged Attack DMG.',
@@ -386,7 +386,7 @@ export const ARTIFACT_SET_DATA = {
   'thundering-fury': {
     id: 'thundering-fury',
     name: 'Thundering Fury',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     bonuses: {
       2: 'Electro DMG Bonus +15%',
       4: 'Increases the DMG caused by Overloaded, Electro-Charged, Superconduct, and Hyperbloom by 40%, the DMG Bonus conferred by Aggravate by 20%, and the DMG caused by Lunar-Charged and Stellar-Conduct by 20%. When Quicken or the aforementioned Elemental Reactions are triggered, Elemental Skill CD is decreased by 1s. Can only occur once every 0.8s.',
@@ -395,7 +395,7 @@ export const ARTIFACT_SET_DATA = {
   thundersoother: {
     id: 'thundersoother',
     name: 'Thundersoother',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     bonuses: {
       2: 'Electro RES increased by 40%.',
       4: 'Increases DMG against opponents affected by Electro by 35%.',
@@ -404,7 +404,7 @@ export const ARTIFACT_SET_DATA = {
   'viridescent-venerer': {
     id: 'viridescent-venerer',
     name: 'Viridescent Venerer',
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     bonuses: {
       2: 'Anemo DMG Bonus +15%',
       4: "Increases Swirl reaction DMG dealt by 60%, and Stellar Swirl reaction DMG dealt by 20%. Decreases opponent's Elemental RES to the element infused in the Swirl by 40% for 10s. Upon triggering a Stellar Swirl in the opponent, will also decrease their Cryo RES by 40%. RES debuffs of the same elemental type do not stack.",
@@ -413,7 +413,7 @@ export const ARTIFACT_SET_DATA = {
   'wanderers-troupe': {
     id: 'wanderers-troupe',
     name: "Wanderer's Troupe",
-    version: '1.0',
+    version: { major: 1, minor: 0 },
     bonuses: {
       2: 'Increases Elemental Mastery by 80.',
       4: 'Increases Charged Attack DMG by 35% if the character uses a Catalyst or a Bow.',

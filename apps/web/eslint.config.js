@@ -52,7 +52,7 @@ export default defineConfig([
     files: TYPESCRIPT_FILES,
     extends: [
       eslintReact.configs['recommended-typescript'],
-      reactHooks.configs.flat.recommended,
+      reactHooks.configs.flat['recommended-latest'],
       reactRefresh.configs.vite,
     ],
     rules: {

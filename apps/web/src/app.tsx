@@ -8,6 +8,7 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { Layout } from './components/chrome/layout';
 import { ThemeProvider } from './components/chrome/theme-provider';
 import { Toaster } from './components/ui/sonner';
+import { ClearUserDataOnSignOut } from './features/account';
 import { AuthProvider } from './features/auth';
 import { CharactersPage } from './pages/characters-page';
 import { NotFoundPage } from './pages/not-found-page';
@@ -23,6 +24,7 @@ export function App(): JSX.Element {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
+          <ClearUserDataOnSignOut />
           <Router>
             <Routes>
               <Route element={<Layout />}>
