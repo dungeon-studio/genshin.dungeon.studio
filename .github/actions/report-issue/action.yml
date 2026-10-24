@@ -1,0 +1,51 @@
+---
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+name: Report issue
+description: Open a Task issue from a file, or update the open one with the same title
+
+inputs:
+  title:
+    description: Issue title, also the key that finds the open report
+    required: true
+  content-filepath:
+    description: Path to the Markdown issue body
+    required: true
+  labels:
+    description: Comma-separated labels to apply
+    required: false
+
+runs:
+  using: composite
+
+  steps:
+    # Reuse the open report if one exists so repeated findings update a
+    # single issue instead of filing a new one every run.
+    - name: Find existing report issue
+      id: report
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        TITLE: ${{ inputs.title }}
+      run: |
+        number=$(gh issue list --repo "${GITHUB_REPOSITORY}" --state open \
+          --search "${TITLE} in:title" --json number --jq '.[0].number // empty')
+        echo "number=${number}" >> "${GITHUB_OUTPUT}"
+
+    - name: Open or update issue
+      id: issue
+      uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6.0.0
+      with:
+        title: ${{ inputs.title }}
+        content-filepath: ${{ inputs.content-filepath }}
+        issue-number: ${{ steps.report.outputs.number }}
+        labels: ${{ inputs.labels }}
+
+    # The action has no input for the native issue type.
+    - name: Set issue type
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        ISSUE: ${{ steps.issue.outputs.issue-number }}
+      run: gh api --method PATCH "repos/${GITHUB_REPOSITORY}/issues/${ISSUE}" -f type=Task
