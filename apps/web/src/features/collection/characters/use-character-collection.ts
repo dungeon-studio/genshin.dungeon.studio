@@ -3,9 +3,10 @@
 
 import type { CharacterId, CollectionCharacter, ConstellationLevel } from '@genshin/domain';
 import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 
+import type { AuthState } from '@/features/auth/auth-context';
 import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
@@ -39,28 +40,63 @@ function entriesAheadOfServer(
     .map((entry) => ({ characterId: entry.characterId, level: entry.constellationLevel }));
 }
 
+// Where storage is blocked, the record always reads as absent, so the sign-in
+// push runs on every mount.
+const PUSHED_FOR_KEY = 'genshin-collection-pushed-for';
+
+function pushedForUid(): string | null {
+  try {
+    return localStorage.getItem(PUSHED_FOR_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function recordPushFor(uid: string): void {
+  try {
+    localStorage.setItem(PUSHED_FOR_KEY, uid);
+  } catch {
+    // Blocked storage, see PUSHED_FOR_KEY.
+  }
+}
+
+function clearPushRecord(): void {
+  try {
+    localStorage.removeItem(PUSHED_FOR_KEY);
+  } catch {
+    // Blocked storage, see PUSHED_FOR_KEY.
+  }
+}
+
 /**
  * Reconciles the local store with the server's collection whenever the query
  * resolves.
  *
- * The first resolution per signed-in user merges what this browser recorded
- * and pushes the entries the server is behind on. Refetches merge additively,
- * so they don't overwrite optimistic state while those pushes are in flight.
+ * The first resolution per sign-in merges what this browser holds and pushes
+ * the entries the server is behind on. Refetches merge additively, so they
+ * don't overwrite optimistic state while those pushes are in flight.
+ *
+ * The push runs once per sign-in, not per mount or page load, so a stale copy
+ * can't re-add a character removed on another device. Skipping it loses
+ * nothing, because a signed-in write goes straight to the server. The record
+ * clears whenever auth settles signed out, which also catches a session that
+ * ended with no tab open.
  */
 function useServerSync(
-  uid: string | undefined,
+  auth: AuthState,
   apiCharacters: CharacterCollection | undefined,
   setConstellationLevelApi: ReturnType<typeof useSetConstellationLevelMutation>['mutate'],
   applyMutationResult: (result: MutationResult) => void,
 ): void {
   const replaceCharacters = useCollectionStore((s) => s.replaceCharacters);
-  const mergedForUser = useRef<string | null>(null);
+  const uid = signedInUid(auth);
+  const signedOut = auth.status === 'signed-out';
 
   useEffect(() => {
-    if (uid === undefined) {
-      mergedForUser.current = null;
+    if (signedOut) {
+      clearPushRecord();
     }
-  }, [uid]);
+  }, [signedOut]);
 
   useEffect(() => {
     if (!apiCharacters) return;
@@ -68,7 +104,8 @@ function useServerSync(
     const merged = mergeCollections(useCollectionStore.getState().characters, apiCharacters);
     replaceCharacters(merged);
 
-    if (uid === undefined || mergedForUser.current === uid) return;
+    if (uid === undefined || pushedForUid() === uid) return;
+    recordPushFor(uid);
 
     const diffs = entriesAheadOfServer(merged, apiCharacters);
 
@@ -84,8 +121,6 @@ function useServerSync(
     if (diffs.length > 0) {
       toast.success(`Merged ${diffs.length} character(s) from your local collection.`);
     }
-
-    mergedForUser.current = uid;
   }, [apiCharacters, uid, replaceCharacters, setConstellationLevelApi, applyMutationResult]);
 }
 
@@ -251,7 +286,7 @@ export function useCollection(): UseCollectionResult {
     [storeReplaceCharacter],
   );
 
-  useServerSync(uid, apiCharacters, setConstellationLevelApi, applyMutationResult);
+  useServerSync(auth, apiCharacters, setConstellationLevelApi, applyMutationResult);
 
   const { addCharacter, removeCharacter, setConstellationLevel } = useOptimisticActions(
     isAuthenticated,
