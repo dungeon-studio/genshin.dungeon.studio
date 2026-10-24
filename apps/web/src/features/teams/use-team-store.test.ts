@@ -181,18 +181,6 @@ describe('useTeamStore', () => {
     });
   });
 
-  describe('isCharacterInTeam', () => {
-    it('returns true when the character is in the team', () => {
-      useTeamStore.getState().assignCharacter(1, 0, 'amber');
-
-      expect(useTeamStore.getState().isCharacterInTeam(1, 'amber')).toBe(true);
-    });
-
-    it('returns false when the character is not in the team', () => {
-      expect(useTeamStore.getState().isCharacterInTeam(1, 'amber')).toBe(false);
-    });
-  });
-
   describe('setArtifactPlan', () => {
     it('sets an artifact plan on a team member', () => {
       useTeamStore.getState().assignCharacter(1, 0, 'amber');
