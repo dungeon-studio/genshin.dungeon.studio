@@ -2,41 +2,28 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# Pre-commit hooks for code quality and consistency
-# See https://pre-commit.com for more information
-
-# Global excludes - never touch these directories with any hook
 exclude: |
   (?x)^(
-    \.styles/(?!config)|    # Vale vendor files (exclude all of .styles/ except .styles/config/)
-    node_modules/|          # Dependencies
-    \.pnpm-store/|          # pnpm cache
-    dist/|                  # Build output
-    build/|                 # Build output
-    \.turbo/|               # Turborepo cache
-    pnpm-lock\.yaml         # Package lockfile
+    \.styles/(?!config)|    # Vale syncs packages here; only config/ is ours
+    pnpm-lock\.yaml
   )
 
 repos:
-  # Basic file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
-      # File formatting
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
       - id: end-of-file-fixer
       - id: mixed-line-ending
         args: [--fix=lf]
 
-      # Syntax validation
       - id: check-yaml
-        args: [--unsafe] # Allow custom YAML tags
       - id: check-json
-        exclude: '\.jsonc$|\.vscode/|tsconfig|\.devcontainer/' # Skip JSONC files and dirs with JSON-with-comments
+        # These formats permit comments.
+        exclude: '\.vscode/|tsconfig|\.devcontainer/'
       - id: check-toml
 
-      # Prevent issues
       - id: check-added-large-files
         args: [--maxkb=1000]
       - id: check-case-conflict
@@ -49,25 +36,21 @@ repos:
       - id: check-executables-have-shebangs
       - id: detect-private-key
 
-      # Git hygiene
       - id: no-commit-to-branch
         args: [--branch, develop, --branch, main]
 
-  # Markdown linting
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.23.2
+    rev: v0.23.3
     hooks:
       - id: markdownlint-cli2
         args: [--fix]
 
-  # YAML linting
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.38.0
     hooks:
       - id: yamllint
         args: [--strict]
 
-  # Shell script linting
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.11.0.1
     hooks:
@@ -76,83 +59,76 @@ repos:
         # unresolvable instead of checking against it.
         args: [-x]
 
-  # Shell script formatting
   - repo: https://github.com/scop/pre-commit-shfmt
     rev: v3.13.1-1
     hooks:
       - id: shfmt
-        # Keep --write. It is one of the hook's default args, and pre-commit
-        # replaces those wholesale rather than appending; without it shfmt
-        # writes to stdout and exits 0 on files it would have rewritten.
+        # Setting args replaces the hook's defaults, --write among them; without
+        # it shfmt prints the fix to stdout and exits 0.
         args: [--write, -i, '2', -ci]
 
-  # Vale - Prose linting
   - repo: https://github.com/errata-ai/vale
-    rev: v3.19.0
+    rev: v3.24.0
     hooks:
       - id: vale
         args: [--config=.vale.ini]
         types: [markdown]
 
-  # Terraform - Infrastructure as Code
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.109.0
+    rev: v1.109.2
     hooks:
       - id: terraform_fmt
         args: [--args=-recursive]
+      - id: terraform_validate
+        # Validate never reads state, so it skips the GCS backend and the
+        # credentials it needs.
+        args: [--tf-init-args=-backend=false]
       - id: terraform_trivy
         args:
           - --args=--severity=HIGH,CRITICAL
 
-  # REUSE - SPDX license compliance
   - repo: https://github.com/fsfe/reuse-tool
     rev: v6.2.0
     hooks:
       - id: reuse
         always_run: true
 
-  # GitHub Actions static analysis: zizmor audits security, actionlint
-  # correctness.
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.29.0
+    rev: v1.31.1
     hooks:
       - id: zizmor
         # Online audits need a token, so they run in ci.yml's workflows job.
         args: [--no-progress, --offline]
-  - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.12
+  - repo: https://github.com/Mateusz-Grzelinski/actionlint-py
+    rev: v1.7.12.25
     hooks:
-      # actionlint skips shellcheck when it isn't on PATH; this image bundles
-      # it.
-      - id: actionlint-docker
+      # actionlint skips shellcheck when it isn't on PATH. Renovate tracks
+      # additional_dependencies only on hooks that declare a language.
+      - id: actionlint
+        language: python
+        additional_dependencies: [shellcheck-py==0.11.0.1]
 
-  # Dockerfile linting
-  - repo: https://github.com/hadolint/hadolint
+  - repo: https://github.com/AleksaC/hadolint-py
     rev: v2.15.1
     hooks:
-      - id: hadolint-docker
+      - id: hadolint
 
-  # Renovate config validation
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 44.52.1
+    rev: 44.166.0
     hooks:
       - id: renovate-config-validator
         args: [--strict, --no-global]
 
-  # Local hooks using package.json-managed tools. Kept local (not via
-  # remote pre-commit repos) so versions stay aligned with package.json
-  # and aren't perturbed by pre-commit autoupdate.
+  # `pnpm exec` runs the package.json pin, so pre-commit autoupdate can't
+  # move a tool out of step with it.
   - repo: local
     hooks:
-      # eslint is only correct with the consuming workspace as its working
-      # directory and that workspace's dependencies built. From the root, `@/*`
-      # aliases go unresolved and unbuilt sibling `dist/` leaves type-aware
-      # rules seeing `any`, so it invents findings `eslint .` never reports.
-      # Turbo arranges both, and caches on inputs, which is why `--fix` cannot
-      # live here: a cache hit replays the log without rewriting anything.
-      # `--max-warnings=0` lives in each workspace's `lint` script instead: a
-      # flag here reaches the commit gate but not the `turbo run lint` a
-      # contributor or CI job runs directly.
+      # eslint needs the workspace as its working directory and the
+      # workspace's dependencies built. From the root, `@/*` aliases don't
+      # resolve and type-aware rules see unbuilt siblings as `any`. Turbo
+      # provides both. A turbo cache hit replays the log without rewriting
+      # files, so `--fix` can't go here. `--max-warnings=0` sits in each
+      # workspace's `lint` script so a direct `turbo run lint` enforces it too.
       #
       # No file matcher: turbo.json decides staleness, and its `lint` inputs
       # reach past the module extensions.
@@ -185,8 +161,7 @@ repos:
         pass_filenames: false
         always_run: true
 
-      # knip analyzes the whole workspace graph, so it can't be file-scoped and
-      # runs on every commit.
+      # knip analyzes the whole workspace graph, so it can't be file-scoped.
       - id: knip
         name: knip (unused files, dependencies, exports)
         entry: pnpm exec knip
@@ -194,26 +169,32 @@ repos:
         pass_filenames: false
         always_run: true
 
-      # Offline resolves on-disk paths and makes no network request, so it
-      # gates every commit and every pull request. The weekly external sweep
-      # stays an action for its issue reporting. Upstream's auto-installing
-      # hook is unusable here: cargo-binstall fetches a glibc build that needs
-      # GLIBC_2.38, newer than some contributor machines.
+      # Offline mode makes no network request, so it can gate commits;
+      # weekly.yml checks external links and files an issue. Upstream's hook installs through
+      # cargo-binstall, whose glibc build is newer than some contributor
+      # machines have.
       - id: lychee
         name: lychee (internal links)
         entry: lychee --offline --no-progress
         language: system
         types: [markdown]
 
-      # ls-lint's ignore list filters its findings but does not prune its walk,
-      # so it traverses node_modules to validate the tracked files and takes
-      # seconds rather than milliseconds.
+      # ls-lint walks node_modules despite its ignore list, so it takes
+      # seconds.
       - id: ls-lint
         name: file naming conventions
         entry: pnpm exec ls-lint
         language: system
         pass_filenames: false
         always_run: true
+
+      # Vite deploys apps/web/public/ verbatim, so every file there is public.
+      - id: web-public-images-only
+        name: only images in apps/web/public
+        entry: only .png and .ico files belong in apps/web/public; put asset notes in apps/web/provenance
+        language: fail
+        files: ^apps/web/public/
+        exclude: \.(png|ico)$
 
       - id: vscode-extensions
         name: devcontainer and editor extensions in sync
@@ -229,13 +210,33 @@ repos:
         files: (^|/)package\.json$
         pass_filenames: false
 
-      # Keeps the committed JSON Schema snapshots faithful to their Zod source — a
-      # pure function of the working tree, unlike the base-branch compatibility
-      # proof, which is a PR-level check in ci.yml. Runs through turbo so the
-      # workspace packages the schemas import build first.
+      # Turbo builds the workspace packages the schemas import before export.
+      # Compatibility with the base branch is a ci.yml job.
       - id: schema-snapshots
         name: schema snapshots (regenerate from Zod)
         entry: pnpm exec turbo run schemas:export
         language: system
         files: ^apps/[^/]+/(src/.+/schemas/|schema-snapshots/)
+        pass_filenames: false
+
+      # Pillow matches the pin in the generator's script metadata.
+      - id: brand-assets
+        name: brand assets (regenerate from environments)
+        entry: python apps/web/scripts/generate-brand-assets.py
+        language: python
+        additional_dependencies: [pillow==13.0.0]
+        files: |
+          (?x)^apps/web/(
+            scripts/generate-brand-assets\.py|
+            src/lib/environments\.json|
+            public/(favicon|icon|og-image)[^/]*\.(png|ico)
+          )$
+        pass_filenames: false
+
+      # The generators import @genshin/game-data, so its sources are inputs too.
+      - id: game-data
+        name: game data (regenerate from genshin-db)
+        entry: scripts/regenerate-game-data.sh
+        language: script
+        files: ^(tools/game-data-codegen/|packages/game-data/src/|scripts/regenerate-game-data\.sh$)
         pass_filenames: false

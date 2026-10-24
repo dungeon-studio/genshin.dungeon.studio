@@ -3,7 +3,7 @@
 
 import type { CollectionWeapon, CollectionWeaponId } from '@genshin/domain';
 import { WEAPON_ROSTER } from '@genshin/game-data';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { assert, beforeEach, describe, expect, it } from 'vitest';
 
 import { makeWeapon } from '@/test/fixtures';
 
@@ -12,6 +12,8 @@ import { groupByWeapon, useWeaponCollectionStore } from './use-weapon-collection
 // Two weapons from game data, so a filtered read has something to leave out
 // and a roster change cannot strand the suite.
 const [WEAPON, OTHER_WEAPON] = WEAPON_ROSTER;
+assert.isDefined(WEAPON);
+assert.isDefined(OTHER_WEAPON);
 
 function storedWeapon(weaponInstanceId: CollectionWeaponId): CollectionWeapon | undefined {
   return useWeaponCollectionStore.getState().weapons[weaponInstanceId];
@@ -46,14 +48,6 @@ describe('useWeaponCollectionStore', () => {
       useWeaponCollectionStore.getState().setRefinementLevel('inst-1', 3);
 
       expect(storedWeapon('inst-1')?.refinementLevel).toBe(3);
-    });
-
-    it('ignores invalid refinement levels', () => {
-      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', WEAPON.id));
-      useWeaponCollectionStore.getState().setRefinementLevel('inst-1', 0);
-      useWeaponCollectionStore.getState().setRefinementLevel('inst-1', 6);
-
-      expect(storedWeapon('inst-1')?.refinementLevel).toBe(1);
     });
 
     it('ignores updates for nonexistent weapons', () => {

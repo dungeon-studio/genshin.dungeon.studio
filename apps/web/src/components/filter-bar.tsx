@@ -13,8 +13,8 @@ import type { JSX } from 'react';
 import { useId, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { ChipIcon } from '@/components/ui/chip-icon';
 import { Input } from '@/components/ui/input';
-import { ThemedIcon } from '@/components/ui/themed-icon';
 import type { BaseFilterState } from '@/lib/collection-filters';
 import { toggleInSet } from '@/lib/toggle-in-set';
 import { cn } from '@/lib/utils';
@@ -172,7 +172,8 @@ function SortControl<F extends BaseFilterState>({
 
   function cycleField() {
     const currentIndex = sortFields.findIndex((f) => f.value === filters.sortField);
-    onChange({ ...filters, sortField: sortFields[(currentIndex + 1) % sortFields.length].value });
+    const next = sortFields[(currentIndex + 1) % sortFields.length];
+    if (next) onChange({ ...filters, sortField: next.value });
   }
 
   function toggleDirection() {
@@ -249,7 +250,7 @@ function FilterChips<F extends BaseFilterState, T extends string>({
           key={rarity}
           type="button"
           onClick={() => toggleRarity(rarity)}
-          className={cn(CHIP, filters.rarities.has(rarity) ? 'text-white bg-geo-dark' : CHIP_IDLE)}
+          className={cn(CHIP, filters.rarities.has(rarity) ? 'text-black bg-geo-dark' : CHIP_IDLE)}
           aria-pressed={filters.rarities.has(rarity)}
           aria-label={`Filter by ${rarity}-star`}
         >
@@ -260,28 +261,27 @@ function FilterChips<F extends BaseFilterState, T extends string>({
       {showCategory && <ChipDivider />}
 
       {showCategory &&
-        category.values.map((value) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => category.onToggle(value)}
-            className={cn(
-              CHIP,
-              'gap-1.5 inline-flex items-center',
-              category.selected.has(value) ? category.activeClassName(value) : CHIP_IDLE,
-            )}
-            aria-pressed={category.selected.has(value)}
-            aria-label={`Filter by ${value}`}
-          >
-            <ThemedIcon
-              lightSrc={category.iconPath(value, 'light')}
-              darkSrc={category.iconPath(value, 'dark')}
-              alt=""
-              className="h-3.5 w-3.5"
-            />
-            {value}
-          </button>
-        ))}
+        category.values.map((value) => {
+          const active = category.selected.has(value);
+
+          return (
+            <button
+              key={value}
+              type="button"
+              onClick={() => category.onToggle(value)}
+              className={cn(
+                CHIP,
+                'gap-1.5 inline-flex items-center',
+                active ? category.activeClassName(value) : CHIP_IDLE,
+              )}
+              aria-pressed={active}
+              aria-label={`Filter by ${value}`}
+            >
+              <ChipIcon iconPath={(variant) => category.iconPath(value, variant)} onFill={active} />
+              {value}
+            </button>
+          );
+        })}
     </div>
   );
 }

@@ -27,7 +27,6 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",
-    "lint:names": "ls-lint",
     "knip": "knip",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "typecheck": "turbo run typecheck",
@@ -36,23 +35,23 @@
     "vscode-extensions:check": "tsx scripts/check-vscode-extensions.ts"
   },
   "devDependencies": {
-    "@ls-lint/ls-lint": "2.3.1",
-    "@turbo/gen": "2.10.12",
-    "@types/node": "25.9.5",
-    "eslint": "10.9.1",
-    "firebase-tools": "15.28.2",
-    "knip": "6.33.0",
-    "prettier": "3.9.6",
+    "@ls-lint/ls-lint": "2.3.2",
+    "@turbo/gen": "2.11.10",
+    "@types/node": "24.19.2",
+    "eslint": "10.13.0",
+    "firebase-tools": "15.34.0",
+    "knip": "6.42.1",
+    "prettier": "3.9.10",
     "prettier-plugin-tailwindcss": "0.8.1",
-    "stylelint": "17.14.1",
+    "stylelint": "17.16.0",
     "syncpack": "15.3.3",
-    "tsx": "4.23.13",
-    "turbo": "2.10.12",
+    "tsx": "4.23.15",
+    "turbo": "2.11.10",
     "typescript": "npm:@typescript/typescript6@6.0.2",
-    "vitest": "4.1.11"
+    "vitest": "5.0.5"
   },
-  "packageManager": "pnpm@11.25.0",
+  "packageManager": "pnpm@12.14.0",
   "engines": {
-    "node": "26.8.1"
+    "node": "24.22.1"
   }
 }

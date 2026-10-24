@@ -3,33 +3,26 @@
 
 import type { QueryClient } from '@tanstack/react-query';
 import { QueryClientProvider } from '@tanstack/react-query';
-import type { User } from 'firebase/auth';
 import type { JSX, ReactNode } from 'react';
 
+import type { AuthState } from '@/features/auth';
 import { AuthContext } from '@/features/auth/auth-context';
 
 interface TestProvidersProps {
   children: ReactNode;
   queryClient: QueryClient;
-  user?: User | null;
-  loading?: boolean;
+  auth: AuthState;
 }
 
 /**
  * The TanStack Query and auth context the collection and team hooks need.
  *
- * Auth arrives as props so a test can sign a different user in between
- * `rerender()` calls.
+ * Auth arrives as a prop so a test can change it between `rerender()` calls.
  */
-export function TestProviders({
-  children,
-  queryClient,
-  user = null,
-  loading = false,
-}: TestProvidersProps): JSX.Element {
+export function TestProviders({ children, queryClient, auth }: TestProvidersProps): JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthContext value={{ user, loading }}>{children}</AuthContext>
+      <AuthContext value={auth}>{children}</AuthContext>
     </QueryClientProvider>
   );
 }

@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 import { compareVersions } from '@genshin/game-data';
+import type { GameVersion } from '@genshin/game-data';
 
 interface VersionedRecord {
   name: string;
-  version: string;
+  version: GameVersion;
 }
 
 /**

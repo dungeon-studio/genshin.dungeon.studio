@@ -4,6 +4,7 @@
 import { CHARACTER_DATA } from './characters.generated.js';
 import type { Element } from './elements.js';
 import type { Rarity } from './rarities.js';
+import type { GameVersion } from './versions.js';
 import type { WeaponType } from './weapons.js';
 
 /**
@@ -28,7 +29,7 @@ export interface Character {
   weaponType: WeaponType;
   rarity: Rarity;
   region: string;
-  version: string; // Release version (e.g., "1.0", "3.1", "6.7")
+  version: GameVersion;
   releaseDate: string; // ISO 8601 release date (e.g., "2020-09-28"); exact ordering within a version
 }
 
