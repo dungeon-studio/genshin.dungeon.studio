@@ -93,8 +93,10 @@ export function WeaponPool({
   const ownedCount = ownedWeaponIds.size;
 
   const hasWeaponsOfType = useMemo(
-    () => !weaponType || [...ownedWeaponIds].some((id) => getWeaponById(id)?.type === weaponType),
-    [ownedWeaponIds, weaponType],
+    () =>
+      !weaponType ||
+      collectionWeapons.some((cw) => getWeaponById(cw.weaponId)?.type === weaponType),
+    [collectionWeapons, weaponType],
   );
 
   const { filteredWeapons, filteredOwnedCount } = useMemo(() => {
@@ -110,7 +112,7 @@ export function WeaponPool({
   const instancesByWeaponId = useMemo(() => groupByWeapon(collectionWeapons), [collectionWeapons]);
 
   if (ownedCount === 0) return <EmptyWeaponPool />;
-  if (weaponType && !hasWeaponsOfType) return <EmptyWeaponPool weaponType={weaponType} />;
+  if (!hasWeaponsOfType) return <EmptyWeaponPool weaponType={weaponType} />;
 
   return (
     <div className="min-h-0 gap-3 flex flex-1 flex-col">
