@@ -86,8 +86,6 @@ type TeamActions = Pick<
   | 'setTeamName'
 >;
 
-// The API calls are `mutateAsync`: `mutate` fires a per-call `onError` only for
-// its latest call, which would drop the rollback of a save still in flight.
 function useTeamActions(
   isAuthenticated: boolean,
   saveTeamApi: ReturnType<typeof useSaveTeamMutation>['mutateAsync'],
@@ -99,14 +97,16 @@ function useTeamActions(
     const editThenPersist = (
       slot: TeamSlot,
       edit: () => void,
-      request: (onError: () => void) => void,
+      request: () => Promise<void>,
       failure: string,
     ) => {
       const previousTeam = { ...store().teams[slot] };
       edit();
       if (!isAuthenticated) return;
       const optimisticTeam = store().teams[slot];
-      request(() => {
+      // Rolls back on this request's own promise: `mutate`'s per-call `onError`
+      // fires only for the latest call, dropping a save still in flight.
+      request().catch(() => {
         if (store().teams[slot] !== optimisticTeam) {
           toast.error(`${failure}.`);
           return;
@@ -120,9 +120,7 @@ function useTeamActions(
       editThenPersist(
         slot,
         edit,
-        (onError) => {
-          saveTeamApi(teamToSavePayload(store().teams[slot])).catch(onError);
-        },
+        () => saveTeamApi(teamToSavePayload(store().teams[slot])),
         'Failed to save team',
       );
     };
@@ -164,9 +162,7 @@ function useTeamActions(
           () => {
             store().clearTeam(slot);
           },
-          (onError) => {
-            deleteTeamApi(slot).catch(onError);
-          },
+          () => deleteTeamApi(slot),
           'Failed to clear team',
         );
       },
