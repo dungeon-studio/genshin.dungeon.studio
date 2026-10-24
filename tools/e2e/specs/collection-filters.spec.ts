@@ -46,10 +46,6 @@ async function renderedNames(page: Page, cardName: RegExp): Promise<string[]> {
   return labels.map((label) => cardName.exec(label)?.[1] ?? label);
 }
 
-function namesOf(items: readonly CollectionItem[]): string[] {
-  return items.map((item) => item.name);
-}
-
 function describeFilters<I extends CollectionItem>(collection: CollectionPage<I>): void {
   const { noun, path, roster, category, cardName, collect, sample } = collection;
   const names = (page: Page) => renderedNames(page, cardName);
@@ -58,7 +54,12 @@ function describeFilters<I extends CollectionItem>(collection: CollectionPage<I>
   const expectGridOf = (page: Page, matches: (item: I) => boolean) =>
     expect
       .poll(async () => (await names(page)).toSorted())
-      .toEqual(namesOf(roster.filter(matches)).toSorted());
+      .toEqual(
+        roster
+          .filter(matches)
+          .map((item) => item.name)
+          .toSorted(),
+      );
 
   test.describe(`the ${noun} filters`, () => {
     test('search narrows the grid to matching names', async ({ page }) => {
@@ -115,7 +116,7 @@ function describeFilters<I extends CollectionItem>(collection: CollectionPage<I>
       await expect(page.getByRole('button', { name: 'Name' })).toBeVisible();
       await expect
         .poll(() => names(page))
-        .toEqual(namesOf(roster).toSorted((a, b) => nameCollator.compare(b, a)));
+        .toEqual(roster.map((item) => item.name).toSorted((a, b) => nameCollator.compare(b, a)));
     });
   });
 }
