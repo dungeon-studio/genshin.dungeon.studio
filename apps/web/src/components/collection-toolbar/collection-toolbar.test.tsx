@@ -6,10 +6,10 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { BaseFilterState } from '@/lib/collection-filters';
-import { SORT_FIELDS } from '@/lib/collection-filters';
 import { iconSources } from '@/test/icons';
 
-import { FilterBar, type FilterCategoryConfig } from './filter-bar';
+import { CollectionToolbar } from './collection-toolbar';
+import type { FilterCategoryConfig } from './types';
 
 function baseFilters(overrides: Partial<BaseFilterState> = {}): BaseFilterState {
   return {
@@ -22,7 +22,7 @@ function baseFilters(overrides: Partial<BaseFilterState> = {}): BaseFilterState 
   };
 }
 
-function renderBar(
+function renderToolbar(
   props: {
     filters?: BaseFilterState;
     category?: Partial<FilterCategoryConfig<string>>;
@@ -46,11 +46,10 @@ function renderBar(
   };
 
   render(
-    <FilterBar
+    <CollectionToolbar
       filters={props.filters ?? baseFilters()}
       onChange={onChange}
       category={category}
-      sortFields={SORT_FIELDS}
       noun={{ one: 'item', other: 'items' }}
       searchLabel="Search items by name"
       filteredCount={props.filteredCount ?? 5}
@@ -65,10 +64,10 @@ function renderBar(
   return { onChange, onToggle };
 }
 
-describe('FilterBar', () => {
+describe('CollectionToolbar', () => {
   it('toggles ownership to the picked value', async () => {
     const user = userEvent.setup({ delay: null });
-    const { onChange } = renderBar();
+    const { onChange } = renderToolbar();
 
     await user.click(screen.getByRole('button', { name: 'owned' }));
 
@@ -77,7 +76,7 @@ describe('FilterBar', () => {
 
   it('adds a rarity that was not selected', async () => {
     const user = userEvent.setup({ delay: null });
-    const { onChange } = renderBar();
+    const { onChange } = renderToolbar();
 
     await user.click(screen.getByRole('button', { name: 'Filter by 5-star' }));
 
@@ -86,7 +85,7 @@ describe('FilterBar', () => {
 
   it('removes a rarity that was already selected', async () => {
     const user = userEvent.setup({ delay: null });
-    const { onChange } = renderBar({ filters: baseFilters({ rarities: new Set([5]) }) });
+    const { onChange } = renderToolbar({ filters: baseFilters({ rarities: new Set([5]) }) });
 
     await user.click(screen.getByRole('button', { name: 'Filter by 5-star' }));
 
@@ -95,7 +94,7 @@ describe('FilterBar', () => {
 
   it('delegates category toggles to the config', async () => {
     const user = userEvent.setup({ delay: null });
-    const { onToggle } = renderBar();
+    const { onToggle } = renderToolbar();
 
     await user.click(screen.getByRole('button', { name: 'Filter by A' }));
 
@@ -103,20 +102,20 @@ describe('FilterBar', () => {
   });
 
   it('draws an active chip icon in the label color, not a theme variant', () => {
-    renderBar({ category: { selected: new Set(['A']) } });
+    renderToolbar({ category: { selected: new Set(['A']) } });
 
     expect(iconSources('Filter by A')).toStrictEqual(['url("/icons/A-light.png")']);
   });
 
   it('draws an idle chip icon in the page theme variant', () => {
-    renderBar();
+    renderToolbar();
 
     expect(iconSources('Filter by A')).toStrictEqual(['/icons/A-light.png', '/icons/A-dark.png']);
   });
 
   it('cycles the sort field and wraps back to the first', async () => {
     const user = userEvent.setup({ delay: null });
-    const { onChange } = renderBar({ filters: baseFilters({ sortField: 'name' }) });
+    const { onChange } = renderToolbar({ filters: baseFilters({ sortField: 'name' }) });
 
     await user.click(screen.getByRole('button', { name: 'Name' }));
 
@@ -125,7 +124,7 @@ describe('FilterBar', () => {
 
   it('flips the sort direction from descending to ascending', async () => {
     const user = userEvent.setup({ delay: null });
-    const { onChange } = renderBar();
+    const { onChange } = renderToolbar();
 
     await user.click(screen.getByRole('button', { name: 'Sort descending' }));
 
@@ -134,7 +133,7 @@ describe('FilterBar', () => {
 
   it('flips the sort direction from ascending to descending', async () => {
     const user = userEvent.setup({ delay: null });
-    const { onChange } = renderBar({ filters: baseFilters({ sortDirection: 'asc' }) });
+    const { onChange } = renderToolbar({ filters: baseFilters({ sortDirection: 'asc' }) });
 
     await user.click(screen.getByRole('button', { name: 'Sort ascending' }));
 
@@ -143,7 +142,7 @@ describe('FilterBar', () => {
 
   it('reports what is typed in the search box', async () => {
     const user = userEvent.setup({ delay: null });
-    const { onChange } = renderBar();
+    const { onChange } = renderToolbar();
 
     await user.type(screen.getByRole('searchbox', { name: 'Search items by name' }), 'x');
 
@@ -151,44 +150,44 @@ describe('FilterBar', () => {
   });
 
   it('shows a plain count and no ownership controls when ownership is hidden', () => {
-    renderBar({ showOwnership: false, filteredCount: 3 });
+    renderToolbar({ showOwnership: false, filteredCount: 3 });
 
     expect(screen.getByText(/3 items/)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'owned' })).not.toBeInTheDocument();
   });
 
   it('uses the singular noun for a single match', () => {
-    renderBar({ showOwnership: false, filteredCount: 1 });
+    renderToolbar({ showOwnership: false, filteredCount: 1 });
 
     expect(screen.getByText('1 item')).toBeInTheDocument();
   });
 
   it('hides the category row when configured off', () => {
-    renderBar({ category: { show: false } });
+    renderToolbar({ category: { show: false } });
 
     expect(screen.queryByRole('button', { name: 'Filter by A' })).not.toBeInTheDocument();
   });
 
   it('summarizes owned over total when nothing is filtered out', () => {
-    renderBar({ filteredCount: 5, totalCount: 5, ownedCount: 2 });
+    renderToolbar({ filteredCount: 5, totalCount: 5, ownedCount: 2 });
 
     expect(screen.getByText(/2 \/ 5 owned/)).toBeInTheDocument();
   });
 
   it('summarizes owned over filtered once a filter narrows the list', () => {
-    renderBar({ filteredCount: 3, totalCount: 5, filteredOwnedCount: 1 });
+    renderToolbar({ filteredCount: 3, totalCount: 5, filteredOwnedCount: 1 });
 
     expect(screen.getByText(/1 \/ 3 owned/)).toBeInTheDocument();
   });
 
   it('offers no collapse toggle unless asked for one', () => {
-    renderBar();
+    renderToolbar();
 
     expect(screen.queryByRole('button', { name: /Filters/ })).not.toBeInTheDocument();
   });
 
   it('collapses only the chips, leaving search and sort reachable', () => {
-    renderBar({ collapsible: true });
+    renderToolbar({ collapsible: true });
     // `aria-controls` holds an element id; no Testing Library query expresses
     // "the region this button controls".
     // eslint-disable-next-line testing-library/no-node-access
@@ -205,7 +204,7 @@ describe('FilterBar', () => {
 
   it('starts collapsed and expands when the toggle is pressed', async () => {
     const user = userEvent.setup({ delay: null });
-    renderBar({ collapsible: true });
+    renderToolbar({ collapsible: true });
     const toggle = screen.getByRole('button', { name: /Filters/ });
 
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
@@ -215,7 +214,7 @@ describe('FilterBar', () => {
   });
 
   it('counts every kind of narrowing filter on the toggle', () => {
-    renderBar({
+    renderToolbar({
       collapsible: true,
       filters: baseFilters({ search: 'amber', rarities: new Set([5, 4]), ownership: 'owned' }),
       category: { selected: new Set(['A']) },
@@ -225,13 +224,13 @@ describe('FilterBar', () => {
   });
 
   it('leaves the toggle unbadged when only the sort field is set', () => {
-    renderBar({ collapsible: true, filters: baseFilters({ sortField: 'name' }) });
+    renderToolbar({ collapsible: true, filters: baseFilters({ sortField: 'name' }) });
 
     expect(screen.getByRole('button', { name: 'Filters' })).toBeInTheDocument();
   });
 
   it('ignores filters whose rows are hidden when counting', () => {
-    renderBar({
+    renderToolbar({
       collapsible: true,
       showOwnership: false,
       filters: baseFilters({ ownership: 'owned' }),
