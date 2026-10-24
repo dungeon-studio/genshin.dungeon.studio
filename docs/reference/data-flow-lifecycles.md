@@ -68,7 +68,7 @@ stateDiagram-v2
   Overwritten --> HeldLocally: DELETE succeeds
   Confirmed --> Sent: edit while signed in
   Confirmed --> HeldLocally: lowered or removed on another device, merge keeps it
-  HeldLocally --> Sent: edit, or the sign-in push on a signed-in remount
+  HeldLocally --> Sent: edit, or the next sign-in push
   RolledBack --> Sent: edit
   RolledBack --> Confirmed: next refetch
 ```
@@ -86,8 +86,8 @@ stateDiagram-v2
 - Held only locally: a copy ahead of the server, which lacks it or holds a lower
   level. A failed sign-in push or a rejected add with a raised level only
   toasts, so each leaves one, see [#1840]. The merge keeps the copy until the
-  store empties, and an edit or a sign-in push writes it back to the server, see
-  [#1741].
+  store empties. An edit writes it back to the server, and so does the push on
+  the next sign-in.
 
 ## Weapons
 
@@ -162,6 +162,5 @@ stateDiagram-v2
 
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
 [#1534]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1534
-[#1741]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1741
 [#1839]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1839
 [#1840]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1840
