@@ -42,7 +42,7 @@ function entriesAheadOfServer(
 
 const PUSHED_FOR_KEY = 'genshin-collection-pushed-for';
 
-function readPushedFor(): string | null {
+function pushedForUid(): string | null {
   try {
     return localStorage.getItem(PUSHED_FOR_KEY);
   } catch {
@@ -51,13 +51,17 @@ function readPushedFor(): string | null {
   }
 }
 
-function writePushedFor(uid: string | null): void {
+function recordPushFor(uid: string): void {
   try {
-    if (uid === null) {
-      localStorage.removeItem(PUSHED_FOR_KEY);
-    } else {
-      localStorage.setItem(PUSHED_FOR_KEY, uid);
-    }
+    localStorage.setItem(PUSHED_FOR_KEY, uid);
+  } catch {
+    // Storage access blocked (privacy mode / sandboxed iframe)
+  }
+}
+
+function clearPushRecord(): void {
+  try {
+    localStorage.removeItem(PUSHED_FOR_KEY);
   } catch {
     // Storage access blocked (privacy mode / sandboxed iframe)
   }
@@ -88,7 +92,7 @@ function useServerSync(
 
   useEffect(() => {
     if (signedOut) {
-      writePushedFor(null);
+      clearPushRecord();
     }
   }, [signedOut]);
 
@@ -98,7 +102,8 @@ function useServerSync(
     const merged = mergeCollections(useCollectionStore.getState().characters, apiCharacters);
     replaceCharacters(merged);
 
-    if (uid === undefined || readPushedFor() === uid) return;
+    if (uid === undefined || pushedForUid() === uid) return;
+    recordPushFor(uid);
 
     const diffs = entriesAheadOfServer(merged, apiCharacters);
 
@@ -114,8 +119,6 @@ function useServerSync(
     if (diffs.length > 0) {
       toast.success(`Merged ${diffs.length} character(s) from your local collection.`);
     }
-
-    writePushedFor(uid);
   }, [apiCharacters, uid, replaceCharacters, setConstellationLevelApi, applyMutationResult]);
 }
 
