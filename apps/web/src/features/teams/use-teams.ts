@@ -182,7 +182,8 @@ function useTeamActions(
  * same slot again, their newer edit stands and they get an error toast instead.
  *
  * Signed out, the actions still work and nothing is persisted, so a visitor can
- * plan a team before deciding to sign in. Signing out discards it.
+ * plan a team before deciding to sign in. Signing out empties the teams, through
+ * `ClearUserDataOnSignOut` rather than this hook.
  */
 export function useTeams(): UseTeamsResult {
   const auth = useAuth();

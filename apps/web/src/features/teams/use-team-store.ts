@@ -82,7 +82,7 @@ function weaponHeldElsewhere(
  * The four teams as the UI currently shows them, with no knowledge of the API.
  *
  * Components reach for `useTeams` instead, which wraps this with loading and
- * saving. This store is for that hook and for tests.
+ * saving.
  *
  * Every mutation is a silent no-op when it can't apply, such as an index
  * outside a team or a weapon assigned to an empty position, so a caller gets no
