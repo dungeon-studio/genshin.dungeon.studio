@@ -152,7 +152,8 @@ export async function signIn(page: Page, persona = 'traveler'): Promise<void> {
   const { email, displayName } = account(persona);
 
   const popupPromise = page.waitForEvent('popup');
-  await page.getByRole('button', { name: 'Sign in' }).click();
+  // An empty collection offers its own sign-in button beside the header's.
+  await page.getByRole('banner').getByRole('button', { name: 'Sign in' }).click();
   const popup = await popupPromise;
 
   // The emulator wires its controls up in a script that runs after load, so a
@@ -176,7 +177,7 @@ export async function signOut(page: Page, persona = 'traveler'): Promise<void> {
   await page.getByRole('button', { name: account(persona).displayName }).click();
   await page.getByRole('menuitem', { name: 'Sign out' }).click();
 
-  await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
+  await expect(page.getByRole('banner').getByRole('button', { name: 'Sign in' })).toBeVisible();
 }
 
 /** Put a character in the signed-in collection via the UI, server write included. */
