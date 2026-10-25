@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionTeamMembers, ISOTimestamp } from '@genshin/domain';
+import type { CollectionTeam, CollectionTeamMembers, ISOTimestamp } from '@genshin/domain';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { toast } from 'sonner';
@@ -9,6 +9,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { makeTeam, teamsDocument } from '@/test/fixtures';
 import { holdResponse } from '@/test/msw/held-response';
+import { matchJsonBody } from '@/test/msw/match-json-body';
 import { server } from '@/test/msw/server';
 import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
 
@@ -99,10 +100,14 @@ describe('useTeams (authenticated)', () => {
 
   it('rolls back a failed save while another team saves', async () => {
     const firstPut = holdResponse(() => new HttpResponse(null, { status: 500 }));
+    const saved: CollectionTeam[] = [];
     server.use(
-      http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([]))),
+      http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument(saved))),
       http.put('http://localhost:8080/teams/1', firstPut.resolver),
-      http.put('http://localhost:8080/teams/2', () => new HttpResponse(null, { status: 204 })),
+      http.put('http://localhost:8080/teams/2', () => {
+        saved.push(makeTeam(2, { members: MEMBERS }));
+        return new HttpResponse(null, { status: 204 });
+      }),
     );
 
     const { result } = renderHookSignedIn(() => useTeams(), 'user-1');
@@ -123,9 +128,16 @@ describe('useTeams (authenticated)', () => {
 
   it('reports a failed save that a newer edit to the same team superseded', async () => {
     const firstPut = holdResponse(() => new HttpResponse(null, { status: 500 }));
+    const newerName = 'Newer';
     server.use(
       http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([]))),
-      http.put('http://localhost:8080/teams/1', firstPut.resolver, { once: true }),
+      http.put(
+        matchJsonBody<{ name: string }>(
+          'http://localhost:8080/teams/1',
+          ({ name }) => name !== newerName,
+        ),
+        firstPut.resolver,
+      ),
       http.put('http://localhost:8080/teams/1', () => new HttpResponse(null, { status: 204 })),
     );
 
@@ -136,12 +148,13 @@ describe('useTeams (authenticated)', () => {
       result.current.assignCharacter(1, 0, CHARACTER);
     });
     act(() => {
-      result.current.setTeamName(1, 'Newer');
+      result.current.setTeamName(1, newerName);
     });
+    await act(() => firstPut.arrived);
 
     firstPut.release();
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Failed to save team.'));
-    expect(result.current.getTeam(1).name).toBe('Newer');
+    expect(result.current.getTeam(1).name).toBe(newerName);
     expect(result.current.getTeam(1).members[0]?.characterId).toBe(CHARACTER);
   });
 
