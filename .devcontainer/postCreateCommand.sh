@@ -37,13 +37,7 @@ step "Installing reuse-tool for SPDX license compliance"
 
 step "Installing lychee link checker"
 
-# renovate: datasource=github-releases depName=lycheeverse/lychee extractVersion=^lychee-v(?<version>.+)$
-LYCHEE_VERSION="0.24.2"
-LYCHEE_DIR=lychee-x86_64-unknown-linux-gnu
-curl -fsSL \
-  "https://github.com/lycheeverse/lychee/releases/download/lychee-v${LYCHEE_VERSION}/${LYCHEE_DIR}.tar.gz" |
-  sudo tar -xz -C /usr/local/bin --strip-components=1 "${LYCHEE_DIR}/lychee"
-sudo chmod +x /usr/local/bin/lychee
+"${REPO_ROOT}/scripts/install-lychee.sh"
 
 step "Installing Playwright Chromium and Chrome"
 

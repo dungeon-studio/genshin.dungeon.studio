@@ -31,25 +31,14 @@ jobs:
       contents: read
       issues: write
 
-    env:
-      # renovate: datasource=github-releases depName=lycheeverse/lychee extractVersion=^lychee-v(?<version>.+)$
-      LYCHEE_VERSION: '0.24.2'
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      # musl, so the binary is static and carries no glibc floor.
       - name: Install lychee
-        run: |
-          set -euo pipefail
-          LYCHEE_URL=https://github.com/lycheeverse/lychee/releases/download
-          LYCHEE_DIR=lychee-x86_64-unknown-linux-musl
-          curl -fsSL \
-            "${LYCHEE_URL}/lychee-v${LYCHEE_VERSION}/${LYCHEE_DIR}.tar.gz" \
-            | sudo tar -xz -C /usr/local/bin --strip-components=1 "${LYCHEE_DIR}/lychee"
+        run: scripts/install-lychee.sh
 
       # Broken links open a report issue instead of failing the job.
       - name: Check all links

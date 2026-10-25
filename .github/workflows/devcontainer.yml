@@ -12,6 +12,7 @@ on:
     paths: &paths
       - '.devcontainer/**'
       - 'scripts/install-reuse.sh'
+      - 'scripts/install-lychee.sh'
       - '.github/workflows/devcontainer.yml'
       # packageManager, engines, and the firebase-tools pin.
       - 'package.json'
