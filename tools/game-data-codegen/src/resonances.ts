@@ -1,10 +1,14 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { ELEMENTS, RESONANCE_TRIGGERS } from '@genshin/game-data';
+import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { isDeepStrictEqual } from 'node:util';
+
+import { ELEMENTAL_RESONANCES, ELEMENTS, RESONANCE_TRIGGERS } from '@genshin/game-data';
 import type { Element, ElementalResonance, ResonanceCondition } from '@genshin/game-data';
 
-import { serializeEntry, writeGeneratedModule } from './emit.js';
+import { resolveGeneratedPath, serializeEntry, writeGeneratedModule } from './emit.js';
 import { toId } from './slug.js';
 
 /**
@@ -17,16 +21,52 @@ import { toId } from './slug.js';
  */
 const ANIME_GAME_DATA = {
   repository: 'DimbreathBot/AnimeGameData',
-  commit: '433284d22ef1a704e9d49ae22fb96cf7a245828e',
   resonances: 'ExcelBinOutput/TeamResonanceExcelConfigData.json',
   // The main `TextMapEN.json` doesn't carry resonance strings; the medium one does.
   textMap: 'TextMap/TextMap_MediumEN.json',
 } as const;
 
-/** The fields of one `TeamResonanceExcelConfigData` record this generator reads. */
+const RESONANCES_MODULE = 'src/resonances.generated.ts';
+
+const REPOSITORY_URL = `https://github.com/${ANIME_GAME_DATA.repository}`;
+
+const SOURCE_PREFIX = `${REPOSITORY_URL}/tree/`;
+
+const COMMIT_PATTERN = /^[0-9a-f]{40}$/;
+
+function resolveCommit(ref: string): string {
+  if (COMMIT_PATTERN.test(ref)) return ref;
+
+  const [commit] = execFileSync('git', ['ls-remote', REPOSITORY_URL, ref], {
+    encoding: 'utf8',
+  }).split('\t');
+  if (!commit) {
+    throw new Error(`${ANIME_GAME_DATA.repository} has no ref "${ref}"`);
+  }
+
+  return commit;
+}
+
+/** The pin is the commit the generated module's header names, so it can't drift from the data. */
+function pinnedCommit(): string {
+  const module = readFileSync(resolveGeneratedPath(RESONANCES_MODULE), 'utf8');
+  const commit = new RegExp(`${SOURCE_PREFIX}([0-9a-f]{40})`).exec(module)?.[1];
+  if (!commit) {
+    throw new Error(`${RESONANCES_MODULE} names no ${ANIME_GAME_DATA.repository} commit`);
+  }
+
+  return commit;
+}
+
+/**
+ * The fields of one `TeamResonanceExcelConfigData` record this generator reads.
+ *
+ * Upstream omits a field holding its default, so an absent `cond` is
+ * {@link PAIR_COND} and an absent element count is zero.
+ */
 export interface UpstreamResonance {
   teamResonanceId: number;
-  cond: string;
+  cond?: string;
   nameTextMapHash: number;
   descTextMapHash: number;
   [field: string]: unknown;
@@ -57,8 +97,7 @@ function isUpstreamResonance(value: unknown): value is UpstreamResonance {
     value !== null &&
     'teamResonanceId' in value &&
     typeof value.teamResonanceId === 'number' &&
-    'cond' in value &&
-    typeof value.cond === 'string' &&
+    (!('cond' in value) || typeof value.cond === 'string') &&
     'nameTextMapHash' in value &&
     typeof value.nameTextMapHash === 'number' &&
     'descTextMapHash' in value &&
@@ -93,16 +132,18 @@ function toCondition(record: UpstreamResonance, name: string): ResonanceConditio
     throw new Error(`Unmapped element count for "${name}": ${JSON.stringify(unmapped)}`);
   }
 
-  if (record.cond === UNIQUE_ELEMENTS_COND && counts.length === 0) {
+  const cond = record.cond ?? PAIR_COND;
+
+  if (cond === UNIQUE_ELEMENTS_COND && counts.length === 0) {
     return { trigger: RESONANCE_TRIGGERS.UNIQUE_ELEMENTS };
   }
 
-  const pair = record.cond === PAIR_COND && counts.length === 1 ? counts[0] : undefined;
+  const pair = cond === PAIR_COND && counts.length === 1 ? counts[0] : undefined;
   const element = pair?.[1] === 2 ? ELEMENT_BY_COUNT_FIELD.get(pair[0]) : undefined;
   if (element) return { trigger: RESONANCE_TRIGGERS.PAIR, element };
 
   throw new Error(
-    `Unrecognised trigger for "${name}": cond ${record.cond}, counts ${JSON.stringify(counts)}`,
+    `Unrecognised trigger for "${name}": cond ${cond}, counts ${JSON.stringify(counts)}`,
   );
 }
 
@@ -163,8 +204,8 @@ export function buildResonances(records: unknown, textMap: unknown): GeneratedRe
   return resonances;
 }
 
-async function fetchJson(path: string): Promise<unknown> {
-  const url = `https://raw.githubusercontent.com/${ANIME_GAME_DATA.repository}/${ANIME_GAME_DATA.commit}/${path}`;
+async function fetchJson(commit: string, path: string): Promise<unknown> {
+  const url = `https://raw.githubusercontent.com/${ANIME_GAME_DATA.repository}/${commit}/${path}`;
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`Fetching ${url} failed: ${response.status} ${response.statusText}`);
@@ -188,26 +229,34 @@ function serializeResonance({ id, name, condition, description }: GeneratedReson
 
 /**
  * Regenerate `@genshin/game-data`'s `resonances.generated.ts` from
- * AnimeGameData. Returns the number of resonances written.
+ * AnimeGameData at `ref`, a commit or a ref such as `HEAD`, defaulting to the
+ * pin. Writes nothing when the records match the shipped ones, so the pin
+ * moves only with the data.
  *
- * @throws Error when a fetch fails or upstream has reshaped either file.
+ * @throws Error when `ref` doesn't resolve, a fetch fails, or upstream has
+ *   reshaped either file.
  */
-export async function generateResonances(): Promise<number> {
+export async function generateResonances(
+  ref: string = pinnedCommit(),
+): Promise<{ count: number; written: boolean }> {
+  const commit = resolveCommit(ref);
   const [records, textMap] = await Promise.all([
-    fetchJson(ANIME_GAME_DATA.resonances),
-    fetchJson(ANIME_GAME_DATA.textMap),
+    fetchJson(commit, ANIME_GAME_DATA.resonances),
+    fetchJson(commit, ANIME_GAME_DATA.textMap),
   ]);
   const resonances = buildResonances(records, textMap);
 
+  if (isDeepStrictEqual(resonances, Object.values(ELEMENTAL_RESONANCES))) {
+    return { count: resonances.length, written: false };
+  }
+
   writeGeneratedModule({
-    path: 'src/resonances.generated.ts',
+    path: RESONANCES_MODULE,
     exportName: 'RESONANCE_DATA',
     command: 'resonances',
     entries: resonances.map(serializeResonance),
-    upstream: {
-      source: `https://github.com/${ANIME_GAME_DATA.repository}/tree/${ANIME_GAME_DATA.commit}`,
-    },
+    upstream: { source: `${SOURCE_PREFIX}${commit}` },
   });
 
-  return resonances.length;
+  return { count: resonances.length, written: true };
 }

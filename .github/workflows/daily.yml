@@ -164,3 +164,45 @@ jobs:
             Closing this after 44 quiet days. That isn't a call on the change
             itself, and nothing is lost: the branch stays where it is, so
             comment here if you want to pick it back up and I'll reopen it.
+
+  # A run with no upstream change opens nothing, so a daily cadence costs only
+  # the fetches and puts a game patch in review within a day.
+  game-data-refresh:
+    name: Refresh game data
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # A pull request opened with the workflow token triggers no workflows, so
+      # CI would never run on the refresh.
+      - id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.GAME_DATA_APP_CLIENT_ID }}
+          private-key: ${{ secrets.GAME_DATA_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Regenerate game data from upstream
+        run: scripts/refresh-game-data.sh
+
+      - name: Open or update the refresh pull request
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          branch: game-data/refresh
+          delete-branch: true
+          sign-commits: true
+          commit-message: 'feat(game-data): refresh from upstream'
+          title: 'feat(game-data): refresh from upstream'
+          labels: game-data
+          body: |
+            Upstream game data changed, and the daily refresh regenerated it.
+            Review the data diff before merging.
