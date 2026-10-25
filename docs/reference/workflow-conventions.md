@@ -34,7 +34,7 @@ Workflows that mutate state outside the checkout are named for what they change,
 
 A new check is a job in the file matching its when. A new file means a different when: a new trigger, a new cadence, or a path gate. Jobs on different triggers sit in different files, even when they serve the same purpose. Reusable (`workflow_call`) workflows are exempt, since a caller decides when they run.
 
-A job is named for _what_ it checks: the action and its subject, such as `Plan dev infrastructure`, never a bare environment name. Job names are unique across every workflow.
+A job is named for _what_ it checks: the action and its subject, such as `Plan infrastructure`, never a bare environment name. Job names are unique across every workflow.
 
 ## Required checks
 

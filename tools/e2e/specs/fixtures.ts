@@ -4,7 +4,8 @@
 import type { Character, Weapon } from '@genshin/game-data';
 import { CHARACTER_ROSTER, WEAPON_ROSTER } from '@genshin/game-data';
 import type { Page, Request } from '@playwright/test';
-import { test as base, expect } from '@playwright/test';
+
+import { test as base, expect } from './page-failures';
 
 /**
  * A character and a weapon the character can actually equip.
@@ -65,14 +66,32 @@ export async function withApiWrite(
   page: Page,
   method: string,
   pathFragment: string,
-  action: () => Promise<void>,
+  action: () => Promise<unknown>,
 ): Promise<void> {
-  const settled = page.waitForResponse(
-    (response) => isApiWrite(response.request(), method, pathFragment) && response.ok(),
+  const settled = Promise.race([
+    page.waitForResponse(
+      (response) => isApiWrite(response.request(), method, pathFragment) && response.ok(),
+    ),
+    blockedApiWrite(page, method, pathFragment),
+  ]);
+
+  // A blocked request can fail before the action resolves.
+  await Promise.all([settled, action()]);
+}
+
+/**
+ * Fail, naming the request, when the browser blocks a matching API write.
+ *
+ * A blocked write, such as one refused by CORS, never gets a response to wait on.
+ */
+async function blockedApiWrite(page: Page, method: string, pathFragment: string): Promise<never> {
+  const request = await page.waitForEvent('requestfailed', (candidate) =>
+    isApiWrite(candidate, method, pathFragment),
   );
 
-  await action();
-  await settled;
+  throw new Error(
+    `${request.method()} ${request.url()} failed: ${request.failure()?.errorText ?? 'unknown error'}`,
+  );
 }
 
 /**
@@ -133,7 +152,8 @@ export async function signIn(page: Page, persona = 'traveler'): Promise<void> {
   const { email, displayName } = account(persona);
 
   const popupPromise = page.waitForEvent('popup');
-  await page.getByRole('button', { name: 'Sign in' }).click();
+  // An empty collection offers its own sign-in button beside the header's.
+  await page.getByRole('banner').getByRole('button', { name: 'Sign in' }).click();
   const popup = await popupPromise;
 
   // The emulator wires its controls up in a script that runs after load, so a
@@ -157,7 +177,7 @@ export async function signOut(page: Page, persona = 'traveler'): Promise<void> {
   await page.getByRole('button', { name: account(persona).displayName }).click();
   await page.getByRole('menuitem', { name: 'Sign out' }).click();
 
-  await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
+  await expect(page.getByRole('banner').getByRole('button', { name: 'Sign in' })).toBeVisible();
 }
 
 /** Put a character in the signed-in collection via the UI, server write included. */

@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 
 import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
+import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
 import type { WeaponMutationResult } from './use-weapon-collection-api';
 import {
@@ -36,6 +37,18 @@ export interface UseWeaponCollectionResult {
   error: Error | null;
 }
 
+type WeaponActions = Pick<
+  UseWeaponCollectionResult,
+  'ensureWeapon' | 'addWeapon' | 'removeWeapon' | 'setRefinementLevel'
+>;
+
+const SIGNED_OUT_ACTIONS: WeaponActions = {
+  ensureWeapon: () => {},
+  addWeapon: () => {},
+  removeWeapon: () => {},
+  setRefinementLevel: () => {},
+};
+
 /**
  * Edits to an owned instance, each applied to the store before the server
  * confirms it.
@@ -45,7 +58,6 @@ export interface UseWeaponCollectionResult {
  * the instance ID.
  */
 function useOptimisticEdits(
-  isAuthenticated: boolean,
   api: {
     removeWeaponApi: ReturnType<typeof useRemoveWeaponMutation>['mutate'];
     setRefinementLevelApi: ReturnType<typeof useSetRefinementLevelMutation>['mutate'];
@@ -59,8 +71,6 @@ function useOptimisticEdits(
 
   const removeWeapon = useCallback(
     (collectionWeaponId: CollectionWeaponId) => {
-      if (!isAuthenticated) return;
-
       const current = useWeaponCollectionStore.getState().weapons[collectionWeaponId];
       if (!current) return;
 
@@ -77,13 +87,11 @@ function useOptimisticEdits(
         },
       });
     },
-    [isAuthenticated, removeWeaponApi, storeRemoveWeapon, storeAddWeapon],
+    [removeWeaponApi, storeRemoveWeapon, storeAddWeapon],
   );
 
   const setRefinementLevel = useCallback(
     (collectionWeaponId: CollectionWeaponId, level: RefinementLevel) => {
-      if (!isAuthenticated) return;
-
       const previous = useWeaponCollectionStore.getState().weapons[collectionWeaponId];
       if (!previous || previous.refinementLevel === level) return;
 
@@ -105,7 +113,7 @@ function useOptimisticEdits(
         },
       );
     },
-    [isAuthenticated, setRefinementLevelApi, storeSetRefinementLevel, applyMutationResult],
+    [setRefinementLevelApi, storeSetRefinementLevel, applyMutationResult],
   );
 
   return { removeWeapon, setRefinementLevel };
@@ -115,10 +123,9 @@ function useOptimisticEdits(
  * The weapon collection's whole interface: the instances the user owns, the
  * actions that change them, and the state of the sync behind them.
  *
- * Every action is a no-op while signed out, unlike the character collection: an
- * instance identifier comes from the server, so there is nothing to record
- * locally first. Callers show `isAuthenticated` rather than offering an action
- * that will silently do nothing.
+ * A collection belongs to an account, so every action is a no-op while signed
+ * out. Callers show `isAuthenticated` rather than offering an action that will
+ * silently do nothing.
  */
 export function useWeaponCollection(): UseWeaponCollectionResult {
   const auth = useAuth();
@@ -128,7 +135,6 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   const weapons = useWeaponCollectionStore((s) => s.weapons);
   const storeSetWeapons = useWeaponCollectionStore((s) => s.setWeapons);
   const storeAddWeapon = useWeaponCollectionStore((s) => s.addWeapon);
-  const clearWeapons = useWeaponCollectionStore((s) => s.clearWeapons);
 
   const {
     data: apiWeapons,
@@ -136,9 +142,12 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     isLoading: queryLoading,
   } = useWeaponCollectionQuery(uid);
 
-  const { mutate: addWeaponApi } = useAddWeaponMutation(uid);
-  const { mutate: removeWeaponApi } = useRemoveWeaponMutation(uid);
-  const { mutate: setRefinementLevelApi } = useSetRefinementLevelMutation(uid);
+  const addWeaponApi = useSenderBoundMutate(uid, useAddWeaponMutation(uid).mutate);
+  const removeWeaponApi = useSenderBoundMutate(uid, useRemoveWeaponMutation(uid).mutate);
+  const setRefinementLevelApi = useSenderBoundMutate(
+    uid,
+    useSetRefinementLevelMutation(uid).mutate,
+  );
 
   const applyMutationResult = useCallback(
     ({ weapon }: WeaponMutationResult) => {
@@ -146,12 +155,6 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     },
     [storeAddWeapon],
   );
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      clearWeapons();
-    }
-  }, [isAuthenticated, clearWeapons]);
 
   useEffect(() => {
     if (!apiWeapons) return;
@@ -174,10 +177,9 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   // Additive: every call creates a new instance. Contrast ensureWeapon.
   const addWeapon = useCallback(
     (weaponId: Weapon['id']) => {
-      if (!isAuthenticated) return;
       runAdd(weaponId);
     },
-    [isAuthenticated, runAdd],
+    [runAdd],
   );
 
   // Weapon instances carry a server-generated id, so an add can't reach the
@@ -187,8 +189,6 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
 
   const ensureWeapon = useCallback(
     (weaponId: Weapon['id']) => {
-      if (!isAuthenticated) return;
-
       const alreadyOwned = Object.values(useWeaponCollectionStore.getState().weapons).some(
         (w) => w.weaponId === weaponId,
       );
@@ -199,14 +199,16 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
         pendingEnsures.current.delete(weaponId);
       });
     },
-    [isAuthenticated, runAdd],
+    [runAdd],
   );
 
   const { removeWeapon, setRefinementLevel } = useOptimisticEdits(
-    isAuthenticated,
     { removeWeaponApi, setRefinementLevelApi },
     applyMutationResult,
   );
+  const actions = isAuthenticated
+    ? { ensureWeapon, addWeapon, removeWeapon, setRefinementLevel }
+    : SIGNED_OUT_ACTIONS;
 
   const getWeaponsByWeaponId = useCallback(
     (weaponId: Weapon['id']) => {
@@ -220,10 +222,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   return {
     weapons,
     isAuthenticated,
-    ensureWeapon,
-    addWeapon,
-    removeWeapon,
-    setRefinementLevel,
+    ...actions,
     getWeaponsByWeaponId,
     isLoading: awaitingUserData(auth, queryLoading),
     error,

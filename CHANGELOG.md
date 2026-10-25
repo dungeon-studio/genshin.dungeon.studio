@@ -9,9 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 This project hasn't yet cut its first release, so every entry collects under a
-single `### Added` bucket in `[Unreleased]`. Once `0.1.0` ships, later unreleased
-changes split into the standard Added, Changed, Deprecated, Removed, Fixed, and
-Security sections, since they then describe deltas from a shipped release.
+single `### Added` bucket in `[Unreleased]`.
 
 ## [Unreleased]
 
@@ -19,7 +17,7 @@ Security sections, since they then describe deltas from a shipped release.
 
 - Character collection page with compact card tiles, element icons, filters, search, and sort.
 - Weapon collection page with ownership tracking and visual distinction between owned and unowned items.
-- Prompts to get started when character or weapon collections are empty.
+- Prompts to get started when character or weapon collections are empty, including on the team builder landing page.
 - Team builder as the default landing page with four teams of up to four character slots each.
 - Character assignment to team slots from the owned collection.
 - Per-character weapon assignment with conflict prevention when a weapon is already equipped on another team.
@@ -30,8 +28,7 @@ Security sections, since they then describe deltas from a shipped release.
 - Responsive team editing sheet for small screens.
 - Phone-width layout for the header and team slots.
 - Team persistence so compositions survive across sessions.
-- Offline collection management that syncs when back online.
-- Anonymous-to-authenticated collection merge on sign-in.
+- Collections saved to your account, with a sign-in prompt when managing one signed out.
 - Google sign-in and sign-out from the site header.
 - Dark mode support.
 - Footer links to GitHub issues, feature requests, discussions, changelog, and repository.

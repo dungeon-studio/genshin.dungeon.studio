@@ -136,7 +136,7 @@ jobs:
       - name: Check schema compatibility
         env:
           SCHEMA_COMPAT_BASE: origin/${{ github.base_ref }}
-        run: pnpm --filter @genshin/api schemas:check
+        run: pnpm --filter @genshin/schema-snapshots schemas:check
 
   # Smoke-tests the root `pnpm dev` script — the one command a contributor runs
   # to bring up the whole stack (web, API, Firebase emulators). The e2e job below
@@ -348,7 +348,7 @@ jobs:
       # The action derives a scan range only for push and pull_request, and
       # scans the full history on any other event.
       - name: Scan for verified secrets
-        uses: trufflesecurity/trufflehog@e76dff8a7e57d6df0c60ad8cbf5d5cba505a8fc9 # v3.99.2
+        uses: trufflesecurity/trufflehog@e63326d6545de8f425d93ce24078c6e68d83f70e # v3.99.3
         with:
           base: ${{ github.event.merge_group.base_sha }}
           head: ${{ github.event.merge_group.head_sha }}
@@ -413,7 +413,7 @@ jobs:
           persist-credentials: false
 
       - name: Scan Terraform
-        uses: aquasecurity/trivy-action@6abccf398f78b4c337599c0656f933d91efb91a0 # master
+        uses: aquasecurity/trivy-action@8f28faec26515256b6d22074d1d2a8986f4cbd87 # master
         with:
           scan-type: config
           scan-ref: ${{ matrix.path }}
@@ -477,8 +477,10 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
+  # A skipped job never expands its matrix, so a matrix reference in the
+  # name would show raw. GitHub appends the environment to each run's name.
   terraform-plan:
-    name: Plan ${{ matrix.environment }} infrastructure
+    name: Plan environment infrastructure
     needs: terraform-changes
     if: needs.terraform-changes.outputs.changed == 'true'
     runs-on: ubuntu-latest
@@ -561,9 +563,9 @@ jobs:
             ].join('\n');
 
             const issue = { ...context.repo, issue_number: context.issue.number };
-            const comments = await github.rest.issues.listComments(issue);
+            const comments = await github.paginate(github.rest.issues.listComments, { ...issue, per_page: 100 });
 
-            const existing = comments.data.find(comment => comment.body.includes(marker));
+            const existing = comments.find(comment => comment.body.includes(marker));
 
             if (existing) {
               await github.rest.issues.updateComment({ ...context.repo, comment_id: existing.id, body });
@@ -602,7 +604,7 @@ jobs:
           persist-credentials: false
 
       - name: Scan Dockerfile
-        uses: aquasecurity/trivy-action@6abccf398f78b4c337599c0656f933d91efb91a0 # master
+        uses: aquasecurity/trivy-action@8f28faec26515256b6d22074d1d2a8986f4cbd87 # master
         with:
           scan-type: config
           scan-ref: apps/api
@@ -631,7 +633,7 @@ jobs:
       # The lockfile resolves every workspace; scanning the directory would
       # also walk build output and fixtures.
       - name: Scan dependency vulnerabilities
-        uses: aquasecurity/trivy-action@6abccf398f78b4c337599c0656f933d91efb91a0 # master
+        uses: aquasecurity/trivy-action@8f28faec26515256b6d22074d1d2a8986f4cbd87 # master
         with:
           scan-type: fs
           scan-ref: pnpm-lock.yaml
@@ -645,7 +647,7 @@ jobs:
       # scan. Failing on UNKNOWN forces a decision on any licence Trivy can't
       # classify.
       - name: Scan dependency licences
-        uses: aquasecurity/trivy-action@6abccf398f78b4c337599c0656f933d91efb91a0 # master
+        uses: aquasecurity/trivy-action@8f28faec26515256b6d22074d1d2a8986f4cbd87 # master
         with:
           scan-type: fs
           scan-ref: .
@@ -689,7 +691,7 @@ jobs:
       # to act on. trivy-action drops a severity input for SARIF unless
       # limit-severities-for-sarif is set.
       - name: Scan Container Image
-        uses: aquasecurity/trivy-action@6abccf398f78b4c337599c0656f933d91efb91a0 # master
+        uses: aquasecurity/trivy-action@8f28faec26515256b6d22074d1d2a8986f4cbd87 # master
         with:
           image-ref: api:ci
           scanners: vuln

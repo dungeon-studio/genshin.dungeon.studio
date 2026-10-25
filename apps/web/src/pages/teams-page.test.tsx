@@ -7,6 +7,7 @@ import { CHARACTER_ROSTER, WEAPON_ROSTER } from '@genshin/game-data';
 import { act, configure, render, screen, within } from '@testing-library/react';
 import type { UserEvent } from '@testing-library/user-event';
 import userEvent from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -14,7 +15,8 @@ import { useCollectionStore } from '@/features/collection/characters/use-charact
 import { useWeaponCollectionStore } from '@/features/collection/weapons/use-weapon-collection-store';
 import { useTeamStore } from '@/features/teams/use-team-store';
 import { makeCharacter, makeWeapon } from '@/test/fixtures';
-import { createWrapper } from '@/test/render';
+import { TestProviders } from '@/test/providers';
+import { createTestQueryClient, createWrapper } from '@/test/render';
 
 import { TeamsPage } from './teams-page';
 
@@ -50,16 +52,25 @@ async function firstEmptyMember() {
   return member;
 }
 
-function setupTeamsPage(): UserEvent {
-  const user = userEvent.setup({ delay: null });
+function AuthLoading({ children }: { children: ReactNode }) {
+  return (
+    <TestProviders queryClient={createTestQueryClient()} auth={{ status: 'loading' }}>
+      {children}
+    </TestProviders>
+  );
+}
+
+function renderTeamsPage(wrapper = createWrapper()): void {
   render(
     <MemoryRouter>
       <TeamsPage />
     </MemoryRouter>,
-    { wrapper: createWrapper() },
+    { wrapper },
   );
+}
 
-  // Seeded after mount: the hooks clear their stores on finding no signed-in user.
+// Call after rendering: the hooks clear their stores on finding no signed-in user.
+function seedCollections(): void {
   act(() => {
     useCollectionStore
       .getState()
@@ -71,7 +82,12 @@ function setupTeamsPage(): UserEvent {
       [BOW_INSTANCE]: makeWeapon(BOW_INSTANCE, BOW_WEAPON.id),
     });
   });
+}
 
+function setupTeamsPage(): UserEvent {
+  const user = userEvent.setup({ delay: null });
+  renderTeamsPage();
+  seedCollections();
   return user;
 }
 
@@ -88,15 +104,15 @@ async function pickCharacterFirst(user: UserEvent, character: Character): Promis
   await user.click(await screen.findByRole('button', { name: `Add ${character.name} to team` }));
 }
 
+beforeEach(() => {
+  useTeamStore.getState().resetTeams();
+  useCollectionStore.getState().clearCharacters();
+  useWeaponCollectionStore.getState().clearWeapons();
+});
+
 // Under coverage, with the rest of the suite competing for workers, a case runs
 // to tens of seconds.
 describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
-  beforeEach(() => {
-    useTeamStore.getState().resetTeams();
-    useCollectionStore.getState().clearCharacters();
-    useWeaponCollectionStore.getState().clearWeapons();
-  });
-
   it('assigns a weapon picked before a character, and narrows the pool to its wielders', async () => {
     const user = setupTeamsPage();
 
@@ -294,5 +310,29 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
       await screen.findByRole('button', { name: `Add ${BOW_USER.name} to team` }),
     ).toBeInTheDocument();
     expect(screen.queryByText(/users for/)).not.toBeInTheDocument();
+  });
+});
+
+describe('TeamsPage empty collection', () => {
+  // A collection belongs to an account, so the characters page can't fill one signed out.
+  it('offers sign-in to a signed-out visitor', () => {
+    renderTeamsPage();
+
+    expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
+  });
+
+  it('withholds the prompt until the collection has loaded', () => {
+    renderTeamsPage(AuthLoading);
+
+    expect(screen.queryByRole('button', { name: 'Sign in' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
+  });
+
+  it('shows no prompt once the user owns a character', () => {
+    renderTeamsPage();
+    seedCollections();
+
+    expect(screen.queryByRole('button', { name: 'Sign in' })).not.toBeInTheDocument();
   });
 });

@@ -55,25 +55,12 @@ Version numbers appear on every exported type—there's no unversioned
 
 ---
 
-## Implementation: Local storage (zustand persist)
-
-The `apps/web` stores that use zustand's `persist` middleware version their
-snapshots the same way, without Verzod—`persist` owns version dispatch. Each
-store keeps a Zod schema per version under
-`src/features/.../schemas/v{n}.ts`, stamps every write through `persist`'s
-`version`, and validates the old snapshot in `migrate` when the store reloads.
-`migrate` drops records that no longer satisfy the domain model; a signed-in
-user re-merges from the server afterward, so a dropped local record is never a
-real loss.
-
----
-
 ## Implementation: REST API
 
 The `profile` media type parameter on `Content-Type` and `Accept` carries the
 version, naming a JSON Schema served at its own URL.
-[DSGEP-003](../explanation/dsgep-003-json-schema-strategy.md) decides that
-mechanism; [DSGEP-005](../explanation/dsgep-005-schema-direction-segment.md)
+[ADR-0003](../explanation/adr-0003-json-schema-strategy.md) decides that
+mechanism; [ADR-0005](../explanation/adr-0005-schema-direction-segment.md)
 decides the schema paths.
 
 A route declares its **acceptor set** as the profile list passed to
@@ -87,15 +74,26 @@ type is the union over its route's acceptor set, and serialisation emits the
 current version alone.
 
 Retiring a version withdraws it from every acceptor set and from the schema
-endpoints, following DSGEP-003's [major version transition
-process](../explanation/dsgep-003-json-schema-strategy.md#major-version-transition-process).
+endpoints, following ADR-0003's [major version transition
+process](../explanation/adr-0003-json-schema-strategy.md#major-version-transition-process).
 
 ---
 
 ## Implementation: Other boundaries
 
-Queue payloads and cache entries don't yet use this pattern. Both are in-band
-boundaries like Firestore: when they're introduced, stamp every payload with a
+Queue payloads, cache entries, and local storage don't yet use this pattern.
+A zustand `persist` store stamps `persist`'s `version` and gates its Zod schemas
+through `tools/schema-snapshots`. Queue payloads and cache entries are
+in-band boundaries like Firestore: when they're introduced, stamp every payload with a
 `version` field, keep one `schemas/v{n}.ts` file per version, write a strict
 serializer and a union deserializer, use the same `V{n}ConceptSchema` /
 `V{n}Concept` naming convention.
+
+---
+
+## Retiring a snapshot
+
+Delete a shipped `schema-snapshots/{name}/v{n}.json` only when nothing reads
+data stored under that version any longer. Commit a `v{n}.retired` file in its
+place that says why. The Check schema compatibility job accepts the deletion
+only with it.

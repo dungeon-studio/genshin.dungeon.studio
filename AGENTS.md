@@ -29,6 +29,7 @@ config for another tool follows the pattern in
 - `packages/domain`: Shared domain model: types, invariants, and wire format representations.
 - `packages/collection-json`, `packages/validation`: Wire format and schema validation.
 - `tools/game-data-codegen`: CLI that generates `game-data` sources like `weapons.generated.ts` from `genshin-db`. Never hand-edit generated files.
+- `tools/schema-snapshots`: Snapshot export and base-branch compatibility check for persisted schemas.
 - `tools/e2e`: Playwright end-to-end specs.
 - `infrastructure`: Terraform.
 - `docs`: Diátaxis-organized how-tos, references, and explanations.
@@ -81,7 +82,7 @@ Terraform, or workflow. Read it from an environment variable.
 
 - Define each JSON Schema as a typed TypeScript module in `apps/api/src/profiles/json-schema/{module}/`, not a `.json` file.
 - Export a single `const` using `as const satisfies JsonSchemaProfile` from `@/profiles/json-schema/json-schema-profile.js`.
-- Name files `{method}-{direction}-v{n}.ts` (for example, `get-response-v1.ts`, `put-request-v1.ts`). `{method}` is the lowercase HTTP method and `{direction}` is `request` or `response`. The serving path mirrors the filename: `/profiles/json-schema/{module}/{method}-{direction}-v{n}.json`. See [DSGEP-005](docs/explanation/dsgep-005-schema-direction-segment.md).
+- Name files `{method}-{direction}-v{n}.ts` (for example, `get-response-v1.ts`, `put-request-v1.ts`). `{method}` is the lowercase HTTP method and `{direction}` is `request` or `response`. The serving path mirrors the filename: `/profiles/json-schema/{module}/{method}-{direction}-v{n}.json`. See [ADR-0005](docs/explanation/adr-0005-schema-direction-segment.md).
 - Register every schema module in `apps/api/src/profiles/json-schema/registry.ts`. The registry completeness test discovers files on disk and asserts the registry contains each one.
 - The schema route stamps `$id` from the request origin at serve time. Don't declare `$id` in schema modules.
 
@@ -97,7 +98,7 @@ writing tests.
 - Prefer composition over inheritance and use early returns for conditional rendering.
 - Use semantic HTML: proper heading hierarchy, structural elements, and native interactive elements (`<button>`, not `<div onClick>`).
 - Mark decorative Lucide icons with `aria-hidden="true"` and `focusable={false}`. Icons inside labeled buttons, or adjacent to labeled inputs, are decorative.
-- Use aliases such as `@/components`, `@/components/ui`, `@/lib`, and `@/lib/utils`.
+- Use aliases such as `@/components`, `@/components/ui`, and `@/lib`.
 - `shadcn/ui` gotchas:
   - Use ESM imports in Tailwind or Vite config (`import ...`), not `require()`.
   - Keep Vite starter CSS dark-mode defaults removed from `apps/web/src/index.css`; don't reintroduce `color-scheme` or `prefers-color-scheme` defaults.
@@ -118,7 +119,8 @@ writing tests.
 ## Documentation rules
 
 - Place guidance at the highest-priority location that fits, following the documentation strategy in [Code conventions](docs/reference/code-conventions.md). Don't duplicate guidance across files; link to the canonical source.
-- Keep docs accurate to `HEAD`: verify dependencies, command availability, and feature status. State plans explicitly as planned or not yet implemented.
+- Keep docs accurate to `HEAD`: verify dependencies, command availability, and feature status. Describe only what exists; the issue tracker and milestones carry plans.
+- Record architecture decisions as MADR records at `docs/explanation/adr-NNNN-<slug>.md`, numbered in sequence and copied from `docs/explanation/adr-template.md`.
 - Every source file needs SPDX headers. For files without comment syntax, declare them in `REUSE.toml`; see [How to add SPDX headers to new files](docs/how-tos/add-spdx-headers.md).
 - Wrap file and directory paths in backticks in prose and YAML metadata (for example, `apps/web`, `packages/game-data/src/index.ts`). Markdown link targets don't need backticks.
 - When adding features, keep these descriptions in sync: `package.json` `description`, `README.md` tagline or summary, and `CONTRIBUTING.md` references to commands or scripts.

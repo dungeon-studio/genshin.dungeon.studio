@@ -4,7 +4,7 @@
 import { CircleHelp } from 'lucide-react';
 import type { JSX } from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/class-names';
 
 import { ICON_SLOT } from './item-summary';
 

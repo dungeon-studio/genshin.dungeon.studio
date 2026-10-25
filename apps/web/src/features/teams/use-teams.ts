@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 
-import { useSaveTeamMutation, useTeamsQuery } from './use-team-api';
+import { useSaveTeamMutation, useTeamsQuery, useTeamWritePending } from './use-team-api';
 import { useTeamStore } from './use-team-store';
 
 export interface UseTeamsResult {
@@ -31,7 +31,6 @@ export interface UseTeamsResult {
   clearTeam: (slot: TeamSlot) => void;
   setTeamName: (slot: TeamSlot, name: string) => void;
   getTeam: (slot: TeamSlot) => CollectionTeam;
-  isCharacterInTeam: (slot: TeamSlot, characterId: string) => boolean;
   isSaving: boolean;
   isLoading: boolean;
   error: Error | null;
@@ -81,7 +80,7 @@ type TeamStore = ReturnType<typeof useTeamStore.getState>;
 
 function useTeamActions(
   isAuthenticated: boolean,
-  saveTeamApi: ReturnType<typeof useSaveTeamMutation>['mutate'],
+  saveTeamApi: ReturnType<typeof useSaveTeamMutation>['mutateAsync'],
 ): TeamActions {
   return useMemo(() => {
     const store = () => useTeamStore.getState();
@@ -93,15 +92,15 @@ function useTeamActions(
         action(store())(slot, ...args);
         if (!isAuthenticated) return;
         const optimisticTeam = store().teams[slot];
-        saveTeamApi(optimisticTeam, {
-          onError: () => {
-            if (store().teams[slot] !== optimisticTeam) {
-              toast.error('Failed to save team.');
-              return;
-            }
-            store().setTeam(slot, previousTeam);
-            toast.error('Failed to save team. Change has been reverted.');
-          },
+        // Each request needs its own promise: `mutate`'s per-call `onError` fires
+        // only for the latest call.
+        saveTeamApi(optimisticTeam).catch(() => {
+          if (store().teams[slot] !== optimisticTeam) {
+            toast.error('Failed to save team.');
+            return;
+          }
+          store().setTeam(slot, previousTeam);
+          toast.error('Failed to save team. Change has been reverted.');
         });
       };
 
@@ -127,7 +126,8 @@ function useTeamActions(
  * same slot again, their newer edit stands and they get an error toast instead.
  *
  * Signed out, the actions still work and nothing is persisted, so a visitor can
- * plan a team before deciding to sign in. Signing out discards it.
+ * plan a team before deciding to sign in. Signing out empties the teams, through
+ * `ClearUserDataOnSignOut` rather than this hook.
  */
 export function useTeams(): UseTeamsResult {
   const auth = useAuth();
@@ -136,46 +136,36 @@ export function useTeams(): UseTeamsResult {
 
   const teams = useTeamStore((s) => s.teams);
   const storeSetTeams = useTeamStore((s) => s.setTeams);
-  const storeResetTeams = useTeamStore((s) => s.resetTeams);
 
-  const { data: apiTeams, error: queryError, isLoading: queryLoading } = useTeamsQuery(uid);
+  const {
+    data: apiTeams,
+    dataUpdatedAt,
+    error: queryError,
+    isLoading: queryLoading,
+  } = useTeamsQuery(uid);
+  const isWritePending = useTeamWritePending(uid);
 
-  const { mutate: saveTeamApi, isPending: isSaving } = useSaveTeamMutation(uid);
+  const { mutateAsync: saveTeamApi, isPending: isSaving } = useSaveTeamMutation(uid);
 
   useWarnOnUnloadWhileSaving(isSaving);
 
-  // Reset store on logout
+  // The last write's refetch replaces a skipped answer. `dataUpdatedAt` reruns
+  // this when that refetch returns identical data.
   useEffect(() => {
-    if (!isAuthenticated) {
-      storeResetTeams();
-    }
-  }, [isAuthenticated, storeResetTeams]);
-
-  // Populate store from API data
-  useEffect(() => {
-    if (!apiTeams) return;
+    if (!apiTeams || isWritePending()) return;
     storeSetTeams(collectionTeamsToStore(apiTeams));
-  }, [apiTeams, storeSetTeams]);
+  }, [apiTeams, dataUpdatedAt, isWritePending, storeSetTeams]);
 
   const actions = useTeamActions(isAuthenticated, saveTeamApi);
 
   const getTeam = useCallback((slot: TeamSlot) => teams[slot], [teams]);
 
-  const isCharacterInTeam = useCallback(
-    (slot: TeamSlot, characterId: string) =>
-      teams[slot].members.some((m) => m?.characterId === characterId),
-    [teams],
-  );
-
-  const error = isAuthenticated ? (queryError ?? null) : null;
-
   return {
     teams,
     ...actions,
     getTeam,
-    isCharacterInTeam,
     isSaving,
     isLoading: awaitingUserData(auth, queryLoading),
-    error,
+    error: isAuthenticated ? (queryError ?? null) : null,
   };
 }
