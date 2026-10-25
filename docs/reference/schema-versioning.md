@@ -93,7 +93,7 @@ serializer and a union deserializer, use the same `V{n}ConceptSchema` /
 
 ## Retiring a snapshot
 
-A shipped `schema-snapshots/{name}/v{n}.json` may be deleted only when nothing
-reads data stored under that version any longer. Commit a `v{n}.retired` file
-in its place, saying why; the Check schema compatibility job accepts the
-deletion only with it.
+Delete a shipped `schema-snapshots/{name}/v{n}.json` only when nothing reads
+data stored under that version any longer. Commit a `v{n}.retired` file in its
+place that says why. The Check schema compatibility job accepts the deletion
+only with it.
