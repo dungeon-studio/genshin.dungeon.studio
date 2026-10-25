@@ -22,28 +22,18 @@ runs:
   using: composite
 
   steps:
-    - name: Find existing report issue
-      id: report
-      shell: bash
-      env:
-        GH_TOKEN: ${{ github.token }}
-        TITLE: ${{ inputs.title }}
-      run: |
-        number=$(gh issue list --repo "${GITHUB_REPOSITORY}" --state open \
-          --search "${TITLE} in:title" --json number --jq '.[0].number // empty')
-        echo "number=${number}" >> "${GITHUB_OUTPUT}"
-
     - name: Open or update report issue
       shell: bash
       env:
         GH_TOKEN: ${{ github.token }}
-        NUMBER: ${{ steps.report.outputs.number }}
         TITLE: ${{ inputs.title }}
         CONTENT_FILEPATH: ${{ inputs.content-filepath }}
         LABELS: ${{ inputs.labels }}
       run: |
-        if [ -n "${NUMBER}" ]; then
-          gh issue edit "${NUMBER}" --repo "${GITHUB_REPOSITORY}" \
+        number=$(gh issue list --repo "${GITHUB_REPOSITORY}" --state open \
+          --search "${TITLE} in:title" --json number --jq '.[0].number // empty')
+        if [ -n "${number}" ]; then
+          gh issue edit "${number}" --repo "${GITHUB_REPOSITORY}" \
             --body-file "${CONTENT_FILEPATH}" --add-label "${LABELS}"
         else
           gh issue create --repo "${GITHUB_REPOSITORY}" --title "${TITLE}" \
