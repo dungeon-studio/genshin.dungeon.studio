@@ -5,6 +5,5 @@
 
 import { network } from 'virtual:msw';
 
-// Shared request-mocking network for the jsdom test environment. Tests register
-// per-case handlers with `server.use(...)`; lifecycle is wired in setup.ts.
+// Enabled and reset around every test in setup.ts.
 export const server = network;
