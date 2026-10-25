@@ -231,7 +231,6 @@ describe('useTeams (authenticated)', () => {
     });
     await waitFor(() => expect(putBodies).toHaveLength(2));
     unsubscribe();
-    await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
 
     act(() => {
       result.current.setTeamName(1, 'Third');

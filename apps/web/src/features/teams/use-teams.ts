@@ -211,8 +211,7 @@ export function useTeams(): UseTeamsResult {
 
   useWarnOnUnloadWhileSaving(isSaving);
 
-  // An answer that lands while a write is pending predates it, so the store
-  // keeps its edits and waits for the refetch the last write starts.
+  // A skipped answer waits for the refetch the last write starts.
   // `dataUpdatedAt` reruns this when that refetch matches the answer skipped.
   useEffect(() => {
     if (!apiTeams || isWritePending()) return;
