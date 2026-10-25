@@ -51,9 +51,9 @@ export function useUserQuerySync(
 }
 
 /**
- * Whether a write through `useUserQuerySync` is still waiting on the server,
- * read when called rather than at render, so an effect sees writes started
- * since. An answer that lands meanwhile predates that write.
+ * A check for whether a write through `useUserQuerySync` is still waiting on
+ * the server. It reads at call time, so an effect sees writes started after
+ * the render. A query answer that lands while one is pending predates it.
  */
 export function useUserWritePending(
   userId: string | undefined,

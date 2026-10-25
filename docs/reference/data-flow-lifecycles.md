@@ -28,8 +28,8 @@ In every feature:
   refetch changes the store only when its result differs.
 - Sending a request cancels any refetch already in flight, except the first
   load. The first load, or a refetch that starts after the request, can still
-  land before the request settles. A character or weapon refetch that lands
-  then reaches the store; a team refetch doesn't.
+  land before the request settles. A character or weapon refetch that lands in
+  that window reaches the store. The team store skips it.
 - Only the latest character or weapon request of each kind through a hook gets
   its response handling: confirm, rollback, and toast. An earlier one, or one
   that settles after the user leaves its page, reaches the store only through a
@@ -157,10 +157,10 @@ stateDiagram-v2
 - Sent by a clear: no component calls `clearTeam`. The store keeps the team's
   name and empties its positions. The server deletes the record, so the refetch
   brings back the default name, see [#1839].
-- No Overwritten state: a refetch that lands while any team save or clear is
-  pending leaves the store alone, and the store waits for the refetch the last
-  request starts. If that request fails, nothing refetches, so the store keeps
-  its rolled-back slots until the next refetch, see [#550].
+- Edits in flight: a refetch that lands while any team save or clear is pending
+  leaves the store alone. The refetch the last request starts updates it. If
+  that request fails, nothing refetches, and the store keeps its rolled-back
+  slots until the next refetch, see [#550].
 
 [#550]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/550
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133

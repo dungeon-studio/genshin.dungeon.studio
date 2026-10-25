@@ -217,7 +217,8 @@ describe('useTeams (authenticated)', () => {
     const { result, queryClient } = renderHookSignedIn(() => useTeams(), 'user-1');
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    // Cache listeners run as the answer lands; React renders it a tick later.
+    // A cache listener runs before React renders the answer, so this edit
+    // lands in between.
     const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
       if (event.type !== 'updated' || event.action.type !== 'success') return;
       if (putBodies.length !== 1) return;

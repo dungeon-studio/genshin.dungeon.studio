@@ -211,8 +211,8 @@ export function useTeams(): UseTeamsResult {
 
   useWarnOnUnloadWhileSaving(isSaving);
 
-  // A skipped answer waits for the refetch the last write starts.
-  // `dataUpdatedAt` reruns this when that refetch matches the answer skipped.
+  // The last write's refetch replaces a skipped answer. `dataUpdatedAt` reruns
+  // this when that refetch returns identical data.
   useEffect(() => {
     if (!apiTeams || isWritePending()) return;
     storeSetTeams(collectionTeamsToStore(apiTeams));
