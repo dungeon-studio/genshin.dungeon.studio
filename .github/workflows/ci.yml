@@ -721,14 +721,13 @@ jobs:
         if: always()
         run: docker rm -f api-smoke 2>/dev/null || true
 
-  # A cold devcontainer build is expensive, so the job builds only when an
-  # input that no other job exercises changed. The skip lives in a step rather
-  # than a `paths:` gate so the check reports on every pull request and a
-  # ruleset can require it.
+  # A step skips the expensive devcontainer build unless an input changed, so
+  # the check still reports on every pull request and a ruleset can require
+  # it. Inputs another job already exercises stay off the list.
   toolchain:
     name: Verify toolchain
     runs-on: ubuntu-latest
-    # Headroom for a cold build, which has no cache to fall back on.
+    # Headroom for a cold build.
     timeout-minutes: 30
 
     steps:
