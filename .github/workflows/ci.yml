@@ -724,7 +724,7 @@ jobs:
 
   # A step skips the expensive devcontainer build unless an input changed, so
   # the check still reports on every pull request and a ruleset can require
-  # it. Inputs another job already exercises stay off the list.
+  # it. The inputs are the files the image build reads, plus this workflow.
   toolchain:
     name: Verify toolchain
     runs-on: ubuntu-latest
