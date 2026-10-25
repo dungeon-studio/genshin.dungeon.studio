@@ -35,8 +35,7 @@ apart?
 Each prototype covers weapons in full, and characters for Local mode and the
 sign-in push. Weapons have no Local mode, because the server mints their
 instance identifiers. [Issue #1760](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1760)
-records the measurements. [Issue #1133](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133)
-makes the decision. No prototype merges.
+describes the prototypes.
 
 ## Decision drivers
 
@@ -60,20 +59,14 @@ Pending [issue #1133](https://github.com/dungeon-studio/genshin.dungeon.studio/i
 
 ### Measurements
 
-Each prototype starts from `develop` at `8f87a630`, whose web bundle is
-1,032.92 KB, or 303.87 KB compressed. Line counts are non-test source under
-`apps/web`. Package counts are direct dependencies, then every package new to
-`pnpm-lock.yaml`.
+Line counts cover non-test web source. The bundle change starts from 303.87 KB
+compressed. Package counts are direct dependencies, then all new packages.
 
 | Option                         | Lines added / removed | Compressed bundle change | Packages added |
 | ------------------------------ | --------------------- | ------------------------ | -------------- |
 | TanStack Query alone           | 693 / 754             | +1.02 KB                 | 2 / 3          |
-| TanStack DB, weapons only      | 536 / 313             | +107.07 KB               | 5 / 8          |
+| TanStack DB, weapons only      | 272 / 313             | +107.07 KB               | 5 / 8          |
 | Status quo with a write helper | 199 / 197             | +0.10 KB                 | 0 / 0          |
-
-The TanStack DB character spike isn't wired in. Its row counts the new code but
-not the deletions wiring it in would bring, mostly in `use-character-collection.ts`
-and `use-character-collection-api.ts`.
 
 ### Mechanisms each option removes
 
@@ -85,33 +78,31 @@ and `use-character-collection-api.ts`.
 | Sign-in push     | Kept, about 20 lines        | Kept                      | Kept                           |
 | Guarded rollback | Kept                        | Replaced by the library's | Kept, in one helper            |
 | Sender check     | Kept, needed in more places | Kept, in two places       | Kept, in one helper            |
-| Query sync       | Moved to mutation defaults  | Removed for weapons       | Kept                           |
+| Query sync       | Kept, in shared write setup | Removed for weapons       | Kept                           |
 
 ### Modes each option supports
 
 | Mode    | TanStack Query alone                            | TanStack DB                                     | Status quo with a write helper              |
 | ------- | ----------------------------------------------- | ----------------------------------------------- | ------------------------------------------- |
 | Local   | Hand-written storage module with the migration  | Storage collection, synced across tabs          | Unchanged persisted store                   |
-| Offline | Paused writes survive a reload, untested        | Queues in one tab only, no reads after a reload | Nothing queues                              |
+| Offline | Paused writes survive a reload, unverified      | Queues in one tab only, no reads after a reload | Nothing queues                              |
 | Online  | Optimistic, writes to one entity run in order   | Optimistic, adds included                       | Optimistic, every write in one helper       |
 | Remote  | A refetch shows server truth, removals included | Per-user collections refetch from the server    | Per-feature reconcile, merge for characters |
 
 ### TanStack Query alone
 
-Optimistic writes through `onMutate` and `onError`, writes to one entity
-serialized with mutation `scope`, and paused mutations saved to `localStorage`
-with `@tanstack/react-query-persist-client` and `@tanstack/query-sync-storage-persister`.
+Optimistic writes in the query cache, writes to one entity run in order, and
+paused writes kept in browser storage by TanStack's persistence packages.
 
 - Good, because it removes the most code and the second client copy for about
   1 KB of bundle.
-- Neutral, because the guarded rollback survives. The optimistic update runs
-  before the scope queue waits, so a failed earlier write could otherwise
-  overwrite a newer one.
+- Neutral, because the guarded rollback survives. An optimistic update applies
+  before earlier writes to the same entity finish, so one of those failing could
+  otherwise overwrite it.
 - Bad, because the sender check spreads. A paused write needs one before it
-  replays, and every `onError` needs one before it toasts. The prototype failed
-  one test showing a reverted-write toast after sign-out.
-- Bad, because the sign-out purge drops the departing user's queued writes.
-- Bad, because account data stays in `localStorage` for up to 24 hours, where
+  replays, and every failure needs one before it toasts.
+- Bad, because signing out drops the departing user's queued writes.
+- Bad, because account data stays in browser storage for up to 24 hours, where
   weapons were memory-only.
 
 <!-- vale Microsoft.HeadingAcronyms = NO -->
@@ -120,35 +111,32 @@ with `@tanstack/react-query-persist-client` and `@tanstack/query-sync-storage-pe
 
 <!-- vale Microsoft.HeadingAcronyms = YES -->
 
-`@tanstack/db` 0.15.2 with `@tanstack/react-db`, `@tanstack/query-db-collection`,
-and `@tanstack/offline-transactions`, layered on the existing query client.
+TanStack DB 0.15 collections over the existing query client, with optimistic
+transactions and an offline outbox.
 
 - Good, because weapon adds become optimistic through a temporary identifier,
   which removes the in-flight duplicate guard.
 - Bad, because the compressed bundle grows by about 35% for weapons alone.
-- Bad, because a replay after a crash can create a duplicate weapon:
-  `POST /weapons` ignores the key the outbox sends to mark a replay.
+- Bad, because a replay after a crash can create a duplicate weapon: the API
+  doesn't recognize a replayed add.
 - Bad, because a failed write also rolls back later pending writes to the same
   row, where the guarded rollback keeps the newer edit.
-- Bad, because the default leader lock name covers the whole origin, so each
-  user needs their own lock.
-- Bad, because the library is pre-1.0 and churning. Five minor releases landed
-  between 0.11.0 on 2026-09-30 and 0.15.0 on 2026-10-15. The 0.15.0 release
-  notes flag a breaking change.
+- Bad, because the outbox's default lock spans the whole site, so each user
+  needs their own.
+- Bad, because the library is pre-1.0 and churning, with five minor releases in
+  October 2026, one of them breaking.
 - Bad, because the library's storage format carries no version. The character
-  schema migration runs once on import, and a rollback to an older build loses
-  the moved data.
+  migration runs once and moves the data, so an older build can't read it.
 
 ### Status quo with a write helper
 
-Keep the zustand mirrors and route every write through one
-`useOptimisticWrite` helper, as [issue #1533](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1533)
+Keep the zustand mirrors and route every write through one shared helper, as
+[issue #1533](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1533)
 proposes.
 
 - Good, because it adds no dependency and doesn't change the bundle.
-- Good, because each write settles on its own promise, which fixes
-  [issue #1534](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1534)
-  for characters and weapons.
+- Good, because a failed write rolls back even while a later write is in
+  flight, which fixes [issue #1534](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1534).
 - Bad, because the net line count is flat: it consolidates the synchronization
   code without removing it.
 - Bad, because an offline queue needs each mutation stored as data and a cache
