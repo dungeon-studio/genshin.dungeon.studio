@@ -47,7 +47,6 @@ function appWrapper(auth: { current: AuthState }) {
 
 describe('ClearUserDataOnSignOut', () => {
   it("keeps a visitor's work while auth settles and across page changes", () => {
-    useCollectionStore.getState().addCharacter(SKIRK);
     useTeamStore.getState().assignCharacter(1, 0, SKIRK);
 
     const auth: { current: AuthState } = { current: { status: 'loading' } };
@@ -63,19 +62,13 @@ describe('ClearUserDataOnSignOut', () => {
     unmount();
     renderHook(usePages, { wrapper });
 
-    expect(useCollectionStore.getState().characters[SKIRK]).toBeDefined();
     expect(useTeamStore.getState().teams[1].members[0]?.characterId).toBe(SKIRK);
   });
 
-  it('clears on sign-out, even off the pages that show the data, so the next user merges fresh', async () => {
-    useCollectionStore.getState().addCharacter(SKIRK);
-
-    let serverCharacters = charactersDocument([]);
+  it('clears on sign-out, even off the pages that show the data, so the next user starts fresh', async () => {
+    let serverCharacters = charactersDocument([makeCharacter(SKIRK)]);
     server.use(
       http.get('http://localhost:8080/characters', () => HttpResponse.json(serverCharacters)),
-      http.put('http://localhost:8080/characters/skirk', () =>
-        HttpResponse.json(charactersDocument([makeCharacter(SKIRK)])),
-      ),
     );
 
     const auth = { current: settledAuth(fakeUser('user-1')) };

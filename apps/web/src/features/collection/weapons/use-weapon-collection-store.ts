@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { CollectionWeapon, CollectionWeaponId, RefinementLevel } from '@genshin/domain';
-import type { Weapon, WeaponId } from '@genshin/game-data';
+import type { WeaponId } from '@genshin/game-data';
 import { create } from 'zustand';
 
 interface WeaponCollectionState {
@@ -11,7 +11,6 @@ interface WeaponCollectionState {
   addWeapon: (weapon: CollectionWeapon) => void;
   removeWeapon: (collectionWeaponId: CollectionWeaponId) => void;
   setRefinementLevel: (collectionWeaponId: CollectionWeaponId, level: RefinementLevel) => void;
-  getWeaponsByWeaponId: (weaponId: Weapon['id']) => CollectionWeapon[];
   clearWeapons: () => void;
 }
 
@@ -33,10 +32,6 @@ export function groupByWeapon(
  *
  * Components reach for `useWeaponCollection` instead, which wraps this with the
  * server sync. This store is for that hook and for tests.
- *
- * Not persisted, unlike the character collection: an instance identifier is
- * minted by the server, so a copy recorded offline could never be reconciled
- * with the account's own records.
  */
 export const useWeaponCollectionStore = create<WeaponCollectionState>()((set, get) => ({
   weapons: {},
@@ -72,10 +67,6 @@ export const useWeaponCollectionStore = create<WeaponCollectionState>()((set, ge
         [collectionWeaponId]: { ...entry, refinementLevel: level },
       },
     }));
-  },
-
-  getWeaponsByWeaponId: (weaponId) => {
-    return Object.values(get().weapons).filter((w) => w.weaponId === weaponId);
   },
 
   clearWeapons: () => {

@@ -46,51 +46,38 @@ In every feature:
 
 ```mermaid
 stateDiagram-v2
-  state "Local only" as LocalOnly
   state "Rolled back" as RolledBack
   state "Held only locally" as HeldLocally
 
-  [*] --> LocalOnly: add while not signed in
-  [*] --> LocalOnly: restore from localStorage
-  [*] --> Sent: add while signed in
+  [*] --> Sent: add
   [*] --> Confirmed: refetch brings an entry the store lacks
-  LocalOnly --> Sent: edit after sign-in, before the first fetch lands
-  LocalOnly --> Sent: sign-in merge, server lacks it or holds a lower level
-  LocalOnly --> Confirmed: sign-in merge, server holds an equal or higher level
-  LocalOnly --> [*]: remove while not signed in
   Sent --> Sent: newer edit
   Sent --> Confirmed: PUT succeeds, saved entry replaces the copy
   Sent --> [*]: DELETE succeeds
   Sent --> [*]: add rejected, store still at the minimum level
   Sent --> RolledBack: rejected, store still holds the sent value
-  Sent --> Overwritten: refetch during a lowering or a removal
-  Sent --> HeldLocally: sign-in push fails
+  Sent --> Overwritten: refetch while in flight
   Sent --> HeldLocally: add rejected after a raise
   Overwritten --> Confirmed: PUT succeeds, or the request fails
-  Overwritten --> HeldLocally: DELETE succeeds
-  Confirmed --> Sent: edit while signed in
-  Confirmed --> HeldLocally: lowered or removed on another device, merge keeps it
-  HeldLocally --> Sent: edit, or sign-in after an unseen sign-out
+  Overwritten --> [*]: DELETE succeeds, then a refetch drops it
+  Confirmed --> Sent: edit
+  Confirmed --> [*]: refetch lacks it
+  HeldLocally --> Sent: edit
+  HeldLocally --> [*]: next refetch
   RolledBack --> Sent: edit
   RolledBack --> Confirmed: next refetch
 ```
 
-- Local only: persisted in `localStorage`, so it survives page loads until the
-  sign-in merge. A session that ends while no tab is open isn't seen as a
-  sign-out, so its characters stay local.
+- No local-only state: every action is a no-op while not signed in.
 - Confirmed by a response: the saved entry replaces the copy, server timestamps
   included. A response for a character removed since is skipped.
-- Confirmed by a refetch: the store takes the server's `createdAt`, and its
-  `updatedAt` only where the server's level is at least the local one.
+- Confirmed by a refetch: the store takes the server's entry whole.
 - Rolled back: a rolled-back removal returns with new client timestamps.
-- Overwritten: a refetch merges additively, so a raise or an add in flight
-  survives it.
-- Held only locally: a copy ahead of the server, which lacks it or holds a lower
-  level. A failed sign-in push or a rejected add with a raised level only
-  toasts, so each leaves one, see [#1840]. The merge keeps the copy until the
-  store empties. An edit writes it back to the server. So does the sign-in push
-  after a session that ended with no tab open, since that leaves the store
-  intact.
+- Overwritten: a refetch replaces the whole store, so a refetch the request
+  didn't cancel overwrites any edit in flight.
+- Held only locally: a rejected add with a raised level only toasts, leaving a
+  copy the server lacks. The next refetch drops it, and an edit writes it to
+  the server.
 
 ## Weapons
 
@@ -166,4 +153,3 @@ stateDiagram-v2
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
 [#1534]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1534
 [#1839]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1839
-[#1840]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1840

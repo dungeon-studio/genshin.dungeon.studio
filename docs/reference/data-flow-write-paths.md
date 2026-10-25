@@ -11,7 +11,7 @@ branches, and an `opt` box runs only when its condition holds.
 A write path is any code that reaches one of these:
 
 - A non-`GET` route under `apps/api/src/routes/`.
-- A zustand `set` or `persist` call under `apps/web/src/features/`.
+- A zustand `set` call under `apps/web/src/features/`.
 - A TanStack Query mutation or cache call.
 
 Four features do: characters, weapons, teams, and the account. Artifact plans
@@ -49,7 +49,8 @@ another account signs in, changes nothing and shows no toast, through
 
 ## Characters
 
-`useCollection` in `use-character-collection.ts`.
+`useCollection` in `use-character-collection.ts`. A collection belongs to an
+account, so nothing works signed out.
 
 ```mermaid
 sequenceDiagram
@@ -61,36 +62,28 @@ sequenceDiagram
   participant FS as Firestore
 
   Hook->>Store: addCharacter / removeCharacter / setConstellationLevel
-  opt signed in
-    Hook->>Cache: cancel any refetch in flight
-    Hook->>API: PUT or DELETE /characters/{id}
-    API->>FS: PUT: transaction of read, nextCharacter, set<br>DELETE: delete
-    alt success
-      API-->>Hook: saved character, or no content on DELETE
-      Hook->>Cache: invalidate, unless another write is pending
-      opt PUT
-        Hook->>Store: replaceCharacter (skipped once removed)
-      end
-      Cache-->>Reconcile: refetched collection
-      Reconcile->>Store: mergeCollections, then replaceCharacters
-    else failure
-      API-->>Hook: problem detail
-      Hook->>Store: guarded rollback
+  Hook->>Cache: cancel any refetch in flight
+  Hook->>API: PUT or DELETE /characters/{id}
+  API->>FS: PUT: transaction of read, nextCharacter, set<br>DELETE: delete
+  alt success
+    API-->>Hook: saved character, or no content on DELETE
+    Hook->>Cache: invalidate, unless another write is pending
+    opt PUT
+      Hook->>Store: replaceCharacter (skipped once removed)
     end
+    Cache-->>Reconcile: refetched collection
+    Reconcile->>Store: replaceCharacters (replace)
+  else failure
+    API-->>Hook: problem detail
+    Hook->>Store: guarded rollback
   end
 ```
-
-The first time the query resolves after a sign-in, the reconcile effect,
-`useServerSync`, also makes the sign-in push. It runs once per sign-in, so a
-remount or a page load skips it. It merges the store into the server collection, then sends a `PUT` for every
-entry the server lacks or holds at a lower constellation. A failed push only
-toasts, and only for the last entry sent. The merged value stays in the store.
 
 ## Weapons
 
 `useWeaponCollection` in `use-weapon-collection.ts`. The server mints the
-instance identifier, so adding can't be optimistic and nothing works signed
-out.
+instance identifier, so adding can't be optimistic. Like characters, nothing
+works signed out.
 
 ```mermaid
 sequenceDiagram
@@ -171,7 +164,7 @@ On the teams page, a `beforeunload` prompt guards the latest in-flight save.
 ```mermaid
 sequenceDiagram
   participant Hook as useDeleteAccount
-  participant Stores as stores and localStorage
+  participant Stores as stores
   participant Cache as query cache
   participant API as API
   participant FS as Firestore
@@ -195,14 +188,14 @@ failure between the two never orphans data: the identity remains and can retry.
 
 ## Divergences
 
-| Question                                    | Characters                                                                | Weapons                                | Teams                                    |
-| ------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------- | ---------------------------------------- |
-| Works signed out?                           | Yes, persisted until sign-in merges it                                    | No, every action is a no-op            | Yes, in memory until a reload or sign-in |
-| Optimistic?                                 | All three actions                                                         | Remove and refine, not add             | Every action                             |
-| Applies the mutation response to the store? | Whole entry, skipped once removed                                         | Whole instance, replaced               | No                                       |
-| How a refetch reaches the store             | Additive merge                                                            | Replace                                | Replace, filled to four slots            |
-| Can a refetch overwrite an edit in flight?  | Raise or add, no. Lower or remove, only a refetch the write didn't cancel | Only a refetch the write didn't cancel | Only a refetch the write didn't cancel   |
-| What a removal elsewhere does to the store  | Survives the merge                                                        | Disappears on refetch                  | Disappears on refetch                    |
+| Question                                    | Characters                             | Weapons                                | Teams                                    |
+| ------------------------------------------- | -------------------------------------- | -------------------------------------- | ---------------------------------------- |
+| Works signed out?                           | No, every action is a no-op            | No, every action is a no-op            | Yes, in memory until a reload or sign-in |
+| Optimistic?                                 | All three actions                      | Remove and refine, not add             | Every action                             |
+| Applies the mutation response to the store? | Whole entry, skipped once removed      | Whole instance, replaced               | No                                       |
+| How a refetch reaches the store             | Replace                                | Replace                                | Replace, filled to four slots            |
+| Can a refetch overwrite an edit in flight?  | Only a refetch the write didn't cancel | Only a refetch the write didn't cancel | Only a refetch the write didn't cancel   |
+| What a removal elsewhere does to the store  | Disappears on refetch                  | Disappears on refetch                  | Disappears on refetch                    |
 
 Teams also depend on the other two features. The server rejects a team that
 names a character or weapon instance the user doesn't own, so a team save can
