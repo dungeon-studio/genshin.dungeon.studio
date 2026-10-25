@@ -9,6 +9,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { makeTeam, teamsDocument } from '@/test/fixtures';
 import { holdResponse } from '@/test/msw/held-response';
+import { matchJsonBody } from '@/test/msw/match-json-body';
 import { server } from '@/test/msw/server';
 import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
 
@@ -128,17 +129,16 @@ describe('useTeams (authenticated)', () => {
   it('reports a failed save that a newer edit to the same team superseded', async () => {
     const firstPut = holdResponse(() => new HttpResponse(null, { status: 500 }));
     const newerName = 'Newer';
-    let putCount = 0;
     server.use(
       http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([]))),
-      // Matched on the body, not arrival order, which concurrent requests
-      // don't guarantee.
-      http.put('http://localhost:8080/teams/1', async ({ request }) => {
-        putCount += 1;
-        const { name } = (await request.json()) as { name: string };
-        if (name !== newerName) return firstPut.resolver();
-        return new HttpResponse(null, { status: 204 });
-      }),
+      http.put(
+        matchJsonBody<{ name: string }>(
+          'http://localhost:8080/teams/1',
+          ({ name }) => name !== newerName,
+        ),
+        firstPut.resolver,
+      ),
+      http.put('http://localhost:8080/teams/1', () => new HttpResponse(null, { status: 204 })),
     );
 
     const { result } = renderHookSignedIn(() => useTeams(), 'user-1');
@@ -150,7 +150,7 @@ describe('useTeams (authenticated)', () => {
     act(() => {
       result.current.setTeamName(1, newerName);
     });
-    await waitFor(() => expect(putCount).toBe(2));
+    await firstPut.arrived;
 
     firstPut.release();
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Failed to save team.'));

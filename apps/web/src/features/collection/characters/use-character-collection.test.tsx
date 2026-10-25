@@ -10,6 +10,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { charactersDocument, makeCharacter } from '@/test/fixtures';
 import { holdResponse } from '@/test/msw/held-response';
+import { matchJsonBody } from '@/test/msw/match-json-body';
 import { server } from '@/test/msw/server';
 import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
 
@@ -19,6 +20,10 @@ import { useCollection } from './use-character-collection';
 import { useCollectionStore } from './use-character-collection-store';
 
 const SKIRK = 'skirk' as CharacterId;
+
+interface CharacterLevelBody {
+  constellationLevel: number;
+}
 
 beforeEach(() => {
   useCollectionStore.getState().clearCharacters();
@@ -160,19 +165,20 @@ describe('useCollection mutations', () => {
   it('keeps a raise made while a failing add was in flight', async () => {
     const addFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
     const raisedLevel = 3;
-    let putCount = 0;
     server.use(
       http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
-      // Matched on the body, not arrival order, which concurrent requests
-      // don't guarantee.
-      http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
-        putCount += 1;
-        const { constellationLevel } = (await request.json()) as { constellationLevel: number };
-        if (constellationLevel === MIN_CONSTELLATION_LEVEL) return addFailure.resolver();
-        return HttpResponse.json(
+      http.put(
+        matchJsonBody<CharacterLevelBody>(
+          'http://localhost:8080/characters/skirk',
+          ({ constellationLevel }) => constellationLevel === MIN_CONSTELLATION_LEVEL,
+        ),
+        addFailure.resolver,
+      ),
+      http.put('http://localhost:8080/characters/skirk', () =>
+        HttpResponse.json(
           charactersDocument([makeCharacter(SKIRK, { constellationLevel: raisedLevel })]),
-        );
-      }),
+        ),
+      ),
     );
 
     const { result } = renderHook(() => useCollection(), {
@@ -186,7 +192,7 @@ describe('useCollection mutations', () => {
     act(() => {
       result.current.setConstellationLevel(SKIRK, raisedLevel);
     });
-    await waitFor(() => expect(putCount).toBe(2));
+    await addFailure.arrived;
     addFailure.release();
 
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Failed to add character.'));
@@ -222,17 +228,20 @@ describe('useCollection mutations', () => {
   it('keeps a re-add made while a failing level change was in flight', async () => {
     const levelFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
     const failingLevel = 5;
-    let putCount = 0;
     server.use(
       http.get('http://localhost:8080/characters', () =>
         HttpResponse.json(charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })])),
       ),
-      http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
-        putCount += 1;
-        const { constellationLevel } = (await request.json()) as { constellationLevel: number };
-        if (constellationLevel === failingLevel) return levelFailure.resolver();
-        return HttpResponse.json(charactersDocument([makeCharacter(SKIRK)]));
-      }),
+      http.put(
+        matchJsonBody<CharacterLevelBody>(
+          'http://localhost:8080/characters/skirk',
+          ({ constellationLevel }) => constellationLevel === failingLevel,
+        ),
+        levelFailure.resolver,
+      ),
+      http.put('http://localhost:8080/characters/skirk', () =>
+        HttpResponse.json(charactersDocument([makeCharacter(SKIRK)])),
+      ),
       http.delete(
         'http://localhost:8080/characters/skirk',
         () => new HttpResponse(null, { status: 204 }),
@@ -250,7 +259,7 @@ describe('useCollection mutations', () => {
     act(() => {
       result.current.addCharacter(SKIRK);
     });
-    await waitFor(() => expect(putCount).toBe(2));
+    await levelFailure.arrived;
     levelFailure.release();
 
     await waitFor(() =>
