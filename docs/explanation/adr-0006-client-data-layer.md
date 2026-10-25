@@ -15,32 +15,33 @@ characters, weapons, and teams each keeping those copies in step their own way,
 through these hand-written mechanisms:
 
 - **Reconcile effect:** copies each refetch from the query cache into the store.
-- **Additive merge:** reconciles the device's characters with the account's on
-  refetch, never removing one.
-- **Sign-in push:** sends characters recorded while signed out, once per
-  sign-in.
 - **Guarded rollback:** reverts a failed write unless a newer edit replaced it.
 - **Sender check:** drops a response that arrives after its sender signed out.
 - **Query sync:** cancels refetches when a write starts and refetches after the
   last write ends.
 
-Which client data layer removes the most of these, while keeping four modes
-apart?
+The reconcile effect is also a layer skip: the [layers](../reference/data-flow-layers.md)
+reference lists it with the view and feature-hook skips that lint doesn't
+catch. Which client data layer removes the most of these mechanisms, gives a
+layer stack lint can enforce, and keeps four modes apart?
 
-- **Local:** signed out, data on this device only.
-- **Offline:** signed in, writes queued.
+- **Local:** signed out, data on this device only. Only teams have it, because
+  collections are sign-in only.
+- **Offline:** signed in, writes queued. [Issue #1762](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1762)
+  owns it.
 - **Online:** writes in flight.
 - **Remote:** the server holds the truth in Firestore, behind the API.
 
-Each prototype covers weapons in full, and characters for Local mode and the
-sign-in push. Weapons have no Local mode, because the server mints their
-instance identifiers. [Issue #1760](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1760)
+Each prototype covers weapons, for the signed-in path, and teams, for Local
+mode. [Issue #1760](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1760)
 describes the prototypes.
 
 ## Decision drivers
 
 - Remove hand-written synchronization code rather than move it.
-- Keep Local, Offline, Online, and Remote modes distinct and testable.
+- Each layer imports only the one below, enforced by lint as the API's are.
+- Keep Local, Offline, Online, and Remote modes distinct and testable, and
+  leave room to add Offline later without rework.
 - A queued write never replays, rolls back, or toasts under another account.
 - Bundle size and dependency count stay proportionate to what they remove.
 - API stability: the layer shouldn't need rework on every minor release.
