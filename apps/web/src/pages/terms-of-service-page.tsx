@@ -6,92 +6,76 @@
 import type { JSX } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Container } from '@/components/chrome/container';
 import { PrivacyEmailLink } from '@/components/legal/legal-link';
+import { LegalPage, LegalSection } from '@/components/legal/legal-page';
 
 const EFFECTIVE_DATE = '25 October 2026';
 
 export function TermsOfServicePage(): JSX.Element {
   return (
-    <Container className="max-w-3xl py-12">
-      <article className="text-muted-foreground">
-        <h1 className="text-3xl font-bold text-foreground">Terms of Service</h1>
-        <p className="mt-2 text-sm text-muted-foreground/70">Effective {EFFECTIVE_DATE}</p>
+    <LegalPage title="Terms of Service" effectiveDate={EFFECTIVE_DATE}>
+      <p className="mt-6 leading-relaxed">
+        By using genshin.dungeon.studio you agree to these terms. If you don't agree, please don't
+        use the app.
+      </p>
 
-        <p className="mt-6 leading-relaxed">
-          By using genshin.dungeon.studio you agree to these terms. If you don't agree, please don't
-          use the app.
-        </p>
+      <LegalSection title="The service">
+        genshin.dungeon.studio is a free, unofficial team-building companion for Genshin Impact. It
+        helps you track your collection and plan teams. It is provided at no cost and with no
+        guarantee of continued availability.
+      </LegalSection>
 
-        <h2 className="mt-8 text-xl font-semibold text-foreground">The service</h2>
-        <p className="mt-4 leading-relaxed">
-          genshin.dungeon.studio is a free, unofficial team-building companion for Genshin Impact.
-          It helps you track your collection and plan teams. It is provided at no cost and with no
-          guarantee of continued availability.
-        </p>
+      <LegalSection title="Not affiliated with HoYoverse">
+        This is a fan-made project. It is not affiliated with, endorsed by, or sponsored by
+        HoYoverse (miHoYo/Cognosphere). Genshin Impact and all related names, characters, and art
+        are trademarks and copyright of their respective owners. Game data is presented for
+        reference and may be inaccurate or out of date.
+      </LegalSection>
 
-        <h2 className="mt-8 text-xl font-semibold text-foreground">
-          Not affiliated with HoYoverse
-        </h2>
-        <p className="mt-4 leading-relaxed">
-          This is a fan-made project. It is not affiliated with, endorsed by, or sponsored by
-          HoYoverse (miHoYo/Cognosphere). Genshin Impact and all related names, characters, and art
-          are trademarks and copyright of their respective owners. Game data is presented for
-          reference and may be inaccurate or out of date.
-        </p>
+      <LegalSection title="Your account">
+        Signing in uses your Google account through Firebase Authentication. You are responsible for
+        keeping that account secure. We describe what we do with your data in our{' '}
+        <Link
+          to="/privacy"
+          className="text-foreground underline underline-offset-4 hover:no-underline"
+        >
+          Privacy Policy
+        </Link>
+        .
+      </LegalSection>
 
-        <h2 className="mt-8 text-xl font-semibold text-foreground">Your account</h2>
-        <p className="mt-4 leading-relaxed">
-          Signing in uses your Google account through Firebase Authentication. You are responsible
-          for keeping that account secure. We describe what we do with your data in our{' '}
-          <Link
-            to="/privacy"
-            className="text-foreground underline underline-offset-4 hover:no-underline"
-          >
-            Privacy Policy
-          </Link>
-          .
-        </p>
+      <LegalSection title="Acceptable use">
+        Don't use the app to break the law, and don't attempt to disrupt, overload, or reverse the
+        service or gain unauthorized access to it or to other users' data.
+      </LegalSection>
 
-        <h2 className="mt-8 text-xl font-semibold text-foreground">Acceptable use</h2>
-        <p className="mt-4 leading-relaxed">
-          Don't use the app to break the law, and don't attempt to disrupt, overload, or reverse the
-          service or gain unauthorized access to it or to other users' data.
-        </p>
+      <LegalSection title="No warranty">
+        The app is provided "as is" and "as available", without warranties of any kind. We don't
+        guarantee that it will be accurate, complete, uninterrupted, or error-free.
+      </LegalSection>
 
-        <h2 className="mt-8 text-xl font-semibold text-foreground">No warranty</h2>
-        <p className="mt-4 leading-relaxed">
-          The app is provided "as is" and "as available", without warranties of any kind. We don't
-          guarantee that it will be accurate, complete, uninterrupted, or error-free.
-        </p>
+      <LegalSection title="Limitation of liability">
+        To the extent permitted by law, Alex Brandt, who operates the app as Dungeon Studio, is not
+        liable for any indirect, incidental, or consequential damages arising from your use of the
+        app.
+      </LegalSection>
 
-        <h2 className="mt-8 text-xl font-semibold text-foreground">Limitation of liability</h2>
-        <p className="mt-4 leading-relaxed">
-          To the extent permitted by law, Alex Brandt, who operates the app as Dungeon Studio, is
-          not liable for any indirect, incidental, or consequential damages arising from your use of
-          the app.
-        </p>
+      <LegalSection title="Governing law">
+        These terms are governed by the laws of England and Wales, and any dispute will be subject
+        to the exclusive jurisdiction of the courts of England and Wales. If you are a consumer, you
+        may also be entitled to the protection of mandatory provisions of the law of the country
+        where you live, and nothing in these terms affects your rights as a consumer to rely on
+        those provisions.
+      </LegalSection>
 
-        <h2 className="mt-8 text-xl font-semibold text-foreground">Governing law</h2>
-        <p className="mt-4 leading-relaxed">
-          These terms are governed by the laws of England and Wales, and any dispute will be subject
-          to the exclusive jurisdiction of the courts of England and Wales. If you are a consumer,
-          you may also be entitled to the protection of mandatory provisions of the law of the
-          country where you live, and nothing in these terms affects your rights as a consumer to
-          rely on those provisions.
-        </p>
+      <LegalSection title="Changes to these terms">
+        We may update these terms as the app evolves. When we do, we'll revise the effective date
+        above.
+      </LegalSection>
 
-        <h2 className="mt-8 text-xl font-semibold text-foreground">Changes to these terms</h2>
-        <p className="mt-4 leading-relaxed">
-          We may update these terms as the app evolves. When we do, we'll revise the effective date
-          above.
-        </p>
-
-        <h2 className="mt-8 text-xl font-semibold text-foreground">Contact</h2>
-        <p className="mt-4 leading-relaxed">
-          Questions about these terms? Email <PrivacyEmailLink />.
-        </p>
-      </article>
-    </Container>
+      <LegalSection title="Contact">
+        Questions about these terms? Email <PrivacyEmailLink />.
+      </LegalSection>
+    </LegalPage>
   );
 }

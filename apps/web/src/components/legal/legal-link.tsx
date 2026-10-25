@@ -3,7 +3,7 @@
 
 import type { JSX, ReactNode } from 'react';
 
-import { PRIVACY_EMAIL } from '@/lib/contact';
+const PRIVACY_EMAIL = 'privacy@dungeon.studio';
 
 const LINK_CLASS = 'text-foreground underline underline-offset-4 hover:no-underline';
 
