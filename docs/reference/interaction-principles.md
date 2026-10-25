@@ -5,8 +5,8 @@ SPDX-License-Identifier: MIT
 
 # Interaction principles
 
-Rules every view and interaction in `apps/web` meets, so a user can predict an
-action's effect and see what it did. Each rule names something a reviewer can
+Every view and interaction in `apps/web` meets these rules, so a user can
+predict an action's effect and see what it did. Each rule names something a reviewer can
 check against one view, and cites the cognitive engineering source it applies.
 Visual design, accessibility conformance, and copy tone are out of scope.
 
@@ -50,8 +50,7 @@ heuristic 5 of [Nielsen1994].
 ### A user recognizes options rather than recalls them
 
 A view shows what the user needs to decide: why the view locks an option,
-which member a choice applies to, and the filter that narrowed a list. The
-user doesn't carry state from another view in memory.
+which member a choice applies to, and the filter that narrowed a list.
 
 Source: recognition rather than recall, heuristic 6 of [Nielsen1994], and
 extraneous cognitive load [Sweller1988].
@@ -109,8 +108,7 @@ Source: the conceptual model a user builds from what they see, chapter 1 of
 
 When a write fails, the message names the thing in the user's terms: which
 team, character, or weapon, and what came back. It also names a next step:
-retry, reload, sign in again, or report the problem. A message that only says
-something failed leaves the user to guess.
+retry, reload, sign in again, or report the problem.
 
 Source: help users recognize, diagnose, and recover from errors, heuristic 9
 of [Nielsen1994], and match between system and the real world, heuristic 2.
