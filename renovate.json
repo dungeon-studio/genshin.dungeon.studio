@@ -63,6 +63,12 @@
       "matchDepNames": ["node", "@types/node"],
       "matchManagers": ["npm"],
       "versioning": "node"
+    },
+    {
+      "description": "Keep deploy-cloudrun majors manual: it has no dry-run mode, so no required check can exercise it before it deploys",
+      "matchPackageNames": ["google-github-actions/deploy-cloudrun"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false
     }
   ],
   "customManagers": [
