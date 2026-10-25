@@ -192,7 +192,7 @@ describe('useCollection mutations', () => {
     act(() => {
       result.current.setConstellationLevel(SKIRK, raisedLevel);
     });
-    await addFailure.arrived;
+    await act(() => addFailure.arrived);
     addFailure.release();
 
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Failed to add character.'));
@@ -259,7 +259,7 @@ describe('useCollection mutations', () => {
     act(() => {
       result.current.addCharacter(SKIRK);
     });
-    await levelFailure.arrived;
+    await act(() => levelFailure.arrived);
     levelFailure.release();
 
     await waitFor(() =>

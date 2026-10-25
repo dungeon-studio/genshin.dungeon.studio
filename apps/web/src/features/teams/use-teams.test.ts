@@ -150,7 +150,7 @@ describe('useTeams (authenticated)', () => {
     act(() => {
       result.current.setTeamName(1, newerName);
     });
-    await firstPut.arrived;
+    await act(() => firstPut.arrived);
 
     firstPut.release();
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Failed to save team.'));
