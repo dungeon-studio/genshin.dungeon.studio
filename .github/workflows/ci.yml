@@ -722,6 +722,54 @@ jobs:
         if: always()
         run: docker rm -f api-smoke 2>/dev/null || true
 
+  # A step skips the expensive devcontainer build unless an input changed, so
+  # the check still reports on every pull request and a ruleset can require
+  # it. The inputs are the files the image build reads, plus this workflow.
+  toolchain:
+    name: Verify toolchain
+    runs-on: ubuntu-latest
+    # Headroom for a cold build.
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Reaches the base: the first parent of the merge or squash commit.
+          fetch-depth: 2
+
+      # `git diff` exits nonzero on error too, so a failed diff builds.
+      - name: Diff against the base
+        id: diff
+        run: |
+          inputs=(
+            .devcontainer
+            scripts/install-reuse.sh
+            scripts/install-lychee.sh
+            # packageManager, engines, and the firebase-tools pin.
+            package.json
+            # The Playwright pin the browsers install from.
+            tools/e2e/package.json
+            .github/workflows/ci.yml
+          )
+          if git diff --quiet HEAD^1 HEAD -- "${inputs[@]}"; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build the image and verify its toolchain
+        if: steps.diff.outputs.changed == 'true'
+        uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
+        with:
+          imageName: genshin-planner-devcontainer
+          push: never
+          # The action starts the container only when runCmd is set. Starting
+          # it runs postCreateCommand.sh, which verifies the toolchain.
+          # Project-wide checks belong in .pre-commit-config.yaml.
+          runCmd: 'true'
+
   # release-notes.yml drafts only after merge, so a breaking release-drafter
   # has to fail here first.
   release-draft:
