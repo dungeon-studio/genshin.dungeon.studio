@@ -140,8 +140,8 @@ stateDiagram-v2
 - Confirmed: a response never reaches the store. Only a refetch confirms it,
   server timestamps included. A save that succeeds while another team save is
   pending skips its refetch and waits on that save's.
-- Sent by a clear: no component calls `clearTeam`. It saves the team with its
-  name and four empty positions.
+- Cleared: an edit like any other. The slot keeps its name, so a clear never
+  returns it to Default.
 - Edits in flight: a refetch that lands while any team save is pending
   leaves the store alone. The refetch the last request starts updates it. If
   that request fails, nothing refetches, and the store keeps its rolled-back
