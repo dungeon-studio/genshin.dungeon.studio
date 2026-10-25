@@ -95,6 +95,7 @@ writing tests.
 
 ## Frontend rules
 
+- Check every new or changed view against the [Interaction principles](docs/reference/interaction-principles.md), and cite a rule by its `id` anchor.
 - Prefer composition over inheritance and use early returns for conditional rendering.
 - Use semantic HTML: proper heading hierarchy, structural elements, and native interactive elements (`<button>`, not `<div onClick>`).
 - Mark decorative Lucide icons with `aria-hidden="true"` and `focusable={false}`. Icons inside labeled buttons, or adjacent to labeled inputs, are decorative.
