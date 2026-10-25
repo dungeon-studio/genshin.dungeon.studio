@@ -50,7 +50,7 @@ describes the prototypes.
 
 - TanStack Query alone
 - TanStack DB
-- Status quo with a shared write helper
+- Status quo, refactored
 
 ## Decision outcome
 
@@ -60,51 +60,73 @@ Pending [issue #1133](https://github.com/dungeon-studio/genshin.dungeon.studio/i
 
 ### Measurements
 
-Line counts cover non-test web source. The bundle change starts from 303.87 KB
-compressed. Package counts are direct dependencies, then all new packages.
+Line counts cover non-test web source. Changes start from the `develop` branch, with a 286.89 KB
+compressed bundle and 1,516 locked packages. The TanStack prototypes cover
+weapons and teams. The status-quo prototypes also cover characters. Rows marked
+"with offline replay" add the queue that issue #1762 owns.
 
-| Option                         | Lines added / removed | Compressed bundle change | Packages added |
-| ------------------------------ | --------------------- | ------------------------ | -------------- |
-| TanStack Query alone           | 693 / 754             | +1.02 KB                 | 2 / 3          |
-| TanStack DB, weapons only      | 272 / 313             | +107.07 KB               | 5 / 8          |
-| Status quo with a write helper | 199 / 197             | +0.10 KB                 | 0 / 0          |
+| Option                               | Lines added / removed | Compressed bundle change | Packages added, direct / all | Web tests     |
+| ------------------------------------ | --------------------- | ------------------------ | ---------------------------- | ------------- |
+| TanStack Query alone                 | 787 / 682             | +1.18 KB                 | 0 / 0                        | Pass          |
+| TanStack Query, with offline replay  | 848 / 684             | +2.82 KB                 | 2 / 3                        | Pass          |
+| TanStack DB                          | 720 / 738             | +99.31 KB                | 3 / 7                        | Pass          |
+| TanStack DB, with offline replay     | 844 / 739             | +107.90 KB               | 4 / 8                        | Pass          |
+| Status quo, refactored               | 328 / 355             | −0.03 KB                 | 0 / 0                        | Pass          |
+| Status quo without collection stores | 460 / 572             | −0.06 KB                 | 0 / 0                        | 6 of 307 fail |
+
+The status-quo rows include 109 / 57 lines of import fixes that clear every
+layer violation. Either TanStack option needs the same fixes for the code its
+prototype left alone.
+
+### Layers each option enforces
+
+Three lint zones express the [layer stack](../reference/data-flow-layers.md):
+views import only feature hooks, only the query layer imports the fetch
+wrapper, and stores import neither. The `develop` branch breaks them 13 times.
+
+| Layer check                    | TanStack Query alone                  | TanStack DB                                  | Status quo                                         |
+| ------------------------------ | ------------------------------------- | -------------------------------------------- | -------------------------------------------------- |
+| Lint violations left           | 7, in characters and account deletion | 10, the same plus sign-out                   | 0                                                  |
+| Store layer                    | None for weapons and teams            | A collection is store and query layer in one | Kept                                               |
+| Query cache copied into stores | Characters only                       | Characters only                              | All three, or teams only without collection stores |
 
 ### Mechanisms each option removes
 
-| Mechanism        | TanStack Query alone        | TanStack DB               | Status quo with a write helper |
-| ---------------- | --------------------------- | ------------------------- | ------------------------------ |
-| Store mirror     | Removed                     | Removed for weapons       | Kept                           |
-| Reconcile effect | Removed                     | Removed for weapons       | Kept                           |
-| Additive merge   | Removed                     | Kept, inside the push     | Kept                           |
-| Sign-in push     | Kept, about 20 lines        | Kept                      | Kept                           |
-| Guarded rollback | Kept                        | Replaced by the library's | Kept, in one helper            |
-| Sender check     | Kept, needed in more places | Kept, in two places       | Kept, in one helper            |
-| Query sync       | Kept, in shared write setup | Removed for weapons       | Kept                           |
+| Mechanism        | TanStack Query alone                 | TanStack DB                         | Status quo                                            |
+| ---------------- | ------------------------------------ | ----------------------------------- | ----------------------------------------------------- |
+| Store mirror     | Removed for weapons and teams        | Removed for weapons and teams       | Kept, or removed for collections without their stores |
+| Reconcile effect | Removed for weapons and teams        | Removed for weapons and teams       | Kept, or removed for collections without their stores |
+| Guarded rollback | Kept, in three places                | Replaced by the library's           | Kept, in one helper                                   |
+| Sender check     | Kept, before every request and toast | Replaced by one collection per user | Kept                                                  |
+| Query sync       | Kept, in shared helpers              | Removed, the library owns it        | Kept, in shared helpers                               |
 
 ### Modes each option supports
 
-| Mode    | TanStack Query alone                            | TanStack DB                                     | Status quo with a write helper              |
-| ------- | ----------------------------------------------- | ----------------------------------------------- | ------------------------------------------- |
-| Local   | Hand-written storage module with the migration  | Storage collection, synced across tabs          | Unchanged persisted store                   |
-| Offline | Paused writes survive a reload, unverified      | Queues in one tab only, no reads after a reload | Nothing queues                              |
-| Online  | Optimistic, writes to one entity run in order   | Optimistic, adds included                       | Optimistic, every write in one helper       |
-| Remote  | A refetch shows server truth, removals included | Per-user collections refetch from the server    | Per-feature reconcile, merge for characters |
+| Mode                | TanStack Query alone                          | TanStack DB                                       | Status quo                            |
+| ------------------- | --------------------------------------------- | ------------------------------------------------- | ------------------------------------- |
+| Local               | A cache entry that's never fetched            | A local-only collection                           | Unchanged in-memory store             |
+| Offline             | Writes pause, and a reload loses them         | Writes fail and roll back                         | Writes pause, and a reload loses them |
+| Offline with replay | Paused writes survive a reload in a unit test | A per-user queue survives a reload in a unit test | Not built                             |
+| Online              | Optimistic, writes to one entity in order     | Optimistic, adds included                         | Optimistic, unchanged                 |
+| Remote              | The last write to finish refetches            | Refetches on focus and reconnect                  | Each feature copies its refetch       |
 
 ### TanStack Query alone
 
 Optimistic writes in the query cache, writes to one entity run in order, and
 paused writes kept in browser storage by TanStack's persistence packages.
 
-- Good, because it removes the most code and the second client copy for about
-  1 KB of bundle.
-- Neutral, because the guarded rollback survives. An optimistic update applies
-  before earlier writes to the same entity finish, so one of those failing could
-  otherwise overwrite it.
-- Bad, because the sender check spreads. A paused write needs one before it
-  replays, and every failure needs one before it toasts.
-- Bad, because signing out drops the departing user's queued writes.
-- Bad, because account data stays in browser storage for up to 24 hours, where
-  weapons were memory-only.
+- Good, because it removes the second client copy and the copy step for about
+  1 KB, with no new package until offline replay.
+- Good, because signed-out teams need no store.
+- Neutral, because the line count rises: the stores' edit logic moves into pure
+  helpers rather than going away.
+- Bad, because the guarded rollback and the sender check survive, and the
+  sender check spreads to every request and every failure toast.
+- Bad, because a replayed write restored while signed out goes out without a
+  token. Its rejection rolls back the departed user's data and toasts the
+  visitor.
+- Bad, because offline replay keeps account data in browser storage for up to
+  24 hours, where weapons and teams were memory-only.
 
 <!-- vale Microsoft.HeadingAcronyms = NO -->
 
@@ -113,36 +135,41 @@ paused writes kept in browser storage by TanStack's persistence packages.
 <!-- vale Microsoft.HeadingAcronyms = YES -->
 
 TanStack DB 0.15 collections over the existing query client, with optimistic
-transactions and an offline outbox.
+transactions and a per-user offline queue.
 
-- Good, because weapon adds become optimistic through a temporary identifier,
-  which removes the in-flight duplicate guard.
-- Bad, because the compressed bundle grows by about 35% for weapons alone.
-- Bad, because a replay after a crash can create a duplicate weapon: the API
-  doesn't recognize a replayed add.
-- Bad, because a failed write also rolls back later pending writes to the same
-  row, where the guarded rollback keeps the newer edit.
-- Bad, because the outbox's default lock spans the whole site, so each user
-  needs their own.
-- Bad, because the library is pre-1.0 and churning, with five minor releases in
-  October 2026, one of them breaking.
-- Bad, because the library's storage format carries no version. The character
-  migration runs once and moves the data, so an older build can't read it.
+- Good, because it removes the most mechanisms: the store mirror, the copy
+  step, the guarded rollback, and query sync.
+- Good, because weapon adds become optimistic through a temporary identifier.
+- Bad, because the compressed bundle grows by about 35%.
+- Bad, because without the queue an offline write fails at once, where today it
+  pauses.
+- Bad, because a retried weapon add can create a duplicate: the API doesn't
+  recognize a replayed add.
+- Bad, because the queue outlives sign-out. It replays at that user's next sign-in,
+  where an old team save can overwrite newer edits from another device.
+- Bad, because the library is pre-1.0 and churning, with four minor releases in
+  October 2026. The queue package pins one exact version, so the two upgrade
+  together.
+- Bad, because lint can't keep store and query layers apart when one module is
+  both.
 
-### Status quo with a write helper
+### Status quo, refactored
 
-Keep the zustand mirrors and route every write through one shared helper, as
-[issue #1533](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1533)
-proposes.
+Keep zustand and the query cache, and restructure the code with steps from
+Fowler's refactoring catalogue that preserve behaviour. The result has one
+shared write helper, shared query and mutation hooks, and views that read only
+through feature hooks.
 
 - Good, because it adds no dependency and doesn't change the bundle.
-- Good, because a failed write rolls back even while a later write is in
-  flight, which fixes [issue #1534](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1534).
-- Bad, because the net line count is flat: it consolidates the synchronization
-  code without removing it.
-- Bad, because an offline queue needs each mutation stored as data and a cache
-  persistence package. The weapon and team reconcile effects would also need a
-  merge, so a reconnect doesn't wipe queued edits.
+- Good, because it clears every layer violation without changing behaviour.
+- Good, because removing the weapon and character stores is a small further
+  step, since signing in is now required for collections.
+- Neutral, because that further step changes behaviour: a refetch can
+  overwrite a re-add made while a failing removal was in flight.
+- Bad, because the guarded rollback, sender check, and query sync stay
+  hand-written.
+- Bad, because offline replay would need each write stored as data, a cache
+  persistence package, and a merge in the teams copy step.
 
 ## More information
 
