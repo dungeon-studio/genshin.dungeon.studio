@@ -5,6 +5,7 @@
     "security:openssf-scorecard",
     "customManagers:githubActionsVersions",
     "customManagers:dockerfileVersions",
+    ":automergeMinor",
     ":automergeDigest"
   ],
   "timezone": "Europe/London",
@@ -63,19 +64,6 @@
       "matchDepNames": ["node", "@types/node"],
       "matchManagers": ["npm"],
       "versioning": "node"
-    },
-    {
-      "description": "Merge development dependency patch and minor updates on green CI",
-      "matchDepTypes": ["devDependencies"],
-      "matchUpdateTypes": ["patch", "minor"],
-      "automerge": true
-    },
-    {
-      "description": "Merge non-breaking production dependency patch updates on green CI",
-      "matchDepTypes": ["dependencies"],
-      "matchUpdateTypes": ["patch"],
-      "matchJsonata": ["isBreaking != true"],
-      "automerge": true
     }
   ],
   "customManagers": [
