@@ -133,6 +133,125 @@ describe('useCollection mutations', () => {
     expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
   });
 
+  it('drops an added character when the add fails', async () => {
+    server.use(
+      http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
+      http.put(
+        'http://localhost:8080/characters/skirk',
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    const { result } = renderHook(() => useCollection(), {
+      wrapper: createWrapper({ user: fakeUser('user-1') }),
+    });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => {
+      result.current.addCharacter(SKIRK);
+    });
+
+    expect(result.current.isOwned(SKIRK)).toBe(true);
+    await waitFor(() => expect(result.current.isOwned(SKIRK)).toBe(false));
+    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+  });
+
+  it('keeps a raise made while a failing add was in flight', async () => {
+    const addFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
+    let putCount = 0;
+    server.use(
+      http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
+      http.put('http://localhost:8080/characters/skirk', () => {
+        putCount += 1;
+        if (putCount === 1) return addFailure.resolver();
+        return HttpResponse.json(
+          charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })]),
+        );
+      }),
+    );
+
+    const { result } = renderHook(() => useCollection(), {
+      wrapper: createWrapper({ user: fakeUser('user-1') }),
+    });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => {
+      result.current.addCharacter(SKIRK);
+    });
+    act(() => {
+      result.current.setConstellationLevel(SKIRK, 3);
+    });
+    await waitFor(() => expect(putCount).toBe(2));
+    addFailure.release();
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Failed to add character.'));
+    expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3);
+  });
+
+  it('keeps a re-add made while a failing removal was in flight', async () => {
+    const deleteFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
+    server.use(
+      http.get('http://localhost:8080/characters', () =>
+        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })])),
+      ),
+      http.delete('http://localhost:8080/characters/skirk', deleteFailure.resolver),
+      http.put('http://localhost:8080/characters/skirk', () =>
+        HttpResponse.json(charactersDocument([makeCharacter(SKIRK)])),
+      ),
+    );
+
+    const { result } = await renderOwningSkirkAtC3();
+
+    act(() => {
+      result.current.removeCharacter(SKIRK);
+    });
+    act(() => {
+      result.current.addCharacter(SKIRK);
+    });
+    deleteFailure.release();
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Failed to remove character.'));
+    expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(0);
+  });
+
+  it('keeps a re-add made while a failing level change was in flight', async () => {
+    const levelFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
+    let putCount = 0;
+    server.use(
+      http.get('http://localhost:8080/characters', () =>
+        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })])),
+      ),
+      http.put('http://localhost:8080/characters/skirk', () => {
+        putCount += 1;
+        if (putCount === 1) return levelFailure.resolver();
+        return HttpResponse.json(charactersDocument([makeCharacter(SKIRK)]));
+      }),
+      http.delete(
+        'http://localhost:8080/characters/skirk',
+        () => new HttpResponse(null, { status: 204 }),
+      ),
+    );
+
+    const { result } = await renderOwningSkirkAtC3();
+
+    act(() => {
+      result.current.setConstellationLevel(SKIRK, 5);
+    });
+    act(() => {
+      result.current.removeCharacter(SKIRK);
+    });
+    act(() => {
+      result.current.addCharacter(SKIRK);
+    });
+    await waitFor(() => expect(putCount).toBe(2));
+    levelFailure.release();
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith('Failed to update constellation level.'),
+    );
+    expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(0);
+  });
+
   it('leaves the store alone when a removal fails after sign-out', async () => {
     const deleteFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
     server.use(
