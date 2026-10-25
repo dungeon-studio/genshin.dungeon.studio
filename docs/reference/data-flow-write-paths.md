@@ -37,7 +37,8 @@ write cancels any refetch of its query already in flight. A write that succeeds
 while another write to the same query is pending skips its refetch and leaves
 it to the write still pending. The cancel skips the first load, and it can't
 reach a refetch that starts after the write, such as on window focus or
-reconnect. Either can still overwrite an edit in flight.
+reconnect. Either can still overwrite a character or weapon edit in flight.
+The team store takes no refetch while a team write is pending.
 
 A character or weapon write that fails after a later write from the same hook
 has started gets neither rollback nor toast, see [#1534].

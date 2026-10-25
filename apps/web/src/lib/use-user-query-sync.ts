@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { QueryKey } from '@tanstack/react-query';
+import type { QueryClient, QueryKey } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 
 export interface UserQuerySync {
   mutationKey?: QueryKey;
@@ -43,8 +44,28 @@ export function useUserQuerySync(
       await queryClient.cancelQueries({ queryKey });
     },
     onSuccess: () => {
-      if (queryClient.isMutating({ mutationKey: queryKey }) > 1) return;
+      if (pendingWrites(queryClient, queryKey) > 1) return;
       void queryClient.invalidateQueries({ queryKey });
     },
   };
+}
+
+/**
+ * A check for whether a write through `useUserQuerySync` is still waiting on
+ * the server. It reads at call time, so an effect sees writes started after
+ * the render. A query answer that lands while one is pending predates it.
+ */
+export function useUserWritePending(
+  userId: string | undefined,
+  keyFor: (userId: string) => QueryKey,
+): () => boolean {
+  const queryClient = useQueryClient();
+  return useCallback(
+    () => userId !== undefined && pendingWrites(queryClient, keyFor(userId)) > 0,
+    [queryClient, userId, keyFor],
+  );
+}
+
+function pendingWrites(queryClient: QueryClient, queryKey: QueryKey): number {
+  return queryClient.isMutating({ mutationKey: queryKey });
 }

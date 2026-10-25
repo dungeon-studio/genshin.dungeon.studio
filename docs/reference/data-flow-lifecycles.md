@@ -24,11 +24,12 @@ In every feature:
   Default instead. Auth settling on page load isn't a sign-out.
 - While signed in, a refetch runs on window focus, on reconnect, when a hook
   mounts, and after a successful mutation in the same feature unless another is
-  still pending. A mount first applies the cached result. A refetch changes the
-  store only when its result differs.
+  still pending. A mount first applies the cached result. A character or weapon
+  refetch changes the store only when its result differs.
 - Sending a request cancels any refetch already in flight, except the first
   load. The first load, or a refetch that starts after the request, can still
-  land before the request settles.
+  land before the request settles. A character or weapon refetch that lands in
+  that window reaches the store. The team store skips it.
 - Only the latest character or weapon request of each kind through a hook gets
   its response handling: confirm, rollback, and toast. An earlier one, or one
   that settles after the user leaves its page, reaches the store only through a
@@ -138,9 +139,6 @@ stateDiagram-v2
   Sent --> Confirmed: save succeeds, then a refetch lands
   Sent --> DefaultTeam: clear succeeds, then a refetch lands
   Sent --> RolledBack: rejected, slot still holds the sent team
-  Sent --> Overwritten: refetch while in flight
-  Overwritten --> Confirmed: save succeeds, or the request fails
-  Overwritten --> DefaultTeam: clear succeeds
   Confirmed --> Sent: edit
   Confirmed --> DefaultTeam: refetch lacks the slot
   RolledBack --> Sent: edit
@@ -148,7 +146,7 @@ stateDiagram-v2
 ```
 
 - Default: `createEmptyTeam`, with the default name, four empty positions, and
-  client-minted timestamps. A changed refetch, a signed-in mount, or a sign-out
+  client-minted timestamps. A refetch, a signed-in mount, or a sign-out
   rebuilds it with new timestamps whenever the server holds nothing for the
   slot.
 - Local only: in memory, so it survives moving between pages but not a page
@@ -159,9 +157,12 @@ stateDiagram-v2
 - Sent by a clear: no component calls `clearTeam`. The store keeps the team's
   name and empties its positions. The server deletes the record, so the refetch
   brings back the default name, see [#1839].
-- Overwritten: a refetch replaces all four slots, so a refetch the request
-  didn't cancel overwrites an edit in flight in any slot.
+- Edits in flight: a refetch that lands while any team save or clear is pending
+  leaves the store alone. The refetch the last request starts updates it. If
+  that request fails, nothing refetches, and the store keeps its rolled-back
+  slots until the next refetch, see [#550].
 
+[#550]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/550
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
 [#1534]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1534
 [#1839]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1839
