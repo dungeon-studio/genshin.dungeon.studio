@@ -21,9 +21,8 @@
     "automerge": true
   },
   "lockFileMaintenance": {
-    "description": "Open the lock file refresh past the concurrent limit and merge it on green CI, so transitive dependency fixes keep reaching develop",
-    "prConcurrentLimit": 0,
-    "automerge": true
+    "description": "Open the lock file refresh past the concurrent limit, so transitive dependency fixes keep reaching develop",
+    "prConcurrentLimit": 0
   },
   "pre-commit": {
     "enabled": true
