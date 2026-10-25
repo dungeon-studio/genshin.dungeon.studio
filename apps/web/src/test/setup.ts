@@ -16,6 +16,6 @@ vi.mock('@/lib/firebase', () => ({
 
 // Unhandled requests surface as errors so a missing handler fails loudly rather
 // than hanging or hitting the network.
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
