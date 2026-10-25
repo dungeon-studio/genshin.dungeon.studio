@@ -15,11 +15,11 @@ const put = (url: string) =>
   });
 
 describe('matchJsonBody', () => {
-  it('matches a request to its TEAM_URL whose body satisfies the predicate', async () => {
+  it('matches a request to its URL whose body satisfies the predicate', async () => {
     await expect(put(TEAM_URL)).resolves.toBe(true);
   });
 
-  it('ignores a request to another TEAM_URL with the same body', async () => {
+  it('ignores a request to another URL with the same body', async () => {
     await expect(put('http://localhost:8080/teams/2')).resolves.toBe(false);
   });
 });
