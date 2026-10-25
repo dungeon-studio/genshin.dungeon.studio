@@ -93,8 +93,8 @@ type TeamActions = Pick<
 
 function useTeamActions(
   isAuthenticated: boolean,
-  saveTeamApi: ReturnType<typeof useSaveTeamMutation>['mutate'],
-  deleteTeamApi: ReturnType<typeof useDeleteTeamMutation>['mutate'],
+  saveTeamApi: ReturnType<typeof useSaveTeamMutation>['mutateAsync'],
+  deleteTeamApi: ReturnType<typeof useDeleteTeamMutation>['mutateAsync'],
 ): TeamActions {
   return useMemo(() => {
     const store = () => useTeamStore.getState();
@@ -102,14 +102,16 @@ function useTeamActions(
     const editThenPersist = (
       slot: TeamSlot,
       edit: () => void,
-      request: (onError: () => void) => void,
+      request: () => Promise<void>,
       failure: string,
     ) => {
       const previousTeam = { ...store().teams[slot] };
       edit();
       if (!isAuthenticated) return;
       const optimisticTeam = store().teams[slot];
-      request(() => {
+      // Each request needs its own promise: `mutate`'s per-call `onError` fires
+      // only for the latest call.
+      request().catch(() => {
         if (store().teams[slot] !== optimisticTeam) {
           toast.error(`${failure}.`);
           return;
@@ -123,9 +125,7 @@ function useTeamActions(
       editThenPersist(
         slot,
         edit,
-        (onError) => {
-          saveTeamApi(teamToSavePayload(store().teams[slot]), { onError });
-        },
+        () => saveTeamApi(teamToSavePayload(store().teams[slot])),
         'Failed to save team',
       );
     };
@@ -167,9 +167,7 @@ function useTeamActions(
           () => {
             store().clearTeam(slot);
           },
-          (onError) => {
-            deleteTeamApi(slot, { onError });
-          },
+          () => deleteTeamApi(slot),
           'Failed to clear team',
         );
       },
@@ -206,8 +204,8 @@ export function useTeams(): UseTeamsResult {
   } = useTeamsQuery(uid);
   const isWritePending = useTeamWritePending(uid);
 
-  const { mutate: saveTeamApi, isPending: isSavePending } = useSaveTeamMutation(uid);
-  const { mutate: deleteTeamApi, isPending: isDeletePending } = useDeleteTeamMutation(uid);
+  const { mutateAsync: saveTeamApi, isPending: isSavePending } = useSaveTeamMutation(uid);
+  const { mutateAsync: deleteTeamApi, isPending: isDeletePending } = useDeleteTeamMutation(uid);
 
   const isSaving = isSavePending || isDeletePending;
 

@@ -30,12 +30,13 @@ In every feature:
   load. The first load, or a refetch that starts after the request, can still
   land before the request settles. A character or weapon refetch that lands
   then reaches the store; a team refetch doesn't.
-- Only the latest request of each kind through a hook gets its response
-  handling: confirm, rollback, and toast. An earlier request, or one that
-  settles after the user leaves its page, reaches the store only through a
+- Only the latest character or weapon request of each kind through a hook gets
+  its response handling: confirm, rollback, and toast. An earlier one, or one
+  that settles after the user leaves its page, reaches the store only through a
   refetch, see [#1534]. A character or weapon request that settles after
-  sign-out leaves the store untouched. A team request can still show its
-  failure toast.
+  sign-out leaves the store untouched. Every team request gets its rollback and
+  toast, even after the user leaves the teams page. One that fails after
+  sign-out shows only its toast.
 - Requests of different kinds through one hook settle in any order, so a
   response can undo a newer edit. The response to an add can put the minimum
   level back over a raise, and a refinement's response can put an instance back
