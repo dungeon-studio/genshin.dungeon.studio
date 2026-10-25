@@ -20,123 +20,34 @@ import { useCollectionStore } from './use-character-collection-store';
 const SKIRK = 'skirk' as CharacterId;
 
 beforeEach(() => {
-  localStorage.clear();
   useCollectionStore.getState().clearCharacters();
   vi.clearAllMocks();
 });
 
-describe('useCollection merge-on-first-login', () => {
-  it('merges the local collection into the store and syncs new entries to the server', async () => {
-    // Anonymous local collection built before signing in.
-    useCollectionStore.getState().addCharacter(SKIRK);
-    useCollectionStore.getState().setConstellationLevel(SKIRK, 3);
+describe('useCollection sync', () => {
+  it('records nothing signed out', () => {
+    const { result } = renderHook(() => useCollection(), { wrapper: createWrapper() });
 
-    const putBodies: unknown[] = [];
+    act(() => {
+      result.current.addCharacter(SKIRK);
+    });
+
+    expect(result.current.isOwned(SKIRK)).toBe(false);
+  });
+
+  it("replaces the store with the server's collection", async () => {
+    // Held from an earlier session, since removed on another device.
+    useCollectionStore.getState().addCharacter(SKIRK);
     server.use(
       http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
-      http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
-        putBodies.push(await request.json());
-        return HttpResponse.json(
-          charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })]),
-        );
-      }),
     );
 
     const { result } = renderHook(() => useCollection(), {
       wrapper: createWrapper({ user: fakeUser('user-1') }),
     });
 
-    await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
-    // The locally-owned character absent from the server is pushed up.
-    await waitFor(() => expect(putBodies).toContainEqual({ constellationLevel: 3 }));
-  });
-
-  it('does not re-push local entries when the same user refetches', async () => {
-    useCollectionStore.getState().addCharacter(SKIRK);
-    useCollectionStore.getState().setConstellationLevel(SKIRK, 3);
-
-    let getCount = 0;
-    let putCount = 0;
-    server.use(
-      http.get('http://localhost:8080/characters', () => {
-        getCount += 1;
-        return HttpResponse.json(charactersDocument([]));
-      }),
-      http.put('http://localhost:8080/characters/skirk', () => {
-        putCount += 1;
-        return HttpResponse.json(
-          charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })]),
-        );
-      }),
-    );
-
-    renderHook(() => useCollection(), {
-      wrapper: createWrapper({ user: fakeUser('user-1') }),
-    });
-
-    // First merge pushes the diff, whose success invalidates and refetches.
-    await waitFor(() => expect(putCount).toBe(1));
-    await waitFor(() => expect(getCount).toBeGreaterThanOrEqual(2));
-
-    // The refetch runs the additive branch, not another merge push.
-    expect(putCount).toBe(1);
-  });
-
-  it('does not re-add a character removed elsewhere when the hook mounts again', async () => {
-    let serverCharacters = [makeCharacter(SKIRK, { constellationLevel: 3 })];
-    let putCount = 0;
-    server.use(
-      http.get('http://localhost:8080/characters', () =>
-        HttpResponse.json(charactersDocument(serverCharacters)),
-      ),
-      http.put('http://localhost:8080/characters/skirk', () => {
-        putCount += 1;
-        return HttpResponse.json(charactersDocument(serverCharacters));
-      }),
-    );
-
-    const { result: firstMount, unmount } = renderHook(() => useCollection(), {
-      wrapper: createWrapper({ user: fakeUser('user-1') }),
-    });
-    await waitFor(() => expect(firstMount.current.isOwned(SKIRK)).toBe(true));
-    unmount();
-
-    // Another device removes the character while this one still holds it.
-    serverCharacters = [];
-
-    const { result: secondMount } = renderHook(() => useCollection(), {
-      wrapper: createWrapper({ user: fakeUser('user-1') }),
-    });
-    await waitFor(() => expect(secondMount.current.isLoading).toBe(false));
-
-    expect(putCount).toBe(0);
-  });
-
-  it('pushes local entries again after the user signs out and back in', async () => {
-    let putCount = 0;
-    server.use(
-      http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
-      http.put('http://localhost:8080/characters/skirk', () => {
-        putCount += 1;
-        return HttpResponse.json(
-          charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })]),
-        );
-      }),
-    );
-
-    useCollectionStore.getState().addCharacter(SKIRK);
-    const { signOut, unmount } = renderHookSignedIn(() => useCollection(), 'user-1');
-    await waitFor(() => expect(putCount).toBe(1));
-    signOut();
-    unmount();
-
-    // A visitor's addition made signed out has to reach the account on sign-in.
-    useCollectionStore.getState().addCharacter(SKIRK);
-    renderHook(() => useCollection(), {
-      wrapper: createWrapper({ user: fakeUser('user-1') }),
-    });
-
-    await waitFor(() => expect(putCount).toBe(2));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    await waitFor(() => expect(result.current.isOwned(SKIRK)).toBe(false));
   });
 });
 

@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { makeCharacter } from '@/test/fixtures';
 
-import { mergeCollections, useCollectionStore } from './use-character-collection-store';
+import { useCollectionStore } from './use-character-collection-store';
 
 /** A real character the tests never add, for the "not in the collection" paths. */
 const UNOWNED: CharacterId = 'zhongli';
@@ -107,43 +107,5 @@ describe('useCollectionStore', () => {
 
       expect(Object.keys(useCollectionStore.getState().characters)).toHaveLength(0);
     });
-  });
-});
-
-describe('mergeCollections', () => {
-  it('unions local and server collections', () => {
-    const local = { amber: makeCharacter('amber') };
-    const server = { xiangling: makeCharacter('xiangling') };
-
-    const merged = mergeCollections(local, server);
-
-    expect(merged['amber']).toBeDefined();
-    expect(merged['xiangling']).toBeDefined();
-  });
-
-  it('keeps the higher constellation level on conflict', () => {
-    const local = { amber: makeCharacter('amber', { constellationLevel: 3 }) };
-    const server = { amber: makeCharacter('amber', { constellationLevel: 1 }) };
-
-    const merged = mergeCollections(local, server);
-
-    expect(merged).toMatchObject({ amber: { constellationLevel: 3 } });
-  });
-
-  it('keeps server value when server constellation is higher', () => {
-    const local = { amber: makeCharacter('amber', { constellationLevel: 1 }) };
-    const server = { amber: makeCharacter('amber', { constellationLevel: 5 }) };
-
-    const merged = mergeCollections(local, server);
-
-    expect(merged).toMatchObject({ amber: { constellationLevel: 5 } });
-  });
-
-  it('returns server collection when local is empty', () => {
-    const server = { amber: makeCharacter('amber', { constellationLevel: 2 }) };
-
-    const merged = mergeCollections({}, server);
-
-    expect(merged).toEqual(server);
   });
 });

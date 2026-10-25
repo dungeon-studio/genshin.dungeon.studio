@@ -55,19 +55,6 @@ Version numbers appear on every exported type—there's no unversioned
 
 ---
 
-## Implementation: Local storage (zustand persist)
-
-The `apps/web` stores that use zustand's `persist` middleware version their
-snapshots the same way, without Verzod—`persist` owns version dispatch. Each
-store keeps a Zod schema per version under
-`src/features/.../schemas/v{n}.ts`, stamps every write through `persist`'s
-`version`, and validates the old snapshot in `migrate` when the store reloads.
-`migrate` drops records that no longer satisfy the domain model; a signed-in
-user re-merges from the server afterward, so a dropped local record is never a
-real loss.
-
----
-
 ## Implementation: REST API
 
 The `profile` media type parameter on `Content-Type` and `Accept` carries the
@@ -94,8 +81,19 @@ process](../explanation/adr-0003-json-schema-strategy.md#major-version-transitio
 
 ## Implementation: Other boundaries
 
-Queue payloads and cache entries don't yet use this pattern. Both are in-band
-boundaries like Firestore: when they're introduced, stamp every payload with a
+Queue payloads, cache entries, and local storage don't yet use this pattern.
+A zustand `persist` store would stamp `persist`'s `version` and gate its Zod
+schemas through `tools/schema-snapshots`. Queue payloads and cache entries are
+in-band boundaries like Firestore: when they're introduced, stamp every payload with a
 `version` field, keep one `schemas/v{n}.ts` file per version, write a strict
 serializer and a union deserializer, use the same `V{n}ConceptSchema` /
 `V{n}Concept` naming convention.
+
+---
+
+## Retiring a snapshot
+
+A shipped `schema-snapshots/{name}/v{n}.json` may be deleted only when nothing
+reads data stored under that version any longer. Commit a `v{n}.retired` file
+in its place, saying why; the Check schema compatibility job accepts the
+deletion only with it.

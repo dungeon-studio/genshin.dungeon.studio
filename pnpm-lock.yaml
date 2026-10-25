@@ -359,9 +359,6 @@ importers:
       tailwind-merge:
         specifier: 3.7.0
         version: 3.7.0
-      zod:
-        specifier: 4.6.7
-        version: 4.6.7
       zustand:
         specifier: 5.0.15
         version: 5.0.15(@types/react@19.3.0)(react@19.3.1)
@@ -375,9 +372,6 @@ importers:
       '@genshin/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
-      '@genshin/schema-snapshots':
-        specifier: workspace:*
-        version: link:../../tools/schema-snapshots
       '@genshin/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig

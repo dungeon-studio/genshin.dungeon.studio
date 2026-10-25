@@ -314,18 +314,18 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
 });
 
 describe('TeamsPage empty collection', () => {
-  it('points the user at the characters page', () => {
+  // A collection belongs to an account, so the characters page can't fill one signed out.
+  it('offers sign-in to a signed-out visitor', () => {
     renderTeamsPage();
 
-    expect(screen.getByRole('link', { name: 'Go to Characters' })).toHaveAttribute(
-      'href',
-      '/characters',
-    );
+    expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
   });
 
   it('withholds the prompt until the collection has loaded', () => {
     renderTeamsPage(AuthLoading);
 
+    expect(screen.queryByRole('button', { name: 'Sign in' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
   });
 
@@ -333,6 +333,6 @@ describe('TeamsPage empty collection', () => {
     renderTeamsPage();
     seedCollections();
 
-    expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Sign in' })).not.toBeInTheDocument();
   });
 });

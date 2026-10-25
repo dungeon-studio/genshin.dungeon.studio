@@ -6,15 +6,11 @@ import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 
-import type { AuthState } from '@/features/auth/auth-context';
 import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
-import type {
-  MutationResult,
-  SetConstellationLevelVariables,
-} from './use-character-collection-api';
+import type { MutationResult } from './use-character-collection-api';
 import {
   useAddCharacterMutation,
   useCharacterCollectionQuery,
@@ -22,110 +18,11 @@ import {
   useSetConstellationLevelMutation,
 } from './use-character-collection-api';
 import type { CharacterCollection } from './use-character-collection-store';
-import {
-  mergeCollections,
-  ownedCharacters,
-  useCollectionStore,
-} from './use-character-collection-store';
-
-function entriesAheadOfServer(
-  merged: CharacterCollection,
-  server: CharacterCollection,
-): SetConstellationLevelVariables[] {
-  return ownedCharacters(merged)
-    .filter((entry) => {
-      const serverEntry = server[entry.characterId];
-      return !serverEntry || entry.constellationLevel > serverEntry.constellationLevel;
-    })
-    .map((entry) => ({ characterId: entry.characterId, level: entry.constellationLevel }));
-}
-
-// Where storage is blocked, the record always reads as absent, so the sign-in
-// push runs on every mount.
-const PUSHED_FOR_KEY = 'genshin-collection-pushed-for';
-
-function pushedForUid(): string | null {
-  try {
-    return localStorage.getItem(PUSHED_FOR_KEY);
-  } catch {
-    return null;
-  }
-}
-
-function recordPushFor(uid: string): void {
-  try {
-    localStorage.setItem(PUSHED_FOR_KEY, uid);
-  } catch {
-    // Blocked storage, see PUSHED_FOR_KEY.
-  }
-}
-
-function clearPushRecord(): void {
-  try {
-    localStorage.removeItem(PUSHED_FOR_KEY);
-  } catch {
-    // Blocked storage, see PUSHED_FOR_KEY.
-  }
-}
-
-/**
- * Reconciles the local store with the server's collection whenever the query
- * resolves.
- *
- * The first resolution per sign-in merges what this browser holds and pushes
- * the entries the server is behind on. Refetches merge additively, so they
- * don't overwrite optimistic state while those pushes are in flight.
- *
- * The push runs once per sign-in, not per mount or page load, so a stale copy
- * can't re-add a character removed on another device. Skipping it loses
- * nothing, because a signed-in write goes straight to the server. The record
- * clears whenever auth settles signed out, which also catches a session that
- * ended with no tab open.
- */
-function useServerSync(
-  auth: AuthState,
-  apiCharacters: CharacterCollection | undefined,
-  setConstellationLevelApi: ReturnType<typeof useSetConstellationLevelMutation>['mutate'],
-  applyMutationResult: (result: MutationResult) => void,
-): void {
-  const replaceCharacters = useCollectionStore((s) => s.replaceCharacters);
-  const uid = signedInUid(auth);
-  const signedOut = auth.status === 'signed-out';
-
-  useEffect(() => {
-    if (signedOut) {
-      clearPushRecord();
-    }
-  }, [signedOut]);
-
-  useEffect(() => {
-    if (!apiCharacters) return;
-
-    const merged = mergeCollections(useCollectionStore.getState().characters, apiCharacters);
-    replaceCharacters(merged);
-
-    if (uid === undefined || pushedForUid() === uid) return;
-    recordPushFor(uid);
-
-    const diffs = entriesAheadOfServer(merged, apiCharacters);
-
-    for (const diff of diffs) {
-      setConstellationLevelApi(diff, {
-        onSuccess: applyMutationResult,
-        onError: () => {
-          toast.error('Failed to sync a merged character to the server.');
-        },
-      });
-    }
-
-    if (diffs.length > 0) {
-      toast.success(`Merged ${diffs.length} character(s) from your local collection.`);
-    }
-  }, [apiCharacters, uid, replaceCharacters, setConstellationLevelApi, applyMutationResult]);
-}
+import { useCollectionStore } from './use-character-collection-store';
 
 export interface UseCollectionResult {
   characters: CharacterCollection;
+  isAuthenticated: boolean;
   addCharacter: (characterId: CharacterId) => void;
   removeCharacter: (characterId: CharacterId) => void;
   setConstellationLevel: (characterId: CharacterId, level: ConstellationLevel) => void;
@@ -140,7 +37,8 @@ export interface UseCollectionResult {
  * confirms it.
  *
  * A rejected write rolls back only if the store still holds its value, so a
- * newer edit survives. Every failure toasts, and nothing retries.
+ * newer edit survives. Every failure toasts, and nothing retries. Signed out,
+ * every action is a no-op.
  */
 function useOptimisticActions(
   isAuthenticated: boolean,
@@ -158,24 +56,24 @@ function useOptimisticActions(
 
   const addCharacter = useCallback(
     (id: CharacterId) => {
+      if (!isAuthenticated) return;
+
       const alreadyOwned = id in useCollectionStore.getState().characters;
       if (alreadyOwned) return;
 
       storeAddCharacter(id);
-      if (isAuthenticated) {
-        addCharacterApi(id, {
-          onSuccess: applyMutationResult,
-          onError: () => {
-            const current = useCollectionStore.getState().characters[id];
-            if (current?.constellationLevel === MIN_CONSTELLATION_LEVEL) {
-              storeRemoveCharacter(id);
-              toast.error('Failed to add character. Change has been reverted.');
-            } else {
-              toast.error('Failed to add character.');
-            }
-          },
-        });
-      }
+      addCharacterApi(id, {
+        onSuccess: applyMutationResult,
+        onError: () => {
+          const current = useCollectionStore.getState().characters[id];
+          if (current?.constellationLevel === MIN_CONSTELLATION_LEVEL) {
+            storeRemoveCharacter(id);
+            toast.error('Failed to add character. Change has been reverted.');
+          } else {
+            toast.error('Failed to add character.');
+          }
+        },
+      });
     },
     [
       isAuthenticated,
@@ -188,24 +86,24 @@ function useOptimisticActions(
 
   const removeCharacter = useCallback(
     (id: CharacterId) => {
+      if (!isAuthenticated) return;
+
       const current = useCollectionStore.getState().characters[id];
       if (!current) return;
 
       storeRemoveCharacter(id);
-      if (isAuthenticated) {
-        removeCharacterApi(id, {
-          onError: () => {
-            const stillAbsent = !(id in useCollectionStore.getState().characters);
-            if (stillAbsent) {
-              storeAddCharacter(id);
-              storeSetConstellationLevel(id, current.constellationLevel);
-              toast.error('Failed to remove character. Change has been reverted.');
-            } else {
-              toast.error('Failed to remove character.');
-            }
-          },
-        });
-      }
+      removeCharacterApi(id, {
+        onError: () => {
+          const stillAbsent = !(id in useCollectionStore.getState().characters);
+          if (stillAbsent) {
+            storeAddCharacter(id);
+            storeSetConstellationLevel(id, current.constellationLevel);
+            toast.error('Failed to remove character. Change has been reverted.');
+          } else {
+            toast.error('Failed to remove character.');
+          }
+        },
+      });
     },
     [
       isAuthenticated,
@@ -218,27 +116,27 @@ function useOptimisticActions(
 
   const setConstellationLevel = useCallback(
     (id: CharacterId, level: ConstellationLevel) => {
+      if (!isAuthenticated) return;
+
       const previousLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
       if (previousLevel === undefined || previousLevel === level) return;
 
       storeSetConstellationLevel(id, level);
-      if (isAuthenticated) {
-        setConstellationLevelApi(
-          { characterId: id, level },
-          {
-            onSuccess: applyMutationResult,
-            onError: () => {
-              const currentLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
-              if (currentLevel === level) {
-                storeSetConstellationLevel(id, previousLevel);
-                toast.error('Failed to update constellation level. Change has been reverted.');
-              } else {
-                toast.error('Failed to update constellation level.');
-              }
-            },
+      setConstellationLevelApi(
+        { characterId: id, level },
+        {
+          onSuccess: applyMutationResult,
+          onError: () => {
+            const currentLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
+            if (currentLevel === level) {
+              storeSetConstellationLevel(id, previousLevel);
+              toast.error('Failed to update constellation level. Change has been reverted.');
+            } else {
+              toast.error('Failed to update constellation level.');
+            }
           },
-        );
-      }
+        },
+      );
     },
     [isAuthenticated, setConstellationLevelApi, storeSetConstellationLevel, applyMutationResult],
   );
@@ -250,22 +148,19 @@ function useOptimisticActions(
  * The character collection page's whole interface: what the user owns, the
  * actions that change it, and the state of the sync behind it.
  *
- * Reads always come from the local store, so the page renders before the
- * network answers and keeps working signed out. Signing in merges what this
- * browser recorded with the account's own collection and pushes anything the
- * server hasn't seen, which is how a visitor's offline work survives their
- * first sign-in.
+ * A collection belongs to an account, so every action is a no-op while signed
+ * out, matching the weapon collection. Callers show `isAuthenticated` rather
+ * than offering an action that will silently do nothing.
  */
 export function useCollection(): UseCollectionResult {
   const auth = useAuth();
   const uid = signedInUid(auth);
   const isAuthenticated = uid !== undefined;
 
-  // Zustand store — always the read layer
   const characters = useCollectionStore((s) => s.characters);
   const storeReplaceCharacter = useCollectionStore((s) => s.replaceCharacter);
+  const storeReplaceCharacters = useCollectionStore((s) => s.replaceCharacters);
 
-  // TanStack Query — background sync when authenticated
   const {
     data: apiCharacters,
     error: queryError,
@@ -286,7 +181,10 @@ export function useCollection(): UseCollectionResult {
     [storeReplaceCharacter],
   );
 
-  useServerSync(auth, apiCharacters, setConstellationLevelApi, applyMutationResult);
+  useEffect(() => {
+    if (!apiCharacters) return;
+    storeReplaceCharacters(apiCharacters);
+  }, [apiCharacters, storeReplaceCharacters]);
 
   const { addCharacter, removeCharacter, setConstellationLevel } = useOptimisticActions(
     isAuthenticated,
@@ -301,6 +199,7 @@ export function useCollection(): UseCollectionResult {
 
   return {
     characters,
+    isAuthenticated,
     addCharacter,
     removeCharacter,
     setConstellationLevel,

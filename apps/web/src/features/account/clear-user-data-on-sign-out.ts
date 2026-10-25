@@ -11,12 +11,11 @@ import { useTeamStore } from '@/features/teams/use-team-store';
 
 /**
  * Empties every per-user store when a signed-in user leaves, so the next
- * account to sign in merges only its own data.
+ * account to sign in sees only its own data.
  *
  * Mount it once, outside the routes: a page's own hooks see only the sign-outs
  * that happen while that page is open. Auth settling on page load isn't a
- * sign-out, so a visitor's persisted collection survives until sign-in merges
- * it.
+ * sign-out, so a visitor's unsaved teams survive it.
  */
 export function ClearUserDataOnSignOut(): null {
   const uid = signedInUid(useAuth());

@@ -6,9 +6,10 @@ import type { Character } from '@genshin/game-data';
 import { CHARACTER_ROSTER } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
 import type { JSX } from 'react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { Container } from '@/components/chrome/container';
+import { promptSignIn } from '@/features/auth';
 import { CharacterCard } from '@/features/collection/characters/character-card';
 import { CharacterFilters } from '@/features/collection/characters/character-filters';
 import type { CharacterFilterState } from '@/features/collection/characters/filtering';
@@ -19,6 +20,7 @@ import { ownedCharacterIds } from '@/features/collection/characters/use-characte
 export function CharactersPage(): JSX.Element {
   const {
     characters,
+    isAuthenticated,
     addCharacter,
     removeCharacter,
     setConstellationLevel,
@@ -39,6 +41,20 @@ export function CharactersPage(): JSX.Element {
       filteredOwnedCount: filtered.filter((c) => ownedIds.has(c.id)).length,
     };
   }, [filters, ownedIds]);
+
+  // Signed out the collection is empty, so adding is the only action a card
+  // offers, and the only one that has to explain itself.
+  const handleAddCharacter = useCallback(
+    (characterId: Character['id']) => {
+      if (!isAuthenticated) {
+        promptSignIn('character collection');
+        return;
+      }
+
+      addCharacter(characterId);
+    },
+    [isAuthenticated, addCharacter],
+  );
 
   function handleConstellationChange(characterId: Character['id'], level: ConstellationLevel) {
     setConstellationLevel(characterId, level);
@@ -68,7 +84,7 @@ export function CharactersPage(): JSX.Element {
         <Container className="py-4">
           {error && (
             <p className="mb-3 px-4 py-3 text-sm rounded-md bg-destructive/10 text-center text-destructive">
-              Failed to sync collection. Local data is still available.
+              Failed to sync character collection.
             </p>
           )}
           <CharacterFilters
@@ -95,7 +111,7 @@ export function CharactersPage(): JSX.Element {
                   character={character}
                   owned={owned}
                   constellationLevel={entry?.constellationLevel}
-                  onAdd={addCharacter}
+                  onAdd={handleAddCharacter}
                   onRemove={removeCharacter}
                   onConstellationChange={handleConstellationChange}
                 />

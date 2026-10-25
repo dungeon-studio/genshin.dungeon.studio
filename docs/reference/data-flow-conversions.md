@@ -23,7 +23,7 @@ Every feature runs the same chain:
 
 | Feature    | Cache shape, step 4                                    | Store shape, step 5                                      |
 | ---------- | ------------------------------------------------------ | -------------------------------------------------------- |
-| Characters | `toCharacterCollection`: record keyed by `CharacterId` | `mergeCollections`: additive, higher constellation wins  |
+| Characters | `toCharacterCollection`: record keyed by `CharacterId` | identity: `replaceCharacters` stores the cache shape     |
 | Weapons    | `toWeaponRecord`: record keyed by instance ID          | identity: `setWeapons` stores the cache shape            |
 | Teams      | `parseTeamsResponse`: array of `CollectionTeam`        | `collectionTeamsToStore`: four slots over `initialTeams` |
 
