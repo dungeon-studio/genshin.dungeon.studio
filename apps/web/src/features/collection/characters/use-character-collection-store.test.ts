@@ -69,18 +69,6 @@ describe('useCollectionStore', () => {
     });
   });
 
-  describe('isOwned', () => {
-    it('returns true for owned characters', () => {
-      useCollectionStore.getState().addCharacter('amber');
-
-      expect(useCollectionStore.getState().isOwned('amber')).toBe(true);
-    });
-
-    it('returns false for unowned characters', () => {
-      expect(useCollectionStore.getState().isOwned('amber')).toBe(false);
-    });
-  });
-
   describe('replaceCharacter', () => {
     it('does not restore a character no longer in the collection', () => {
       useCollectionStore.getState().replaceCharacter(makeCharacter(UNOWNED));

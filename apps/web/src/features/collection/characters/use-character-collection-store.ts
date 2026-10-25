@@ -21,8 +21,6 @@ interface CollectionState {
   addCharacter: (characterId: CharacterId) => void;
   removeCharacter: (characterId: CharacterId) => void;
   setConstellationLevel: (characterId: CharacterId, level: ConstellationLevel) => void;
-  isOwned: (characterId: CharacterId) => boolean;
-  getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
   /** Skips a character no longer owned, so a save landing after its removal can't restore it. */
   replaceCharacter: (entry: CollectionCharacter) => void;
   replaceCharacters: (characters: CharacterCollection) => void;
@@ -74,14 +72,6 @@ export const useCollectionStore = create<CollectionState>()((set, get) => ({
         [characterId]: { ...entry, constellationLevel: level, updatedAt: nowTimestamp() },
       },
     }));
-  },
-
-  isOwned: (characterId) => {
-    return characterId in get().characters;
-  },
-
-  getCharacter: (characterId) => {
-    return get().characters[characterId];
   },
 
   replaceCharacter: (entry) => {
