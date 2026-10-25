@@ -1,8 +1,10 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import { setupServer } from 'msw/node';
+/// <reference types="msw/vite/client" />
 
-// Shared request-mocking server for the jsdom test environment. Tests register
+import { network } from 'virtual:msw';
+
+// Shared request-mocking network for the jsdom test environment. Tests register
 // per-case handlers with `server.use(...)`; lifecycle is wired in setup.ts.
-export const server = setupServer();
+export const server = network;
