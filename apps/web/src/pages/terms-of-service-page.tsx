@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-// Describes the service's terms. No lawyer has reviewed them.
+// No lawyer has reviewed these terms.
 
 import type { JSX } from 'react';
 import { Link } from 'react-router-dom';
@@ -74,7 +74,7 @@ export function TermsOfServicePage(): JSX.Element {
       </LegalSection>
 
       <LegalSection title="Contact">
-        Questions about these terms? Email <PrivacyEmailLink />.
+        Email questions about these terms to <PrivacyEmailLink />.
       </LegalSection>
     </LegalPage>
   );

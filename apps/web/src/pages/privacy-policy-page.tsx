@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-// Describes the app's actual data practices. No lawyer has reviewed it.
+// No lawyer has reviewed this policy.
 
 import type { JSX, ReactNode } from 'react';
 
@@ -27,8 +27,9 @@ export function PrivacyPolicyPage(): JSX.Element {
       </p>
 
       <LegalSection title="Who we are">
-        Alex Brandt operates genshin.dungeon.studio under the name Dungeon Studio and is the
-        controller of your personal data. Contact us at <PrivacyEmailLink />.
+        Alex Brandt runs genshin.dungeon.studio under the name Dungeon Studio. As the data
+        controller, Alex Brandt is responsible for your personal data. Contact us at{' '}
+        <PrivacyEmailLink />.
       </LegalSection>
 
       <LegalHeading>What we collect</LegalHeading>
@@ -38,13 +39,13 @@ export function PrivacyPolicyPage(): JSX.Element {
           Google account identifier through Firebase Authentication. Signing in is optional.
         </CollectedItem>
         <CollectedItem label="Your collection">
-          The characters and weapons you mark as owned and their levels, and the teams you build.
-          Before you sign in this stays in your browser; once you sign in it is saved to our servers
-          so it syncs across your devices.
+          The characters and weapons you own, their levels, and the teams you build. Before you sign
+          in, this stays in your browser. Once you sign in, we save it to our servers so it syncs
+          across your devices.
         </CollectedItem>
         <CollectedItem label="Request logs">
-          Our servers record each request's address, time, and outcome, and our hosting provider
-          records the IP address it came from.
+          For each request, our servers record what was requested, when, and whether it succeeded.
+          Our hosting provider also records the IP address the request came from.
         </CollectedItem>
         <CollectedItem label="Preferences">
           Your light or dark theme choice, stored only in your browser and never sent to us.
@@ -69,28 +70,29 @@ export function PrivacyPolicyPage(): JSX.Element {
       </LegalSection>
 
       <LegalSection title="Service providers">
-        Google hosts the app and its servers through Firebase Hosting, Cloud Run, Firebase
-        Authentication, and Cloud Firestore. Cloudflare routes email sent to our privacy address.
-        Your collection is stored in the European Union. Google and Cloudflare may process data in
-        other countries under their own data protection terms. Their handling of your data is
-        governed by the{' '}
+        Google runs the app for us. Firebase Hosting serves the site, Cloud Run runs our servers,
+        Firebase Authentication handles sign-in, and Cloud Firestore stores your collection in the
+        European Union. Cloudflare routes email sent to our privacy address. Google and Cloudflare
+        may process data in other countries under their own data protection terms. The{' '}
         <ExternalLegalLink href="https://policies.google.com/privacy">
           Google Privacy Policy
         </ExternalLegalLink>{' '}
         and the{' '}
         <ExternalLegalLink href="https://www.cloudflare.com/privacypolicy/">
           Cloudflare Privacy Policy
-        </ExternalLegalLink>
-        .
+        </ExternalLegalLink>{' '}
+        govern how they handle your data.
       </LegalSection>
 
-      <LegalSection title="Your choices and rights">
+      <LegalSection title="Your choices">
         Signing out clears your collection from your browser. Deleting your account erases your
-        characters, weapons, and teams along with your sign-in. We cannot undo it. To access,
-        correct, or receive a copy of your data, to object to how we use it, or to ask any question
-        about your privacy, email <PrivacyEmailLink />. Depending on where you live, you may have
-        additional rights over your personal data under laws such as the GDPR or CCPA. You can also
-        complain to a data protection authority, such as the UK's{' '}
+        sign-in and your characters, weapons, and teams. We can't undo a deletion.
+      </LegalSection>
+
+      <LegalSection title="Your rights">
+        Email <PrivacyEmailLink /> to access, correct, or get a copy of your data, or to object to
+        how we use it. Depending on where you live, laws such as the GDPR or CCPA may give you
+        further rights. You can also complain to a data protection authority, such as the UK's{' '}
         <ExternalLegalLink href="https://ico.org.uk/make-a-complaint/">
           Information Commissioner's Office
         </ExternalLegalLink>
