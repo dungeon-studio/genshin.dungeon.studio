@@ -722,9 +722,9 @@ jobs:
         run: docker rm -f api-smoke 2>/dev/null || true
 
   # A cold devcontainer build is expensive, so the job builds only when an
-  # input that the jobs above don't already exercise changed. The skip lives in
-  # a step rather than a `paths:` gate so the check reports on every pull
-  # request and a ruleset can require it.
+  # input that no other job exercises changed. The skip lives in a step rather
+  # than a `paths:` gate so the check reports on every pull request and a
+  # ruleset can require it.
   toolchain:
     name: Verify toolchain
     runs-on: ubuntu-latest
@@ -739,18 +739,20 @@ jobs:
           # Reaches the base: the first parent of the merge or squash commit.
           fetch-depth: 2
 
-      # package.json carries packageManager, engines, and the firebase-tools
-      # pin; tools/e2e/package.json the Playwright pin the browsers install
-      # from. `git diff` exits nonzero on error too, so a failed diff builds.
+      # `git diff` exits nonzero on error too, so a failed diff builds.
       - name: Diff against the base
         id: diff
         run: |
-          if git diff --quiet HEAD^1 HEAD -- \
-            .devcontainer \
-            scripts/install-reuse.sh \
-            package.json \
-            tools/e2e/package.json \
-            .github/workflows/ci.yml; then
+          inputs=(
+            .devcontainer
+            scripts/install-reuse.sh
+            # packageManager, engines, and the firebase-tools pin.
+            package.json
+            # The Playwright pin the browsers install from.
+            tools/e2e/package.json
+            .github/workflows/ci.yml
+          )
+          if git diff --quiet HEAD^1 HEAD -- "${inputs[@]}"; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
