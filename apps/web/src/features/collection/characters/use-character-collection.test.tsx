@@ -161,9 +161,12 @@ describe('useCollection mutations', () => {
     let putCount = 0;
     server.use(
       http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
-      http.put('http://localhost:8080/characters/skirk', () => {
+      // Matched on the body, not arrival order, which concurrent requests
+      // don't guarantee.
+      http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
         putCount += 1;
-        if (putCount === 1) return addFailure.resolver();
+        const { constellationLevel } = (await request.json()) as { constellationLevel: number };
+        if (constellationLevel === 0) return addFailure.resolver();
         return HttpResponse.json(
           charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })]),
         );
@@ -221,9 +224,10 @@ describe('useCollection mutations', () => {
       http.get('http://localhost:8080/characters', () =>
         HttpResponse.json(charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })])),
       ),
-      http.put('http://localhost:8080/characters/skirk', () => {
+      http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
         putCount += 1;
-        if (putCount === 1) return levelFailure.resolver();
+        const { constellationLevel } = (await request.json()) as { constellationLevel: number };
+        if (constellationLevel === 5) return levelFailure.resolver();
         return HttpResponse.json(charactersDocument([makeCharacter(SKIRK)]));
       }),
       http.delete(
