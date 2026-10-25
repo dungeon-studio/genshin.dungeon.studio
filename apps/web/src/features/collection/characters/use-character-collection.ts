@@ -32,23 +32,32 @@ export interface UseCollectionResult {
   error: Error | null;
 }
 
+type CollectionActions = Pick<
+  UseCollectionResult,
+  'addCharacter' | 'removeCharacter' | 'setConstellationLevel'
+>;
+
+const SIGNED_OUT_ACTIONS: CollectionActions = {
+  addCharacter: () => {},
+  removeCharacter: () => {},
+  setConstellationLevel: () => {},
+};
+
 /**
  * The collection's write actions, each applied to the store before the server
  * confirms it.
  *
  * A rejected write rolls back only if the store still holds its value, so a
- * newer edit survives. Every failure toasts, and nothing retries. Signed out,
- * every action is a no-op.
+ * newer edit survives. Every failure toasts, and nothing retries.
  */
 function useOptimisticActions(
-  isAuthenticated: boolean,
   api: {
     addCharacterApi: ReturnType<typeof useAddCharacterMutation>['mutate'];
     removeCharacterApi: ReturnType<typeof useRemoveCharacterMutation>['mutate'];
     setConstellationLevelApi: ReturnType<typeof useSetConstellationLevelMutation>['mutate'];
   },
   applyMutationResult: (result: MutationResult) => void,
-): Pick<UseCollectionResult, 'addCharacter' | 'removeCharacter' | 'setConstellationLevel'> {
+): CollectionActions {
   const { addCharacterApi, removeCharacterApi, setConstellationLevelApi } = api;
   const storeAddCharacter = useCollectionStore((s) => s.addCharacter);
   const storeRemoveCharacter = useCollectionStore((s) => s.removeCharacter);
@@ -56,8 +65,6 @@ function useOptimisticActions(
 
   const addCharacter = useCallback(
     (id: CharacterId) => {
-      if (!isAuthenticated) return;
-
       const alreadyOwned = id in useCollectionStore.getState().characters;
       if (alreadyOwned) return;
 
@@ -75,19 +82,11 @@ function useOptimisticActions(
         },
       });
     },
-    [
-      isAuthenticated,
-      addCharacterApi,
-      storeAddCharacter,
-      storeRemoveCharacter,
-      applyMutationResult,
-    ],
+    [addCharacterApi, storeAddCharacter, storeRemoveCharacter, applyMutationResult],
   );
 
   const removeCharacter = useCallback(
     (id: CharacterId) => {
-      if (!isAuthenticated) return;
-
       const current = useCollectionStore.getState().characters[id];
       if (!current) return;
 
@@ -105,19 +104,11 @@ function useOptimisticActions(
         },
       });
     },
-    [
-      isAuthenticated,
-      removeCharacterApi,
-      storeRemoveCharacter,
-      storeAddCharacter,
-      storeSetConstellationLevel,
-    ],
+    [removeCharacterApi, storeRemoveCharacter, storeAddCharacter, storeSetConstellationLevel],
   );
 
   const setConstellationLevel = useCallback(
     (id: CharacterId, level: ConstellationLevel) => {
-      if (!isAuthenticated) return;
-
       const previousLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
       if (previousLevel === undefined || previousLevel === level) return;
 
@@ -138,7 +129,7 @@ function useOptimisticActions(
         },
       );
     },
-    [isAuthenticated, setConstellationLevelApi, storeSetConstellationLevel, applyMutationResult],
+    [setConstellationLevelApi, storeSetConstellationLevel, applyMutationResult],
   );
 
   return { addCharacter, removeCharacter, setConstellationLevel };
@@ -186,11 +177,11 @@ export function useCollection(): UseCollectionResult {
     storeReplaceCharacters(apiCharacters);
   }, [apiCharacters, storeReplaceCharacters]);
 
-  const { addCharacter, removeCharacter, setConstellationLevel } = useOptimisticActions(
-    isAuthenticated,
+  const optimisticActions = useOptimisticActions(
     { addCharacterApi, removeCharacterApi, setConstellationLevelApi },
     applyMutationResult,
   );
+  const actions = isAuthenticated ? optimisticActions : SIGNED_OUT_ACTIONS;
 
   const isOwned = useCallback((id: CharacterId) => id in characters, [characters]);
   const getCharacter = useCallback((id: CharacterId) => characters[id], [characters]);
@@ -200,9 +191,7 @@ export function useCollection(): UseCollectionResult {
   return {
     characters,
     isAuthenticated,
-    addCharacter,
-    removeCharacter,
-    setConstellationLevel,
+    ...actions,
     isOwned,
     getCharacter,
     isLoading: awaitingUserData(auth, queryLoading),

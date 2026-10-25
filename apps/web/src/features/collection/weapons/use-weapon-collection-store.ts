@@ -33,10 +33,6 @@ export function groupByWeapon(
  *
  * Components reach for `useWeaponCollection` instead, which wraps this with the
  * server sync. This store is for that hook and for tests.
- *
- * Not persisted, unlike the character collection: an instance identifier is
- * minted by the server, so a copy recorded offline could never be reconciled
- * with the account's own records.
  */
 export const useWeaponCollectionStore = create<WeaponCollectionState>()((set, get) => ({
   weapons: {},
