@@ -140,6 +140,7 @@ SRECon
 [Ss]ignifiers?
 [Ss]uperset
 [Tt]oolchain
+[Tt]ooltips?
 [Tt]ypechecking
 [Uu]nprocessable
 [Uu]nversioned
