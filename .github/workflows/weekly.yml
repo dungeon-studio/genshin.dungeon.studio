@@ -43,16 +43,13 @@ jobs:
       # Broken links open a report issue instead of failing the job.
       - name: Check all links
         id: lychee
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          exit_code=0
-          lychee --no-progress --format markdown --output lychee-report.md '**/*.md' \
-            || exit_code=$?
-          echo "exit_code=${exit_code}" >> "$GITHUB_OUTPUT"
+        run: lychee --no-progress --format markdown --output lychee-report.md '**/*.md'
 
       - name: Report broken links
-        if: steps.lychee.outputs.exit_code != 0
+        if: steps.lychee.outcome == 'failure'
         uses: ./.github/actions/report-issue
         with:
           title: Link Checker Report
