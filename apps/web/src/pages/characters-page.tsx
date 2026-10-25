@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { ConstellationLevel } from '@genshin/domain';
 import type { Character } from '@genshin/game-data';
 import { CHARACTER_ROSTER } from '@genshin/game-data';
 import { Loader2 } from 'lucide-react';
@@ -56,10 +55,6 @@ export function CharactersPage(): JSX.Element {
     [isAuthenticated, addCharacter],
   );
 
-  function handleConstellationChange(characterId: Character['id'], level: ConstellationLevel) {
-    setConstellationLevel(characterId, level);
-  }
-
   if (isLoading) {
     return (
       <Container className="py-12">
@@ -113,7 +108,7 @@ export function CharactersPage(): JSX.Element {
                   constellationLevel={entry?.constellationLevel}
                   onAdd={handleAddCharacter}
                   onRemove={removeCharacter}
-                  onConstellationChange={handleConstellationChange}
+                  onConstellationChange={setConstellationLevel}
                 />
               </div>
             );
