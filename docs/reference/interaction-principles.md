@@ -14,7 +14,8 @@ scope.
 A view is anything a user reads or acts on: a page, sheet, dialog, popover,
 toast, and each of its loading, empty, and error states. An interaction is one
 control and everything it causes, including the optimistic update and rollback
-behind a write.
+behind a write. A wait is a delay longer than about a second, past which a user
+needs to see that the app is working [Nielsen1993].
 
 The rules follow the order a user meets a view. The first group bridges the
 gulf of execution, working out what to do. The second bridges the gulf of
@@ -51,8 +52,8 @@ collection, names that effect too.
 Fails when: a button that cycles the sort order names only the current order.
 
 Source: signifiers and the conceptual model, chapter 1 of [Norman2013], the
-button pattern of the ARIA Authoring Practices Guide [APG], and match between
-the system and the real world, heuristic 2 of [Nielsen1994].
+button pattern of [APG], and match between the system and the real world,
+heuristic 2 of [Nielsen1994].
 
 <a id="available-controls"></a>
 
@@ -92,42 +93,41 @@ cognitive load [Sweller1988].
 
 A user who changes something can tell, from the view they're on, whether the
 server has the change yet. An optimistic update shows the new value at once
-and, after about a second, marks it pending on or near the thing that changed.
-Saved state shows in the same place. Failure can arrive as a toast.
+and, during a wait, marks it pending on or near the thing that changed. Saved
+state shows in the same place.
 
 A view that keeps edits only in memory, such as a signed-out draft, says so
 before the user starts, and names what discards them.
 
 Fails when: a constellation change shows no sign that it's still saving.
 
-Source: visibility of system status, heuristic 1 of [Nielsen1994], error
-prevention, heuristic 5, and [Nielsen1993].
+Source: visibility of system status, heuristic 1 of [Nielsen1994], and error
+prevention, heuristic 5.
 
 <a id="loading-state"></a>
 
 ### Data that hasn't loaded never renders as empty
 
-A view still waiting on data after about a second shows that it's loading. A
+During a wait for data, the view shows that it's loading. A
 failed load says so in place of the content and offers a retry. Neither renders
 the defaults or empty state a user would read as "you have nothing here."
 
 Fails when: the teams page shows default teams while the user's teams load.
 
-Source: feedback, chapter 1 of [Norman2013], visibility of system status,
-heuristic 1 of [Nielsen1994], and [Nielsen1993].
+Source: feedback, chapter 1 of [Norman2013], and visibility of system status,
+heuristic 1 of [Nielsen1994].
 
 <a id="visible-effect"></a>
 
 ### Every action has a visible effect or says why it had none
 
 Clicking, typing, or selecting changes the view, or a message explains why it
-didn't. An effect that takes longer than about a second shows that the app is
-working. A failure the user caused by dismissing something, such as closing a
+didn't. An action that starts a wait shows that the app is working. A failure the user caused by dismissing something, such as closing a
 sign-in popup, needs no message.
 
 Fails when: the browser blocks the sign-in popup and the view doesn't change.
 
-Source: feedback, chapter 1 of [Norman2013], and [Nielsen1993].
+Source: feedback, chapter 1 of [Norman2013].
 
 <a id="stable-edits"></a>
 
@@ -165,7 +165,8 @@ Source: the conceptual model a user builds from what they see, chapter 1 of
 
 When a write fails, the message names the thing in the user's terms: which
 team, character, or weapon, and what came back. It also names a next step:
-retry, reload, sign in again, or report the problem.
+retry, reload, sign in again, or report the problem. The message can arrive as a
+toast.
 
 The value the user entered stays recoverable, such as through a retry that
 sends it again, or the message names what the user lost.
@@ -182,7 +183,7 @@ recognize, diagnose, and recover from errors, heuristic 9 of [Nielsen1994], and
 
 Removing something the user can't get back without redoing work offers undo.
 An action that undo can't reverse asks first, and the question names the thing
-it destroys. The more work it destroys, the stronger the confirmation, up to
+it destroys. The more work an action destroys, the stronger the confirmation, up to
 typing the item's name.
 
 Fails when: removing a weapon instance deletes it with no way back.
