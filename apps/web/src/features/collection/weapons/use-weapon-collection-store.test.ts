@@ -57,24 +57,6 @@ describe('useWeaponCollectionStore', () => {
     });
   });
 
-  describe('getWeaponsByWeaponId', () => {
-    it('returns all instances of a specific weapon', () => {
-      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', WEAPON.id));
-      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-2', WEAPON.id));
-      useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-3', OTHER_WEAPON.id));
-
-      const instances = useWeaponCollectionStore.getState().getWeaponsByWeaponId(WEAPON.id);
-
-      expect(instances).toHaveLength(2);
-    });
-
-    it('returns empty array when no instances exist', () => {
-      const result = useWeaponCollectionStore.getState().getWeaponsByWeaponId(OTHER_WEAPON.id);
-
-      expect(result).toEqual([]);
-    });
-  });
-
   describe('setWeapons', () => {
     it('replaces the entire collection', () => {
       useWeaponCollectionStore.getState().addWeapon(makeWeapon('inst-1', WEAPON.id));

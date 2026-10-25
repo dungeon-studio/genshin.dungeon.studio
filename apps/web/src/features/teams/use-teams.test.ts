@@ -196,6 +196,52 @@ describe('useTeams (authenticated)', () => {
     secondPut.release();
     await waitFor(() => expect(result.current.isSaving).toBe(false));
   });
+
+  it('keeps an edit made after a refetch answers but before it renders', async () => {
+    const secondPut = holdResponse(() => new HttpResponse(null, { status: 204 }));
+    const putBodies: { members: CollectionTeamMembers }[] = [];
+    server.use(
+      http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([])), {
+        once: true,
+      }),
+      http.get('http://localhost:8080/teams', () =>
+        HttpResponse.json(teamsDocument([makeTeam(1, { name: 'First' })])),
+      ),
+      http.put('http://localhost:8080/teams/1', async ({ request }) => {
+        putBodies.push((await request.json()) as { members: CollectionTeamMembers });
+        if (putBodies.length === 2) return secondPut.resolver();
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+
+    const { result, queryClient } = renderHookSignedIn(() => useTeams(), 'user-1');
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    // A cache listener runs before React renders the answer, so this edit
+    // lands in between.
+    const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
+      if (event.type !== 'updated' || event.action.type !== 'success') return;
+      if (putBodies.length !== 1) return;
+      act(() => {
+        result.current.assignCharacter(1, 0, CHARACTER);
+      });
+    });
+
+    act(() => {
+      result.current.setTeamName(1, 'First');
+    });
+    await waitFor(() => expect(putBodies).toHaveLength(2));
+    unsubscribe();
+
+    act(() => {
+      result.current.setTeamName(1, 'Third');
+    });
+    await waitFor(() => expect(putBodies).toHaveLength(3));
+    expect(putBodies[2]?.members[0]?.characterId).toBe(CHARACTER);
+
+    secondPut.release();
+    await waitFor(() => expect(result.current.isSaving).toBe(false));
+  });
 });
 
 describe('useTeams (local-only)', () => {

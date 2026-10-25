@@ -4,9 +4,8 @@
 # Data flow
 
 Where each copy of user data lives and which processes move data between them.
-User data has up to four copies: the Firestore document, the TanStack Query
-cache, a zustand store, and, for characters only, the browser's `localStorage`.
-Which copy should be authoritative is [#1133]. Out of scope:
+User data has three copies: the Firestore document, the TanStack Query cache,
+and a zustand store. Which copy should be authoritative is [#1133]. Out of scope:
 
 - Static game data, which is never written.
 - The theme preference, which never leaves the browser.
@@ -53,7 +52,7 @@ flowchart LR
 
 ## Level 0
 
-The system runs eight processes over four data stores, D1 to D4, across three
+The system runs seven processes over three data stores, D1 to D3, across three
 trust boundaries:
 
 - The browser runs on hardware the user controls.
@@ -72,20 +71,18 @@ flowchart TB
     send(2.0 Send writes)
     fetch(4.0 Fetch records)
     reconcile(5.0 Reconcile store with cache)
-    persistCharacters(6.0 Persist character collection)
-    clearUserData(8.0 Clear user data)
+    clearUserData(7.0 Clear user data)
     store[(D1 zustand stores)]
     cache[(D2 Query cache)]
-    local[(D3 localStorage genshin-collection)]
   end
 
   subgraph cloud[Google Cloud project]
     serve(3.0 Serve and store records)
-    firestore[(D4 Firestore users/uid)]
+    firestore[(D3 Firestore users/uid)]
   end
 
   subgraph workstation[Operator workstation]
-    sweep(7.0 Sweep stored documents)
+    sweep(6.0 Sweep stored documents)
   end
 
   user -->|edit| edit
@@ -113,15 +110,7 @@ flowchart TB
   fetch -->|server collection| cache
 
   cache -->|server collection| reconcile
-  store -->|local characters| reconcile
-  firebaseAuth -->|user ID| reconcile
   reconcile -->|reconciled entities| store
-  reconcile -->|characters ahead of the server| send
-
-  store -->|characters| persistCharacters
-  persistCharacters -->|versioned collection| local
-  local -->|stored collection| persistCharacters
-  persistCharacters -->|migrated characters| store
 
   firebaseAuth -->|user ID| clearUserData
   clearUserData -->|emptied entities| store
@@ -141,7 +130,6 @@ the previous user's entries, keyed by user ID, until garbage collection.
 
 Clear user data runs when a signed-in user signs out or another account signs
 in, whichever page is open. It empties the character and weapon stores and
-resets teams to their default slots. The emptied character collection then
-persists to D3.
+resets teams to their default slots.
 
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133

@@ -82,4 +82,11 @@ describe('checkSnapshotCompat', () => {
     expect(violations).toHaveLength(1);
     expect(violations[0]).toMatch(/export v1 in its schema registry/);
   });
+
+  it('passes a deleted snapshot with a tombstone beside it', () => {
+    rmSync(join(repo, PACKAGE_SNAPSHOT));
+    write(PACKAGE_SNAPSHOT.replace(/\.json$/, '.retired'), 'Nothing reads export v1.\n');
+
+    expect(checkSnapshotCompat(repo, 'HEAD')).toEqual([]);
+  });
 });

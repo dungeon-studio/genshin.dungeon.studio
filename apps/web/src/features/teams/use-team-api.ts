@@ -19,7 +19,7 @@ import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { apiDelete, apiGet, apiPut } from '@/lib/api';
-import { useUserQuerySync } from '@/lib/use-user-query-sync';
+import { useUserQuerySync, useUserWritePending } from '@/lib/use-user-query-sync';
 import { userScopedKey } from '@/lib/user-scoped-key';
 
 export interface SaveTeamPayload {
@@ -45,6 +45,10 @@ export function useTeamsQuery(userId: string | undefined): UseQueryResult<Collec
     },
     enabled: userId !== undefined,
   });
+}
+
+export function useTeamWritePending(userId: string | undefined): () => boolean {
+  return useUserWritePending(userId, teamsKey);
 }
 
 export function useSaveTeamMutation(
