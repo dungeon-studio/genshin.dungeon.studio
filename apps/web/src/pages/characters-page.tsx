@@ -41,8 +41,7 @@ export function CharactersPage(): JSX.Element {
     };
   }, [filters, ownedIds]);
 
-  // Signed out the collection is empty, so adding is the only action a card
-  // offers, and the only one that has to explain itself.
+  // Signed out, the collection is empty, so add is the only action a card offers.
   const handleAddCharacter = useCallback(
     (characterId: Character['id']) => {
       if (!isAuthenticated) {

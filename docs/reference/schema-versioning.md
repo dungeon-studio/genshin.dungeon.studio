@@ -82,8 +82,8 @@ process](../explanation/adr-0003-json-schema-strategy.md#major-version-transitio
 ## Implementation: Other boundaries
 
 Queue payloads, cache entries, and local storage don't yet use this pattern.
-A zustand `persist` store would stamp `persist`'s `version` and gate its Zod
-schemas through `tools/schema-snapshots`. Queue payloads and cache entries are
+A zustand `persist` store stamps `persist`'s `version` and gates its Zod schemas
+through `tools/schema-snapshots`. Queue payloads and cache entries are
 in-band boundaries like Firestore: when they're introduced, stamp every payload with a
 `version` field, keep one `schemas/v{n}.ts` file per version, write a strict
 serializer and a union deserializer, use the same `V{n}ConceptSchema` /

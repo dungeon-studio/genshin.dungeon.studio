@@ -15,7 +15,10 @@ const require = createRequire(import.meta.url);
 // so adding a gated package never edits this tool.
 const SNAPSHOT_PATH = /^[^/]+\/[^/]+\/schema-snapshots\/([^/]+)\/(v\d+)\.json$/;
 
-/** `v{n}.retired` beside a snapshot marks its deletion as deliberate. */
+/**
+ * `v{n}.retired` beside a deleted snapshot records that nothing reads that
+ * version, so its removal orphans no stored data.
+ */
 function tombstoneFor(snapshot: string): string {
   return snapshot.replace(/\.json$/, '.retired');
 }
@@ -42,8 +45,6 @@ export function checkSnapshotCompat(repoRoot: string, baseRef: string): string[]
       const file = join(repoRoot, path);
 
       if (!existsSync(file)) {
-        // A tombstone records that nothing reads this version any longer, so
-        // no stored data is orphaned by its removal.
         if (existsSync(tombstoneFor(file))) return [];
 
         return [

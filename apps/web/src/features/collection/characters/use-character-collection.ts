@@ -140,8 +140,8 @@ function useOptimisticActions(
  * actions that change it, and the state of the sync behind it.
  *
  * A collection belongs to an account, so every action is a no-op while signed
- * out, matching the weapon collection. Callers show `isAuthenticated` rather
- * than offering an action that will silently do nothing.
+ * out. Callers show `isAuthenticated` rather than offering an action that will
+ * silently do nothing.
  */
 export function useCollection(): UseCollectionResult {
   const auth = useAuth();

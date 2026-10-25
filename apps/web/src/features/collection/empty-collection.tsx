@@ -22,7 +22,7 @@ interface EmptyCollectionProps {
  * Empty state for a view that needs collection entries before it can show anything.
  *
  * Signed out, it offers sign-in in place of `to`: a collection belongs to an
- * account, so the page it would link to can't add anything yet.
+ * account, so the page it would link to can't add anything.
  */
 export function EmptyCollection({
   icon,

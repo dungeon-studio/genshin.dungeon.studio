@@ -81,8 +81,8 @@ sequenceDiagram
 ## Weapons
 
 `useWeaponCollection` in `use-weapon-collection.ts`. The server mints the
-instance identifier, so adding can't be optimistic and nothing works signed
-out.
+instance identifier, so adding can't be optimistic. Like characters, nothing
+works signed out.
 
 ```mermaid
 sequenceDiagram
