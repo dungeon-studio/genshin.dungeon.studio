@@ -34,9 +34,18 @@ runs:
         echo "number=${number}" >> "${GITHUB_OUTPUT}"
 
     - name: Open or update report issue
-      uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6.0.0
-      with:
-        title: ${{ inputs.title }}
-        content-filepath: ${{ inputs.content-filepath }}
-        issue-number: ${{ steps.report.outputs.number }}
-        labels: ${{ inputs.labels }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        NUMBER: ${{ steps.report.outputs.number }}
+        TITLE: ${{ inputs.title }}
+        CONTENT_FILEPATH: ${{ inputs.content-filepath }}
+        LABELS: ${{ inputs.labels }}
+      run: |
+        if [ -n "${NUMBER}" ]; then
+          gh issue edit "${NUMBER}" --repo "${GITHUB_REPOSITORY}" \
+            --body-file "${CONTENT_FILEPATH}" --add-label "${LABELS}"
+        else
+          gh issue create --repo "${GITHUB_REPOSITORY}" --title "${TITLE}" \
+            --body-file "${CONTENT_FILEPATH}" --label "${LABELS}"
+        fi
