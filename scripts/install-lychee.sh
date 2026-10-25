@@ -2,11 +2,8 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# Install the lychee link checker into /usr/local/bin.
-#
-# Shared by the DevContainer post-create script and the workflows that check
-# links, so every lychee run uses the same version. The musl build is static
-# and carries no glibc floor.
+# One pin for every lychee install, so local and CI link checks agree. The
+# musl build is static and carries no glibc floor.
 
 set -euo pipefail
 set -x

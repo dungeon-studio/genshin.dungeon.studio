@@ -666,9 +666,8 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
-      # deploy.yml tags and labels the published image from this action, which
-      # otherwise runs only after merge. The steps below expect api:ci, so a
-      # change to its outputs fails here.
+      # deploy.yml tags its image with this action after merge, so a breaking
+      # release has to fail here first.
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
@@ -723,8 +722,8 @@ jobs:
         if: always()
         run: docker rm -f api-smoke 2>/dev/null || true
 
-  # release-notes.yml runs this action only after merge. The dry run reads the
-  # same config and merged pull requests without writing the draft.
+  # release-notes.yml drafts only after merge, so a breaking release-drafter
+  # has to fail here first.
   release-draft:
     name: Preview release draft
     runs-on: ubuntu-latest
@@ -741,8 +740,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # daily.yml prunes on a schedule only. This pass logs what it would change
-  # without touching a pull request.
+  # daily.yml prunes only on a schedule, so a breaking actions/stale has to
+  # fail here first.
   stale-pull-requests:
     name: Preview stale pull request pruning
     runs-on: ubuntu-latest

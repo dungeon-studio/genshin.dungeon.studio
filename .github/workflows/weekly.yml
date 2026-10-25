@@ -40,7 +40,6 @@ jobs:
       - name: Install lychee
         run: scripts/install-lychee.sh
 
-      # Broken links open a report issue instead of failing the job.
       - name: Check all links
         id: lychee
         continue-on-error: true
