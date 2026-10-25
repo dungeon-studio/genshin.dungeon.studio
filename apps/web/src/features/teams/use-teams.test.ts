@@ -61,9 +61,7 @@ describe('useTeams (authenticated)', () => {
       }),
     );
 
-    const { result } = renderHook(() => useTeams(), {
-      wrapper: createWrapper({ user: fakeUser('user-1') }),
-    });
+    const { result } = renderHookSignedIn(() => useTeams(), 'user-1');
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
@@ -85,9 +83,7 @@ describe('useTeams (authenticated)', () => {
       }),
     );
 
-    const { result } = renderHook(() => useTeams(), {
-      wrapper: createWrapper({ user: fakeUser('user-1') }),
-    });
+    const { result } = renderHookSignedIn(() => useTeams(), 'user-1');
 
     await waitFor(() => expect(result.current.getTeam(1).members[0]?.characterId).toBe(CHARACTER));
 
