@@ -37,20 +37,22 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install lychee
+        run: scripts/install-lychee.sh
+
       - name: Check all links
         id: lychee
-        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
-        with:
-          args: --no-progress "**/*.md"
-          fail: false
-          token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: lychee --no-progress --format markdown --output lychee-report.md '**/*.md'
 
       - name: Report broken links
-        if: steps.lychee.outputs.exit_code != 0
+        if: steps.lychee.outcome == 'failure'
         uses: ./.github/actions/report-issue
         with:
           title: Link Checker Report
-          content-filepath: ./lychee/out.md
+          content-filepath: ./lychee-report.md
           labels: documentation
 
   # Stryker reruns the suite once per mutant, and the score shifts under
