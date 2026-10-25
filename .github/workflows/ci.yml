@@ -731,3 +731,43 @@ jobs:
       - name: Cleanup container
         if: always()
         run: docker rm -f api-smoke 2>/dev/null || true
+
+  # release-notes.yml runs this action only after merge. The dry run reads the
+  # same config and merged pull requests without writing the draft.
+  release-draft:
+    name: Preview release draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+      - name: Preview release draft
+        uses: release-drafter/release-drafter@978bb0b30c5ee8cdd332ced253758157150d43f0 # v7.10.0
+        with:
+          dry-run: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # daily.yml prunes on a schedule only. This pass logs what it would change
+  # without touching a pull request.
+  stale-pull-requests:
+    name: Preview stale pull request pruning
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Preview stale pull request pruning
+        uses: ./.github/actions/prune-stale-pull-requests
+        with:
+          debug-only: 'true'
