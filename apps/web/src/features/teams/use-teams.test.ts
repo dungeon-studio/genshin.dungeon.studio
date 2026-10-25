@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionTeamMembers } from '@genshin/domain';
+import type { CollectionTeamMembers, ISOTimestamp } from '@genshin/domain';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { toast } from 'sonner';
@@ -19,6 +19,7 @@ vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
 const CHARACTER = 'skirk';
 const MEMBERS: CollectionTeamMembers = [{ characterId: CHARACTER }, null, null, null];
+const SAVED_AT = '2026-04-01T00:00:00.000Z' as ISOTimestamp;
 
 beforeEach(() => {
   useTeamStore.getState().resetTeams();
@@ -50,17 +51,39 @@ describe('useTeams (authenticated)', () => {
     expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
   });
 
-  it('restores a cleared team when the delete fails', async () => {
+  it('saves a renamed team', async () => {
+    let putBody: unknown;
     server.use(
-      http.get('http://localhost:8080/teams', () =>
-        HttpResponse.json(teamsDocument([makeTeam(1, { members: MEMBERS })])),
-      ),
-      http.delete('http://localhost:8080/teams/1', () => new HttpResponse(null, { status: 500 })),
+      http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([]))),
+      http.put('http://localhost:8080/teams/1', async ({ request }) => {
+        putBody = await request.json();
+        return new HttpResponse(null, { status: 204 });
+      }),
     );
 
-    const { result } = renderHook(() => useTeams(), {
-      wrapper: createWrapper({ user: fakeUser('user-1') }),
+    const { result } = renderHookSignedIn(() => useTeams(), 'user-1');
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => {
+      result.current.setTeamName(1, 'Abyss');
     });
+
+    await waitFor(() => expect(putBody).toMatchObject({ name: 'Abyss' }));
+  });
+
+  it("keeps a cleared team's name after the refetch", async () => {
+    let stored = makeTeam(1, { name: 'Abyss', members: MEMBERS });
+    server.use(
+      http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([stored]))),
+      http.put('http://localhost:8080/teams/1', async ({ request }) => {
+        const body = (await request.json()) as Pick<typeof stored, 'name' | 'members'>;
+        stored = makeTeam(1, { name: body.name, members: body.members, updatedAt: SAVED_AT });
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+
+    const { result } = renderHookSignedIn(() => useTeams(), 'user-1');
 
     await waitFor(() => expect(result.current.getTeam(1).members[0]?.characterId).toBe(CHARACTER));
 
@@ -68,10 +91,10 @@ describe('useTeams (authenticated)', () => {
       result.current.clearTeam(1);
     });
 
-    // Optimistically emptied, then restored once the delete errors.
+    // The server's timestamp marks the refetch landing in the store.
+    await waitFor(() => expect(result.current.getTeam(1).updatedAt).toBe(SAVED_AT));
     expect(result.current.getTeam(1).members[0]).toBeNull();
-    await waitFor(() => expect(result.current.getTeam(1).members[0]?.characterId).toBe(CHARACTER));
-    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+    expect(result.current.getTeam(1).name).toBe('Abyss');
   });
 
   it('rolls back a failed save while another team saves', async () => {
