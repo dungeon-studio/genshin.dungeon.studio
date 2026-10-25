@@ -31,26 +31,43 @@ jobs:
       contents: read
       issues: write
 
+    env:
+      # renovate: datasource=github-releases depName=lycheeverse/lychee extractVersion=^lychee-v(?<version>.+)$
+      LYCHEE_VERSION: '0.24.2'
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
+      # musl, so the binary is static and carries no glibc floor.
+      - name: Install lychee
+        run: |
+          set -euo pipefail
+          LYCHEE_URL=https://github.com/lycheeverse/lychee/releases/download
+          LYCHEE_DIR=lychee-x86_64-unknown-linux-musl
+          curl -fsSL \
+            "${LYCHEE_URL}/lychee-v${LYCHEE_VERSION}/${LYCHEE_DIR}.tar.gz" \
+            | sudo tar -xz -C /usr/local/bin --strip-components=1 "${LYCHEE_DIR}/lychee"
+
+      # Broken links open a report issue instead of failing the job.
       - name: Check all links
         id: lychee
-        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
-        with:
-          args: --no-progress "**/*.md"
-          fail: false
-          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          exit_code=0
+          lychee --no-progress --format markdown --output lychee-report.md '**/*.md' \
+            || exit_code=$?
+          echo "exit_code=${exit_code}" >> "$GITHUB_OUTPUT"
 
       - name: Report broken links
         if: steps.lychee.outputs.exit_code != 0
         uses: ./.github/actions/report-issue
         with:
           title: Link Checker Report
-          content-filepath: ./lychee/out.md
+          content-filepath: ./lychee-report.md
           labels: documentation
 
   # Stryker reruns the suite once per mutant, and the score shifts under
