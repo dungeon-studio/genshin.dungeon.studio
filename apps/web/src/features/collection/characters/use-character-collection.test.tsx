@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { CharacterId } from '@genshin/domain';
+import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { toast } from 'sonner';
@@ -158,6 +159,7 @@ describe('useCollection mutations', () => {
 
   it('keeps a raise made while a failing add was in flight', async () => {
     const addFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
+    const raisedLevel = 3;
     let putCount = 0;
     server.use(
       http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
@@ -166,9 +168,9 @@ describe('useCollection mutations', () => {
       http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
         putCount += 1;
         const { constellationLevel } = (await request.json()) as { constellationLevel: number };
-        if (constellationLevel === 0) return addFailure.resolver();
+        if (constellationLevel === MIN_CONSTELLATION_LEVEL) return addFailure.resolver();
         return HttpResponse.json(
-          charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })]),
+          charactersDocument([makeCharacter(SKIRK, { constellationLevel: raisedLevel })]),
         );
       }),
     );
@@ -182,13 +184,13 @@ describe('useCollection mutations', () => {
       result.current.addCharacter(SKIRK);
     });
     act(() => {
-      result.current.setConstellationLevel(SKIRK, 3);
+      result.current.setConstellationLevel(SKIRK, raisedLevel);
     });
     await waitFor(() => expect(putCount).toBe(2));
     addFailure.release();
 
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Failed to add character.'));
-    expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3);
+    expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(raisedLevel);
   });
 
   it('keeps a re-add made while a failing removal was in flight', async () => {
@@ -219,6 +221,7 @@ describe('useCollection mutations', () => {
 
   it('keeps a re-add made while a failing level change was in flight', async () => {
     const levelFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
+    const failingLevel = 5;
     let putCount = 0;
     server.use(
       http.get('http://localhost:8080/characters', () =>
@@ -227,7 +230,7 @@ describe('useCollection mutations', () => {
       http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
         putCount += 1;
         const { constellationLevel } = (await request.json()) as { constellationLevel: number };
-        if (constellationLevel === 5) return levelFailure.resolver();
+        if (constellationLevel === failingLevel) return levelFailure.resolver();
         return HttpResponse.json(charactersDocument([makeCharacter(SKIRK)]));
       }),
       http.delete(
@@ -239,7 +242,7 @@ describe('useCollection mutations', () => {
     const { result } = await renderOwningSkirkAtC3();
 
     act(() => {
-      result.current.setConstellationLevel(SKIRK, 5);
+      result.current.setConstellationLevel(SKIRK, failingLevel);
     });
     act(() => {
       result.current.removeCharacter(SKIRK);
