@@ -1,16 +1,15 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-// Draft terms describing the service. No lawyer has reviewed them, and they
-// have no dedicated contact address.
+// Describes the service's terms. No lawyer has reviewed them.
 
 import type { JSX } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Container } from '@/components/chrome/container';
-import { REPOSITORY_URL } from '@/lib/repository';
+import { PrivacyEmailLink } from '@/components/legal/legal-link';
 
-const EFFECTIVE_DATE = '3 July 2026';
+const EFFECTIVE_DATE = '25 October 2026';
 
 export function TermsOfServicePage(): JSX.Element {
   return (
@@ -68,8 +67,9 @@ export function TermsOfServicePage(): JSX.Element {
 
         <h2 className="mt-8 text-xl font-semibold text-foreground">Limitation of liability</h2>
         <p className="mt-4 leading-relaxed">
-          To the extent permitted by law, Dungeon Studio is not liable for any indirect, incidental,
-          or consequential damages arising from your use of the app.
+          To the extent permitted by law, Alex Brandt, who operates the app as Dungeon Studio, is
+          not liable for any indirect, incidental, or consequential damages arising from your use of
+          the app.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold text-foreground">Governing law</h2>
@@ -89,16 +89,7 @@ export function TermsOfServicePage(): JSX.Element {
 
         <h2 className="mt-8 text-xl font-semibold text-foreground">Contact</h2>
         <p className="mt-4 leading-relaxed">
-          Questions about these terms? Reach us through our{' '}
-          <a
-            href={`${REPOSITORY_URL}/issues/new/choose`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-foreground underline underline-offset-4 hover:no-underline"
-          >
-            GitHub repository
-          </a>
-          .
+          Questions about these terms? Email <PrivacyEmailLink />.
         </p>
       </article>
     </Container>

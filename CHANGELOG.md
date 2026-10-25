@@ -34,5 +34,6 @@ single `### Added` bucket in `[Unreleased]`.
 - Dark mode support.
 - Footer links to GitHub issues, feature requests, discussions, changelog, and repository.
 - Game data version displayed in the footer.
+- Privacy policy and terms of service, with a private email address for privacy requests.
 
 [unreleased]: https://github.com/dungeon-studio/genshin.dungeon.studio/commits/develop
