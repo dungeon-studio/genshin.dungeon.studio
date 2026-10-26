@@ -5,9 +5,9 @@
 name: Diff against the base
 description: Report whether any of the given paths differ from the base commit
 
-# The calling job checks out with `fetch-depth: 2`, so the first parent of the
-# merge or squash commit is the base. `git diff` exits nonzero on error too, so
-# a failed diff reports a change and the gated work runs.
+# The calling job checks out with `fetch-depth: 2`. `git diff --quiet` exits
+# nonzero on error as well as on a difference, so a failed diff runs the gated
+# work.
 
 inputs:
   paths:
