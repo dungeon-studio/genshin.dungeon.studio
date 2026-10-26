@@ -6,7 +6,8 @@
     "customManagers:githubActionsVersions",
     "customManagers:dockerfileVersions",
     ":automergeMinor",
-    ":automergeDigest"
+    ":automergeDigest",
+    "group:allNonMajor"
   ],
   "timezone": "Europe/London",
   "labels": ["dependencies"],
@@ -48,9 +49,10 @@
       "minimumReleaseAge": null
     },
     {
-      "description": "Move each dependency in one pull request across all of its pins, so develop never holds two versions of it",
+      "description": "Update each of these dependencies in its own pull request that moves every pin at once, so develop never holds two versions of it",
       "matchDepNames": ["hashicorp/terraform", "fsfe/reuse-tool", "node", "errata-ai/vale"],
-      "groupName": "{{depName}}"
+      "groupName": "{{depName}}",
+      "groupSlug": "{{depNameSanitized}}"
     },
     {
       "description": "Move engines and @types/node to a new Node.js major only once it reaches LTS",
