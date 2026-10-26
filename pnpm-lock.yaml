@@ -303,8 +303,8 @@ importers:
         specifier: 0.16.4
         version: 0.16.4
       '@firebase/auth':
-        specifier: 1.13.7
-        version: 1.13.7(@firebase/app@0.16.4)
+        specifier: 1.13.8
+        version: 1.13.8(@firebase/app@0.16.4)
       '@genshin/collection-json':
         specifier: workspace:*
         version: link:../../packages/collection-json
@@ -1453,8 +1453,8 @@ packages:
   '@firebase/auth-interop-types@0.2.6':
     resolution: {integrity: sha512-FgwZqDrBqgK0BHI70QTv1v/5wmuDF9f8fsJFvKSxoRlK2PPfSQtZAk2jhXu4pe9BZzFi/e4UYusU/bEQHdf6Qg==}
 
-  '@firebase/auth@1.13.7':
-    resolution: {integrity: sha512-00wn8cMrh1ZyEPF6RO5G081Xq1b57FN0QxChiAda0hy/D3Q5TrMk30qhWszRWCgXPRipw6yM6qtqUew3u3qEjA==}
+  '@firebase/auth@1.13.8':
+    resolution: {integrity: sha512-JPW7S7Hwp5qhn8VwEEHWfI1P2kqCqpKbJVTWlKT5UWl1NNbVjrYOGKTZHCVqUeVhLs7BjMWWkCnkoa8tzUjSjQ==}
     engines: {node: '>=24.12.0'}
     peerDependencies:
       '@firebase/app': 0.x
@@ -8466,7 +8466,7 @@ snapshots:
 
   '@firebase/auth-interop-types@0.2.6': {}
 
-  '@firebase/auth@1.13.7(@firebase/app@0.16.4)':
+  '@firebase/auth@1.13.8(@firebase/app@0.16.4)':
     dependencies:
       '@firebase/app': 0.16.4
       '@firebase/component': 0.7.5
