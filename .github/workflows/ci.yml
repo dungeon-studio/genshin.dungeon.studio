@@ -450,7 +450,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      changed: ${{ steps.diff.outputs.changed }}
+      plan: ${{ steps.plan-diff.outputs.changed }}
       scan: ${{ steps.scan-diff.outputs.changed }}
 
     steps:
@@ -461,40 +461,35 @@ jobs:
           # Reaches the base: the first parent of the pull request's merge commit.
           fetch-depth: 2
 
-      # bootstrap/ is applied by hand, and no plan below targets prod. `git diff`
-      # exits nonzero on error too, so a failed diff runs the plans.
-      - name: Diff against the base
-        id: diff
-        run: |
-          if git diff --quiet HEAD^1 HEAD -- \
-            infrastructure/terraform \
-            ':!infrastructure/terraform/bootstrap' \
-            ':!infrastructure/terraform/environments/prod' \
-            .github/workflows/ci.yml; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
+      # bootstrap/ is applied by hand, and no plan below targets prod.
+      - name: Diff the planned inputs against the base
+        id: plan-diff
+        uses: ./.github/actions/diff-against-base
+        with:
+          paths: |
+            infrastructure/terraform
+            :!infrastructure/terraform/bootstrap
+            :!infrastructure/terraform/environments/prod
+            .github/actions/diff-against-base
+            .github/workflows/ci.yml
 
       # Every root scans, bootstrap and prod included.
       - name: Diff the scanned inputs against the base
         id: scan-diff
-        run: |
-          if git diff --quiet HEAD^1 HEAD -- \
-            infrastructure/terraform \
-            .trivy.yaml \
-            .github/workflows/ci.yml; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
+        uses: ./.github/actions/diff-against-base
+        with:
+          paths: |
+            infrastructure/terraform
+            .trivy.yaml
+            .github/actions/diff-against-base
+            .github/workflows/ci.yml
 
   # A skipped job never expands its matrix, so a matrix reference in the
   # name would show raw. GitHub appends the environment to each run's name.
   terraform-plan:
     name: Plan environment infrastructure
     needs: terraform-changes
-    if: needs.terraform-changes.outputs.changed == 'true'
+    if: needs.terraform-changes.outputs.plan == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -745,7 +740,9 @@ jobs:
 
   # A step skips the expensive devcontainer build unless an input changed, so
   # the check still reports on every pull request and a ruleset can require
-  # it. The inputs are the files the image build reads, plus this workflow.
+  # it. The inputs are the files the image build reads, plus this workflow:
+  # package.json carries packageManager, engines, and the firebase-tools pin,
+  # and tools/e2e/package.json the Playwright pin the browsers install from.
   toolchain:
     name: Verify toolchain
     runs-on: ubuntu-latest
@@ -760,25 +757,18 @@ jobs:
           # Reaches the base: the first parent of the merge or squash commit.
           fetch-depth: 2
 
-      # `git diff` exits nonzero on error too, so a failed diff builds.
       - name: Diff against the base
         id: diff
-        run: |
-          inputs=(
+        uses: ./.github/actions/diff-against-base
+        with:
+          paths: |
             .devcontainer
             scripts/install-reuse.sh
             scripts/install-lychee.sh
-            # packageManager, engines, and the firebase-tools pin.
             package.json
-            # The Playwright pin the browsers install from.
             tools/e2e/package.json
+            .github/actions/diff-against-base
             .github/workflows/ci.yml
-          )
-          if git diff --quiet HEAD^1 HEAD -- "${inputs[@]}"; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
 
       - name: Build the image and verify its toolchain
         if: steps.diff.outputs.changed == 'true'

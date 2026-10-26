@@ -1,0 +1,37 @@
+---
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+name: Diff against the base
+description: Report whether any of the given paths differ from the base commit
+
+# The calling job checks out with `fetch-depth: 2`, so the first parent of the
+# merge or squash commit is the base. `git diff` exits nonzero on error too, so
+# a failed diff reports a change and the gated work runs.
+
+inputs:
+  paths:
+    description: 'Pathspecs to compare, one per line'
+    required: true
+
+outputs:
+  changed:
+    description: "'true' when any pathspec differs from the base, else 'false'"
+    value: ${{ steps.diff.outputs.changed }}
+
+runs:
+  using: composite
+
+  steps:
+    - name: Diff against the base
+      id: diff
+      shell: bash
+      env:
+        PATHS: ${{ inputs.paths }}
+      run: |
+        mapfile -t paths < <(printf '%s' "${PATHS}")
+        if git diff --quiet HEAD^1 HEAD -- "${paths[@]}"; then
+          echo "changed=false" >> "$GITHUB_OUTPUT"
+        else
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+        fi
