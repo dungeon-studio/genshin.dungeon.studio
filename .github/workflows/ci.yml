@@ -369,9 +369,15 @@ jobs:
           config: .github/zizmor.yml
 
   # Trivy applies a tfvars file to every root module under the scan path, so
-  # each root scans alone with its own.
+  # each root scans alone with its own. A pull request scans only when it
+  # changes a scanned input; every other event scans unconditionally.
   trivy-terraform:
     name: Scan ${{ matrix.root }} Terraform
+    needs: terraform-changes
+    if: >-
+      !cancelled() &&
+      (github.event_name != 'pull_request' ||
+      needs.terraform-changes.outputs.scan == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -421,22 +427,23 @@ jobs:
           category: trivy-terraform-${{ matrix.root }}
 
   # The matrix reports one context per root, so a ruleset requires this job
-  # instead and a new root never touches the ruleset.
+  # instead and a new root never touches the ruleset. It needs change detection
+  # too, so a detection failure can't pass as a skipped scan.
   trivy-terraform-result:
     name: Scan Terraform
-    needs: trivy-terraform
+    needs: [terraform-changes, trivy-terraform]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
-      - name: Fail unless every scan succeeded
-        if: needs.trivy-terraform.result != 'success'
+      - name: Fail on a failed or cancelled scan
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
         run: exit 1
 
-  # A job decides whether to plan, rather than a `paths:` gate, so
-  # `Plan infrastructure` reports on every pull request and a ruleset can
-  # require it.
+  # A job decides whether to plan and scan, rather than a `paths:` gate, so
+  # `Plan infrastructure` and `Scan Terraform` report on every pull request and
+  # a ruleset can require them.
   terraform-changes:
     name: Detect Terraform changes
     if: github.event_name == 'pull_request'
@@ -444,6 +451,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       changed: ${{ steps.diff.outputs.changed }}
+      scan: ${{ steps.scan-diff.outputs.changed }}
 
     steps:
       - name: Checkout repository
@@ -462,6 +470,19 @@ jobs:
             infrastructure/terraform \
             ':!infrastructure/terraform/bootstrap' \
             ':!infrastructure/terraform/environments/prod' \
+            .github/workflows/ci.yml; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Every root scans, bootstrap and prod included.
+      - name: Diff the scanned inputs against the base
+        id: scan-diff
+        run: |
+          if git diff --quiet HEAD^1 HEAD -- \
+            infrastructure/terraform \
+            .trivy.yaml \
             .github/workflows/ci.yml; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
