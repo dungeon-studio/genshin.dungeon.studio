@@ -7,6 +7,7 @@ import { CHARACTER_ROSTER, WEAPON_ROSTER } from '@genshin/game-data';
 import { act, configure, render, screen, within } from '@testing-library/react';
 import type { UserEvent } from '@testing-library/user-event';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -14,9 +15,18 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { useCollectionStore } from '@/features/collection/characters/use-character-collection-store';
 import { useWeaponCollectionStore } from '@/features/collection/weapons/use-weapon-collection-store';
 import { useTeamStore } from '@/features/teams/use-team-store';
-import { makeCharacter, makeWeapon } from '@/test/fixtures';
+import {
+  charactersDocument,
+  makeCharacter,
+  makeTeam,
+  makeWeapon,
+  teamsDocument,
+  weaponsDocument,
+} from '@/test/fixtures';
+import { holdResponse } from '@/test/msw/held-response';
+import { server } from '@/test/msw/server';
 import { TestProviders } from '@/test/providers';
-import { createTestQueryClient, createWrapper } from '@/test/render';
+import { createTestQueryClient, createWrapper, fakeUser } from '@/test/render';
 
 import { TeamsPage } from './teams-page';
 
@@ -310,6 +320,34 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
       await screen.findByRole('button', { name: `Add ${BOW_USER.name} to team` }),
     ).toBeInTheDocument();
     expect(screen.queryByText(/users for/)).not.toBeInTheDocument();
+  });
+});
+
+describe('TeamsPage loading', () => {
+  // An edit to a default slot would save over the user's team on the server.
+  it('offers no team to edit until the saved teams load', async () => {
+    const saved = makeTeam(1, {
+      name: 'Abyss',
+      members: [{ characterId: CLAYMORE_USER.id }, null, null, null],
+    });
+    const teams = holdResponse(() => HttpResponse.json(teamsDocument([saved])));
+    server.use(
+      http.get('http://localhost:8080/teams', teams.resolver),
+      http.get('http://localhost:8080/characters', () =>
+        HttpResponse.json(charactersDocument([makeCharacter(CLAYMORE_USER.id)])),
+      ),
+      http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument([]))),
+    );
+
+    renderTeamsPage(createWrapper({ user: fakeUser('user-1') }));
+    await teams.arrived;
+
+    expect(screen.getByText('Loading teams')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Edit / })).not.toBeInTheDocument();
+
+    teams.release();
+
+    expect(await screen.findByRole('button', { name: 'Edit Abyss' })).toBeInTheDocument();
   });
 });
 

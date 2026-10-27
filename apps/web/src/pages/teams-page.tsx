@@ -9,6 +9,7 @@ import type { JSX, ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
 import { Container } from '@/components/chrome/container';
+import { LoadingPage } from '@/components/chrome/loading-page';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
@@ -162,6 +163,7 @@ export function TeamsPage(): JSX.Element {
     assignWeapon,
     removeWeapon,
     setArtifactPlan,
+    isLoading: teamsLoading,
   } = useTeams();
 
   const [activeTab, setActiveTab] = useState<SheetTab>('characters');
@@ -173,6 +175,9 @@ export function TeamsPage(): JSX.Element {
   });
   const { selectedSlot, selectedMemberIndex } = editor;
   const selectedTeam = selectedSlot !== null ? teams[selectedSlot] : null;
+
+  // Every edit saves the whole team, so one made to a default slot erases the saved one.
+  if (teamsLoading) return <LoadingPage title="Teams" label="Loading teams" />;
 
   return (
     <Container className="py-12">
