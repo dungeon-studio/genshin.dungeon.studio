@@ -113,8 +113,8 @@ keeps zustand's second copy of server data.
 ### Confirmation
 
 No prototype combines TanStack Query with link following. The first feature
-moved confirms both together: its tests pass, and it reaches every resource
-through the API's links.
+migrated to the new layer confirms both together: its tests pass, and it
+reaches every resource through the API's links.
 
 The lint zones in `apps/web/eslint.config.js` fail any import that skips a
 layer. The web tests keep covering three cases:
@@ -194,8 +194,10 @@ order. TanStack's persistence packages keep paused writes in browser storage.
 - Good, because signed-out teams need no store.
 - Neutral, because the line count rises: the stores' edit logic moves into pure
   helpers rather than going away.
-- Bad, because the guarded rollback and the sender check survive, and the
-  sender check spreads to every request and every failure toast.
+- Neutral, because the guarded rollback survives, as in every option but
+  TanStack DB.
+- Bad, because the sender check spreads to every request and every failure
+  toast.
 - Bad, because a write restored after sign-out replays without a token. Its rejection rolls back the departed user's data and toasts the
   visitor.
 - Bad, because offline replay keeps account data in browser storage for up to
