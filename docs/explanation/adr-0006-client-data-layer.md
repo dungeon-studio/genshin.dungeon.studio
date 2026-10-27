@@ -87,24 +87,34 @@ follows links itself.
 - **Offline:** issue #1762 persists paused writes with TanStack's persistence
   packages. A restored write re-checks the signed-in account before it sends.
 
+The refactored status quo is the close second. It changes the fewest lines,
+adds nothing to the bundle, and clears every lint violation. It loses because
+it gathers the synchronization code in one place without removing any, and it
+keeps zustand's second copy of server data.
+
 ### Consequences
 
 - Good, because every feature loses its store mirror and reconcile effect,
   which removes layer skip 2.
 - Good, because the client stops building paths, so an API path change no
   longer breaks it.
-- Bad, because the guarded rollback, sender check, and query sync stay
-  hand-written, in shared helpers.
-- Bad, because the line count rises slightly. The stores' edit logic,
-  including rules the hook and server repeat, moves into pure helpers rather
-  than going away. Merging those copies is separate work.
-- Bad, because characters and account deletion still need the same move and
-  import fixes the prototypes left out.
-- Bad, because no prototype combines TanStack Query with link following. The
-  Ketting prototype is the evidence that links reach every weapon and team
-  resource.
+- Bad, because the sender check spreads to every request and every failure
+  toast.
+- Bad, because offline replay keeps account data in browser storage for up to
+  24 hours.
+- Neutral, because the guarded rollback and query sync stay hand-written, as
+  in every option but TanStack DB.
+- Neutral, because the line count rises slightly, as in every option but the
+  status quo. The stores' edit logic moves into pure helpers rather than going
+  away, and merging it with the hook's and server's copies is separate work.
+- Neutral, because characters and account deletion need the same move and
+  import fixes, which the prototypes left out.
 
 ### Confirmation
+
+No prototype combines TanStack Query with link following. The first feature
+moved confirms both together: its tests pass, and it reaches every resource
+through the API's links.
 
 The lint zones in `apps/web/eslint.config.js` fail any import that skips a
 layer. The web tests keep covering three cases:
