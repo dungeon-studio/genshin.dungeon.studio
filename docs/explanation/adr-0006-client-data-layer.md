@@ -60,7 +60,7 @@ Pending [issue #1133](https://github.com/dungeon-studio/genshin.dungeon.studio/i
 
 ### Measurements
 
-Line counts cover non-test web source. Changes start from the `develop` branch, with a 286.89 KB
+Line counts cover non-test web source. Changes start from `develop` at commit `c928fbc8`, with a 286.89 KB
 compressed bundle and 1,516 locked packages. The TanStack prototypes cover
 weapons and teams. The status-quo prototypes also cover characters. Rows marked
 "with offline replay" add the queue that issue #1762 owns.
@@ -82,7 +82,7 @@ prototype left alone.
 
 Three lint zones express the [layer stack](../reference/data-flow-layers.md):
 views import only feature hooks, only the query layer imports the fetch
-wrapper, and stores import neither. The `develop` branch breaks them 13 times.
+wrapper, and stores import neither. That commit breaks them 13 times.
 
 | Layer check                    | TanStack Query alone                  | TanStack DB                                  | Status quo                                         |
 | ------------------------------ | ------------------------------------- | -------------------------------------------- | -------------------------------------------------- |
