@@ -63,11 +63,11 @@ stack lint can enforce, and keeps these four modes apart?
 
 The chosen option is TanStack Query alone, with a query layer that follows the
 API's links. It's the only option that leaves one client copy of server data
-without a new runtime package. It's also the layer the state rule already
-names. Ketting showed that following links removes every hand-built path.
-Its Collection+JSON support needed a parser written in the app, though, and
-its React bindings no longer get releases. So the query layer follows links
-itself.
+and adds no runtime package. It's also the layer the state rule already names.
+Ketting showed that following links removes every hand-built path, but the
+library itself fell short. Its Collection+JSON support needed a parser written
+in the app, and its React bindings no longer get releases. So the query layer
+follows links itself.
 
 - **Authority:** the server holds the truth for reads and writes.
 - **Client copy:** the TanStack Query cache is the only client copy of server
@@ -81,15 +81,16 @@ itself.
   settles.
 - **Navigation:** the query layer starts at the API root and follows its links,
   item links, and write templates. It builds no request paths.
-- **Layers:** lint enforces the three zones in the layers section. Views go
-  through feature hooks, and only the query layer reaches the fetch wrapper.
+- **Layers:** lint enforces three import zones. Views go through feature
+  hooks, only the query layer reaches the fetch wrapper, and stores reach
+  neither.
 - **Offline:** issue #1762 persists paused writes with TanStack's persistence
   packages. A restored write re-checks the signed-in account before it sends.
 
 ### Consequences
 
-- Good, because the store mirror and reconcile effect go from every feature,
-  and with them layer skip 2.
+- Good, because every feature loses its store mirror and reconcile effect,
+  which removes layer skip 2.
 - Good, because the client stops building paths, so an API path change no
   longer breaks it.
 - Bad, because the guarded rollback, sender check, and query sync stay
@@ -106,17 +107,19 @@ itself.
 ### Confirmation
 
 The lint zones in `apps/web/eslint.config.js` fail any import that skips a
-layer. The web tests keep covering rollback while another write is in flight, a
-refetch that would overwrite a pending edit, and a response that arrives after
-sign-out.
+layer. The web tests keep covering three cases:
+
+- A failed write rolls back while another write is in flight.
+- An older refetch doesn't overwrite a pending edit.
+- A response that arrives after sign-out changes nothing.
 
 ## Pros and cons of the options
 
 ### Measurements
 
-The [issue #1760](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1760)
-prototypes produced these numbers. Line counts cover non-test web source.
-Changes start from `develop` at commit `c928fbc8`, with a 286.89 KB compressed
+Each option ran as an [issue #1760](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1760)
+prototype. Line counts cover non-test web source. Changes start from `develop`
+at commit `c928fbc8`, with a 286.89 KB compressed
 bundle and 1,516 locked packages. The TanStack and Ketting prototypes cover
 weapons and teams. The status-quo prototypes also cover characters. Rows marked
 "with offline replay" add the queue owned by
@@ -138,8 +141,8 @@ Three lint zones express the [layer stack](../reference/data-flow-layers.md):
 views import only feature hooks, only the query layer imports the fetch
 wrapper, and stores import neither. The baseline commit breaks them 13 times.
 
-The status quo clears every violation with 109 / 57 lines of import fixes,
-counted in its measurement rows. The other options need the same fixes in the
+The status quo clears every violation with 109 / 57 lines of import fixes.
+The other options need the same fixes in the
 code their prototypes left alone: characters and account deletion, plus
 sign-out for TanStack DB.
 
@@ -148,12 +151,12 @@ Ketting's prototype builds none. The others keep building them.
 
 ### Mechanisms each option removes
 
-The TanStack and Ketting columns describe weapons and teams. Characters keep
-today's mechanisms in those prototypes. The status-quo column describes the
-refactored variant. Removing the weapon and character stores also removes their
-store mirror and reconcile effect, so only teams keep them.
+The TanStack and Ketting prototypes change weapons and teams only, so
+characters keep today's mechanisms in them. Without its weapon and character
+stores, the status quo also loses those features' store mirror and reconcile
+effect, and only teams keep them.
 
-| Mechanism        | TanStack Query alone                 | TanStack DB                         | Ketting                         | Status quo              |
+| Mechanism        | TanStack Query alone                 | TanStack DB                         | Ketting                         | Status quo, refactored  |
 | ---------------- | ------------------------------------ | ----------------------------------- | ------------------------------- | ----------------------- |
 | Store mirror     | Removed                              | Removed                             | Removed                         | Kept                    |
 | Reconcile effect | Removed                              | Removed                             | Removed                         | Kept                    |
@@ -173,8 +176,8 @@ store mirror and reconcile effect, so only teams keep them.
 
 ### TanStack Query alone
 
-Optimistic writes in the query cache, writes to one entity run in order, and
-paused writes kept in browser storage by TanStack's persistence packages.
+The query cache holds optimistic writes and runs writes to one entity in
+order. TanStack's persistence packages keep paused writes in browser storage.
 
 - Good, because it removes the store mirror and reconcile effect for about
   1 KB, with no new package until offline replay.
@@ -183,8 +186,7 @@ paused writes kept in browser storage by TanStack's persistence packages.
   helpers rather than going away.
 - Bad, because the guarded rollback and the sender check survive, and the
   sender check spreads to every request and every failure toast.
-- Bad, because a replayed write restored while signed out goes out without a
-  token. Its rejection rolls back the departed user's data and toasts the
+- Bad, because a write restored after sign-out replays without a token. Its rejection rolls back the departed user's data and toasts the
   visitor.
 - Bad, because offline replay keeps account data in browser storage for up to
   24 hours. Without offline replay, account data stays in memory only.
@@ -195,8 +197,8 @@ paused writes kept in browser storage by TanStack's persistence packages.
 
 <!-- vale Microsoft.HeadingAcronyms = YES -->
 
-TanStack DB 0.15 collections over the existing query client, with optimistic
-transactions and a per-user offline queue.
+TanStack DB 0.15 layers collections over the existing query client, with
+optimistic transactions and a per-user offline queue.
 
 - Good, because it removes the most mechanisms: the store mirror, the
   reconcile effect, the guarded rollback, and query sync.
@@ -209,8 +211,8 @@ transactions and a per-user offline queue.
 - Bad, because the queue outlives sign-out. It replays at that user's next
   sign-in, where an old team save can overwrite newer edits from another
   device.
-- Bad, because the library is pre-1.0 and churning, with four minor releases in
-  October 2026. The queue package pins one exact version, so the two upgrade
+- Bad, because the library is pre-1.0 and changes often, with four minor
+  releases in October 2026. The queue package pins one exact version, so the two upgrade
   together.
 - Bad, because lint can't keep store and query layers apart: a collection is
   both.
@@ -251,7 +253,7 @@ through feature hooks.
 
 ## More information
 
-Prototyping skipped these options:
+These options fail a driver outright:
 
 - **Firestore client SDK with its offline cache**, because it bypasses the API
   contract.
