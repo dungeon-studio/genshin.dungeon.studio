@@ -5,8 +5,8 @@
 
 The states one entity's copy in the
 [zustand store, D1](data-flow.md#level-0) moves through, per feature. Each
-diagram follows one character, one weapon instance, or one team slot. Whether
-the features should share one state machine is [#1133]. What a request carries
+diagram follows one character, one weapon instance, or one team slot. [ADR-0006]
+decides whether the features share one write lifecycle. What a request carries
 from each copy is in [Data conversions](data-flow-conversions.md#outbound).
 
 The features share five states:
@@ -148,5 +148,5 @@ stateDiagram-v2
   slots until the next refetch, see [#550].
 
 [#550]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/550
-[#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
+[ADR-0006]: ../explanation/adr-0006-client-data-layer.md
 [#1534]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1534

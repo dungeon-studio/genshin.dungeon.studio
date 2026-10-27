@@ -31,8 +31,10 @@ Which client data layer removes the most of these mechanisms, gives a layer
 stack lint can enforce, and keeps these four modes apart?
 
 - **Local:** signed out, data on this device only. Only teams have it, because
-  collections are sign-in only.
-- **Offline:** signed in, writes queued. [Issue #1762](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1762)
+  [issue #563](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/563)
+  made collections sign-in only.
+- **Offline:** signed in, writes queued. Issue #563 asked for it, and
+  [issue #1762](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1762)
   owns it.
 - **Online:** writes in flight.
 - **Remote:** the server holds the truth in Firestore, behind the API.

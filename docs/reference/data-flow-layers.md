@@ -4,8 +4,8 @@
 # Layers
 
 The layer stacks user data crosses between the browser and Firestore, where the
-code skips a layer, and which jobs each layer does. Which layering the client
-should have is [#1133].
+code skips a layer, and which jobs each layer does. [ADR-0006] decides
+which layering the client should have.
 
 ## Stack
 
@@ -73,7 +73,7 @@ representations every layer uses.
    empties every store on sign-out without a feature hook, see [#1889].
 2. **Query layer to store.** Each hook's reconcile effect copies the cache into
    the store, so the store has four writers: actions, responses, reconcile,
-   and the sign-out clear. Which copy owns state is [#1133].
+   and the sign-out clear. [ADR-0006] decides which copy owns state.
 3. **Route to Firebase Auth.** `routes/account.ts` calls `deleteUser`, outside
    the boundaries [#1020] sets.
 4. **Feature hook to fetch wrapper.** `useDeleteAccount` defines its own
@@ -285,7 +285,7 @@ A team save also reads the user's characters, weapons, and other teams through
 3.4 before writing, to check its members.
 
 [#1020]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1020
-[#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
+[ADR-0006]: ../explanation/adr-0006-client-data-layer.md
 [#1846]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1846
 [#1848]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1848
 [#1849]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1849
