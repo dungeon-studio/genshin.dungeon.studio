@@ -71,6 +71,12 @@ zizmor
 Zod
 zustand
 
+# Libraries weighed and rejected in decision records
+Dexie
+Ketting
+Replicache
+XState
+
 # Standards, formats, and acronyms
 ADR
 API

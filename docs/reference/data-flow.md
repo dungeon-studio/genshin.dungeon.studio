@@ -5,7 +5,8 @@
 
 Where each copy of user data lives and which processes move data between them.
 User data has three copies: the Firestore document, the TanStack Query cache,
-and a zustand store. Which copy should be authoritative is [#1133]. Out of scope:
+and a zustand store. [ADR-0006] decides which copy is authoritative. Out of
+scope:
 
 - Static game data, which is never written.
 - The theme preference, which never leaves the browser.
@@ -132,4 +133,4 @@ Clear user data runs when a signed-in user signs out or another account signs
 in, whichever page is open. It empties the character and weapon stores and
 resets teams to their default slots.
 
-[#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
+[ADR-0006]: ../explanation/adr-0006-client-data-layer.md
