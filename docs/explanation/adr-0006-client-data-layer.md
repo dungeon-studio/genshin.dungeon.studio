@@ -21,10 +21,12 @@ through these hand-written mechanisms:
 - **Query sync:** cancels refetches when a write starts and refetches after the
   last write ends.
 
-The reconcile effect is also a layer skip: the [layers](../reference/data-flow-layers.md)
+The reconcile effect is also a layer skip. The [layers](../reference/data-flow-layers.md)
 reference lists it with the view and feature-hook skips that lint doesn't
-catch. Which client data layer removes the most of these mechanisms, gives a
-layer stack lint can enforce, and keeps four modes apart?
+catch.
+
+Which client data layer removes the most of these mechanisms, gives a layer
+stack lint can enforce, and keeps these four modes apart?
 
 - **Local:** signed out, data on this device only. Only teams have it, because
   collections are sign-in only.
@@ -33,18 +35,15 @@ layer stack lint can enforce, and keeps four modes apart?
 - **Online:** writes in flight.
 - **Remote:** the server holds the truth in Firestore, behind the API.
 
-[Issue #1760](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1760)
-describes the prototypes.
-
 ## Decision drivers
 
 - Remove hand-written synchronization code rather than move it.
 - Each layer imports only the one below, enforced by lint as the API's are.
-- Keep Local, Offline, Online, and Remote modes distinct and testable, and
-  leave room to add Offline later without rework.
+- Keep Local, Offline, Online, and Remote modes distinct and testable.
+- Offline can arrive later without reworking the other modes.
 - A queued write never replays, rolls back, or toasts under another account.
 - Bundle size and dependency count stay proportionate to what they remove.
-- Library stability: the layer shouldn't need rework on every minor release.
+- The layer survives library minor releases without rework.
 
 ## Considered options
 
@@ -60,10 +59,11 @@ Pending [issue #1133](https://github.com/dungeon-studio/genshin.dungeon.studio/i
 
 ### Measurements
 
-Line counts cover non-test web source. Changes start from `develop` at commit
-`c928fbc8`, with a 286.89 KB compressed bundle and 1,516 locked packages. The
-TanStack prototypes cover weapons and teams. The status-quo prototypes also
-cover characters. Rows marked "with offline replay" add the queue owned by
+The [issue #1760](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1760)
+prototypes produced these numbers. Line counts cover non-test web source.
+Changes start from `develop` at commit `c928fbc8`, with a 286.89 KB compressed
+bundle and 1,516 locked packages. The TanStack prototypes cover weapons and
+teams. The status-quo prototypes also cover characters. Rows marked "with offline replay" add the queue owned by
 [issue #1762](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1762).
 
 | Option                               | Lines added / removed | Compressed bundle change | Packages added, direct / all | Web tests     | Lint violations left |
@@ -127,7 +127,7 @@ paused writes kept in browser storage by TanStack's persistence packages.
   token. Its rejection rolls back the departed user's data and toasts the
   visitor.
 - Bad, because offline replay keeps account data in browser storage for up to
-  24 hours, where weapons and teams were memory-only.
+  24 hours. Without offline replay, account data stays in memory only.
 
 <!-- vale Microsoft.HeadingAcronyms = NO -->
 
@@ -140,7 +140,7 @@ transactions and a per-user offline queue.
 
 - Good, because it removes the most mechanisms: the store mirror, the
   reconcile effect, the guarded rollback, and query sync.
-- Good, because weapon adds become optimistic through a temporary identifier.
+- Good, because weapon adds become optimistic.
 - Bad, because the compressed bundle grows by about 35%.
 - Bad, because without the queue an offline write fails at once, where today it
   pauses.
@@ -164,7 +164,7 @@ through feature hooks.
 - Good, because it adds no dependency and doesn't change the bundle.
 - Good, because it clears every layer violation without changing behaviour.
 - Good, because removing the weapon and character stores is a small further
-  step, since signing in is now required for collections.
+  step: collections require sign-in, so those stores hold only server data.
 - Neutral, because that further step changes behaviour: a refetch can
   overwrite a re-add made while a failing removal was in flight.
 - Bad, because the guarded rollback, sender check, and query sync stay
@@ -174,7 +174,7 @@ through feature hooks.
 
 ## More information
 
-These options fell out before prototyping:
+Prototyping skipped these options:
 
 - **Firestore client SDK with its offline cache**, because it bypasses the API
   contract.
