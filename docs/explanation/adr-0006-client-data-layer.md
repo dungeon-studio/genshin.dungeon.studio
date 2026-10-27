@@ -14,6 +14,7 @@ and [conversions](../reference/data-flow-conversions.md) references show
 characters, weapons, and teams each keeping those copies in step their own way,
 through these hand-written mechanisms:
 
+- **Store mirror:** the zustand copy of server data that views read.
 - **Reconcile effect:** copies each refetch from the query cache into the store.
 - **Guarded rollback:** reverts a failed write unless a newer edit replaced it.
 - **Sender check:** drops a response that arrives after its sender signed out.
@@ -32,8 +33,7 @@ layer stack lint can enforce, and keeps four modes apart?
 - **Online:** writes in flight.
 - **Remote:** the server holds the truth in Firestore, behind the API.
 
-Each prototype covers weapons, for the signed-in path, and teams, for Local
-mode. [Issue #1760](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1760)
+[Issue #1760](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1760)
 describes the prototypes.
 
 ## Decision drivers
@@ -44,7 +44,7 @@ describes the prototypes.
   leave room to add Offline later without rework.
 - A queued write never replays, rolls back, or toasts under another account.
 - Bundle size and dependency count stay proportionate to what they remove.
-- API stability: the layer shouldn't need rework on every minor release.
+- Library stability: the layer shouldn't need rework on every minor release.
 
 ## Considered options
 
@@ -60,45 +60,46 @@ Pending [issue #1133](https://github.com/dungeon-studio/genshin.dungeon.studio/i
 
 ### Measurements
 
-Line counts cover non-test web source. Changes start from `develop` at commit `c928fbc8`, with a 286.89 KB
-compressed bundle and 1,516 locked packages. The TanStack prototypes cover
-weapons and teams. The status-quo prototypes also cover characters. Rows marked
-"with offline replay" add the queue that issue #1762 owns.
+Line counts cover non-test web source. Changes start from `develop` at commit
+`c928fbc8`, with a 286.89 KB compressed bundle and 1,516 locked packages. The
+TanStack prototypes cover weapons and teams. The status-quo prototypes also
+cover characters. Rows marked "with offline replay" add the queue owned by
+[issue #1762](https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1762).
 
-| Option                               | Lines added / removed | Compressed bundle change | Packages added, direct / all | Web tests     |
-| ------------------------------------ | --------------------- | ------------------------ | ---------------------------- | ------------- |
-| TanStack Query alone                 | 787 / 682             | +1.18 KB                 | 0 / 0                        | Pass          |
-| TanStack Query, with offline replay  | 848 / 684             | +2.82 KB                 | 2 / 3                        | Pass          |
-| TanStack DB                          | 720 / 738             | +99.31 KB                | 3 / 7                        | Pass          |
-| TanStack DB, with offline replay     | 844 / 739             | +107.90 KB               | 4 / 8                        | Pass          |
-| Status quo, refactored               | 328 / 355             | −0.03 KB                 | 0 / 0                        | Pass          |
-| Status quo without collection stores | 460 / 572             | −0.06 KB                 | 0 / 0                        | 6 of 307 fail |
-
-The status-quo rows include 109 / 57 lines of import fixes that clear every
-layer violation. Either TanStack option needs the same fixes for the code its
-prototype left alone.
+| Option                               | Lines added / removed | Compressed bundle change | Packages added, direct / all | Web tests     | Lint violations left |
+| ------------------------------------ | --------------------- | ------------------------ | ---------------------------- | ------------- | -------------------- |
+| TanStack Query alone                 | 787 / 682             | +1.18 KB                 | 0 / 0                        | Pass          | 7                    |
+| TanStack Query, with offline replay  | 848 / 684             | +2.82 KB                 | 2 / 3                        | Pass          | 7                    |
+| TanStack DB                          | 720 / 738             | +99.31 KB                | 3 / 7                        | Pass          | 10                   |
+| TanStack DB, with offline replay     | 844 / 739             | +107.90 KB               | 4 / 8                        | Pass          | 10                   |
+| Status quo, refactored               | 328 / 355             | −0.03 KB                 | 0 / 0                        | Pass          | 0                    |
+| Status quo without collection stores | 460 / 572             | −0.06 KB                 | 0 / 0                        | 6 of 307 fail | 0                    |
 
 ### Layers each option enforces
 
 Three lint zones express the [layer stack](../reference/data-flow-layers.md):
 views import only feature hooks, only the query layer imports the fetch
-wrapper, and stores import neither. That commit breaks them 13 times.
+wrapper, and stores import neither. The baseline commit breaks them 13 times.
 
-| Layer check                    | TanStack Query alone                  | TanStack DB                                  | Status quo                                         |
-| ------------------------------ | ------------------------------------- | -------------------------------------------- | -------------------------------------------------- |
-| Lint violations left           | 7, in characters and account deletion | 10, the same plus sign-out                   | 0                                                  |
-| Store layer                    | None for weapons and teams            | A collection is store and query layer in one | Kept                                               |
-| Query cache copied into stores | Characters only                       | Characters only                              | All three, or teams only without collection stores |
+The status quo clears every violation with 109 / 57 lines of import fixes,
+counted in its measurement rows. Either TanStack option needs the same fixes
+in the code its prototype left alone: characters and account deletion, plus
+sign-out for TanStack DB.
 
 ### Mechanisms each option removes
 
-| Mechanism        | TanStack Query alone                 | TanStack DB                         | Status quo                                            |
-| ---------------- | ------------------------------------ | ----------------------------------- | ----------------------------------------------------- |
-| Store mirror     | Removed for weapons and teams        | Removed for weapons and teams       | Kept, or removed for collections without their stores |
-| Reconcile effect | Removed for weapons and teams        | Removed for weapons and teams       | Kept, or removed for collections without their stores |
-| Guarded rollback | Kept, in three places                | Replaced by the library's           | Kept, in one helper                                   |
-| Sender check     | Kept, before every request and toast | Replaced by one collection per user | Kept                                                  |
-| Query sync       | Kept, in shared helpers              | Removed, the library owns it        | Kept, in shared helpers                               |
+The TanStack columns describe weapons and teams. Characters keep today's
+mechanisms in both prototypes. The status-quo column describes the refactored
+variant. Removing the weapon and character stores also removes their store
+mirror and reconcile effect, so only teams keep them.
+
+| Mechanism        | TanStack Query alone                 | TanStack DB                         | Status quo              |
+| ---------------- | ------------------------------------ | ----------------------------------- | ----------------------- |
+| Store mirror     | Removed                              | Removed                             | Kept                    |
+| Reconcile effect | Removed                              | Removed                             | Kept                    |
+| Guarded rollback | Kept, in three places                | Replaced by the library's           | Kept, in one helper     |
+| Sender check     | Kept, before every request and toast | Replaced by one collection per user | Kept                    |
+| Query sync       | Kept, in shared helpers              | Removed, the library owns it        | Kept, in shared helpers |
 
 ### Modes each option supports
 
@@ -108,14 +109,14 @@ wrapper, and stores import neither. That commit breaks them 13 times.
 | Offline             | Writes pause, and a reload loses them         | Writes fail and roll back                         | Writes pause, and a reload loses them |
 | Offline with replay | Paused writes survive a reload in a unit test | A per-user queue survives a reload in a unit test | Not built                             |
 | Online              | Optimistic, writes to one entity in order     | Optimistic, adds included                         | Optimistic, unchanged                 |
-| Remote              | The last write to finish refetches            | Refetches on focus and reconnect                  | Each feature copies its refetch       |
+| Remote              | The last write to finish refetches            | Refetches on focus and reconnect                  | Each feature's reconcile effect       |
 
 ### TanStack Query alone
 
 Optimistic writes in the query cache, writes to one entity run in order, and
 paused writes kept in browser storage by TanStack's persistence packages.
 
-- Good, because it removes the second client copy and the copy step for about
+- Good, because it removes the store mirror and reconcile effect for about
   1 KB, with no new package until offline replay.
 - Good, because signed-out teams need no store.
 - Neutral, because the line count rises: the stores' edit logic moves into pure
@@ -137,8 +138,8 @@ paused writes kept in browser storage by TanStack's persistence packages.
 TanStack DB 0.15 collections over the existing query client, with optimistic
 transactions and a per-user offline queue.
 
-- Good, because it removes the most mechanisms: the store mirror, the copy
-  step, the guarded rollback, and query sync.
+- Good, because it removes the most mechanisms: the store mirror, the
+  reconcile effect, the guarded rollback, and query sync.
 - Good, because weapon adds become optimistic through a temporary identifier.
 - Bad, because the compressed bundle grows by about 35%.
 - Bad, because without the queue an offline write fails at once, where today it
@@ -150,7 +151,7 @@ transactions and a per-user offline queue.
 - Bad, because the library is pre-1.0 and churning, with four minor releases in
   October 2026. The queue package pins one exact version, so the two upgrade
   together.
-- Bad, because lint can't keep store and query layers apart when one module is
+- Bad, because lint can't keep store and query layers apart: a collection is
   both.
 
 ### Status quo, refactored
@@ -169,7 +170,7 @@ through feature hooks.
 - Bad, because the guarded rollback, sender check, and query sync stay
   hand-written.
 - Bad, because offline replay would need each write stored as data, a cache
-  persistence package, and a merge in the teams copy step.
+  persistence package, and a merge in the teams reconcile effect.
 
 ## More information
 
