@@ -4,7 +4,7 @@
 import type { CollectionWeapon, CollectionWeaponId, TeamSlot } from '@genshin/domain';
 import { TEAM_SLOTS } from '@genshin/domain';
 import { getCharacterById, getWeaponById } from '@genshin/game-data';
-import { Users } from 'lucide-react';
+import { Loader2, Users } from 'lucide-react';
 import type { JSX, ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -162,6 +162,9 @@ export function TeamsPage(): JSX.Element {
     assignWeapon,
     removeWeapon,
     setArtifactPlan,
+    isLoading: teamsLoading,
+    error: teamsError,
+    retry: retryTeams,
   } = useTeams();
 
   const [activeTab, setActiveTab] = useState<SheetTab>('characters');
@@ -173,6 +176,9 @@ export function TeamsPage(): JSX.Element {
   });
   const { selectedSlot, selectedMemberIndex } = editor;
   const selectedTeam = selectedSlot !== null ? teams[selectedSlot] : null;
+
+  if (teamsLoading) return <LoadingTeams />;
+  if (teamsError) return <TeamsLoadFailed onRetry={retryTeams} />;
 
   return (
     <Container className="py-12">
@@ -225,14 +231,7 @@ export function TeamsPage(): JSX.Element {
                 />
               </SheetHeader>
 
-              <nav className="mt-4 gap-4 flex border-b border-border" aria-label="Team editor tabs">
-                <TabButton tab="characters" activeTab={activeTab} onSelect={setActiveTab}>
-                  Characters
-                </TabButton>
-                <TabButton tab="weapons" activeTab={activeTab} onSelect={setActiveTab}>
-                  Weapons
-                </TabButton>
-              </nav>
+              <TeamEditorTabs activeTab={activeTab} onSelect={setActiveTab} />
 
               <div className="mt-3 min-h-0 gap-3 flex flex-1 flex-col">
                 <TeamEditorPanel
@@ -251,6 +250,40 @@ export function TeamsPage(): JSX.Element {
 }
 
 /**
+ * Stands in for the planner until the user's teams arrive: the store's defaults
+ * would read as a user with no teams.
+ */
+function LoadingTeams(): JSX.Element {
+  return (
+    <Container className="py-12">
+      <h1 className="sr-only">Teams</h1>
+      <div className="py-24 flex items-center justify-center">
+        <Loader2
+          className="h-8 w-8 animate-spin text-muted-foreground"
+          aria-hidden="true"
+          focusable={false}
+        />
+        <span className="sr-only">Loading teams</span>
+      </div>
+    </Container>
+  );
+}
+
+function TeamsLoadFailed({ onRetry }: { onRetry: () => void }): JSX.Element {
+  return (
+    <Container className="py-12">
+      <h1 className="sr-only">Teams</h1>
+      <div className="gap-4 py-24 flex flex-col items-center text-center">
+        <p className="text-sm text-destructive">Failed to load your teams.</p>
+        <Button variant="outline" onClick={onRetry}>
+          Retry
+        </Button>
+      </div>
+    </Container>
+  );
+}
+
+/**
  * Leaves the team rows in place: a user who removes every character still sees the teams
  * that reference them.
  */
@@ -264,6 +297,25 @@ function EmptyCollectionPrompt(): JSX.Element {
       action="Go to Characters"
       className="mb-8 rounded-lg border border-border"
     />
+  );
+}
+
+function TeamEditorTabs({
+  activeTab,
+  onSelect,
+}: {
+  activeTab: SheetTab;
+  onSelect: (tab: SheetTab) => void;
+}): JSX.Element {
+  return (
+    <nav className="mt-4 gap-4 flex border-b border-border" aria-label="Team editor tabs">
+      <TabButton tab="characters" activeTab={activeTab} onSelect={onSelect}>
+        Characters
+      </TabButton>
+      <TabButton tab="weapons" activeTab={activeTab} onSelect={onSelect}>
+        Weapons
+      </TabButton>
+    </nav>
   );
 }
 

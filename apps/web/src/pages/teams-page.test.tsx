@@ -7,6 +7,7 @@ import { CHARACTER_ROSTER, WEAPON_ROSTER } from '@genshin/game-data';
 import { act, configure, render, screen, within } from '@testing-library/react';
 import type { UserEvent } from '@testing-library/user-event';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -14,9 +15,18 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { useCollectionStore } from '@/features/collection/characters/use-character-collection-store';
 import { useWeaponCollectionStore } from '@/features/collection/weapons/use-weapon-collection-store';
 import { useTeamStore } from '@/features/teams/use-team-store';
-import { makeCharacter, makeWeapon } from '@/test/fixtures';
+import {
+  charactersDocument,
+  makeCharacter,
+  makeTeam,
+  makeWeapon,
+  teamsDocument,
+  weaponsDocument,
+} from '@/test/fixtures';
+import { holdResponse } from '@/test/msw/held-response';
+import { server } from '@/test/msw/server';
 import { TestProviders } from '@/test/providers';
-import { createTestQueryClient, createWrapper } from '@/test/render';
+import { createTestQueryClient, createWrapper, fakeUser } from '@/test/render';
 
 import { TeamsPage } from './teams-page';
 
@@ -334,5 +344,49 @@ describe('TeamsPage empty collection', () => {
     seedCollections();
 
     expect(screen.queryByRole('button', { name: 'Sign in' })).not.toBeInTheDocument();
+  });
+});
+
+describe("TeamsPage loading the user's teams", () => {
+  const signedIn = () => createWrapper({ user: fakeUser('user-1') });
+
+  beforeEach(() => {
+    server.use(
+      http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
+      http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument([]))),
+    );
+  });
+
+  it('shows the load in progress rather than default teams', async () => {
+    const held = holdResponse(() => HttpResponse.json(teamsDocument([])));
+    server.use(http.get('http://localhost:8080/teams', held.resolver));
+
+    renderTeamsPage(signedIn());
+    await held.arrived;
+
+    expect(screen.getByText('Loading teams')).toBeInTheDocument();
+    expect(screen.queryAllByRole('button', { name: /No character/ })).toHaveLength(0);
+    held.release();
+  });
+
+  it('reports a failed load in place of the teams, and recovers on retry', async () => {
+    server.use(
+      http.get('http://localhost:8080/teams', () => new HttpResponse(null, { status: 500 })),
+    );
+    const user = userEvent.setup({ delay: null });
+
+    renderTeamsPage(signedIn());
+
+    expect(await screen.findByText('Failed to load your teams.')).toBeInTheDocument();
+    expect(screen.queryAllByRole('button', { name: /No character/ })).toHaveLength(0);
+
+    server.use(
+      http.get('http://localhost:8080/teams', () =>
+        HttpResponse.json(teamsDocument([makeTeam(1, { name: 'Abyss' })])),
+      ),
+    );
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+
+    expect(await screen.findByRole('region', { name: 'Abyss' })).toBeInTheDocument();
   });
 });
