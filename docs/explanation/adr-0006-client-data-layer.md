@@ -42,8 +42,8 @@ stack lint can enforce, and keeps these four modes apart?
 ## Decision drivers
 
 - Remove hand-written synchronization code rather than move it.
-- Hold server data in one client copy, as the repository's state rule asks:
-  zustand for UI state, TanStack Query for server state.
+- Hold server data in one client copy, as the [state rule](../../AGENTS.md#core-coding-rules)
+  asks: zustand for UI state, TanStack Query for server state.
 - Each layer imports only the one below, enforced by lint as the API's are.
 - Reach resources through the API's links and templates, not hand-built paths.
 - Keep Local, Offline, Online, and Remote modes distinct and testable.
@@ -81,8 +81,8 @@ itself.
   settles.
 - **Navigation:** the query layer starts at the API root and follows its links,
   item links, and write templates. It builds no request paths.
-- **Layers:** lint enforces the three zones in the layers section. Views go through feature
-  hooks, and only the query layer reaches the fetch wrapper.
+- **Layers:** lint enforces the three zones in the layers section. Views go
+  through feature hooks, and only the query layer reaches the fetch wrapper.
 - **Offline:** issue #1762 persists paused writes with TanStack's persistence
   packages. A restored write re-checks the signed-in account before it sends.
 
@@ -92,13 +92,11 @@ itself.
   and with them layer skip 2.
 - Good, because the client stops building paths, so an API path change no
   longer breaks it.
-- Neutral, because the rules the store repeats from the hook and the server,
-  such as team composition and team names, move into pure helpers. Merging
-  each with its other copies is separate work.
 - Bad, because the guarded rollback, sender check, and query sync stay
   hand-written, in shared helpers.
-- Bad, because the line count rises slightly: the stores' edit logic moves into
-  pure helpers rather than going away.
+- Bad, because the line count rises slightly. The stores' edit logic,
+  including rules the hook and server repeat, moves into pure helpers rather
+  than going away. Merging those copies is separate work.
 - Bad, because characters and account deletion still need the same move and
   import fixes the prototypes left out.
 - Bad, because no prototype combines TanStack Query with link following. The
@@ -134,7 +132,7 @@ weapons and teams. The status-quo prototypes also cover characters. Rows marked
 | Status quo, refactored               | 328 / 355             | −0.03 KB                 | 0 / 0                        | Pass          | 0                    |
 | Status quo without collection stores | 460 / 572             | −0.06 KB                 | 0 / 0                        | 6 of 307 fail | 0                    |
 
-### Layers each option enforces
+### Layers and request paths each option leaves
 
 Three lint zones express the [layer stack](../reference/data-flow-layers.md):
 views import only feature hooks, only the query layer imports the fetch
@@ -145,8 +143,8 @@ counted in its measurement rows. The other options need the same fixes in the
 code their prototypes left alone: characters and account deletion, plus
 sign-out for TanStack DB.
 
-Weapons and teams build 7 request paths by hand on the baseline commit. Ketting's
-prototype builds none. The others keep building them.
+Weapons and teams build 7 request paths by hand on the baseline commit.
+Ketting's prototype builds none. The others keep building them.
 
 ### Mechanisms each option removes
 
@@ -208,8 +206,9 @@ transactions and a per-user offline queue.
   pauses.
 - Bad, because a retried weapon add can create a duplicate: the API doesn't
   recognize a replayed add.
-- Bad, because the queue outlives sign-out. It replays at that user's next sign-in,
-  where an old team save can overwrite newer edits from another device.
+- Bad, because the queue outlives sign-out. It replays at that user's next
+  sign-in, where an old team save can overwrite newer edits from another
+  device.
 - Bad, because the library is pre-1.0 and churning, with four minor releases in
   October 2026. The queue package pins one exact version, so the two upgrade
   together.
