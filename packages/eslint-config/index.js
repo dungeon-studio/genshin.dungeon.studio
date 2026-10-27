@@ -182,7 +182,8 @@ const IMPORT_DISCIPLINE = {
     'import-x/newline-after-import': 'error',
     // Sibling workspaces resolve through built `dist/`, so checking them would
     // report whether the repo is built, not whether the import is correct.
-    'import-x/no-unresolved': ['error', { ignore: ['^@genshin/'] }],
+    // Vite virtual modules exist only inside a plugin's resolve hook.
+    'import-x/no-unresolved': ['error', { ignore: ['^@genshin/', '^virtual:'] }],
     // Cycles inside `node_modules` are not ours to break.
     'import-x/no-cycle': ['error', { ignoreExternal: true }],
     // `unused-imports` owns unused-symbol reporting so removals are

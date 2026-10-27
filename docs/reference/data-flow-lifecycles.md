@@ -124,7 +124,6 @@ stateDiagram-v2
   LocalOnly --> DefaultTeam: sign in with the slot unsaved
   Sent --> Sent: newer edit to the same slot
   Sent --> Confirmed: save succeeds, then a refetch lands
-  Sent --> DefaultTeam: clear succeeds, then a refetch lands
   Sent --> RolledBack: rejected, slot still holds the sent team
   Confirmed --> Sent: edit
   Confirmed --> DefaultTeam: refetch lacks the slot
@@ -141,10 +140,9 @@ stateDiagram-v2
 - Confirmed: a response never reaches the store. Only a refetch confirms it,
   server timestamps included. A save that succeeds while another team save is
   pending skips its refetch and waits on that save's.
-- Sent by a clear: no component calls `clearTeam`. The store keeps the team's
-  name and empties its positions. The server deletes the record, so the refetch
-  brings back the default name, see [#1839].
-- Edits in flight: a refetch that lands while any team save or clear is pending
+- Cleared: an edit like any other. The slot keeps its name, so a clear never
+  returns it to Default.
+- Edits in flight: a refetch that lands while any team save is pending
   leaves the store alone. The refetch the last request starts updates it. If
   that request fails, nothing refetches, and the store keeps its rolled-back
   slots until the next refetch, see [#550].
@@ -152,4 +150,3 @@ stateDiagram-v2
 [#550]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/550
 [#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
 [#1534]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1534
-[#1839]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1839

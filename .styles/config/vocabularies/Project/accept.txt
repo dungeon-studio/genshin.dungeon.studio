@@ -125,6 +125,7 @@ SRECon
 [Cc]onfigs
 [Dd]eserializer
 [Dd]ev
+[Dd]iscoverability
 [Ff]avicon
 [Ff]ormatters
 [Hh]ardcoded
@@ -141,8 +142,10 @@ SRECon
 [Rr]ollouts
 [Rr]uleset
 [Ss]erializer
+[Ss]ignifiers?
 [Ss]uperset
 [Tt]oolchain
+[Tt]ooltips?
 [Tt]ypechecking
 [Uu]nprocessable
 [Uu]nversioned

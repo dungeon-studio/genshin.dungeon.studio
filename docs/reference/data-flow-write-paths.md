@@ -128,11 +128,11 @@ sequenceDiagram
 
 ## Teams
 
-`useTeams` in `use-teams.ts`. Every action goes through `editThenPersist`.
+`useTeams` in `use-teams.ts`. Every action goes through `editThenSave`.
 
 ```mermaid
 sequenceDiagram
-  participant Hook as editThenPersist
+  participant Hook as editThenSave
   participant Store as team store
   participant Reconcile as reconcile effect
   participant Cache as query cache
@@ -142,9 +142,9 @@ sequenceDiagram
   Hook->>Store: snapshot slot, then edit
   opt signed in
     Hook->>Cache: cancel any refetch in flight
-    Hook->>API: PUT /teams/{slot} with name, members, and description,<br>or DELETE to clear
-    API->>FS: PUT with members: read characters, weapons,<br>and other teams to validate them
-    API->>FS: PUT: transaction of read, nextTeam, set<br>DELETE: delete
+    Hook->>API: PUT /teams/{slot} with name, members, and description
+    API->>FS: with any position filled: read characters, weapons,<br>and other teams to validate them
+    API->>FS: transaction of read, nextTeam, set
     alt success
       Hook->>Cache: invalidate, unless another write is pending
       Cache-->>Reconcile: refetched teams

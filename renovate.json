@@ -5,7 +5,9 @@
     "security:openssf-scorecard",
     "customManagers:githubActionsVersions",
     "customManagers:dockerfileVersions",
-    ":automergeDigest"
+    ":automergeMinor",
+    ":automergeDigest",
+    "group:allNonMajor"
   ],
   "timezone": "Europe/London",
   "labels": ["dependencies"],
@@ -20,9 +22,8 @@
     "automerge": true
   },
   "lockFileMaintenance": {
-    "description": "Open the lock file refresh past the concurrent limit and merge it on green CI, so transitive dependency fixes keep reaching develop",
-    "prConcurrentLimit": 0,
-    "automerge": true
+    "description": "Open the lock file refresh past the concurrent limit, so transitive dependency fixes keep reaching develop",
+    "prConcurrentLimit": 0
   },
   "pre-commit": {
     "enabled": true
@@ -48,15 +49,10 @@
       "minimumReleaseAge": null
     },
     {
-      "description": "Move each dependency in one pull request across all of its pins, so develop never holds two versions of it",
-      "matchDepNames": [
-        "hashicorp/terraform",
-        "fsfe/reuse-tool",
-        "lycheeverse/lychee",
-        "node",
-        "errata-ai/vale"
-      ],
-      "groupName": "{{depName}}"
+      "description": "Update each of these dependencies in its own pull request that moves every pin at once, so develop never holds two versions of it",
+      "matchDepNames": ["hashicorp/terraform", "fsfe/reuse-tool", "node", "errata-ai/vale"],
+      "groupName": "{{depName}}",
+      "groupSlug": "{{depNameSanitized}}"
     },
     {
       "description": "Move engines and @types/node to a new Node.js major only once it reaches LTS",
@@ -65,17 +61,10 @@
       "versioning": "node"
     },
     {
-      "description": "Merge development dependency patch and minor updates on green CI",
-      "matchDepTypes": ["devDependencies"],
-      "matchUpdateTypes": ["patch", "minor"],
-      "automerge": true
-    },
-    {
-      "description": "Merge non-breaking production dependency patch updates on green CI",
-      "matchDepTypes": ["dependencies"],
-      "matchUpdateTypes": ["patch"],
-      "matchJsonata": ["isBreaking != true"],
-      "automerge": true
+      "description": "Keep deploy-cloudrun majors manual: it has no dry-run mode, so no required check can exercise it before it deploys",
+      "matchPackageNames": ["google-github-actions/deploy-cloudrun"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false
     }
   ],
   "customManagers": [

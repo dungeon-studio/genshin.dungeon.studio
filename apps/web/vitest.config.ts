@@ -5,6 +5,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import baseConfig from '@genshin/vitest-config';
+import { msw } from 'msw/vite';
 import { defineConfig, mergeConfig } from 'vitest/config';
 
 // Vitest stubs `.css` imports to an empty string, `?raw` included, so the
@@ -22,6 +23,7 @@ const publicFiles = readdirSync(fileURLToPath(new URL('./public', import.meta.ur
 export default mergeConfig(
   baseConfig,
   defineConfig({
+    plugins: [msw()],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
