@@ -31,5 +31,10 @@ export function rollBackFailedWrite({
     return;
   }
   revert();
-  toast.error(`${failure} ${reverted} Try again.`);
+  reportFailedWrite(`${failure} ${reverted}`);
+}
+
+/** Tells the user a write failed, ending on the next step to take. */
+export function reportFailedWrite(failure: string): void {
+  toast.error(`${failure} Try again.`);
 }

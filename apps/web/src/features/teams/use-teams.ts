@@ -80,25 +80,26 @@ type TeamActions = Pick<
 type TeamStore = ReturnType<typeof useTeamStore.getState>;
 
 /** Who sat at a position, for a message about what a revert brought back. */
-function memberAt(team: CollectionTeam, memberIndex: number): string | undefined {
+function memberName(team: CollectionTeam, memberIndex: number): string | undefined {
   const member = team.members[memberIndex];
   if (!member) return undefined;
   return getCharacterById(member.characterId)?.name ?? member.characterId;
 }
 
-function restoredPosition(previous: CollectionTeam, memberIndex: number): string {
-  const who = memberAt(previous, memberIndex);
+/** The arguments every per-member action starts with. */
+type MemberArgs = readonly [memberIndex: number, ...rest: unknown[]];
+
+function restoredPosition(previous: CollectionTeam, [memberIndex]: MemberArgs): string {
+  const who = memberName(previous, memberIndex);
   const position = memberIndex + 1;
   return who ? `${who} is back in position ${position}.` : `Position ${position} is empty again.`;
 }
 
-function restoredMemberDetail(
-  previous: CollectionTeam,
-  memberIndex: number,
-  detail: string,
-): string {
-  const who = memberAt(previous, memberIndex) ?? `Position ${memberIndex + 1}`;
-  return `${who}'s ${detail} is back to how it was.`;
+function restoredMemberDetail(detail: string) {
+  return (previous: CollectionTeam, [memberIndex]: MemberArgs): string => {
+    const who = memberName(previous, memberIndex) ?? `Position ${memberIndex + 1}`;
+    return `${who}'s ${detail} is back to how it was.`;
+  };
 }
 
 function useTeamActions(
@@ -111,7 +112,7 @@ function useTeamActions(
     const editThenSave =
       <Args extends unknown[]>(
         action: (s: TeamStore) => (slot: TeamSlot, ...args: Args) => void,
-        describeRevert: (previous: CollectionTeam, args: Args) => string,
+        describeRevert: (previous: CollectionTeam, args: NoInfer<Args>) => string,
       ) =>
       (slot: TeamSlot, ...args: Args) => {
         const previousTeam = { ...store().teams[slot] };
@@ -131,25 +132,13 @@ function useTeamActions(
       };
 
     return {
-      assignCharacter: editThenSave(
-        (s) => s.assignCharacter,
-        (previous, [memberIndex]) => restoredPosition(previous, memberIndex),
-      ),
-      removeCharacter: editThenSave(
-        (s) => s.removeCharacter,
-        (previous, [memberIndex]) => restoredPosition(previous, memberIndex),
-      ),
-      assignWeapon: editThenSave(
-        (s) => s.assignWeapon,
-        (previous, [memberIndex]) => restoredMemberDetail(previous, memberIndex, 'weapon'),
-      ),
-      removeWeapon: editThenSave(
-        (s) => s.removeWeapon,
-        (previous, [memberIndex]) => restoredMemberDetail(previous, memberIndex, 'weapon'),
-      ),
+      assignCharacter: editThenSave((s) => s.assignCharacter, restoredPosition),
+      removeCharacter: editThenSave((s) => s.removeCharacter, restoredPosition),
+      assignWeapon: editThenSave((s) => s.assignWeapon, restoredMemberDetail('weapon')),
+      removeWeapon: editThenSave((s) => s.removeWeapon, restoredMemberDetail('weapon')),
       setArtifactPlan: editThenSave(
         (s) => s.setArtifactPlan,
-        (previous, [memberIndex]) => restoredMemberDetail(previous, memberIndex, 'artifact plan'),
+        restoredMemberDetail('artifact plan'),
       ),
       setTeamName: editThenSave(
         (s) => s.setTeamName,

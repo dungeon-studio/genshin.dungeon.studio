@@ -5,11 +5,10 @@ import type { CollectionWeapon, CollectionWeaponId, RefinementLevel } from '@gen
 import type { Weapon } from '@genshin/game-data';
 import { getWeaponById } from '@genshin/game-data';
 import { useCallback, useEffect, useRef } from 'react';
-import { toast } from 'sonner';
 
 import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
-import { rollBackFailedWrite } from '@/lib/roll-back-failed-write';
+import { reportFailedWrite, rollBackFailedWrite } from '@/lib/roll-back-failed-write';
 import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
 import type { WeaponMutationResult } from './use-weapon-collection-api';
@@ -174,7 +173,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
       addWeaponApi(weaponId, {
         onSuccess: applyMutationResult,
         onError: () => {
-          toast.error(`Couldn't add ${weaponName(weaponId)}. Try again.`);
+          reportFailedWrite(`Couldn't add ${weaponName(weaponId)}.`);
         },
         onSettled,
       });
