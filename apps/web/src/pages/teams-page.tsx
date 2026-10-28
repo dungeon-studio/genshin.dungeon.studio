@@ -12,10 +12,12 @@ import { Container } from '@/components/chrome/container';
 import { LoadingPage } from '@/components/chrome/loading-page';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
+import type { UseCollectionResult } from '@/features/collection/characters/use-character-collection';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
 import type { CharacterCollection } from '@/features/collection/characters/use-character-collection-store';
 import { ownedCharacters } from '@/features/collection/characters/use-character-collection-store';
 import { EmptyCollection } from '@/features/collection/empty-collection';
+import type { UseWeaponCollectionResult } from '@/features/collection/weapons/use-weapon-collection';
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
 import { CharacterPool } from '@/features/teams/character-pool';
 import { TeamPlanner } from '@/features/teams/team-planner';
@@ -143,8 +145,29 @@ function useMemberEditor(
 type MemberEditor = ReturnType<typeof useMemberEditor>;
 
 export function TeamsPage(): JSX.Element {
-  const { characters, getCharacter, isLoading: collectionLoading } = useCollection();
-  const { weapons } = useWeaponCollection();
+  // Called here rather than in `TeamBuilder`, so all three requests start together.
+  const planner = useTeams();
+  const collection = useCollection();
+  const weaponCollection = useWeaponCollection();
+
+  // Every edit saves the whole team, so one made to a default slot erases the saved one.
+  if (planner.isLoading) return <LoadingPage title="Teams" label="Loading teams" />;
+
+  return (
+    <TeamBuilder planner={planner} collection={collection} weaponCollection={weaponCollection} />
+  );
+}
+
+interface TeamBuilderProps {
+  planner: UseTeamsResult;
+  collection: UseCollectionResult;
+  weaponCollection: UseWeaponCollectionResult;
+}
+
+/** The four teams and the sheet that edits them, mounted only once the saved teams are in. */
+function TeamBuilder({ planner, collection, weaponCollection }: TeamBuilderProps): JSX.Element {
+  const { characters, getCharacter, isLoading: collectionLoading } = collection;
+  const { weapons } = weaponCollection;
 
   const collectionEmpty = !collectionLoading && ownedCharacters(characters).length === 0;
 
@@ -163,8 +186,7 @@ export function TeamsPage(): JSX.Element {
     assignWeapon,
     removeWeapon,
     setArtifactPlan,
-    isLoading: teamsLoading,
-  } = useTeams();
+  } = planner;
 
   const [activeTab, setActiveTab] = useState<SheetTab>('characters');
   const editor = useMemberEditor(weapons, teams, {
@@ -175,9 +197,6 @@ export function TeamsPage(): JSX.Element {
   });
   const { selectedSlot, selectedMemberIndex } = editor;
   const selectedTeam = selectedSlot !== null ? teams[selectedSlot] : null;
-
-  // Every edit saves the whole team, so one made to a default slot erases the saved one.
-  if (teamsLoading) return <LoadingPage title="Teams" label="Loading teams" />;
 
   return (
     <Container className="py-12">
