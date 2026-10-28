@@ -14,12 +14,28 @@ import { CharacterCard } from '@/features/collection/characters/character-card';
 import { CharacterFilters } from '@/features/collection/characters/character-filters';
 import type { CharacterFilterState } from '@/features/collection/characters/filtering';
 import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
+import type { UseCollectionResult } from '@/features/collection/characters/use-character-collection';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
 import { ownedCharacterIds } from '@/features/collection/characters/use-character-collection-store';
 
-const LOAD_FAILED = 'Failed to load your character collection.';
-
 export function CharactersPage(): JSX.Element {
+  const collection = useCollection();
+
+  if (collection.isLoading) return <LoadingPage title="Characters" label="Loading collection" />;
+  if (collection.loadFailed) {
+    return (
+      <LoadFailedPage
+        title="Characters"
+        message="Failed to load your character collection."
+        onRetry={collection.retry}
+      />
+    );
+  }
+
+  return <CharacterRoster collection={collection} />;
+}
+
+function CharacterRoster({ collection }: { collection: UseCollectionResult }): JSX.Element {
   const {
     characters,
     isAuthenticated,
@@ -27,11 +43,8 @@ export function CharactersPage(): JSX.Element {
     removeCharacter,
     setConstellationLevel,
     isOwned,
-    isLoading,
     error,
-    loadFailed,
-    retry,
-  } = useCollection();
+  } = collection;
 
   const [filters, setFilters] = useState<CharacterFilterState>(initialFilterState);
 
@@ -58,10 +71,6 @@ export function CharactersPage(): JSX.Element {
     },
     [isAuthenticated, addCharacter],
   );
-
-  if (isLoading) return <LoadingPage title="Characters" label="Loading collection" />;
-  if (loadFailed)
-    return <LoadFailedPage title="Characters" message={LOAD_FAILED} onRetry={retry} />;
 
   return (
     <>
