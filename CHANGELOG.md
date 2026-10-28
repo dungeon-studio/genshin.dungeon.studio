@@ -29,6 +29,7 @@ single `### Added` bucket in `[Unreleased]`.
 - Phone-width layout for the header and team slots.
 - Team persistence so compositions survive across sessions.
 - Collections saved to your account, with a sign-in prompt when managing one signed out.
+- Save-failure messages that name the team, character, or weapon, say what was put back, and suggest trying again.
 - Google sign-in and sign-out from the site header.
 - Dark mode support.
 - Footer links to GitHub issues, feature requests, discussions, changelog, and repository.

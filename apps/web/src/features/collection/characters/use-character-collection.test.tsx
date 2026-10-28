@@ -107,7 +107,9 @@ describe('useCollection mutations', () => {
     // Optimistically gone, then restored at its prior level once the delete errors.
     expect(result.current.getCharacter(SKIRK)).toBeUndefined();
     await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
-    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+    expect(toast.error).toHaveBeenCalledWith(
+      "Couldn't remove Skirk. Skirk is back in your collection. Try again.",
+    );
   });
 
   it('stores the saved character with the server timestamps', async () => {
@@ -155,7 +157,9 @@ describe('useCollection mutations', () => {
 
     expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(5);
     await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
-    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+    expect(toast.error).toHaveBeenCalledWith(
+      "Couldn't set Skirk to constellation level 5. Skirk is back at constellation level 3. Try again.",
+    );
   });
 
   it('drops an added character when the add fails', async () => {
@@ -178,7 +182,9 @@ describe('useCollection mutations', () => {
 
     expect(result.current.isOwned(SKIRK)).toBe(true);
     await waitFor(() => expect(result.current.isOwned(SKIRK)).toBe(false));
-    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+    expect(toast.error).toHaveBeenCalledWith(
+      "Couldn't add Skirk. Skirk is out of your collection again. Try again.",
+    );
   });
 
   it('keeps a raise made while a failing add was in flight', async () => {
@@ -214,7 +220,9 @@ describe('useCollection mutations', () => {
     await act(() => addFailure.arrived);
     addFailure.release();
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Failed to add character.'));
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith("Couldn't add Skirk. Your newer change stands."),
+    );
     expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(raisedLevel);
   });
 
@@ -240,7 +248,9 @@ describe('useCollection mutations', () => {
     });
     deleteFailure.release();
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Failed to remove character.'));
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith("Couldn't remove Skirk. Your newer change stands."),
+    );
     expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(0);
   });
 
@@ -282,7 +292,9 @@ describe('useCollection mutations', () => {
     levelFailure.release();
 
     await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith('Failed to update constellation level.'),
+      expect(toast.error).toHaveBeenCalledWith(
+        "Couldn't set Skirk to constellation level 5. Your newer change stands.",
+      ),
     );
     expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(0);
   });

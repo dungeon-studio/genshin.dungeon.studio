@@ -49,7 +49,65 @@ describe('useTeams (authenticated)', () => {
 
     // Save fails, so the member is reverted and the user is notified.
     await waitFor(() => expect(result.current.getTeam(1).members[0]).toBeNull());
-    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+    expect(toast.error).toHaveBeenCalledWith(
+      "Couldn't save Team 1. Position 1 is empty again. Try again.",
+    );
+  });
+
+  it('names the character a failed removal brings back', async () => {
+    server.use(
+      http.get('http://localhost:8080/teams', () =>
+        HttpResponse.json(teamsDocument([makeTeam(1, { members: MEMBERS })])),
+      ),
+      http.put('http://localhost:8080/teams/1', () => new HttpResponse(null, { status: 500 })),
+    );
+
+    const { result } = renderHookSignedIn(() => useTeams(), 'user-1');
+    await waitFor(() => expect(result.current.getTeam(1).members[0]?.characterId).toBe(CHARACTER));
+
+    act(() => {
+      result.current.removeCharacter(1, 0);
+    });
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Couldn't save Team 1. Skirk is back in position 1. Try again.",
+      ),
+    );
+    expect(result.current.getTeam(1).members[0]?.characterId).toBe(CHARACTER);
+  });
+
+  it.each<[string, (teams: ReturnType<typeof useTeams>) => void, string]>([
+    [
+      'a weapon removal',
+      (teams) => teams.removeWeapon(1, 0),
+      "Skirk's weapon is back to how it was.",
+    ],
+    [
+      'an artifact plan change',
+      (teams) => teams.setArtifactPlan(1, 0, undefined),
+      "Skirk's artifact plan is back to how it was.",
+    ],
+    ['a rename', (teams) => teams.setTeamName(1, 'Freeze'), 'The team is named Team 1 again.'],
+    ['a clear', (teams) => teams.clearTeam(1), 'Its members are back.'],
+  ])('says what a failed save of %s puts back', async (_, edit, reverted) => {
+    server.use(
+      http.get('http://localhost:8080/teams', () =>
+        HttpResponse.json(teamsDocument([makeTeam(1, { members: MEMBERS })])),
+      ),
+      http.put('http://localhost:8080/teams/1', () => new HttpResponse(null, { status: 500 })),
+    );
+
+    const { result } = renderHookSignedIn(() => useTeams(), 'user-1');
+    await waitFor(() => expect(result.current.getTeam(1).members[0]?.characterId).toBe(CHARACTER));
+
+    act(() => {
+      edit(result.current);
+    });
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(`Couldn't save Team 1. ${reverted} Try again.`),
+    );
   });
 
   it('saves a renamed team', async () => {
@@ -123,7 +181,9 @@ describe('useTeams (authenticated)', () => {
     firstPut.release();
     await waitFor(() => expect(result.current.getTeam(1).members[0]).toBeNull());
     expect(result.current.getTeam(2).members[0]?.characterId).toBe(CHARACTER);
-    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+    expect(toast.error).toHaveBeenCalledWith(
+      "Couldn't save Team 1. Position 1 is empty again. Try again.",
+    );
   });
 
   it('reports a failed save that a newer edit to the same team superseded', async () => {
@@ -153,7 +213,9 @@ describe('useTeams (authenticated)', () => {
     await act(() => firstPut.arrived);
 
     firstPut.release();
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Failed to save team.'));
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith("Couldn't save Team 1. Your newer change stands."),
+    );
     expect(result.current.getTeam(1).name).toBe(newerName);
     expect(result.current.getTeam(1).members[0]?.characterId).toBe(CHARACTER);
   });

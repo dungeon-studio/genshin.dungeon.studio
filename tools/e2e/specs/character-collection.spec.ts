@@ -93,7 +93,11 @@ test('a rejected add rolls back and says so', async ({ signedInPage: page, pageF
 
   await page.getByRole('button', { name: addCharacterLabel(character) }).click();
 
-  await expect(page.getByText('Failed to add character. Change has been reverted.')).toBeVisible();
+  await expect(
+    page.getByText(
+      `Couldn't add ${character.name}. ${character.name} is out of your collection again. Try again.`,
+    ),
+  ).toBeVisible();
   await expect(page.getByRole('button', { name: addCharacterLabel(character) })).toBeVisible();
 
   // Chromium logs the injected 503 as a console error.

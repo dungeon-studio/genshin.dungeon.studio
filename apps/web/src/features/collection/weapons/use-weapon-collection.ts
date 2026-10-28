@@ -3,13 +3,14 @@
 
 import type { CollectionWeapon, CollectionWeaponId, RefinementLevel } from '@genshin/domain';
 import type { Weapon } from '@genshin/game-data';
+import { getWeaponById } from '@genshin/game-data';
 import { useCallback, useEffect, useRef } from 'react';
-import { toast } from 'sonner';
 
 import { signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 import type { UserDataLoad } from '@/features/auth/use-user-data-load';
 import { useUserDataLoad } from '@/features/auth/use-user-data-load';
+import { reportFailedWrite, rollBackFailedWrite } from '@/lib/roll-back-failed-write';
 import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
 import type { WeaponMutationResult } from './use-weapon-collection-api';
@@ -41,6 +42,10 @@ type WeaponActions = Pick<
   UseWeaponCollectionResult,
   'ensureWeapon' | 'addWeapon' | 'removeWeapon' | 'setRefinementLevel'
 >;
+
+function weaponName(weaponId: Weapon['id']): string {
+  return getWeaponById(weaponId)?.name ?? weaponId;
+}
 
 const SIGNED_OUT_ACTIONS: WeaponActions = {
   ensureWeapon: () => {},
@@ -77,13 +82,14 @@ function useOptimisticEdits(
       storeRemoveWeapon(collectionWeaponId);
       removeWeaponApi(collectionWeaponId, {
         onError: () => {
-          const stillAbsent = !(collectionWeaponId in useWeaponCollectionStore.getState().weapons);
-          if (stillAbsent) {
-            storeAddWeapon(current);
-            toast.error('Failed to remove weapon. Change has been reverted.');
-          } else {
-            toast.error('Failed to remove weapon.');
-          }
+          const name = weaponName(current.weaponId);
+          rollBackFailedWrite({
+            isStillShown: () =>
+              !(collectionWeaponId in useWeaponCollectionStore.getState().weapons),
+            revert: () => storeAddWeapon(current),
+            failure: `Couldn't remove ${name}.`,
+            reverted: `${name} is back in your collection.`,
+          });
         },
       });
     },
@@ -101,14 +107,15 @@ function useOptimisticEdits(
         {
           onSuccess: applyMutationResult,
           onError: () => {
-            const currentLevel =
-              useWeaponCollectionStore.getState().weapons[collectionWeaponId]?.refinementLevel;
-            if (currentLevel === level) {
-              storeSetRefinementLevel(collectionWeaponId, previous.refinementLevel);
-              toast.error('Failed to update refinement level. Change has been reverted.');
-            } else {
-              toast.error('Failed to update refinement level.');
-            }
+            const name = weaponName(previous.weaponId);
+            rollBackFailedWrite({
+              isStillShown: () =>
+                useWeaponCollectionStore.getState().weapons[collectionWeaponId]?.refinementLevel ===
+                level,
+              revert: () => storeSetRefinementLevel(collectionWeaponId, previous.refinementLevel),
+              failure: `Couldn't set ${name} to refinement rank ${level}.`,
+              reverted: `${name} is back at refinement rank ${previous.refinementLevel}.`,
+            });
           },
         },
       );
@@ -164,7 +171,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
       addWeaponApi(weaponId, {
         onSuccess: applyMutationResult,
         onError: () => {
-          toast.error('Failed to add weapon.');
+          reportFailedWrite(`Couldn't add ${weaponName(weaponId)}.`);
         },
         onSettled,
       });
