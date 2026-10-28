@@ -4,11 +4,12 @@
 import type { CollectionWeapon, CollectionWeaponId, TeamSlot } from '@genshin/domain';
 import { TEAM_SLOTS } from '@genshin/domain';
 import { getCharacterById, getWeaponById } from '@genshin/game-data';
-import { Loader2, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 import type { JSX, ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
 import { Container } from '@/components/chrome/container';
+import { LoadingPage } from '@/components/chrome/loading-page';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
@@ -149,7 +150,7 @@ export function TeamsPage(): JSX.Element {
   const teamsState = useTeams();
   const { isLoading, error, retry } = teamsState;
 
-  if (isLoading) return <LoadingTeams />;
+  if (isLoading) return <LoadingPage title="Teams" label="Loading teams" />;
   if (error) return <TeamsLoadFailed onRetry={retry} />;
   return <LoadedTeamsPage teamsState={teamsState} />;
 }
@@ -259,22 +260,6 @@ function LoadedTeamsPage({ teamsState }: { teamsState: UseTeamsResult }): JSX.El
           )}
         </SheetContent>
       </Sheet>
-    </Container>
-  );
-}
-
-function LoadingTeams(): JSX.Element {
-  return (
-    <Container className="py-12">
-      <h1 className="sr-only">Teams</h1>
-      <div className="py-24 flex items-center justify-center">
-        <Loader2
-          className="h-8 w-8 animate-spin text-muted-foreground"
-          aria-hidden="true"
-          focusable={false}
-        />
-        <span className="sr-only">Loading teams</span>
-      </div>
     </Container>
   );
 }

@@ -3,12 +3,12 @@
 
 import type { WeaponId, WeaponType } from '@genshin/game-data';
 import { WEAPON_ROSTER, WEAPON_TYPES } from '@genshin/game-data';
-import { Loader2 } from 'lucide-react';
 import type { JSX } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { Container } from '@/components/chrome/container';
+import { LoadingPage } from '@/components/chrome/loading-page';
 import { promptSignIn } from '@/features/auth';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
@@ -30,22 +30,6 @@ function filtersFromSearchParams(searchParams: URLSearchParams): WeaponFilterSta
     state.weaponTypes = new Set<WeaponType>([typeParam as WeaponType]);
   }
   return state;
-}
-
-function LoadingCollection(): JSX.Element {
-  return (
-    <Container className="py-12">
-      <h1 className="sr-only">Weapons</h1>
-      <div className="py-24 flex items-center justify-center">
-        <Loader2
-          className="h-8 w-8 animate-spin text-muted-foreground"
-          aria-hidden="true"
-          focusable={false}
-        />
-        <span className="sr-only">Loading collection</span>
-      </div>
-    </Container>
-  );
 }
 
 export function WeaponsPage(): JSX.Element {
@@ -105,7 +89,7 @@ export function WeaponsPage(): JSX.Element {
     [selectedWeaponId, isAuthenticated, ensureWeapon],
   );
 
-  if (isLoading) return <LoadingCollection />;
+  if (isLoading) return <LoadingPage title="Weapons" label="Loading collection" />;
 
   return (
     <>
