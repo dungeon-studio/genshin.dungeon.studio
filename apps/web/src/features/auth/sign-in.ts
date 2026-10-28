@@ -5,6 +5,7 @@ import { AuthErrorCodes, GoogleAuthProvider, signInWithPopup } from '@firebase/a
 
 import { auth } from '@/lib/firebase';
 
+import { errorCode } from './auth-error';
 import { toastRetryableFailure } from './auth-toast';
 
 const googleProvider = new GoogleAuthProvider();
@@ -15,10 +16,6 @@ const DISMISSALS: ReadonlySet<unknown> = new Set([
   AuthErrorCodes.EXPIRED_POPUP_REQUEST,
   AuthErrorCodes.USER_CANCELLED,
 ]);
-
-function errorCode(error: unknown): unknown {
-  return typeof error === 'object' && error !== null && 'code' in error ? error.code : undefined;
-}
 
 function describeFailure(code: unknown): string {
   switch (code) {
@@ -44,7 +41,8 @@ export async function signInWithGoogle(): Promise<void> {
     const code = errorCode(error);
     if (DISMISSALS.has(code)) return;
 
-    console.error('Sign-in failed:', error);
+    // The error's `customData` carries the user's email, so only the code is logged.
+    console.error('Sign-in failed:', code);
     toastRetryableFailure(describeFailure(code), signInWithGoogle);
   }
 }

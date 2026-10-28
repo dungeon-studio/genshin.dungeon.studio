@@ -26,6 +26,20 @@ beforeEach(() => {
 });
 
 describe('signInWithGoogle', () => {
+  it('keeps the account email out of the console', async () => {
+    const email = 'traveler@example.com';
+    vi.mocked(signInWithPopup).mockRejectedValueOnce(
+      Object.assign(new Error('Firebase: Error (auth/user-disabled).'), {
+        code: AuthErrorCodes.USER_DISABLED,
+        customData: { appName: '[DEFAULT]', email },
+      }),
+    );
+
+    await signInWithGoogle();
+
+    expect(JSON.stringify(vi.mocked(console.error).mock.calls)).not.toContain(email);
+  });
+
   it('tells the user to allow pop-ups when the browser blocks the window', async () => {
     failsWith(AuthErrorCodes.POPUP_BLOCKED);
 
