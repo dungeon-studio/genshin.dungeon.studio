@@ -10,18 +10,17 @@ import { toastRetryableFailure } from './auth-toast';
 const googleProvider = new GoogleAuthProvider();
 
 /** Popup endings the user caused, which need no message. */
-const DISMISSALS: ReadonlySet<string> = new Set([
+const DISMISSALS: ReadonlySet<unknown> = new Set([
   AuthErrorCodes.POPUP_CLOSED_BY_USER,
   AuthErrorCodes.EXPIRED_POPUP_REQUEST,
   AuthErrorCodes.USER_CANCELLED,
 ]);
 
-function errorCode(error: unknown): string | undefined {
-  if (typeof error !== 'object' || error === null || !('code' in error)) return undefined;
-  return typeof error.code === 'string' ? error.code : undefined;
+function errorCode(error: unknown): unknown {
+  return typeof error === 'object' && error !== null && 'code' in error ? error.code : undefined;
 }
 
-function describeFailure(code: string | undefined): string {
+function describeFailure(code: unknown): string {
   switch (code) {
     case AuthErrorCodes.POPUP_BLOCKED:
       return 'Your browser blocked the sign-in window. Allow pop-ups for this site, then try again.';
@@ -43,7 +42,7 @@ export async function signInWithGoogle(): Promise<void> {
     await signInWithPopup(auth, googleProvider);
   } catch (error) {
     const code = errorCode(error);
-    if (code !== undefined && DISMISSALS.has(code)) return;
+    if (DISMISSALS.has(code)) return;
 
     console.error('Sign-in failed:', error);
     toastRetryableFailure(describeFailure(code), signInWithGoogle);
