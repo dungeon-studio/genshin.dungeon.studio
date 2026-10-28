@@ -9,7 +9,7 @@ import { toastRetryableFailure } from './auth-toast';
 
 const googleProvider = new GoogleAuthProvider();
 
-/** Codes for a popup the user closed, or one a newer sign-in replaced. */
+/** Popup endings the user caused, which need no message. */
 const DISMISSALS: ReadonlySet<string> = new Set([
   AuthErrorCodes.POPUP_CLOSED_BY_USER,
   AuthErrorCodes.EXPIRED_POPUP_REQUEST,
@@ -35,9 +35,8 @@ function describeFailure(code: string | undefined): string {
 /**
  * Opens the Google sign-in popup and resolves once it closes.
  *
- * Resolves either way: a failure toasts with a retry rather than throwing, and
- * the user dismissing the popup stays silent. What actually signed in arrives
- * through `useAuth`.
+ * Never rejects: a failure toasts with a retry, and a dismissed popup stays
+ * silent. The signed-in user arrives through `useAuth`.
  */
 export async function signInWithGoogle(): Promise<void> {
   try {

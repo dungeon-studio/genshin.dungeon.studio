@@ -10,9 +10,8 @@ import { toastRetryableFailure } from './auth-toast';
 /**
  * Ends the Firebase session.
  *
- * Resolves either way: a failure toasts with a retry rather than throwing, so
- * the caller can't tell success from failure here. The signed-out state
- * arrives through `useAuth`.
+ * Never rejects: a failure toasts with a retry. The signed-out state arrives
+ * through `useAuth`.
  */
 export async function signOut(): Promise<void> {
   try {
