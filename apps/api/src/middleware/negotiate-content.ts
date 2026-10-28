@@ -5,6 +5,7 @@ import type { MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import Negotiator from 'negotiator';
 
+import { publicUrl } from '@/http/public-url.js';
 import type { ProfileLink } from '@/middleware/profile-link.js';
 
 /** A representation the endpoint can produce. */
@@ -44,7 +45,7 @@ export function toMediaTypeString(representation: SupportedRepresentation, origi
  */
 export function negotiateContent(supported: SupportedRepresentation[]): MiddlewareHandler {
   return async (c, next) => {
-    const origin = new URL(c.req.url).origin;
+    const origin = publicUrl(c).origin;
     const available = supported.map((s) => toMediaTypeString(s, origin));
     const acceptHeader = c.req.header('Accept');
 
