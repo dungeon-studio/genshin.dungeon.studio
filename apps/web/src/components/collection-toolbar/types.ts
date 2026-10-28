@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
+import type { IconVariant } from '@/components/icons/themed-icon';
+
 /** Configures the one filter row that differs between collection types. */
 export interface FilterCategoryConfig<T extends string> {
   values: readonly T[];
@@ -8,7 +10,7 @@ export interface FilterCategoryConfig<T extends string> {
   onToggle: (value: T) => void;
   /** Replaces a selected chip's idle colors, so it sets both background and text. */
   activeClassName: (value: T) => string;
-  iconPath: (value: T, variant: 'light' | 'dark') => string;
+  iconPath: (value: T, variant: IconVariant) => string;
   /** Defaults to true. */
   show?: boolean;
 }

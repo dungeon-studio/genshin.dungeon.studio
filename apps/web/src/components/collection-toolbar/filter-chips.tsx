@@ -4,7 +4,7 @@
 import type { Rarity } from '@genshin/game-data';
 import type { JSX } from 'react';
 
-import { ChipIcon } from '@/components/ui/chip-icon';
+import { ChipIcon } from '@/components/icons/chip-icon';
 import type { BaseFilterState } from '@/lib/collection-filters';
 import { toggleInSet } from '@/lib/toggle-in-set';
 
