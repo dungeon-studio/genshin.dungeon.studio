@@ -5,17 +5,21 @@ import { signOut as endFirebaseSession } from '@firebase/auth';
 
 import { auth } from '@/lib/firebase';
 
+import { errorCode } from './auth-error';
+import { toastRetryableFailure } from './auth-toast';
+
 /**
  * Ends the Firebase session.
  *
- * Resolves either way: a failure is logged rather than thrown, so the caller
- * can't tell success from failure here. The signed-out state arrives through
- * `useAuth`.
+ * Never rejects: a failure toasts with a retry. The signed-out state arrives
+ * through `useAuth`.
  */
 export async function signOut(): Promise<void> {
   try {
     await endFirebaseSession(auth);
   } catch (error) {
-    console.error('Sign-out failed:', error);
+    // A Firebase error's `customData` can carry the user's email, so only the code is logged.
+    console.error('Sign-out failed:', errorCode(error));
+    toastRetryableFailure('Could not sign you out. You are still signed in; try again.', signOut);
   }
 }
