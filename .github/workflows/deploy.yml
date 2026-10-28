@@ -239,11 +239,11 @@ jobs:
             exit 1
           }
 
-      # Cloud Run terminates TLS, so the service sees every request as http
-      # and only X-Forwarded-Proto carries the client's scheme. A link that
-      # loses it is blocked as mixed content on the https site, and a
-      # collection's next page never loads. The schema route stamps $id from
-      # the origin every link uses, and answers without a token.
+      # Whether the API honours X-Forwarded-Proto is a unit test in
+      # public-url.test.ts. What only a deployed service can answer is whether
+      # its front end sends the header: without it every link reads http, and
+      # the https site blocks them as mixed content. A schema's $id shares its
+      # origin with every link and needs no token.
       - name: Verify Public Links
         env:
           SERVICE_URL: ${{ steps.deploy.outputs.url }}

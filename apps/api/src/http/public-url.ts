@@ -6,13 +6,12 @@ import type { Context } from 'hono';
 /**
  * The URL a client used to reach this request, for building absolute links.
  *
- * Cloud Run terminates TLS in front of the service, so `c.req.url` always
- * reads `http`. Its front end records the client's scheme in
- * `X-Forwarded-Proto`, and a link built from the bare request URL would send
- * an `https` page to a URL its browser blocks as mixed content.
+ * Cloud Run terminates TLS, so the request URL reads `http` even for an
+ * `https` client, and an `https` page blocks a link built from it as mixed
+ * content.
  *
- * Only an upgrade to `https` is honoured: the header can at worst make a
- * client's own links stricter than its connection.
+ * Honouring only `https` means a spoofed header can at worst tighten the
+ * caller's own links.
  */
 export function publicUrl(c: Context): URL {
   const url = new URL(c.req.url);
