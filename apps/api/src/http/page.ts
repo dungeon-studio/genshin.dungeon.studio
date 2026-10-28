@@ -5,6 +5,7 @@ import type { CollectionDocument } from '@genshin/collection-json';
 import type { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
+import { publicUrl } from '@/http/public-url.js';
 import type { Page, PageRequest } from '@/repositories/firestore/page.js';
 
 export const DEFAULT_PAGE_LIMIT = 50;
@@ -71,7 +72,7 @@ export function linkNextPage(
     return document;
   }
 
-  const url = new URL(c.req.url);
+  const url = publicUrl(c);
   url.searchParams.set('cursor', encodeCursor(page.next));
   const links = [...(document.collection.links ?? []), { rel: 'next', href: url.href }];
 

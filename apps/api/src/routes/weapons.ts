@@ -17,6 +17,7 @@ import type { FromSchema } from 'json-schema-to-ts';
 import { requireWeaponId } from '@/catalogue.js';
 import { negotiatedJson } from '@/http/negotiated-response.js';
 import { linkNextPage, parsePageRequest } from '@/http/page.js';
+import { publicUrl } from '@/http/public-url.js';
 import { auth } from '@/middleware/auth.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
@@ -65,7 +66,7 @@ function parseWeaponFilter(weaponId: string | undefined): WeaponId | undefined {
 weapons.get('/', async (c) => {
   const userId = c.get('user').uid;
   const filter = parseWeaponFilter(c.req.query('weaponId'));
-  const baseUrl = new URL(c.req.url).origin;
+  const baseUrl = publicUrl(c).origin;
 
   const page = await Weapons.list(userId, parsePageRequest(c), filter);
   const document =
@@ -86,7 +87,7 @@ weapons.post(
     const { weaponId, refinementLevel } = c.get('validatedBody');
 
     const weapon = await Weapons.create(userId, requireWeaponId(weaponId), refinementLevel);
-    const baseUrl = new URL(c.req.url).origin;
+    const baseUrl = publicUrl(c).origin;
 
     return negotiatedJson(c, weaponListDocument([weapon], baseUrl), 201, {
       Location: weaponItemHref(baseUrl, weapon),
@@ -105,7 +106,7 @@ weapons.get('/:weaponInstanceId', async (c) => {
     throw new HTTPException(404, { message: 'Weapon instance not found' });
   }
 
-  const baseUrl = new URL(c.req.url).origin;
+  const baseUrl = publicUrl(c).origin;
 
   return negotiatedJson(c, weaponItemDocument(weapon, baseUrl));
 });
@@ -127,7 +128,7 @@ weapons.patch(
       throw new HTTPException(404, { message: 'Weapon instance not found' });
     }
 
-    const baseUrl = new URL(c.req.url).origin;
+    const baseUrl = publicUrl(c).origin;
 
     return negotiatedJson(c, weaponItemDocument(weapon, baseUrl));
   },

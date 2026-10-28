@@ -6,8 +6,10 @@ import type { Weapon } from '@genshin/game-data';
 import { getWeaponById } from '@genshin/game-data';
 import { useCallback, useEffect, useRef } from 'react';
 
-import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
+import { signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
+import type { UserDataLoad } from '@/features/auth/use-user-data-load';
+import { useUserDataLoad } from '@/features/auth/use-user-data-load';
 import { reportFailedWrite, rollBackFailedWrite } from '@/lib/roll-back-failed-write';
 import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
@@ -20,7 +22,7 @@ import {
 } from './use-weapon-collection-api';
 import { useWeaponCollectionStore } from './use-weapon-collection-store';
 
-export interface UseWeaponCollectionResult {
+export interface UseWeaponCollectionResult extends UserDataLoad {
   weapons: Record<CollectionWeaponId, CollectionWeapon>;
   isAuthenticated: boolean;
   /**
@@ -34,8 +36,6 @@ export interface UseWeaponCollectionResult {
   removeWeapon: (collectionWeaponId: CollectionWeaponId) => void;
   setRefinementLevel: (collectionWeaponId: CollectionWeaponId, level: RefinementLevel) => void;
   getWeaponsByWeaponId: (weaponId: Weapon['id']) => CollectionWeapon[];
-  isLoading: boolean;
-  error: Error | null;
 }
 
 type WeaponActions = Pick<
@@ -143,11 +143,9 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   const storeSetWeapons = useWeaponCollectionStore((s) => s.setWeapons);
   const storeAddWeapon = useWeaponCollectionStore((s) => s.addWeapon);
 
-  const {
-    data: apiWeapons,
-    error: queryError,
-    isLoading: queryLoading,
-  } = useWeaponCollectionQuery(uid);
+  const query = useWeaponCollectionQuery(uid);
+  const { data: apiWeapons } = query;
+  const load = useUserDataLoad(auth, query);
 
   const addWeaponApi = useSenderBoundMutate(uid, useAddWeaponMutation(uid).mutate);
   const removeWeaponApi = useSenderBoundMutate(uid, useRemoveWeaponMutation(uid).mutate);
@@ -224,14 +222,11 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     [weapons],
   );
 
-  const error = isAuthenticated ? (queryError ?? null) : null;
-
   return {
     weapons,
     isAuthenticated,
     ...actions,
     getWeaponsByWeaponId,
-    isLoading: awaitingUserData(auth, queryLoading),
-    error,
+    ...load,
   };
 }

@@ -349,6 +349,29 @@ describe('TeamsPage loading', () => {
 
     expect(await screen.findByRole('button', { name: 'Edit Abyss' })).toBeInTheDocument();
   });
+
+  it('reports a failed load in place of the teams, and recovers on retry', async () => {
+    server.use(
+      http.get('http://localhost:8080/teams', () => new HttpResponse(null, { status: 500 })),
+      http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
+      http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument([]))),
+    );
+    const user = userEvent.setup({ delay: null });
+
+    renderTeamsPage(createWrapper({ user: fakeUser('user-1') }));
+
+    expect(await screen.findByText('Failed to load your teams.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Edit / })).not.toBeInTheDocument();
+
+    server.use(
+      http.get('http://localhost:8080/teams', () =>
+        HttpResponse.json(teamsDocument([makeTeam(1, { name: 'Abyss' })])),
+      ),
+    );
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+
+    expect(await screen.findByRole('button', { name: 'Edit Abyss' })).toBeInTheDocument();
+  });
 });
 
 describe('TeamsPage empty collection', () => {

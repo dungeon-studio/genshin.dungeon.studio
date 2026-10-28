@@ -4,7 +4,7 @@
 import type { Character } from '@genshin/game-data';
 import type { JSX } from 'react';
 
-import { ThemedIcon } from '@/components/ui/themed-icon';
+import { ThemedIcon } from '@/components/icons/themed-icon';
 import { cn } from '@/lib/class-names';
 import { getElementIconPath } from '@/lib/elements';
 
@@ -22,8 +22,7 @@ export function CharacterSummary({
 }: CharacterSummaryProps): JSX.Element {
   const icon = character ? (
     <ThemedIcon
-      lightSrc={getElementIconPath(character.element, 'light')}
-      darkSrc={getElementIconPath(character.element, 'dark')}
+      iconPath={(variant) => getElementIconPath(character.element, variant)}
       alt={character.element}
       loading="lazy"
       decoding="async"

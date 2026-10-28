@@ -55,6 +55,25 @@ describe('useCollection sync', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     await waitFor(() => expect(result.current.isOwned(SKIRK)).toBe(false));
   });
+
+  it('keeps a loaded collection when a later refetch fails', async () => {
+    server.use(
+      http.get('http://localhost:8080/characters', () =>
+        HttpResponse.json(charactersDocument([makeCharacter(SKIRK)])),
+      ),
+    );
+    const { result, queryClient } = renderHookSignedIn(() => useCollection(), 'user-1');
+    await waitFor(() => expect(result.current.isOwned(SKIRK)).toBe(true));
+
+    server.use(
+      http.get('http://localhost:8080/characters', () => new HttpResponse(null, { status: 500 })),
+    );
+    await act(() => queryClient.invalidateQueries());
+
+    await waitFor(() => expect(result.current.error).not.toBeNull());
+    expect(result.current.loadFailed).toBe(false);
+    expect(result.current.isOwned(SKIRK)).toBe(true);
+  });
 });
 
 describe('useCollection mutations', () => {

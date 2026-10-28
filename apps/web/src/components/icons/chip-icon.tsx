@@ -3,10 +3,10 @@
 
 import type { JSX } from 'react';
 
-import { ThemedIcon } from '@/components/ui/themed-icon';
+import { type IconVariant, ThemedIcon } from '@/components/icons/themed-icon';
 
 interface ChipIconProps {
-  iconPath: (variant: 'light' | 'dark') => string;
+  iconPath: (variant: IconVariant) => string;
   onFill: boolean;
 }
 
@@ -21,9 +21,7 @@ export function ChipIcon({ iconPath, onFill }: ChipIconProps): JSX.Element {
     return <GlyphIcon src={iconPath('light')} />;
   }
 
-  return (
-    <ThemedIcon lightSrc={iconPath('light')} darkSrc={iconPath('dark')} alt="" className={SIZE} />
-  );
+  return <ThemedIcon iconPath={iconPath} alt="" className={SIZE} />;
 }
 
 /** Paints an icon's silhouette in the current text color. */
