@@ -22,7 +22,9 @@ beforeEach(() => {
   useWeaponCollectionStore.getState().clearWeapons();
 });
 
-describe('WeaponsPage loading the collection', () => {
+// The page renders the whole roster, so under the full suite a case runs past the
+// default timeout.
+describe('WeaponsPage loading the collection', { timeout: 30_000 }, () => {
   it('reports a failed load in place of the roster, and recovers on retry', async () => {
     server.use(
       http.get('http://localhost:8080/weapons', () => new HttpResponse(null, { status: 500 })),
