@@ -239,6 +239,25 @@ jobs:
             exit 1
           }
 
+      # Cloud Run terminates TLS, so the service sees every request as http
+      # and only X-Forwarded-Proto carries the client's scheme. A link that
+      # loses it is blocked as mixed content on the https site, and a
+      # collection's next page never loads. The schema route stamps $id from
+      # the origin every link uses, and answers without a token.
+      - name: Verify Public Links
+        env:
+          SERVICE_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          id=$(curl -fsSL "$SERVICE_URL/profiles/json-schema/characters/put-request-v1.json" \
+            | jq -r '."$id"')
+          case "$id" in
+            "$SERVICE_URL"/*) ;;
+            *)
+              echo "expected a link under $SERVICE_URL, got '${id:-<none>}'" >&2
+              exit 1
+              ;;
+          esac
+
       - uses: ./.github/actions/setup-node-pnpm
 
       - name: Generate Verify Token
