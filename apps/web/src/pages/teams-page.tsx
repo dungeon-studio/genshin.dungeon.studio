@@ -145,7 +145,7 @@ function useMemberEditor(
 type MemberEditor = ReturnType<typeof useMemberEditor>;
 
 export function TeamsPage(): JSX.Element {
-  // Called here rather than in `TeamBuilder`, so all three requests start together.
+  // `TeamBuilder` mounts only after teams load, so the collection requests start here.
   const planner = useTeams();
   const collection = useCollection();
   const weaponCollection = useWeaponCollection();
@@ -164,7 +164,7 @@ interface TeamBuilderProps {
   weaponCollection: UseWeaponCollectionResult;
 }
 
-/** The four teams and the sheet that edits them, mounted only once the saved teams are in. */
+/** The four teams and the sheet that edits them, mounted only once the saved teams load. */
 function TeamBuilder({ planner, collection, weaponCollection }: TeamBuilderProps): JSX.Element {
   const { characters, getCharacter, isLoading: collectionLoading } = collection;
   const { weapons } = weaponCollection;

@@ -9,7 +9,7 @@ import { Container } from '@/components/chrome/container';
 interface LoadingPageProps {
   /** The page's `h1`, kept for screen readers while the content loads. */
   title: string;
-  /** What's loading, announced in place of the spinner. */
+  /** What's loading, as a screen reader announces it. */
   label: string;
 }
 
