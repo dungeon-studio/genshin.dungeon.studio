@@ -8,10 +8,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { Container } from '@/components/chrome/container';
+import { LoadFailedPage } from '@/components/chrome/load-failed-page';
 import { LoadingPage } from '@/components/chrome/loading-page';
 import { promptSignIn } from '@/features/auth';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
+import type { UseWeaponCollectionResult } from '@/features/collection/weapons/use-weapon-collection';
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
 import {
   groupByWeapon,
@@ -33,6 +35,23 @@ function filtersFromSearchParams(searchParams: URLSearchParams): WeaponFilterSta
 }
 
 export function WeaponsPage(): JSX.Element {
+  const collection = useWeaponCollection();
+
+  if (collection.isLoading) return <LoadingPage title="Weapons" label="Loading collection" />;
+  if (collection.loadFailed) {
+    return (
+      <LoadFailedPage
+        title="Weapons"
+        message="Failed to load your weapon collection."
+        onRetry={collection.retry}
+      />
+    );
+  }
+
+  return <WeaponRoster collection={collection} />;
+}
+
+function WeaponRoster({ collection }: { collection: UseWeaponCollectionResult }): JSX.Element {
   const {
     weapons,
     isAuthenticated,
@@ -41,9 +60,8 @@ export function WeaponsPage(): JSX.Element {
     removeWeapon,
     setRefinementLevel,
     getWeaponsByWeaponId,
-    isLoading,
     error,
-  } = useWeaponCollection();
+  } = collection;
 
   const [searchParams] = useSearchParams();
 
@@ -88,8 +106,6 @@ export function WeaponsPage(): JSX.Element {
     },
     [selectedWeaponId, isAuthenticated, ensureWeapon],
   );
-
-  if (isLoading) return <LoadingPage title="Weapons" label="Loading collection" />;
 
   return (
     <>

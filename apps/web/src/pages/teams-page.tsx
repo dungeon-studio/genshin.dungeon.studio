@@ -9,6 +9,7 @@ import type { JSX, ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
 import { Container } from '@/components/chrome/container';
+import { LoadFailedPage } from '@/components/chrome/load-failed-page';
 import { LoadingPage } from '@/components/chrome/loading-page';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
@@ -152,7 +153,11 @@ export function TeamsPage(): JSX.Element {
 
   // Every edit saves the whole team, so one made to a default slot erases the saved one.
   if (planner.isLoading) return <LoadingPage title="Teams" label="Loading teams" />;
-  if (planner.error) return <TeamsLoadFailed onRetry={planner.retry} />;
+  if (planner.error) {
+    return (
+      <LoadFailedPage title="Teams" message="Failed to load your teams." onRetry={planner.retry} />
+    );
+  }
 
   return (
     <TeamBuilder planner={planner} collection={collection} weaponCollection={weaponCollection} />
@@ -271,20 +276,6 @@ function TeamBuilder({ planner, collection, weaponCollection }: TeamBuilderProps
           )}
         </SheetContent>
       </Sheet>
-    </Container>
-  );
-}
-
-function TeamsLoadFailed({ onRetry }: { onRetry: () => void }): JSX.Element {
-  return (
-    <Container className="py-12">
-      <h1 className="sr-only">Teams</h1>
-      <div className="gap-4 py-24 flex flex-col items-center text-center">
-        <p className="text-sm text-destructive">Failed to load your teams.</p>
-        <Button variant="outline" onClick={onRetry}>
-          Retry
-        </Button>
-      </div>
     </Container>
   );
 }

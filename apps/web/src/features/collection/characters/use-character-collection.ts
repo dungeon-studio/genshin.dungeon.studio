@@ -6,8 +6,10 @@ import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 
-import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
+import { signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
+import type { UserDataLoad } from '@/features/auth/use-user-data-load';
+import { useUserDataLoad } from '@/features/auth/use-user-data-load';
 import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
 import type { MutationResult } from './use-character-collection-api';
@@ -20,7 +22,7 @@ import {
 import type { CharacterCollection } from './use-character-collection-store';
 import { useCollectionStore } from './use-character-collection-store';
 
-export interface UseCollectionResult {
+export interface UseCollectionResult extends UserDataLoad {
   characters: CharacterCollection;
   isAuthenticated: boolean;
   addCharacter: (characterId: CharacterId) => void;
@@ -28,8 +30,6 @@ export interface UseCollectionResult {
   setConstellationLevel: (characterId: CharacterId, level: ConstellationLevel) => void;
   isOwned: (characterId: CharacterId) => boolean;
   getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
-  isLoading: boolean;
-  error: Error | null;
 }
 
 type CollectionActions = Pick<
@@ -152,11 +152,9 @@ export function useCollection(): UseCollectionResult {
   const storeReplaceCharacter = useCollectionStore((s) => s.replaceCharacter);
   const storeReplaceCharacters = useCollectionStore((s) => s.replaceCharacters);
 
-  const {
-    data: apiCharacters,
-    error: queryError,
-    isLoading: queryLoading,
-  } = useCharacterCollectionQuery(uid);
+  const query = useCharacterCollectionQuery(uid);
+  const { data: apiCharacters } = query;
+  const load = useUserDataLoad(auth, query);
 
   const addCharacterApi = useSenderBoundMutate(uid, useAddCharacterMutation(uid).mutate);
   const removeCharacterApi = useSenderBoundMutate(uid, useRemoveCharacterMutation(uid).mutate);
@@ -186,15 +184,12 @@ export function useCollection(): UseCollectionResult {
   const isOwned = useCallback((id: CharacterId) => id in characters, [characters]);
   const getCharacter = useCallback((id: CharacterId) => characters[id], [characters]);
 
-  const error = isAuthenticated ? (queryError ?? null) : null;
-
   return {
     characters,
     isAuthenticated,
     ...actions,
     isOwned,
     getCharacter,
-    isLoading: awaitingUserData(auth, queryLoading),
-    error,
+    ...load,
   };
 }
