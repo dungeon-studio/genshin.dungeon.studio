@@ -3,11 +3,12 @@
 
 import type { ArtifactPlan, CollectionTeam, CollectionWeaponId, TeamSlot } from '@genshin/domain';
 import { initialTeams } from '@genshin/domain';
+import { getCharacterById } from '@genshin/game-data';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { toast } from 'sonner';
 
 import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
+import { rollBackFailedWrite } from '@/lib/roll-back-failed-write';
 
 import { useSaveTeamMutation, useTeamsQuery, useTeamWritePending } from './use-team-api';
 import { useTeamStore } from './use-team-store';
@@ -78,6 +79,28 @@ type TeamActions = Pick<
 
 type TeamStore = ReturnType<typeof useTeamStore.getState>;
 
+/** Who sat at a position, for a message about what a revert brought back. */
+function memberAt(team: CollectionTeam, memberIndex: number): string | undefined {
+  const member = team.members[memberIndex];
+  if (!member) return undefined;
+  return getCharacterById(member.characterId)?.name ?? member.characterId;
+}
+
+function restoredPosition(previous: CollectionTeam, memberIndex: number): string {
+  const who = memberAt(previous, memberIndex);
+  const position = memberIndex + 1;
+  return who ? `${who} is back in position ${position}.` : `Position ${position} is empty again.`;
+}
+
+function restoredMemberDetail(
+  previous: CollectionTeam,
+  memberIndex: number,
+  detail: string,
+): string {
+  const who = memberAt(previous, memberIndex) ?? `Position ${memberIndex + 1}`;
+  return `${who}'s ${detail} is back to how it was.`;
+}
+
 function useTeamActions(
   isAuthenticated: boolean,
   saveTeamApi: ReturnType<typeof useSaveTeamMutation>['mutateAsync'],
@@ -86,7 +109,10 @@ function useTeamActions(
     const store = () => useTeamStore.getState();
 
     const editThenSave =
-      <Args extends unknown[]>(action: (s: TeamStore) => (slot: TeamSlot, ...args: Args) => void) =>
+      <Args extends unknown[]>(
+        action: (s: TeamStore) => (slot: TeamSlot, ...args: Args) => void,
+        describeRevert: (previous: CollectionTeam, args: Args) => string,
+      ) =>
       (slot: TeamSlot, ...args: Args) => {
         const previousTeam = { ...store().teams[slot] };
         action(store())(slot, ...args);
@@ -95,23 +121,44 @@ function useTeamActions(
         // Each request needs its own promise: `mutate`'s per-call `onError` fires
         // only for the latest call.
         saveTeamApi(optimisticTeam).catch(() => {
-          if (store().teams[slot] !== optimisticTeam) {
-            toast.error('Failed to save team.');
-            return;
-          }
-          store().setTeam(slot, previousTeam);
-          toast.error('Failed to save team. Change has been reverted.');
+          rollBackFailedWrite({
+            isStillShown: () => store().teams[slot] === optimisticTeam,
+            revert: () => store().setTeam(slot, previousTeam),
+            failure: `Couldn't save ${previousTeam.name}.`,
+            reverted: describeRevert(previousTeam, args),
+          });
         });
       };
 
     return {
-      assignCharacter: editThenSave((s) => s.assignCharacter),
-      removeCharacter: editThenSave((s) => s.removeCharacter),
-      assignWeapon: editThenSave((s) => s.assignWeapon),
-      removeWeapon: editThenSave((s) => s.removeWeapon),
-      setArtifactPlan: editThenSave((s) => s.setArtifactPlan),
-      setTeamName: editThenSave((s) => s.setTeamName),
-      clearTeam: editThenSave((s) => s.clearTeam),
+      assignCharacter: editThenSave(
+        (s) => s.assignCharacter,
+        (previous, [memberIndex]) => restoredPosition(previous, memberIndex),
+      ),
+      removeCharacter: editThenSave(
+        (s) => s.removeCharacter,
+        (previous, [memberIndex]) => restoredPosition(previous, memberIndex),
+      ),
+      assignWeapon: editThenSave(
+        (s) => s.assignWeapon,
+        (previous, [memberIndex]) => restoredMemberDetail(previous, memberIndex, 'weapon'),
+      ),
+      removeWeapon: editThenSave(
+        (s) => s.removeWeapon,
+        (previous, [memberIndex]) => restoredMemberDetail(previous, memberIndex, 'weapon'),
+      ),
+      setArtifactPlan: editThenSave(
+        (s) => s.setArtifactPlan,
+        (previous, [memberIndex]) => restoredMemberDetail(previous, memberIndex, 'artifact plan'),
+      ),
+      setTeamName: editThenSave(
+        (s) => s.setTeamName,
+        (previous) => `The team is named ${previous.name} again.`,
+      ),
+      clearTeam: editThenSave(
+        (s) => s.clearTeam,
+        () => 'Its members are back.',
+      ),
     };
   }, [isAuthenticated, saveTeamApi]);
 }

@@ -3,11 +3,12 @@
 
 import type { CharacterId, CollectionCharacter, ConstellationLevel } from '@genshin/domain';
 import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
+import { getCharacterById } from '@genshin/game-data';
 import { useCallback, useEffect } from 'react';
-import { toast } from 'sonner';
 
 import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
+import { rollBackFailedWrite } from '@/lib/roll-back-failed-write';
 import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
 import type { MutationResult } from './use-character-collection-api';
@@ -36,6 +37,10 @@ type CollectionActions = Pick<
   UseCollectionResult,
   'addCharacter' | 'removeCharacter' | 'setConstellationLevel'
 >;
+
+function characterName(id: CharacterId): string {
+  return getCharacterById(id)?.name ?? id;
+}
 
 const SIGNED_OUT_ACTIONS: CollectionActions = {
   addCharacter: () => {},
@@ -72,13 +77,15 @@ function useOptimisticActions(
       addCharacterApi(id, {
         onSuccess: applyMutationResult,
         onError: () => {
-          const current = useCollectionStore.getState().characters[id];
-          if (current?.constellationLevel === MIN_CONSTELLATION_LEVEL) {
-            storeRemoveCharacter(id);
-            toast.error('Failed to add character. Change has been reverted.');
-          } else {
-            toast.error('Failed to add character.');
-          }
+          const name = characterName(id);
+          rollBackFailedWrite({
+            isStillShown: () =>
+              useCollectionStore.getState().characters[id]?.constellationLevel ===
+              MIN_CONSTELLATION_LEVEL,
+            revert: () => storeRemoveCharacter(id),
+            failure: `Couldn't add ${name}.`,
+            reverted: `${name} is out of your collection again.`,
+          });
         },
       });
     },
@@ -93,14 +100,16 @@ function useOptimisticActions(
       storeRemoveCharacter(id);
       removeCharacterApi(id, {
         onError: () => {
-          const stillAbsent = !(id in useCollectionStore.getState().characters);
-          if (stillAbsent) {
-            storeAddCharacter(id);
-            storeSetConstellationLevel(id, current.constellationLevel);
-            toast.error('Failed to remove character. Change has been reverted.');
-          } else {
-            toast.error('Failed to remove character.');
-          }
+          const name = characterName(id);
+          rollBackFailedWrite({
+            isStillShown: () => !(id in useCollectionStore.getState().characters),
+            revert: () => {
+              storeAddCharacter(id);
+              storeSetConstellationLevel(id, current.constellationLevel);
+            },
+            failure: `Couldn't remove ${name}.`,
+            reverted: `${name} is back in your collection.`,
+          });
         },
       });
     },
@@ -118,13 +127,14 @@ function useOptimisticActions(
         {
           onSuccess: applyMutationResult,
           onError: () => {
-            const currentLevel = useCollectionStore.getState().characters[id]?.constellationLevel;
-            if (currentLevel === level) {
-              storeSetConstellationLevel(id, previousLevel);
-              toast.error('Failed to update constellation level. Change has been reverted.');
-            } else {
-              toast.error('Failed to update constellation level.');
-            }
+            const name = characterName(id);
+            rollBackFailedWrite({
+              isStillShown: () =>
+                useCollectionStore.getState().characters[id]?.constellationLevel === level,
+              revert: () => storeSetConstellationLevel(id, previousLevel),
+              failure: `Couldn't set ${name} to constellation level ${level}.`,
+              reverted: `${name} is back at constellation level ${previousLevel}.`,
+            });
           },
         },
       );

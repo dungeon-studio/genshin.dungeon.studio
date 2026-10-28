@@ -190,7 +190,9 @@ describe('useWeaponCollection', () => {
       // Optimistically gone, then restored once the delete errors.
       expect(result.current.weapons[INSTANCE_ID]).toBeUndefined();
       await waitFor(() => expect(result.current.weapons[INSTANCE_ID]).toBeDefined());
-      expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+      expect(toast.error).toHaveBeenCalledWith(
+        "Couldn't remove Angelos' Heptades. Angelos' Heptades is back in your collection. Try again.",
+      );
     });
   });
 
@@ -217,7 +219,9 @@ describe('useWeaponCollection', () => {
 
       expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(5);
       await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(2));
-      expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+      expect(toast.error).toHaveBeenCalledWith(
+        "Couldn't set Angelos' Heptades to refinement rank 5. Angelos' Heptades is back at refinement rank 2. Try again.",
+      );
     });
 
     it('keeps a change that a refetch started before it would overwrite', async () => {
