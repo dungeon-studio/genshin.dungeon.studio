@@ -4,7 +4,7 @@
 import type { Weapon, WeaponType } from '@genshin/game-data';
 import type { JSX } from 'react';
 
-import { ThemedIcon } from '@/components/ui/themed-icon';
+import { ThemedIcon } from '@/components/icons/themed-icon';
 import { cn } from '@/lib/class-names';
 import { getWeaponTypeIconPath } from '@/lib/weapon-types';
 

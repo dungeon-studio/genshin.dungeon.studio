@@ -3,7 +3,7 @@
 
 import type { JSX } from 'react';
 
-import { ThemedIcon } from '@/components/ui/themed-icon';
+import { ThemedIcon } from '@/components/icons/themed-icon';
 
 interface ChipIconProps {
   iconPath: (variant: 'light' | 'dark') => string;
