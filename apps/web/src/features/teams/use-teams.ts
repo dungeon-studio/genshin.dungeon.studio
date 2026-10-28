@@ -34,6 +34,8 @@ export interface UseTeamsResult {
   isSaving: boolean;
   isLoading: boolean;
   error: Error | null;
+  /** Requests the teams again after a failed load; `isLoading` is true while the request runs. */
+  retry: () => void;
 }
 
 function collectionTeamsToStore(apiTeams: CollectionTeam[]): Record<TeamSlot, CollectionTeam> {
@@ -142,6 +144,7 @@ export function useTeams(): UseTeamsResult {
     dataUpdatedAt,
     error: queryError,
     isLoading: queryLoading,
+    refetch,
   } = useTeamsQuery(uid);
   const isWritePending = useTeamWritePending(uid);
 
@@ -160,6 +163,10 @@ export function useTeams(): UseTeamsResult {
 
   const getTeam = useCallback((slot: TeamSlot) => teams[slot], [teams]);
 
+  const retry = useCallback(() => {
+    void refetch();
+  }, [refetch]);
+
   return {
     teams,
     ...actions,
@@ -167,5 +174,6 @@ export function useTeams(): UseTeamsResult {
     isSaving,
     isLoading: awaitingUserData(auth, queryLoading),
     error: isAuthenticated ? (queryError ?? null) : null,
+    retry,
   };
 }

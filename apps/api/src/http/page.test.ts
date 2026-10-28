@@ -25,13 +25,13 @@ async function parse(query: string): Promise<PageRequest | number> {
   return res.ok ? ((await res.json()) as PageRequest) : res.status;
 }
 
-async function linksFor(query: string, page: Page<unknown>) {
+async function linksFor(query: string, page: Page<unknown>, headers: Record<string, string> = {}) {
   const app = new Hono();
   app.get('/items', (c) =>
     c.json(linkNextPage(c, page, buildCollection(BASE, [])).collection.links ?? []),
   );
 
-  const res = await app.request(`${BASE}${query}`);
+  const res = await app.request(`${BASE}${query}`, { headers });
 
   return res.json();
 }
@@ -92,5 +92,15 @@ describe('linkNextPage', () => {
     expect(url.searchParams.get('weaponId')).toBe('x');
     expect(url.searchParams.get('limit')).toBe('2');
     expect(url.searchParams.get('cursor')).not.toBe('old');
+  });
+
+  it('links over https when a proxy terminated TLS in front of the request', async () => {
+    const [link] = (await linksFor(
+      '',
+      { items: [], next: 'doc-42' },
+      { 'X-Forwarded-Proto': 'https' },
+    )) as [{ href: string }];
+
+    expect(new URL(link.href).protocol).toBe('https:');
   });
 });

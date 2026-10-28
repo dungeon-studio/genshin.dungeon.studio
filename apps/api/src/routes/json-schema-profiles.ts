@@ -3,6 +3,7 @@
 
 import { Hono } from 'hono';
 
+import { publicUrl } from '@/http/public-url.js';
 import { jsonSchemaRegistry } from '@/profiles/json-schema/registry.js';
 
 /**
@@ -20,7 +21,7 @@ for (const entry of jsonSchemaRegistry) {
   const routePath = entry.path.replace(/^\/profiles\/json-schema/, '');
 
   jsonSchemaProfiles.get(routePath, (c) => {
-    const origin = new URL(c.req.url).origin;
+    const origin = publicUrl(c).origin;
 
     return c.json({ ...entry.schema, $id: `${origin}${entry.path}` }, 200, {
       'Content-Type': 'application/schema+json',
