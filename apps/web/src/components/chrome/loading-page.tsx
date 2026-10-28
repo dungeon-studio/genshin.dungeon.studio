@@ -7,13 +7,13 @@ import type { JSX } from 'react';
 import { Container } from '@/components/chrome/container';
 
 interface LoadingPageProps {
-  /** The page's heading, kept for screen readers while the content loads. */
+  /** The page heading, visible only to screen readers. */
   title: string;
-  /** What's loading, announced in place of the spinner. */
+  /** Screen-reader text naming what's loading. */
   label: string;
 }
 
-/** A whole page's stand-in while the data it renders loads. */
+/** Renders its own container and heading, so a page returns it in place of its content. */
 function LoadingPage({ title, label }: LoadingPageProps): JSX.Element {
   return (
     <Container className="py-12">

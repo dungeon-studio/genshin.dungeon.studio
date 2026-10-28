@@ -28,7 +28,7 @@ single `### Added` bucket in `[Unreleased]`.
 - Responsive team editing sheet for small screens.
 - Phone-width layout for the header and team slots.
 - Team persistence so compositions survive across sessions.
-- Loading indicator on the team builder while saved teams load, and a retry when they fail to load.
+- Loading indicator on the team builder, and a retry when saved teams fail to load.
 - Collections saved to your account, with a sign-in prompt when managing one signed out.
 - Google sign-in and sign-out from the site header.
 - Dark mode support.
