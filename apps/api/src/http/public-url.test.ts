@@ -6,12 +6,10 @@ import { describe, expect, it } from 'vitest';
 
 import { publicUrl } from './public-url.js';
 
-async function protocolFor(url: string, forwardedProto?: string): Promise<string> {
+async function protocolFor(url: string, headers: Record<string, string> = {}): Promise<string> {
   const app = new Hono();
   app.get('*', (c) => c.text(publicUrl(c).protocol));
 
-  const headers: Record<string, string> =
-    forwardedProto === undefined ? {} : { 'X-Forwarded-Proto': forwardedProto };
   const res = await app.request(url, { headers });
 
   return res.text();
@@ -23,10 +21,14 @@ describe('publicUrl', () => {
   });
 
   it('takes the first hop of a forwarded scheme list', async () => {
-    expect(await protocolFor('http://localhost/x', 'https, http')).toBe('https:');
+    expect(await protocolFor('http://localhost/x', { 'X-Forwarded-Proto': 'https, http' })).toBe(
+      'https:',
+    );
   });
 
   it('never downgrades an https request', async () => {
-    expect(await protocolFor('https://localhost/x', 'http')).toBe('https:');
+    expect(await protocolFor('https://localhost/x', { 'X-Forwarded-Proto': 'http' })).toBe(
+      'https:',
+    );
   });
 });
