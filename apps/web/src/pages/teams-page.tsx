@@ -141,7 +141,20 @@ function useMemberEditor(
 
 type MemberEditor = ReturnType<typeof useMemberEditor>;
 
+/**
+ * Withholds the planner until the user's teams arrive: the store's defaults would
+ * read as a user with no teams.
+ */
 export function TeamsPage(): JSX.Element {
+  const teamsState = useTeams();
+  const { isLoading, error, retry } = teamsState;
+
+  if (isLoading) return <LoadingTeams />;
+  if (error) return <TeamsLoadFailed onRetry={retry} />;
+  return <LoadedTeamsPage teamsState={teamsState} />;
+}
+
+function LoadedTeamsPage({ teamsState }: { teamsState: UseTeamsResult }): JSX.Element {
   const { characters, getCharacter, isLoading: collectionLoading } = useCollection();
   const { weapons } = useWeaponCollection();
 
@@ -162,10 +175,7 @@ export function TeamsPage(): JSX.Element {
     assignWeapon,
     removeWeapon,
     setArtifactPlan,
-    isLoading: teamsLoading,
-    error: teamsError,
-    retry: retryTeams,
-  } = useTeams();
+  } = teamsState;
 
   const [activeTab, setActiveTab] = useState<SheetTab>('characters');
   const editor = useMemberEditor(weapons, teams, {
@@ -176,9 +186,6 @@ export function TeamsPage(): JSX.Element {
   });
   const { selectedSlot, selectedMemberIndex } = editor;
   const selectedTeam = selectedSlot !== null ? teams[selectedSlot] : null;
-
-  if (teamsLoading) return <LoadingTeams />;
-  if (teamsError) return <TeamsLoadFailed onRetry={retryTeams} />;
 
   return (
     <Container className="py-12">
@@ -231,7 +238,14 @@ export function TeamsPage(): JSX.Element {
                 />
               </SheetHeader>
 
-              <TeamEditorTabs activeTab={activeTab} onSelect={setActiveTab} />
+              <nav className="mt-4 gap-4 flex border-b border-border" aria-label="Team editor tabs">
+                <TabButton tab="characters" activeTab={activeTab} onSelect={setActiveTab}>
+                  Characters
+                </TabButton>
+                <TabButton tab="weapons" activeTab={activeTab} onSelect={setActiveTab}>
+                  Weapons
+                </TabButton>
+              </nav>
 
               <div className="mt-3 min-h-0 gap-3 flex flex-1 flex-col">
                 <TeamEditorPanel
@@ -249,10 +263,6 @@ export function TeamsPage(): JSX.Element {
   );
 }
 
-/**
- * Stands in for the planner until the user's teams arrive: the store's defaults
- * would read as a user with no teams.
- */
 function LoadingTeams(): JSX.Element {
   return (
     <Container className="py-12">
@@ -297,25 +307,6 @@ function EmptyCollectionPrompt(): JSX.Element {
       action="Go to Characters"
       className="mb-8 rounded-lg border border-border"
     />
-  );
-}
-
-function TeamEditorTabs({
-  activeTab,
-  onSelect,
-}: {
-  activeTab: SheetTab;
-  onSelect: (tab: SheetTab) => void;
-}): JSX.Element {
-  return (
-    <nav className="mt-4 gap-4 flex border-b border-border" aria-label="Team editor tabs">
-      <TabButton tab="characters" activeTab={activeTab} onSelect={onSelect}>
-        Characters
-      </TabButton>
-      <TabButton tab="weapons" activeTab={activeTab} onSelect={onSelect}>
-        Weapons
-      </TabButton>
-    </nav>
   );
 }
 
