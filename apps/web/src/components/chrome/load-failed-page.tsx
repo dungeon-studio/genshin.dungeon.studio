@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 interface LoadFailedPageProps {
   /** The page's `h1`, kept for screen readers in place of the content. */
   title: string;
-  /** What failed to load, in the user's terms. */
+  /** The sentence shown, naming what failed in the user's terms. */
   message: string;
   onRetry: () => void;
 }

@@ -7,14 +7,14 @@ import { useCallback } from 'react';
 import type { AuthState } from './auth-context';
 import { awaitingUserData } from './auth-state';
 
-/** Where a per-user query stands, for a view that gates on it. */
+/** Where a per-user query stands. */
 export interface UserDataLoad {
   isLoading: boolean;
   /** The query's latest failure; always `null` signed out. */
   error: Error | null;
   /** The first load failed, so there's no data to show. */
   loadFailed: boolean;
-  /** Refetches after a failed load; `isLoading` is true again while it runs. */
+  /** `isLoading` is true again while a retry runs. */
   retry: () => void;
 }
 
