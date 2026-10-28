@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import { AuthErrorCodes, GoogleAuthProvider, signInWithPopup } from '@firebase/auth';
-import { toast } from 'sonner';
 
 import { auth } from '@/lib/firebase';
 
-import { AUTH_TOAST_DURATION_MS } from './auth-toast';
+import { toastRetryableFailure } from './auth-toast';
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -48,9 +47,6 @@ export async function signInWithGoogle(): Promise<void> {
     if (code !== undefined && DISMISSALS.has(code)) return;
 
     console.error('Sign-in failed:', error);
-    toast.error(describeFailure(code), {
-      action: { label: 'Try again', onClick: () => void signInWithGoogle() },
-      duration: AUTH_TOAST_DURATION_MS,
-    });
+    toastRetryableFailure(describeFailure(code), signInWithGoogle);
   }
 }

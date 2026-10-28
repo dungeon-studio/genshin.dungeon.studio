@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import { signOut as endFirebaseSession } from '@firebase/auth';
-import { toast } from 'sonner';
 
 import { auth } from '@/lib/firebase';
 
-import { AUTH_TOAST_DURATION_MS } from './auth-toast';
+import { toastRetryableFailure } from './auth-toast';
 
 /**
  * Ends the Firebase session.
@@ -20,9 +19,6 @@ export async function signOut(): Promise<void> {
     await endFirebaseSession(auth);
   } catch (error) {
     console.error('Sign-out failed:', error);
-    toast.error('Could not sign you out. You are still signed in; try again.', {
-      action: { label: 'Try again', onClick: () => void signOut() },
-      duration: AUTH_TOAST_DURATION_MS,
-    });
+    toastRetryableFailure('Could not sign you out. You are still signed in; try again.', signOut);
   }
 }

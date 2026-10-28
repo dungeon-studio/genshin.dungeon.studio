@@ -3,9 +3,10 @@
 
 import type * as FirebaseAuth from '@firebase/auth';
 import { AuthErrorCodes, signInWithPopup } from '@firebase/auth';
-import type { MouseEvent as ReactMouseEvent } from 'react';
 import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { clickErrorToastAction } from '@/test/toast';
 
 import { signInWithGoogle } from './sign-in';
 
@@ -18,15 +19,6 @@ vi.mock('@firebase/auth', async (importOriginal) => ({
 const failsWith = (code: string) => {
   vi.mocked(signInWithPopup).mockRejectedValueOnce(Object.assign(new Error(code), { code }));
 };
-
-/** Clicks the action button on the most recent error toast. */
-function clickToastAction(): void {
-  const action = vi.mocked(toast.error).mock.lastCall?.[1]?.action;
-  if (typeof action !== 'object' || action === null || !('onClick' in action)) {
-    throw new Error('The error toast carries no action');
-  }
-  action.onClick(new MouseEvent('click') as unknown as ReactMouseEvent<HTMLButtonElement>);
-}
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -83,7 +75,7 @@ describe('signInWithGoogle', () => {
     failsWith(AuthErrorCodes.POPUP_BLOCKED);
     await signInWithGoogle();
 
-    clickToastAction();
+    clickErrorToastAction();
 
     expect(signInWithPopup).toHaveBeenCalledTimes(2);
   });
