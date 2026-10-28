@@ -262,3 +262,24 @@ describe('useWeaponCollection', () => {
     });
   });
 });
+
+describe('useWeaponCollection loading', () => {
+  it('keeps a loaded collection when a later refetch fails', async () => {
+    server.use(
+      http.get('http://localhost:8080/weapons', () =>
+        HttpResponse.json(weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID)])),
+      ),
+    );
+    const { result, queryClient } = renderHookSignedIn(() => useWeaponCollection(), 'user-1');
+    await waitFor(() => expect(result.current.getWeaponsByWeaponId(WEAPON_ID)).toHaveLength(1));
+
+    server.use(
+      http.get('http://localhost:8080/weapons', () => new HttpResponse(null, { status: 500 })),
+    );
+    await act(() => queryClient.invalidateQueries());
+
+    await waitFor(() => expect(result.current.error).not.toBeNull());
+    expect(result.current.loadFailed).toBe(false);
+    expect(result.current.getWeaponsByWeaponId(WEAPON_ID)).toHaveLength(1);
+  });
+});

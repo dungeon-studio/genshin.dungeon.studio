@@ -35,6 +35,10 @@ export interface UseWeaponCollectionResult {
   getWeaponsByWeaponId: (weaponId: Weapon['id']) => CollectionWeapon[];
   isLoading: boolean;
   error: Error | null;
+  /** The first load failed, so there's no collection to show. */
+  loadFailed: boolean;
+  /** Refetches after a failed load; `isLoading` is true again while it runs. */
+  retry: () => void;
 }
 
 type WeaponActions = Pick<
@@ -140,6 +144,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     data: apiWeapons,
     error: queryError,
     isLoading: queryLoading,
+    refetch,
   } = useWeaponCollectionQuery(uid);
 
   const addWeaponApi = useSenderBoundMutate(uid, useAddWeaponMutation(uid).mutate);
@@ -219,6 +224,10 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
 
   const error = isAuthenticated ? (queryError ?? null) : null;
 
+  const retry = useCallback(() => {
+    void refetch();
+  }, [refetch]);
+
   return {
     weapons,
     isAuthenticated,
@@ -226,5 +235,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     getWeaponsByWeaponId,
     isLoading: awaitingUserData(auth, queryLoading),
     error,
+    loadFailed: error !== null && apiWeapons === undefined,
+    retry,
   };
 }

@@ -8,6 +8,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { Container } from '@/components/chrome/container';
+import { LoadFailedPage } from '@/components/chrome/load-failed-page';
 import { LoadingPage } from '@/components/chrome/loading-page';
 import { promptSignIn } from '@/features/auth';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
@@ -20,6 +21,8 @@ import {
 import { WeaponCard } from '@/features/collection/weapons/weapon-card';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
 import { WeaponInstanceSidebar } from '@/features/collection/weapons/weapon-instance-sidebar';
+
+const LOAD_FAILED = 'Failed to load your weapon collection.';
 
 /** Preselects the weapon type a `?type=` query names, as in `/weapons?type=Sword`. */
 function filtersFromSearchParams(searchParams: URLSearchParams): WeaponFilterState {
@@ -43,6 +46,8 @@ export function WeaponsPage(): JSX.Element {
     getWeaponsByWeaponId,
     isLoading,
     error,
+    loadFailed,
+    retry,
   } = useWeaponCollection();
 
   const [searchParams] = useSearchParams();
@@ -90,6 +95,7 @@ export function WeaponsPage(): JSX.Element {
   );
 
   if (isLoading) return <LoadingPage title="Weapons" label="Loading collection" />;
+  if (loadFailed) return <LoadFailedPage title="Weapons" message={LOAD_FAILED} onRetry={retry} />;
 
   return (
     <>

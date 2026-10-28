@@ -30,6 +30,10 @@ export interface UseCollectionResult {
   getCharacter: (characterId: CharacterId) => CollectionCharacter | undefined;
   isLoading: boolean;
   error: Error | null;
+  /** The first load failed, so there's no collection to show. */
+  loadFailed: boolean;
+  /** Refetches after a failed load; `isLoading` is true again while it runs. */
+  retry: () => void;
 }
 
 type CollectionActions = Pick<
@@ -156,6 +160,7 @@ export function useCollection(): UseCollectionResult {
     data: apiCharacters,
     error: queryError,
     isLoading: queryLoading,
+    refetch,
   } = useCharacterCollectionQuery(uid);
 
   const addCharacterApi = useSenderBoundMutate(uid, useAddCharacterMutation(uid).mutate);
@@ -188,6 +193,10 @@ export function useCollection(): UseCollectionResult {
 
   const error = isAuthenticated ? (queryError ?? null) : null;
 
+  const retry = useCallback(() => {
+    void refetch();
+  }, [refetch]);
+
   return {
     characters,
     isAuthenticated,
@@ -196,5 +205,7 @@ export function useCollection(): UseCollectionResult {
     getCharacter,
     isLoading: awaitingUserData(auth, queryLoading),
     error,
+    loadFailed: error !== null && apiCharacters === undefined,
+    retry,
   };
 }

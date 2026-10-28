@@ -7,6 +7,7 @@ import type { JSX } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
 import { Container } from '@/components/chrome/container';
+import { LoadFailedPage } from '@/components/chrome/load-failed-page';
 import { LoadingPage } from '@/components/chrome/loading-page';
 import { promptSignIn } from '@/features/auth';
 import { CharacterCard } from '@/features/collection/characters/character-card';
@@ -15,6 +16,8 @@ import type { CharacterFilterState } from '@/features/collection/characters/filt
 import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
 import { ownedCharacterIds } from '@/features/collection/characters/use-character-collection-store';
+
+const LOAD_FAILED = 'Failed to load your character collection.';
 
 export function CharactersPage(): JSX.Element {
   const {
@@ -26,6 +29,8 @@ export function CharactersPage(): JSX.Element {
     isOwned,
     isLoading,
     error,
+    loadFailed,
+    retry,
   } = useCollection();
 
   const [filters, setFilters] = useState<CharacterFilterState>(initialFilterState);
@@ -55,6 +60,8 @@ export function CharactersPage(): JSX.Element {
   );
 
   if (isLoading) return <LoadingPage title="Characters" label="Loading collection" />;
+  if (loadFailed)
+    return <LoadFailedPage title="Characters" message={LOAD_FAILED} onRetry={retry} />;
 
   return (
     <>
