@@ -3,11 +3,11 @@
 
 import type { Character } from '@genshin/game-data';
 import { CHARACTER_ROSTER } from '@genshin/game-data';
-import { Loader2 } from 'lucide-react';
 import type { JSX } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
 import { Container } from '@/components/chrome/container';
+import { LoadingPage } from '@/components/chrome/loading-page';
 import { promptSignIn } from '@/features/auth';
 import { CharacterCard } from '@/features/collection/characters/character-card';
 import { CharacterFilters } from '@/features/collection/characters/character-filters';
@@ -54,21 +54,7 @@ export function CharactersPage(): JSX.Element {
     [isAuthenticated, addCharacter],
   );
 
-  if (isLoading) {
-    return (
-      <Container className="py-12">
-        <h1 className="sr-only">Characters</h1>
-        <div className="py-24 flex items-center justify-center">
-          <Loader2
-            className="h-8 w-8 animate-spin text-muted-foreground"
-            aria-hidden="true"
-            focusable={false}
-          />
-          <span className="sr-only">Loading collection</span>
-        </div>
-      </Container>
-    );
-  }
+  if (isLoading) return <LoadingPage title="Characters" label="Loading collection" />;
 
   return (
     <>
