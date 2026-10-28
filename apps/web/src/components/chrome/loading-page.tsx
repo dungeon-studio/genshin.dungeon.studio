@@ -7,14 +7,14 @@ import type { JSX } from 'react';
 import { Container } from '@/components/chrome/container';
 
 interface LoadingPageProps {
-  /** The page heading, visible only to screen readers. */
+  /** The page's `h1`, kept for screen readers while the content loads. */
   title: string;
-  /** Screen-reader text naming what's loading. */
+  /** What's loading, as a screen reader announces it. */
   label: string;
 }
 
-/** Renders its own container and heading, so a page returns it in place of its content. */
-function LoadingPage({ title, label }: LoadingPageProps): JSX.Element {
+/** A page whose data hasn't loaded, shown in place of defaults a user would read as empty. */
+export function LoadingPage({ title, label }: LoadingPageProps): JSX.Element {
   return (
     <Container className="py-12">
       <h1 className="sr-only">{title}</h1>
@@ -29,5 +29,3 @@ function LoadingPage({ title, label }: LoadingPageProps): JSX.Element {
     </Container>
   );
 }
-
-export { LoadingPage };

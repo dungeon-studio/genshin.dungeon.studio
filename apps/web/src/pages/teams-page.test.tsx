@@ -323,6 +323,57 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   });
 });
 
+describe('TeamsPage loading', () => {
+  // An edit to a default slot would save over the user's team on the server.
+  it('offers no team to edit until the saved teams load', async () => {
+    const saved = makeTeam(1, {
+      name: 'Abyss',
+      members: [{ characterId: CLAYMORE_USER.id }, null, null, null],
+    });
+    const teams = holdResponse(() => HttpResponse.json(teamsDocument([saved])));
+    server.use(
+      http.get('http://localhost:8080/teams', teams.resolver),
+      http.get('http://localhost:8080/characters', () =>
+        HttpResponse.json(charactersDocument([makeCharacter(CLAYMORE_USER.id)])),
+      ),
+      http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument([]))),
+    );
+
+    renderTeamsPage(createWrapper({ user: fakeUser('user-1') }));
+    await teams.arrived;
+
+    expect(screen.getByText('Loading teams')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Edit / })).not.toBeInTheDocument();
+
+    teams.release();
+
+    expect(await screen.findByRole('button', { name: 'Edit Abyss' })).toBeInTheDocument();
+  });
+
+  it('reports a failed load in place of the teams, and recovers on retry', async () => {
+    server.use(
+      http.get('http://localhost:8080/teams', () => new HttpResponse(null, { status: 500 })),
+      http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
+      http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument([]))),
+    );
+    const user = userEvent.setup({ delay: null });
+
+    renderTeamsPage(createWrapper({ user: fakeUser('user-1') }));
+
+    expect(await screen.findByText('Failed to load your teams.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Edit / })).not.toBeInTheDocument();
+
+    server.use(
+      http.get('http://localhost:8080/teams', () =>
+        HttpResponse.json(teamsDocument([makeTeam(1, { name: 'Abyss' })])),
+      ),
+    );
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+
+    expect(await screen.findByRole('button', { name: 'Edit Abyss' })).toBeInTheDocument();
+  });
+});
+
 describe('TeamsPage empty collection', () => {
   // A collection belongs to an account, so the characters page can't fill one signed out.
   it('offers sign-in to a signed-out visitor', () => {
@@ -344,49 +395,5 @@ describe('TeamsPage empty collection', () => {
     seedCollections();
 
     expect(screen.queryByRole('button', { name: 'Sign in' })).not.toBeInTheDocument();
-  });
-});
-
-describe("TeamsPage loading the user's teams", () => {
-  const signedIn = () => createWrapper({ user: fakeUser('user-1') });
-
-  beforeEach(() => {
-    server.use(
-      http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
-      http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument([]))),
-    );
-  });
-
-  it('shows the load in progress rather than default teams', async () => {
-    const held = holdResponse(() => HttpResponse.json(teamsDocument([])));
-    server.use(http.get('http://localhost:8080/teams', held.resolver));
-
-    renderTeamsPage(signedIn());
-    await held.arrived;
-
-    expect(screen.getByText('Loading teams')).toBeInTheDocument();
-    expect(screen.queryAllByRole('button', { name: /No character/ })).toHaveLength(0);
-    held.release();
-  });
-
-  it('reports a failed load in place of the teams, and recovers on retry', async () => {
-    server.use(
-      http.get('http://localhost:8080/teams', () => new HttpResponse(null, { status: 500 })),
-    );
-    const user = userEvent.setup({ delay: null });
-
-    renderTeamsPage(signedIn());
-
-    expect(await screen.findByText('Failed to load your teams.')).toBeInTheDocument();
-    expect(screen.queryAllByRole('button', { name: /No character/ })).toHaveLength(0);
-
-    server.use(
-      http.get('http://localhost:8080/teams', () =>
-        HttpResponse.json(teamsDocument([makeTeam(1, { name: 'Abyss' })])),
-      ),
-    );
-    await user.click(screen.getByRole('button', { name: 'Retry' }));
-
-    expect(await screen.findByRole('region', { name: 'Abyss' })).toBeInTheDocument();
   });
 });
