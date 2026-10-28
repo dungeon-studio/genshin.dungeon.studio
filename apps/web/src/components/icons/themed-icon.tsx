@@ -12,7 +12,7 @@ interface ThemedIconProps extends Pick<
   'loading' | 'decoding' | 'width' | 'height'
 > {
   iconPath: (variant: IconVariant) => string;
-  /** An empty string marks the icon decorative, mirrored to `aria-hidden`. */
+  /** An empty string marks the icon decorative. */
   alt: string;
   /** Applied to both variants. */
   className?: string;
