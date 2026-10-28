@@ -6,13 +6,15 @@ import { initialTeams } from '@genshin/domain';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { toast } from 'sonner';
 
-import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
+import { signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
+import type { UserDataLoad } from '@/features/auth/use-user-data-load';
+import { useUserDataLoad } from '@/features/auth/use-user-data-load';
 
 import { useSaveTeamMutation, useTeamsQuery, useTeamWritePending } from './use-team-api';
 import { useTeamStore } from './use-team-store';
 
-export interface UseTeamsResult {
+export interface UseTeamsResult extends UserDataLoad {
   teams: Record<TeamSlot, CollectionTeam>;
   assignCharacter: (
     slot: TeamSlot,
@@ -32,10 +34,6 @@ export interface UseTeamsResult {
   setTeamName: (slot: TeamSlot, name: string) => void;
   getTeam: (slot: TeamSlot) => CollectionTeam;
   isSaving: boolean;
-  isLoading: boolean;
-  error: Error | null;
-  /** Requests the teams again after a failed load; `isLoading` is true while the request runs. */
-  retry: () => void;
 }
 
 function collectionTeamsToStore(apiTeams: CollectionTeam[]): Record<TeamSlot, CollectionTeam> {
@@ -139,13 +137,9 @@ export function useTeams(): UseTeamsResult {
   const teams = useTeamStore((s) => s.teams);
   const storeSetTeams = useTeamStore((s) => s.setTeams);
 
-  const {
-    data: apiTeams,
-    dataUpdatedAt,
-    error: queryError,
-    isLoading: queryLoading,
-    refetch,
-  } = useTeamsQuery(uid);
+  const query = useTeamsQuery(uid);
+  const { data: apiTeams, dataUpdatedAt } = query;
+  const load = useUserDataLoad(auth, query);
   const isWritePending = useTeamWritePending(uid);
 
   const { mutateAsync: saveTeamApi, isPending: isSaving } = useSaveTeamMutation(uid);
@@ -163,17 +157,11 @@ export function useTeams(): UseTeamsResult {
 
   const getTeam = useCallback((slot: TeamSlot) => teams[slot], [teams]);
 
-  const retry = useCallback(() => {
-    void refetch();
-  }, [refetch]);
-
   return {
     teams,
     ...actions,
     getTeam,
     isSaving,
-    isLoading: awaitingUserData(auth, queryLoading),
-    error: isAuthenticated ? (queryError ?? null) : null,
-    retry,
+    ...load,
   };
 }

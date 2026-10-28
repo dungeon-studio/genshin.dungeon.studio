@@ -6,8 +6,10 @@ import type { Weapon } from '@genshin/game-data';
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
-import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
+import { signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
+import type { UserDataLoad } from '@/features/auth/use-user-data-load';
+import { useUserDataLoad } from '@/features/auth/use-user-data-load';
 import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
 import type { WeaponMutationResult } from './use-weapon-collection-api';
@@ -19,7 +21,7 @@ import {
 } from './use-weapon-collection-api';
 import { useWeaponCollectionStore } from './use-weapon-collection-store';
 
-export interface UseWeaponCollectionResult {
+export interface UseWeaponCollectionResult extends UserDataLoad {
   weapons: Record<CollectionWeaponId, CollectionWeapon>;
   isAuthenticated: boolean;
   /**
@@ -33,12 +35,6 @@ export interface UseWeaponCollectionResult {
   removeWeapon: (collectionWeaponId: CollectionWeaponId) => void;
   setRefinementLevel: (collectionWeaponId: CollectionWeaponId, level: RefinementLevel) => void;
   getWeaponsByWeaponId: (weaponId: Weapon['id']) => CollectionWeapon[];
-  isLoading: boolean;
-  error: Error | null;
-  /** The first load failed, so there's no collection to show. */
-  loadFailed: boolean;
-  /** Refetches after a failed load; `isLoading` is true again while it runs. */
-  retry: () => void;
 }
 
 type WeaponActions = Pick<
@@ -140,12 +136,9 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   const storeSetWeapons = useWeaponCollectionStore((s) => s.setWeapons);
   const storeAddWeapon = useWeaponCollectionStore((s) => s.addWeapon);
 
-  const {
-    data: apiWeapons,
-    error: queryError,
-    isLoading: queryLoading,
-    refetch,
-  } = useWeaponCollectionQuery(uid);
+  const query = useWeaponCollectionQuery(uid);
+  const { data: apiWeapons } = query;
+  const load = useUserDataLoad(auth, query);
 
   const addWeaponApi = useSenderBoundMutate(uid, useAddWeaponMutation(uid).mutate);
   const removeWeaponApi = useSenderBoundMutate(uid, useRemoveWeaponMutation(uid).mutate);
@@ -222,20 +215,11 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     [weapons],
   );
 
-  const error = isAuthenticated ? (queryError ?? null) : null;
-
-  const retry = useCallback(() => {
-    void refetch();
-  }, [refetch]);
-
   return {
     weapons,
     isAuthenticated,
     ...actions,
     getWeaponsByWeaponId,
-    isLoading: awaitingUserData(auth, queryLoading),
-    error,
-    loadFailed: error !== null && apiWeapons === undefined,
-    retry,
+    ...load,
   };
 }
