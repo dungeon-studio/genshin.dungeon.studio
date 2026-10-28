@@ -13,13 +13,7 @@ export interface FailedWrite {
   reverted: string;
 }
 
-/**
- * Undoes a failed optimistic write and tells the user what happened.
- *
- * The revert runs only while the store still shows the failed value. Once the
- * user has made a newer edit to the same item, that edit stands and the toast
- * says so instead.
- */
+/** Undoes a failed optimistic write unless a newer edit replaced it, and tells the user which. */
 export function rollBackFailedWrite({
   isStillShown,
   revert,

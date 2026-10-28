@@ -79,7 +79,6 @@ type TeamActions = Pick<
 
 type TeamStore = ReturnType<typeof useTeamStore.getState>;
 
-/** Who sat at a position, for a message about what a revert brought back. */
 function memberName(team: CollectionTeam, memberIndex: number): string | undefined {
   const member = team.members[memberIndex];
   if (!member) return undefined;
