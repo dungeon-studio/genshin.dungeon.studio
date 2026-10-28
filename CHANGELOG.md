@@ -30,6 +30,7 @@ single `### Added` bucket in `[Unreleased]`.
 - Team persistence so compositions survive across sessions.
 - Collections saved to your account, with a sign-in prompt when managing one signed out.
 - Google sign-in and sign-out from the site header.
+- Messages when sign-in or sign-out fails, such as a blocked pop-up, with a button to try again.
 - Dark mode support.
 - Footer links to GitHub issues, feature requests, discussions, changelog, and repository.
 - Game data version displayed in the footer.

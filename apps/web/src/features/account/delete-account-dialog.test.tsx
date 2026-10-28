@@ -94,7 +94,10 @@ describe('DeleteAccountDialog', () => {
     await waitFor(() => {
       expect(toast.success).toHaveBeenCalled();
     });
-    expect(toast.error).not.toHaveBeenCalled();
+    expect(toast.error).not.toHaveBeenCalledWith(
+      expect.stringContaining('Could not delete'),
+      expect.anything(),
+    );
   });
 
   // The account survived, so the user has to stay signed in to ask again.
