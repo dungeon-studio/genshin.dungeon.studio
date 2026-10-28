@@ -77,6 +77,39 @@ describe('useTeams (authenticated)', () => {
     expect(result.current.getTeam(1).members[0]?.characterId).toBe(CHARACTER);
   });
 
+  it.each<[string, (teams: ReturnType<typeof useTeams>) => void, string]>([
+    [
+      'a weapon removal',
+      (teams) => teams.removeWeapon(1, 0),
+      "Skirk's weapon is back to how it was.",
+    ],
+    [
+      'an artifact plan change',
+      (teams) => teams.setArtifactPlan(1, 0, undefined),
+      "Skirk's artifact plan is back to how it was.",
+    ],
+    ['a rename', (teams) => teams.setTeamName(1, 'Freeze'), 'The team is named Team 1 again.'],
+    ['a clear', (teams) => teams.clearTeam(1), 'Its members are back.'],
+  ])('says what a failed save of %s puts back', async (_, edit, reverted) => {
+    server.use(
+      http.get('http://localhost:8080/teams', () =>
+        HttpResponse.json(teamsDocument([makeTeam(1, { members: MEMBERS })])),
+      ),
+      http.put('http://localhost:8080/teams/1', () => new HttpResponse(null, { status: 500 })),
+    );
+
+    const { result } = renderHookSignedIn(() => useTeams(), 'user-1');
+    await waitFor(() => expect(result.current.getTeam(1).members[0]?.characterId).toBe(CHARACTER));
+
+    act(() => {
+      edit(result.current);
+    });
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(`Couldn't save Team 1. ${reverted} Try again.`),
+    );
+  });
+
   it('saves a renamed team', async () => {
     let putBody: unknown;
     server.use(

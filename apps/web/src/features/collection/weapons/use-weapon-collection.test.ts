@@ -57,6 +57,24 @@ describe('useWeaponCollection', () => {
       await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.weaponId).toBe(WEAPON_ID));
     });
 
+    it('names the weapon a failed add was for', async () => {
+      server.use(
+        http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument([]))),
+        http.post('http://localhost:8080/weapons', () => new HttpResponse(null, { status: 500 })),
+      );
+
+      const { result } = renderAuthed();
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      act(() => {
+        result.current.addWeapon(WEAPON_ID);
+      });
+
+      await waitFor(() =>
+        expect(toast.error).toHaveBeenCalledWith("Couldn't add Angelos' Heptades. Try again."),
+      );
+    });
+
     it('creates another instance even when the weapon is already owned', async () => {
       server.use(
         http.get('http://localhost:8080/weapons', () =>
