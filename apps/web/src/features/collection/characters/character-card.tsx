@@ -93,7 +93,7 @@ function RemoveButton({ character, onRemove }: RemoveButtonProps): JSX.Element {
         e.stopPropagation();
         onRemove(character.id);
       }}
-      className="p-1 relative z-10 shrink-0 rounded-md text-destructive opacity-0 transition-opacity group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none"
+      className="p-1 relative z-10 shrink-0 rounded-md text-destructive transition-colors hover:bg-destructive hover:text-destructive-foreground focus-visible:ring-2 focus-visible:ring-destructive focus-visible:outline-none"
       aria-label={`Remove ${character.name} from collection`}
     >
       <Trash2 className="h-4 w-4" />
@@ -155,11 +155,7 @@ export function CharacterCard({
   }
 
   if (owned) {
-    return (
-      <div className={cn(sharedClassName, 'group', selected && selectedRingClassName)}>
-        {content}
-      </div>
-    );
+    return <div className={cn(sharedClassName, selected && selectedRingClassName)}>{content}</div>;
   }
 
   return (
