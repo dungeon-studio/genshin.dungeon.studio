@@ -34,7 +34,7 @@ export interface UseTeamsResult {
   isSaving: boolean;
   isLoading: boolean;
   error: Error | null;
-  /** Refetches after a failed load; `isLoading` is true again while it runs. */
+  /** Requests the teams again after a failed load; `isLoading` is true while the request runs. */
   retry: () => void;
 }
 
