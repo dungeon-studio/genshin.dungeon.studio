@@ -22,8 +22,7 @@ export function CharacterSummary({
 }: CharacterSummaryProps): JSX.Element {
   const icon = character ? (
     <ThemedIcon
-      lightSrc={getElementIconPath(character.element, 'light')}
-      darkSrc={getElementIconPath(character.element, 'dark')}
+      iconPath={(variant) => getElementIconPath(character.element, variant)}
       alt={character.element}
       loading="lazy"
       decoding="async"

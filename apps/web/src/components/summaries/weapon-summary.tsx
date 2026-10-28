@@ -33,8 +33,7 @@ export function WeaponSummary({
 
   const icon = iconType ? (
     <ThemedIcon
-      lightSrc={getWeaponTypeIconPath(iconType, 'light')}
-      darkSrc={getWeaponTypeIconPath(iconType, 'dark')}
+      iconPath={(variant) => getWeaponTypeIconPath(iconType, variant)}
       alt=""
       loading="lazy"
       decoding="async"
