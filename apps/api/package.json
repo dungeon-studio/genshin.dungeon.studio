@@ -22,7 +22,7 @@
     "ajv": "8.20.0",
     "content-type": "3.1.1",
     "firebase-admin": "14.5.0",
-    "hono": "4.13.13",
+    "hono": "4.13.14",
     "negotiator": "1.1.0",
     "pino": "10.4.0",
     "verzod": "0.5.1",
@@ -41,7 +41,7 @@
     "fast-check": "4.10.2",
     "globals": "17.13.0",
     "json-schema-to-ts": "3.1.1",
-    "tsc-alias": "1.9.8",
+    "tsc-alias": "1.9.9",
     "tsx": "4.23.15",
     "typescript": "npm:@typescript/typescript6@6.0.2",
     "vitest": "5.0.5"

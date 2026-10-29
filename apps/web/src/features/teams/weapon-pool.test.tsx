@@ -7,6 +7,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { makeWeapon } from '@/test/fixtures';
+import { createWrapper, fakeUser } from '@/test/render';
 
 import { useTeamStore } from './use-team-store';
 import { WeaponPool } from './weapon-pool';
@@ -26,6 +27,7 @@ function renderPool(props: Partial<Parameters<typeof WeaponPool>[0]>) {
         {...props}
       />
     </MemoryRouter>,
+    { wrapper: createWrapper({ user: fakeUser('user-1') }) },
   );
 }
 

@@ -9,12 +9,17 @@ import type { JSX, ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
 import { Container } from '@/components/chrome/container';
+import { LoadFailedPage } from '@/components/chrome/load-failed-page';
+import { LoadingPage } from '@/components/chrome/loading-page';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
+import { SignInPrompt, useAuth } from '@/features/auth';
+import type { UseCollectionResult } from '@/features/collection/characters/use-character-collection';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
 import type { CharacterCollection } from '@/features/collection/characters/use-character-collection-store';
 import { ownedCharacters } from '@/features/collection/characters/use-character-collection-store';
 import { EmptyCollection } from '@/features/collection/empty-collection';
+import type { UseWeaponCollectionResult } from '@/features/collection/weapons/use-weapon-collection';
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
 import { CharacterPool } from '@/features/teams/character-pool';
 import { TeamPlanner } from '@/features/teams/team-planner';
@@ -142,8 +147,36 @@ function useMemberEditor(
 type MemberEditor = ReturnType<typeof useMemberEditor>;
 
 export function TeamsPage(): JSX.Element {
-  const { characters, getCharacter, isLoading: collectionLoading } = useCollection();
-  const { weapons } = useWeaponCollection();
+  const auth = useAuth();
+  // `TeamBuilder` mounts only after teams load, so the collection requests start here.
+  const planner = useTeams();
+  const collection = useCollection();
+  const weaponCollection = useWeaponCollection();
+
+  if (auth.status === 'signed-out') return <SignedOutTeams />;
+  // Every edit saves the whole team, so one made to a default slot erases the saved one.
+  if (planner.isLoading) return <LoadingPage title="Teams" label="Loading teams" />;
+  if (planner.error) {
+    return (
+      <LoadFailedPage title="Teams" message="Failed to load your teams." onRetry={planner.retry} />
+    );
+  }
+
+  return (
+    <TeamBuilder planner={planner} collection={collection} weaponCollection={weaponCollection} />
+  );
+}
+
+interface TeamBuilderProps {
+  planner: UseTeamsResult;
+  collection: UseCollectionResult;
+  weaponCollection: UseWeaponCollectionResult;
+}
+
+/** The four teams and the sheet that edits them, mounted only once the saved teams load. */
+function TeamBuilder({ planner, collection, weaponCollection }: TeamBuilderProps): JSX.Element {
+  const { characters, getCharacter, isLoading: collectionLoading } = collection;
+  const { weapons } = weaponCollection;
 
   const collectionEmpty = !collectionLoading && ownedCharacters(characters).length === 0;
 
@@ -162,7 +195,7 @@ export function TeamsPage(): JSX.Element {
     assignWeapon,
     removeWeapon,
     setArtifactPlan,
-  } = useTeams();
+  } = planner;
 
   const [activeTab, setActiveTab] = useState<SheetTab>('characters');
   const editor = useMemberEditor(weapons, teams, {
@@ -246,6 +279,20 @@ export function TeamsPage(): JSX.Element {
           )}
         </SheetContent>
       </Sheet>
+    </Container>
+  );
+}
+
+/** Teams are saved to an account, so signed-out edits would be lost. */
+function SignedOutTeams(): JSX.Element {
+  return (
+    <Container className="py-12">
+      <h1 className="sr-only">Teams</h1>
+      <SignInPrompt
+        icon={Users}
+        title="Sign in to build teams"
+        description="Teams are saved to your account and use the characters and weapons you own."
+      />
     </Container>
   );
 }

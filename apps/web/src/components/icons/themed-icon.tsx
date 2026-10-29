@@ -5,13 +5,14 @@ import type { ComponentProps, JSX } from 'react';
 
 import { cn } from '@/lib/class-names';
 
+export type IconVariant = 'light' | 'dark';
+
 interface ThemedIconProps extends Pick<
   ComponentProps<'img'>,
   'loading' | 'decoding' | 'width' | 'height'
 > {
-  lightSrc: string;
-  darkSrc: string;
-  /** An empty string marks the icon decorative, mirrored to `aria-hidden`. */
+  iconPath: (variant: IconVariant) => string;
+  /** An empty string marks the icon decorative. */
   alt: string;
   /** Applied to both variants. */
   className?: string;
@@ -19,8 +20,7 @@ interface ThemedIconProps extends Pick<
 
 /** Swaps variants with Tailwind's `dark:` so the browser paints only the active theme's image. */
 export function ThemedIcon({
-  lightSrc,
-  darkSrc,
+  iconPath,
   alt,
   className,
   ...attributes
@@ -34,8 +34,13 @@ export function ThemedIcon({
   // each variant's `dark:` utility trails to win the theme-active conflict.
   return (
     <>
-      <img {...shared} alt={alt} src={lightSrc} className={cn(className, 'dark:hidden')} />
-      <img {...shared} alt={alt} src={darkSrc} className={cn('hidden', className, 'dark:block')} />
+      <img {...shared} alt={alt} src={iconPath('light')} className={cn(className, 'dark:hidden')} />
+      <img
+        {...shared}
+        alt={alt}
+        src={iconPath('dark')}
+        className={cn('hidden', className, 'dark:block')}
+      />
     </>
   );
 }

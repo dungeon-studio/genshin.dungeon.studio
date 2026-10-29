@@ -1,31 +1,50 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { ConstellationLevel } from '@genshin/domain';
 import type { Character } from '@genshin/game-data';
 import { CHARACTER_ROSTER } from '@genshin/game-data';
-import { Loader2 } from 'lucide-react';
 import type { JSX } from 'react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { Container } from '@/components/chrome/container';
+import { LoadFailedPage } from '@/components/chrome/load-failed-page';
+import { LoadingPage } from '@/components/chrome/loading-page';
+import { promptSignIn } from '@/features/auth';
 import { CharacterCard } from '@/features/collection/characters/character-card';
 import { CharacterFilters } from '@/features/collection/characters/character-filters';
 import type { CharacterFilterState } from '@/features/collection/characters/filtering';
 import { filterCharacters, initialFilterState } from '@/features/collection/characters/filtering';
+import type { UseCollectionResult } from '@/features/collection/characters/use-character-collection';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
 import { ownedCharacterIds } from '@/features/collection/characters/use-character-collection-store';
 
 export function CharactersPage(): JSX.Element {
+  const collection = useCollection();
+
+  if (collection.isLoading) return <LoadingPage title="Characters" label="Loading collection" />;
+  if (collection.loadFailed) {
+    return (
+      <LoadFailedPage
+        title="Characters"
+        message="Failed to load your character collection."
+        onRetry={collection.retry}
+      />
+    );
+  }
+
+  return <CharacterRoster collection={collection} />;
+}
+
+function CharacterRoster({ collection }: { collection: UseCollectionResult }): JSX.Element {
   const {
     characters,
+    isAuthenticated,
     addCharacter,
     removeCharacter,
     setConstellationLevel,
     isOwned,
-    isLoading,
     error,
-  } = useCollection();
+  } = collection;
 
   const [filters, setFilters] = useState<CharacterFilterState>(initialFilterState);
 
@@ -40,25 +59,18 @@ export function CharactersPage(): JSX.Element {
     };
   }, [filters, ownedIds]);
 
-  function handleConstellationChange(characterId: Character['id'], level: ConstellationLevel) {
-    setConstellationLevel(characterId, level);
-  }
+  // Signed out, the collection is empty, so add is the only action a card offers.
+  const handleAddCharacter = useCallback(
+    (characterId: Character['id']) => {
+      if (!isAuthenticated) {
+        promptSignIn('character collection');
+        return;
+      }
 
-  if (isLoading) {
-    return (
-      <Container className="py-12">
-        <h1 className="sr-only">Characters</h1>
-        <div className="py-24 flex items-center justify-center">
-          <Loader2
-            className="h-8 w-8 animate-spin text-muted-foreground"
-            aria-hidden="true"
-            focusable={false}
-          />
-          <span className="sr-only">Loading collection</span>
-        </div>
-      </Container>
-    );
-  }
+      addCharacter(characterId);
+    },
+    [isAuthenticated, addCharacter],
+  );
 
   return (
     <>
@@ -68,7 +80,7 @@ export function CharactersPage(): JSX.Element {
         <Container className="py-4">
           {error && (
             <p className="mb-3 px-4 py-3 text-sm rounded-md bg-destructive/10 text-center text-destructive">
-              Failed to sync collection. Local data is still available.
+              Failed to sync character collection.
             </p>
           )}
           <CharacterFilters
@@ -95,9 +107,9 @@ export function CharactersPage(): JSX.Element {
                   character={character}
                   owned={owned}
                   constellationLevel={entry?.constellationLevel}
-                  onAdd={addCharacter}
+                  onAdd={handleAddCharacter}
                   onRemove={removeCharacter}
-                  onConstellationChange={handleConstellationChange}
+                  onConstellationChange={setConstellationLevel}
                 />
               </div>
             );

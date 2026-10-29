@@ -6,15 +6,15 @@
 # mismatch is deliberate rather than drift.
 
 terraform {
-  required_version = "1.16.6"
+  required_version = "1.17.0"
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "8.7.0"
+      version = "8.8.1"
     }
     google-beta = {
       source  = "hashicorp/google-beta"
-      version = "8.7.0"
+      version = "8.8.1"
     }
   }
 }

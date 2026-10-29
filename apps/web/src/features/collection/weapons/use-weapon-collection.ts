@@ -2,24 +2,35 @@
 // SPDX-License-Identifier: MIT
 
 import type { CollectionWeapon, CollectionWeaponId, RefinementLevel } from '@genshin/domain';
+import { MIN_REFINEMENT_LEVEL } from '@genshin/domain';
 import type { Weapon } from '@genshin/game-data';
-import { useCallback, useEffect, useRef } from 'react';
-import { toast } from 'sonner';
+import { getWeaponById } from '@genshin/game-data';
+import { useCallback, useRef } from 'react';
 
-import { awaitingUserData, signedInUid } from '@/features/auth/auth-state';
+import { signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
+import type { UserDataLoad } from '@/features/auth/use-user-data-load';
+import { useUserDataLoad } from '@/features/auth/use-user-data-load';
+import { offerUndo } from '@/lib/offer-undo';
+import { reportFailedWrite, reportRolledBackWrite } from '@/lib/roll-back-failed-write';
+import type { SenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
-import type { WeaponMutationResult } from './use-weapon-collection-api';
+import type {
+  AddWeaponVariables,
+  SetRefinementLevelVariables,
+  WeaponCache,
+  WeaponMutationResult,
+} from './use-weapon-collection-api';
 import {
   useAddWeaponMutation,
   useRemoveWeaponMutation,
   useSetRefinementLevelMutation,
+  useWeaponCache,
   useWeaponCollectionQuery,
 } from './use-weapon-collection-api';
-import { useWeaponCollectionStore } from './use-weapon-collection-store';
 
-export interface UseWeaponCollectionResult {
+export interface UseWeaponCollectionResult extends UserDataLoad {
   weapons: Record<CollectionWeaponId, CollectionWeapon>;
   isAuthenticated: boolean;
   /**
@@ -33,80 +44,111 @@ export interface UseWeaponCollectionResult {
   removeWeapon: (collectionWeaponId: CollectionWeaponId) => void;
   setRefinementLevel: (collectionWeaponId: CollectionWeaponId, level: RefinementLevel) => void;
   getWeaponsByWeaponId: (weaponId: Weapon['id']) => CollectionWeapon[];
-  isLoading: boolean;
-  error: Error | null;
 }
 
+type WeaponActions = Pick<
+  UseWeaponCollectionResult,
+  'ensureWeapon' | 'addWeapon' | 'removeWeapon' | 'setRefinementLevel'
+>;
+
+function weaponName(weaponId: Weapon['id']): string {
+  return getWeaponById(weaponId)?.name ?? weaponId;
+}
+
+const NO_WEAPONS: Record<CollectionWeaponId, CollectionWeapon> = {};
+
+const SIGNED_OUT_ACTIONS: WeaponActions = {
+  ensureWeapon: () => {},
+  addWeapon: () => {},
+  removeWeapon: () => {},
+  setRefinementLevel: () => {},
+};
+
 /**
- * Edits to an owned instance, each applied to the store before the server
- * confirms it.
- *
- * A rejected edit rolls back only if the store still holds its value, and
- * every failure toasts. Adds can't be optimistic, because the server assigns
- * the instance ID.
+ * Adds a copy at the refinement rank a removed one had. The server assigns the
+ * copy a new ID, so a team that had the removed one equipped stays without it.
  */
-function useOptimisticEdits(
-  isAuthenticated: boolean,
-  api: {
-    removeWeaponApi: ReturnType<typeof useRemoveWeaponMutation>['mutate'];
-    setRefinementLevelApi: ReturnType<typeof useSetRefinementLevelMutation>['mutate'];
-  },
-  applyMutationResult: (result: WeaponMutationResult) => void,
-): Pick<UseWeaponCollectionResult, 'removeWeapon' | 'setRefinementLevel'> {
-  const { removeWeaponApi, setRefinementLevelApi } = api;
-  const storeAddWeapon = useWeaponCollectionStore((s) => s.addWeapon);
-  const storeRemoveWeapon = useWeaponCollectionStore((s) => s.removeWeapon);
-  const storeSetRefinementLevel = useWeaponCollectionStore((s) => s.setRefinementLevel);
-
-  const removeWeapon = useCallback(
-    (collectionWeaponId: CollectionWeaponId) => {
-      if (!isAuthenticated) return;
-
-      const current = useWeaponCollectionStore.getState().weapons[collectionWeaponId];
-      if (!current) return;
-
-      storeRemoveWeapon(collectionWeaponId);
-      removeWeaponApi(collectionWeaponId, {
-        onError: () => {
-          const stillAbsent = !(collectionWeaponId in useWeaponCollectionStore.getState().weapons);
-          if (stillAbsent) {
-            storeAddWeapon(current);
-            toast.error('Failed to remove weapon. Change has been reverted.');
-          } else {
-            toast.error('Failed to remove weapon.');
-          }
-        },
-      });
-    },
-    [isAuthenticated, removeWeaponApi, storeRemoveWeapon, storeAddWeapon],
-  );
-
-  const setRefinementLevel = useCallback(
-    (collectionWeaponId: CollectionWeaponId, level: RefinementLevel) => {
-      if (!isAuthenticated) return;
-
-      const previous = useWeaponCollectionStore.getState().weapons[collectionWeaponId];
-      if (!previous || previous.refinementLevel === level) return;
-
-      storeSetRefinementLevel(collectionWeaponId, level);
-      setRefinementLevelApi(
-        { collectionWeaponId, level },
+function useRestoreWeapon(
+  addWeaponApi: SenderBoundMutate<WeaponMutationResult, AddWeaponVariables>,
+): (removed: CollectionWeapon) => void {
+  return useCallback(
+    ({ weaponId, refinementLevel }: CollectionWeapon) => {
+      addWeaponApi(
+        { weaponId, refinementLevel },
         {
-          onSuccess: applyMutationResult,
           onError: () => {
-            const currentLevel =
-              useWeaponCollectionStore.getState().weapons[collectionWeaponId]?.refinementLevel;
-            if (currentLevel === level) {
-              storeSetRefinementLevel(collectionWeaponId, previous.refinementLevel);
-              toast.error('Failed to update refinement level. Change has been reverted.');
-            } else {
-              toast.error('Failed to update refinement level.');
-            }
+            reportFailedWrite(
+              `Couldn't bring back ${weaponName(weaponId)} at refinement rank ${refinementLevel}.`,
+            );
           },
         },
       );
     },
-    [isAuthenticated, setRefinementLevelApi, storeSetRefinementLevel, applyMutationResult],
+    [addWeaponApi],
+  );
+}
+
+/**
+ * Edits to an owned instance that tell the user how a rejected one ended. The
+ * mutations make the optimistic write and undo it.
+ */
+function useInstanceEdits(
+  api: {
+    addWeaponApi: SenderBoundMutate<WeaponMutationResult, AddWeaponVariables>;
+    removeWeaponApi: SenderBoundMutate<void, CollectionWeaponId>;
+    setRefinementLevelApi: SenderBoundMutate<WeaponMutationResult, SetRefinementLevelVariables>;
+  },
+  cache: WeaponCache,
+): Pick<UseWeaponCollectionResult, 'removeWeapon' | 'setRefinementLevel'> {
+  const { addWeaponApi, removeWeaponApi, setRefinementLevelApi } = api;
+  const restoreWeapon = useRestoreWeapon(addWeaponApi);
+
+  const removeWeapon = useCallback(
+    (collectionWeaponId: CollectionWeaponId) => {
+      const current = cache.read()[collectionWeaponId];
+      if (!current) return;
+
+      const name = weaponName(current.weaponId);
+
+      removeWeaponApi(collectionWeaponId, {
+        onSuccess: () => {
+          offerUndo(`Removed ${name} at refinement rank ${current.refinementLevel}.`, () => {
+            restoreWeapon(current);
+          });
+        },
+        onError: () => {
+          reportRolledBackWrite({
+            restored: cache.holds(collectionWeaponId, current),
+            failure: `Couldn't remove ${name}.`,
+            reverted: `${name} is back in your collection.`,
+          });
+        },
+      });
+    },
+    [cache, removeWeaponApi, restoreWeapon],
+  );
+
+  const setRefinementLevel = useCallback(
+    (collectionWeaponId: CollectionWeaponId, level: RefinementLevel) => {
+      const previous = cache.read()[collectionWeaponId];
+      if (!previous || previous.refinementLevel === level) return;
+
+      const name = weaponName(previous.weaponId);
+
+      setRefinementLevelApi(
+        { collectionWeaponId, level },
+        {
+          onError: () => {
+            reportRolledBackWrite({
+              restored: cache.holds(collectionWeaponId, previous),
+              failure: `Couldn't set ${name} to refinement rank ${level}.`,
+              reverted: `${name} is back at refinement rank ${previous.refinementLevel}.`,
+            });
+          },
+        },
+      );
+    },
+    [cache, setRefinementLevelApi],
   );
 
   return { removeWeapon, setRefinementLevel };
@@ -116,79 +158,58 @@ function useOptimisticEdits(
  * The weapon collection's whole interface: the instances the user owns, the
  * actions that change them, and the state of the sync behind them.
  *
- * Every action is a no-op while signed out, unlike the character collection: an
- * instance identifier comes from the server, so there is nothing to record
- * locally first. Callers show `isAuthenticated` rather than offering an action
- * that will silently do nothing.
+ * A collection belongs to an account, so every action is a no-op while signed
+ * out. Callers show `isAuthenticated` rather than offering an action that will
+ * silently do nothing.
  */
 export function useWeaponCollection(): UseWeaponCollectionResult {
   const auth = useAuth();
   const uid = signedInUid(auth);
   const isAuthenticated = uid !== undefined;
 
-  const weapons = useWeaponCollectionStore((s) => s.weapons);
-  const storeSetWeapons = useWeaponCollectionStore((s) => s.setWeapons);
-  const storeAddWeapon = useWeaponCollectionStore((s) => s.addWeapon);
+  const query = useWeaponCollectionQuery(uid);
+  const weapons = query.data ?? NO_WEAPONS;
+  const load = useUserDataLoad(auth, query);
+  const cache = useWeaponCache(uid);
 
-  const {
-    data: apiWeapons,
-    error: queryError,
-    isLoading: queryLoading,
-  } = useWeaponCollectionQuery(uid);
-
-  const addWeaponApi = useSenderBoundMutate(uid, useAddWeaponMutation(uid).mutate);
-  const removeWeaponApi = useSenderBoundMutate(uid, useRemoveWeaponMutation(uid).mutate);
+  const addWeaponApi = useSenderBoundMutate(uid, useAddWeaponMutation(uid).mutateAsync);
+  const removeWeaponApi = useSenderBoundMutate(uid, useRemoveWeaponMutation(uid).mutateAsync);
   const setRefinementLevelApi = useSenderBoundMutate(
     uid,
-    useSetRefinementLevelMutation(uid).mutate,
+    useSetRefinementLevelMutation(uid).mutateAsync,
   );
-
-  const applyMutationResult = useCallback(
-    ({ weapon }: WeaponMutationResult) => {
-      storeAddWeapon(weapon);
-    },
-    [storeAddWeapon],
-  );
-
-  useEffect(() => {
-    if (!apiWeapons) return;
-    storeSetWeapons(apiWeapons);
-  }, [apiWeapons, storeSetWeapons]);
 
   const runAdd = useCallback(
     (weaponId: Weapon['id'], onSettled?: () => void) => {
-      addWeaponApi(weaponId, {
-        onSuccess: applyMutationResult,
-        onError: () => {
-          toast.error('Failed to add weapon.');
+      addWeaponApi(
+        { weaponId, refinementLevel: MIN_REFINEMENT_LEVEL },
+        {
+          onError: () => {
+            reportFailedWrite(`Couldn't add ${weaponName(weaponId)}.`);
+          },
+          onSettled,
         },
-        onSettled,
-      });
+      );
     },
-    [addWeaponApi, applyMutationResult],
+    [addWeaponApi],
   );
 
   // Additive: every call creates a new instance. Contrast ensureWeapon.
   const addWeapon = useCallback(
     (weaponId: Weapon['id']) => {
-      if (!isAuthenticated) return;
       runAdd(weaponId);
     },
-    [isAuthenticated, runAdd],
+    [runAdd],
   );
 
   // Weapon instances carry a server-generated id, so an add can't reach the
-  // store until the POST resolves. Tracking in-flight adds per weapon id closes
+  // cache until the POST resolves. Tracking in-flight adds per weapon id closes
   // the window where rapid clicks would each auto-create an instance.
   const pendingEnsures = useRef<Set<Weapon['id']>>(new Set());
 
   const ensureWeapon = useCallback(
     (weaponId: Weapon['id']) => {
-      if (!isAuthenticated) return;
-
-      const alreadyOwned = Object.values(useWeaponCollectionStore.getState().weapons).some(
-        (w) => w.weaponId === weaponId,
-      );
+      const alreadyOwned = Object.values(cache.read()).some((w) => w.weaponId === weaponId);
       if (alreadyOwned || pendingEnsures.current.has(weaponId)) return;
 
       pendingEnsures.current.add(weaponId);
@@ -196,14 +217,16 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
         pendingEnsures.current.delete(weaponId);
       });
     },
-    [isAuthenticated, runAdd],
+    [cache, runAdd],
   );
 
-  const { removeWeapon, setRefinementLevel } = useOptimisticEdits(
-    isAuthenticated,
-    { removeWeaponApi, setRefinementLevelApi },
-    applyMutationResult,
+  const { removeWeapon, setRefinementLevel } = useInstanceEdits(
+    { addWeaponApi, removeWeaponApi, setRefinementLevelApi },
+    cache,
   );
+  const actions = isAuthenticated
+    ? { ensureWeapon, addWeapon, removeWeapon, setRefinementLevel }
+    : SIGNED_OUT_ACTIONS;
 
   const getWeaponsByWeaponId = useCallback(
     (weaponId: Weapon['id']) => {
@@ -212,17 +235,11 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     [weapons],
   );
 
-  const error = isAuthenticated ? (queryError ?? null) : null;
-
   return {
     weapons,
     isAuthenticated,
-    ensureWeapon,
-    addWeapon,
-    removeWeapon,
-    setRefinementLevel,
+    ...actions,
     getWeaponsByWeaponId,
-    isLoading: awaitingUserData(auth, queryLoading),
-    error,
+    ...load,
   };
 }

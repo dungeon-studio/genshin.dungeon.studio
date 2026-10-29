@@ -95,6 +95,7 @@ writing tests.
 
 ## Frontend rules
 
+- Check every new or changed view against the [Interaction principles](docs/reference/interaction-principles.md), and cite a rule by its `id` anchor.
 - Prefer composition over inheritance and use early returns for conditional rendering.
 - Use semantic HTML: proper heading hierarchy, structural elements, and native interactive elements (`<button>`, not `<div onClick>`).
 - Mark decorative Lucide icons with `aria-hidden="true"` and `focusable={false}`. Icons inside labeled buttons, or adjacent to labeled inputs, are decorative.
@@ -166,7 +167,7 @@ header describes the layout they sit in. Read both before adding a line.
 
 - Provision a tool through a `devcontainer.json` feature when one publishes it. The image build caches a feature; every step in `.devcontainer/postCreateCommand.sh` runs again on each container create.
 - Add a `postCreateCommand.sh` step when no feature publishes the tool, or when the step needs the checked-out repository. Dependency installs, hook installs, and workspace-pinned browsers all need the repository.
-- Add every provisioned tool to `for_each_tool` in `.devcontainer/lib.sh`, whichever mechanism installed it. A tool missing from that list breaks on a contributor's machine instead of in the `Devcontainer / Verify toolchain` job.
+- Add every provisioned tool to `for_each_tool` in `.devcontainer/lib.sh`, whichever mechanism installed it. A tool missing from that list breaks on a contributor's machine instead of in the `Verify toolchain` job.
 
 ## Playwright MCP rules
 

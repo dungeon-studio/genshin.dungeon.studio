@@ -3,7 +3,7 @@
 
 import type { JSX } from 'react';
 
-import { ThemedIcon } from '@/components/ui/themed-icon';
+import { ThemedIcon } from '@/components/icons/themed-icon';
 import { resolveEnvironment } from '@/lib/environments';
 
 const SIZE = 32;
@@ -23,8 +23,7 @@ export function BrandMark(): JSX.Element {
 
   return (
     <ThemedIcon
-      lightSrc={`/favicon-32x32${suffix}.png`}
-      darkSrc={`/favicon-32x32-dark${suffix}.png`}
+      iconPath={(variant) => `/favicon-32x32${variant === 'dark' ? '-dark' : ''}${suffix}.png`}
       alt={name}
       width={SIZE}
       height={SIZE}

@@ -4,8 +4,8 @@
 # Layers
 
 The layer stacks user data crosses between the browser and Firestore, where the
-code skips a layer, and which jobs each layer does. Which layering the client
-should have is [#1133].
+code skips a layer, and which jobs each layer does. [ADR-0006] decides
+which layering the client should have.
 
 ## Stack
 
@@ -20,7 +20,6 @@ flowchart TB
     hook[Feature hook<br>action arguments]
     store[(Store, D1<br>domain entities)]
     query[(Query layer, D2<br>domain entities)]
-    persist[(Persist, D3<br>versioned collection)]
     fetchWrapper[Fetch wrapper<br>JSON body and ID token]
   end
 
@@ -29,7 +28,7 @@ flowchart TB
     route[Route<br>domain objects]
     repository[Repository<br>domain records]
     document[Document<br>versioned documents]
-    firestore[(Firestore, D4)]
+    firestore[(Firestore, D3)]
   end
 
   firebaseAuth[Firebase Auth]
@@ -37,7 +36,6 @@ flowchart TB
   view --> hook
   hook --> store
   hook --> query
-  store --> persist
   query --> fetchWrapper
   fetchWrapper -->|HTTP| middleware
   middleware --> route
@@ -49,23 +47,21 @@ flowchart TB
 
   view -.->|1| store
   query -.->|2| store
-  store -.->|3| query
-  route -.->|4| firebaseAuth
-  hook -.->|5| fetchWrapper
+  route -.->|3| firebaseAuth
+  hook -.->|4| fetchWrapper
 ```
 
-| Layer           | Code                                                                       | Data unit                                                   |
-| --------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| View            | `apps/web/src/pages/` and feature components                               | Rendered entities and user actions                          |
-| Feature hook    | `useCollection`, `useWeaponCollection`, `useTeams`, `useDeleteAccount`     | Action arguments                                            |
-| Store, D1       | `use-*-store.ts`                                                           | `CollectionCharacter`, `CollectionWeapon`, `CollectionTeam` |
-| Persist, D3     | zustand `persist` and `schemas/` for the character store                   | Versioned character collection                              |
-| Query layer, D2 | `use-*-api.ts` and `apps/web/src/lib/api-collection.ts`                    | Collection+JSON in, domain entities out                     |
-| Fetch wrapper   | `apps/web/src/lib/api.ts`                                                  | JSON body with the ID token                                 |
-| Middleware      | `apps/api/src/middleware/`                                                 | User ID and validated body                                  |
-| Route           | `apps/api/src/routes/`                                                     | Domain objects in, Collection+JSON out                      |
-| Repository      | `index.ts` under each `apps/api/src/repositories/` feature, and `merge.ts` | Domain records                                              |
-| Document        | `document.ts`, `schemas/`, and `schema-version.ts`                         | Versioned Firestore documents                               |
+| Layer           | Code                                                                       | Data unit                               |
+| --------------- | -------------------------------------------------------------------------- | --------------------------------------- |
+| View            | `apps/web/src/pages/` and feature components                               | Rendered entities and user actions      |
+| Feature hook    | `useCollection`, `useWeaponCollection`, `useTeams`, `useDeleteAccount`     | Action arguments                        |
+| Store, D1       | `use-*-store.ts`                                                           | `CollectionCharacter`, `CollectionTeam` |
+| Query layer, D2 | `use-*-api.ts` and `apps/web/src/lib/api-collection.ts`                    | Collection+JSON in, domain entities out |
+| Fetch wrapper   | `apps/web/src/lib/api.ts`                                                  | JSON body with the ID token             |
+| Middleware      | `apps/api/src/middleware/`                                                 | User ID and validated body              |
+| Route           | `apps/api/src/routes/`                                                     | Domain objects in, Collection+JSON out  |
+| Repository      | `index.ts` under each `apps/api/src/repositories/` feature, and `merge.ts` | Domain records                          |
+| Document        | `document.ts`, `schemas/`, and `schema-version.ts`                         | Versioned Firestore documents           |
 
 `@genshin/domain` supplies the types, assertions, and Collection+JSON
 representations every layer uses.
@@ -75,14 +71,12 @@ representations every layer uses.
 1. **View to store.** `character-pool.tsx` and `weapon-pool.tsx` read
    `useTeamStore` instead of `useTeams`, see [#1846]. `ClearUserDataOnSignOut`
    empties every store on sign-out without a feature hook, see [#1889].
-2. **Query layer to store.** Each hook's reconcile effect copies the cache into
-   the store, so the store has four writers: actions, responses, reconcile,
-   and the sign-out clear. Which copy owns state is [#1133].
-3. **Store to query layer.** The sign-in push sends store entries through the
-   mutation, without the hook's actions or their rollback, see [#1847].
-4. **Route to Firebase Auth.** `routes/account.ts` calls `deleteUser`, outside
+2. **Query layer to store.** The character and team hooks' reconcile effects
+   copy the cache into the store, so the store has four writers: actions, responses, reconcile,
+   and the sign-out clear. [ADR-0006] decides which copy owns state.
+3. **Route to Firebase Auth.** `routes/account.ts` calls `deleteUser`, outside
    the boundaries [#1020] sets.
-5. **Feature hook to fetch wrapper.** `useDeleteAccount` defines its own
+4. **Feature hook to fetch wrapper.** `useDeleteAccount` defines its own
    mutation and calls `apiDelete`, see [#1849].
 
 ## Jobs by layer
@@ -106,8 +100,6 @@ merges, timestamps, and instance IDs. See [#1848].
   Ignores a bad member index, an empty position,
   and a duplicate character. Trims a team name. Overlaps
   [owned-character guard], [team composition rules], [team name rules].
-- **Persist:** on a version change, drops a stored collection that doesn't
-  parse.
 - **Query layer:** asserts every response is Collection+JSON, with one item for
   a character or weapon mutation. Team mutations discard theirs.
 - **Fetch wrapper:** none. Trusts a problem document on its content type.
@@ -146,8 +138,6 @@ character the store already holds.
 
 Each layer below asserts the same domain invariants, an overlap.
 
-- **Persist:** each entry on a version change, through
-  `assertCollectionCharacter`.
 - **Query layer:** every item, through `deserialise*`.
 - **Route:** team members, through `deserialiseCollectionTeamMembers`.
 - **Document:** every document after migrating, through `assertCollection*`.
@@ -158,20 +148,20 @@ Each layer below mints `createdAt` and `updatedAt`, an overlap.
 When the server's values reach each store is in
 [Lifecycles](data-flow-lifecycles.md).
 
-- **Feature hook:** both for every unsaved team slot. `updatedAt` on a
-  character merge that keeps the local level.
+- **Feature hook:** both for every unsaved team slot.
 - **Store:** both on a character add, and on every team slot at start and on
   reset. `updatedAt` on every other character and
-  team edit. The weapon store never mints them.
+  team edit. Weapons never mint them in the browser.
 - **Repository:** both on every save, keeping a stored `createdAt`.
 
 ### Identity
 
 - **View:** `ClearUserDataOnSignOut` empties every store when a signed-in user
   signs out or another account signs in.
-- **Feature hook:** applies a character or weapon response or rollback only
-  while its sender is still signed in.
+- **Feature hook:** applies a character response or rollback, and shows a
+  character or weapon toast, only while its sender is still signed in.
 - **Query layer:** puts the character ID, instance ID, or slot in the path.
+  Writes a weapon response or rollback into its sender's cache entry.
 - **Fetch wrapper:** attaches the signed-in user's ID token.
 - **Middleware:** verifies the ID token. Its user ID keys all storage.
 - **Route:** takes the character ID or slot from the path. Casts an instance ID
@@ -204,7 +194,6 @@ the server each define the default name and the four empty member slots.
 
 Each layer below versions its own format, an overlap.
 
-- **Persist:** zustand `persist` version on the `localStorage` collection.
 - **Middleware:** picks the request schema from the `profile`. The client sends
   no `profile`, so the server validates against its latest request schema.
 - **Document:** migrates on read. `toDocument` stamps the version.
@@ -214,11 +203,11 @@ Each layer below versions its own format, an overlap.
 The hook and the repository merge by different rules, an overlap. The same two
 character values resolve differently on each side.
 
-- **Feature hook:** [guarded rollback](data-flow-write-paths.md). Applies a
-  response: a character's whole record unless it's no longer held, or a
-  weapon's whole instance. Reconciles
-  characters additively with `mergeCollections`, keeping the higher
-  constellation, and replaces weapons and teams.
+- **Feature hook:** [guarded rollback](data-flow-write-paths.md) for characters
+  and teams. Applies a character's whole record from a response unless it's no
+  longer held. Reconciles by replacing the store with the server's collection.
+- **Query layer:** guarded rollback for weapons. Applies a weapon's whole
+  instance from a response.
 - **Repository:** `nextCharacter` and the weapon update keep the latest write.
   `nextTeam` keeps any stored field the body omits.
 
@@ -237,7 +226,6 @@ document layer.
 flowchart TB
   firebaseAuth[Firebase Auth]
   edit(1.0 Edit and render state)
-  reconcile(5.0 Reconcile store with cache)
   serve(3.0 Serve and store records)
 
   subgraph send[2.0 Send writes]
@@ -248,7 +236,6 @@ flowchart TB
 
   edit -->|write request| dispatch
   dispatch -->|mutation variables| build
-  reconcile -->|characters ahead of the server| build
   build -->|path and request body| callApi
   firebaseAuth -->|ID token| callApi
   firebaseAuth -->|user ID| dispatch
@@ -259,8 +246,6 @@ flowchart TB
   dispatch -->|write outcome| edit
 ```
 
-The reconcile effect sends the sign-in push straight to 2.2, skipping the hook.
-
 ### 3.0 Serve and store records
 
 3.1 to 3.5 run in the Google Cloud project.
@@ -270,7 +255,7 @@ flowchart TB
   firebaseAuth[Firebase Auth]
   send(2.0 Send writes)
   fetch(4.0 Fetch records)
-  firestore[(D4 Firestore users/uid)]
+  firestore[(D3 Firestore users/uid)]
 
   subgraph serve[3.0 Serve and store records]
     authenticate(3.1 Authenticate caller)
@@ -302,9 +287,8 @@ A team save also reads the user's characters, weapons, and other teams through
 3.4 before writing, to check its members.
 
 [#1020]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1020
-[#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
+[ADR-0006]: ../explanation/adr-0006-client-data-layer.md
 [#1846]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1846
-[#1847]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1847
 [#1848]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1848
 [#1849]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1849
 [#1889]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1889

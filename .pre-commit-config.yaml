@@ -40,7 +40,7 @@ repos:
         args: [--branch, develop, --branch, main]
 
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.23.3
+    rev: v0.24.0
     hooks:
       - id: markdownlint-cli2
         args: [--fix]
@@ -75,7 +75,7 @@ repos:
         types: [markdown]
 
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.109.2
+    rev: v1.109.3
     hooks:
       - id: terraform_fmt
         args: [--args=-recursive]
@@ -114,7 +114,7 @@ repos:
       - id: hadolint
 
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 44.166.0
+    rev: 44.181.5
     hooks:
       - id: renovate-config-validator
         args: [--strict, --no-global]

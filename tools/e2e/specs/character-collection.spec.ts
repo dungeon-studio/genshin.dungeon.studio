@@ -26,34 +26,24 @@ if (!otherCharacter) throw new Error('Game data has fewer than two characters.')
 const STARTING_CONSTELLATION = 0;
 const RAISED_CONSTELLATION = 4;
 
-// Nothing here asserts that an anonymous collection outlives a navigation or a
-// reload. It does not today — the store clears whenever the hook mounts without
-// a user — and whether it should is open between #552 and #563, which propose
-// opposite answers. Asserting either would put this suite on one side of it.
-
-test('a character can be collected and released anonymously', async ({ page }) => {
+test('the character collection is gated behind signing in', async ({ page }) => {
   await page.goto('/characters');
 
   await page.getByRole('button', { name: addCharacterLabel(character) }).click();
 
-  const owned = page.getByRole('button', { name: removeCharacterLabel(character) });
-  await expect(owned).toBeVisible();
-
-  await owned.click();
-
+  await expect(page.getByText('Sign in to manage your character collection.')).toBeVisible();
   await expect(page.getByRole('button', { name: addCharacterLabel(character) })).toBeVisible();
 });
 
-test('a collected character takes a constellation level', async ({ page }) => {
-  await page.goto('/characters');
+test('a collected character takes a constellation level', async ({ signedInPage: page }) => {
+  await collectCharacter(page, character);
 
-  await page.getByRole('button', { name: addCharacterLabel(character) }).click();
   await page
     .getByRole('button', { name: constellationLabel(character, STARTING_CONSTELLATION) })
     .click();
-  await page
-    .getByRole('button', { name: `Set constellation level ${RAISED_CONSTELLATION}` })
-    .click();
+  await withApiWrite(page, 'PUT', apiPath.character(character), () =>
+    page.getByRole('button', { name: `Set constellation level ${RAISED_CONSTELLATION}` }).click(),
+  );
 
   await expect(
     page.getByRole('button', { name: constellationLabel(character, RAISED_CONSTELLATION) }),
@@ -63,25 +53,8 @@ test('a collected character takes a constellation level', async ({ page }) => {
 test('a signed-in collection round-trips through the API', async ({ signedInPage: page }) => {
   await collectCharacter(page, character);
 
-  // A reload clears the persisted collection while auth is still resolving, so
-  // what comes back has been served by the API rather than read from
-  // localStorage.
-  await page.reload();
-
-  await expect(page.getByRole('button', { name: removeCharacterLabel(character) })).toBeVisible();
-});
-
-test('an anonymous collection merges into the account on first sign-in', async ({ page }) => {
-  await page.goto('/characters');
-
-  await page.getByRole('button', { name: addCharacterLabel(character) }).click();
-
-  // Signing in from the same page keeps the anonymous store alive; a navigation
-  // would clear it before the account arrives.
-  await withApiWrite(page, 'PUT', apiPath.character(character), () => signIn(page));
-
-  await expect(page.getByText('Merged 1 character(s) from your local collection.')).toBeVisible();
-
+  // Nothing survives a reload in the browser, so what comes back has been
+  // served by the API.
   await page.reload();
 
   await expect(page.getByRole('button', { name: removeCharacterLabel(character) })).toBeVisible();
@@ -120,7 +93,11 @@ test('a rejected add rolls back and says so', async ({ signedInPage: page, pageF
 
   await page.getByRole('button', { name: addCharacterLabel(character) }).click();
 
-  await expect(page.getByText('Failed to add character. Change has been reverted.')).toBeVisible();
+  await expect(
+    page.getByText(
+      `Couldn't add ${character.name}. ${character.name} is out of your collection again. Try again.`,
+    ),
+  ).toBeVisible();
   await expect(page.getByRole('button', { name: addCharacterLabel(character) })).toBeVisible();
 
   // Chromium logs the injected 503 as a console error.

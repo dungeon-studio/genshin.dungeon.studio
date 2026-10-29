@@ -3,6 +3,8 @@
 
 export interface HeldResponse {
   resolver: () => Promise<Response>;
+  /** Settles once the held request reaches its handler. */
+  arrived: Promise<void>;
   release: () => void;
 }
 
@@ -14,9 +16,17 @@ export function holdResponse(respond: () => Response): HeldResponse {
       resolve(respond());
     };
   });
+  let arrive = (): void => {};
+  const arrived = new Promise<void>((resolve) => {
+    arrive = resolve;
+  });
 
   return {
-    resolver: () => pending,
+    resolver: () => {
+      arrive();
+      return pending;
+    },
+    arrived,
     release: () => {
       send();
     },

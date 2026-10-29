@@ -15,6 +15,7 @@ import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
 import { negotiatedJson } from '@/http/negotiated-response.js';
+import { publicUrl } from '@/http/public-url.js';
 import { auth } from '@/middleware/auth.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
@@ -59,7 +60,7 @@ function parseSlot(param: string): TeamSlot {
 teams.get('/', async (c) => {
   const userId = c.get('user').uid;
   const items = await Teams.list(userId);
-  const baseUrl = new URL(c.req.url).origin;
+  const baseUrl = publicUrl(c).origin;
 
   return negotiatedJson(c, teamListDocument(items, baseUrl));
 });
@@ -75,7 +76,7 @@ teams.get('/:slot', async (c) => {
     throw new HTTPException(404, { message: 'Team not found' });
   }
 
-  const baseUrl = new URL(c.req.url).origin;
+  const baseUrl = publicUrl(c).origin;
 
   return negotiatedJson(c, teamItemDocument(team, baseUrl));
 });
@@ -97,7 +98,7 @@ teams.put(
 
     const { team, created } = await Teams.save(userId, slot, { ...body, members });
 
-    const baseUrl = new URL(c.req.url).origin;
+    const baseUrl = publicUrl(c).origin;
 
     return negotiatedJson(c, teamItemDocument(team, baseUrl), created ? 201 : 200);
   },

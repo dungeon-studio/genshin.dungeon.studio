@@ -1,31 +1,41 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { MutateOptions } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef } from 'react';
 
-type Mutate<TData, TError, TVariables> = (
+interface SenderBoundCallbacks<TData> {
+  onSuccess?: (data: TData) => void;
+  onError?: (error: unknown) => void;
+  onSettled?: () => void;
+}
+
+type MutateAsync<TData, TVariables> = (variables: TVariables) => Promise<TData>;
+
+export type SenderBoundMutate<TData, TVariables> = (
   variables: TVariables,
-  options?: MutateOptions<TData, TError, TVariables>,
+  callbacks?: SenderBoundCallbacks<TData>,
 ) => void;
 
 /**
  * Runs each call's `onSuccess` and `onError` only while the user who sent the
  * request is still signed in, so a late response or rollback never reaches the
  * next user's store. `onSettled` always runs, for cleanup that isn't per-user.
+ *
+ * Every call keeps its own callbacks, unlike `mutate`, which runs per-call
+ * callbacks for the latest call only and so drops an earlier failure.
  */
-export function useSenderBoundMutate<TData, TError, TVariables>(
+export function useSenderBoundMutate<TData, TVariables>(
   userId: string | undefined,
-  mutate: Mutate<TData, TError, TVariables>,
-): Mutate<TData, TError, TVariables> {
+  mutateAsync: MutateAsync<TData, TVariables>,
+): SenderBoundMutate<TData, TVariables> {
   const currentUserId = useRef(userId);
 
   useEffect(() => {
     currentUserId.current = userId;
   }, [userId]);
 
-  return useCallback<Mutate<TData, TError, TVariables>>(
-    (variables, options) => {
+  return useCallback<SenderBoundMutate<TData, TVariables>>(
+    (variables, callbacks) => {
       const sender = currentUserId.current;
       const whileSenderSignedIn =
         <A extends unknown[]>(callback: ((...args: A) => void) | undefined) =>
@@ -33,12 +43,10 @@ export function useSenderBoundMutate<TData, TError, TVariables>(
           if (currentUserId.current === sender) callback?.(...args);
         };
 
-      mutate(variables, {
-        ...options,
-        onSuccess: whileSenderSignedIn(options?.onSuccess),
-        onError: whileSenderSignedIn(options?.onError),
-      });
+      mutateAsync(variables)
+        .then(whileSenderSignedIn(callbacks?.onSuccess), whileSenderSignedIn(callbacks?.onError))
+        .finally(() => callbacks?.onSettled?.());
     },
-    [mutate],
+    [mutateAsync],
   );
 }

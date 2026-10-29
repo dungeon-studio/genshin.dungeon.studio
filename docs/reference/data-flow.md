@@ -4,9 +4,9 @@
 # Data flow
 
 Where each copy of user data lives and which processes move data between them.
-User data has up to four copies: the Firestore document, the TanStack Query
-cache, a zustand store, and, for characters only, the browser's `localStorage`.
-Which copy should be authoritative is [#1133]. Out of scope:
+User data has three copies: the Firestore document, the TanStack Query cache,
+and, for characters and teams, a zustand store. [ADR-0006] decides which copy is authoritative. Out of
+scope:
 
 - Static game data, which is never written.
 - The theme preference, which never leaves the browser.
@@ -21,7 +21,7 @@ Companion pages:
   at each hop.
 - [Layers](data-flow-layers.md): the browser and API layer stacks, where the
   code skips a layer, and the jobs each layer does.
-- [Lifecycles](data-flow-lifecycles.md): the states each entity's store copy
+- [Lifecycles](data-flow-lifecycles.md): the states each entity's client copy
   moves through.
 
 ---
@@ -53,7 +53,7 @@ flowchart LR
 
 ## Level 0
 
-The system runs eight processes over four data stores, D1 to D4, across three
+The system runs seven processes over three data stores, D1 to D3, across three
 trust boundaries:
 
 - The browser runs on hardware the user controls.
@@ -72,26 +72,25 @@ flowchart TB
     send(2.0 Send writes)
     fetch(4.0 Fetch records)
     reconcile(5.0 Reconcile store with cache)
-    persistCharacters(6.0 Persist character collection)
-    clearUserData(8.0 Clear user data)
+    clearUserData(7.0 Clear user data)
     store[(D1 zustand stores)]
     cache[(D2 Query cache)]
-    local[(D3 localStorage genshin-collection)]
   end
 
   subgraph cloud[Google Cloud project]
     serve(3.0 Serve and store records)
-    firestore[(D4 Firestore users/uid)]
+    firestore[(D3 Firestore users/uid)]
   end
 
   subgraph workstation[Operator workstation]
-    sweep(7.0 Sweep stored documents)
+    sweep(6.0 Sweep stored documents)
   end
 
   user -->|edit| edit
   edit -->|rendered state| user
   store -->|current entities| edit
   edit -->|edited entities| store
+  cache -->|current weapons| edit
   edit -->|write request| send
 
   firebaseAuth -->|ID token| send
@@ -102,6 +101,7 @@ flowchart TB
   fetch -->|ID token| serve
   serve -->|saved record| send
   send -->|write outcome| edit
+  send -->|edited and saved weapons| cache
 
   firebaseAuth -->|signing keys and revocation status| serve
   serve -->|identity to delete| firebaseAuth
@@ -113,15 +113,7 @@ flowchart TB
   fetch -->|server collection| cache
 
   cache -->|server collection| reconcile
-  store -->|local characters| reconcile
-  firebaseAuth -->|user ID| reconcile
   reconcile -->|reconciled entities| store
-  reconcile -->|characters ahead of the server| send
-
-  store -->|characters| persistCharacters
-  persistCharacters -->|versioned collection| local
-  local -->|stored collection| persistCharacters
-  persistCharacters -->|migrated characters| store
 
   firebaseAuth -->|user ID| clearUserData
   clearUserData -->|emptied entities| store
@@ -135,13 +127,13 @@ flowchart TB
 A control signal carries no data: a successful collection or team mutation
 invalidates its query, which makes Fetch records run again. A mutation that
 succeeds while another to the same query is pending skips the invalidation.
-Starting a mutation cancels a refetch already in flight. No mutation writes into
-the query cache directly. Account deletion empties it. A plain sign-out leaves
+Starting a mutation cancels a refetch already in flight. Weapon mutations write
+their edits and saved instances into the query cache directly, and no other
+mutation does. Account deletion empties it. A plain sign-out leaves
 the previous user's entries, keyed by user ID, until garbage collection.
 
 Clear user data runs when a signed-in user signs out or another account signs
-in, whichever page is open. It empties the character and weapon stores and
-resets teams to their default slots. The emptied character collection then
-persists to D3.
+in, whichever page is open. It empties the character store and resets teams to
+their default slots. Weapons need no clear, because the user ID keys the cache.
 
-[#1133]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1133
+[ADR-0006]: ../explanation/adr-0006-client-data-layer.md

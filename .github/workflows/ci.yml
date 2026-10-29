@@ -149,7 +149,7 @@ jobs:
 
     env:
       # renovate: datasource=java-version depName=java
-      JAVA_VERSION: '25.0.4+101.0.LTS'
+      JAVA_VERSION: '25.0.5+8.0.LTS'
 
     steps:
       - name: Checkout repository
@@ -182,7 +182,7 @@ jobs:
 
     env:
       # renovate: datasource=java-version depName=java
-      JAVA_VERSION: '25.0.4+101.0.LTS'
+      JAVA_VERSION: '25.0.5+8.0.LTS'
 
     steps:
       - name: Checkout repository
@@ -230,7 +230,7 @@ jobs:
 
     env:
       # renovate: datasource=java-version depName=java
-      JAVA_VERSION: '25.0.4+101.0.LTS'
+      JAVA_VERSION: '25.0.5+8.0.LTS'
 
     steps:
       - name: Checkout repository
@@ -278,11 +278,9 @@ jobs:
 
     env:
       # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
-      TERRAFORM_VERSION: '1.16.6'
-      # renovate: datasource=github-releases depName=lycheeverse/lychee extractVersion=^lychee-v(?<version>.+)$
-      LYCHEE_VERSION: '0.24.2'
+      TERRAFORM_VERSION: '1.17.0'
       # renovate: datasource=github-releases depName=aquasecurity/trivy extractVersion=^v(?<version>.+)$
-      TRIVY_VERSION: '0.76.0'
+      TRIVY_VERSION: '0.76.1'
 
     steps:
       - name: Checkout repository
@@ -306,15 +304,8 @@ jobs:
             "${TRIVY_URL}/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" \
             | sudo tar -xz -C /usr/local/bin trivy
 
-      # musl, so the binary is static and carries no glibc floor.
       - name: Install lychee
-        run: |
-          set -euo pipefail
-          LYCHEE_URL=https://github.com/lycheeverse/lychee/releases/download
-          LYCHEE_DIR=lychee-x86_64-unknown-linux-musl
-          curl -fsSL \
-            "${LYCHEE_URL}/lychee-v${LYCHEE_VERSION}/${LYCHEE_DIR}.tar.gz" \
-            | sudo tar -xz -C /usr/local/bin --strip-components=1 "${LYCHEE_DIR}/lychee"
+        run: scripts/install-lychee.sh
 
       - name: Run hooks
         uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
@@ -348,7 +339,7 @@ jobs:
       # The action derives a scan range only for push and pull_request, and
       # scans the full history on any other event.
       - name: Scan for verified secrets
-        uses: trufflesecurity/trufflehog@e63326d6545de8f425d93ce24078c6e68d83f70e # v3.99.3
+        uses: trufflesecurity/trufflehog@31ce31ee1abbcc7dc8eee5764c17121c3044c8b2 # v3.99.7
         with:
           base: ${{ github.event.merge_group.base_sha }}
           head: ${{ github.event.merge_group.head_sha }}
@@ -373,14 +364,20 @@ jobs:
           persist-credentials: false
 
       - name: Run zizmor
-        uses: zizmorcore/zizmor-action@85b2b9fb8e3325e7a23d7d0a9d7ba5ae0f999e3e # v0.7.1
+        uses: zizmorcore/zizmor-action@53290badfa369cb0bf7ad16342cb62c2fa47ac7b # v0.8.0
         with:
           config: .github/zizmor.yml
 
   # Trivy applies a tfvars file to every root module under the scan path, so
-  # each root scans alone with its own.
+  # each root scans alone with its own. Pushes scan every root, so code
+  # scanning has a complete base to compare each pull request against.
   trivy-terraform:
     name: Scan ${{ matrix.root }} Terraform
+    needs: terraform-changes
+    if: >-
+      !cancelled() &&
+      (github.event_name != 'pull_request' ||
+      needs.terraform-changes.outputs.scan == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -423,36 +420,38 @@ jobs:
           trivy-config: .trivy.yaml
 
       - name: Upload Terraform SARIF
-        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
         if: always()
         with:
           sarif_file: terraform-results.sarif
           category: trivy-terraform-${{ matrix.root }}
 
   # The matrix reports one context per root, so a ruleset requires this job
-  # instead and a new root never touches the ruleset.
+  # instead and a new root never touches the ruleset. It needs change detection
+  # too, so a detection failure can't pass as a skipped scan.
   trivy-terraform-result:
     name: Scan Terraform
-    needs: trivy-terraform
+    needs: [terraform-changes, trivy-terraform]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
-      - name: Fail unless every scan succeeded
-        if: needs.trivy-terraform.result != 'success'
+      - name: Fail on a failed or cancelled scan
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
         run: exit 1
 
-  # A job decides whether to plan, rather than a `paths:` gate, so
-  # `Plan infrastructure` reports on every pull request and a ruleset can
-  # require it.
+  # A job decides whether to plan and scan, rather than a `paths:` gate, so
+  # `Plan infrastructure` and `Scan Terraform` report on every pull request and
+  # a ruleset can require them.
   terraform-changes:
     name: Detect Terraform changes
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      changed: ${{ steps.diff.outputs.changed }}
+      plan: ${{ steps.plan-diff.outputs.changed }}
+      scan: ${{ steps.scan-diff.outputs.changed }}
 
     steps:
       - name: Checkout repository
@@ -462,27 +461,35 @@ jobs:
           # Reaches the base: the first parent of the pull request's merge commit.
           fetch-depth: 2
 
-      # bootstrap/ is applied by hand, and no plan below targets prod. `git diff`
-      # exits nonzero on error too, so a failed diff runs the plans.
-      - name: Diff against the base
-        id: diff
-        run: |
-          if git diff --quiet HEAD^1 HEAD -- \
-            infrastructure/terraform \
-            ':!infrastructure/terraform/bootstrap' \
-            ':!infrastructure/terraform/environments/prod' \
-            .github/workflows/ci.yml; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
+      # bootstrap/ is applied by hand, and no plan below targets prod.
+      - name: Diff the planned inputs against the base
+        id: plan-diff
+        uses: ./.github/actions/diff-against-base
+        with:
+          paths: |
+            infrastructure/terraform
+            :!infrastructure/terraform/bootstrap
+            :!infrastructure/terraform/environments/prod
+            .github/actions/diff-against-base
+            .github/workflows/ci.yml
+
+      # Every root scans, bootstrap and prod included.
+      - name: Diff the scanned inputs against the base
+        id: scan-diff
+        uses: ./.github/actions/diff-against-base
+        with:
+          paths: |
+            infrastructure/terraform
+            .trivy.yaml
+            .github/actions/diff-against-base
+            .github/workflows/ci.yml
 
   # A skipped job never expands its matrix, so a matrix reference in the
   # name would show raw. GitHub appends the environment to each run's name.
   terraform-plan:
     name: Plan environment infrastructure
     needs: terraform-changes
-    if: needs.terraform-changes.outputs.changed == 'true'
+    if: needs.terraform-changes.outputs.plan == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -492,7 +499,7 @@ jobs:
 
     env:
       # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
-      TERRAFORM_VERSION: '1.16.6'
+      TERRAFORM_VERSION: '1.17.0'
 
     strategy:
       fail-fast: false
@@ -613,7 +620,7 @@ jobs:
           trivy-config: .trivy.yaml
 
       - name: Upload Dockerfile SARIF
-        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
         if: always()
         with:
           sarif_file: dockerfile-results.sarif
@@ -675,6 +682,15 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
+      # deploy.yml tags its image with this action after merge, so a breaking
+      # release has to fail here first.
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: api
+          tags: type=raw,value=ci
+
       - name: Build image
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
@@ -682,7 +698,8 @@ jobs:
           file: ./apps/api/Dockerfile
           push: false
           load: true
-          tags: api:ci
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -702,7 +719,7 @@ jobs:
           trivy-config: .trivy.yaml
 
       - name: Upload Container SARIF
-        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
         if: always()
         with:
           sarif_file: container-results.sarif
@@ -720,3 +737,86 @@ jobs:
       - name: Cleanup container
         if: always()
         run: docker rm -f api-smoke 2>/dev/null || true
+
+  # A step skips the expensive devcontainer build unless an input changed, so
+  # the check still reports on every pull request and a ruleset can require
+  # it. The inputs are the files the image build reads, plus this workflow.
+  # `package.json` pins the package manager, engines, and firebase-tools;
+  # `tools/e2e/package.json` pins the Playwright browsers.
+  toolchain:
+    name: Verify toolchain
+    runs-on: ubuntu-latest
+    # Headroom for a cold build.
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Reaches the base: the first parent of the merge or squash commit.
+          fetch-depth: 2
+
+      - name: Diff against the base
+        id: diff
+        uses: ./.github/actions/diff-against-base
+        with:
+          paths: |
+            .devcontainer
+            scripts/install-reuse.sh
+            scripts/install-lychee.sh
+            package.json
+            tools/e2e/package.json
+            .github/actions/diff-against-base
+            .github/workflows/ci.yml
+
+      - name: Build the image and verify its toolchain
+        if: steps.diff.outputs.changed == 'true'
+        uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
+        with:
+          imageName: genshin-planner-devcontainer
+          push: never
+          # The action starts the container only when runCmd is set. Starting
+          # it runs postCreateCommand.sh, which verifies the toolchain.
+          # Project-wide checks belong in .pre-commit-config.yaml.
+          runCmd: 'true'
+
+  # release-notes.yml drafts only after merge, so a breaking release-drafter
+  # has to fail here first.
+  release-draft:
+    name: Preview release draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+      - name: Preview release draft
+        uses: release-drafter/release-drafter@978bb0b30c5ee8cdd332ced253758157150d43f0 # v7.10.0
+        with:
+          dry-run: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # daily.yml prunes only on a schedule, so a breaking actions/stale has to
+  # fail here first.
+  stale-pull-requests:
+    name: Preview stale pull request pruning
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Preview stale pull request pruning
+        uses: ./.github/actions/prune-stale-pull-requests
+        with:
+          debug-only: 'true'

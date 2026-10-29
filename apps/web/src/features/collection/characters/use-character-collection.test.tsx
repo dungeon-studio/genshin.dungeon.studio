@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CharacterId } from '@genshin/domain';
+import type { CharacterId, CollectionCharacter } from '@genshin/domain';
+import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { toast } from 'sonner';
@@ -9,8 +10,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { charactersDocument, makeCharacter } from '@/test/fixtures';
 import { holdResponse } from '@/test/msw/held-response';
+import { matchJsonBody } from '@/test/msw/match-json-body';
 import { server } from '@/test/msw/server';
 import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
+import { selectUndo } from '@/test/undo-toast';
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
@@ -19,124 +22,77 @@ import { useCollectionStore } from './use-character-collection-store';
 
 const SKIRK = 'skirk' as CharacterId;
 
+interface CharacterLevelBody {
+  constellationLevel: number;
+}
+
+/** A fake API whose list answers with what its successful writes left behind. */
+function fakeCharacterServer(initial: CollectionCharacter[]) {
+  let stored = initial;
+  const without = (id: CharacterId) => stored.filter((c) => c.characterId !== id);
+  return {
+    list: http.get('http://localhost:8080/characters', () =>
+      HttpResponse.json(charactersDocument(stored)),
+    ),
+    put: (character: CollectionCharacter) => {
+      stored = [...without(character.characterId), character];
+      return HttpResponse.json(charactersDocument([character]));
+    },
+    remove: (id: CharacterId) => {
+      stored = without(id);
+      return new HttpResponse(null, { status: 204 });
+    },
+  };
+}
+
 beforeEach(() => {
-  localStorage.clear();
   useCollectionStore.getState().clearCharacters();
   vi.clearAllMocks();
 });
 
-describe('useCollection merge-on-first-login', () => {
-  it('merges the local collection into the store and syncs new entries to the server', async () => {
-    // Anonymous local collection built before signing in.
-    useCollectionStore.getState().addCharacter(SKIRK);
-    useCollectionStore.getState().setConstellationLevel(SKIRK, 3);
+describe('useCollection sync', () => {
+  it('records nothing signed out', () => {
+    const { result } = renderHook(() => useCollection(), { wrapper: createWrapper() });
 
-    const putBodies: unknown[] = [];
+    act(() => {
+      result.current.addCharacter(SKIRK);
+    });
+
+    expect(result.current.isOwned(SKIRK)).toBe(false);
+  });
+
+  it("replaces the store with the server's collection", async () => {
+    // Held from an earlier session, since removed on another device.
+    useCollectionStore.getState().addCharacter(SKIRK);
     server.use(
       http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
-      http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
-        putBodies.push(await request.json());
-        return HttpResponse.json(
-          charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })]),
-        );
-      }),
     );
 
     const { result } = renderHook(() => useCollection(), {
       wrapper: createWrapper({ user: fakeUser('user-1') }),
     });
 
-    await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
-    // The locally-owned character absent from the server is pushed up.
-    await waitFor(() => expect(putBodies).toContainEqual({ constellationLevel: 3 }));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    await waitFor(() => expect(result.current.isOwned(SKIRK)).toBe(false));
   });
 
-  it('does not re-push local entries when the same user refetches', async () => {
-    useCollectionStore.getState().addCharacter(SKIRK);
-    useCollectionStore.getState().setConstellationLevel(SKIRK, 3);
-
-    let getCount = 0;
-    let putCount = 0;
-    server.use(
-      http.get('http://localhost:8080/characters', () => {
-        getCount += 1;
-        return HttpResponse.json(charactersDocument([]));
-      }),
-      http.put('http://localhost:8080/characters/skirk', () => {
-        putCount += 1;
-        return HttpResponse.json(
-          charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })]),
-        );
-      }),
-    );
-
-    renderHook(() => useCollection(), {
-      wrapper: createWrapper({ user: fakeUser('user-1') }),
-    });
-
-    // First merge pushes the diff, whose success invalidates and refetches.
-    await waitFor(() => expect(putCount).toBe(1));
-    await waitFor(() => expect(getCount).toBeGreaterThanOrEqual(2));
-
-    // The refetch runs the additive branch, not another merge push.
-    expect(putCount).toBe(1);
-  });
-
-  it('does not re-add a character removed elsewhere when the hook mounts again', async () => {
-    let serverCharacters = [makeCharacter(SKIRK, { constellationLevel: 3 })];
-    let putCount = 0;
+  it('keeps a loaded collection when a later refetch fails', async () => {
     server.use(
       http.get('http://localhost:8080/characters', () =>
-        HttpResponse.json(charactersDocument(serverCharacters)),
+        HttpResponse.json(charactersDocument([makeCharacter(SKIRK)])),
       ),
-      http.put('http://localhost:8080/characters/skirk', () => {
-        putCount += 1;
-        return HttpResponse.json(charactersDocument(serverCharacters));
-      }),
     );
+    const { result, queryClient } = renderHookSignedIn(() => useCollection(), 'user-1');
+    await waitFor(() => expect(result.current.isOwned(SKIRK)).toBe(true));
 
-    const { result: firstMount, unmount } = renderHook(() => useCollection(), {
-      wrapper: createWrapper({ user: fakeUser('user-1') }),
-    });
-    await waitFor(() => expect(firstMount.current.isOwned(SKIRK)).toBe(true));
-    unmount();
-
-    // Another device removes the character while this one still holds it.
-    serverCharacters = [];
-
-    const { result: secondMount } = renderHook(() => useCollection(), {
-      wrapper: createWrapper({ user: fakeUser('user-1') }),
-    });
-    await waitFor(() => expect(secondMount.current.isLoading).toBe(false));
-
-    expect(putCount).toBe(0);
-  });
-
-  it('pushes local entries again after the user signs out and back in', async () => {
-    let putCount = 0;
     server.use(
-      http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
-      http.put('http://localhost:8080/characters/skirk', () => {
-        putCount += 1;
-        return HttpResponse.json(
-          charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })]),
-        );
-      }),
+      http.get('http://localhost:8080/characters', () => new HttpResponse(null, { status: 500 })),
     );
+    await act(() => queryClient.invalidateQueries());
 
-    useCollectionStore.getState().addCharacter(SKIRK);
-    const { signOut, unmount } = renderHookSignedIn(() => useCollection(), 'user-1');
-    await waitFor(() => expect(putCount).toBe(1));
-    signOut();
-    unmount();
-
-    // A visitor's addition made signed out has to reach the account on sign-in.
-    useCollectionStore.getState().addCharacter(SKIRK);
-    renderHook(() => useCollection(), {
-      wrapper: createWrapper({ user: fakeUser('user-1') }),
-    });
-
-    await waitFor(() => expect(putCount).toBe(2));
+    await waitFor(() => expect(result.current.error).not.toBeNull());
+    expect(result.current.loadFailed).toBe(false);
+    expect(result.current.isOwned(SKIRK)).toBe(true);
   });
 });
 
@@ -171,7 +127,64 @@ describe('useCollection mutations', () => {
     // Optimistically gone, then restored at its prior level once the delete errors.
     expect(result.current.getCharacter(SKIRK)).toBeUndefined();
     await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
-    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+    expect(toast.error).toHaveBeenCalledWith(
+      "Couldn't remove Skirk. Skirk is back in your collection. Try again.",
+    );
+  });
+
+  it('brings a removed character back at its level when undone', async () => {
+    let putBody: CharacterLevelBody | undefined;
+    const fake = fakeCharacterServer([makeCharacter(SKIRK, { constellationLevel: 3 })]);
+    server.use(
+      fake.list,
+      http.delete('http://localhost:8080/characters/skirk', () => fake.remove(SKIRK)),
+      http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
+        putBody = (await request.json()) as CharacterLevelBody;
+        return fake.put(makeCharacter(SKIRK, { constellationLevel: 3 }));
+      }),
+    );
+
+    const { result } = await renderOwningSkirkAtC3();
+
+    act(() => {
+      result.current.removeCharacter(SKIRK);
+    });
+    await waitFor(() => expect(toast.success).toHaveBeenCalled());
+    act(() => {
+      selectUndo('Removed Skirk at constellation level 3.');
+    });
+
+    expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3);
+    await waitFor(() => expect(putBody).toEqual({ constellationLevel: 3 }));
+  });
+
+  it('takes an undone removal back out when the restore fails', async () => {
+    const fake = fakeCharacterServer([makeCharacter(SKIRK, { constellationLevel: 3 })]);
+    server.use(
+      fake.list,
+      http.delete('http://localhost:8080/characters/skirk', () => fake.remove(SKIRK)),
+      http.put(
+        'http://localhost:8080/characters/skirk',
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    const { result } = await renderOwningSkirkAtC3();
+
+    act(() => {
+      result.current.removeCharacter(SKIRK);
+    });
+    await waitFor(() => expect(toast.success).toHaveBeenCalled());
+    act(() => {
+      selectUndo('Removed Skirk at constellation level 3.');
+    });
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Couldn't bring back Skirk. Skirk is out of your collection again. Try again.",
+      ),
+    );
+    expect(result.current.getCharacter(SKIRK)).toBeUndefined();
   });
 
   it('stores the saved character with the server timestamps', async () => {
@@ -219,7 +232,188 @@ describe('useCollection mutations', () => {
 
     expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(5);
     await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
-    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('reverted'));
+    expect(toast.error).toHaveBeenCalledWith(
+      "Couldn't set Skirk to constellation level 5. Skirk is back at constellation level 3. Try again.",
+    );
+  });
+
+  it("returns to the server's level when two rapid level changes both fail", async () => {
+    const secondFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
+    const serverLevel = 3;
+    const firstLevel = 4;
+    const secondLevel = 5;
+    server.use(
+      http.get('http://localhost:8080/characters', () =>
+        HttpResponse.json(
+          charactersDocument([makeCharacter(SKIRK, { constellationLevel: serverLevel })]),
+        ),
+      ),
+      http.put(
+        matchJsonBody<CharacterLevelBody>(
+          'http://localhost:8080/characters/skirk',
+          ({ constellationLevel }) => constellationLevel === secondLevel,
+        ),
+        secondFailure.resolver,
+      ),
+      http.put(
+        'http://localhost:8080/characters/skirk',
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    const { result } = await renderOwningSkirkAtC3();
+
+    act(() => {
+      result.current.setConstellationLevel(SKIRK, firstLevel);
+    });
+    act(() => {
+      result.current.setConstellationLevel(SKIRK, secondLevel);
+    });
+    // The first failure leaves the newer edit, and the second rolls back to the
+    // level the first one sent.
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        `Couldn't set Skirk to constellation level ${firstLevel}. Your newer change stands.`,
+      ),
+    );
+    await act(() => secondFailure.arrived);
+    secondFailure.release();
+
+    await waitFor(() =>
+      expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(serverLevel),
+    );
+  });
+
+  it('drops an added character when the add fails', async () => {
+    server.use(
+      http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
+      http.put(
+        'http://localhost:8080/characters/skirk',
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    const { result } = renderHook(() => useCollection(), {
+      wrapper: createWrapper({ user: fakeUser('user-1') }),
+    });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => {
+      result.current.addCharacter(SKIRK);
+    });
+
+    expect(result.current.isOwned(SKIRK)).toBe(true);
+    await waitFor(() => expect(result.current.isOwned(SKIRK)).toBe(false));
+    expect(toast.error).toHaveBeenCalledWith(
+      "Couldn't add Skirk. Skirk is out of your collection again. Try again.",
+    );
+  });
+
+  it('keeps a raise made while a failing add was in flight', async () => {
+    const addFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
+    const raisedLevel = 3;
+    const fake = fakeCharacterServer([]);
+    server.use(
+      fake.list,
+      http.put(
+        matchJsonBody<CharacterLevelBody>(
+          'http://localhost:8080/characters/skirk',
+          ({ constellationLevel }) => constellationLevel === MIN_CONSTELLATION_LEVEL,
+        ),
+        addFailure.resolver,
+      ),
+      http.put('http://localhost:8080/characters/skirk', () =>
+        fake.put(makeCharacter(SKIRK, { constellationLevel: raisedLevel })),
+      ),
+    );
+
+    const { result } = renderHook(() => useCollection(), {
+      wrapper: createWrapper({ user: fakeUser('user-1') }),
+    });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => {
+      result.current.addCharacter(SKIRK);
+    });
+    act(() => {
+      result.current.setConstellationLevel(SKIRK, raisedLevel);
+    });
+    await act(() => addFailure.arrived);
+    addFailure.release();
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith("Couldn't add Skirk. Your newer change stands."),
+    );
+    expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(raisedLevel);
+  });
+
+  it('keeps a re-add made while a failing removal was in flight', async () => {
+    const deleteFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
+    const fake = fakeCharacterServer([makeCharacter(SKIRK, { constellationLevel: 3 })]);
+    server.use(
+      fake.list,
+      http.delete('http://localhost:8080/characters/skirk', deleteFailure.resolver),
+      http.put('http://localhost:8080/characters/skirk', () => fake.put(makeCharacter(SKIRK))),
+    );
+
+    const { result } = await renderOwningSkirkAtC3();
+
+    act(() => {
+      result.current.removeCharacter(SKIRK);
+    });
+    act(() => {
+      result.current.addCharacter(SKIRK);
+    });
+    deleteFailure.release();
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith("Couldn't remove Skirk. Your newer change stands."),
+    );
+    expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(0);
+  });
+
+  it('keeps a re-add made while a failing level change was in flight', async () => {
+    const levelFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
+    const failingLevel = 5;
+    const fake = fakeCharacterServer([makeCharacter(SKIRK, { constellationLevel: 3 })]);
+    const deletion = holdResponse(() => fake.remove(SKIRK));
+    server.use(
+      fake.list,
+      http.put(
+        matchJsonBody<CharacterLevelBody>(
+          'http://localhost:8080/characters/skirk',
+          ({ constellationLevel }) => constellationLevel === failingLevel,
+        ),
+        levelFailure.resolver,
+      ),
+      http.put('http://localhost:8080/characters/skirk', () => fake.put(makeCharacter(SKIRK))),
+      http.delete('http://localhost:8080/characters/skirk', deletion.resolver),
+    );
+
+    const { result } = await renderOwningSkirkAtC3();
+
+    act(() => {
+      result.current.setConstellationLevel(SKIRK, failingLevel);
+    });
+    act(() => {
+      result.current.removeCharacter(SKIRK);
+    });
+    // The removal reaches the server before the re-add, in the order the user
+    // made them.
+    await act(() => deletion.arrived);
+    deletion.release();
+    act(() => {
+      result.current.addCharacter(SKIRK);
+    });
+    await act(() => levelFailure.arrived);
+    levelFailure.release();
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Couldn't set Skirk to constellation level 5. Your newer change stands.",
+      ),
+    );
+    expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(0);
   });
 
   it('leaves the store alone when a removal fails after sign-out', async () => {

@@ -6,7 +6,7 @@ import type { Element, ElementalResonance } from '@genshin/game-data';
 import { getActiveResonances, getCharacterById, RESONANCE_TRIGGERS } from '@genshin/game-data';
 import type { JSX } from 'react';
 
-import { ChipIcon } from '@/components/ui/chip-icon';
+import { ChipIcon } from '@/components/icons/chip-icon';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/class-names';
 import { ELEMENT_BG_COLORS } from '@/lib/element-styles';

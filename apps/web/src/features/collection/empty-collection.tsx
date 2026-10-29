@@ -5,8 +5,9 @@ import type { LucideIcon } from 'lucide-react';
 import type { JSX } from 'react';
 import { Link } from 'react-router-dom';
 
+import { EmptyState } from '@/components/chrome/empty-state';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/class-names';
+import { SignInPrompt, useAuth } from '@/features/auth';
 
 interface EmptyCollectionProps {
   icon: LucideIcon;
@@ -17,25 +18,36 @@ interface EmptyCollectionProps {
   className?: string;
 }
 
-/** Empty state for a view that needs collection entries before it can show anything. */
+/**
+ * Empty state for a view that needs collection entries before it can show anything.
+ *
+ * Signed out, it offers sign-in in place of `to`: a collection belongs to an
+ * account, so the page it would link to can't add anything.
+ */
 export function EmptyCollection({
-  icon: Icon,
+  icon,
   title,
   description,
   to,
   action,
   className,
 }: EmptyCollectionProps): JSX.Element {
+  if (useAuth().status === 'signed-out') {
+    return (
+      <SignInPrompt
+        icon={icon}
+        title={title}
+        description="Sign in to start your collection."
+        className={className}
+      />
+    );
+  }
+
   return (
-    <div className={cn('gap-4 py-12 flex flex-1 flex-col items-center justify-center', className)}>
-      <Icon className="h-10 w-10 text-muted-foreground" aria-hidden="true" focusable={false} />
-      <div className="text-center">
-        <p className="font-medium">{title}</p>
-        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-      </div>
+    <EmptyState icon={icon} title={title} description={description} className={className}>
       <Button asChild>
         <Link to={to}>{action}</Link>
       </Button>
-    </div>
+    </EmptyState>
   );
 }

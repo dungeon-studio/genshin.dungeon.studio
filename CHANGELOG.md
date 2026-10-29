@@ -27,10 +27,13 @@ single `### Added` bucket in `[Unreleased]`.
 - Elemental resonance badges on full teams; tapping one shows its bonus.
 - Responsive team editing sheet for small screens.
 - Phone-width layout for the header and team slots.
-- Team persistence so compositions survive across sessions.
-- Offline collection management that syncs when back online.
-- Anonymous-to-authenticated collection merge on sign-in.
+- Team persistence so compositions survive across sessions, with a sign-in prompt on the team builder when signed out.
+- Collections saved to your account, with a sign-in prompt when managing one signed out.
+- Save-failure messages that name the team, character, or weapon, say what was put back, and suggest trying again.
+- Collections and teams that reload from your account after a failed save, so quick failed edits never leave an unsaved value.
+- Undo for removing a character or weapon copy, restoring its constellation level or refinement rank.
 - Google sign-in and sign-out from the site header.
+- Messages when sign-in or sign-out fails, such as a blocked pop-up, with a button to try again.
 - Dark mode support.
 - Footer links to GitHub issues, feature requests, discussions, changelog, and repository.
 - Game data version displayed in the footer.

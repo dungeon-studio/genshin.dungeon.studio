@@ -37,7 +37,7 @@ permissions:
 
 env:
   # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
-  TERRAFORM_VERSION: '1.16.6'
+  TERRAFORM_VERSION: '1.17.0'
 
 # Only one deploy per ref at a time. Cloud Run and the `:develop` image tag
 # are single mutable targets, so concurrent runs race: an older run's health
@@ -238,6 +238,25 @@ jobs:
             echo "expected $FRONTEND_ORIGIN, got '${allowed:-<none>}'" >&2
             exit 1
           }
+
+      # Whether the API honours X-Forwarded-Proto is a unit test in
+      # public-url.test.ts. What only a deployed service can answer is whether
+      # its front end sends the header: without it every link reads http, and
+      # the https site blocks them as mixed content. A schema's $id shares its
+      # origin with every link and needs no token.
+      - name: Verify Public Links
+        env:
+          SERVICE_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          id=$(curl -fsSL "$SERVICE_URL/profiles/json-schema/characters/put-request-v1.json" \
+            | jq -r '."$id"')
+          case "$id" in
+            "$SERVICE_URL"/*) ;;
+            *)
+              echo "expected a link under $SERVICE_URL, got '${id:-<none>}'" >&2
+              exit 1
+              ;;
+          esac
 
       - uses: ./.github/actions/setup-node-pnpm
 

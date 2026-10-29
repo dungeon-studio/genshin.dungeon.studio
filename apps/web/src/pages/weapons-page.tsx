@@ -3,34 +3,22 @@
 
 import type { WeaponId, WeaponType } from '@genshin/game-data';
 import { WEAPON_ROSTER, WEAPON_TYPES } from '@genshin/game-data';
-import { Loader2 } from 'lucide-react';
 import type { JSX } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { toast } from 'sonner';
 
 import { Container } from '@/components/chrome/container';
-import { signInWithGoogle } from '@/features/auth';
+import { LoadFailedPage } from '@/components/chrome/load-failed-page';
+import { LoadingPage } from '@/components/chrome/loading-page';
+import { promptSignIn } from '@/features/auth';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
+import type { UseWeaponCollectionResult } from '@/features/collection/weapons/use-weapon-collection';
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
-import {
-  groupByWeapon,
-  weaponIdsOf,
-} from '@/features/collection/weapons/use-weapon-collection-store';
 import { WeaponCard } from '@/features/collection/weapons/weapon-card';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
 import { WeaponInstanceSidebar } from '@/features/collection/weapons/weapon-instance-sidebar';
-
-/** The toast asks the user to act, not just to read. */
-const AUTH_TOAST_DURATION_MS = 10_000;
-
-function promptSignIn() {
-  toast.info('Sign in to manage your weapon collection.', {
-    action: { label: 'Sign in', onClick: () => void signInWithGoogle() },
-    duration: AUTH_TOAST_DURATION_MS,
-  });
-}
+import { groupByWeapon, weaponIdsOf } from '@/features/collection/weapons/weapon-instances';
 
 /** Preselects the weapon type a `?type=` query names, as in `/weapons?type=Sword`. */
 function filtersFromSearchParams(searchParams: URLSearchParams): WeaponFilterState {
@@ -43,23 +31,24 @@ function filtersFromSearchParams(searchParams: URLSearchParams): WeaponFilterSta
   return state;
 }
 
-function LoadingCollection(): JSX.Element {
-  return (
-    <Container className="py-12">
-      <h1 className="sr-only">Weapons</h1>
-      <div className="py-24 flex items-center justify-center">
-        <Loader2
-          className="h-8 w-8 animate-spin text-muted-foreground"
-          aria-hidden="true"
-          focusable={false}
-        />
-        <span className="sr-only">Loading collection</span>
-      </div>
-    </Container>
-  );
+export function WeaponsPage(): JSX.Element {
+  const collection = useWeaponCollection();
+
+  if (collection.isLoading) return <LoadingPage title="Weapons" label="Loading collection" />;
+  if (collection.loadFailed) {
+    return (
+      <LoadFailedPage
+        title="Weapons"
+        message="Failed to load your weapon collection."
+        onRetry={collection.retry}
+      />
+    );
+  }
+
+  return <WeaponRoster collection={collection} />;
 }
 
-export function WeaponsPage(): JSX.Element {
+function WeaponRoster({ collection }: { collection: UseWeaponCollectionResult }): JSX.Element {
   const {
     weapons,
     isAuthenticated,
@@ -68,9 +57,8 @@ export function WeaponsPage(): JSX.Element {
     removeWeapon,
     setRefinementLevel,
     getWeaponsByWeaponId,
-    isLoading,
     error,
-  } = useWeaponCollection();
+  } = collection;
 
   const [searchParams] = useSearchParams();
 
@@ -106,7 +94,7 @@ export function WeaponsPage(): JSX.Element {
       }
 
       if (!isAuthenticated) {
-        promptSignIn();
+        promptSignIn('weapon collection');
         return;
       }
 
@@ -115,8 +103,6 @@ export function WeaponsPage(): JSX.Element {
     },
     [selectedWeaponId, isAuthenticated, ensureWeapon],
   );
-
-  if (isLoading) return <LoadingCollection />;
 
   return (
     <>

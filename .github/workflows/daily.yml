@@ -135,32 +135,15 @@ jobs:
     permissions:
       # `actions: write` is omitted: it covers only the resume cache, so a
       # truncated run warns and restarts rather than failing.
+      contents: read
       issues: write
       pull-requests: write
 
     steps:
-      # Both issue legs are disabled, not just marking: an issue already
-      # carrying the label would otherwise stay eligible for closing.
-      - uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v11.0.0
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          days-before-issue-stale: -1
-          days-before-issue-close: -1
-          days-before-pr-stale: 30
-          days-before-pr-close: 14
-          # The action defaults this input to Stale and creates that label if
-          # it is absent.
-          stale-pr-label: stale
-          # Closing a Renovate pull request tells Renovate the version is
-          # unwanted and it will not re-offer it. Renovate labels nothing by
-          # default, so exempting `dependencies` relies on renovate.json
-          # applying it. A `blocked` pull request waits on other work, not on
-          # its author.
-          exempt-pr-labels: blocked,dependencies
-          stale-pr-message: >-
-            This has been quiet for 30 days, so it's picked up a stale label. A
-            comment or a push clears the label and restarts the clock. Otherwise
-            this closes in another 14 days.
-          close-pr-message: >-
-            Closing this after 44 quiet days. That isn't a call on the change
-            itself, and nothing is lost: the branch stays where it is, so
-            comment here if you want to pick it back up and I'll reopen it.
+          persist-credentials: false
+
+      - name: Prune stale pull requests
+        uses: ./.github/actions/prune-stale-pull-requests

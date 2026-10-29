@@ -73,9 +73,7 @@ async function addMember(page: Page, slot: number, member: Character): Promise<v
   await closeTeamEditor(page);
 }
 
-// A weapon instance exists only once the server mints its id, so the whole flow
-// runs signed in. Anonymous team building stays uncovered while the anonymous
-// collection path is open between #552 and #563.
+// Teams are sign-in-only, so the whole flow runs signed in.
 
 test('a team takes a name, a character, and a weapon that survive a reload', async ({
   signedInPage: page,

@@ -11,6 +11,7 @@ import type { FromSchema } from 'json-schema-to-ts';
 import { requireCharacterId } from '@/catalogue.js';
 import { negotiatedJson } from '@/http/negotiated-response.js';
 import { linkNextPage, parsePageRequest } from '@/http/page.js';
+import { publicUrl } from '@/http/public-url.js';
 import { auth } from '@/middleware/auth.js';
 import { negotiateContent } from '@/middleware/negotiate-content.js';
 import { negotiateRequestSchema } from '@/middleware/negotiate-request-schema.js';
@@ -44,7 +45,7 @@ type SaveCharacterBody = FromSchema<typeof characterPutRequestV1.schema> & {
 characters.get('/', async (c) => {
   const userId = c.get('user').uid;
   const page = await Characters.list(userId, parsePageRequest(c));
-  const baseUrl = new URL(c.req.url).origin;
+  const baseUrl = publicUrl(c).origin;
 
   return negotiatedJson(c, linkNextPage(c, page, characterListDocument(page.items, baseUrl)));
 });
@@ -60,7 +61,7 @@ characters.get('/:characterId', async (c) => {
     throw new HTTPException(404, { message: 'Character not found in collection' });
   }
 
-  const baseUrl = new URL(c.req.url).origin;
+  const baseUrl = publicUrl(c).origin;
 
   return negotiatedJson(c, characterItemDocument(character, baseUrl));
 });
@@ -77,7 +78,7 @@ characters.put(
     const knownId = requireCharacterId(characterId);
     const { constellationLevel } = c.get('validatedBody');
     const { character, created } = await Characters.save(userId, knownId, constellationLevel);
-    const baseUrl = new URL(c.req.url).origin;
+    const baseUrl = publicUrl(c).origin;
 
     return negotiatedJson(c, characterItemDocument(character, baseUrl), created ? 201 : 200);
   },
