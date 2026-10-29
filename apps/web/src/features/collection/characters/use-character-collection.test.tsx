@@ -398,7 +398,8 @@ describe('useCollection mutations', () => {
     act(() => {
       result.current.removeCharacter(SKIRK);
     });
-    // The server applies the removal before the re-add, as the user made them.
+    // The removal reaches the server before the re-add, in the order the user
+    // made them.
     await act(() => deletion.arrived);
     deletion.release();
     act(() => {
