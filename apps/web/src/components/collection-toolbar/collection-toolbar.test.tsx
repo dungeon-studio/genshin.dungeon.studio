@@ -117,7 +117,7 @@ describe('CollectionToolbar', () => {
     const user = userEvent.setup({ delay: null });
     const { onChange } = renderToolbar({ filters: baseFilters({ sortField: 'name' }) });
 
-    await user.click(screen.getByRole('button', { name: 'Name' }));
+    await user.click(screen.getByRole('button', { name: 'Sort by: Name, switch to Release' }));
 
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ sortField: 'release' }));
   });
@@ -126,7 +126,9 @@ describe('CollectionToolbar', () => {
     const user = userEvent.setup({ delay: null });
     const { onChange } = renderToolbar();
 
-    await user.click(screen.getByRole('button', { name: 'Sort descending' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Sort order: descending, switch to ascending' }),
+    );
 
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ sortDirection: 'asc' }));
   });
@@ -135,7 +137,9 @@ describe('CollectionToolbar', () => {
     const user = userEvent.setup({ delay: null });
     const { onChange } = renderToolbar({ filters: baseFilters({ sortDirection: 'asc' }) });
 
-    await user.click(screen.getByRole('button', { name: 'Sort ascending' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Sort order: ascending, switch to descending' }),
+    );
 
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ sortDirection: 'desc' }));
   });
@@ -199,7 +203,9 @@ describe('CollectionToolbar', () => {
     expect(region).not.toContainElement(
       screen.getByRole('searchbox', { name: 'Search items by name' }),
     );
-    expect(region).not.toContainElement(screen.getByRole('button', { name: 'Sort descending' }));
+    expect(region).not.toContainElement(
+      screen.getByRole('button', { name: 'Sort order: descending, switch to ascending' }),
+    );
   });
 
   it('starts collapsed and expands when the toggle is pressed', async () => {

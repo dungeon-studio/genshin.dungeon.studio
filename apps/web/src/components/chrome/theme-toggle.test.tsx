@@ -46,7 +46,9 @@ describe('ThemeToggle', () => {
     stubPrefersDark(true);
     renderToggle();
 
-    expect(screen.getByRole('button', { name: 'System theme' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Theme: system, switch to light' }),
+    ).toBeInTheDocument();
     expect(isDark()).toBe(true);
     expect(localStorage.getItem('theme')).toBeNull();
   });
@@ -55,9 +57,11 @@ describe('ThemeToggle', () => {
     stubPrefersDark(true);
     renderToggle();
 
-    await userEvent.click(screen.getByRole('button', { name: 'System theme' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Theme: system, switch to light' }));
 
-    expect(screen.getByRole('button', { name: 'Light mode' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Theme: light, switch to dark' }),
+    ).toBeInTheDocument();
     expect(isDark()).toBe(false);
     expect(localStorage.getItem('theme')).toBe('light');
   });
@@ -67,10 +71,12 @@ describe('ThemeToggle', () => {
     renderToggle();
 
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'System theme' }));
-    await user.click(screen.getByRole('button', { name: 'Light mode' }));
+    await user.click(screen.getByRole('button', { name: 'Theme: system, switch to light' }));
+    await user.click(screen.getByRole('button', { name: 'Theme: light, switch to dark' }));
 
-    expect(screen.getByRole('button', { name: 'Dark mode' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Theme: dark, switch to system' }),
+    ).toBeInTheDocument();
     expect(isDark()).toBe(true);
     expect(localStorage.getItem('theme')).toBe('dark');
   });
@@ -80,11 +86,13 @@ describe('ThemeToggle', () => {
     renderToggle();
 
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'System theme' }));
-    await user.click(screen.getByRole('button', { name: 'Light mode' }));
-    await user.click(screen.getByRole('button', { name: 'Dark mode' }));
+    await user.click(screen.getByRole('button', { name: 'Theme: system, switch to light' }));
+    await user.click(screen.getByRole('button', { name: 'Theme: light, switch to dark' }));
+    await user.click(screen.getByRole('button', { name: 'Theme: dark, switch to system' }));
 
-    expect(screen.getByRole('button', { name: 'System theme' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Theme: system, switch to light' }),
+    ).toBeInTheDocument();
     expect(isDark()).toBe(false);
     expect(localStorage.getItem('theme')).toBeNull();
   });
@@ -94,7 +102,9 @@ describe('ThemeToggle', () => {
     stubPrefersDark(false);
     renderToggle();
 
-    expect(screen.getByRole('button', { name: 'Dark mode' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Theme: dark, switch to system' }),
+    ).toBeInTheDocument();
     expect(isDark()).toBe(true);
   });
 });
