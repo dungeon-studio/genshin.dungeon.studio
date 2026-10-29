@@ -27,7 +27,7 @@ single `### Added` bucket in `[Unreleased]`.
 - Elemental resonance badges on full teams; tapping one shows its bonus.
 - Responsive team editing sheet for small screens.
 - Phone-width layout for the header and team slots.
-- Team persistence so compositions survive across sessions.
+- Team persistence so compositions survive across sessions, with a sign-in prompt on the team builder when signed out.
 - Collections saved to your account, with a sign-in prompt when managing one signed out.
 - Save-failure messages that name the team, character, or weapon, say what was put back, and suggest trying again.
 - Google sign-in and sign-out from the site header.
