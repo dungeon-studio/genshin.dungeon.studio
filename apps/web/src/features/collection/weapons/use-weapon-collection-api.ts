@@ -5,9 +5,14 @@
  * The weapon collection's TanStack Query layer, wrapping the raw HTTP calls.
  *
  * Query keys are scoped by user ID, so signing in as someone else never serves
- * the previous account's cached instances. Every mutation invalidates that key
- * rather than writing into the cache, because the server mints the instance
- * identifier and decides the stored timestamps.
+ * the previous account's cached instances. The cache is the collection's only
+ * client-side copy.
+ *
+ * Removes and refinement changes write into the cache before the server
+ * answers. A rejected one puts back what it replaced, unless a newer write has
+ * since changed that instance. Adds can't be optimistic, because the server
+ * mints the instance identifier. Every write still invalidates the key once it
+ * succeeds, because the server decides the stored timestamps.
  *
  * `useWeaponCollection` is what a component reaches for; these are its parts.
  */
@@ -17,7 +22,8 @@ import { assertCollectionDocument } from '@genshin/collection-json';
 import type { CollectionWeapon, CollectionWeaponId, RefinementLevel } from '@genshin/domain';
 import { deserialiseWeapon } from '@genshin/domain';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMemo } from 'react';
 
 import { apiDelete, apiPatch, apiPost } from '@/lib/api';
 import { apiGetAllItems } from '@/lib/api-collection';
@@ -31,6 +37,46 @@ export interface WeaponMutationResult {
 }
 
 const weaponsKey = userScopedKey('weapons');
+
+/** The cached collection of one user, read at call time. */
+export interface WeaponCache {
+  read: () => WeaponRecord;
+  /** Changes a loaded collection; one still loading is left to its first fetch. */
+  update: (change: (weapons: WeaponRecord) => WeaponRecord) => void;
+}
+
+export function useWeaponCache(userId: string | undefined): WeaponCache {
+  const queryClient = useQueryClient();
+
+  return useMemo(() => {
+    const queryKey = weaponsKey(userId ?? '');
+    return {
+      read: () => queryClient.getQueryData<WeaponRecord>(queryKey) ?? {},
+      update: (change) => {
+        queryClient.setQueryData<WeaponRecord>(queryKey, (weapons) => weapons && change(weapons));
+      },
+    };
+  }, [queryClient, userId]);
+}
+
+function withWeapon(weapon: CollectionWeapon): (weapons: WeaponRecord) => WeaponRecord {
+  return (weapons) => ({ ...weapons, [weapon.weaponInstanceId]: weapon });
+}
+
+function withoutWeapon(
+  collectionWeaponId: CollectionWeaponId,
+): (weapons: WeaponRecord) => WeaponRecord {
+  return (weapons) => {
+    const rest = { ...weapons };
+    delete rest[collectionWeaponId];
+    return rest;
+  };
+}
+
+/** What an optimistic edit replaced, for putting back if the server rejects it. */
+export interface WeaponEditContext {
+  previous: CollectionWeapon | undefined;
+}
 
 function toWeaponRecord(items: Item[]): WeaponRecord {
   const record: WeaponRecord = {};
@@ -75,6 +121,7 @@ export function useAddWeaponMutation(
   userId: string | undefined,
 ): UseMutationResult<WeaponMutationResult, Error, AddWeaponVariables> {
   const querySync = useUserQuerySync(userId, weaponsKey);
+  const cache = useWeaponCache(userId);
 
   return useMutation({
     mutationFn: async ({
@@ -85,19 +132,35 @@ export function useAddWeaponMutation(
       return parseSingleWeaponResponse(response);
     },
     ...querySync,
+    onSuccess: ({ weapon }) => {
+      cache.update(withWeapon(weapon));
+      querySync.onSuccess();
+    },
   });
 }
 
 export function useRemoveWeaponMutation(
   userId: string | undefined,
-): UseMutationResult<void, Error, CollectionWeaponId> {
+): UseMutationResult<void, Error, CollectionWeaponId, WeaponEditContext> {
   const querySync = useUserQuerySync(userId, weaponsKey);
+  const cache = useWeaponCache(userId);
 
   return useMutation({
     mutationFn: async (collectionWeaponId: CollectionWeaponId) => {
       await apiDelete(`/weapons/${encodeURIComponent(collectionWeaponId)}`);
     },
     ...querySync,
+    onMutate: async (collectionWeaponId) => {
+      await querySync.onMutate();
+      const previous = cache.read()[collectionWeaponId];
+      cache.update(withoutWeapon(collectionWeaponId));
+      return { previous };
+    },
+    onError: (_error, collectionWeaponId, context) => {
+      const previous = context?.previous;
+      if (!previous || collectionWeaponId in cache.read()) return;
+      cache.update(withWeapon(previous));
+    },
   });
 }
 
@@ -108,8 +171,9 @@ export interface SetRefinementLevelVariables {
 
 export function useSetRefinementLevelMutation(
   userId: string | undefined,
-): UseMutationResult<WeaponMutationResult, Error, SetRefinementLevelVariables> {
+): UseMutationResult<WeaponMutationResult, Error, SetRefinementLevelVariables, WeaponEditContext> {
   const querySync = useUserQuerySync(userId, weaponsKey);
+  const cache = useWeaponCache(userId);
 
   return useMutation({
     mutationFn: async ({
@@ -122,5 +186,20 @@ export function useSetRefinementLevelMutation(
       return parseSingleWeaponResponse(response);
     },
     ...querySync,
+    onMutate: async ({ collectionWeaponId, level }) => {
+      await querySync.onMutate();
+      const previous = cache.read()[collectionWeaponId];
+      if (previous) cache.update(withWeapon({ ...previous, refinementLevel: level }));
+      return { previous };
+    },
+    onError: (_error, { collectionWeaponId, level }, context) => {
+      const previous = context?.previous;
+      if (!previous || cache.read()[collectionWeaponId]?.refinementLevel !== level) return;
+      cache.update(withWeapon(previous));
+    },
+    onSuccess: ({ weapon }) => {
+      cache.update(withWeapon(weapon));
+      querySync.onSuccess();
+    },
   });
 }

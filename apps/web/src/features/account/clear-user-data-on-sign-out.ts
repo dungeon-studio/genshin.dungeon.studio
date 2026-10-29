@@ -6,7 +6,6 @@ import { useEffect, useRef } from 'react';
 import { signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 import { useCollectionStore } from '@/features/collection/characters/use-character-collection-store';
-import { useWeaponCollectionStore } from '@/features/collection/weapons/use-weapon-collection-store';
 import { useTeamStore } from '@/features/teams/use-team-store';
 import { withdrawUndoOffers } from '@/lib/offer-undo';
 
@@ -26,7 +25,6 @@ export function ClearUserDataOnSignOut(): null {
     const signedInUserLeft = previousUid.current !== undefined && previousUid.current !== uid;
     if (signedInUserLeft) {
       useCollectionStore.getState().clearCharacters();
-      useWeaponCollectionStore.getState().clearWeapons();
       useTeamStore.getState().resetTeams();
       withdrawUndoOffers();
     }

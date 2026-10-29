@@ -20,11 +20,22 @@ export function rollBackFailedWrite({
   failure,
   reverted,
 }: FailedWrite): void {
-  if (!isStillShown()) {
+  const restored = isStillShown();
+  if (restored) revert();
+  reportRolledBackWrite({ restored, failure, reverted });
+}
+
+interface RolledBackWrite extends Pick<FailedWrite, 'failure' | 'reverted'> {
+  /** Whether the revert ran, rather than leaving a newer edit in place. */
+  restored: boolean;
+}
+
+/** Tells the user what a failed optimistic write left showing, once something else reverted it. */
+export function reportRolledBackWrite({ restored, failure, reverted }: RolledBackWrite): void {
+  if (!restored) {
     toast.error(`${failure} Your newer change stands.`);
     return;
   }
-  revert();
   reportFailedWrite(`${failure} ${reverted}`);
 }
 

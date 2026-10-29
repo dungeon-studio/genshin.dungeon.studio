@@ -15,13 +15,10 @@ import type { WeaponFilterState } from '@/features/collection/weapons/filtering'
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
 import type { UseWeaponCollectionResult } from '@/features/collection/weapons/use-weapon-collection';
 import { useWeaponCollection } from '@/features/collection/weapons/use-weapon-collection';
-import {
-  groupByWeapon,
-  weaponIdsOf,
-} from '@/features/collection/weapons/use-weapon-collection-store';
 import { WeaponCard } from '@/features/collection/weapons/weapon-card';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
 import { WeaponInstanceSidebar } from '@/features/collection/weapons/weapon-instance-sidebar';
+import { groupByWeapon, weaponIdsOf } from '@/features/collection/weapons/weapon-instances';
 
 /** Preselects the weapon type a `?type=` query names, as in `/weapons?type=Sword`. */
 function filtersFromSearchParams(searchParams: URLSearchParams): WeaponFilterState {

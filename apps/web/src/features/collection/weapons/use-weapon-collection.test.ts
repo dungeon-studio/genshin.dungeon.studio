@@ -14,7 +14,6 @@ import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
 import { selectUndo } from '@/test/undo-toast';
 
 import { useWeaponCollection } from './use-weapon-collection';
-import { useWeaponCollectionStore } from './use-weapon-collection-store';
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
@@ -22,7 +21,6 @@ const WEAPON_ID = 'angelos-heptades';
 const INSTANCE_ID = 'weapon-instance-1' as CollectionWeaponId;
 
 beforeEach(() => {
-  useWeaponCollectionStore.getState().clearWeapons();
   vi.clearAllMocks();
 });
 
@@ -36,7 +34,7 @@ const SECOND_INSTANCE_ID = 'weapon-instance-2' as CollectionWeaponId;
 
 describe('useWeaponCollection', () => {
   describe('addWeapon', () => {
-    it('adds the server-confirmed weapon to the store', async () => {
+    it('adds the server-confirmed weapon to the collection', async () => {
       let serverWeapons = weaponsDocument([]);
       server.use(
         http.get('http://localhost:8080/weapons', () => HttpResponse.json(serverWeapons)),
@@ -77,17 +75,17 @@ describe('useWeaponCollection', () => {
     });
 
     it('creates another instance even when the weapon is already owned', async () => {
+      const owned = makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 });
+      const added = makeWeapon(SECOND_INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 });
+      let serverWeapons = [owned];
       server.use(
         http.get('http://localhost:8080/weapons', () =>
-          HttpResponse.json(
-            weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 })]),
-          ),
+          HttpResponse.json(weaponsDocument(serverWeapons)),
         ),
-        http.post('http://localhost:8080/weapons', () =>
-          HttpResponse.json(
-            weaponsDocument([makeWeapon(SECOND_INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 })]),
-          ),
-        ),
+        http.post('http://localhost:8080/weapons', () => {
+          serverWeapons = [owned, added];
+          return HttpResponse.json(weaponsDocument([added]));
+        }),
       );
 
       const { result } = renderAuthed();
@@ -101,7 +99,7 @@ describe('useWeaponCollection', () => {
       expect(result.current.weapons[INSTANCE_ID]).toBeDefined();
     });
 
-    it('leaves the store alone when the add settles after sign-out', async () => {
+    it('shows nothing of an add that settles after sign-out', async () => {
       const addConfirmation = holdResponse(() =>
         HttpResponse.json(
           weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 })]),
@@ -126,7 +124,7 @@ describe('useWeaponCollection', () => {
       addConfirmation.release();
 
       await waitFor(() => expect(queryClient.isMutating()).toBe(0));
-      expect(useWeaponCollectionStore.getState().weapons).toEqual({});
+      expect(result.current.weapons).toEqual({});
     });
   });
 
@@ -187,16 +185,14 @@ describe('useWeaponCollection', () => {
 
   describe('removeWeapon', () => {
     it('restores a removed weapon when the delete fails', async () => {
+      const deletion = holdResponse(() => new HttpResponse(null, { status: 500 }));
       server.use(
         http.get('http://localhost:8080/weapons', () =>
           HttpResponse.json(
             weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 2 })]),
           ),
         ),
-        http.delete(
-          'http://localhost:8080/weapons/weapon-instance-1',
-          () => new HttpResponse(null, { status: 500 }),
-        ),
+        http.delete('http://localhost:8080/weapons/weapon-instance-1', deletion.resolver),
       );
 
       const { result } = renderAuthed();
@@ -207,7 +203,8 @@ describe('useWeaponCollection', () => {
       });
 
       // Optimistically gone, then restored once the delete errors.
-      expect(result.current.weapons[INSTANCE_ID]).toBeUndefined();
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]).toBeUndefined());
+      deletion.release();
       await waitFor(() => expect(result.current.weapons[INSTANCE_ID]).toBeDefined());
       expect(toast.error).toHaveBeenCalledWith(
         "Couldn't remove Angelos' Heptades. Angelos' Heptades is back in your collection. Try again.",
@@ -217,22 +214,21 @@ describe('useWeaponCollection', () => {
 
   describe('undoing a removal', () => {
     it('brings back a copy at the removed refinement rank', async () => {
+      const restored = makeWeapon(SECOND_INSTANCE_ID, WEAPON_ID, { refinementLevel: 2 });
+      let serverWeapons = [makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 2 })];
       let postBody: unknown;
       server.use(
         http.get('http://localhost:8080/weapons', () =>
-          HttpResponse.json(
-            weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 2 })]),
-          ),
+          HttpResponse.json(weaponsDocument(serverWeapons)),
         ),
-        http.delete(
-          'http://localhost:8080/weapons/weapon-instance-1',
-          () => new HttpResponse(null, { status: 204 }),
-        ),
+        http.delete('http://localhost:8080/weapons/weapon-instance-1', () => {
+          serverWeapons = [];
+          return new HttpResponse(null, { status: 204 });
+        }),
         http.post('http://localhost:8080/weapons', async ({ request }) => {
           postBody = await request.json();
-          return HttpResponse.json(
-            weaponsDocument([makeWeapon(SECOND_INSTANCE_ID, WEAPON_ID, { refinementLevel: 2 })]),
-          );
+          serverWeapons = [restored];
+          return HttpResponse.json(weaponsDocument([restored]));
         }),
       );
 
@@ -288,16 +284,14 @@ describe('useWeaponCollection', () => {
 
   describe('setRefinementLevel', () => {
     it('reverts a refinement change when the update fails', async () => {
+      const update = holdResponse(() => new HttpResponse(null, { status: 500 }));
       server.use(
         http.get('http://localhost:8080/weapons', () =>
           HttpResponse.json(
             weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 2 })]),
           ),
         ),
-        http.patch(
-          'http://localhost:8080/weapons/weapon-instance-1',
-          () => new HttpResponse(null, { status: 500 }),
-        ),
+        http.patch('http://localhost:8080/weapons/weapon-instance-1', update.resolver),
       );
 
       const { result } = renderAuthed();
@@ -307,11 +301,55 @@ describe('useWeaponCollection', () => {
         result.current.setRefinementLevel(INSTANCE_ID, 5);
       });
 
-      expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(5);
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(5));
+      update.release();
       await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(2));
       expect(toast.error).toHaveBeenCalledWith(
         "Couldn't set Angelos' Heptades to refinement rank 5. Angelos' Heptades is back at refinement rank 2. Try again.",
       );
+    });
+
+    it('keeps a newer change when an earlier one fails', async () => {
+      const firstUpdate = holdResponse(() => new HttpResponse(null, { status: 500 }));
+      const secondUpdate = holdResponse(() =>
+        HttpResponse.json(
+          weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 4 })]),
+        ),
+      );
+      let patches = 0;
+      server.use(
+        http.get('http://localhost:8080/weapons', () =>
+          HttpResponse.json(
+            weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 2 })]),
+          ),
+        ),
+        http.patch('http://localhost:8080/weapons/weapon-instance-1', () => {
+          patches += 1;
+          return patches === 1 ? firstUpdate.resolver() : secondUpdate.resolver();
+        }),
+      );
+
+      const { result, queryClient } = renderHookSignedIn(() => useWeaponCollection(), 'user-1');
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(2));
+
+      act(() => {
+        result.current.setRefinementLevel(INSTANCE_ID, 3);
+      });
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(3));
+      act(() => {
+        result.current.setRefinementLevel(INSTANCE_ID, 4);
+      });
+      await waitFor(() => expect(patches).toBe(2));
+
+      firstUpdate.release();
+      await waitFor(() => expect(toast.error).toHaveBeenCalled());
+      expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(4);
+      expect(toast.error).toHaveBeenCalledWith(
+        "Couldn't set Angelos' Heptades to refinement rank 3. Your newer change stands.",
+      );
+
+      secondUpdate.release();
+      await waitFor(() => expect(queryClient.isMutating()).toBe(0));
     });
 
     it('keeps a change that a refetch started before it would overwrite', async () => {

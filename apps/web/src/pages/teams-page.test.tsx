@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionWeaponId } from '@genshin/domain';
+import type { CollectionTeam, CollectionWeaponId, TeamSlot } from '@genshin/domain';
 import type { Character, Weapon, WeaponType } from '@genshin/game-data';
 import { CHARACTER_ROSTER, WEAPON_ROSTER } from '@genshin/game-data';
 import { act, configure, render, screen, within } from '@testing-library/react';
@@ -13,7 +13,6 @@ import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { useCollectionStore } from '@/features/collection/characters/use-character-collection-store';
-import { useWeaponCollectionStore } from '@/features/collection/weapons/use-weapon-collection-store';
 import { useTeamStore } from '@/features/teams/use-team-store';
 import {
   charactersDocument,
@@ -79,25 +78,40 @@ function renderTeamsPage(wrapper = createWrapper()): void {
   );
 }
 
-// Call after rendering: the hooks clear their stores on finding no signed-in user.
-function seedCollections(): void {
-  act(() => {
-    useCollectionStore
-      .getState()
-      .replaceCharacters(
-        Object.fromEntries([CLAYMORE_USER, BOW_USER].map((c) => [c.id, makeCharacter(c.id)])),
-      );
-    useWeaponCollectionStore.getState().setWeapons({
-      [CLAYMORE_INSTANCE]: makeWeapon(CLAYMORE_INSTANCE, CLAYMORE.id),
-      [BOW_INSTANCE]: makeWeapon(BOW_INSTANCE, BOW_WEAPON.id),
-    });
-  });
+/** Serves a signed-in user who owns two characters and a weapon for each, and keeps the teams they save. */
+function serveCollections(): void {
+  const savedTeams = new Map<TeamSlot, CollectionTeam>();
+  server.use(
+    http.get('http://localhost:8080/characters', () =>
+      HttpResponse.json(
+        charactersDocument([CLAYMORE_USER, BOW_USER].map((c) => makeCharacter(c.id))),
+      ),
+    ),
+    http.get('http://localhost:8080/weapons', () =>
+      HttpResponse.json(
+        weaponsDocument([
+          makeWeapon(CLAYMORE_INSTANCE, CLAYMORE.id),
+          makeWeapon(BOW_INSTANCE, BOW_WEAPON.id),
+        ]),
+      ),
+    ),
+    http.get('http://localhost:8080/teams', () =>
+      HttpResponse.json(teamsDocument([...savedTeams.values()])),
+    ),
+    http.put('http://localhost:8080/teams/:slot', async ({ params, request }) => {
+      const slot = Number(params['slot']) as TeamSlot;
+      const body = (await request.json()) as Pick<CollectionTeam, 'name' | 'members'>;
+      savedTeams.set(slot, makeTeam(slot, body));
+      return new HttpResponse(null, { status: 204 });
+    }),
+  );
 }
 
-function setupTeamsPage(): UserEvent {
+async function setupTeamsPage(): Promise<UserEvent> {
   const user = userEvent.setup({ delay: null });
-  renderTeamsPage();
-  seedCollections();
+  serveCollections();
+  renderTeamsPage(createWrapper({ user: fakeUser('user-1') }));
+  await screen.findByRole('region', { name: 'Team 2' });
   return user;
 }
 
@@ -117,14 +131,13 @@ async function pickCharacterFirst(user: UserEvent, character: Character): Promis
 beforeEach(() => {
   useTeamStore.getState().resetTeams();
   useCollectionStore.getState().clearCharacters();
-  useWeaponCollectionStore.getState().clearWeapons();
 });
 
 // Under coverage, with the rest of the suite competing for workers, a case runs
 // to tens of seconds.
 describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   it('assigns a weapon picked before a character, and narrows the pool to its wielders', async () => {
-    const user = setupTeamsPage();
+    const user = await setupTeamsPage();
 
     await pickWeaponFirst(user, CLAYMORE);
     await user.click(screen.getByRole('button', { name: 'Characters' }));
@@ -146,7 +159,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   });
 
   it('leaves the character pool unnarrowed when no weapon was picked first', async () => {
-    const user = setupTeamsPage();
+    const user = await setupTeamsPage();
 
     await user.click(await firstEmptyMember());
 
@@ -156,7 +169,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   });
 
   it('offers weapons of any type, filterable, on a member with no character', async () => {
-    const user = setupTeamsPage();
+    const user = await setupTeamsPage();
 
     await user.click(await firstEmptyMember());
     await user.click(await screen.findByRole('button', { name: 'Weapons' }));
@@ -173,7 +186,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   });
 
   it('restores the whole character pool when the pending weapon is cleared', async () => {
-    const user = setupTeamsPage();
+    const user = await setupTeamsPage();
 
     await pickWeaponFirst(user, CLAYMORE);
     await user.click(screen.getByRole('button', { name: 'Characters' }));
@@ -191,7 +204,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
 
   describe('character-first flow', () => {
     it('constrains the weapon pool to the assigned character and equips from it', async () => {
-      const user = setupTeamsPage();
+      const user = await setupTeamsPage();
 
       await pickCharacterFirst(user, CLAYMORE_USER);
       await user.click(screen.getByRole('button', { name: 'Weapons' }));
@@ -212,7 +225,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
     });
 
     it('empties the slot when the assigned character is picked again', async () => {
-      const user = setupTeamsPage();
+      const user = await setupTeamsPage();
 
       await pickCharacterFirst(user, CLAYMORE_USER);
 
@@ -225,7 +238,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
     });
 
     it('unequips the weapon when the equipped one is picked again', async () => {
-      const user = setupTeamsPage();
+      const user = await setupTeamsPage();
 
       await pickCharacterFirst(user, CLAYMORE_USER);
       await user.click(screen.getByRole('button', { name: 'Weapons' }));
@@ -245,7 +258,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   });
 
   it('drops a pending weapon when the same card is picked again', async () => {
-    const user = setupTeamsPage();
+    const user = await setupTeamsPage();
 
     await pickWeaponFirst(user, CLAYMORE);
     await user.click(
@@ -264,7 +277,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   // elsewhere belongs to the character about to be chosen. Reaching that pairing means
   // going character-first, where the weapon carries over on its own.
   it('withholds a weapon another team already equips, and names the way to it', async () => {
-    const user = setupTeamsPage();
+    const user = await setupTeamsPage();
 
     act(() => {
       useTeamStore.getState().assignCharacter(1, 0, CLAYMORE_USER.id);
@@ -287,7 +300,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   });
 
   it('offers no character-first route on a member that already has a character', async () => {
-    const user = setupTeamsPage();
+    const user = await setupTeamsPage();
 
     act(() => {
       useTeamStore.getState().assignCharacter(1, 0, CLAYMORE_USER.id);
@@ -309,7 +322,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   });
 
   it('forgets a pending weapon once the editor is closed', async () => {
-    const user = setupTeamsPage();
+    const user = await setupTeamsPage();
 
     await pickWeaponFirst(user, CLAYMORE);
     await user.click(screen.getByRole('button', { name: 'Close' }));
@@ -390,10 +403,9 @@ describe('TeamsPage empty collection', () => {
     expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
   });
 
-  it('shows no prompt once the user owns a character', () => {
-    renderTeamsPage();
-    seedCollections();
+  it('shows no prompt once the user owns a character', async () => {
+    await setupTeamsPage();
 
-    expect(screen.queryByRole('button', { name: 'Sign in' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
   });
 });
