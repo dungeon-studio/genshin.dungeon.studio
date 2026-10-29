@@ -23,9 +23,10 @@ const SIGNED_OUT: UserQuerySync = {
  * A refetch that starts before a write can answer with data that predates it.
  * Starting a write cancels any refetch in flight, and a write that settles
  * while another is pending leaves the refetch to the one still pending. A
- * failed write refetches too: a rollback guarded against newer edits can skip
- * one failure and revert another, leaving a value the server never stored. A
  * first load is never cancelled, because nothing would restart it.
+ *
+ * Failed writes refetch as well. Guarded rollbacks of two failed writes can
+ * leave a value the server never stored.
  *
  * The refetch isn't awaited: returning it would hold the mutation pending
  * until the refetch settled.

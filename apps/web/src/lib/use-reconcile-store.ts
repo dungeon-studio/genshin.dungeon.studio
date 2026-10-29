@@ -7,18 +7,15 @@ import { useEffect } from 'react';
 const NEVER_PENDING = (): boolean => false;
 
 /**
- * Copies each answer to a query into a store, replacing what the store held.
+ * Replaces a store with each answer to a query, even an answer identical to
+ * the last. A refetch after a failed write must overwrite the rollback, and
+ * structural sharing returns unchanged data under the same reference.
  *
- * Every answer replaces the store, even one identical to the last. Structural
- * sharing keeps the data's reference when a refetch returns the same data, so
- * the effect also reruns on `dataUpdatedAt`. Without that, a refetch after a
- * failed write couldn't replace a rollback that left a value the server never
- * stored.
+ * An answer that lands while `isWritePending()` is true predates the write, so
+ * it's skipped. The last write's refetch replaces it.
  *
- * An answer that lands while `isWritePending` holds predates the write and is
- * skipped; the last write's refetch replaces it. `replace` and
- * `isWritePending` must keep their identity across renders, or the effect
- * reruns on each one.
+ * `replace` and `isWritePending` need stable identities. A new one reruns the
+ * effect on every render.
  */
 export function useReconcileStore<T>(
   { data, dataUpdatedAt }: Pick<UseQueryResult<T>, 'data' | 'dataUpdatedAt'>,

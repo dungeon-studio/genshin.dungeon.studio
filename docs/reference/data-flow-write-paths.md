@@ -34,11 +34,9 @@ so a newer edit stands. A toast shows either way, and nothing retries.
 
 Every mutation follows one refetch rule, set by `useUserQuerySync`. Starting a
 write cancels any refetch of its query already in flight. A write refetches once
-it settles, whether it succeeded or failed. A write that settles while another
-write to the same query is pending skips its refetch and leaves it to the write
-still pending. The refetch after a failure corrects a guarded rollback that
-skipped one failed write and reverted another to a value the server never
-stored. The cancel skips the first load, and it can't
+it settles, failed or not, unless another write to the same query is still
+pending. A failed write needs its refetch because guarded rollbacks of two
+failed writes can leave a value the server never stored. The cancel skips the first load, and it can't
 reach a refetch that starts after the write, such as on window focus or
 reconnect. Either can still overwrite a character or weapon edit in flight.
 The team store takes no refetch while a team write is pending.
