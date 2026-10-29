@@ -273,7 +273,7 @@ describe('useCollection mutations', () => {
     // level the first one sent.
     await waitFor(() =>
       expect(toast.error).toHaveBeenCalledWith(
-        "Couldn't set Skirk to constellation level 4. Your newer change stands.",
+        `Couldn't set Skirk to constellation level ${firstLevel}. Your newer change stands.`,
       ),
     );
     await act(() => secondFailure.arrived);

@@ -348,7 +348,7 @@ describe('useWeaponCollection', () => {
       // rank the first one sent.
       await waitFor(() =>
         expect(toast.error).toHaveBeenCalledWith(
-          "Couldn't set Angelos' Heptades to refinement rank 3. Your newer change stands.",
+          `Couldn't set Angelos' Heptades to refinement rank ${firstRank}. Your newer change stands.`,
         ),
       );
       await act(() => secondFailure.arrived);

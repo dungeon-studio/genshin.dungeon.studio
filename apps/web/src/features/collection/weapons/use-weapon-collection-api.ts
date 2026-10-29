@@ -123,12 +123,6 @@ function optimisticEdit<TVariables>(
   };
 }
 
-function storeConfirmed(cache: WeaponCache): (result: WeaponMutationResult) => void {
-  return ({ weapon }) => {
-    cache.update(withWeapon(weapon));
-  };
-}
-
 function toWeaponRecord(items: Item[]): WeaponRecord {
   const record: WeaponRecord = {};
 
@@ -183,7 +177,9 @@ export function useAddWeaponMutation(
       return parseSingleWeaponResponse(response);
     },
     ...querySync,
-    onSuccess: storeConfirmed(cache),
+    onSuccess: ({ weapon }) => {
+      cache.update(withWeapon(weapon));
+    },
   });
 }
 
@@ -245,6 +241,8 @@ export function useSetRefinementLevelMutation(
       ({ collectionWeaponId }) => collectionWeaponId,
       (current, { level }) => ({ ...current, refinementLevel: level }),
     ),
-    onSuccess: storeConfirmed(cache),
+    onSuccess: ({ weapon }) => {
+      cache.update(withWeapon(weapon));
+    },
   });
 }
