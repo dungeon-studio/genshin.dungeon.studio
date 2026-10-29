@@ -4,9 +4,8 @@
 // No lawyer has reviewed these terms.
 
 import type { JSX } from 'react';
-import { Link } from 'react-router-dom';
 
-import { PrivacyEmailLink } from '@/components/legal/legal-link';
+import { InternalLegalLink, PrivacyEmailLink } from '@/components/legal/legal-link';
 import { LegalPage, LegalSection } from '@/components/legal/legal-page';
 
 const EFFECTIVE_DATE = '25 October 2026';
@@ -35,13 +34,7 @@ export function TermsOfServicePage(): JSX.Element {
       <LegalSection title="Your account">
         Signing in uses your Google account through Firebase Authentication. You are responsible for
         keeping that account secure. We describe what we do with your data in our{' '}
-        <Link
-          to="/privacy"
-          className="text-foreground underline underline-offset-4 hover:no-underline"
-        >
-          Privacy Policy
-        </Link>
-        .
+        <InternalLegalLink to="/privacy">Privacy Policy</InternalLegalLink>.
       </LegalSection>
 
       <LegalSection title="Acceptable use">

@@ -2,10 +2,25 @@
 // SPDX-License-Identifier: MIT
 
 import type { JSX, ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 
 const PRIVACY_EMAIL = 'privacy@dungeon.studio';
 
 const LINK_CLASS = 'text-foreground underline underline-offset-4 hover:no-underline';
+
+export function InternalLegalLink({
+  to,
+  children,
+}: {
+  to: string;
+  children: ReactNode;
+}): JSX.Element {
+  return (
+    <Link to={to} className={LINK_CLASS}>
+      {children}
+    </Link>
+  );
+}
 
 export function ExternalLegalLink({
   href,
