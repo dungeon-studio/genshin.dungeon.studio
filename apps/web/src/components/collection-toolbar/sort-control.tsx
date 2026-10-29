@@ -6,10 +6,20 @@ import type { JSX } from 'react';
 
 import { Button } from '@/components/ui/button';
 import type { BaseFilterState } from '@/lib/collection-filters';
-import { SORT_FIELDS } from '@/lib/collection-filters';
 import { cycleLabel } from '@/lib/cycle-label';
 
+type SortField = BaseFilterState['sortField'];
 type SortDirection = BaseFilterState['sortDirection'];
+
+const NEXT_FIELD: Record<SortField, SortField> = {
+  release: 'name',
+  name: 'release',
+};
+
+const FIELD_LABELS: Record<SortField, string> = {
+  release: 'Release',
+  name: 'Name',
+};
 
 const NEXT_DIRECTION: Record<SortDirection, SortDirection> = {
   asc: 'desc',
@@ -29,12 +39,9 @@ interface SortControlProps<F extends BaseFilterState> {
 export function SortControl<F extends BaseFilterState>({
   filters,
   onChange,
-}: SortControlProps<F>): JSX.Element | null {
-  const fieldIndex = SORT_FIELDS.findIndex((f) => f.value === filters.sortField);
-  const field = SORT_FIELDS[fieldIndex];
-  const nextField = SORT_FIELDS[(fieldIndex + 1) % SORT_FIELDS.length];
-  if (!field || !nextField) return null;
-
+}: SortControlProps<F>): JSX.Element {
+  const field = filters.sortField;
+  const nextField = NEXT_FIELD[field];
   const direction = filters.sortDirection;
   const nextDirection = NEXT_DIRECTION[direction];
 
@@ -43,11 +50,11 @@ export function SortControl<F extends BaseFilterState>({
       <Button
         variant="outline"
         size="sm"
-        onClick={() => onChange({ ...filters, sortField: nextField.value })}
-        aria-label={cycleLabel('Sort by', field.label, nextField.label)}
+        onClick={() => onChange({ ...filters, sortField: nextField })}
+        aria-label={cycleLabel('Sort by', FIELD_LABELS[field], FIELD_LABELS[nextField])}
         className="rounded-r-none"
       >
-        {field.label}
+        {FIELD_LABELS[field]}
       </Button>
       <Button
         variant="outline"

@@ -5,13 +5,7 @@ import type { Rarity } from '@genshin/game-data';
 
 type OwnershipFilter = 'all' | 'owned' | 'unowned';
 type SortDirection = 'asc' | 'desc';
-
-export const SORT_FIELDS = [
-  { value: 'release', label: 'Release' },
-  { value: 'name', label: 'Name' },
-] as const;
-
-type SortField = (typeof SORT_FIELDS)[number]['value'];
+type SortField = 'release' | 'name';
 
 /** Each collection extends this with its own category set. */
 export interface BaseFilterState {
