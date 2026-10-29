@@ -111,7 +111,7 @@ const SIGNED_OUT_ACTIONS: TeamActions = {
   setTeamName: () => {},
 };
 
-function useTeamActions(
+function useOptimisticActions(
   saveTeamApi: ReturnType<typeof useSaveTeamMutation>['mutateAsync'],
 ): TeamActions {
   return useMemo(() => {
@@ -196,7 +196,7 @@ export function useTeams(): UseTeamsResult {
     storeSetTeams(collectionTeamsToStore(apiTeams));
   }, [apiTeams, dataUpdatedAt, isWritePending, storeSetTeams]);
 
-  const optimisticActions = useTeamActions(saveTeamApi);
+  const optimisticActions = useOptimisticActions(saveTeamApi);
   const actions = isAuthenticated ? optimisticActions : SIGNED_OUT_ACTIONS;
 
   const getTeam = useCallback((slot: TeamSlot) => teams[slot], [teams]);
