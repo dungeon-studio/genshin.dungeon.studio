@@ -61,8 +61,7 @@ const SIGNED_OUT_ACTIONS: WeaponActions = {
  *
  * A rejected edit rolls back only if the store still holds its value, and
  * every failure toasts. Adds can't be optimistic, because the server assigns
- * the instance ID. A removal toasts an undo that adds the copy back at its
- * removed refinement rank.
+ * the instance ID. A removal offers undo.
  */
 function useOptimisticEdits(
   api: {

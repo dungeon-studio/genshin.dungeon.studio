@@ -49,10 +49,7 @@ const SIGNED_OUT_ACTIONS: CollectionActions = {
   setConstellationLevel: () => {},
 };
 
-/**
- * Rolls back a failed write that put a character into the collection at
- * `level`, removing it again unless a newer edit changed it.
- */
+/** `verb` completes "Couldn't ___ <character>." */
 function rollBackFailedPut(id: CharacterId, level: ConstellationLevel, verb: string): void {
   const name = characterName(id);
   rollBackFailedWrite({
@@ -69,7 +66,7 @@ function rollBackFailedPut(id: CharacterId, level: ConstellationLevel, verb: str
  *
  * A rejected write rolls back only if the store still holds its value, so a
  * newer edit survives. Every failure toasts, and nothing retries. A removal
- * toasts an undo that puts the character back at its removed level.
+ * offers undo.
  */
 function useOptimisticActions(
   api: {
