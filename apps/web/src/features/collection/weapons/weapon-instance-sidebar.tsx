@@ -36,6 +36,7 @@ export function WeaponInstanceSidebar({
   onRefinementChange,
 }: WeaponInstanceSidebarProps): JSX.Element {
   const weapon: Weapon | undefined = weaponId ? getWeaponById(weaponId) : undefined;
+  const rows = [...instances].sort(oldestFirst);
 
   return (
     <Sheet open={weaponId !== null} onOpenChange={(open) => !open && onClose()}>
@@ -91,17 +92,15 @@ export function WeaponInstanceSidebar({
             </p>
           )}
 
-          {[...instances]
-            .sort((a, b) => b.refinementLevel - a.refinementLevel)
-            .map((instance, index) => (
-              <InstanceRow
-                key={instance.weaponInstanceId}
-                instance={instance}
-                position={index + 1}
-                onRemove={onRemove}
-                onRefinementChange={onRefinementChange}
-              />
-            ))}
+          {rows.map((instance, index) => (
+            <InstanceRow
+              key={instance.weaponInstanceId}
+              instance={instance}
+              position={index + 1}
+              onRemove={onRemove}
+              onRefinementChange={onRefinementChange}
+            />
+          ))}
         </div>
 
         {weaponId && (
@@ -117,9 +116,14 @@ export function WeaponInstanceSidebar({
   );
 }
 
+/** No edit in the sheet changes an instance's creation time, so an edited row stays under the pointer. */
+function oldestFirst(a: CollectionWeapon, b: CollectionWeapon): number {
+  return a.createdAt.localeCompare(b.createdAt);
+}
+
 interface InstanceRowProps {
   instance: CollectionWeapon;
-  /** One-based position in the sorted list, which names the row to assistive technology. */
+  /** One-based position in the sheet's rows, which names the row to assistive technology. */
   position: number;
   onRemove: (collectionWeaponId: CollectionWeaponId) => void;
   onRefinementChange: (collectionWeaponId: CollectionWeaponId, level: RefinementLevel) => void;
