@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CollectionTeam, CollectionWeaponId, TeamSlot } from '@genshin/domain';
+import type { CollectionWeaponId } from '@genshin/domain';
 import type { Character, Weapon, WeaponType } from '@genshin/game-data';
 import { CHARACTER_ROSTER, WEAPON_ROSTER } from '@genshin/game-data';
-import { act, configure, render, screen, within } from '@testing-library/react';
+import type { QueryClient } from '@tanstack/react-query';
+import { act, configure, render, screen, waitFor, within } from '@testing-library/react';
 import type { UserEvent } from '@testing-library/user-event';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
@@ -78,43 +79,45 @@ function renderTeamsPage(wrapper = createWrapper()): void {
   );
 }
 
-/**
- * Serves a signed-in user owning two characters and a weapon for each, keeping
- * the teams they save.
- */
-function serveCollections(): void {
-  const savedTeams = new Map<TeamSlot, CollectionTeam>();
+// Call after rendering: the hooks clear their stores on finding no signed-in user.
+const signedIn = () => createWrapper({ user: fakeUser('user-1') });
+
+const OWNED_CHARACTERS = [CLAYMORE_USER, BOW_USER].map((c) => makeCharacter(c.id));
+const OWNED_WEAPONS = [
+  makeWeapon(CLAYMORE_INSTANCE, CLAYMORE.id),
+  makeWeapon(BOW_INSTANCE, BOW_WEAPON.id),
+];
+
+/** Serves an account with no saved teams. */
+function serveAccount(characters = OWNED_CHARACTERS, weapons = OWNED_WEAPONS): void {
+  // Saves never answer, so no refetch replaces the edits under test.
+  const save = holdResponse(() => new HttpResponse(null, { status: 204 }));
   server.use(
+    http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([]))),
     http.get('http://localhost:8080/characters', () =>
-      HttpResponse.json(
-        charactersDocument([CLAYMORE_USER, BOW_USER].map((c) => makeCharacter(c.id))),
-      ),
+      HttpResponse.json(charactersDocument(characters)),
     ),
-    http.get('http://localhost:8080/weapons', () =>
-      HttpResponse.json(
-        weaponsDocument([
-          makeWeapon(CLAYMORE_INSTANCE, CLAYMORE.id),
-          makeWeapon(BOW_INSTANCE, BOW_WEAPON.id),
-        ]),
-      ),
-    ),
-    http.get('http://localhost:8080/teams', () =>
-      HttpResponse.json(teamsDocument([...savedTeams.values()])),
-    ),
-    http.put('http://localhost:8080/teams/:slot', async ({ params, request }) => {
-      const slot = Number(params['slot']) as TeamSlot;
-      const body = (await request.json()) as Pick<CollectionTeam, 'name' | 'members'>;
-      savedTeams.set(slot, makeTeam(slot, body));
-      return new HttpResponse(null, { status: 204 });
-    }),
+    http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument(weapons))),
+    http.put('http://localhost:8080/teams/:slot', save.resolver),
   );
 }
 
+async function collectionsLoaded(queryClient: QueryClient): Promise<void> {
+  await waitFor(() => {
+    expect(Object.keys(useCollectionStore.getState().characters)).toHaveLength(
+      OWNED_CHARACTERS.length,
+    );
+    expect(queryClient.isFetching()).toBe(0);
+  });
+}
+
 async function setupTeamsPage(): Promise<UserEvent> {
+  serveAccount();
   const user = userEvent.setup({ delay: null });
-  serveCollections();
-  renderTeamsPage(createWrapper({ user: fakeUser('user-1') }));
-  await screen.findByRole('region', { name: 'Team 2' });
+  const queryClient = createTestQueryClient();
+  renderTeamsPage(createWrapper({ user: fakeUser('user-1'), queryClient }));
+  await screen.findByRole('region', { name: 'Team 1' });
+  await collectionsLoaded(queryClient);
   return user;
 }
 
@@ -355,7 +358,7 @@ describe('TeamsPage loading', () => {
       http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument([]))),
     );
 
-    renderTeamsPage(createWrapper({ user: fakeUser('user-1') }));
+    renderTeamsPage(signedIn());
     await teams.arrived;
 
     expect(screen.getByText('Loading teams')).toBeInTheDocument();
@@ -374,7 +377,7 @@ describe('TeamsPage loading', () => {
     );
     const user = userEvent.setup({ delay: null });
 
-    renderTeamsPage(createWrapper({ user: fakeUser('user-1') }));
+    renderTeamsPage(signedIn());
 
     expect(await screen.findByText('Failed to load your teams.')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^Edit / })).not.toBeInTheDocument();
@@ -390,20 +393,30 @@ describe('TeamsPage loading', () => {
   });
 });
 
-describe('TeamsPage empty collection', () => {
-  // A collection belongs to an account, so the characters page can't fill one signed out.
-  it('offers sign-in to a signed-out visitor', () => {
+describe('TeamsPage signed out', () => {
+  it('offers sign-in in place of the teams', () => {
     renderTeamsPage();
 
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Team 1' })).not.toBeInTheDocument();
   });
 
-  it('withholds the prompt until the collection has loaded', () => {
+  it('withholds the prompt until auth settles', () => {
     renderTeamsPage(AuthLoading);
 
     expect(screen.queryByRole('button', { name: 'Sign in' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
+  });
+});
+
+describe('TeamsPage empty collection', () => {
+  it('points the user at the characters page', async () => {
+    serveAccount([], []);
+    renderTeamsPage(signedIn());
+
+    expect(await screen.findByRole('link', { name: 'Go to Characters' })).toHaveAttribute(
+      'href',
+      '/characters',
+    );
   });
 
   it('shows no prompt once the user owns a character', async () => {

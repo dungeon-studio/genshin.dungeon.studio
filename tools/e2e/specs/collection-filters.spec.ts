@@ -103,7 +103,9 @@ function describeFilters<I extends CollectionItem>(collection: CollectionPage<I>
       await expect.poll(async () => (await names(page)).length).toBe(roster.length);
       const before = await names(page);
 
-      await page.getByRole('button', { name: 'Sort descending' }).click();
+      await page
+        .getByRole('button', { name: 'Sort order: descending, switch to ascending' })
+        .click();
 
       await expect.poll(() => names(page)).toEqual(before.toReversed());
     });
@@ -111,9 +113,11 @@ function describeFilters<I extends CollectionItem>(collection: CollectionPage<I>
     test('the field control switches to name order', async ({ page }) => {
       await page.goto(path);
 
-      await page.getByRole('button', { name: 'Release' }).click();
+      await page.getByRole('button', { name: 'Sort by: Release, switch to Name' }).click();
 
-      await expect(page.getByRole('button', { name: 'Name' })).toBeVisible();
+      await expect(
+        page.getByRole('button', { name: 'Sort by: Name, switch to Release' }),
+      ).toBeVisible();
       await expect
         .poll(() => names(page))
         .toEqual(roster.map((item) => item.name).toSorted((a, b) => nameCollator.compare(b, a)));

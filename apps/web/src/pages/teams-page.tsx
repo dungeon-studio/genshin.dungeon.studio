@@ -13,6 +13,7 @@ import { LoadFailedPage } from '@/components/chrome/load-failed-page';
 import { LoadingPage } from '@/components/chrome/loading-page';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
+import { SignInPrompt, useAuth } from '@/features/auth';
 import type { UseCollectionResult } from '@/features/collection/characters/use-character-collection';
 import { useCollection } from '@/features/collection/characters/use-character-collection';
 import type { CharacterCollection } from '@/features/collection/characters/use-character-collection-store';
@@ -146,11 +147,13 @@ function useMemberEditor(
 type MemberEditor = ReturnType<typeof useMemberEditor>;
 
 export function TeamsPage(): JSX.Element {
+  const auth = useAuth();
   // `TeamBuilder` mounts only after teams load, so the collection requests start here.
   const planner = useTeams();
   const collection = useCollection();
   const weaponCollection = useWeaponCollection();
 
+  if (auth.status === 'signed-out') return <SignedOutTeams />;
   // Every edit saves the whole team, so one made to a default slot erases the saved one.
   if (planner.isLoading) return <LoadingPage title="Teams" label="Loading teams" />;
   if (planner.error) {
@@ -276,6 +279,20 @@ function TeamBuilder({ planner, collection, weaponCollection }: TeamBuilderProps
           )}
         </SheetContent>
       </Sheet>
+    </Container>
+  );
+}
+
+/** Teams are saved to an account, so signed-out edits would be lost. */
+function SignedOutTeams(): JSX.Element {
+  return (
+    <Container className="py-12">
+      <h1 className="sr-only">Teams</h1>
+      <SignInPrompt
+        icon={Users}
+        title="Sign in to build teams"
+        description="Teams are saved to your account and use the characters and weapons you own."
+      />
     </Container>
   );
 }

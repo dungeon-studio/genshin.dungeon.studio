@@ -128,7 +128,8 @@ sequenceDiagram
 
 ## Teams
 
-`useTeams` in `use-teams.ts`. Every action goes through `editThenSave`.
+`useTeams` in `use-teams.ts`. Like characters, nothing works signed out.
+Signed in, every action goes through `editThenSave`.
 
 ```mermaid
 sequenceDiagram
@@ -140,18 +141,16 @@ sequenceDiagram
   participant FS as Firestore
 
   Hook->>Store: snapshot slot, then edit
-  opt signed in
-    Hook->>Cache: cancel any refetch in flight
-    Hook->>API: PUT /teams/{slot} with name, members, and description
-    API->>FS: with any position filled: read characters, weapons,<br>and other teams to validate them
-    API->>FS: transaction of read, nextTeam, set
-    alt success
-      Hook->>Cache: invalidate, unless another write is pending
-      Cache-->>Reconcile: refetched teams
-      Reconcile->>Store: collectionTeamsToStore, then setTeams (replace)
-    else failure
-      Hook->>Store: guarded rollback to the snapshot
-    end
+  Hook->>Cache: cancel any refetch in flight
+  Hook->>API: PUT /teams/{slot} with name, members, and description
+  API->>FS: with any position filled: read characters, weapons,<br>and other teams to validate them
+  API->>FS: transaction of read, nextTeam, set
+  alt success
+    Hook->>Cache: invalidate, unless another write is pending
+    Cache-->>Reconcile: refetched teams
+    Reconcile->>Store: collectionTeamsToStore, then setTeams (replace)
+  else failure
+    Hook->>Store: guarded rollback to the snapshot
   end
 ```
 
@@ -188,14 +187,14 @@ failure between the two never orphans data: the identity remains and can retry.
 
 ## Divergences
 
-| Question                                    | Characters                             | Weapons                                | Teams                                    |
-| ------------------------------------------- | -------------------------------------- | -------------------------------------- | ---------------------------------------- |
-| Works signed out?                           | No, every action is a no-op            | No, every action is a no-op            | Yes, in memory until a reload or sign-in |
-| Optimistic?                                 | All three actions                      | Remove and refine, not add             | Every action                             |
-| Applies the mutation response to the store? | Whole entry, skipped once removed      | Whole instance, replaced               | No                                       |
-| How a refetch reaches the store             | Replace                                | Replace                                | Replace, filled to four slots            |
-| Can a refetch overwrite an edit in flight?  | Only a refetch the write didn't cancel | Only a refetch the write didn't cancel | Only a refetch the write didn't cancel   |
-| What a removal elsewhere does to the store  | Disappears on refetch                  | Disappears on refetch                  | Disappears on refetch                    |
+| Question                                    | Characters                             | Weapons                                | Teams                                  |
+| ------------------------------------------- | -------------------------------------- | -------------------------------------- | -------------------------------------- |
+| Works signed out?                           | No, every action is a no-op            | No, every action is a no-op            | No, every action is a no-op            |
+| Optimistic?                                 | All three actions                      | Remove and refine, not add             | Every action                           |
+| Applies the mutation response to the store? | Whole entry, skipped once removed      | Whole instance, replaced               | No                                     |
+| How a refetch reaches the store             | Replace                                | Replace                                | Replace, filled to four slots          |
+| Can a refetch overwrite an edit in flight?  | Only a refetch the write didn't cancel | Only a refetch the write didn't cancel | Only a refetch the write didn't cancel |
+| What a removal elsewhere does to the store  | Disappears on refetch                  | Disappears on refetch                  | Disappears on refetch                  |
 
 Teams also depend on the other two features. The server rejects a team that
 names a character or weapon instance the user doesn't own, so a team save can

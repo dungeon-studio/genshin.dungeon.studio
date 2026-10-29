@@ -111,17 +111,12 @@ stateDiagram-v2
 
 ```mermaid
 stateDiagram-v2
-  state "Local only" as LocalOnly
   state "Rolled back" as RolledBack
   state "Default" as DefaultTeam
 
   [*] --> DefaultTeam: store created
-  DefaultTeam --> LocalOnly: edit while not signed in
-  DefaultTeam --> Sent: edit while signed in
+  DefaultTeam --> Sent: edit
   DefaultTeam --> Confirmed: refetch brings a saved team for the slot
-  LocalOnly --> Confirmed: sign in, refetch brings a saved team
-  LocalOnly --> Sent: edit after sign-in, before the first fetch lands
-  LocalOnly --> DefaultTeam: sign in with the slot unsaved
   Sent --> Sent: newer edit to the same slot
   Sent --> Confirmed: save succeeds, then a refetch lands
   Sent --> RolledBack: rejected, slot still holds the sent team
@@ -135,8 +130,6 @@ stateDiagram-v2
   client-minted timestamps. A refetch, a signed-in mount, or a sign-out
   rebuilds it with new timestamps whenever the server holds nothing for the
   slot.
-- Local only: in memory, so it survives moving between pages but not a page
-  load. Signing in replaces it rather than merging it.
 - Confirmed: a response never reaches the store. Only a refetch confirms it,
   server timestamps included. A save that succeeds while another team save is
   pending skips its refetch and waits on that save's.
