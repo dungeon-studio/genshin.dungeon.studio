@@ -5,6 +5,7 @@ import { Monitor, Moon, Sun } from 'lucide-react';
 import type { JSX } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { cycleLabel } from '@/lib/cycle-label';
 
 import type { Theme } from './theme-context';
 import { useTheme } from './use-theme';
@@ -35,7 +36,7 @@ export function ThemeToggle(): JSX.Element {
       variant="ghost"
       size="icon"
       onClick={cycle}
-      aria-label={`Theme: ${theme}, switch to ${NEXT[theme]}`}
+      aria-label={cycleLabel('Theme', theme, NEXT[theme])}
     >
       <Icon className="h-4 w-4" />
     </Button>
