@@ -189,8 +189,9 @@ describe('useTeams (authenticated)', () => {
   it('reports a failed save that a newer edit to the same team superseded', async () => {
     const firstPut = holdResponse(() => new HttpResponse(null, { status: 500 }));
     const newerName = 'Newer';
+    let savedTeams: CollectionTeam[] = [];
     server.use(
-      http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([]))),
+      http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument(savedTeams))),
       http.put(
         matchJsonBody<{ name: string }>(
           'http://localhost:8080/teams/1',
@@ -198,7 +199,10 @@ describe('useTeams (authenticated)', () => {
         ),
         firstPut.resolver,
       ),
-      http.put('http://localhost:8080/teams/1', () => new HttpResponse(null, { status: 204 })),
+      http.put('http://localhost:8080/teams/1', async ({ request }) => {
+        savedTeams = [makeTeam(1, (await request.json()) as Partial<CollectionTeam>)];
+        return new HttpResponse(null, { status: 204 });
+      }),
     );
 
     const { result } = renderHookSignedIn(() => useTeams(), 'user-1');

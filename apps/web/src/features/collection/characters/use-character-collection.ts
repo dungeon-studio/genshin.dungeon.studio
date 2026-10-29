@@ -163,7 +163,7 @@ export function useCollection(): UseCollectionResult {
   const storeReplaceCharacters = useCollectionStore((s) => s.replaceCharacters);
 
   const query = useCharacterCollectionQuery(uid);
-  const { data: apiCharacters } = query;
+  const { data: apiCharacters, dataUpdatedAt } = query;
   const load = useUserDataLoad(auth, query);
 
   const addCharacterApi = useSenderBoundMutate(uid, useAddCharacterMutation(uid).mutate);
@@ -180,10 +180,12 @@ export function useCollection(): UseCollectionResult {
     [storeReplaceCharacter],
   );
 
+  // `dataUpdatedAt` reruns this when a refetch after a failed write returns
+  // identical data, which still has to replace the rolled-back store.
   useEffect(() => {
     if (!apiCharacters) return;
     storeReplaceCharacters(apiCharacters);
-  }, [apiCharacters, storeReplaceCharacters]);
+  }, [apiCharacters, dataUpdatedAt, storeReplaceCharacters]);
 
   const optimisticActions = useOptimisticActions(
     { addCharacterApi, removeCharacterApi, setConstellationLevelApi },

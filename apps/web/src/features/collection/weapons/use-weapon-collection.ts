@@ -144,7 +144,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   const storeAddWeapon = useWeaponCollectionStore((s) => s.addWeapon);
 
   const query = useWeaponCollectionQuery(uid);
-  const { data: apiWeapons } = query;
+  const { data: apiWeapons, dataUpdatedAt } = query;
   const load = useUserDataLoad(auth, query);
 
   const addWeaponApi = useSenderBoundMutate(uid, useAddWeaponMutation(uid).mutate);
@@ -161,10 +161,12 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     [storeAddWeapon],
   );
 
+  // `dataUpdatedAt` reruns this when a refetch after a failed write returns
+  // identical data, which still has to replace the rolled-back store.
   useEffect(() => {
     if (!apiWeapons) return;
     storeSetWeapons(apiWeapons);
-  }, [apiWeapons, storeSetWeapons]);
+  }, [apiWeapons, dataUpdatedAt, storeSetWeapons]);
 
   const runAdd = useCallback(
     (weaponId: Weapon['id'], onSettled?: () => void) => {

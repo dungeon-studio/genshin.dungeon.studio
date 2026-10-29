@@ -9,6 +9,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { makeWeapon, weaponsDocument } from '@/test/fixtures';
 import { holdResponse } from '@/test/msw/held-response';
+import { matchJsonBody } from '@/test/msw/match-json-body';
 import { server } from '@/test/msw/server';
 import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
 
@@ -76,17 +77,17 @@ describe('useWeaponCollection', () => {
     });
 
     it('creates another instance even when the weapon is already owned', async () => {
+      const first = makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 });
+      const second = makeWeapon(SECOND_INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 });
+      let serverWeapons = [first];
       server.use(
         http.get('http://localhost:8080/weapons', () =>
-          HttpResponse.json(
-            weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 })]),
-          ),
+          HttpResponse.json(weaponsDocument(serverWeapons)),
         ),
-        http.post('http://localhost:8080/weapons', () =>
-          HttpResponse.json(
-            weaponsDocument([makeWeapon(SECOND_INSTANCE_ID, WEAPON_ID, { refinementLevel: 1 })]),
-          ),
-        ),
+        http.post('http://localhost:8080/weapons', () => {
+          serverWeapons = [first, second];
+          return HttpResponse.json(weaponsDocument([second]));
+        }),
       );
 
       const { result } = renderAuthed();
@@ -240,6 +241,44 @@ describe('useWeaponCollection', () => {
       expect(toast.error).toHaveBeenCalledWith(
         "Couldn't set Angelos' Heptades to refinement rank 5. Angelos' Heptades is back at refinement rank 2. Try again.",
       );
+    });
+
+    it("returns to the server's rank when two rapid refinement changes both fail", async () => {
+      const firstFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
+      server.use(
+        http.get('http://localhost:8080/weapons', () =>
+          HttpResponse.json(
+            weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 2 })]),
+          ),
+        ),
+        http.patch(
+          matchJsonBody<{ refinementLevel: number }>(
+            'http://localhost:8080/weapons/weapon-instance-1',
+            ({ refinementLevel }) => refinementLevel === 3,
+          ),
+          firstFailure.resolver,
+        ),
+        http.patch(
+          'http://localhost:8080/weapons/weapon-instance-1',
+          () => new HttpResponse(null, { status: 500 }),
+        ),
+      );
+
+      const { result } = renderAuthed();
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(2));
+
+      act(() => {
+        result.current.setRefinementLevel(INSTANCE_ID, 3);
+      });
+      act(() => {
+        result.current.setRefinementLevel(INSTANCE_ID, 4);
+      });
+      // The second failure lands first and rolls back to 3, the rank it replaced.
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(3));
+      await act(() => firstFailure.arrived);
+      firstFailure.release();
+
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(2));
     });
 
     it('keeps a change that a refetch started before it would overwrite', async () => {

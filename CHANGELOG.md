@@ -30,6 +30,7 @@ single `### Added` bucket in `[Unreleased]`.
 - Team persistence so compositions survive across sessions.
 - Collections saved to your account, with a sign-in prompt when managing one signed out.
 - Save-failure messages that name the team, character, or weapon, say what was put back, and suggest trying again.
+- Collections and teams that reload what your account holds after a save fails, so several quick failed edits can't leave a value that was never saved.
 - Google sign-in and sign-out from the site header.
 - Messages when sign-in or sign-out fails, such as a blocked pop-up, with a button to try again.
 - Dark mode support.
