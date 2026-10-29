@@ -9,7 +9,7 @@ import {
   equippablePair,
   expect,
   test,
-  weaponCardLabel,
+  ownedWeaponLabel,
   withApiWrite,
 } from './fixtures';
 
@@ -42,7 +42,7 @@ test('an instance takes a refinement level that survives a reload', async ({
   );
 
   await page.reload();
-  await page.getByRole('button', { name: weaponCardLabel(weapon, 1) }).click();
+  await page.getByRole('button', { name: ownedWeaponLabel(weapon, 1) }).click();
 
   await expect(page.getByRole('button', { name: refinementLabel })).toHaveAttribute(
     'aria-pressed',
@@ -60,5 +60,5 @@ test('a weapon can hold more than one instance', async ({ signedInPage: page }) 
   await expect(page.getByRole('button', { name: /^Remove instance/ })).toHaveCount(2);
 
   await closeWeaponSheet(page, weapon);
-  await expect(page.getByRole('button', { name: weaponCardLabel(weapon, 2) })).toBeVisible();
+  await expect(page.getByRole('button', { name: ownedWeaponLabel(weapon, 2) })).toBeVisible();
 });

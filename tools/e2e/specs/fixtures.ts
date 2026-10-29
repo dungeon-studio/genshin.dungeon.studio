@@ -25,7 +25,7 @@ export function equippablePair(): { character: Character; weapon: Weapon } {
 
 // The accessible names the app renders.
 
-export function weaponCardLabel(weapon: Weapon, instances: number): string {
+export function ownedWeaponLabel(weapon: Weapon, instances: number): string {
   return `${weapon.name}, ${instances} owned`;
 }
 
