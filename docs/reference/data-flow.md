@@ -5,7 +5,7 @@
 
 Where each copy of user data lives and which processes move data between them.
 User data has three copies: the Firestore document, the TanStack Query cache,
-and a zustand store. [ADR-0006] decides which copy is authoritative. Out of
+and, for characters and teams, a zustand store. [ADR-0006] decides which copy is authoritative. Out of
 scope:
 
 - Static game data, which is never written.
@@ -21,7 +21,7 @@ Companion pages:
   at each hop.
 - [Layers](data-flow-layers.md): the browser and API layer stacks, where the
   code skips a layer, and the jobs each layer does.
-- [Lifecycles](data-flow-lifecycles.md): the states each entity's store copy
+- [Lifecycles](data-flow-lifecycles.md): the states each entity's client copy
   moves through.
 
 ---
@@ -90,6 +90,7 @@ flowchart TB
   edit -->|rendered state| user
   store -->|current entities| edit
   edit -->|edited entities| store
+  cache -->|current weapons| edit
   edit -->|write request| send
 
   firebaseAuth -->|ID token| send
@@ -100,6 +101,7 @@ flowchart TB
   fetch -->|ID token| serve
   serve -->|saved record| send
   send -->|write outcome| edit
+  send -->|edited and saved weapons| cache
 
   firebaseAuth -->|signing keys and revocation status| serve
   serve -->|identity to delete| firebaseAuth
@@ -125,12 +127,13 @@ flowchart TB
 A control signal carries no data: a successful collection or team mutation
 invalidates its query, which makes Fetch records run again. A mutation that
 succeeds while another to the same query is pending skips the invalidation.
-Starting a mutation cancels a refetch already in flight. No mutation writes into
-the query cache directly. Account deletion empties it. A plain sign-out leaves
+Starting a mutation cancels a refetch already in flight. Weapon mutations write
+their edits and saved instances into the query cache directly, and no other
+mutation does. Account deletion empties it. A plain sign-out leaves
 the previous user's entries, keyed by user ID, until garbage collection.
 
 Clear user data runs when a signed-in user signs out or another account signs
-in, whichever page is open. It empties the character and weapon stores and
-resets teams to their default slots.
+in, whichever page is open. It empties the character store and resets teams to
+their default slots. Weapons need no clear, because the user ID keys the cache.
 
 [ADR-0006]: ../explanation/adr-0006-client-data-layer.md
