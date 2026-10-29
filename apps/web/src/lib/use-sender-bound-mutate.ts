@@ -21,8 +21,8 @@ export type SenderBoundMutate<TData, TVariables> = (
  * request is still signed in, so a late response or rollback never reaches the
  * next user's store. `onSettled` always runs, for cleanup that isn't per-user.
  *
- * Every call keeps its own callbacks. `mutate`'s per-call callbacks fire only
- * for the latest call, which would drop an earlier request's failure.
+ * Every call keeps its own callbacks, unlike `mutate`, which runs per-call
+ * callbacks for the latest call only and so drops an earlier failure.
  */
 export function useSenderBoundMutate<TData, TVariables>(
   userId: string | undefined,

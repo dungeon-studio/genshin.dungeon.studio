@@ -89,9 +89,8 @@ function useRestoreWeapon(
 }
 
 /**
- * Edits to an owned instance. The mutations show each edit before the server
- * confirms it and put back what a rejected one replaced; these name the result
- * to the user.
+ * Edits to an owned instance that tell the user how a rejected one ended. The
+ * mutations make the optimistic write and undo it.
  */
 function useInstanceEdits(
   api: {

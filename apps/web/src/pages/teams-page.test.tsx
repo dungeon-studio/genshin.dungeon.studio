@@ -78,7 +78,10 @@ function renderTeamsPage(wrapper = createWrapper()): void {
   );
 }
 
-/** Serves a signed-in user who owns two characters and a weapon for each, and keeps the teams they save. */
+/**
+ * Serves a signed-in user owning two characters and a weapon for each, keeping
+ * the teams they save.
+ */
 function serveCollections(): void {
   const savedTeams = new Map<TeamSlot, CollectionTeam>();
   server.use(

@@ -30,7 +30,10 @@ interface RolledBackWrite extends Pick<FailedWrite, 'failure' | 'reverted'> {
   restored: boolean;
 }
 
-/** Tells the user what a failed optimistic write left showing, once something else reverted it. */
+/**
+ * Tells the user what a failed optimistic write left showing, for a caller that
+ * reverts elsewhere.
+ */
 export function reportRolledBackWrite({ restored, failure, reverted }: RolledBackWrite): void {
   if (!restored) {
     toast.error(`${failure} Your newer change stands.`);

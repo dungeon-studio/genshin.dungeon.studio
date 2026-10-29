@@ -5,14 +5,12 @@
  * The weapon collection's TanStack Query layer, wrapping the raw HTTP calls.
  *
  * Query keys are scoped by user ID, so signing in as someone else never serves
- * the previous account's cached instances. The cache is the collection's only
- * client-side copy.
+ * the previous account's cached instances.
  *
- * Removes and refinement changes write into the cache before the server
- * answers. A rejected one puts back what it replaced, unless a newer write has
- * since changed that instance. Adds can't be optimistic, because the server
- * mints the instance identifier. Every write still invalidates the key once it
- * succeeds, because the server decides the stored timestamps.
+ * Removes and refinement changes show in the cache before the server answers.
+ * Adds wait for the response, because the server mints the instance
+ * identifier. Every successful write invalidates the key, because the server
+ * decides the stored timestamps.
  *
  * `useWeaponCollection` is what a component reaches for; these are its parts.
  */
@@ -43,8 +41,8 @@ const weaponsKey = userScopedKey('weapons');
 export interface WeaponCache {
   read: () => WeaponRecord;
   /**
-   * Whether the cache holds the instance as `instance` has it, `undefined`
-   * meaning not at all. Refinement is the only field an edit changes.
+   * Whether the cache matches `instance`, where `undefined` means absent. It
+   * compares refinement only, the one field an edit changes.
    */
   holds: (
     collectionWeaponId: CollectionWeaponId,
@@ -92,11 +90,11 @@ export interface WeaponEditContext {
 }
 
 /**
- * The `onMutate` and `onError` of an edit to one cached instance. `apply`
- * returns the instance as the edit leaves it, or `undefined` for a removal.
+ * Shows an edit to one instance before the server answers. `apply` returns the
+ * edited instance, or `undefined` to remove it.
  *
- * A rejected edit puts back what it replaced only while the cache still holds
- * what it wrote, so a newer edit to the same instance stands.
+ * A rejected edit puts back the replaced instance only while the cache still
+ * holds the edit, so a newer edit to the same instance stands.
  */
 function optimisticEdit<TVariables>(
   cache: WeaponCache,
@@ -125,7 +123,6 @@ function optimisticEdit<TVariables>(
   };
 }
 
-/** The `onSuccess` of a write the server answers with the stored instance. */
 function storeConfirmed(
   cache: WeaponCache,
   querySync: UserQuerySync,
