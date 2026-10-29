@@ -82,38 +82,39 @@ function renderTeamsPage(wrapper = createWrapper()): void {
 // Call after rendering: the hooks clear their stores on finding no signed-in user.
 const signedIn = () => createWrapper({ user: fakeUser('user-1') });
 
-/** Serves no saved teams and a collection of the two characters and weapons. */
-function serveCollections(): void {
+const OWNED_CHARACTERS = [CLAYMORE_USER, BOW_USER].map((c) => makeCharacter(c.id));
+const OWNED_WEAPONS = [
+  makeWeapon(CLAYMORE_INSTANCE, CLAYMORE.id),
+  makeWeapon(BOW_INSTANCE, BOW_WEAPON.id),
+];
+
+/** Serves an account with no saved teams, owning `characters` and `weapons`. */
+function serveAccount(characters = OWNED_CHARACTERS, weapons = OWNED_WEAPONS): void {
   // Saves never answer, so no refetch replaces the edits under test.
   const save = holdResponse(() => new HttpResponse(null, { status: 204 }));
   server.use(
     http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([]))),
     http.get('http://localhost:8080/characters', () =>
-      HttpResponse.json(
-        charactersDocument([CLAYMORE_USER, BOW_USER].map((c) => makeCharacter(c.id))),
-      ),
+      HttpResponse.json(charactersDocument(characters)),
     ),
-    http.get('http://localhost:8080/weapons', () =>
-      HttpResponse.json(
-        weaponsDocument([
-          makeWeapon(CLAYMORE_INSTANCE, CLAYMORE.id),
-          makeWeapon(BOW_INSTANCE, BOW_WEAPON.id),
-        ]),
-      ),
-    ),
+    http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument(weapons))),
     http.put('http://localhost:8080/teams/:slot', save.resolver),
   );
 }
 
 async function collectionsLoaded(): Promise<void> {
   await waitFor(() => {
-    expect(Object.keys(useCollectionStore.getState().characters)).toHaveLength(2);
-    expect(Object.keys(useWeaponCollectionStore.getState().weapons)).toHaveLength(2);
+    expect(Object.keys(useCollectionStore.getState().characters)).toHaveLength(
+      OWNED_CHARACTERS.length,
+    );
+    expect(Object.keys(useWeaponCollectionStore.getState().weapons)).toHaveLength(
+      OWNED_WEAPONS.length,
+    );
   });
 }
 
 async function setupTeamsPage(): Promise<UserEvent> {
-  serveCollections();
+  serveAccount();
   const user = userEvent.setup({ delay: null });
   renderTeamsPage(signedIn());
   await screen.findByRole('region', { name: 'Team 1' });
@@ -412,11 +413,7 @@ describe('TeamsPage signed out', () => {
 
 describe('TeamsPage empty collection', () => {
   it('points the user at the characters page', async () => {
-    server.use(
-      http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([]))),
-      http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
-      http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument([]))),
-    );
+    serveAccount([], []);
     renderTeamsPage(signedIn());
 
     expect(await screen.findByRole('link', { name: 'Go to Characters' })).toHaveAttribute(
