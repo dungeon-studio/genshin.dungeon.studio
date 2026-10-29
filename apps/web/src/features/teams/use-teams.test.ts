@@ -342,8 +342,8 @@ describe('useTeams (authenticated)', () => {
   });
 });
 
-describe('useTeams (local-only)', () => {
-  it('applies assignments to the store without calling the API', () => {
+describe('useTeams (signed out)', () => {
+  it('leaves the teams unchanged without calling the API', () => {
     // No handlers: any request would trip the unhandled-request guard.
     const { result } = renderHook(() => useTeams(), {
       wrapper: createWrapper({ user: null }),
@@ -353,7 +353,6 @@ describe('useTeams (local-only)', () => {
       result.current.assignCharacter(1, 0, CHARACTER);
     });
 
-    expect(result.current.getTeam(1).members[0]?.characterId).toBe(CHARACTER);
-    expect(result.current.isSaving).toBe(false);
+    expect(result.current.getTeam(1).members[0]).toBeNull();
   });
 });
