@@ -92,7 +92,7 @@ export function WeaponInstanceSidebar({
           )}
 
           {[...instances]
-            .sort((a, b) => b.refinementLevel - a.refinementLevel)
+            .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
             .map((instance, index) => (
               <InstanceRow
                 key={instance.weaponInstanceId}
@@ -119,7 +119,7 @@ export function WeaponInstanceSidebar({
 
 interface InstanceRowProps {
   instance: CollectionWeapon;
-  /** One-based position in the sorted list, which names the row to assistive technology. */
+  /** One-based position in the oldest-first list, which names the row to assistive technology. */
   position: number;
   onRemove: (collectionWeaponId: CollectionWeaponId) => void;
   onRefinementChange: (collectionWeaponId: CollectionWeaponId, level: RefinementLevel) => void;
