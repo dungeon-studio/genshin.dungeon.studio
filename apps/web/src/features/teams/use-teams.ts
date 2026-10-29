@@ -101,8 +101,17 @@ function restoredMemberDetail(detail: string) {
   };
 }
 
+const SIGNED_OUT_ACTIONS: TeamActions = {
+  assignCharacter: () => {},
+  removeCharacter: () => {},
+  assignWeapon: () => {},
+  removeWeapon: () => {},
+  setArtifactPlan: () => {},
+  clearTeam: () => {},
+  setTeamName: () => {},
+};
+
 function useTeamActions(
-  isAuthenticated: boolean,
   saveTeamApi: ReturnType<typeof useSaveTeamMutation>['mutateAsync'],
 ): TeamActions {
   return useMemo(() => {
@@ -116,7 +125,6 @@ function useTeamActions(
       (slot: TeamSlot, ...args: Args) => {
         const previousTeam = { ...store().teams[slot] };
         action(store())(slot, ...args);
-        if (!isAuthenticated) return;
         const optimisticTeam = store().teams[slot];
         // Each request needs its own promise: `mutate`'s per-call `onError` fires
         // only for the latest call.
@@ -148,7 +156,7 @@ function useTeamActions(
         () => 'Its members are back.',
       ),
     };
-  }, [isAuthenticated, saveTeamApi]);
+  }, [saveTeamApi]);
 }
 
 /**
@@ -160,9 +168,9 @@ function useTeamActions(
  * still holds the value that request sent; if the user has since changed the
  * same slot again, their newer edit stands and they get an error toast instead.
  *
- * Signed out, the actions still work and nothing is persisted, so a visitor can
- * plan a team before deciding to sign in. Signing out empties the teams, through
- * `ClearUserDataOnSignOut` rather than this hook.
+ * Teams belong to an account, so every action is a no-op while signed out.
+ * Signing out empties the teams, through `ClearUserDataOnSignOut` rather than
+ * this hook.
  */
 export function useTeams(): UseTeamsResult {
   const auth = useAuth();
@@ -188,7 +196,8 @@ export function useTeams(): UseTeamsResult {
     storeSetTeams(collectionTeamsToStore(apiTeams));
   }, [apiTeams, dataUpdatedAt, isWritePending, storeSetTeams]);
 
-  const actions = useTeamActions(isAuthenticated, saveTeamApi);
+  const optimisticActions = useTeamActions(saveTeamApi);
+  const actions = isAuthenticated ? optimisticActions : SIGNED_OUT_ACTIONS;
 
   const getTeam = useCallback((slot: TeamSlot) => teams[slot], [teams]);
 
