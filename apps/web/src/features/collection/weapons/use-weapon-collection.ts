@@ -93,7 +93,7 @@ function useRestoreWeapon(
  * confirms it and put back what a rejected one replaced; these name the result
  * to the user.
  */
-function useOptimisticEdits(
+function useInstanceEdits(
   api: {
     addWeaponApi: SenderBoundMutate<WeaponMutationResult, AddWeaponVariables>;
     removeWeaponApi: SenderBoundMutate<void, CollectionWeaponId>;
@@ -119,7 +119,7 @@ function useOptimisticEdits(
         },
         onError: () => {
           reportRolledBackWrite({
-            restored: collectionWeaponId in cache.read(),
+            restored: cache.holds(collectionWeaponId, current),
             failure: `Couldn't remove ${name}.`,
             reverted: `${name} is back in your collection.`,
           });
@@ -134,14 +134,14 @@ function useOptimisticEdits(
       const previous = cache.read()[collectionWeaponId];
       if (!previous || previous.refinementLevel === level) return;
 
+      const name = weaponName(previous.weaponId);
+
       setRefinementLevelApi(
         { collectionWeaponId, level },
         {
           onError: () => {
-            const name = weaponName(previous.weaponId);
             reportRolledBackWrite({
-              restored:
-                cache.read()[collectionWeaponId]?.refinementLevel === previous.refinementLevel,
+              restored: cache.holds(collectionWeaponId, previous),
               failure: `Couldn't set ${name} to refinement rank ${level}.`,
               reverted: `${name} is back at refinement rank ${previous.refinementLevel}.`,
             });
@@ -221,7 +221,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     [cache, runAdd],
   );
 
-  const { removeWeapon, setRefinementLevel } = useOptimisticEdits(
+  const { removeWeapon, setRefinementLevel } = useInstanceEdits(
     { addWeaponApi, removeWeaponApi, setRefinementLevelApi },
     cache,
   );

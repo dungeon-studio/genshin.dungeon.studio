@@ -27,6 +27,7 @@ import { useMemo } from 'react';
 
 import { apiDelete, apiPatch, apiPost } from '@/lib/api';
 import { apiGetAllItems } from '@/lib/api-collection';
+import type { UserQuerySync } from '@/lib/use-user-query-sync';
 import { useUserQuerySync } from '@/lib/use-user-query-sync';
 import { userScopedKey } from '@/lib/user-scoped-key';
 
@@ -41,6 +42,14 @@ const weaponsKey = userScopedKey('weapons');
 /** The cached collection of one user, read at call time. */
 export interface WeaponCache {
   read: () => WeaponRecord;
+  /**
+   * Whether the cache holds the instance as `instance` has it, `undefined`
+   * meaning not at all. Refinement is the only field an edit changes.
+   */
+  holds: (
+    collectionWeaponId: CollectionWeaponId,
+    instance: CollectionWeapon | undefined,
+  ) => boolean;
   /** Changes a loaded collection; one still loading is left to its first fetch. */
   update: (change: (weapons: WeaponRecord) => WeaponRecord) => void;
 }
@@ -50,8 +59,11 @@ export function useWeaponCache(userId: string | undefined): WeaponCache {
 
   return useMemo(() => {
     const queryKey = weaponsKey(userId ?? '');
+    const read = () => queryClient.getQueryData<WeaponRecord>(queryKey) ?? {};
     return {
-      read: () => queryClient.getQueryData<WeaponRecord>(queryKey) ?? {},
+      read,
+      holds: (collectionWeaponId, instance) =>
+        read()[collectionWeaponId]?.refinementLevel === instance?.refinementLevel,
       update: (change) => {
         queryClient.setQueryData<WeaponRecord>(queryKey, (weapons) => weapons && change(weapons));
       },
@@ -73,9 +85,55 @@ function withoutWeapon(
   };
 }
 
-/** What an optimistic edit replaced, for putting back if the server rejects it. */
+/** What an optimistic edit replaced and what it wrote, for undoing a rejected one. */
 export interface WeaponEditContext {
-  previous: CollectionWeapon | undefined;
+  previous: CollectionWeapon;
+  optimistic: CollectionWeapon | undefined;
+}
+
+/**
+ * The `onMutate` and `onError` of an edit to one cached instance. `apply`
+ * returns the instance as the edit leaves it, or `undefined` for a removal.
+ *
+ * A rejected edit puts back what it replaced only while the cache still holds
+ * what it wrote, so a newer edit to the same instance stands.
+ */
+function optimisticEdit<TVariables>(
+  cache: WeaponCache,
+  querySync: UserQuerySync,
+  idOf: (variables: TVariables) => CollectionWeaponId,
+  apply: (current: CollectionWeapon, variables: TVariables) => CollectionWeapon | undefined,
+): {
+  onMutate: (variables: TVariables) => Promise<WeaponEditContext | undefined>;
+  onError: (error: Error, variables: TVariables, context: WeaponEditContext | undefined) => void;
+} {
+  return {
+    onMutate: async (variables) => {
+      await querySync.onMutate();
+      const collectionWeaponId = idOf(variables);
+      const previous = cache.read()[collectionWeaponId];
+      if (!previous) return undefined;
+
+      const optimistic = apply(previous, variables);
+      cache.update(optimistic ? withWeapon(optimistic) : withoutWeapon(collectionWeaponId));
+      return { previous, optimistic };
+    },
+    onError: (_error, variables, context) => {
+      if (!context || !cache.holds(idOf(variables), context.optimistic)) return;
+      cache.update(withWeapon(context.previous));
+    },
+  };
+}
+
+/** The `onSuccess` of a write the server answers with the stored instance. */
+function storeConfirmed(
+  cache: WeaponCache,
+  querySync: UserQuerySync,
+): (result: WeaponMutationResult) => void {
+  return ({ weapon }) => {
+    cache.update(withWeapon(weapon));
+    querySync.onSuccess();
+  };
 }
 
 function toWeaponRecord(items: Item[]): WeaponRecord {
@@ -132,35 +190,27 @@ export function useAddWeaponMutation(
       return parseSingleWeaponResponse(response);
     },
     ...querySync,
-    onSuccess: ({ weapon }) => {
-      cache.update(withWeapon(weapon));
-      querySync.onSuccess();
-    },
+    onSuccess: storeConfirmed(cache, querySync),
   });
 }
 
 export function useRemoveWeaponMutation(
   userId: string | undefined,
-): UseMutationResult<void, Error, CollectionWeaponId, WeaponEditContext> {
+): UseMutationResult<void, Error, CollectionWeaponId, WeaponEditContext | undefined> {
   const querySync = useUserQuerySync(userId, weaponsKey);
   const cache = useWeaponCache(userId);
 
-  return useMutation({
+  return useMutation<void, Error, CollectionWeaponId, WeaponEditContext | undefined>({
     mutationFn: async (collectionWeaponId: CollectionWeaponId) => {
       await apiDelete(`/weapons/${encodeURIComponent(collectionWeaponId)}`);
     },
     ...querySync,
-    onMutate: async (collectionWeaponId) => {
-      await querySync.onMutate();
-      const previous = cache.read()[collectionWeaponId];
-      cache.update(withoutWeapon(collectionWeaponId));
-      return { previous };
-    },
-    onError: (_error, collectionWeaponId, context) => {
-      const previous = context?.previous;
-      if (!previous || collectionWeaponId in cache.read()) return;
-      cache.update(withWeapon(previous));
-    },
+    ...optimisticEdit<CollectionWeaponId>(
+      cache,
+      querySync,
+      (collectionWeaponId) => collectionWeaponId,
+      () => undefined,
+    ),
   });
 }
 
@@ -171,11 +221,21 @@ export interface SetRefinementLevelVariables {
 
 export function useSetRefinementLevelMutation(
   userId: string | undefined,
-): UseMutationResult<WeaponMutationResult, Error, SetRefinementLevelVariables, WeaponEditContext> {
+): UseMutationResult<
+  WeaponMutationResult,
+  Error,
+  SetRefinementLevelVariables,
+  WeaponEditContext | undefined
+> {
   const querySync = useUserQuerySync(userId, weaponsKey);
   const cache = useWeaponCache(userId);
 
-  return useMutation({
+  return useMutation<
+    WeaponMutationResult,
+    Error,
+    SetRefinementLevelVariables,
+    WeaponEditContext | undefined
+  >({
     mutationFn: async ({
       collectionWeaponId,
       level,
@@ -186,20 +246,12 @@ export function useSetRefinementLevelMutation(
       return parseSingleWeaponResponse(response);
     },
     ...querySync,
-    onMutate: async ({ collectionWeaponId, level }) => {
-      await querySync.onMutate();
-      const previous = cache.read()[collectionWeaponId];
-      if (previous) cache.update(withWeapon({ ...previous, refinementLevel: level }));
-      return { previous };
-    },
-    onError: (_error, { collectionWeaponId, level }, context) => {
-      const previous = context?.previous;
-      if (!previous || cache.read()[collectionWeaponId]?.refinementLevel !== level) return;
-      cache.update(withWeapon(previous));
-    },
-    onSuccess: ({ weapon }) => {
-      cache.update(withWeapon(weapon));
-      querySync.onSuccess();
-    },
+    ...optimisticEdit<SetRefinementLevelVariables>(
+      cache,
+      querySync,
+      ({ collectionWeaponId }) => collectionWeaponId,
+      (current, { level }) => ({ ...current, refinementLevel: level }),
+    ),
+    onSuccess: storeConfirmed(cache, querySync),
   });
 }
