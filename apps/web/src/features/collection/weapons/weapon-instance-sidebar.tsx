@@ -116,10 +116,7 @@ export function WeaponInstanceSidebar({
   );
 }
 
-/**
- * Orders rows by when each instance was added, a field no edit in the sheet
- * changes, so an edited row stays under the pointer.
- */
+/** No edit in the sheet changes an instance's creation time, so an edited row stays under the pointer. */
 function oldestFirst(a: CollectionWeapon, b: CollectionWeapon): number {
   return a.createdAt.localeCompare(b.createdAt);
 }
