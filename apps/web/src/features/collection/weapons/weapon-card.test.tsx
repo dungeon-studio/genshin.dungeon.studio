@@ -36,7 +36,7 @@ describe('WeaponCard', () => {
     expect(screen.getByRole('button', { name: 'Favonius Sword, 2 owned' })).toBeInTheDocument();
   });
 
-  it('names the add when not owned', () => {
+  it('says it adds to the collection when not owned', () => {
     render(<WeaponCard weapon={SWORD} instanceCount={0} />);
 
     expect(
