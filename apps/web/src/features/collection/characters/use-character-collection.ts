@@ -10,6 +10,7 @@ import { signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 import type { UserDataLoad } from '@/features/auth/use-user-data-load';
 import { useUserDataLoad } from '@/features/auth/use-user-data-load';
+import { offerUndo } from '@/lib/offer-undo';
 import { rollBackFailedWrite } from '@/lib/roll-back-failed-write';
 import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
@@ -49,6 +50,51 @@ const SIGNED_OUT_ACTIONS: CollectionActions = {
 };
 
 /**
+ * Puts a removed character back at the level it had, unless it has already
+ * been re-added. A PUT creates the entry, so the level change does the work.
+ */
+function useRestoreCharacter(
+  setConstellationLevelApi: ReturnType<typeof useSetConstellationLevelMutation>['mutate'],
+  applyMutationResult: (result: MutationResult) => void,
+): (id: CharacterId, level: ConstellationLevel) => void {
+  const storeAddCharacter = useCollectionStore((s) => s.addCharacter);
+  const storeRemoveCharacter = useCollectionStore((s) => s.removeCharacter);
+  const storeSetConstellationLevel = useCollectionStore((s) => s.setConstellationLevel);
+
+  return useCallback(
+    (id: CharacterId, level: ConstellationLevel) => {
+      if (id in useCollectionStore.getState().characters) return;
+
+      storeAddCharacter(id);
+      storeSetConstellationLevel(id, level);
+      setConstellationLevelApi(
+        { characterId: id, level },
+        {
+          onSuccess: applyMutationResult,
+          onError: () => {
+            const name = characterName(id);
+            rollBackFailedWrite({
+              isStillShown: () =>
+                useCollectionStore.getState().characters[id]?.constellationLevel === level,
+              revert: () => storeRemoveCharacter(id),
+              failure: `Couldn't bring back ${name}.`,
+              reverted: `${name} is out of your collection again.`,
+            });
+          },
+        },
+      );
+    },
+    [
+      setConstellationLevelApi,
+      storeAddCharacter,
+      storeRemoveCharacter,
+      storeSetConstellationLevel,
+      applyMutationResult,
+    ],
+  );
+}
+
+/**
  * The collection's write actions, each applied to the store before the server
  * confirms it.
  *
@@ -67,6 +113,7 @@ function useOptimisticActions(
   const storeAddCharacter = useCollectionStore((s) => s.addCharacter);
   const storeRemoveCharacter = useCollectionStore((s) => s.removeCharacter);
   const storeSetConstellationLevel = useCollectionStore((s) => s.setConstellationLevel);
+  const restoreCharacter = useRestoreCharacter(setConstellationLevelApi, applyMutationResult);
 
   const addCharacter = useCallback(
     (id: CharacterId) => {
@@ -97,15 +144,22 @@ function useOptimisticActions(
       const current = useCollectionStore.getState().characters[id];
       if (!current) return;
 
+      const name = characterName(id);
+      const level = current.constellationLevel;
+
       storeRemoveCharacter(id);
       removeCharacterApi(id, {
+        onSuccess: () => {
+          offerUndo(`Removed ${name} at constellation level ${level}.`, () => {
+            restoreCharacter(id, level);
+          });
+        },
         onError: () => {
-          const name = characterName(id);
           rollBackFailedWrite({
             isStillShown: () => !(id in useCollectionStore.getState().characters),
             revert: () => {
               storeAddCharacter(id);
-              storeSetConstellationLevel(id, current.constellationLevel);
+              storeSetConstellationLevel(id, level);
             },
             failure: `Couldn't remove ${name}.`,
             reverted: `${name} is back in your collection.`,
@@ -113,7 +167,13 @@ function useOptimisticActions(
         },
       });
     },
-    [removeCharacterApi, storeRemoveCharacter, storeAddCharacter, storeSetConstellationLevel],
+    [
+      removeCharacterApi,
+      restoreCharacter,
+      storeRemoveCharacter,
+      storeAddCharacter,
+      storeSetConstellationLevel,
+    ],
   );
 
   const setConstellationLevel = useCallback(

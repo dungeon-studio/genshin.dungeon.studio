@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import type { CollectionWeapon, CollectionWeaponId, RefinementLevel } from '@genshin/domain';
+import { MIN_REFINEMENT_LEVEL } from '@genshin/domain';
 import type { Weapon } from '@genshin/game-data';
 import { getWeaponById } from '@genshin/game-data';
 import { useCallback, useEffect, useRef } from 'react';
@@ -10,6 +11,7 @@ import { signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 import type { UserDataLoad } from '@/features/auth/use-user-data-load';
 import { useUserDataLoad } from '@/features/auth/use-user-data-load';
+import { offerUndo } from '@/lib/offer-undo';
 import { reportFailedWrite, rollBackFailedWrite } from '@/lib/roll-back-failed-write';
 import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
@@ -60,16 +62,18 @@ const SIGNED_OUT_ACTIONS: WeaponActions = {
  *
  * A rejected edit rolls back only if the store still holds its value, and
  * every failure toasts. Adds can't be optimistic, because the server assigns
- * the instance ID.
+ * the instance ID, so undoing a removal brings back a new copy: a team that
+ * had the removed one equipped stays without it.
  */
 function useOptimisticEdits(
   api: {
+    addWeaponApi: ReturnType<typeof useAddWeaponMutation>['mutate'];
     removeWeaponApi: ReturnType<typeof useRemoveWeaponMutation>['mutate'];
     setRefinementLevelApi: ReturnType<typeof useSetRefinementLevelMutation>['mutate'];
   },
   applyMutationResult: (result: WeaponMutationResult) => void,
 ): Pick<UseWeaponCollectionResult, 'removeWeapon' | 'setRefinementLevel'> {
-  const { removeWeaponApi, setRefinementLevelApi } = api;
+  const { addWeaponApi, removeWeaponApi, setRefinementLevelApi } = api;
   const storeAddWeapon = useWeaponCollectionStore((s) => s.addWeapon);
   const storeRemoveWeapon = useWeaponCollectionStore((s) => s.removeWeapon);
   const storeSetRefinementLevel = useWeaponCollectionStore((s) => s.setRefinementLevel);
@@ -79,10 +83,28 @@ function useOptimisticEdits(
       const current = useWeaponCollectionStore.getState().weapons[collectionWeaponId];
       if (!current) return;
 
+      const name = weaponName(current.weaponId);
+      const { weaponId, refinementLevel } = current;
+      const restore = () => {
+        addWeaponApi(
+          { weaponId, refinementLevel },
+          {
+            onSuccess: applyMutationResult,
+            onError: () => {
+              reportFailedWrite(
+                `Couldn't bring back ${name} at refinement rank ${refinementLevel}.`,
+              );
+            },
+          },
+        );
+      };
+
       storeRemoveWeapon(collectionWeaponId);
       removeWeaponApi(collectionWeaponId, {
+        onSuccess: () => {
+          offerUndo(`Removed ${name} at refinement rank ${refinementLevel}.`, restore);
+        },
         onError: () => {
-          const name = weaponName(current.weaponId);
           rollBackFailedWrite({
             isStillShown: () =>
               !(collectionWeaponId in useWeaponCollectionStore.getState().weapons),
@@ -93,7 +115,7 @@ function useOptimisticEdits(
         },
       });
     },
-    [removeWeaponApi, storeRemoveWeapon, storeAddWeapon],
+    [addWeaponApi, removeWeaponApi, storeRemoveWeapon, storeAddWeapon, applyMutationResult],
   );
 
   const setRefinementLevel = useCallback(
@@ -168,13 +190,16 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
 
   const runAdd = useCallback(
     (weaponId: Weapon['id'], onSettled?: () => void) => {
-      addWeaponApi(weaponId, {
-        onSuccess: applyMutationResult,
-        onError: () => {
-          reportFailedWrite(`Couldn't add ${weaponName(weaponId)}.`);
+      addWeaponApi(
+        { weaponId, refinementLevel: MIN_REFINEMENT_LEVEL },
+        {
+          onSuccess: applyMutationResult,
+          onError: () => {
+            reportFailedWrite(`Couldn't add ${weaponName(weaponId)}.`);
+          },
+          onSettled,
         },
-        onSettled,
-      });
+      );
     },
     [addWeaponApi, applyMutationResult],
   );
@@ -208,7 +233,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   );
 
   const { removeWeapon, setRefinementLevel } = useOptimisticEdits(
-    { removeWeaponApi, setRefinementLevelApi },
+    { addWeaponApi, removeWeaponApi, setRefinementLevelApi },
     applyMutationResult,
   );
   const actions = isAuthenticated

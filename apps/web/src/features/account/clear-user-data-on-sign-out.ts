@@ -8,6 +8,7 @@ import { useAuth } from '@/features/auth/use-auth';
 import { useCollectionStore } from '@/features/collection/characters/use-character-collection-store';
 import { useWeaponCollectionStore } from '@/features/collection/weapons/use-weapon-collection-store';
 import { useTeamStore } from '@/features/teams/use-team-store';
+import { withdrawUndoOffers } from '@/lib/offer-undo';
 
 /**
  * Empties every per-user store when a signed-in user leaves, so the next
@@ -27,6 +28,7 @@ export function ClearUserDataOnSignOut(): null {
       useCollectionStore.getState().clearCharacters();
       useWeaponCollectionStore.getState().clearWeapons();
       useTeamStore.getState().resetTeams();
+      withdrawUndoOffers();
     }
     previousUid.current = uid;
   }, [uid]);

@@ -43,7 +43,7 @@ describe('useWeaponCollectionQuery', () => {
 });
 
 describe('useAddWeaponMutation', () => {
-  it('POSTs the weapon id at the minimum refinement level', async () => {
+  it('POSTs the weapon id and refinement level', async () => {
     let postBody: unknown;
     server.use(
       http.post('http://localhost:8080/weapons', async ({ request }) => {
@@ -59,7 +59,7 @@ describe('useAddWeaponMutation', () => {
     });
 
     act(() => {
-      result.current.mutate(WEAPON_ID);
+      result.current.mutate({ weaponId: WEAPON_ID, refinementLevel: MIN_REFINEMENT_LEVEL });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -90,7 +90,7 @@ describe('useAddWeaponMutation', () => {
     expect(getCount).toBe(1);
 
     act(() => {
-      result.current.add.mutate(WEAPON_ID);
+      result.current.add.mutate({ weaponId: WEAPON_ID, refinementLevel: MIN_REFINEMENT_LEVEL });
     });
 
     await waitFor(() => expect(getCount).toBe(2));
