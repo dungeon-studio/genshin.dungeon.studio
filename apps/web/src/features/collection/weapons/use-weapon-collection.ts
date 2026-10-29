@@ -57,13 +57,38 @@ const SIGNED_OUT_ACTIONS: WeaponActions = {
 };
 
 /**
+ * Adds a copy at the refinement rank a removed one had. The server assigns the
+ * copy a new ID, so a team that had the removed one equipped stays without it.
+ */
+function useRestoreWeapon(
+  addWeaponApi: ReturnType<typeof useAddWeaponMutation>['mutate'],
+  applyMutationResult: (result: WeaponMutationResult) => void,
+): (removed: CollectionWeapon) => void {
+  return useCallback(
+    ({ weaponId, refinementLevel }: CollectionWeapon) => {
+      addWeaponApi(
+        { weaponId, refinementLevel },
+        {
+          onSuccess: applyMutationResult,
+          onError: () => {
+            reportFailedWrite(
+              `Couldn't bring back ${weaponName(weaponId)} at refinement rank ${refinementLevel}.`,
+            );
+          },
+        },
+      );
+    },
+    [addWeaponApi, applyMutationResult],
+  );
+}
+
+/**
  * Edits to an owned instance, each applied to the store before the server
  * confirms it.
  *
  * A rejected edit rolls back only if the store still holds its value, and
  * every failure toasts. Adds can't be optimistic, because the server assigns
- * the instance ID, so undoing a removal brings back a new copy: a team that
- * had the removed one equipped stays without it.
+ * the instance ID.
  */
 function useOptimisticEdits(
   api: {
@@ -77,6 +102,7 @@ function useOptimisticEdits(
   const storeAddWeapon = useWeaponCollectionStore((s) => s.addWeapon);
   const storeRemoveWeapon = useWeaponCollectionStore((s) => s.removeWeapon);
   const storeSetRefinementLevel = useWeaponCollectionStore((s) => s.setRefinementLevel);
+  const restoreWeapon = useRestoreWeapon(addWeaponApi, applyMutationResult);
 
   const removeWeapon = useCallback(
     (collectionWeaponId: CollectionWeaponId) => {
@@ -84,25 +110,13 @@ function useOptimisticEdits(
       if (!current) return;
 
       const name = weaponName(current.weaponId);
-      const { weaponId, refinementLevel } = current;
-      const restore = () => {
-        addWeaponApi(
-          { weaponId, refinementLevel },
-          {
-            onSuccess: applyMutationResult,
-            onError: () => {
-              reportFailedWrite(
-                `Couldn't bring back ${name} at refinement rank ${refinementLevel}.`,
-              );
-            },
-          },
-        );
-      };
 
       storeRemoveWeapon(collectionWeaponId);
       removeWeaponApi(collectionWeaponId, {
         onSuccess: () => {
-          offerUndo(`Removed ${name} at refinement rank ${refinementLevel}.`, restore);
+          offerUndo(`Removed ${name} at refinement rank ${current.refinementLevel}.`, () => {
+            restoreWeapon(current);
+          });
         },
         onError: () => {
           rollBackFailedWrite({
@@ -115,7 +129,7 @@ function useOptimisticEdits(
         },
       });
     },
-    [addWeaponApi, removeWeaponApi, storeRemoveWeapon, storeAddWeapon, applyMutationResult],
+    [removeWeaponApi, restoreWeapon, storeRemoveWeapon, storeAddWeapon],
   );
 
   const setRefinementLevel = useCallback(

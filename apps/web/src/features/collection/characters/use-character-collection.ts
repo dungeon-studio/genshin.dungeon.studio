@@ -56,13 +56,13 @@ const SIGNED_OUT_ACTIONS: CollectionActions = {
 function useRestoreCharacter(
   setConstellationLevelApi: ReturnType<typeof useSetConstellationLevelMutation>['mutate'],
   applyMutationResult: (result: MutationResult) => void,
-): (id: CharacterId, level: ConstellationLevel) => void {
+): (removed: CollectionCharacter) => void {
   const storeAddCharacter = useCollectionStore((s) => s.addCharacter);
   const storeRemoveCharacter = useCollectionStore((s) => s.removeCharacter);
   const storeSetConstellationLevel = useCollectionStore((s) => s.setConstellationLevel);
 
   return useCallback(
-    (id: CharacterId, level: ConstellationLevel) => {
+    ({ characterId: id, constellationLevel: level }: CollectionCharacter) => {
       if (id in useCollectionStore.getState().characters) return;
 
       storeAddCharacter(id);
@@ -151,7 +151,7 @@ function useOptimisticActions(
       removeCharacterApi(id, {
         onSuccess: () => {
           offerUndo(`Removed ${name} at constellation level ${level}.`, () => {
-            restoreCharacter(id, level);
+            restoreCharacter(current);
           });
         },
         onError: () => {

@@ -8,9 +8,13 @@ const UNDO_TOAST_DURATION_MS = 10_000;
 
 const openOffers = new Set<string | number>();
 
-/** Confirms a destructive write and offers to reverse it: "Removed Furina." */
-export function offerUndo(done: string, undo: () => void): void {
-  const id = toast.success(done, {
+/**
+ * Confirms a destructive write and offers to reverse it.
+ *
+ * `confirmation` names what was lost: "Removed Furina at constellation level 2."
+ */
+export function offerUndo(confirmation: string, undo: () => void): void {
+  const id = toast.success(confirmation, {
     action: {
       label: 'Undo',
       onClick: () => {
