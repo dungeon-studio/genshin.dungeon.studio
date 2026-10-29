@@ -41,16 +41,6 @@ export const ELEMENT_SELECTED_RINGS: Record<Element, string> = {
   Dendro: 'ring-dendro',
 };
 
-export const ELEMENT_FOCUS_RINGS: Record<Element, string> = {
-  Pyro: 'focus-visible:ring-pyro',
-  Hydro: 'focus-visible:ring-hydro',
-  Electro: 'focus-visible:ring-electro',
-  Cryo: 'focus-visible:ring-cryo',
-  Anemo: 'focus-visible:ring-anemo',
-  Geo: 'focus-visible:ring-geo',
-  Dendro: 'focus-visible:ring-dendro',
-};
-
 /** Text colors reach 4.5:1 contrast on their fill in both themes. */
 export const ELEMENT_BG_COLORS: Record<Element, string> = {
   Pyro: 'bg-pyro-dark text-white',

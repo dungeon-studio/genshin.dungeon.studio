@@ -12,12 +12,7 @@ import { useState } from 'react';
 import { CharacterSummary } from '@/components/summaries/character-summary';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/class-names';
-import {
-  ELEMENT_BORDER_COLORS,
-  ELEMENT_BORDER_COLORS_DIM,
-  ELEMENT_FOCUS_RINGS,
-  ELEMENT_SELECTED_RINGS,
-} from '@/lib/element-styles';
+import { ELEMENT_BORDER_COLORS, ELEMENT_BORDER_COLORS_DIM } from '@/lib/element-styles';
 
 interface ConstellationPopoverProps {
   character: Character;
@@ -105,7 +100,6 @@ interface CharacterCardProps {
   character: Character;
   owned?: boolean;
   constellationLevel?: ConstellationLevel;
-  selected?: boolean;
   onAdd?: (characterId: Character['id']) => void;
   onRemove?: (characterId: Character['id']) => void;
   onConstellationChange?: (characterId: Character['id'], level: ConstellationLevel) => void;
@@ -115,7 +109,6 @@ export function CharacterCard({
   character,
   owned = false,
   constellationLevel = MIN_CONSTELLATION_LEVEL,
-  selected = false,
   onAdd,
   onRemove,
   onConstellationChange,
@@ -125,11 +118,6 @@ export function CharacterCard({
   const sharedClassName = cn(
     'relative flex w-full items-center gap-3 rounded-lg border border-border border-l-4 bg-card p-3 text-left shadow-sm transition-colors',
     borderColors[character.element],
-  );
-
-  const selectedRingClassName = cn(
-    'ring-2 ring-offset-2 ring-offset-background',
-    ELEMENT_SELECTED_RINGS[character.element],
   );
 
   const readOnly = !onAdd && !onRemove;
@@ -150,12 +138,8 @@ export function CharacterCard({
     </>
   );
 
-  if (readOnly) {
+  if (owned || readOnly) {
     return <div className={sharedClassName}>{content}</div>;
-  }
-
-  if (owned) {
-    return <div className={cn(sharedClassName, selected && selectedRingClassName)}>{content}</div>;
   }
 
   return (
@@ -166,10 +150,7 @@ export function CharacterCard({
       onClick={() => onAdd?.(character.id)}
       className={cn(
         sharedClassName,
-        'cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
-        selected
-          ? cn(selectedRingClassName, ELEMENT_FOCUS_RINGS[character.element])
-          : 'focus-visible:ring-ring',
+        'cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
       )}
       aria-label={`Add ${character.name} to collection`}
     >
