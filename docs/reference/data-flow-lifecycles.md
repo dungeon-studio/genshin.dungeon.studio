@@ -3,40 +3,40 @@
 
 # Lifecycles
 
-The states one entity's copy in the
-[zustand store, D1](data-flow.md#level-0) moves through, per feature. Each
+The states one entity's client copy moves through, per feature: the
+[zustand store, D1](data-flow.md#level-0) for characters and teams, and the
+[query cache, D2](data-flow.md#level-0) for weapons. Each
 diagram follows one character, one weapon instance, or one team slot. [ADR-0006]
 decides whether the features share one write lifecycle. What a request carries
 from each copy is in [Data conversions](data-flow-conversions.md#outbound).
 
 The features share five states:
 
-- **Local only:** in the store, never sent.
-- **Sent:** edited in the store, with a request in flight.
+- **Local only:** in the copy, never sent.
+- **Sent:** edited in the copy, with a request in flight.
 - **Confirmed:** matches what the server last returned.
 - **Rolled back:** restored to its value before a rejected request.
 - **Overwritten:** replaced by a refetch while a request is still in flight.
 
 In every feature:
 
-- From every state, the store empties when a signed-in user signs out or
+- From every state, the copy empties when a signed-in user signs out or
   another account signs in, whichever page is open. A team slot resets to
-  Default instead. Auth settling on page load isn't a sign-out.
+  Default instead. Weapons empty because the user ID keys the cache. Auth
+  settling on page load isn't a sign-out.
 - While signed in, a refetch runs on window focus, on reconnect, when a hook
   mounts, and after a successful mutation in the same feature unless another is
   still pending. A mount first applies the cached result. A character or weapon
-  refetch changes the store only when its result differs.
+  refetch changes the copy only when its result differs.
 - Sending a request cancels any refetch already in flight, except the first
   load. The first load, or a refetch that starts after the request, can still
   land before the request settles. A character or weapon refetch that lands in
-  that window reaches the store. The team store skips it.
-- Only the latest character or weapon request of each kind through a hook gets
-  its response handling: confirm, rollback, and toast. An earlier one, or one
-  that settles after the user leaves its page, reaches the store only through a
-  refetch, see [#1534]. A character or weapon request that settles after
-  sign-out leaves the store untouched. Every team request gets its rollback and
-  toast, even after the user leaves the teams page. One that fails after
-  sign-out shows only its toast.
+  that window reaches the copy. The team store skips it.
+- Every request gets its response handling: confirm, rollback, and toast. That
+  holds after a newer request through the same hook has started, and after the
+  user leaves its page. A character or weapon request that settles after
+  sign-out changes nothing the next account sees and shows no toast. A team
+  request that fails after sign-out shows only its toast.
 - Requests of different kinds through one hook settle in any order, so a
   response can undo a newer edit. The response to an add can put the minimum
   level back over a raise, and a refinement's response can put an instance back
@@ -91,7 +91,7 @@ stateDiagram-v2
   Sent --> Sent: newer edit
   Sent --> Confirmed: PATCH succeeds, saved instance replaces the copy
   Sent --> [*]: DELETE succeeds
-  Sent --> RolledBack: rejected, store still holds the sent value
+  Sent --> RolledBack: rejected, cache still holds the sent value
   Sent --> Overwritten: refetch while in flight
   Overwritten --> Confirmed: PATCH succeeds, or the request fails
   Overwritten --> [*]: DELETE succeeds, then a refetch drops it
@@ -100,12 +100,12 @@ stateDiagram-v2
 ```
 
 - No local-only state: every action is a no-op while not signed in, and an add
-  reaches the store only from the server.
+  reaches the cache only from the server.
 - Confirmed by a response: the saved instance replaces the copy, server
   timestamps included.
 - Rolled back: a rolled-back removal returns the exact instance it removed.
-- Overwritten: a refetch replaces the whole store, so a refetch the request
-  didn't cancel overwrites any edit in flight.
+- Overwritten: a refetch replaces the whole cached collection, so a refetch the
+  request didn't cancel overwrites any edit in flight.
 
 ## Teams
 
@@ -142,4 +142,3 @@ stateDiagram-v2
 
 [#550]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/550
 [ADR-0006]: ../explanation/adr-0006-client-data-layer.md
-[#1534]: https://github.com/dungeon-studio/genshin.dungeon.studio/issues/1534

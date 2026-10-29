@@ -17,11 +17,8 @@ import { WeaponSummary } from '@/components/summaries/weapon-summary';
 import { EmptyCollection } from '@/features/collection/empty-collection';
 import type { WeaponFilterState } from '@/features/collection/weapons/filtering';
 import { filterWeapons, initialFilterState } from '@/features/collection/weapons/filtering';
-import {
-  groupByWeapon,
-  weaponIdsOf,
-} from '@/features/collection/weapons/use-weapon-collection-store';
 import { WeaponFilters } from '@/features/collection/weapons/weapon-filters';
+import { groupByWeapon, weaponIdsOf } from '@/features/collection/weapons/weapon-instances';
 import { useTeamStore } from '@/features/teams/use-team-store';
 import { cn } from '@/lib/class-names';
 import { RARITY_BORDER_COLORS, RARITY_SELECTED_RINGS } from '@/lib/rarity-styles';
