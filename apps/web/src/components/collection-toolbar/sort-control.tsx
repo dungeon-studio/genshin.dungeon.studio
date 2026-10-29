@@ -18,11 +18,12 @@ export function SortControl<F extends BaseFilterState>({
   onChange,
 }: SortControlProps<F>): JSX.Element {
   const fieldIndex = SORT_FIELDS.findIndex((f) => f.value === filters.sortField);
+  const field = SORT_FIELDS[fieldIndex];
+  const nextField = SORT_FIELDS[(fieldIndex + 1) % SORT_FIELDS.length];
   const ascending = filters.sortDirection === 'asc';
 
   function cycleField() {
-    const next = SORT_FIELDS[(fieldIndex + 1) % SORT_FIELDS.length];
-    if (next) onChange({ ...filters, sortField: next.value });
+    if (nextField) onChange({ ...filters, sortField: nextField.value });
   }
 
   function toggleDirection() {
@@ -31,14 +32,24 @@ export function SortControl<F extends BaseFilterState>({
 
   return (
     <div className="flex items-center">
-      <Button variant="outline" size="sm" onClick={cycleField} className="rounded-r-none">
-        {SORT_FIELDS[fieldIndex]?.label}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={cycleField}
+        aria-label={`Sort by: ${field?.label}, switch to ${nextField?.label}`}
+        className="rounded-r-none"
+      >
+        {field?.label}
       </Button>
       <Button
         variant="outline"
         size="sm"
         onClick={toggleDirection}
-        aria-label={`Sort ${ascending ? 'ascending' : 'descending'}`}
+        aria-label={
+          ascending
+            ? 'Sort order: ascending, switch to descending'
+            : 'Sort order: descending, switch to ascending'
+        }
         className="px-1.5 -ml-px rounded-l-none"
       >
         {ascending ? (

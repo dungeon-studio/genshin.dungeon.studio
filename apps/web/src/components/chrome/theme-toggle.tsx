@@ -15,23 +15,28 @@ const NEXT: Record<Theme, Theme> = {
   dark: 'system',
 };
 
-const FACES: Record<Theme, { icon: typeof Sun; label: string }> = {
-  light: { icon: Sun, label: 'Light mode' },
-  dark: { icon: Moon, label: 'Dark mode' },
-  system: { icon: Monitor, label: 'System theme' },
+const ICONS: Record<Theme, typeof Sun> = {
+  light: Sun,
+  dark: Moon,
+  system: Monitor,
 };
 
 export function ThemeToggle(): JSX.Element {
   const { theme, setTheme } = useTheme();
 
-  const { icon: Icon, label } = FACES[theme];
+  const Icon = ICONS[theme];
 
   function cycle() {
     setTheme(NEXT[theme]);
   }
 
   return (
-    <Button variant="ghost" size="icon" onClick={cycle} aria-label={label}>
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={cycle}
+      aria-label={`Theme: ${theme}, switch to ${NEXT[theme]}`}
+    >
       <Icon className="h-4 w-4" />
     </Button>
   );
