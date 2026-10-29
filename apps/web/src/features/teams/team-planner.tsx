@@ -86,7 +86,7 @@ export function TeamPlanner({
             >
               {name}
               <Pencil
-                className="h-3.5 w-3.5 opacity-0 transition-opacity group-hover:opacity-100"
+                className="h-3.5 w-3.5 text-muted-foreground transition-colors group-hover:text-primary"
                 aria-hidden="true"
                 focusable={false}
               />
