@@ -59,7 +59,7 @@ describe('useAddWeaponMutation', () => {
     });
 
     act(() => {
-      result.current.mutate(WEAPON_ID);
+      result.current.mutate({ weaponId: WEAPON_ID });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -90,7 +90,7 @@ describe('useAddWeaponMutation', () => {
     expect(getCount).toBe(1);
 
     act(() => {
-      result.current.add.mutate(WEAPON_ID);
+      result.current.add.mutate({ weaponId: WEAPON_ID });
     });
 
     await waitFor(() => expect(getCount).toBe(2));

@@ -13,6 +13,7 @@ import { holdResponse } from '@/test/msw/held-response';
 import { matchJsonBody } from '@/test/msw/match-json-body';
 import { server } from '@/test/msw/server';
 import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
+import { clickSuccessToastAction } from '@/test/toast';
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
@@ -109,6 +110,69 @@ describe('useCollection mutations', () => {
     await waitFor(() => expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3));
     expect(toast.error).toHaveBeenCalledWith(
       "Couldn't remove Skirk. Skirk is back in your collection. Try again.",
+    );
+  });
+
+  it('puts a removed character back at its level on undo', async () => {
+    let putBody: unknown;
+    server.use(
+      http.get('http://localhost:8080/characters', () =>
+        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })])),
+      ),
+      http.delete(
+        'http://localhost:8080/characters/skirk',
+        () => new HttpResponse(null, { status: 204 }),
+      ),
+      http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
+        putBody = await request.json();
+        return HttpResponse.json(
+          charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })]),
+        );
+      }),
+    );
+
+    const { result } = await renderOwningSkirkAtC3();
+
+    act(() => {
+      result.current.removeCharacter(SKIRK);
+    });
+    expect(vi.mocked(toast.success).mock.lastCall?.[0]).toBe('Removed Skirk.');
+
+    act(() => {
+      clickSuccessToastAction();
+    });
+
+    expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3);
+    await waitFor(() => expect(putBody).toEqual({ constellationLevel: 3 }));
+  });
+
+  it('removes a restored character again when the undo fails', async () => {
+    server.use(
+      http.get('http://localhost:8080/characters', () =>
+        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })])),
+      ),
+      http.delete(
+        'http://localhost:8080/characters/skirk',
+        () => new HttpResponse(null, { status: 204 }),
+      ),
+      http.put(
+        'http://localhost:8080/characters/skirk',
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    const { result } = await renderOwningSkirkAtC3();
+
+    act(() => {
+      result.current.removeCharacter(SKIRK);
+    });
+    act(() => {
+      clickSuccessToastAction();
+    });
+
+    await waitFor(() => expect(result.current.getCharacter(SKIRK)).toBeUndefined());
+    expect(toast.error).toHaveBeenCalledWith(
+      "Couldn't restore Skirk. Skirk is out of your collection again. Try again.",
     );
   });
 

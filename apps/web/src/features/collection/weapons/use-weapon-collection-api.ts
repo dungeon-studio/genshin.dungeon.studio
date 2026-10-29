@@ -66,17 +66,23 @@ export function useWeaponCollectionQuery(
   });
 }
 
+export interface AddWeaponVariables {
+  weaponId: string;
+  /** Defaults to the minimum, as a newly obtained copy has. */
+  refinementLevel?: RefinementLevel;
+}
+
 export function useAddWeaponMutation(
   userId: string | undefined,
-): UseMutationResult<WeaponMutationResult, Error, string> {
+): UseMutationResult<WeaponMutationResult, Error, AddWeaponVariables> {
   const querySync = useUserQuerySync(userId, weaponsKey);
 
   return useMutation({
-    mutationFn: async (weaponId: string): Promise<WeaponMutationResult> => {
-      const response = await apiPost('/weapons', {
-        weaponId,
-        refinementLevel: MIN_REFINEMENT_LEVEL,
-      });
+    mutationFn: async ({
+      weaponId,
+      refinementLevel = MIN_REFINEMENT_LEVEL,
+    }: AddWeaponVariables): Promise<WeaponMutationResult> => {
+      const response = await apiPost('/weapons', { weaponId, refinementLevel });
       return parseSingleWeaponResponse(response);
     },
     ...querySync,

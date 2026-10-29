@@ -30,6 +30,7 @@ single `### Added` bucket in `[Unreleased]`.
 - Team persistence so compositions survive across sessions.
 - Collections saved to your account, with a sign-in prompt when managing one signed out.
 - Save-failure messages that name the team, character, or weapon, say what was put back, and suggest trying again.
+- Undo on removing a character or weapon copy, restoring its constellation or refinement level.
 - Google sign-in and sign-out from the site header.
 - Messages when sign-in or sign-out fails, such as a blocked pop-up, with a button to try again.
 - Dark mode support.

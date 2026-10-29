@@ -5,6 +5,7 @@ import type { CharacterId, CollectionCharacter, ConstellationLevel } from '@gens
 import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
 import { useCallback, useEffect } from 'react';
+import { toast } from 'sonner';
 
 import { signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
@@ -49,11 +50,56 @@ const SIGNED_OUT_ACTIONS: CollectionActions = {
 };
 
 /**
+ * Undoes a removal, putting the character back at the level it was removed
+ * at. Setting a level creates the character server-side, so one write covers
+ * both.
+ */
+function useRestoreCharacter(
+  setConstellationLevelApi: ReturnType<typeof useSetConstellationLevelMutation>['mutate'],
+  applyMutationResult: (result: MutationResult) => void,
+): (id: CharacterId, level: ConstellationLevel) => void {
+  const storeAddCharacter = useCollectionStore((s) => s.addCharacter);
+  const storeRemoveCharacter = useCollectionStore((s) => s.removeCharacter);
+  const storeSetConstellationLevel = useCollectionStore((s) => s.setConstellationLevel);
+
+  return useCallback(
+    (id: CharacterId, level: ConstellationLevel) => {
+      storeAddCharacter(id);
+      storeSetConstellationLevel(id, level);
+      setConstellationLevelApi(
+        { characterId: id, level },
+        {
+          onSuccess: applyMutationResult,
+          onError: () => {
+            const name = characterName(id);
+            rollBackFailedWrite({
+              isStillShown: () =>
+                useCollectionStore.getState().characters[id]?.constellationLevel === level,
+              revert: () => storeRemoveCharacter(id),
+              failure: `Couldn't restore ${name}.`,
+              reverted: `${name} is out of your collection again.`,
+            });
+          },
+        },
+      );
+    },
+    [
+      setConstellationLevelApi,
+      storeAddCharacter,
+      storeSetConstellationLevel,
+      storeRemoveCharacter,
+      applyMutationResult,
+    ],
+  );
+}
+
+/**
  * The collection's write actions, each applied to the store before the server
  * confirms it.
  *
  * A rejected write rolls back only if the store still holds its value, so a
- * newer edit survives. Every failure toasts, and nothing retries.
+ * newer edit survives. Every failure toasts, and nothing retries. A removal
+ * toasts an undo that puts the character back at its removed level.
  */
 function useOptimisticActions(
   api: {
@@ -92,12 +138,17 @@ function useOptimisticActions(
     [addCharacterApi, storeAddCharacter, storeRemoveCharacter, applyMutationResult],
   );
 
+  const restoreCharacter = useRestoreCharacter(setConstellationLevelApi, applyMutationResult);
+
   const removeCharacter = useCallback(
     (id: CharacterId) => {
       const current = useCollectionStore.getState().characters[id];
       if (!current) return;
 
       storeRemoveCharacter(id);
+      toast.success(`Removed ${characterName(id)}.`, {
+        action: { label: 'Undo', onClick: () => restoreCharacter(id, current.constellationLevel) },
+      });
       removeCharacterApi(id, {
         onError: () => {
           const name = characterName(id);
@@ -113,7 +164,13 @@ function useOptimisticActions(
         },
       });
     },
-    [removeCharacterApi, storeRemoveCharacter, storeAddCharacter, storeSetConstellationLevel],
+    [
+      removeCharacterApi,
+      storeRemoveCharacter,
+      storeAddCharacter,
+      storeSetConstellationLevel,
+      restoreCharacter,
+    ],
   );
 
   const setConstellationLevel = useCallback(

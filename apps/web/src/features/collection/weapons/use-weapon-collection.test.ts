@@ -11,6 +11,7 @@ import { makeWeapon, weaponsDocument } from '@/test/fixtures';
 import { holdResponse } from '@/test/msw/held-response';
 import { server } from '@/test/msw/server';
 import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
+import { clickSuccessToastAction } from '@/test/toast';
 
 import { useWeaponCollection } from './use-weapon-collection';
 import { useWeaponCollectionStore } from './use-weapon-collection-store';
@@ -211,6 +212,44 @@ describe('useWeaponCollection', () => {
       expect(toast.error).toHaveBeenCalledWith(
         "Couldn't remove Angelos' Heptades. Angelos' Heptades is back in your collection. Try again.",
       );
+    });
+
+    it('adds the removed copy back at its refinement rank on undo', async () => {
+      let postBody: unknown;
+      server.use(
+        http.get('http://localhost:8080/weapons', () =>
+          HttpResponse.json(
+            weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 3 })]),
+          ),
+        ),
+        http.delete(
+          'http://localhost:8080/weapons/weapon-instance-1',
+          () => new HttpResponse(null, { status: 204 }),
+        ),
+        http.post('http://localhost:8080/weapons', async ({ request }) => {
+          postBody = await request.json();
+          return HttpResponse.json(
+            weaponsDocument([makeWeapon(SECOND_INSTANCE_ID, WEAPON_ID, { refinementLevel: 3 })]),
+          );
+        }),
+      );
+
+      const { result } = renderAuthed();
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]).toBeDefined());
+
+      act(() => {
+        result.current.removeWeapon(INSTANCE_ID);
+      });
+      expect(vi.mocked(toast.success).mock.lastCall?.[0]).toBe("Removed Angelos' Heptades.");
+
+      act(() => {
+        clickSuccessToastAction();
+      });
+
+      await waitFor(() =>
+        expect(result.current.weapons[SECOND_INSTANCE_ID]?.refinementLevel).toBe(3),
+      );
+      expect(postBody).toEqual({ weaponId: WEAPON_ID, refinementLevel: 3 });
     });
   });
 
