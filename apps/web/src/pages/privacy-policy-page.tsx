@@ -1,104 +1,113 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-// Draft content describing the app's actual data practices. No lawyer has
-// reviewed it, and it has no dedicated privacy-contact address.
+// No lawyer has reviewed this policy.
 
-import type { JSX } from 'react';
+import type { JSX, ReactNode } from 'react';
 
-import { Container } from '@/components/chrome/container';
-import { REPOSITORY_URL } from '@/lib/repository';
+import { ExternalLegalLink, PrivacyEmailLink } from '@/components/legal/legal-link';
+import { LegalHeading, LegalPage, LegalSection } from '@/components/legal/legal-page';
 
-const EFFECTIVE_DATE = '3 July 2026';
+const EFFECTIVE_DATE = '25 October 2026';
+
+function CollectedItem({ label, children }: { label: string; children: ReactNode }): JSX.Element {
+  return (
+    <li>
+      <strong className="font-medium text-foreground">{label}.</strong> {children}
+    </li>
+  );
+}
 
 export function PrivacyPolicyPage(): JSX.Element {
   return (
-    <Container className="max-w-3xl py-12">
-      <article className="text-muted-foreground">
-        <h1 className="text-3xl font-bold text-foreground">Privacy Policy</h1>
-        <p className="mt-2 text-sm text-muted-foreground/70">Effective {EFFECTIVE_DATE}</p>
+    <LegalPage title="Privacy Policy" effectiveDate={EFFECTIVE_DATE}>
+      <p className="mt-6 leading-relaxed">
+        genshin.dungeon.studio is an unofficial, fan-made team-building companion for Genshin
+        Impact. This policy explains what data we collect, why, and how you can control it.
+      </p>
 
-        <p className="mt-6 leading-relaxed">
-          genshin.dungeon.studio is an unofficial, fan-made team-building companion for Genshin
-          Impact, operated by Dungeon Studio. This policy explains what data we collect, why, and
-          how you can control it.
-        </p>
+      <LegalSection title="Who we are">
+        Alex Brandt runs genshin.dungeon.studio under the name Dungeon Studio. As the data
+        controller, Alex Brandt is responsible for your personal data. Contact us at{' '}
+        <PrivacyEmailLink />.
+      </LegalSection>
 
-        <h2 className="mt-8 text-xl font-semibold text-foreground">What we collect</h2>
-        <ul className="mt-4 space-y-2 pl-6 leading-relaxed list-disc">
-          <li>
-            <strong className="font-medium text-foreground">Account information.</strong> When you
-            sign in with Google, we receive your name, email address, profile photo, and Google
-            account identifier through Firebase Authentication. Signing in is optional.
-          </li>
-          <li>
-            <strong className="font-medium text-foreground">Your collection.</strong> The characters
-            and weapons you mark as owned and their levels. Before you sign in this stays in your
-            browser; once you sign in it is saved to our servers so it syncs across your devices.
-          </li>
-          <li>
-            <strong className="font-medium text-foreground">Preferences.</strong> Your light or dark
-            theme choice, stored only in your browser and never sent to us.
-          </li>
-        </ul>
+      <LegalHeading>What we collect</LegalHeading>
+      <ul className="mt-4 space-y-2 pl-6 leading-relaxed list-disc">
+        <CollectedItem label="Account information">
+          When you sign in with Google, we receive your name, email address, profile photo, and
+          Google account identifier through Firebase Authentication. Signing in is optional.
+        </CollectedItem>
+        <CollectedItem label="Your collection">
+          The characters and weapons you own, their levels, and the teams you build. Before you sign
+          in, this stays in your browser. Once you sign in, we save it to our servers so it syncs
+          across your devices.
+        </CollectedItem>
+        <CollectedItem label="Request logs">
+          For each request, our servers record what was requested, when, and whether it succeeded.
+          Our hosting provider also records the IP address the request came from.
+        </CollectedItem>
+        <CollectedItem label="Preferences">
+          Your light or dark theme choice, stored only in your browser and never sent to us.
+        </CollectedItem>
+      </ul>
 
-        <h2 className="mt-8 text-xl font-semibold text-foreground">What we don't do</h2>
-        <p className="mt-4 leading-relaxed">
-          We do not use analytics or tracking, serve advertising, or set tracking cookies. We do not
-          sell your data or share it for marketing.
-        </p>
+      <LegalSection title="What we don't do">
+        We do not use analytics or tracking, serve advertising, or set tracking cookies. We do not
+        sell your data or share it for marketing.
+      </LegalSection>
 
-        <h2 className="mt-8 text-xl font-semibold text-foreground">How we use your data</h2>
-        <p className="mt-4 leading-relaxed">
-          We use your account information to sign you in, and your collection data to save and sync
-          it across devices. We don't use it for anything else.
-        </p>
+      <LegalSection title="How we use your data">
+        We use your account information to sign you in, and your collection data to save and sync it
+        across devices. Both are necessary to provide the service you ask for when you sign in. We
+        use request logs to keep the service running and secure, which is in our legitimate
+        interest. We don't use your data for anything else.
+      </LegalSection>
 
-        <h2 className="mt-8 text-xl font-semibold text-foreground">Service providers</h2>
-        <p className="mt-4 leading-relaxed">
-          We rely on Google Firebase (Firebase Authentication and Cloud Firestore) to authenticate
-          you and store your collection on our behalf. Their handling of that data is governed by
-          the{' '}
-          <a
-            href="https://policies.google.com/privacy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-foreground underline underline-offset-4 hover:no-underline"
-          >
-            Google Privacy Policy
-          </a>
-          .
-        </p>
+      <LegalSection title="How long we keep it">
+        We keep your account information and collection until you delete your account. Request logs
+        are deleted after 30 days.
+      </LegalSection>
 
-        <h2 className="mt-8 text-xl font-semibold text-foreground">Your choices and rights</h2>
-        <p className="mt-4 leading-relaxed">
-          Signing out clears your collection from your browser. Deleting your account erases your
-          characters, weapons, and teams along with your sign-in. We cannot undo it. To access or
-          correct your data, or to ask any question about your privacy, reach us through our{' '}
-          <a
-            href={`${REPOSITORY_URL}/issues/new/choose`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-foreground underline underline-offset-4 hover:no-underline"
-          >
-            GitHub repository
-          </a>
-          . Depending on where you live, you may have additional rights over your personal data
-          under laws such as the GDPR or CCPA.
-        </p>
+      <LegalSection title="Service providers">
+        Google runs the app for us. Firebase Hosting serves the site, Cloud Run runs our servers,
+        Firebase Authentication handles sign-in, and Cloud Firestore stores your collection in the
+        European Union. Cloudflare routes email sent to our privacy address. Google and Cloudflare
+        may process data in other countries under their own data protection terms. The{' '}
+        <ExternalLegalLink href="https://policies.google.com/privacy">
+          Google Privacy Policy
+        </ExternalLegalLink>{' '}
+        and the{' '}
+        <ExternalLegalLink href="https://www.cloudflare.com/privacypolicy/">
+          Cloudflare Privacy Policy
+        </ExternalLegalLink>{' '}
+        govern how they handle your data.
+      </LegalSection>
 
-        <h2 className="mt-8 text-xl font-semibold text-foreground">Children</h2>
-        <p className="mt-4 leading-relaxed">
-          This app is not directed to children under 13, and we do not knowingly collect their
-          personal information.
-        </p>
+      <LegalSection title="Your choices">
+        Signing out clears your collection from your browser. Deleting your account erases your
+        sign-in and your characters, weapons, and teams. We can't undo a deletion.
+      </LegalSection>
 
-        <h2 className="mt-8 text-xl font-semibold text-foreground">Changes to this policy</h2>
-        <p className="mt-4 leading-relaxed">
-          We may update this policy as the app evolves. When we do, we'll revise the effective date
-          above.
-        </p>
-      </article>
-    </Container>
+      <LegalSection title="Your rights">
+        Email <PrivacyEmailLink /> to access, correct, or get a copy of your data, or to object to
+        how we use it. Depending on where you live, laws such as the GDPR or CCPA may give you
+        further rights. You can also complain to a data protection authority, such as the UK's{' '}
+        <ExternalLegalLink href="https://ico.org.uk/make-a-complaint/">
+          Information Commissioner's Office
+        </ExternalLegalLink>
+        .
+      </LegalSection>
+
+      <LegalSection title="Children">
+        This app is not directed to children under 13, and we do not knowingly collect their
+        personal information.
+      </LegalSection>
+
+      <LegalSection title="Changes to this policy">
+        We may update this policy as the app evolves. When we do, we'll revise the effective date
+        above.
+      </LegalSection>
+    </LegalPage>
   );
 }
