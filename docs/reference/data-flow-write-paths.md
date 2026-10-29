@@ -33,9 +33,12 @@ value comes back only if the store still holds the value that write put there,
 so a newer edit stands. A toast shows either way, and nothing retries.
 
 Every mutation follows one refetch rule, set by `useUserQuerySync`. Starting a
-write cancels any refetch of its query already in flight. A write that succeeds
-while another write to the same query is pending skips its refetch and leaves
-it to the write still pending. The cancel skips the first load, and it can't
+write cancels any refetch of its query already in flight. A write refetches once
+it settles, whether it succeeded or failed. A write that settles while another
+write to the same query is pending skips its refetch and leaves it to the write
+still pending. The refetch after a failure corrects a guarded rollback that
+skipped one failed write and reverted another to a value the server never
+stored. The cancel skips the first load, and it can't
 reach a refetch that starts after the write, such as on window focus or
 reconnect. Either can still overwrite a character or weapon edit in flight.
 The team store takes no refetch while a team write is pending.
@@ -67,16 +70,16 @@ sequenceDiagram
   API->>FS: PUT: transaction of read, nextCharacter, set<br>DELETE: delete
   alt success
     API-->>Hook: saved character, or no content on DELETE
-    Hook->>Cache: invalidate, unless another write is pending
     opt PUT
       Hook->>Store: replaceCharacter (skipped once removed)
     end
-    Cache-->>Reconcile: refetched collection
-    Reconcile->>Store: replaceCharacters (replace)
   else failure
     API-->>Hook: problem detail
     Hook->>Store: guarded rollback
   end
+  Hook->>Cache: invalidate, unless another write is pending
+  Cache-->>Reconcile: refetched collection
+  Reconcile->>Store: replaceCharacters (replace)
 ```
 
 ## Weapons
@@ -100,7 +103,6 @@ sequenceDiagram
     API->>FS: create with minted instance ID
     alt success
       API-->>Hook: saved weapon
-      Hook->>Cache: invalidate, unless another write is pending
       Hook->>Store: addWeapon (upsert)
     else failure
       Hook->>Hook: toast, store untouched
@@ -112,7 +114,6 @@ sequenceDiagram
     API->>FS: PATCH: read, then set, no transaction<br>DELETE: delete
     alt success
       API-->>Hook: saved weapon, or no content on DELETE
-      Hook->>Cache: invalidate, unless another write is pending
       opt PATCH
         Hook->>Store: addWeapon (replaces the instance)
       end
@@ -120,10 +121,9 @@ sequenceDiagram
       Hook->>Store: guarded rollback
     end
   end
-  opt either branch succeeded
-    Cache-->>Reconcile: refetched weapons
-    Reconcile->>Store: setWeapons (replace)
-  end
+  Hook->>Cache: invalidate, unless another write is pending
+  Cache-->>Reconcile: refetched weapons
+  Reconcile->>Store: setWeapons (replace)
 ```
 
 ## Teams
@@ -145,13 +145,12 @@ sequenceDiagram
     Hook->>API: PUT /teams/{slot} with name, members, and description
     API->>FS: with any position filled: read characters, weapons,<br>and other teams to validate them
     API->>FS: transaction of read, nextTeam, set
-    alt success
-      Hook->>Cache: invalidate, unless another write is pending
-      Cache-->>Reconcile: refetched teams
-      Reconcile->>Store: collectionTeamsToStore, then setTeams (replace)
-    else failure
+    opt failure
       Hook->>Store: guarded rollback to the snapshot
     end
+    Hook->>Cache: invalidate, unless another write is pending
+    Cache-->>Reconcile: refetched teams
+    Reconcile->>Store: collectionTeamsToStore, then setTeams (replace)
   end
 ```
 
