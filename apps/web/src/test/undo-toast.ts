@@ -5,10 +5,7 @@ import type { MouseEvent } from 'react';
 import { toast } from 'sonner';
 import { expect, vi } from 'vitest';
 
-/**
- * Selects Undo on the toast that said `message`, for a test file that mocks
- * `sonner`. Fails the test if no such toast offered one.
- */
+/** Selects Undo on the toast that said `message`, for a test file that mocks `sonner`. */
 export function selectUndo(message: string): void {
   const call = vi.mocked(toast.success).mock.calls.find(([shown]) => shown === message);
   expect(call, `no toast said "${message}"`).toBeDefined();

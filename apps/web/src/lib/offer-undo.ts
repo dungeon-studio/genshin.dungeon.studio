@@ -29,10 +29,7 @@ export function offerUndo(confirmation: string, undo: () => void): void {
   openOffers.add(id);
 }
 
-/**
- * Withdraws every open offer, so an undo clicked after sign-out can't write
- * into the next account's data.
- */
+/** Call on sign-out, so an undo can't write into the next account's data. */
 export function withdrawUndoOffers(): void {
   for (const id of openOffers) toast.dismiss(id);
   openOffers.clear();

@@ -51,7 +51,7 @@ const SIGNED_OUT_ACTIONS: CollectionActions = {
 
 /**
  * Puts a removed character back at the level it had, unless it has already
- * been re-added. A PUT creates the entry, so the level change does the work.
+ * been re-added. A level update creates a missing entry, so no add is sent.
  */
 function useRestoreCharacter(
   setConstellationLevelApi: ReturnType<typeof useSetConstellationLevelMutation>['mutate'],
