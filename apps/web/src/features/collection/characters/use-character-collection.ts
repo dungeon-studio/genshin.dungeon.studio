@@ -5,12 +5,12 @@ import type { CharacterId, CollectionCharacter, ConstellationLevel } from '@gens
 import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
 import { useCallback, useEffect } from 'react';
-import { toast } from 'sonner';
 
 import { signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 import type { UserDataLoad } from '@/features/auth/use-user-data-load';
 import { useUserDataLoad } from '@/features/auth/use-user-data-load';
+import { offerUndo } from '@/lib/offer-undo';
 import { rollBackFailedWrite } from '@/lib/roll-back-failed-write';
 import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
@@ -50,47 +50,17 @@ const SIGNED_OUT_ACTIONS: CollectionActions = {
 };
 
 /**
- * Undoes a removal, putting the character back at the level it was removed
- * at. Setting a level creates the character server-side, so one write covers
- * both.
+ * Rolls back a failed write that put a character into the collection at
+ * `level`, removing it again unless a newer edit changed it.
  */
-function useRestoreCharacter(
-  setConstellationLevelApi: ReturnType<typeof useSetConstellationLevelMutation>['mutate'],
-  applyMutationResult: (result: MutationResult) => void,
-): (id: CharacterId, level: ConstellationLevel) => void {
-  const storeAddCharacter = useCollectionStore((s) => s.addCharacter);
-  const storeRemoveCharacter = useCollectionStore((s) => s.removeCharacter);
-  const storeSetConstellationLevel = useCollectionStore((s) => s.setConstellationLevel);
-
-  return useCallback(
-    (id: CharacterId, level: ConstellationLevel) => {
-      storeAddCharacter(id);
-      storeSetConstellationLevel(id, level);
-      setConstellationLevelApi(
-        { characterId: id, level },
-        {
-          onSuccess: applyMutationResult,
-          onError: () => {
-            const name = characterName(id);
-            rollBackFailedWrite({
-              isStillShown: () =>
-                useCollectionStore.getState().characters[id]?.constellationLevel === level,
-              revert: () => storeRemoveCharacter(id),
-              failure: `Couldn't restore ${name}.`,
-              reverted: `${name} is out of your collection again.`,
-            });
-          },
-        },
-      );
-    },
-    [
-      setConstellationLevelApi,
-      storeAddCharacter,
-      storeSetConstellationLevel,
-      storeRemoveCharacter,
-      applyMutationResult,
-    ],
-  );
+function rollBackFailedPut(id: CharacterId, level: ConstellationLevel, verb: string): void {
+  const name = characterName(id);
+  rollBackFailedWrite({
+    isStillShown: () => useCollectionStore.getState().characters[id]?.constellationLevel === level,
+    revert: () => useCollectionStore.getState().removeCharacter(id),
+    failure: `Couldn't ${verb} ${name}.`,
+    reverted: `${name} is out of your collection again.`,
+  });
 }
 
 /**
@@ -122,23 +92,27 @@ function useOptimisticActions(
       storeAddCharacter(id);
       addCharacterApi(id, {
         onSuccess: applyMutationResult,
-        onError: () => {
-          const name = characterName(id);
-          rollBackFailedWrite({
-            isStillShown: () =>
-              useCollectionStore.getState().characters[id]?.constellationLevel ===
-              MIN_CONSTELLATION_LEVEL,
-            revert: () => storeRemoveCharacter(id),
-            failure: `Couldn't add ${name}.`,
-            reverted: `${name} is out of your collection again.`,
-          });
-        },
+        onError: () => rollBackFailedPut(id, MIN_CONSTELLATION_LEVEL, 'add'),
       });
     },
-    [addCharacterApi, storeAddCharacter, storeRemoveCharacter, applyMutationResult],
+    [addCharacterApi, storeAddCharacter, applyMutationResult],
   );
 
-  const restoreCharacter = useRestoreCharacter(setConstellationLevelApi, applyMutationResult);
+  // Setting a level creates the character server-side, so one write restores it.
+  const restoreCharacter = useCallback(
+    (id: CharacterId, level: ConstellationLevel) => {
+      storeAddCharacter(id);
+      storeSetConstellationLevel(id, level);
+      setConstellationLevelApi(
+        { characterId: id, level },
+        {
+          onSuccess: applyMutationResult,
+          onError: () => rollBackFailedPut(id, level, 'restore'),
+        },
+      );
+    },
+    [setConstellationLevelApi, storeAddCharacter, storeSetConstellationLevel, applyMutationResult],
+  );
 
   const removeCharacter = useCallback(
     (id: CharacterId) => {
@@ -146,9 +120,9 @@ function useOptimisticActions(
       if (!current) return;
 
       storeRemoveCharacter(id);
-      toast.success(`Removed ${characterName(id)}.`, {
-        action: { label: 'Undo', onClick: () => restoreCharacter(id, current.constellationLevel) },
-      });
+      offerUndo(`Removed ${characterName(id)}.`, () =>
+        restoreCharacter(id, current.constellationLevel),
+      );
       removeCharacterApi(id, {
         onError: () => {
           const name = characterName(id);

@@ -5,16 +5,16 @@ import type { CollectionWeapon, CollectionWeaponId, RefinementLevel } from '@gen
 import type { Weapon } from '@genshin/game-data';
 import { getWeaponById } from '@genshin/game-data';
 import { useCallback, useEffect, useRef } from 'react';
-import { toast } from 'sonner';
 
 import { signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 import type { UserDataLoad } from '@/features/auth/use-user-data-load';
 import { useUserDataLoad } from '@/features/auth/use-user-data-load';
+import { offerUndo } from '@/lib/offer-undo';
 import { reportFailedWrite, rollBackFailedWrite } from '@/lib/roll-back-failed-write';
 import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
-import type { WeaponMutationResult } from './use-weapon-collection-api';
+import type { AddWeaponVariables, WeaponMutationResult } from './use-weapon-collection-api';
 import {
   useAddWeaponMutation,
   useRemoveWeaponMutation,
@@ -66,30 +66,13 @@ const SIGNED_OUT_ACTIONS: WeaponActions = {
  */
 function useOptimisticEdits(
   api: {
-    addWeaponApi: ReturnType<typeof useAddWeaponMutation>['mutate'];
     removeWeaponApi: ReturnType<typeof useRemoveWeaponMutation>['mutate'];
     setRefinementLevelApi: ReturnType<typeof useSetRefinementLevelMutation>['mutate'];
   },
   applyMutationResult: (result: WeaponMutationResult) => void,
+  restoreWeapon: (removed: CollectionWeapon) => void,
 ): Pick<UseWeaponCollectionResult, 'removeWeapon' | 'setRefinementLevel'> {
-  const { addWeaponApi, removeWeaponApi, setRefinementLevelApi } = api;
-
-  // The server mints a new instance ID, so team slots that equipped the
-  // removed copy don't follow it back.
-  const restoreWeapon = useCallback(
-    ({ weaponId, refinementLevel }: CollectionWeapon) => {
-      addWeaponApi(
-        { weaponId, refinementLevel },
-        {
-          onSuccess: applyMutationResult,
-          onError: () => {
-            reportFailedWrite(`Couldn't restore ${weaponName(weaponId)}.`);
-          },
-        },
-      );
-    },
-    [addWeaponApi, applyMutationResult],
-  );
+  const { removeWeaponApi, setRefinementLevelApi } = api;
   const storeAddWeapon = useWeaponCollectionStore((s) => s.addWeapon);
   const storeRemoveWeapon = useWeaponCollectionStore((s) => s.removeWeapon);
   const storeSetRefinementLevel = useWeaponCollectionStore((s) => s.setRefinementLevel);
@@ -100,9 +83,7 @@ function useOptimisticEdits(
       if (!current) return;
 
       storeRemoveWeapon(collectionWeaponId);
-      toast.success(`Removed ${weaponName(current.weaponId)}.`, {
-        action: { label: 'Undo', onClick: () => restoreWeapon(current) },
-      });
+      offerUndo(`Removed ${weaponName(current.weaponId)}.`, () => restoreWeapon(current));
       removeWeaponApi(collectionWeaponId, {
         onError: () => {
           const name = weaponName(current.weaponId);
@@ -189,18 +170,20 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     storeSetWeapons(apiWeapons);
   }, [apiWeapons, storeSetWeapons]);
 
+  // `verb` completes "Couldn't ___ <weapon>." when the add fails.
   const runAdd = useCallback(
-    (weaponId: Weapon['id'], onSettled?: () => void) => {
-      addWeaponApi(
-        { weaponId },
-        {
-          onSuccess: applyMutationResult,
-          onError: () => {
-            reportFailedWrite(`Couldn't add ${weaponName(weaponId)}.`);
-          },
-          onSettled,
+    (
+      variables: AddWeaponVariables & { weaponId: Weapon['id'] },
+      verb: string,
+      onSettled?: () => void,
+    ) => {
+      addWeaponApi(variables, {
+        onSuccess: applyMutationResult,
+        onError: () => {
+          reportFailedWrite(`Couldn't ${verb} ${weaponName(variables.weaponId)}.`);
         },
-      );
+        onSettled,
+      });
     },
     [addWeaponApi, applyMutationResult],
   );
@@ -208,7 +191,16 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   // Additive: every call creates a new instance. Contrast ensureWeapon.
   const addWeapon = useCallback(
     (weaponId: Weapon['id']) => {
-      runAdd(weaponId);
+      runAdd({ weaponId }, 'add');
+    },
+    [runAdd],
+  );
+
+  // The server mints a new instance ID, so team slots that equipped the
+  // removed copy don't follow it back.
+  const restoreWeapon = useCallback(
+    ({ weaponId, refinementLevel }: CollectionWeapon) => {
+      runAdd({ weaponId, refinementLevel }, 'restore');
     },
     [runAdd],
   );
@@ -226,7 +218,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
       if (alreadyOwned || pendingEnsures.current.has(weaponId)) return;
 
       pendingEnsures.current.add(weaponId);
-      runAdd(weaponId, () => {
+      runAdd({ weaponId }, 'add', () => {
         pendingEnsures.current.delete(weaponId);
       });
     },
@@ -234,8 +226,9 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   );
 
   const { removeWeapon, setRefinementLevel } = useOptimisticEdits(
-    { addWeaponApi, removeWeaponApi, setRefinementLevelApi },
+    { removeWeaponApi, setRefinementLevelApi },
     applyMutationResult,
+    restoreWeapon,
   );
   const actions = isAuthenticated
     ? { ensureWeapon, addWeapon, removeWeapon, setRefinementLevel }
