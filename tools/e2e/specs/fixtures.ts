@@ -25,8 +25,12 @@ export function equippablePair(): { character: Character; weapon: Weapon } {
 
 // The accessible names the app renders.
 
-export function weaponCardLabel(weapon: Weapon, instances: number): string {
+export function ownedWeaponLabel(weapon: Weapon, instances: number): string {
   return `${weapon.name}, ${instances} owned`;
+}
+
+export function addWeaponLabel(weapon: Weapon): string {
+  return `Add ${weapon.name} to collection`;
 }
 
 export function addCharacterLabel(character: Character): string {
@@ -201,7 +205,7 @@ export async function collectWeapon(page: Page, weapon: Weapon): Promise<void> {
   await page.goto('/weapons');
 
   await withApiWrite(page, 'POST', apiPath.weapons, () =>
-    page.getByRole('button', { name: weaponCardLabel(weapon, 0) }).click(),
+    page.getByRole('button', { name: addWeaponLabel(weapon) }).click(),
   );
 
   // The instance sheet the card opens is modal, hiding the grid behind it from

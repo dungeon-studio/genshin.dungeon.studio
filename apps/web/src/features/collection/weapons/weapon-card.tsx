@@ -33,7 +33,9 @@ export function WeaponCard({
         selected && 'ring-2 ring-primary ring-offset-2 ring-offset-background',
         'cursor-pointer hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
       )}
-      aria-label={`${weapon.name}, ${instanceCount} owned`}
+      aria-label={
+        owned ? `${weapon.name}, ${instanceCount} owned` : `Add ${weapon.name} to collection`
+      }
     >
       <WeaponSummary weapon={weapon} dimmed={!owned} />
 

@@ -138,7 +138,7 @@ describeFilters({
   path: '/weapons',
   roster: WEAPON_ROSTER,
   category: (item) => item.type,
-  cardName: /^(.+), \d+ owned$/,
+  cardName: /^(?:Add )?(.+?)(?: to collection|, \d+ owned)$/,
   collect: async (page, item) => {
     await collectWeapon(page, item);
     await closeWeaponSheet(page, item);
