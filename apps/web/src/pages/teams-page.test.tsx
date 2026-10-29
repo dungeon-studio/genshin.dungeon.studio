@@ -88,7 +88,7 @@ const OWNED_WEAPONS = [
   makeWeapon(BOW_INSTANCE, BOW_WEAPON.id),
 ];
 
-/** Serves an account with no saved teams, owning `characters` and `weapons`. */
+/** Serves an account with no saved teams. */
 function serveAccount(characters = OWNED_CHARACTERS, weapons = OWNED_WEAPONS): void {
   // Saves never answer, so no refetch replaces the edits under test.
   const save = holdResponse(() => new HttpResponse(null, { status: 204 }));
@@ -396,7 +396,6 @@ describe('TeamsPage loading', () => {
 });
 
 describe('TeamsPage signed out', () => {
-  // Teams are saved to an account, so a signed-out edit would be lost on reload or sign-in.
   it('offers sign-in in place of the teams', () => {
     renderTeamsPage();
 

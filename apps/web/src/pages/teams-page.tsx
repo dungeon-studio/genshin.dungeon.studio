@@ -283,7 +283,7 @@ function TeamBuilder({ planner, collection, weaponCollection }: TeamBuilderProps
   );
 }
 
-/** Teams are saved to an account, so signed out there's nothing to build them in. */
+/** Teams are saved to an account, so signed-out edits would be lost. */
 function SignedOutTeams(): JSX.Element {
   return (
     <Container className="py-12">

@@ -16,7 +16,7 @@ interface SignInPromptProps {
   className?: string;
 }
 
-/** An empty view whose content belongs to an account, offering sign-in to fill it. */
+/** Empty state for a view whose content needs an account. */
 export function SignInPrompt({
   icon,
   title,
