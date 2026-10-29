@@ -30,10 +30,18 @@ describe('WeaponCard', () => {
     expect(screen.queryByText(/×/)).not.toBeInTheDocument();
   });
 
-  it('has the correct aria-label', () => {
+  it('names the instance count when owned', () => {
     render(<WeaponCard weapon={SWORD} instanceCount={2} />);
 
     expect(screen.getByRole('button', { name: 'Favonius Sword, 2 owned' })).toBeInTheDocument();
+  });
+
+  it('names the add when not owned', () => {
+    render(<WeaponCard weapon={SWORD} instanceCount={0} />);
+
+    expect(
+      screen.getByRole('button', { name: 'Add Favonius Sword to collection' }),
+    ).toBeInTheDocument();
   });
 
   it('calls onClick when clicked', async () => {

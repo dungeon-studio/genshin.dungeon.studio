@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import {
+  addWeaponLabel,
   apiPath,
   closeWeaponSheet,
   collectWeapon,
@@ -20,7 +21,7 @@ const refinementLabel = `Set refinement level ${REFINEMENT_LEVEL}`;
 test('the weapon collection is gated behind signing in', async ({ page }) => {
   await page.goto('/weapons');
 
-  await page.getByRole('button', { name: weaponCardLabel(weapon, 0) }).click();
+  await page.getByRole('button', { name: addWeaponLabel(weapon) }).click();
 
   await expect(page.getByText('Sign in to manage your weapon collection.')).toBeVisible();
   await expect(page.getByRole('dialog', { name: weapon.name })).toBeHidden();
