@@ -25,9 +25,10 @@ In every feature:
   Default instead. Weapons empty because the user ID keys the cache. Auth
   settling on page load isn't a sign-out.
 - While signed in, a refetch runs on window focus, on reconnect, when a hook
-  mounts, and after a successful mutation in the same feature unless another is
-  still pending. A mount first applies the cached result. A character or weapon
-  refetch changes the copy only when its result differs.
+  mounts, and after a mutation in the same feature settles unless another is
+  still pending. A mount first applies the cached result. A refetch that reaches
+  a character or team store replaces it, even when its result matches the
+  cached one.
 - Sending a request cancels any refetch already in flight, except the first
   load. The first load, or a refetch that starts after the request, can still
   land before the request settles. A character or weapon refetch that lands in

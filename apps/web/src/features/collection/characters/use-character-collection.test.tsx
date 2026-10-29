@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 // SPDX-License-Identifier: MIT
 
-import type { CharacterId } from '@genshin/domain';
+import type { CharacterId, CollectionCharacter } from '@genshin/domain';
 import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
@@ -24,6 +24,25 @@ const SKIRK = 'skirk' as CharacterId;
 
 interface CharacterLevelBody {
   constellationLevel: number;
+}
+
+/** A fake API whose list answers with what its successful writes left behind. */
+function fakeCharacterServer(initial: CollectionCharacter[]) {
+  let stored = initial;
+  const without = (id: CharacterId) => stored.filter((c) => c.characterId !== id);
+  return {
+    list: http.get('http://localhost:8080/characters', () =>
+      HttpResponse.json(charactersDocument(stored)),
+    ),
+    put: (character: CollectionCharacter) => {
+      stored = [...without(character.characterId), character];
+      return HttpResponse.json(charactersDocument([character]));
+    },
+    remove: (id: CharacterId) => {
+      stored = without(id);
+      return new HttpResponse(null, { status: 204 });
+    },
+  };
 }
 
 beforeEach(() => {
@@ -115,19 +134,13 @@ describe('useCollection mutations', () => {
 
   it('brings a removed character back at its level when undone', async () => {
     let putBody: CharacterLevelBody | undefined;
+    const fake = fakeCharacterServer([makeCharacter(SKIRK, { constellationLevel: 3 })]);
     server.use(
-      http.get('http://localhost:8080/characters', () =>
-        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })])),
-      ),
-      http.delete(
-        'http://localhost:8080/characters/skirk',
-        () => new HttpResponse(null, { status: 204 }),
-      ),
+      fake.list,
+      http.delete('http://localhost:8080/characters/skirk', () => fake.remove(SKIRK)),
       http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
         putBody = (await request.json()) as CharacterLevelBody;
-        return HttpResponse.json(
-          charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })]),
-        );
+        return fake.put(makeCharacter(SKIRK, { constellationLevel: 3 }));
       }),
     );
 
@@ -146,14 +159,10 @@ describe('useCollection mutations', () => {
   });
 
   it('takes an undone removal back out when the restore fails', async () => {
+    const fake = fakeCharacterServer([makeCharacter(SKIRK, { constellationLevel: 3 })]);
     server.use(
-      http.get('http://localhost:8080/characters', () =>
-        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })])),
-      ),
-      http.delete(
-        'http://localhost:8080/characters/skirk',
-        () => new HttpResponse(null, { status: 204 }),
-      ),
+      fake.list,
+      http.delete('http://localhost:8080/characters/skirk', () => fake.remove(SKIRK)),
       http.put(
         'http://localhost:8080/characters/skirk',
         () => new HttpResponse(null, { status: 500 }),
@@ -228,6 +237,53 @@ describe('useCollection mutations', () => {
     );
   });
 
+  it("returns to the server's level when two rapid level changes both fail", async () => {
+    const secondFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
+    const serverLevel = 3;
+    const firstLevel = 4;
+    const secondLevel = 5;
+    server.use(
+      http.get('http://localhost:8080/characters', () =>
+        HttpResponse.json(
+          charactersDocument([makeCharacter(SKIRK, { constellationLevel: serverLevel })]),
+        ),
+      ),
+      http.put(
+        matchJsonBody<CharacterLevelBody>(
+          'http://localhost:8080/characters/skirk',
+          ({ constellationLevel }) => constellationLevel === secondLevel,
+        ),
+        secondFailure.resolver,
+      ),
+      http.put(
+        'http://localhost:8080/characters/skirk',
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    const { result } = await renderOwningSkirkAtC3();
+
+    act(() => {
+      result.current.setConstellationLevel(SKIRK, firstLevel);
+    });
+    act(() => {
+      result.current.setConstellationLevel(SKIRK, secondLevel);
+    });
+    // The first failure leaves the newer edit, and the second rolls back to the
+    // level the first one sent.
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        `Couldn't set Skirk to constellation level ${firstLevel}. Your newer change stands.`,
+      ),
+    );
+    await act(() => secondFailure.arrived);
+    secondFailure.release();
+
+    await waitFor(() =>
+      expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(serverLevel),
+    );
+  });
+
   it('drops an added character when the add fails', async () => {
     server.use(
       http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
@@ -256,8 +312,9 @@ describe('useCollection mutations', () => {
   it('keeps a raise made while a failing add was in flight', async () => {
     const addFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
     const raisedLevel = 3;
+    const fake = fakeCharacterServer([]);
     server.use(
-      http.get('http://localhost:8080/characters', () => HttpResponse.json(charactersDocument([]))),
+      fake.list,
       http.put(
         matchJsonBody<CharacterLevelBody>(
           'http://localhost:8080/characters/skirk',
@@ -266,9 +323,7 @@ describe('useCollection mutations', () => {
         addFailure.resolver,
       ),
       http.put('http://localhost:8080/characters/skirk', () =>
-        HttpResponse.json(
-          charactersDocument([makeCharacter(SKIRK, { constellationLevel: raisedLevel })]),
-        ),
+        fake.put(makeCharacter(SKIRK, { constellationLevel: raisedLevel })),
       ),
     );
 
@@ -294,14 +349,11 @@ describe('useCollection mutations', () => {
 
   it('keeps a re-add made while a failing removal was in flight', async () => {
     const deleteFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
+    const fake = fakeCharacterServer([makeCharacter(SKIRK, { constellationLevel: 3 })]);
     server.use(
-      http.get('http://localhost:8080/characters', () =>
-        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })])),
-      ),
+      fake.list,
       http.delete('http://localhost:8080/characters/skirk', deleteFailure.resolver),
-      http.put('http://localhost:8080/characters/skirk', () =>
-        HttpResponse.json(charactersDocument([makeCharacter(SKIRK)])),
-      ),
+      http.put('http://localhost:8080/characters/skirk', () => fake.put(makeCharacter(SKIRK))),
     );
 
     const { result } = await renderOwningSkirkAtC3();
@@ -323,10 +375,10 @@ describe('useCollection mutations', () => {
   it('keeps a re-add made while a failing level change was in flight', async () => {
     const levelFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
     const failingLevel = 5;
+    const fake = fakeCharacterServer([makeCharacter(SKIRK, { constellationLevel: 3 })]);
+    const deletion = holdResponse(() => fake.remove(SKIRK));
     server.use(
-      http.get('http://localhost:8080/characters', () =>
-        HttpResponse.json(charactersDocument([makeCharacter(SKIRK, { constellationLevel: 3 })])),
-      ),
+      fake.list,
       http.put(
         matchJsonBody<CharacterLevelBody>(
           'http://localhost:8080/characters/skirk',
@@ -334,13 +386,8 @@ describe('useCollection mutations', () => {
         ),
         levelFailure.resolver,
       ),
-      http.put('http://localhost:8080/characters/skirk', () =>
-        HttpResponse.json(charactersDocument([makeCharacter(SKIRK)])),
-      ),
-      http.delete(
-        'http://localhost:8080/characters/skirk',
-        () => new HttpResponse(null, { status: 204 }),
-      ),
+      http.put('http://localhost:8080/characters/skirk', () => fake.put(makeCharacter(SKIRK))),
+      http.delete('http://localhost:8080/characters/skirk', deletion.resolver),
     );
 
     const { result } = await renderOwningSkirkAtC3();
@@ -351,6 +398,10 @@ describe('useCollection mutations', () => {
     act(() => {
       result.current.removeCharacter(SKIRK);
     });
+    // The removal reaches the server before the re-add, in the order the user
+    // made them.
+    await act(() => deletion.arrived);
+    deletion.release();
     act(() => {
       result.current.addCharacter(SKIRK);
     });

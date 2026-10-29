@@ -37,12 +37,13 @@ put there, so a newer edit stands. A toast shows either way, and nothing
 retries.
 
 Every mutation follows one refetch rule, set by `useUserQuerySync`. Starting a
-write cancels any refetch of its query already in flight. A write that succeeds
-while another write to the same query is pending skips its refetch and leaves
-it to the write still pending. The cancel skips the first load, and it can't
-reach a refetch that starts after the write, such as on window focus or
-reconnect. Either can still overwrite a character or weapon edit in flight.
-The team store takes no refetch while a team write is pending.
+write cancels any refetch of its query already in flight. A write refetches once
+it settles, failed or not, unless another write to the same query is still
+pending. A failed write needs its refetch because guarded rollbacks of two
+failed writes can leave a value the server never stored. The cancel skips the
+first load, and it can't reach a refetch that starts after the write, such as
+on window focus or reconnect. Either can still overwrite a character or weapon
+edit in flight. The team store takes no refetch while a team write is pending.
 
 Every write gets its own rollback and toast, even after a later write from the
 same hook has started.
@@ -73,16 +74,16 @@ sequenceDiagram
   API->>FS: PUT: transaction of read, nextCharacter, set<br>DELETE: delete
   alt success
     API-->>Hook: saved character, or no content on DELETE
-    Hook->>Cache: invalidate, unless another write is pending
     opt PUT
       Hook->>Store: replaceCharacter (skipped once removed)
     end
-    Cache-->>Reconcile: refetched collection
-    Reconcile->>Store: replaceCharacters (replace)
   else failure
     API-->>Hook: problem detail
     Hook->>Store: guarded rollback
   end
+  Hook->>Cache: invalidate, unless another write is pending
+  Cache-->>Reconcile: refetched collection
+  Reconcile->>Store: replaceCharacters (replace)
 ```
 
 ## Weapons
@@ -107,7 +108,6 @@ sequenceDiagram
     alt success
       API-->>Mutation: saved weapon
       Mutation->>Cache: write the saved instance
-      Mutation->>Cache: invalidate, unless another write is pending
     else failure
       Hook->>Hook: toast, cache untouched
     end
@@ -122,13 +122,13 @@ sequenceDiagram
       opt PATCH
         Mutation->>Cache: write the saved instance
       end
-      Mutation->>Cache: invalidate, unless another write is pending
     else failure
       API-->>Mutation: problem detail
       Mutation->>Cache: guarded rollback
       Hook->>Hook: toast naming what the cache shows
     end
   end
+  Mutation->>Cache: invalidate, unless another write is pending
 ```
 
 ## Teams
@@ -150,13 +150,12 @@ sequenceDiagram
   Hook->>API: PUT /teams/{slot} with name, members, and description
   API->>FS: with any position filled: read characters, weapons,<br>and other teams to validate them
   API->>FS: transaction of read, nextTeam, set
-  alt success
-    Hook->>Cache: invalidate, unless another write is pending
-    Cache-->>Reconcile: refetched teams
-    Reconcile->>Store: collectionTeamsToStore, then setTeams (replace)
-  else failure
+  opt failure
     Hook->>Store: guarded rollback to the snapshot
   end
+  Hook->>Cache: invalidate, unless another write is pending
+  Cache-->>Reconcile: refetched teams
+  Reconcile->>Store: collectionTeamsToStore, then setTeams (replace)
 ```
 
 On the teams page, a `beforeunload` prompt guards the latest in-flight save.

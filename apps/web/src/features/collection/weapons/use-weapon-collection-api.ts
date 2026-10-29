@@ -9,8 +9,8 @@
  *
  * Removes and refinement changes show in the cache before the server answers.
  * Adds wait for the response, because the server mints the instance
- * identifier. Every successful write invalidates the key, because the server
- * decides the stored timestamps.
+ * identifier. Every write invalidates the key once it settles, because the
+ * server decides the stored timestamps.
  *
  * `useWeaponCollection` is what a component reaches for; these are its parts.
  */
@@ -123,16 +123,6 @@ function optimisticEdit<TVariables>(
   };
 }
 
-function storeConfirmed(
-  cache: WeaponCache,
-  querySync: UserQuerySync,
-): (result: WeaponMutationResult) => void {
-  return ({ weapon }) => {
-    cache.update(withWeapon(weapon));
-    querySync.onSuccess();
-  };
-}
-
 function toWeaponRecord(items: Item[]): WeaponRecord {
   const record: WeaponRecord = {};
 
@@ -187,7 +177,9 @@ export function useAddWeaponMutation(
       return parseSingleWeaponResponse(response);
     },
     ...querySync,
-    onSuccess: storeConfirmed(cache, querySync),
+    onSuccess: ({ weapon }) => {
+      cache.update(withWeapon(weapon));
+    },
   });
 }
 
@@ -249,6 +241,8 @@ export function useSetRefinementLevelMutation(
       ({ collectionWeaponId }) => collectionWeaponId,
       (current, { level }) => ({ ...current, refinementLevel: level }),
     ),
-    onSuccess: storeConfirmed(cache, querySync),
+    onSuccess: ({ weapon }) => {
+      cache.update(withWeapon(weapon));
+    },
   });
 }

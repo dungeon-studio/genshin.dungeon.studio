@@ -9,6 +9,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { makeWeapon, weaponsDocument } from '@/test/fixtures';
 import { holdResponse } from '@/test/msw/held-response';
+import { matchJsonBody } from '@/test/msw/match-json-body';
 import { server } from '@/test/msw/server';
 import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
 import { selectUndo } from '@/test/undo-toast';
@@ -307,6 +308,53 @@ describe('useWeaponCollection', () => {
       expect(toast.error).toHaveBeenCalledWith(
         "Couldn't set Angelos' Heptades to refinement rank 5. Angelos' Heptades is back at refinement rank 2. Try again.",
       );
+    });
+
+    it("returns to the server's rank when two rapid refinement changes both fail", async () => {
+      const secondFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
+      const serverRank = 2;
+      const firstRank = 3;
+      const secondRank = 4;
+      server.use(
+        http.get('http://localhost:8080/weapons', () =>
+          HttpResponse.json(
+            weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: serverRank })]),
+          ),
+        ),
+        http.patch(
+          matchJsonBody<{ refinementLevel: number }>(
+            'http://localhost:8080/weapons/weapon-instance-1',
+            ({ refinementLevel }) => refinementLevel === secondRank,
+          ),
+          secondFailure.resolver,
+        ),
+        http.patch(
+          'http://localhost:8080/weapons/weapon-instance-1',
+          () => new HttpResponse(null, { status: 500 }),
+        ),
+      );
+
+      const { result } = renderAuthed();
+      const rank = () => result.current.weapons[INSTANCE_ID]?.refinementLevel;
+      await waitFor(() => expect(rank()).toBe(serverRank));
+
+      act(() => {
+        result.current.setRefinementLevel(INSTANCE_ID, firstRank);
+      });
+      act(() => {
+        result.current.setRefinementLevel(INSTANCE_ID, secondRank);
+      });
+      // The first failure leaves the newer edit, and the second rolls back to the
+      // rank the first one sent.
+      await waitFor(() =>
+        expect(toast.error).toHaveBeenCalledWith(
+          `Couldn't set Angelos' Heptades to refinement rank ${firstRank}. Your newer change stands.`,
+        ),
+      );
+      await act(() => secondFailure.arrived);
+      secondFailure.release();
+
+      await waitFor(() => expect(rank()).toBe(serverRank));
     });
 
     it('keeps a newer change when an earlier one fails', async () => {

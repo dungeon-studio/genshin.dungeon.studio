@@ -8,12 +8,12 @@ import { useCallback } from 'react';
 export interface UserQuerySync {
   mutationKey?: QueryKey;
   onMutate: () => Promise<void>;
-  onSuccess: () => void;
+  onSettled: () => void;
 }
 
 const SIGNED_OUT: UserQuerySync = {
   onMutate: async () => {},
-  onSuccess: () => {},
+  onSettled: () => {},
 };
 
 /**
@@ -21,9 +21,12 @@ const SIGNED_OUT: UserQuerySync = {
  * it, for spreading into `useMutation`.
  *
  * A refetch that starts before a write can answer with data that predates it.
- * Starting a write cancels any refetch in flight, and a write that succeeds
+ * Starting a write cancels any refetch in flight, and a write that settles
  * while another is pending leaves the refetch to the one still pending. A
  * first load is never cancelled, because nothing would restart it.
+ *
+ * Failed writes refetch as well. Guarded rollbacks of two failed writes can
+ * leave a value the server never stored.
  *
  * The refetch isn't awaited: returning it would hold the mutation pending
  * until the refetch settled.
@@ -43,7 +46,7 @@ export function useUserQuerySync(
       if (queryClient.getQueryData(queryKey) === undefined) return;
       await queryClient.cancelQueries({ queryKey });
     },
-    onSuccess: () => {
+    onSettled: () => {
       if (pendingWrites(queryClient, queryKey) > 1) return;
       void queryClient.invalidateQueries({ queryKey });
     },

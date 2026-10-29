@@ -11,6 +11,7 @@ import { useAuth } from '@/features/auth/use-auth';
 import type { UserDataLoad } from '@/features/auth/use-user-data-load';
 import { useUserDataLoad } from '@/features/auth/use-user-data-load';
 import { rollBackFailedWrite } from '@/lib/roll-back-failed-write';
+import { useReconcileStore } from '@/lib/use-reconcile-store';
 
 import { useSaveTeamMutation, useTeamsQuery, useTeamWritePending } from './use-team-api';
 import { useTeamStore } from './use-team-store';
@@ -181,7 +182,6 @@ export function useTeams(): UseTeamsResult {
   const storeSetTeams = useTeamStore((s) => s.setTeams);
 
   const query = useTeamsQuery(uid);
-  const { data: apiTeams, dataUpdatedAt } = query;
   const load = useUserDataLoad(auth, query);
   const isWritePending = useTeamWritePending(uid);
 
@@ -189,12 +189,11 @@ export function useTeams(): UseTeamsResult {
 
   useWarnOnUnloadWhileSaving(isSaving);
 
-  // The last write's refetch replaces a skipped answer. `dataUpdatedAt` reruns
-  // this when that refetch returns identical data.
-  useEffect(() => {
-    if (!apiTeams || isWritePending()) return;
-    storeSetTeams(collectionTeamsToStore(apiTeams));
-  }, [apiTeams, dataUpdatedAt, isWritePending, storeSetTeams]);
+  const replaceTeams = useCallback(
+    (apiTeams: CollectionTeam[]) => storeSetTeams(collectionTeamsToStore(apiTeams)),
+    [storeSetTeams],
+  );
+  useReconcileStore(query, replaceTeams, isWritePending);
 
   const optimisticActions = useOptimisticActions(saveTeamApi);
   const actions = isAuthenticated ? optimisticActions : SIGNED_OUT_ACTIONS;
