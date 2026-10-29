@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import type { CharacterId } from '@genshin/domain';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import type { ReactNode } from 'react';
+import { toast } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { AuthState } from '@/features/auth';
@@ -21,7 +22,9 @@ import { createTestQueryClient, fakeUser } from '@/test/render';
 
 import { ClearUserDataOnSignOut } from './clear-user-data-on-sign-out';
 
-vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
+vi.mock('sonner', () => ({
+  toast: { error: vi.fn(), success: vi.fn(() => 'undo-toast'), dismiss: vi.fn() },
+}));
 
 const SKIRK = 'skirk' as CharacterId;
 const ESCOFFIER = 'escoffier' as CharacterId;
@@ -30,6 +33,7 @@ beforeEach(() => {
   useCollectionStore.getState().clearCharacters();
   useWeaponCollectionStore.getState().clearWeapons();
   useTeamStore.getState().resetTeams();
+  vi.clearAllMocks();
 });
 
 /** Auth arrives through `auth.current`, so a test can change it between `rerender()` calls. */
@@ -96,5 +100,33 @@ describe('ClearUserDataOnSignOut', () => {
 
     await waitFor(() => expect(result.current.getCharacter(ESCOFFIER)?.constellationLevel).toBe(2));
     expect(result.current.getCharacter(SKIRK)).toBeUndefined();
+  });
+
+  it("withdraws the previous user's undo offers, so an undo can't restore into the next account", async () => {
+    server.use(
+      http.get('http://localhost:8080/characters', () =>
+        HttpResponse.json(charactersDocument([makeCharacter(SKIRK)])),
+      ),
+      http.delete(
+        'http://localhost:8080/characters/skirk',
+        () => new HttpResponse(null, { status: 204 }),
+      ),
+    );
+
+    const auth = { current: settledAuth(fakeUser('user-1')) };
+    const { result, rerender } = renderHook(() => useCollection(), {
+      wrapper: appWrapper(auth),
+    });
+    await waitFor(() => expect(result.current.getCharacter(SKIRK)).toBeDefined());
+
+    act(() => {
+      result.current.removeCharacter(SKIRK);
+    });
+    await waitFor(() => expect(toast.success).toHaveBeenCalled());
+
+    auth.current = settledAuth(null);
+    rerender();
+
+    expect(toast.dismiss).toHaveBeenCalledWith('undo-toast');
   });
 });

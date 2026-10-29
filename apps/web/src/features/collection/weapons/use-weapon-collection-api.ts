@@ -15,7 +15,7 @@
 import type { Item } from '@genshin/collection-json';
 import { assertCollectionDocument } from '@genshin/collection-json';
 import type { CollectionWeapon, CollectionWeaponId, RefinementLevel } from '@genshin/domain';
-import { deserialiseWeapon, MIN_REFINEMENT_LEVEL } from '@genshin/domain';
+import { deserialiseWeapon } from '@genshin/domain';
 import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
@@ -66,17 +66,22 @@ export function useWeaponCollectionQuery(
   });
 }
 
+export interface AddWeaponVariables {
+  weaponId: string;
+  refinementLevel: RefinementLevel;
+}
+
 export function useAddWeaponMutation(
   userId: string | undefined,
-): UseMutationResult<WeaponMutationResult, Error, string> {
+): UseMutationResult<WeaponMutationResult, Error, AddWeaponVariables> {
   const querySync = useUserQuerySync(userId, weaponsKey);
 
   return useMutation({
-    mutationFn: async (weaponId: string): Promise<WeaponMutationResult> => {
-      const response = await apiPost('/weapons', {
-        weaponId,
-        refinementLevel: MIN_REFINEMENT_LEVEL,
-      });
+    mutationFn: async ({
+      weaponId,
+      refinementLevel,
+    }: AddWeaponVariables): Promise<WeaponMutationResult> => {
+      const response = await apiPost('/weapons', { weaponId, refinementLevel });
       return parseSingleWeaponResponse(response);
     },
     ...querySync,

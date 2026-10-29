@@ -12,6 +12,7 @@ import { holdResponse } from '@/test/msw/held-response';
 import { matchJsonBody } from '@/test/msw/match-json-body';
 import { server } from '@/test/msw/server';
 import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
+import { selectUndo } from '@/test/undo-toast';
 
 import { useWeaponCollection } from './use-weapon-collection';
 import { useWeaponCollectionStore } from './use-weapon-collection-store';
@@ -211,6 +212,76 @@ describe('useWeaponCollection', () => {
       await waitFor(() => expect(result.current.weapons[INSTANCE_ID]).toBeDefined());
       expect(toast.error).toHaveBeenCalledWith(
         "Couldn't remove Angelos' Heptades. Angelos' Heptades is back in your collection. Try again.",
+      );
+    });
+  });
+
+  describe('undoing a removal', () => {
+    it('brings back a copy at the removed refinement rank', async () => {
+      let postBody: unknown;
+      const restored = makeWeapon(SECOND_INSTANCE_ID, WEAPON_ID, { refinementLevel: 2 });
+      let serverWeapons = [makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 2 })];
+      server.use(
+        http.get('http://localhost:8080/weapons', () =>
+          HttpResponse.json(weaponsDocument(serverWeapons)),
+        ),
+        http.delete('http://localhost:8080/weapons/weapon-instance-1', () => {
+          serverWeapons = [];
+          return new HttpResponse(null, { status: 204 });
+        }),
+        http.post('http://localhost:8080/weapons', async ({ request }) => {
+          postBody = await request.json();
+          serverWeapons = [restored];
+          return HttpResponse.json(weaponsDocument([restored]));
+        }),
+      );
+
+      const { result } = renderAuthed();
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]).toBeDefined());
+
+      act(() => {
+        result.current.removeWeapon(INSTANCE_ID);
+      });
+      await waitFor(() => expect(toast.success).toHaveBeenCalled());
+      act(() => {
+        selectUndo("Removed Angelos' Heptades at refinement rank 2.");
+      });
+
+      await waitFor(() =>
+        expect(result.current.weapons[SECOND_INSTANCE_ID]?.refinementLevel).toBe(2),
+      );
+      expect(postBody).toEqual({ weaponId: WEAPON_ID, refinementLevel: 2 });
+    });
+
+    it('names the copy a failed restore was for', async () => {
+      server.use(
+        http.get('http://localhost:8080/weapons', () =>
+          HttpResponse.json(
+            weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 2 })]),
+          ),
+        ),
+        http.delete(
+          'http://localhost:8080/weapons/weapon-instance-1',
+          () => new HttpResponse(null, { status: 204 }),
+        ),
+        http.post('http://localhost:8080/weapons', () => new HttpResponse(null, { status: 500 })),
+      );
+
+      const { result } = renderAuthed();
+      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]).toBeDefined());
+
+      act(() => {
+        result.current.removeWeapon(INSTANCE_ID);
+      });
+      await waitFor(() => expect(toast.success).toHaveBeenCalled());
+      act(() => {
+        selectUndo("Removed Angelos' Heptades at refinement rank 2.");
+      });
+
+      await waitFor(() =>
+        expect(toast.error).toHaveBeenCalledWith(
+          "Couldn't bring back Angelos' Heptades at refinement rank 2. Try again.",
+        ),
       );
     });
   });

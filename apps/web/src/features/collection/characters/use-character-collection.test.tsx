@@ -13,6 +13,7 @@ import { holdResponse } from '@/test/msw/held-response';
 import { matchJsonBody } from '@/test/msw/match-json-body';
 import { server } from '@/test/msw/server';
 import { createWrapper, fakeUser, renderHookSignedIn } from '@/test/render';
+import { selectUndo } from '@/test/undo-toast';
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
@@ -129,6 +130,61 @@ describe('useCollection mutations', () => {
     expect(toast.error).toHaveBeenCalledWith(
       "Couldn't remove Skirk. Skirk is back in your collection. Try again.",
     );
+  });
+
+  it('brings a removed character back at its level when undone', async () => {
+    let putBody: CharacterLevelBody | undefined;
+    const fake = fakeCharacterServer([makeCharacter(SKIRK, { constellationLevel: 3 })]);
+    server.use(
+      fake.list,
+      http.delete('http://localhost:8080/characters/skirk', () => fake.remove(SKIRK)),
+      http.put('http://localhost:8080/characters/skirk', async ({ request }) => {
+        putBody = (await request.json()) as CharacterLevelBody;
+        return fake.put(makeCharacter(SKIRK, { constellationLevel: 3 }));
+      }),
+    );
+
+    const { result } = await renderOwningSkirkAtC3();
+
+    act(() => {
+      result.current.removeCharacter(SKIRK);
+    });
+    await waitFor(() => expect(toast.success).toHaveBeenCalled());
+    act(() => {
+      selectUndo('Removed Skirk at constellation level 3.');
+    });
+
+    expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(3);
+    await waitFor(() => expect(putBody).toEqual({ constellationLevel: 3 }));
+  });
+
+  it('takes an undone removal back out when the restore fails', async () => {
+    const fake = fakeCharacterServer([makeCharacter(SKIRK, { constellationLevel: 3 })]);
+    server.use(
+      fake.list,
+      http.delete('http://localhost:8080/characters/skirk', () => fake.remove(SKIRK)),
+      http.put(
+        'http://localhost:8080/characters/skirk',
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    const { result } = await renderOwningSkirkAtC3();
+
+    act(() => {
+      result.current.removeCharacter(SKIRK);
+    });
+    await waitFor(() => expect(toast.success).toHaveBeenCalled());
+    act(() => {
+      selectUndo('Removed Skirk at constellation level 3.');
+    });
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Couldn't bring back Skirk. Skirk is out of your collection again. Try again.",
+      ),
+    );
+    expect(result.current.getCharacter(SKIRK)).toBeUndefined();
   });
 
   it('stores the saved character with the server timestamps', async () => {

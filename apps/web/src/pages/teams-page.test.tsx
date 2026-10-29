@@ -4,7 +4,7 @@
 import type { CollectionWeaponId } from '@genshin/domain';
 import type { Character, Weapon, WeaponType } from '@genshin/game-data';
 import { CHARACTER_ROSTER, WEAPON_ROSTER } from '@genshin/game-data';
-import { act, configure, render, screen, within } from '@testing-library/react';
+import { act, configure, render, screen, waitFor, within } from '@testing-library/react';
 import type { UserEvent } from '@testing-library/user-event';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
@@ -80,24 +80,45 @@ function renderTeamsPage(wrapper = createWrapper()): void {
 }
 
 // Call after rendering: the hooks clear their stores on finding no signed-in user.
-function seedCollections(): void {
-  act(() => {
-    useCollectionStore
-      .getState()
-      .replaceCharacters(
-        Object.fromEntries([CLAYMORE_USER, BOW_USER].map((c) => [c.id, makeCharacter(c.id)])),
-      );
-    useWeaponCollectionStore.getState().setWeapons({
-      [CLAYMORE_INSTANCE]: makeWeapon(CLAYMORE_INSTANCE, CLAYMORE.id),
-      [BOW_INSTANCE]: makeWeapon(BOW_INSTANCE, BOW_WEAPON.id),
-    });
+const signedIn = () => createWrapper({ user: fakeUser('user-1') });
+
+const OWNED_CHARACTERS = [CLAYMORE_USER, BOW_USER].map((c) => makeCharacter(c.id));
+const OWNED_WEAPONS = [
+  makeWeapon(CLAYMORE_INSTANCE, CLAYMORE.id),
+  makeWeapon(BOW_INSTANCE, BOW_WEAPON.id),
+];
+
+/** Serves an account with no saved teams. */
+function serveAccount(characters = OWNED_CHARACTERS, weapons = OWNED_WEAPONS): void {
+  // Saves never answer, so no refetch replaces the edits under test.
+  const save = holdResponse(() => new HttpResponse(null, { status: 204 }));
+  server.use(
+    http.get('http://localhost:8080/teams', () => HttpResponse.json(teamsDocument([]))),
+    http.get('http://localhost:8080/characters', () =>
+      HttpResponse.json(charactersDocument(characters)),
+    ),
+    http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument(weapons))),
+    http.put('http://localhost:8080/teams/:slot', save.resolver),
+  );
+}
+
+async function collectionsLoaded(): Promise<void> {
+  await waitFor(() => {
+    expect(Object.keys(useCollectionStore.getState().characters)).toHaveLength(
+      OWNED_CHARACTERS.length,
+    );
+    expect(Object.keys(useWeaponCollectionStore.getState().weapons)).toHaveLength(
+      OWNED_WEAPONS.length,
+    );
   });
 }
 
-function setupTeamsPage(): UserEvent {
+async function setupTeamsPage(): Promise<UserEvent> {
+  serveAccount();
   const user = userEvent.setup({ delay: null });
-  renderTeamsPage();
-  seedCollections();
+  renderTeamsPage(signedIn());
+  await screen.findByRole('region', { name: 'Team 1' });
+  await collectionsLoaded();
   return user;
 }
 
@@ -124,7 +145,7 @@ beforeEach(() => {
 // to tens of seconds.
 describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   it('assigns a weapon picked before a character, and narrows the pool to its wielders', async () => {
-    const user = setupTeamsPage();
+    const user = await setupTeamsPage();
 
     await pickWeaponFirst(user, CLAYMORE);
     await user.click(screen.getByRole('button', { name: 'Characters' }));
@@ -146,7 +167,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   });
 
   it('leaves the character pool unnarrowed when no weapon was picked first', async () => {
-    const user = setupTeamsPage();
+    const user = await setupTeamsPage();
 
     await user.click(await firstEmptyMember());
 
@@ -156,7 +177,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   });
 
   it('offers weapons of any type, filterable, on a member with no character', async () => {
-    const user = setupTeamsPage();
+    const user = await setupTeamsPage();
 
     await user.click(await firstEmptyMember());
     await user.click(await screen.findByRole('button', { name: 'Weapons' }));
@@ -173,7 +194,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   });
 
   it('restores the whole character pool when the pending weapon is cleared', async () => {
-    const user = setupTeamsPage();
+    const user = await setupTeamsPage();
 
     await pickWeaponFirst(user, CLAYMORE);
     await user.click(screen.getByRole('button', { name: 'Characters' }));
@@ -191,7 +212,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
 
   describe('character-first flow', () => {
     it('constrains the weapon pool to the assigned character and equips from it', async () => {
-      const user = setupTeamsPage();
+      const user = await setupTeamsPage();
 
       await pickCharacterFirst(user, CLAYMORE_USER);
       await user.click(screen.getByRole('button', { name: 'Weapons' }));
@@ -212,7 +233,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
     });
 
     it('empties the slot when the assigned character is picked again', async () => {
-      const user = setupTeamsPage();
+      const user = await setupTeamsPage();
 
       await pickCharacterFirst(user, CLAYMORE_USER);
 
@@ -225,7 +246,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
     });
 
     it('unequips the weapon when the equipped one is picked again', async () => {
-      const user = setupTeamsPage();
+      const user = await setupTeamsPage();
 
       await pickCharacterFirst(user, CLAYMORE_USER);
       await user.click(screen.getByRole('button', { name: 'Weapons' }));
@@ -245,7 +266,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   });
 
   it('drops a pending weapon when the same card is picked again', async () => {
-    const user = setupTeamsPage();
+    const user = await setupTeamsPage();
 
     await pickWeaponFirst(user, CLAYMORE);
     await user.click(
@@ -264,7 +285,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   // elsewhere belongs to the character about to be chosen. Reaching that pairing means
   // going character-first, where the weapon carries over on its own.
   it('withholds a weapon another team already equips, and names the way to it', async () => {
-    const user = setupTeamsPage();
+    const user = await setupTeamsPage();
 
     act(() => {
       useTeamStore.getState().assignCharacter(1, 0, CLAYMORE_USER.id);
@@ -287,7 +308,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   });
 
   it('offers no character-first route on a member that already has a character', async () => {
-    const user = setupTeamsPage();
+    const user = await setupTeamsPage();
 
     act(() => {
       useTeamStore.getState().assignCharacter(1, 0, CLAYMORE_USER.id);
@@ -309,7 +330,7 @@ describe('TeamsPage weapon-first flow', { timeout: 60_000 }, () => {
   });
 
   it('forgets a pending weapon once the editor is closed', async () => {
-    const user = setupTeamsPage();
+    const user = await setupTeamsPage();
 
     await pickWeaponFirst(user, CLAYMORE);
     await user.click(screen.getByRole('button', { name: 'Close' }));
@@ -339,7 +360,7 @@ describe('TeamsPage loading', () => {
       http.get('http://localhost:8080/weapons', () => HttpResponse.json(weaponsDocument([]))),
     );
 
-    renderTeamsPage(createWrapper({ user: fakeUser('user-1') }));
+    renderTeamsPage(signedIn());
     await teams.arrived;
 
     expect(screen.getByText('Loading teams')).toBeInTheDocument();
@@ -358,7 +379,7 @@ describe('TeamsPage loading', () => {
     );
     const user = userEvent.setup({ delay: null });
 
-    renderTeamsPage(createWrapper({ user: fakeUser('user-1') }));
+    renderTeamsPage(signedIn());
 
     expect(await screen.findByText('Failed to load your teams.')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^Edit / })).not.toBeInTheDocument();
@@ -374,26 +395,35 @@ describe('TeamsPage loading', () => {
   });
 });
 
-describe('TeamsPage empty collection', () => {
-  // A collection belongs to an account, so the characters page can't fill one signed out.
-  it('offers sign-in to a signed-out visitor', () => {
+describe('TeamsPage signed out', () => {
+  it('offers sign-in in place of the teams', () => {
     renderTeamsPage();
 
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Team 1' })).not.toBeInTheDocument();
   });
 
-  it('withholds the prompt until the collection has loaded', () => {
+  it('withholds the prompt until auth settles', () => {
     renderTeamsPage(AuthLoading);
 
     expect(screen.queryByRole('button', { name: 'Sign in' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
+  });
+});
+
+describe('TeamsPage empty collection', () => {
+  it('points the user at the characters page', async () => {
+    serveAccount([], []);
+    renderTeamsPage(signedIn());
+
+    expect(await screen.findByRole('link', { name: 'Go to Characters' })).toHaveAttribute(
+      'href',
+      '/characters',
+    );
   });
 
-  it('shows no prompt once the user owns a character', () => {
-    renderTeamsPage();
-    seedCollections();
+  it('shows no prompt once the user owns a character', async () => {
+    await setupTeamsPage();
 
-    expect(screen.queryByRole('button', { name: 'Sign in' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Go to Characters' })).not.toBeInTheDocument();
   });
 });
