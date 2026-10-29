@@ -4,13 +4,14 @@
 import type { CollectionWeapon, CollectionWeaponId, RefinementLevel } from '@genshin/domain';
 import type { Weapon } from '@genshin/game-data';
 import { getWeaponById } from '@genshin/game-data';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 import type { UserDataLoad } from '@/features/auth/use-user-data-load';
 import { useUserDataLoad } from '@/features/auth/use-user-data-load';
 import { reportFailedWrite, rollBackFailedWrite } from '@/lib/roll-back-failed-write';
+import { useReconcileStore } from '@/lib/use-reconcile-store';
 import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
 import type { WeaponMutationResult } from './use-weapon-collection-api';
@@ -144,7 +145,6 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
   const storeAddWeapon = useWeaponCollectionStore((s) => s.addWeapon);
 
   const query = useWeaponCollectionQuery(uid);
-  const { data: apiWeapons, dataUpdatedAt } = query;
   const load = useUserDataLoad(auth, query);
 
   const addWeaponApi = useSenderBoundMutate(uid, useAddWeaponMutation(uid).mutate);
@@ -161,12 +161,7 @@ export function useWeaponCollection(): UseWeaponCollectionResult {
     [storeAddWeapon],
   );
 
-  // `dataUpdatedAt` reruns this when a refetch after a failed write returns
-  // identical data, which still has to replace the rolled-back store.
-  useEffect(() => {
-    if (!apiWeapons) return;
-    storeSetWeapons(apiWeapons);
-  }, [apiWeapons, dataUpdatedAt, storeSetWeapons]);
+  useReconcileStore(query, storeSetWeapons);
 
   const runAdd = useCallback(
     (weaponId: Weapon['id'], onSettled?: () => void) => {

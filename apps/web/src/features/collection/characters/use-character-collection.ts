@@ -4,13 +4,14 @@
 import type { CharacterId, CollectionCharacter, ConstellationLevel } from '@genshin/domain';
 import { MIN_CONSTELLATION_LEVEL } from '@genshin/domain';
 import { getCharacterById } from '@genshin/game-data';
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 
 import { signedInUid } from '@/features/auth/auth-state';
 import { useAuth } from '@/features/auth/use-auth';
 import type { UserDataLoad } from '@/features/auth/use-user-data-load';
 import { useUserDataLoad } from '@/features/auth/use-user-data-load';
 import { rollBackFailedWrite } from '@/lib/roll-back-failed-write';
+import { useReconcileStore } from '@/lib/use-reconcile-store';
 import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
 import type { MutationResult } from './use-character-collection-api';
@@ -163,7 +164,6 @@ export function useCollection(): UseCollectionResult {
   const storeReplaceCharacters = useCollectionStore((s) => s.replaceCharacters);
 
   const query = useCharacterCollectionQuery(uid);
-  const { data: apiCharacters, dataUpdatedAt } = query;
   const load = useUserDataLoad(auth, query);
 
   const addCharacterApi = useSenderBoundMutate(uid, useAddCharacterMutation(uid).mutate);
@@ -180,12 +180,7 @@ export function useCollection(): UseCollectionResult {
     [storeReplaceCharacter],
   );
 
-  // `dataUpdatedAt` reruns this when a refetch after a failed write returns
-  // identical data, which still has to replace the rolled-back store.
-  useEffect(() => {
-    if (!apiCharacters) return;
-    storeReplaceCharacters(apiCharacters);
-  }, [apiCharacters, dataUpdatedAt, storeReplaceCharacters]);
+  useReconcileStore(query, storeReplaceCharacters);
 
   const optimisticActions = useOptimisticActions(
     { addCharacterApi, removeCharacterApi, setConstellationLevelApi },

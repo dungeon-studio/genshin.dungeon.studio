@@ -245,16 +245,19 @@ describe('useWeaponCollection', () => {
 
     it("returns to the server's rank when two rapid refinement changes both fail", async () => {
       const firstFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
+      const serverRank = 2;
+      const firstRank = 3;
+      const secondRank = 4;
       server.use(
         http.get('http://localhost:8080/weapons', () =>
           HttpResponse.json(
-            weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: 2 })]),
+            weaponsDocument([makeWeapon(INSTANCE_ID, WEAPON_ID, { refinementLevel: serverRank })]),
           ),
         ),
         http.patch(
           matchJsonBody<{ refinementLevel: number }>(
             'http://localhost:8080/weapons/weapon-instance-1',
-            ({ refinementLevel }) => refinementLevel === 3,
+            ({ refinementLevel }) => refinementLevel === firstRank,
           ),
           firstFailure.resolver,
         ),
@@ -265,20 +268,21 @@ describe('useWeaponCollection', () => {
       );
 
       const { result } = renderAuthed();
-      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(2));
+      const rank = () => result.current.weapons[INSTANCE_ID]?.refinementLevel;
+      await waitFor(() => expect(rank()).toBe(serverRank));
 
       act(() => {
-        result.current.setRefinementLevel(INSTANCE_ID, 3);
+        result.current.setRefinementLevel(INSTANCE_ID, firstRank);
       });
       act(() => {
-        result.current.setRefinementLevel(INSTANCE_ID, 4);
+        result.current.setRefinementLevel(INSTANCE_ID, secondRank);
       });
-      // The second failure lands first and rolls back to 3, the rank it replaced.
-      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(3));
+      // The second failure lands first and rolls back to the rank it replaced.
+      await waitFor(() => expect(rank()).toBe(firstRank));
       await act(() => firstFailure.arrived);
       firstFailure.release();
 
-      await waitFor(() => expect(result.current.weapons[INSTANCE_ID]?.refinementLevel).toBe(2));
+      await waitFor(() => expect(rank()).toBe(serverRank));
     });
 
     it('keeps a change that a refetch started before it would overwrite', async () => {
