@@ -6,9 +6,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { MemoryRouter } from 'react-router-dom';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { useWeaponCollectionStore } from '@/features/collection/weapons/use-weapon-collection-store';
 import { makeWeapon, weaponsDocument } from '@/test/fixtures';
 import { server } from '@/test/msw/server';
 import { createWrapper, fakeUser } from '@/test/render';
@@ -17,10 +16,6 @@ import { WeaponsPage } from './weapons-page';
 
 const [WEAPON] = WEAPON_ROSTER;
 if (!WEAPON) throw new Error('weapon roster is empty');
-
-beforeEach(() => {
-  useWeaponCollectionStore.getState().clearWeapons();
-});
 
 // The page renders the whole roster, so under the full suite a case runs past the
 // default timeout.

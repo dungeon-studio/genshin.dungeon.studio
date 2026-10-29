@@ -51,17 +51,17 @@ flowchart TB
   hook -.->|4| fetchWrapper
 ```
 
-| Layer           | Code                                                                       | Data unit                                                   |
-| --------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| View            | `apps/web/src/pages/` and feature components                               | Rendered entities and user actions                          |
-| Feature hook    | `useCollection`, `useWeaponCollection`, `useTeams`, `useDeleteAccount`     | Action arguments                                            |
-| Store, D1       | `use-*-store.ts`                                                           | `CollectionCharacter`, `CollectionWeapon`, `CollectionTeam` |
-| Query layer, D2 | `use-*-api.ts` and `apps/web/src/lib/api-collection.ts`                    | Collection+JSON in, domain entities out                     |
-| Fetch wrapper   | `apps/web/src/lib/api.ts`                                                  | JSON body with the ID token                                 |
-| Middleware      | `apps/api/src/middleware/`                                                 | User ID and validated body                                  |
-| Route           | `apps/api/src/routes/`                                                     | Domain objects in, Collection+JSON out                      |
-| Repository      | `index.ts` under each `apps/api/src/repositories/` feature, and `merge.ts` | Domain records                                              |
-| Document        | `document.ts`, `schemas/`, and `schema-version.ts`                         | Versioned Firestore documents                               |
+| Layer           | Code                                                                       | Data unit                               |
+| --------------- | -------------------------------------------------------------------------- | --------------------------------------- |
+| View            | `apps/web/src/pages/` and feature components                               | Rendered entities and user actions      |
+| Feature hook    | `useCollection`, `useWeaponCollection`, `useTeams`, `useDeleteAccount`     | Action arguments                        |
+| Store, D1       | `use-*-store.ts`                                                           | `CollectionCharacter`, `CollectionTeam` |
+| Query layer, D2 | `use-*-api.ts` and `apps/web/src/lib/api-collection.ts`                    | Collection+JSON in, domain entities out |
+| Fetch wrapper   | `apps/web/src/lib/api.ts`                                                  | JSON body with the ID token             |
+| Middleware      | `apps/api/src/middleware/`                                                 | User ID and validated body              |
+| Route           | `apps/api/src/routes/`                                                     | Domain objects in, Collection+JSON out  |
+| Repository      | `index.ts` under each `apps/api/src/repositories/` feature, and `merge.ts` | Domain records                          |
+| Document        | `document.ts`, `schemas/`, and `schema-version.ts`                         | Versioned Firestore documents           |
 
 `@genshin/domain` supplies the types, assertions, and Collection+JSON
 representations every layer uses.
@@ -71,8 +71,8 @@ representations every layer uses.
 1. **View to store.** `character-pool.tsx` and `weapon-pool.tsx` read
    `useTeamStore` instead of `useTeams`, see [#1846]. `ClearUserDataOnSignOut`
    empties every store on sign-out without a feature hook, see [#1889].
-2. **Query layer to store.** Each hook's reconcile effect copies the cache into
-   the store, so the store has four writers: actions, responses, reconcile,
+2. **Query layer to store.** The character and team hooks' reconcile effects
+   copy the cache into the store, so the store has four writers: actions, responses, reconcile,
    and the sign-out clear. [ADR-0006] decides which copy owns state.
 3. **Route to Firebase Auth.** `routes/account.ts` calls `deleteUser`, outside
    the boundaries [#1020] sets.
@@ -151,16 +151,17 @@ When the server's values reach each store is in
 - **Feature hook:** both for every unsaved team slot.
 - **Store:** both on a character add, and on every team slot at start and on
   reset. `updatedAt` on every other character and
-  team edit. The weapon store never mints them.
+  team edit. Weapons never mint them in the browser.
 - **Repository:** both on every save, keeping a stored `createdAt`.
 
 ### Identity
 
 - **View:** `ClearUserDataOnSignOut` empties every store when a signed-in user
   signs out or another account signs in.
-- **Feature hook:** applies a character or weapon response or rollback only
-  while its sender is still signed in.
+- **Feature hook:** applies a character response or rollback, and shows a
+  character or weapon toast, only while its sender is still signed in.
 - **Query layer:** puts the character ID, instance ID, or slot in the path.
+  Writes a weapon response or rollback into its sender's cache entry.
 - **Fetch wrapper:** attaches the signed-in user's ID token.
 - **Middleware:** verifies the ID token. Its user ID keys all storage.
 - **Route:** takes the character ID or slot from the path. Casts an instance ID
@@ -202,10 +203,11 @@ Each layer below versions its own format, an overlap.
 The hook and the repository merge by different rules, an overlap. The same two
 character values resolve differently on each side.
 
-- **Feature hook:** [guarded rollback](data-flow-write-paths.md). Applies a
-  response: a character's whole record unless it's no longer held, or a
-  weapon's whole instance. Reconciles by replacing the store with the
-  server's collection.
+- **Feature hook:** [guarded rollback](data-flow-write-paths.md) for characters
+  and teams. Applies a character's whole record from a response unless it's no
+  longer held. Reconciles by replacing the store with the server's collection.
+- **Query layer:** guarded rollback for weapons. Applies a weapon's whole
+  instance from a response.
 - **Repository:** `nextCharacter` and the weapon update keep the latest write.
   `nextTeam` keeps any stored field the body omits.
 

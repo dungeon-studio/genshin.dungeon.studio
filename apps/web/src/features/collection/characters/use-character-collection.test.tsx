@@ -238,7 +238,7 @@ describe('useCollection mutations', () => {
   });
 
   it("returns to the server's level when two rapid level changes both fail", async () => {
-    const firstFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
+    const secondFailure = holdResponse(() => new HttpResponse(null, { status: 500 }));
     const serverLevel = 3;
     const firstLevel = 4;
     const secondLevel = 5;
@@ -251,9 +251,9 @@ describe('useCollection mutations', () => {
       http.put(
         matchJsonBody<CharacterLevelBody>(
           'http://localhost:8080/characters/skirk',
-          ({ constellationLevel }) => constellationLevel === firstLevel,
+          ({ constellationLevel }) => constellationLevel === secondLevel,
         ),
-        firstFailure.resolver,
+        secondFailure.resolver,
       ),
       http.put(
         'http://localhost:8080/characters/skirk',
@@ -269,12 +269,15 @@ describe('useCollection mutations', () => {
     act(() => {
       result.current.setConstellationLevel(SKIRK, secondLevel);
     });
-    // The second failure lands first and rolls back to the level it replaced.
+    // The first failure leaves the newer edit, and the second rolls back to the
+    // level the first one sent.
     await waitFor(() =>
-      expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(firstLevel),
+      expect(toast.error).toHaveBeenCalledWith(
+        "Couldn't set Skirk to constellation level 4. Your newer change stands.",
+      ),
     );
-    await act(() => firstFailure.arrived);
-    firstFailure.release();
+    await act(() => secondFailure.arrived);
+    secondFailure.release();
 
     await waitFor(() =>
       expect(result.current.getCharacter(SKIRK)?.constellationLevel).toBe(serverLevel),

@@ -4,6 +4,7 @@
 import type { CollectionWeaponId } from '@genshin/domain';
 import type { Character, Weapon, WeaponType } from '@genshin/game-data';
 import { CHARACTER_ROSTER, WEAPON_ROSTER } from '@genshin/game-data';
+import type { QueryClient } from '@tanstack/react-query';
 import { act, configure, render, screen, waitFor, within } from '@testing-library/react';
 import type { UserEvent } from '@testing-library/user-event';
 import userEvent from '@testing-library/user-event';
@@ -13,7 +14,6 @@ import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { useCollectionStore } from '@/features/collection/characters/use-character-collection-store';
-import { useWeaponCollectionStore } from '@/features/collection/weapons/use-weapon-collection-store';
 import { useTeamStore } from '@/features/teams/use-team-store';
 import {
   charactersDocument,
@@ -102,23 +102,22 @@ function serveAccount(characters = OWNED_CHARACTERS, weapons = OWNED_WEAPONS): v
   );
 }
 
-async function collectionsLoaded(): Promise<void> {
+async function collectionsLoaded(queryClient: QueryClient): Promise<void> {
   await waitFor(() => {
     expect(Object.keys(useCollectionStore.getState().characters)).toHaveLength(
       OWNED_CHARACTERS.length,
     );
-    expect(Object.keys(useWeaponCollectionStore.getState().weapons)).toHaveLength(
-      OWNED_WEAPONS.length,
-    );
+    expect(queryClient.isFetching()).toBe(0);
   });
 }
 
 async function setupTeamsPage(): Promise<UserEvent> {
   serveAccount();
   const user = userEvent.setup({ delay: null });
-  renderTeamsPage(signedIn());
+  const queryClient = createTestQueryClient();
+  renderTeamsPage(createWrapper({ user: fakeUser('user-1'), queryClient }));
   await screen.findByRole('region', { name: 'Team 1' });
-  await collectionsLoaded();
+  await collectionsLoaded(queryClient);
   return user;
 }
 
@@ -138,7 +137,6 @@ async function pickCharacterFirst(user: UserEvent, character: Character): Promis
 beforeEach(() => {
   useTeamStore.getState().resetTeams();
   useCollectionStore.getState().clearCharacters();
-  useWeaponCollectionStore.getState().clearWeapons();
 });
 
 // Under coverage, with the rest of the suite competing for workers, a case runs

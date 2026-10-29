@@ -13,9 +13,13 @@ import { useUserDataLoad } from '@/features/auth/use-user-data-load';
 import { offerUndo } from '@/lib/offer-undo';
 import { rollBackFailedWrite } from '@/lib/roll-back-failed-write';
 import { useReconcileStore } from '@/lib/use-reconcile-store';
+import type { SenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 import { useSenderBoundMutate } from '@/lib/use-sender-bound-mutate';
 
-import type { MutationResult } from './use-character-collection-api';
+import type {
+  MutationResult,
+  SetConstellationLevelVariables,
+} from './use-character-collection-api';
 import {
   useAddCharacterMutation,
   useCharacterCollectionQuery,
@@ -55,7 +59,7 @@ const SIGNED_OUT_ACTIONS: CollectionActions = {
  * been re-added. A level update creates a missing entry, so no add is sent.
  */
 function useRestoreCharacter(
-  setConstellationLevelApi: ReturnType<typeof useSetConstellationLevelMutation>['mutate'],
+  setConstellationLevelApi: SenderBoundMutate<MutationResult, SetConstellationLevelVariables>,
   applyMutationResult: (result: MutationResult) => void,
 ): (removed: CollectionCharacter) => void {
   const storeAddCharacter = useCollectionStore((s) => s.addCharacter);
@@ -104,9 +108,9 @@ function useRestoreCharacter(
  */
 function useOptimisticActions(
   api: {
-    addCharacterApi: ReturnType<typeof useAddCharacterMutation>['mutate'];
-    removeCharacterApi: ReturnType<typeof useRemoveCharacterMutation>['mutate'];
-    setConstellationLevelApi: ReturnType<typeof useSetConstellationLevelMutation>['mutate'];
+    addCharacterApi: SenderBoundMutate<MutationResult, CharacterId>;
+    removeCharacterApi: SenderBoundMutate<void, CharacterId>;
+    setConstellationLevelApi: SenderBoundMutate<MutationResult, SetConstellationLevelVariables>;
   },
   applyMutationResult: (result: MutationResult) => void,
 ): CollectionActions {
@@ -226,11 +230,11 @@ export function useCollection(): UseCollectionResult {
   const query = useCharacterCollectionQuery(uid);
   const load = useUserDataLoad(auth, query);
 
-  const addCharacterApi = useSenderBoundMutate(uid, useAddCharacterMutation(uid).mutate);
-  const removeCharacterApi = useSenderBoundMutate(uid, useRemoveCharacterMutation(uid).mutate);
+  const addCharacterApi = useSenderBoundMutate(uid, useAddCharacterMutation(uid).mutateAsync);
+  const removeCharacterApi = useSenderBoundMutate(uid, useRemoveCharacterMutation(uid).mutateAsync);
   const setConstellationLevelApi = useSenderBoundMutate(
     uid,
-    useSetConstellationLevelMutation(uid).mutate,
+    useSetConstellationLevelMutation(uid).mutateAsync,
   );
 
   const applyMutationResult = useCallback(
