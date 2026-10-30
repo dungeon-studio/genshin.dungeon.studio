@@ -26,13 +26,11 @@ runs:
         path: ~/.cache/ms-playwright
         key: ${{ runner.os }}-playwright-${{ steps.playwright.outputs.version }}
 
+    # No `--with-deps`: the ubuntu-latest image already carries Chromium's
+    # shared libraries, and the extra fonts it would add cost an apt mirror
+    # round trip that has stalled a run for ten minutes. A runner image that
+    # drops a library fails Playwright's host check by name.
     - name: Install Playwright Chromium
       if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
-      run: pnpm --filter @genshin/e2e exec playwright install --with-deps chromium
-
-    # The cached browser still needs its shared libraries on a fresh runner.
-    - name: Install Chromium system dependencies
-      if: steps.cache.outputs.cache-hit == 'true'
-      shell: bash
-      run: pnpm --filter @genshin/e2e exec playwright install-deps chromium
+      run: pnpm --filter @genshin/e2e exec playwright install chromium
