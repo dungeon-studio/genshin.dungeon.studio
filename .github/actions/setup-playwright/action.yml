@@ -26,10 +26,10 @@ runs:
         path: ~/.cache/ms-playwright
         key: ${{ runner.os }}-playwright-${{ steps.playwright.outputs.version }}
 
-    # No `--with-deps`: the ubuntu-latest image already carries Chromium's
-    # shared libraries, and the extra fonts it would add cost an apt mirror
-    # round trip that has stalled a run for ten minutes. A runner image that
-    # drops a library fails Playwright's host check by name.
+    # The ubuntu-latest image ships Chromium's shared libraries. Installing
+    # system dependencies would add only fonts, through an apt mirror slow
+    # enough to stall the job. If an image drops a library, Playwright's host
+    # check names it.
     - name: Install Playwright Chromium
       if: steps.cache.outputs.cache-hit != 'true'
       shell: bash

@@ -29,10 +29,9 @@ const target = process.env.E2E_BASE_URL;
 
 const ci = Boolean(process.env.CI);
 
-// Each spec adds its full runtime to every pull request, since the suite runs
-// on one worker. The budget sits at about three times the slowest test step
-// measured on develop (98 seconds, October 2026), so a suite that has tripled
-// fails rather than drifting.
+// On one worker, every new spec adds its full runtime to each pull request.
+// The budget is about three times the slowest test step measured in #1949, so
+// a suite that triples fails.
 const TEST_BUDGET_MS = 5 * 60_000;
 
 const junitReporter: ReporterDescription = [
