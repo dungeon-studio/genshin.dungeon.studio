@@ -226,7 +226,8 @@ jobs:
   e2e:
     name: Run end-to-end tests
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # The test budget in playwright.config.ts plus setup on cold caches.
+    timeout-minutes: 10
 
     env:
       # renovate: datasource=java-version depName=java

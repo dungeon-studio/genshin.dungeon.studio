@@ -27,6 +27,13 @@ const API_URL = 'http://localhost:8080';
 // what the suite is talking to.
 const target = process.env.E2E_BASE_URL;
 
+const ci = Boolean(process.env.CI);
+
+// On one worker, every new spec adds its full runtime to each pull request.
+// The budget is about three times the slowest test step measured in #1949, so
+// a suite that triples fails.
+const TEST_BUDGET_MS = 5 * 60_000;
+
 const junitReporter: ReporterDescription = [
   'junit',
   { outputFile: path.join(import.meta.dirname, 'test-results/e2e-junit.xml') },
@@ -42,13 +49,14 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
 
-  forbidOnly: Boolean(process.env.CI),
-  retries: process.env.CI ? 1 : 0,
+  forbidOnly: ci,
+  retries: ci ? 1 : 0,
+  globalTimeout: ci ? TEST_BUDGET_MS : 0,
 
   // JUnit sits in the workspace beside vitest's, not under artifactRoot: it is
   // the report Codecov ingests, not a debugging artifact. A failing run is the
   // one test analytics needs, so every run writes it.
-  reporter: process.env.CI
+  reporter: ci
     ? [
         ['github'],
         junitReporter,
@@ -78,14 +86,14 @@ export default defineConfig({
           command: 'pnpm --filter @genshin/api dev',
           cwd: repoRoot,
           url: API_URL,
-          reuseExistingServer: !process.env.CI,
+          reuseExistingServer: !ci,
           timeout: 120_000,
         },
         {
           command: 'pnpm exec vite',
           cwd: path.join(repoRoot, 'apps/web'),
           url: WEB_URL,
-          reuseExistingServer: !process.env.CI,
+          reuseExistingServer: !ci,
           timeout: 120_000,
         },
       ],
