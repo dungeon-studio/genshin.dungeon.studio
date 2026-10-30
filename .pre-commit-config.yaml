@@ -68,7 +68,7 @@ repos:
         args: [--write, -i, '2', -ci]
 
   - repo: https://github.com/errata-ai/vale
-    rev: v3.24.0
+    rev: v3.25.1
     hooks:
       - id: vale
         args: [--config=.vale.ini]
