@@ -61,7 +61,7 @@
       "versioning": "node"
     },
     {
-      "description": "Leave devcontainer features to the annotated feature-digest manager, since the built-in manager can't see the tag a digest-only feature reference tracks",
+      "description": "Stop the built-in devcontainer manager from updating features, since on a digest-only reference it follows the latest tag across majors and duplicates the annotated feature manager's updates",
       "matchManagers": ["devcontainer"],
       "matchDepTypes": ["feature"],
       "enabled": false
