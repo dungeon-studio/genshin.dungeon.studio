@@ -2,27 +2,35 @@
   // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
   // SPDX-License-Identifier: MIT
   "name": "Genshin Planner",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:24",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:24@sha256:85bf802bec074be0be2fc4229ca4d3882c6f9c9bfda1de7995d025257778514c",
 
   "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/devcontainers-extra/features/act:1": {},
-    "ghcr.io/devcontainers/features/node:2": {
+    // renovate: tag=1
+    "ghcr.io/devcontainers/features/github-cli@sha256:bd7ab48a832228f633239277552c30b353867fef2e5b037e064b4e64f0b843f2": {},
+    // renovate: tag=1
+    "ghcr.io/devcontainers-extra/features/act@sha256:db4a2194930d1f7ec62822d4f600dd2fa4aff3c33b98cdb0b578b64ffb10924c": {},
+    // renovate: tag=2
+    "ghcr.io/devcontainers/features/node@sha256:2a19d3b0b3879437637cfd292eb29fee0afcfbe6364e33db9afc4f80c5c1f956": {
       "version": "24.22.2"
     },
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+    // renovate: tag=1
+    "ghcr.io/devcontainers/features/docker-outside-of-docker@sha256:698f5900fac471e046c6e9d4333fec88c0e8d952c713494fa0712dce80baeca0": {
       "moby": false
     },
-    "ghcr.io/devcontainers/features/terraform:1": {
+    // renovate: tag=1
+    "ghcr.io/devcontainers/features/terraform@sha256:bc9eaf21aaba050bace59f411c282cb58058535a48232c059e60c19f86caa8f5": {
       // renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
       "version": "1.17.1"
     },
-    "ghcr.io/devcontainers-extra/features/pre-commit:2": {},
-    "ghcr.io/shinepukur/devcontainer-features/vale:1": {
+    // renovate: tag=2
+    "ghcr.io/devcontainers-extra/features/pre-commit@sha256:6e0bb2ce80caca1d94f44dab5d0653d88a1c00984e590adb7c6bce012d0ade6e": {},
+    // renovate: tag=1
+    "ghcr.io/shinepukur/devcontainer-features/vale@sha256:471dc747f226bd16f660630d32bfe5142b5d500cf78e11d5289cf197652a68c1": {
       // renovate: datasource=github-tags depName=errata-ai/vale extractVersion=^v(?<version>.+)$
       "version": "3.24.0"
     },
-    "ghcr.io/devcontainers/features/java:1": {
+    // renovate: tag=1
+    "ghcr.io/devcontainers/features/java@sha256:61a839211feda1e2a1f10646648a948e733e4d98d770f3a4b6698a3c5fc92abe": {
       "version": "21",
       "installGradle": false,
       "installMaven": false

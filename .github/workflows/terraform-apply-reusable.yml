@@ -21,7 +21,7 @@ env:
 jobs:
   terraform-apply:
     name: Run terraform apply
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     environment: ${{ inputs.environment }}
     permissions:
