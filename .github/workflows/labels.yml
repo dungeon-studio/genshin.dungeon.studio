@@ -24,7 +24,7 @@ jobs:
   # arrive.
   autolabel:
     name: Label pull request
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
       pull-requests: write

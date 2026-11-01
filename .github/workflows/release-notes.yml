@@ -25,7 +25,7 @@ jobs:
   # to the main merge commit so the tag lands on main per git flow.
   draft:
     name: Update release draft
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
       contents: write

@@ -28,7 +28,7 @@ jobs:
   # one is the only available signal.
   renovate-liveness:
     name: Check Renovate liveness
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
 
     steps:
@@ -78,7 +78,7 @@ jobs:
   # certificate, a Firebase quota or policy change, or DNS drift. Never blocks.
   deployed-environment:
     name: Check the deployed environment
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: read
@@ -130,7 +130,7 @@ jobs:
 
   stale-pull-requests:
     name: Prune stale pull requests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       # `actions: write` is omitted: it covers only the resume cache, so a

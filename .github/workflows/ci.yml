@@ -29,7 +29,7 @@ jobs:
   # package once. Splitting this per package costs that.
   workspace:
     name: Build and test workspace
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
 
     steps:
@@ -114,7 +114,7 @@ jobs:
   # no workspace build.
   schema-compat:
     name: Check schema compatibility
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     if: github.event_name == 'pull_request'
 
@@ -144,7 +144,7 @@ jobs:
   # only this job exercises the root script and the turbo `dev` graph.
   dev-smoke:
     name: Smoke-test dev stack
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
 
     env:
@@ -177,7 +177,7 @@ jobs:
   # incapable of writing.
   integration:
     name: Test against Firestore
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
 
     env:
@@ -225,7 +225,7 @@ jobs:
   # the only check needing a JDK and a browser, and turbo cannot schedule either.
   e2e:
     name: Run end-to-end tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # The test budget in playwright.config.ts plus setup on cold caches.
     timeout-minutes: 10
 
@@ -274,7 +274,7 @@ jobs:
   # without touching this file.
   pre-commit:
     name: Run pre-commit hooks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
 
     env:
@@ -327,7 +327,7 @@ jobs:
   # commit range so it scans only the diff, not a snapshot.
   secrets:
     name: Scan for verified secrets
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
 
     steps:
@@ -352,7 +352,7 @@ jobs:
   # hook, which the pre-commit job above runs.
   workflow-audit:
     name: Audit workflows
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: read
@@ -379,7 +379,7 @@ jobs:
       !cancelled() &&
       (github.event_name != 'pull_request' ||
       needs.terraform-changes.outputs.scan == 'true')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: read
@@ -434,7 +434,7 @@ jobs:
     name: Scan Terraform
     needs: [terraform-changes, trivy-terraform]
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
 
     steps:
@@ -448,7 +448,7 @@ jobs:
   terraform-changes:
     name: Detect Terraform changes
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       plan: ${{ steps.plan-diff.outputs.changed }}
@@ -491,7 +491,7 @@ jobs:
     name: Plan environment infrastructure
     needs: terraform-changes
     if: needs.terraform-changes.outputs.plan == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: read
@@ -589,7 +589,7 @@ jobs:
     name: Plan infrastructure
     needs: [terraform-changes, terraform-plan]
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
 
     steps:
@@ -599,7 +599,7 @@ jobs:
 
   trivy-dockerfile:
     name: Scan Dockerfile
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: read
@@ -629,7 +629,7 @@ jobs:
 
   trivy-dependencies:
     name: Scan dependencies
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
 
     steps:
@@ -668,7 +668,7 @@ jobs:
   # the upload.
   container:
     name: Scan and smoke-test container
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: read
@@ -746,7 +746,7 @@ jobs:
   # `tools/e2e/package.json` pins the Playwright browsers.
   toolchain:
     name: Verify toolchain
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Headroom for a cold build.
     timeout-minutes: 30
 
@@ -786,7 +786,7 @@ jobs:
   # has to fail here first.
   release-draft:
     name: Preview release draft
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
       contents: read
@@ -804,7 +804,7 @@ jobs:
   # fail here first.
   stale-pull-requests:
     name: Preview stale pull request pruning
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: read
