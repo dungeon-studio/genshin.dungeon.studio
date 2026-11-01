@@ -61,6 +61,12 @@
       "versioning": "node"
     },
     {
+      "description": "Leave devcontainer features to the annotated feature-digest manager, since the built-in manager can't see the tag a digest-only feature reference tracks",
+      "matchManagers": ["devcontainer"],
+      "matchDepTypes": ["feature"],
+      "enabled": false
+    },
+    {
       "description": "Keep deploy-cloudrun majors manual: it has no dry-run mode, so no required check can exercise it before it deploys",
       "matchPackageNames": ["google-github-actions/deploy-cloudrun"],
       "matchUpdateTypes": ["major"],
@@ -82,6 +88,15 @@
       "managerFilePatterns": [".devcontainer/devcontainer.json"],
       "matchStrings": [
         "// renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s+\"version\": \"(?<currentValue>[^\"]+)\""
+      ]
+    },
+    {
+      "customType": "regex",
+      "description": "Track devcontainer features pinned by digest alone, reading the tag each one follows from its annotation, because the devcontainers CLI rejects a tag and digest together on a feature",
+      "managerFilePatterns": [".devcontainer/devcontainer.json"],
+      "datasourceTemplate": "docker",
+      "matchStrings": [
+        "// renovate: tag=(?<currentValue>[^\\s]+)\\s+\"(?<depName>[^\"@]+)@(?<currentDigest>sha256:[a-f0-9]{64})\""
       ]
     }
   ]
