@@ -61,7 +61,7 @@
       "versioning": "node"
     },
     {
-      "description": "Stop the built-in devcontainer manager from updating features, since on a digest-only reference it follows the latest tag across majors and duplicates the annotated feature manager's updates",
+      "description": "Leave devcontainer features to their annotations: on a digest-only feature the devcontainer manager follows the latest tag across majors",
       "matchManagers": ["devcontainer"],
       "matchDepTypes": ["feature"],
       "enabled": false
@@ -92,7 +92,7 @@
     },
     {
       "customType": "regex",
-      "description": "Track devcontainer features pinned by digest alone, reading the tag each one follows from its annotation, because the devcontainers CLI rejects a tag and digest together on a feature",
+      "description": "Track each devcontainer feature's digest within its annotated tag: the devcontainers CLI rejects a feature reference carrying both",
       "managerFilePatterns": [".devcontainer/devcontainer.json"],
       "datasourceTemplate": "docker",
       "matchStrings": [
