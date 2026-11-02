@@ -13,7 +13,7 @@ java = "temurin-25.0.5+8.0.LTS"
 node = "24.22.2"
 # Keep equal to package.json's packageManager, which pnpm and the API image's
 # corepack read.
-pnpm = "12.15.0"
+pnpm = "12.16.1"
 # pipx: reuse-tool publishes only to PyPI.
 "pipx:reuse" = "6.3.0"
 terraform = "1.17.1"
