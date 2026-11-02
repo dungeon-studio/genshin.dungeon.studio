@@ -55,6 +55,7 @@ ignore:
   - .claude
   - .devcontainer
   - .github
+  - .mise
   - .reuse
   - .styles
   - .vscode

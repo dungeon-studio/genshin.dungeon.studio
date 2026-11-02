@@ -16,7 +16,7 @@ This guide covers setting up the project **without DevContainers**.
 The setup script installs most tooling, pnpm included. You only need these on
 your host before running it:
 
-- **Node.js** at the version in `.nvmrc` (`node --version`)
+- **Node.js** at the version in `mise.toml` (`node --version`)
 - **Java** 21+, required by Firebase emulators (`java -version`)
 - **GitHub CLI** (`gh --version`)
 - **pre-commit** (`pre-commit --version`)

@@ -11,6 +11,8 @@ SPDX-PackageDownloadLocation = "https://github.com/dungeon-studio/genshin.dungeo
 [[annotations]]
 path = [
   "pnpm-lock.yaml",
+  "mise.lock",
+  ".mise/locks/**",
   ".turbo",
   ".turbo/**",
   "dist",
@@ -55,7 +57,7 @@ SPDX-FileCopyrightText = "2015 Titus Wormer and contributors"
 SPDX-License-Identifier = "MIT"
 
 [[annotations]]
-path = ["**.json", "**/schema-snapshots/**.retired", ".prettierrc", ".nvmrc"]
+path = ["**.json", "**/schema-snapshots/**.retired", ".prettierrc"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
 SPDX-License-Identifier = "MIT"

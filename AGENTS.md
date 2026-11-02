@@ -180,7 +180,7 @@ is configured in `.vscode/mcp.json`.
 - GCP projects use `dungeon-studio-genshin-{env}`; `shared` and `core` are production-grade infrastructure.
 - Apply environment labels on creation with `gcloud alpha projects update --update-labels=environment=VALUE`.
 - Enable Google Cloud APIs on demand when required by active work.
-- The Terraform version is set once per workflow as the `TERRAFORM_VERSION` environment variable. When changing it, keep every workflow that declares it aligned.
+- Workflows install Terraform, like every tool in the root `mise.toml`, through `jdx/mise-action` with `install_args` naming the tools the job needs. Change a tool's version in `mise.toml` and regenerate `mise.lock` with `mise lock`.
 - Terraform files need SPDX headers using `#` comment syntax.
 
 ## Docker rules
