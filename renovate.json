@@ -62,14 +62,14 @@
       "groupSlug": "{{{replace '/' '-' packageName}}}"
     },
     {
-      "description": "Join mise's reuse, which installs from PyPI, to the reuse-tool group the pre-commit hook and install script share",
+      "description": "Group mise's reuse, which Renovate looks up on PyPI, with the other fsfe/reuse-tool pins",
       "matchManagers": ["mise"],
       "matchPackageNames": ["reuse"],
       "groupName": "fsfe/reuse-tool",
       "groupSlug": "fsfe-reuse-tool"
     },
     {
-      "description": "Leave mise's generated tool lock environments to mise lock, which rewrites them when it bumps the tool in mise.toml",
+      "description": "Skip the dependency files mise lock generates under .mise/",
       "matchFileNames": [".mise/**"],
       "enabled": false
     },

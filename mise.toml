@@ -6,14 +6,14 @@ locked = true
 lockfile_platforms = ["linux-x64"]
 
 [tools]
-# github: for the musl build. aqua ships only the gnu build, which needs glibc
-# 2.38+, and the Debian 12 devcontainer has 2.36.
+# github: for the static musl build, which has no glibc floor. aqua ships
+# only the gnu build.
 "github:lycheeverse/lychee" = { version = "0.24.2", version_prefix = "lychee-v", matching = "musl" }
 java = "temurin-25.0.5+8.0.LTS"
 node = "24.22.2"
 # Keep equal to package.json's packageManager, which pnpm and the API image's
 # corepack read.
 pnpm = "12.15.0"
-# pipx: because reuse-tool publishes only to PyPI, with no aqua entry.
+# pipx: reuse-tool publishes only to PyPI.
 "pipx:reuse" = "6.2.0"
 terraform = "1.17.1"

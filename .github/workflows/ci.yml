@@ -153,8 +153,8 @@ jobs:
         with:
           persist-credentials: false
 
-      # The Firestore emulator is a Java process. Installing mise.toml's JDK
-      # keeps the job off whatever one the runner image bakes in.
+      # The Firestore emulator runs on Java, pinned so the job ignores the
+      # runner image's JDK.
       - uses: ./.github/actions/setup-node-pnpm
         with:
           tools: java
@@ -184,8 +184,8 @@ jobs:
         with:
           persist-credentials: false
 
-      # The Firestore emulator is a Java process. Installing mise.toml's JDK
-      # keeps the job off whatever one the runner image bakes in.
+      # The Firestore emulator runs on Java, pinned so the job ignores the
+      # runner image's JDK.
       - uses: ./.github/actions/setup-node-pnpm
         with:
           tools: java
@@ -231,8 +231,8 @@ jobs:
         with:
           persist-credentials: false
 
-      # The Firestore emulator is a Java process. Installing mise.toml's JDK
-      # keeps the job off whatever one the runner image bakes in.
+      # The Firestore emulator runs on Java, pinned so the job ignores the
+      # runner image's JDK.
       - uses: ./.github/actions/setup-node-pnpm
         with:
           tools: java

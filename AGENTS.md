@@ -69,6 +69,7 @@ Terraform, or workflow. Read it from an environment variable.
 - Every workspace `tsconfig.json` extends `@genshin/tsconfig` and never re-declares a strictness flag; those belong in the shared config. Keep local only the options TypeScript resolves relative to the declaring file (`outDir`, `rootDir`, `paths`, `include`) and the platform axis (`module`, `moduleResolution`, `lib`, `types`, `jsx`).
 - The API uses `tsconfig.json` (includes tests) for typechecking and `tsconfig.build.json` (excludes tests) for emit. The build config extends `tsconfig.json`, so compiler options stay in sync automatically; only the exclude patterns differ.
 - When `tsconfig.json` uses project references, type-check with `tsc -b --noEmit`. Plain `tsc --noEmit` won't follow references.
+- Workflows install tools from the root `mise.toml`, naming each by its `mise.toml` key: through the `tools` input of `.github/actions/setup-node-pnpm` in a job that needs Node.js, otherwise through `jdx/mise-action`'s `install_args`. After changing a version in `mise.toml`, run `mise lock`.
 - [Where a check runs](docs/reference/workflow-conventions.md#where-a-check-runs) decides whether a new check is a pre-commit hook or a workflow job.
 
 ## API design rules
@@ -180,7 +181,6 @@ is configured in `.vscode/mcp.json`.
 - GCP projects use `dungeon-studio-genshin-{env}`; `shared` and `core` are production-grade infrastructure.
 - Apply environment labels on creation with `gcloud alpha projects update --update-labels=environment=VALUE`.
 - Enable Google Cloud APIs on demand when required by active work.
-- Workflows install Terraform, like every tool in the root `mise.toml`, through `jdx/mise-action` with `install_args` naming the tools the job needs. Change a tool's version in `mise.toml` and regenerate `mise.lock` with `mise lock`.
 - Terraform files need SPDX headers using `#` comment syntax.
 
 ## Docker rules
