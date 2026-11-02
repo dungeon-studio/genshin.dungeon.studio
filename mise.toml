@@ -15,5 +15,5 @@ node = "24.22.2"
 # corepack read.
 pnpm = "12.15.0"
 # pipx: reuse-tool publishes only to PyPI.
-"pipx:reuse" = "6.2.0"
+"pipx:reuse" = "6.3.0"
 terraform = "1.17.1"
