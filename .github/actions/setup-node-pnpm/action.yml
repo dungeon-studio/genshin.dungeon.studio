@@ -3,16 +3,25 @@
 # SPDX-License-Identifier: MIT
 
 name: Setup Node.js and pnpm
-description: Install Node.js and pnpm from mise.toml, and restore dependency cache
+description: Install Node.js, pnpm, and any other tools the job needs from mise.toml, and restore dependency cache
+
+inputs:
+  tools:
+    description: >-
+      Space-separated mise.toml tool keys to install alongside Node.js and
+      pnpm, spelled as the key appears there (for example
+      `github:lycheeverse/lychee`)
+    required: false
+    default: ''
 
 runs:
   using: composite
 
   steps:
-    - name: Install Node.js and pnpm
+    - name: Install tools
       uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
       with:
-        install_args: node pnpm
+        install_args: node pnpm ${{ inputs.tools }}
 
     - name: Get pnpm store directory
       id: pnpm-store

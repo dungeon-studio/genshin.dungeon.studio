@@ -68,10 +68,8 @@ jobs:
           service_account: ${{ secrets.GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL }}
 
       - uses: ./.github/actions/setup-node-pnpm
-
-      - uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
         with:
-          install_args: terraform
+          tools: terraform
 
       - name: Read Firebase Config from Terraform
         id: firebase-config

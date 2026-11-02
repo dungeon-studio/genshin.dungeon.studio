@@ -153,7 +153,11 @@ jobs:
         with:
           persist-credentials: false
 
+      # The Firestore emulator is a Java process. Installing mise.toml's JDK
+      # keeps the job off whatever one the runner image bakes in.
       - uses: ./.github/actions/setup-node-pnpm
+        with:
+          tools: java
 
       - uses: ./.github/actions/setup-firebase-emulators
 
@@ -180,7 +184,11 @@ jobs:
         with:
           persist-credentials: false
 
+      # The Firestore emulator is a Java process. Installing mise.toml's JDK
+      # keeps the job off whatever one the runner image bakes in.
       - uses: ./.github/actions/setup-node-pnpm
+        with:
+          tools: java
 
       - uses: ./.github/actions/setup-firebase-emulators
 
@@ -223,7 +231,11 @@ jobs:
         with:
           persist-credentials: false
 
+      # The Firestore emulator is a Java process. Installing mise.toml's JDK
+      # keeps the job off whatever one the runner image bakes in.
       - uses: ./.github/actions/setup-node-pnpm
+        with:
+          tools: java
 
       - uses: ./.github/actions/setup-firebase-emulators
 
@@ -269,13 +281,10 @@ jobs:
         with:
           persist-credentials: false
 
+      # Hooks call terraform, lychee, and trivy from PATH.
       - uses: ./.github/actions/setup-node-pnpm
-
-      # Hooks call the tools below from PATH.
-      - name: Install Terraform and lychee
-        uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
         with:
-          install_args: terraform lychee
+          tools: terraform github:lycheeverse/lychee
 
       - name: Install Trivy
         run: |

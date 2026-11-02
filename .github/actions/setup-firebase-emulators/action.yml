@@ -3,19 +3,14 @@
 # SPDX-License-Identifier: MIT
 
 name: Setup Firebase emulators
-description: Install the JDK the emulators run on and restore their downloaded artifacts
+description: >-
+  Restore the emulators' downloaded artifacts. The caller installs Java first,
+  through setup-node-pnpm's `tools` input.
 
 runs:
   using: composite
 
   steps:
-    # The Firestore emulator is a Java process. Pinning it here keeps the jobs
-    # off whatever JDK happens to be baked into the runner image.
-    - name: Install Java
-      uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
-      with:
-        install_args: java
-
     # From the manifest, which syncpack keeps pinned exact: `pnpm exec` writes
     # warnings to the same stream as the version it reports, and both would land
     # in GITHUB_OUTPUT.
