@@ -44,21 +44,15 @@ quietly() {
 }
 
 # One list feeds both verification and the version summary so they can't
-# drift apart. It covers every tool the container provisions, by feature or by
-# script.
+# drift apart. It covers every tool the container provisions outside
+# mise.toml; `mise ls` reports on mise.toml's own tools.
 for_each_tool() {
   local action="$1"
-  "${action}" "node" node --version
-  "${action}" "pnpm" pnpm --version
+  "${action}" "mise" mise --version
   "${action}" "docker" docker --version
   "${action}" "gh" gh --version
   "${action}" "gcloud" gcloud --version
-  "${action}" "terraform" terraform version
-  "${action}" "java" java -version
   "${action}" "pre-commit" pre-commit --version
-  "${action}" "reuse" reuse --version
-  "${action}" "vale" vale --version
-  "${action}" "lychee" lychee --version
   "${action}" "firebase" pnpm exec firebase --version
   "${action}" "playwright" pnpm --filter @genshin/e2e exec playwright --version
 }
@@ -66,6 +60,7 @@ for_each_tool() {
 check_tools() {
   step "Verifying installed tools"
 
+  verify "mise.toml tools" test -z "$(mise ls --local --missing)"
   for_each_tool verify
   # The browsers install separately from the CLI and report no version, so
   # only an install check can see them.
@@ -75,6 +70,7 @@ check_tools() {
 show_versions() {
   step "Environment versions"
 
+  mise ls --local --no-header
   for_each_tool print_version
 }
 

@@ -55,6 +55,6 @@ runs the whole workspace through turbo.
 - [ ] `pnpm turbo run typecheck`
 - [ ] `pnpm turbo run test` (if the package has tests)
 - [ ] `pnpm turbo run build`
-- [ ] `pnpm reuse:check`
+- [ ] `pre-commit run reuse --all-files`
 - [ ] `docker build -f apps/api/Dockerfile .` (if the package is an `apps/api`
       runtime dependency)

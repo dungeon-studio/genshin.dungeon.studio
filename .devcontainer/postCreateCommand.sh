@@ -6,15 +6,13 @@ set -euo pipefail
 set -x
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(git -C "${SCRIPT_DIR}" rev-parse --show-toplevel)"
 # shellcheck source-path=SCRIPTDIR
 # shellcheck source=lib.sh
 source "${SCRIPT_DIR}/lib.sh"
 
-step "Installing pnpm via corepack"
+step "Installing mise.toml's tools"
 
-corepack enable
-corepack install
+mise install
 
 step "Installing Google Cloud CLI"
 
@@ -30,14 +28,6 @@ pnpm install
 step "Installing pre-commit hooks"
 
 pre-commit install
-
-step "Installing reuse-tool for SPDX license compliance"
-
-"${REPO_ROOT}/scripts/install-reuse.sh"
-
-step "Installing lychee link checker"
-
-"${REPO_ROOT}/scripts/install-lychee.sh"
 
 step "Installing Playwright Chromium and Chrome"
 

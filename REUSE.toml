@@ -12,7 +12,6 @@ SPDX-PackageDownloadLocation = "https://github.com/dungeon-studio/genshin.dungeo
 path = [
   "pnpm-lock.yaml",
   "mise.lock",
-  ".mise/locks/**",
   ".turbo",
   ".turbo/**",
   "dist",

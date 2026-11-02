@@ -3,10 +3,6 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
 
-  // `reuse` is a Python tool installed via scripts/install-reuse.sh, not an npm
-  // package; the `reuse:check` script invokes it as a binary knip can't resolve.
-  "ignoreBinaries": ["reuse"],
-
   "workspaces": {
     ".": {
       // `turbo gen` discovers its generator by path, so knip sees no importer.
