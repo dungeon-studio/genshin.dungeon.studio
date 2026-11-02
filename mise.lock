@@ -35,10 +35,9 @@ checksum = "sha256:361718c444e49af2ca5a110c83ba6a8901143f23ab285ebbef0341f391f48
 url = "https://nodejs.org/dist/v24.22.2/node-v24.22.2-linux-x64.tar.gz"
 
 [[tools."pipx:reuse"]]
-version = "6.2.0"
+version = "6.3.0"
 backend = "pipx:reuse"
-specifiers = ["6.2.0"]
-uv = { path = ".mise/locks/pipx-reuse/6.2.0", digest = "sha256:56ba9694b06fba2b93356d4442e0b5b80367dd7d89831588c7d4bdc50bf7e744" }
+specifiers = ["6.3.0"]
 
 [[tools.pnpm]]
 version = "12.15.0"
