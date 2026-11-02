@@ -50,9 +50,28 @@
     },
     {
       "description": "Update each of these dependencies in its own pull request that moves every pin at once, so develop never holds two versions of it",
-      "matchDepNames": ["hashicorp/terraform", "fsfe/reuse-tool", "node", "errata-ai/vale"],
-      "groupName": "{{depName}}",
-      "groupSlug": "{{depNameSanitized}}"
+      "matchPackageNames": [
+        "hashicorp/terraform",
+        "fsfe/reuse-tool",
+        "lycheeverse/lychee",
+        "node",
+        "pnpm",
+        "errata-ai/vale"
+      ],
+      "groupName": "{{packageName}}",
+      "groupSlug": "{{{replace '/' '-' packageName}}}"
+    },
+    {
+      "description": "Group mise's reuse, which Renovate looks up on PyPI, with the other fsfe/reuse-tool pins",
+      "matchManagers": ["mise"],
+      "matchPackageNames": ["reuse"],
+      "groupName": "fsfe/reuse-tool",
+      "groupSlug": "fsfe-reuse-tool"
+    },
+    {
+      "description": "Skip the dependency files mise lock generates under .mise/",
+      "matchFileNames": [".mise/**"],
+      "enabled": false
     },
     {
       "description": "Move engines and @types/node to a new Node.js major only once it reaches LTS",

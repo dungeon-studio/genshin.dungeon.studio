@@ -22,7 +22,8 @@ on:
       # under.
       - 'package.json'
       - 'pnpm-workspace.yaml'
-      - '.nvmrc'
+      - 'mise.toml'
+      - 'mise.lock'
       - 'turbo.json'
       # The API image's build context.
       - '.dockerignore'
@@ -34,10 +35,6 @@ on:
 
 permissions:
   contents: read
-
-env:
-  # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
-  TERRAFORM_VERSION: '1.17.1'
 
 # Only one deploy per ref at a time. Cloud Run and the `:develop` image tag
 # are single mutable targets, so concurrent runs race: an older run's health
@@ -71,11 +68,8 @@ jobs:
           service_account: ${{ secrets.GCP_RW_DEV_SERVICE_ACCOUNT_EMAIL }}
 
       - uses: ./.github/actions/setup-node-pnpm
-
-      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
-          terraform_version: ${{ env.TERRAFORM_VERSION }}
-          terraform_wrapper: false
+          tools: terraform
 
       - name: Read Firebase Config from Terraform
         id: firebase-config

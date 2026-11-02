@@ -3,25 +3,14 @@
 # SPDX-License-Identifier: MIT
 
 name: Setup Firebase emulators
-description: Install the JDK the emulators run on and restore their downloaded artifacts
-
-inputs:
-  java-version:
-    description: JDK version for the emulators. Renovate tracks it in the caller's env block.
-    required: true
+description: >-
+  Restore the emulators' downloaded artifacts. The caller installs Java first,
+  through setup-node-pnpm's `tools` input.
 
 runs:
   using: composite
 
   steps:
-    # The Firestore emulator is a Java process. Pinning it here keeps the jobs
-    # off whatever JDK happens to be baked into the runner image.
-    - name: Set up Java
-      uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
-      with:
-        distribution: temurin
-        java-version: ${{ inputs.java-version }}
-
     # From the manifest, which syncpack keeps pinned exact: `pnpm exec` writes
     # warnings to the same stream as the version it reports, and both would land
     # in GITHUB_OUTPUT.

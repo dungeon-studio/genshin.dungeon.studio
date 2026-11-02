@@ -147,21 +147,19 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
 
-    env:
-      # renovate: datasource=java-version depName=java
-      JAVA_VERSION: '25.0.5+8.0.LTS'
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
+      # The Firestore emulator runs on Java, pinned so the job ignores the
+      # runner image's JDK.
       - uses: ./.github/actions/setup-node-pnpm
+        with:
+          tools: java
 
       - uses: ./.github/actions/setup-firebase-emulators
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
 
       # The stack starts behind `firebase emulators:exec`, so the first
       # readiness check absorbs emulator startup — and the emulator download on
@@ -180,21 +178,19 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
 
-    env:
-      # renovate: datasource=java-version depName=java
-      JAVA_VERSION: '25.0.5+8.0.LTS'
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
+      # The Firestore emulator runs on Java, pinned so the job ignores the
+      # runner image's JDK.
       - uses: ./.github/actions/setup-node-pnpm
+        with:
+          tools: java
 
       - uses: ./.github/actions/setup-firebase-emulators
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
 
       # Coverage lives in the script rather than a `--` passthrough, which would
       # reach `firebase emulators:exec` instead of the vitest run inside it.
@@ -229,21 +225,19 @@ jobs:
     # The test budget in playwright.config.ts plus setup on cold caches.
     timeout-minutes: 10
 
-    env:
-      # renovate: datasource=java-version depName=java
-      JAVA_VERSION: '25.0.5+8.0.LTS'
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
+      # The Firestore emulator runs on Java, pinned so the job ignores the
+      # runner image's JDK.
       - uses: ./.github/actions/setup-node-pnpm
+        with:
+          tools: java
 
       - uses: ./.github/actions/setup-firebase-emulators
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
 
       - uses: ./.github/actions/setup-playwright
 
@@ -278,8 +272,6 @@ jobs:
     timeout-minutes: 10
 
     env:
-      # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
-      TERRAFORM_VERSION: '1.17.1'
       # renovate: datasource=github-releases depName=aquasecurity/trivy extractVersion=^v(?<version>.+)$
       TRIVY_VERSION: '0.76.1'
 
@@ -289,13 +281,10 @@ jobs:
         with:
           persist-credentials: false
 
+      # Hooks call terraform, lychee, and trivy from PATH.
       - uses: ./.github/actions/setup-node-pnpm
-
-      # Hooks call the tools below from PATH.
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
-          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          tools: terraform github:lycheeverse/lychee
 
       - name: Install Trivy
         run: |
@@ -304,9 +293,6 @@ jobs:
           curl -fsSL \
             "${TRIVY_URL}/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" \
             | sudo tar -xz -C /usr/local/bin trivy
-
-      - name: Install lychee
-        run: scripts/install-lychee.sh
 
       - name: Run hooks
         uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
@@ -498,10 +484,6 @@ jobs:
       id-token: write
       pull-requests: write
 
-    env:
-      # renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
-      TERRAFORM_VERSION: '1.17.1'
-
     strategy:
       fail-fast: false
       matrix:
@@ -512,9 +494,9 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+      - uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
         with:
-          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          install_args: terraform
 
       # Each environment maps to an explicit secret, because CodeQL flags
       # dynamic secret indexing as actions/excessive-secrets-exposure.
