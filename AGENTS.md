@@ -169,7 +169,7 @@ header describes the layout they sit in. Read both before adding a line.
 - Pin a standalone CLI or runtime in `mise.toml` when mise has it in its `core` or `aqua` backend, so the DevContainer and CI install the same version.
 - Otherwise provision the tool through a `devcontainer.json` feature when one publishes it. The image build caches a feature; every step in `.devcontainer/postCreateCommand.sh` runs again on each container create.
 - Add a `postCreateCommand.sh` step when neither covers the tool, or when the step needs the checked-out repository. Dependency installs, hook installs, and workspace-pinned browsers all need the repository.
-- Add every tool provisioned outside `mise.toml` to `for_each_tool` in `.devcontainer/lib.sh`. The toolchain check runs `mise ls --missing` for `mise.toml`'s tools. A tool missing from both breaks on a contributor's machine instead of in the `Verify toolchain` job.
+- Add every tool provisioned outside `mise.toml` to `for_each_tool` in `.devcontainer/lib.sh`; the toolchain check covers `mise.toml`'s own tools. An unlisted tool breaks on a contributor's machine instead of in the `Verify toolchain` job.
 
 ## Playwright MCP rules
 

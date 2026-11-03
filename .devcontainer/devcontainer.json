@@ -80,14 +80,14 @@
 
   "containerEnv": {
     "NODE_ENV": "development",
-    // The container exists to work on this checkout, so it trusts its mise.toml.
+    // The container exists only to work on this checkout.
     "MISE_TRUSTED_CONFIG_PATHS": "${containerWorkspaceFolder}"
   },
 
-  // The shims put mise.toml's versions ahead of the base image's Node.js and
-  // pnpm, in lifecycle commands as well as terminals. Setting PATH here
-  // replaces the one probed from the login shell, so this re-adds the
-  // pre-commit feature's directory, which only /etc/bash.bashrc puts on PATH.
+  // The base image's login profile puts its own Node.js and pnpm first, so
+  // only remoteEnv can put the shims ahead of them. This PATH replaces the
+  // login shell's, so it re-adds the pre-commit feature's directory, which
+  // only /etc/bash.bashrc adds.
   "remoteEnv": {
     "PATH": "/home/node/.local/share/mise/shims:${containerEnv:PATH}:/usr/local/py-utils/bin"
   },

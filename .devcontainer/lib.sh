@@ -45,7 +45,7 @@ quietly() {
 
 # One list feeds both verification and the version summary so they can't
 # drift apart. It covers every tool the container provisions outside
-# mise.toml; `mise ls` reports on mise.toml's own tools.
+# mise.toml, whose tools `mise ls` covers.
 for_each_tool() {
   local action="$1"
   "${action}" "mise" mise --version

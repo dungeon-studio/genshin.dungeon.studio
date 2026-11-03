@@ -13,9 +13,8 @@ This guide covers setting up the project **without DevContainers**.
 
 ## Prerequisites
 
-The setup script installs most tooling: [mise](https://mise.jdx.dev) installs
-the versions `mise.toml` pins, and the script adds everything else. You only need these
-on your host before running it:
+The setup script installs most tooling, using [mise](https://mise.jdx.dev) for
+the versions `mise.toml` pins. Install these on your host before running it:
 
 - **mise** (`mise --version`)
 - **GitHub CLI** (`gh --version`)
