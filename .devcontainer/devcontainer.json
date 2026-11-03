@@ -27,7 +27,7 @@
     // renovate: tag=1
     "ghcr.io/shinepukur/devcontainer-features/vale@sha256:471dc747f226bd16f660630d32bfe5142b5d500cf78e11d5289cf197652a68c1": {
       // renovate: datasource=github-tags depName=errata-ai/vale extractVersion=^v(?<version>.+)$
-      "version": "3.24.0"
+      "version": "3.26.0"
     },
     // renovate: tag=1
     "ghcr.io/devcontainers/features/java@sha256:61a839211feda1e2a1f10646648a948e733e4d98d770f3a4b6698a3c5fc92abe": {
