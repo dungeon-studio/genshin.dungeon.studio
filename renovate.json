@@ -56,22 +56,10 @@
         "lycheeverse/lychee",
         "node",
         "pnpm",
-        "errata-ai/vale"
+        "vale-cli/vale"
       ],
       "groupName": "{{packageName}}",
       "groupSlug": "{{{replace '/' '-' packageName}}}"
-    },
-    {
-      "description": "Group mise's reuse, which Renovate looks up on PyPI, with the other fsfe/reuse-tool pins",
-      "matchManagers": ["mise"],
-      "matchPackageNames": ["reuse"],
-      "groupName": "fsfe/reuse-tool",
-      "groupSlug": "fsfe-reuse-tool"
-    },
-    {
-      "description": "Skip the dependency files mise lock generates under .mise/",
-      "matchFileNames": [".mise/**"],
-      "enabled": false
     },
     {
       "description": "Move engines and @types/node to a new Node.js major only once it reaches LTS",
@@ -93,22 +81,6 @@
     }
   ],
   "customManagers": [
-    {
-      "customType": "regex",
-      "description": "Track annotated *_VERSION pins in shell scripts, including the ${VAR:-default} override form",
-      "managerFilePatterns": ["scripts/*.sh", ".devcontainer/*.sh"],
-      "matchStrings": [
-        "# renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: (?:lookupName|packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?(?: extractVersion=(?<extractVersion>[^\\s]+?))?(?: registryUrl=(?<registryUrl>[^\\s]+?))?\\s+[A-Za-z0-9_]+?_VERSION=[\"']?(?:\\$\\{[A-Za-z0-9_]+:-)?(?<currentValue>[^\"'}\\s]+)\\}?[\"']?\\s"
-      ]
-    },
-    {
-      "customType": "regex",
-      "description": "Track annotated feature versions in devcontainer.json that the devcontainer manager doesn't map to a datasource",
-      "managerFilePatterns": [".devcontainer/devcontainer.json"],
-      "matchStrings": [
-        "// renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s+\"version\": \"(?<currentValue>[^\"]+)\""
-      ]
-    },
     {
       "customType": "regex",
       "description": "Track each devcontainer feature's digest within its annotated tag: the devcontainers CLI rejects a feature reference carrying both",

@@ -13,41 +13,37 @@ This guide covers setting up the project **without DevContainers**.
 
 ## Prerequisites
 
-The setup script installs most tooling, pnpm included. You only need these on
-your host before running it:
+The setup script installs most tooling, using [mise](https://mise.jdx.dev) for
+the versions `mise.toml` pins. Install these on your host before running it:
 
-- **Node.js** at the version in `mise.toml` (`node --version`)
-- **Java** 21+, required by Firebase emulators (`java -version`)
+- **mise** (`mise --version`)
 - **GitHub CLI** (`gh --version`)
 - **pre-commit** (`pre-commit --version`)
 - **jq** (`jq --version`)
 - **pipx** (`pipx --version`)
 - **Docker**, required by the hadolint pre-commit hook (`docker --version`)
-- **Terraform**, required by the Terraform pre-commit hooks (`terraform version`)
-- **Vale**, used by the VS Code Vale extension (`vale --version`). The pre-commit hook builds its own copy, so commits pass without it.
 
 ### Install missing prerequisites
 
-Install [Docker](https://docs.docker.com/engine/install/),
-[Terraform](https://developer.hashicorp.com/terraform/install), and
-[Vale](https://vale.sh/docs/install) from their own platform-specific
-instructions. The commands below cover everything else.
+Install [mise](https://mise.jdx.dev/installing-mise.html) and
+[Docker](https://docs.docker.com/engine/install/) from their own
+platform-specific instructions. The commands below cover everything else.
 
 #### macOS
 
 ```bash
-brew install openjdk@21 gh jq pipx pre-commit
+brew install gh jq pipx pre-commit
 ```
 
 #### Linux / Windows Subsystem for Linux
 
 ```bash
 # Debian/Ubuntu (including most WSL images)
-sudo apt-get install openjdk-21-jre-headless gh jq pipx
+sudo apt-get install gh jq pipx
 pipx install pre-commit
 
 # Fedora
-sudo dnf install java-21-openjdk-headless gh jq pipx
+sudo dnf install gh jq pipx
 pipx install pre-commit
 ```
 
@@ -59,6 +55,9 @@ pipx install pre-commit
 # Clone the repository
 git clone https://github.com/dungeon-studio/genshin.dungeon.studio.git
 cd genshin.dungeon.studio
+
+# Let mise run the tools mise.toml pins
+mise trust
 
 # Run the setup script (installs dependencies, hooks, and verifies tools)
 # NOTE: The script assumes Debian/Ubuntu for the Google Cloud SDK install step.

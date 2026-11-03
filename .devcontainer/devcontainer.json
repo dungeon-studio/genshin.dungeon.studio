@@ -8,33 +8,13 @@
     // renovate: tag=1
     "ghcr.io/devcontainers/features/github-cli@sha256:bd7ab48a832228f633239277552c30b353867fef2e5b037e064b4e64f0b843f2": {},
     // renovate: tag=1
-    "ghcr.io/devcontainers-extra/features/act@sha256:db4a2194930d1f7ec62822d4f600dd2fa4aff3c33b98cdb0b578b64ffb10924c": {},
-    // renovate: tag=2
-    "ghcr.io/devcontainers/features/node@sha256:2a19d3b0b3879437637cfd292eb29fee0afcfbe6364e33db9afc4f80c5c1f956": {
-      "version": "24.22.2"
-    },
+    "ghcr.io/devcontainers-extra/features/mise@sha256:5c389ab1e3c8e44e5e0ff119f6868d54dbb781bc860bd8587dc66209cb8c4a8c": {},
     // renovate: tag=1
     "ghcr.io/devcontainers/features/docker-outside-of-docker@sha256:698f5900fac471e046c6e9d4333fec88c0e8d952c713494fa0712dce80baeca0": {
       "moby": false
     },
-    // renovate: tag=1
-    "ghcr.io/devcontainers/features/terraform@sha256:bc9eaf21aaba050bace59f411c282cb58058535a48232c059e60c19f86caa8f5": {
-      // renovate: datasource=github-releases depName=hashicorp/terraform extractVersion=^v(?<version>.+)$
-      "version": "1.17.1"
-    },
     // renovate: tag=2
-    "ghcr.io/devcontainers-extra/features/pre-commit@sha256:6e0bb2ce80caca1d94f44dab5d0653d88a1c00984e590adb7c6bce012d0ade6e": {},
-    // renovate: tag=1
-    "ghcr.io/shinepukur/devcontainer-features/vale@sha256:471dc747f226bd16f660630d32bfe5142b5d500cf78e11d5289cf197652a68c1": {
-      // renovate: datasource=github-tags depName=errata-ai/vale extractVersion=^v(?<version>.+)$
-      "version": "3.24.0"
-    },
-    // renovate: tag=1
-    "ghcr.io/devcontainers/features/java@sha256:61a839211feda1e2a1f10646648a948e733e4d98d770f3a4b6698a3c5fc92abe": {
-      "version": "21",
-      "installGradle": false,
-      "installMaven": false
-    }
+    "ghcr.io/devcontainers-extra/features/pre-commit@sha256:6e0bb2ce80caca1d94f44dab5d0653d88a1c00984e590adb7c6bce012d0ade6e": {}
   },
 
   "customizations": {
@@ -96,11 +76,20 @@
   },
 
   "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
-  "updateContentCommand": "pnpm install",
   "postAttachCommand": "bash .devcontainer/postAttachCommand.sh",
 
   "containerEnv": {
-    "NODE_ENV": "development"
+    "NODE_ENV": "development",
+    // The container exists only to work on this checkout.
+    "MISE_TRUSTED_CONFIG_PATHS": "${containerWorkspaceFolder}"
+  },
+
+  // The base image's login profile puts its own Node.js and pnpm first, so
+  // only remoteEnv can put the shims ahead of them. This PATH replaces the
+  // login shell's, so it re-adds the pre-commit feature's directory, which
+  // only /etc/bash.bashrc adds.
+  "remoteEnv": {
+    "PATH": "/home/node/.local/share/mise/shims:${containerEnv:PATH}:/usr/local/py-utils/bin"
   },
 
   // pnpm store configuration

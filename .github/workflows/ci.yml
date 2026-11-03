@@ -746,8 +746,8 @@ jobs:
         with:
           paths: |
             .devcontainer
-            scripts/install-reuse.sh
-            scripts/install-lychee.sh
+            mise.toml
+            mise.lock
             package.json
             tools/e2e/package.json
             .github/actions/diff-against-base

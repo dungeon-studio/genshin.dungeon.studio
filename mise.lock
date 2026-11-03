@@ -2,6 +2,26 @@
 
 lockfile_version = 3
 
+[[tools."aqua:nektos/act"]]
+version = "0.2.94"
+backend = "aqua:nektos/act"
+specifiers = ["0.2.94"]
+
+[tools."aqua:nektos/act"."platforms.linux-x64"]
+checksum = "sha256:33e6748e3c07affb6855f19fb7a28bc6c344c1d0888fae0564e6d34d4a71915a"
+url = "https://github.com/nektos/act/releases/download/v0.2.94/act_Linux_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/nektos/act/releases/assets/696297200"
+
+[[tools."aqua:vale-cli/vale"]]
+version = "3.24.0"
+backend = "aqua:vale-cli/vale"
+specifiers = ["3.24.0"]
+
+[tools."aqua:vale-cli/vale"."platforms.linux-x64"]
+checksum = "sha256:867534ddb678abca7f214bc4706ead0922bd5252ffe8035fc227013f66c8b214"
+url = "https://github.com/vale-cli/vale/releases/download/v3.24.0/vale_3.24.0_Linux_64-bit.tar.gz"
+url_api = "https://api.github.com/repos/vale-cli/vale/releases/assets/603879404"
+
 [[tools."github:lycheeverse/lychee"]]
 version = "0.24.2"
 backend = "github:lycheeverse/lychee"
@@ -33,11 +53,6 @@ specifiers = ["24.22.2"]
 [tools.node."platforms.linux-x64"]
 checksum = "sha256:361718c444e49af2ca5a110c83ba6a8901143f23ab285ebbef0341f391f482a9"
 url = "https://nodejs.org/dist/v24.22.2/node-v24.22.2-linux-x64.tar.gz"
-
-[[tools."pipx:reuse"]]
-version = "6.3.0"
-backend = "pipx:reuse"
-specifiers = ["6.3.0"]
 
 [[tools.pnpm]]
 version = "12.16.1"

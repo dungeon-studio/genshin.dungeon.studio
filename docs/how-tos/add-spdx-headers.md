@@ -61,7 +61,7 @@ SPDX-License-Identifier: MIT
 After adding headers, verify compliance:
 
 ```bash
-pnpm reuse:check
+pre-commit run reuse --all-files
 ```
 
-Should output: `Congratulations! Your project is compliant with version 3.3 of the REUSE Specification`
+The hook reports `Passed` when every file is compliant.
