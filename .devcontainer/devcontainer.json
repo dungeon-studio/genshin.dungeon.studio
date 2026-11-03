@@ -76,7 +76,6 @@
   },
 
   "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
-  "updateContentCommand": "pnpm install",
   "postAttachCommand": "bash .devcontainer/postAttachCommand.sh",
 
   "containerEnv": {
