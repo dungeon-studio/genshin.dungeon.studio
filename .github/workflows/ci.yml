@@ -397,7 +397,7 @@ jobs:
           persist-credentials: false
 
       - name: Scan Terraform
-        uses: aquasecurity/trivy-action@8f28faec26515256b6d22074d1d2a8986f4cbd87 # master
+        uses: aquasecurity/trivy-action@38b337fff0a2f984d5be173c99e3f633438167ec # master
         with:
           scan-type: config
           scan-ref: ${{ matrix.path }}
@@ -594,7 +594,7 @@ jobs:
           persist-credentials: false
 
       - name: Scan Dockerfile
-        uses: aquasecurity/trivy-action@8f28faec26515256b6d22074d1d2a8986f4cbd87 # master
+        uses: aquasecurity/trivy-action@38b337fff0a2f984d5be173c99e3f633438167ec # master
         with:
           scan-type: config
           scan-ref: apps/api
@@ -623,7 +623,7 @@ jobs:
       # The lockfile resolves every workspace; scanning the directory would
       # also walk build output and fixtures.
       - name: Scan dependency vulnerabilities
-        uses: aquasecurity/trivy-action@8f28faec26515256b6d22074d1d2a8986f4cbd87 # master
+        uses: aquasecurity/trivy-action@38b337fff0a2f984d5be173c99e3f633438167ec # master
         with:
           scan-type: fs
           scan-ref: pnpm-lock.yaml
@@ -637,7 +637,7 @@ jobs:
       # scan. Failing on UNKNOWN forces a decision on any licence Trivy can't
       # classify.
       - name: Scan dependency licences
-        uses: aquasecurity/trivy-action@8f28faec26515256b6d22074d1d2a8986f4cbd87 # master
+        uses: aquasecurity/trivy-action@38b337fff0a2f984d5be173c99e3f633438167ec # master
         with:
           scan-type: fs
           scan-ref: .
@@ -691,7 +691,7 @@ jobs:
       # to act on. trivy-action drops a severity input for SARIF unless
       # limit-severities-for-sarif is set.
       - name: Scan Container Image
-        uses: aquasecurity/trivy-action@8f28faec26515256b6d22074d1d2a8986f4cbd87 # master
+        uses: aquasecurity/trivy-action@38b337fff0a2f984d5be173c99e3f633438167ec # master
         with:
           image-ref: api:ci
           scanners: vuln
