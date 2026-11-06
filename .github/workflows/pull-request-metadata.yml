@@ -26,7 +26,7 @@ jobs:
   # message that lands on develop.
   title:
     name: Check pull request title
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     # A merge group carries no title; the pull request's own run checks it.
     if: github.event_name == 'pull_request'

@@ -25,7 +25,7 @@ jobs:
   # something breaks rather than blocking a PR. Never blocks.
   external-links:
     name: Check external links
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
       contents: read
@@ -62,7 +62,7 @@ jobs:
   # gating a pull request. Never blocks.
   mutation-score:
     name: Report mutation score
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 30
     permissions:
       contents: read
