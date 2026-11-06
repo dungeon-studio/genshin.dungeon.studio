@@ -13,7 +13,7 @@ lockfile_platforms = ["linux-x64"]
 # only the gnu build.
 "github:lycheeverse/lychee" = { version = "0.24.2", version_prefix = "lychee-v", matching = "musl" }
 java = "temurin-25.0.5+8.0.LTS"
-node = "24.22.2"
+node = "26.13.0"
 # Keep equal to package.json's packageManager, which pnpm and the API image's
 # corepack read.
 pnpm = "12.16.1"
