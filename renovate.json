@@ -49,17 +49,17 @@
       "minimumReleaseAge": null
     },
     {
-      "description": "Rebase only on conflict when the update leaves pnpm-lock.yaml alone, so a merge to develop doesn't rerun CI on it",
+      "description": "Rebase non-npm updates only on conflict: they leave pnpm-lock.yaml alone, so a merge to develop needn't rerun their CI",
       "matchManagers": ["!npm"],
       "rebaseWhen": "conflicted"
     },
     {
-      "description": "Rebase grouped minor and patch updates when behind: they share a branch with npm updates that change pnpm-lock.yaml, and a group takes rebaseWhen from whichever member sorts first",
+      "description": "Rebase minor and patch updates when behind: they share a branch with npm updates that change pnpm-lock.yaml, and a group rebases as its first-sorted member does",
       "matchUpdateTypes": ["minor", "patch"],
       "rebaseWhen": "behind-base-branch"
     },
     {
-      "description": "Update each of these dependencies in its own pull request that moves every pin at once, so develop never holds two versions of it, and rebase it only on conflict",
+      "description": "Update each of these dependencies in its own pull request that moves every pin at once, so develop never holds two versions of it. Placed after the minor and patch rule so these branches rebase only on conflict",
       "matchPackageNames": [
         "hashicorp/terraform",
         "fsfe/reuse-tool",
