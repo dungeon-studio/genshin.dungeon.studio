@@ -18,11 +18,11 @@
     "@genshin/collection-json": "workspace:*",
     "@genshin/domain": "workspace:*",
     "@genshin/game-data": "workspace:*",
-    "@hono/node-server": "2.1.5",
+    "@hono/node-server": "2.1.6",
     "ajv": "8.20.0",
     "content-type": "3.1.1",
     "firebase-admin": "14.5.0",
-    "hono": "4.13.14",
+    "hono": "4.13.16",
     "negotiator": "1.1.0",
     "pino": "10.4.0",
     "verzod": "0.5.1",
@@ -36,14 +36,14 @@
     "@types/negotiator": "0.6.5",
     "@types/node": "24.19.2",
     "@typescript/native": "npm:typescript@7.0.2",
-    "@vitest/coverage-v8": "5.0.5",
-    "eslint": "10.13.0",
+    "@vitest/coverage-v8": "5.1.0",
+    "eslint": "10.14.0",
     "fast-check": "4.10.2",
-    "globals": "17.13.0",
+    "globals": "17.14.0",
     "json-schema-to-ts": "3.1.1",
-    "tsc-alias": "1.9.9",
+    "tsc-alias": "1.9.10",
     "tsx": "4.23.15",
     "typescript": "npm:@typescript/typescript6@6.0.2",
-    "vitest": "5.0.5"
+    "vitest": "5.1.0"
   }
 }
