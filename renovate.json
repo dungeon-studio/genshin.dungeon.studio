@@ -62,6 +62,32 @@
       "groupSlug": "{{{replace '/' '-' packageName}}}"
     },
     {
+      "description": "Rebase only on conflict when the update leaves pnpm-lock.yaml alone, so a merge to develop doesn't rerun CI on it",
+      "matchManagers": ["!npm"],
+      "rebaseWhen": "conflicted"
+    },
+    {
+      "description": "Rebase grouped minor and patch updates when behind: they share a branch with npm updates that change pnpm-lock.yaml, and a group takes rebaseWhen from whichever member sorts first",
+      "matchUpdateTypes": ["minor", "patch"],
+      "rebaseWhen": "behind-base-branch"
+    },
+    {
+      "description": "Rebase these single-dependency groups only on conflict: none of them changes pnpm-lock.yaml",
+      "matchPackageNames": [
+        "hashicorp/terraform",
+        "fsfe/reuse-tool",
+        "lycheeverse/lychee",
+        "node",
+        "vale-cli/vale"
+      ],
+      "rebaseWhen": "conflicted"
+    },
+    {
+      "description": "Rebase pnpm updates when behind: a new pnpm rewrites pnpm-lock.yaml",
+      "matchPackageNames": ["pnpm"],
+      "rebaseWhen": "behind-base-branch"
+    },
+    {
       "description": "Move engines and @types/node to a new Node.js major only once it reaches LTS",
       "matchDepNames": ["node", "@types/node"],
       "matchManagers": ["npm"],
