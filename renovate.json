@@ -49,19 +49,6 @@
       "minimumReleaseAge": null
     },
     {
-      "description": "Update each of these dependencies in its own pull request that moves every pin at once, so develop never holds two versions of it",
-      "matchPackageNames": [
-        "hashicorp/terraform",
-        "fsfe/reuse-tool",
-        "lycheeverse/lychee",
-        "node",
-        "pnpm",
-        "vale-cli/vale"
-      ],
-      "groupName": "{{packageName}}",
-      "groupSlug": "{{{replace '/' '-' packageName}}}"
-    },
-    {
       "description": "Rebase only on conflict when the update leaves pnpm-lock.yaml alone, so a merge to develop doesn't rerun CI on it",
       "matchManagers": ["!npm"],
       "rebaseWhen": "conflicted"
@@ -72,14 +59,17 @@
       "rebaseWhen": "behind-base-branch"
     },
     {
-      "description": "Rebase these single-dependency groups only on conflict: none of them changes pnpm-lock.yaml",
+      "description": "Update each of these dependencies in its own pull request that moves every pin at once, so develop never holds two versions of it, and rebase it only on conflict",
       "matchPackageNames": [
         "hashicorp/terraform",
         "fsfe/reuse-tool",
         "lycheeverse/lychee",
         "node",
+        "pnpm",
         "vale-cli/vale"
       ],
+      "groupName": "{{packageName}}",
+      "groupSlug": "{{{replace '/' '-' packageName}}}",
       "rebaseWhen": "conflicted"
     },
     {
