@@ -17,7 +17,7 @@ For the prompts behind both icons, see
 
 ## Prerequisites
 
-- `uv`
+- Workspace dependencies installed with `pnpm install`
 - DejaVu Sans Bold at `/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf`
 
 ## Steps
@@ -25,7 +25,7 @@ For the prompts behind both icons, see
 1. Run the generator from the repository root:
 
    ```shell
-   uv run apps/web/scripts/generate-brand-assets.py
+   pnpm --filter @genshin/web brand-assets
    ```
 
 2. Commit the regenerated files under `apps/web/public/`.
