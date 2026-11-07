@@ -6,7 +6,7 @@ locked = true
 lockfile_platforms = ["linux-x64"]
 
 [tools]
-"aqua:nektos/act" = "0.2.94"
+"aqua:nektos/act" = "0.2.97"
 # Keep equal to the Vale pre-commit hook's rev.
 "aqua:vale-cli/vale" = "3.24.0"
 # github: for the static musl build, which has no glibc floor. aqua ships
