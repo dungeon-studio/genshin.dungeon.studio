@@ -20,21 +20,30 @@ const REPO = fileURLToPath(new URL('../../..', import.meta.url));
 const PUBLIC = fileURLToPath(new URL('../public/', import.meta.url));
 const ENVIRONMENTS = fileURLToPath(new URL('../src/lib/environments.json', import.meta.url));
 
-const FONT = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
+const FONT_PATH = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
 const FONT_FAMILY = 'DejaVu Sans';
 
 const BRAND_TEAL = '#1f514e';
 
-const ICO_SIZES = [16, 32, 48];
+const ICO_SIDES = [16, 32, 48];
+const FAVICON_SIDE = 32;
+const LIGHT_MARK_SIDE = 512;
+
+const BADGE_DIAMETER_RATIO = 0.56;
+const BADGE_GLYPH_RATIO = 0.78;
 
 const OG_WIDTH = 1200;
 const OG_HEIGHT = 630;
 const OG_MARGIN = 100;
 const OG_MARK_SIDE = 240;
 const OG_MARK_TOP = 108;
+const OG_MIN_FONT_SIZE = 8;
+const OG_FONT_SIZE_STEP = 2;
 
-const FAVICON_SIDE = 32;
-const LIGHT_SIDE = 512;
+interface Asset {
+  name: string;
+  data: Uint8Array;
+}
 
 interface Badge {
   suffix: string;
@@ -47,6 +56,31 @@ interface Environment {
   badge: { iconSuffix: string; glyph: string } | null;
 }
 
+interface Text {
+  content: string;
+  x: number;
+  y: number;
+  size: number;
+  fill: string;
+}
+
+interface Line {
+  content: string;
+  y: number;
+  size: number;
+  fill: string;
+}
+
+function readFont(): Uint8Array {
+  if (!existsSync(FONT_PATH)) {
+    process.stderr.write(`${FONT_PATH} is missing; install the DejaVu fonts and retry\n`);
+    process.exit(1);
+  }
+  return readFileSync(FONT_PATH);
+}
+
+const FONT = { fontBuffers: [readFont()], defaultFontFamily: FONT_FAMILY };
+
 function loadBadges(): Badge[] {
   const environments = JSON.parse(readFileSync(ENVIRONMENTS, 'utf8')) as Record<
     string,
@@ -57,52 +91,23 @@ function loadBadges(): Badge[] {
   );
 }
 
+function publicPath(name: string): string {
+  return PUBLIC + name;
+}
+
 function escapeXml(text: string): string {
   return text.replace(/[&<>"]/g, (c) => `&#${String(c.codePointAt(0))};`);
 }
 
-function pngHref(name: string): string {
-  return `data:image/png;base64,${readFileSync(PUBLIC + name).toString('base64')}`;
+function dataUri(png: Uint8Array): string {
+  return `data:image/png;base64,${Buffer.from(png).toString('base64')}`;
 }
 
-let fontBuffer: Uint8Array;
-
-function render(svg: string): Uint8Array {
-  const resvg = new Resvg(svg, {
-    font: { fontBuffers: [fontBuffer], defaultFontFamily: FONT_FAMILY },
-  });
-  try {
-    return resvg.render().asPng();
-  } finally {
-    resvg.free();
-  }
-}
-
-/**
- * resvg samples an image drawn far below its size without filtering, which
- * aliases the mark's thin lines, so this halves until one last step remains.
- */
-function downscale(png: Uint8Array, from: number, to: number): Uint8Array {
-  let image = png;
-  let side = from;
-  while (side > to) {
-    const next = side > 2 * to ? side / 2 : to;
-    const href = `data:image/png;base64,${Buffer.from(image).toString('base64')}`;
-    image = render(
-      `<svg xmlns="http://www.w3.org/2000/svg" width="${String(next)}" height="${String(next)}">` +
-        `<image href="${href}" width="${String(next)}" height="${String(next)}"/></svg>`,
-    );
-    side = next;
-  }
-  return image;
-}
-
-interface Text {
-  content: string;
-  x: number;
-  y: number;
-  size: number;
-  fill: string;
+function svg(width: number, height: number, body: string): string {
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${String(width)}" height="${String(height)}">` +
+    `${body}</svg>`
+  );
 }
 
 function text({ content, x, y, size, fill }: Text): string {
@@ -111,6 +116,35 @@ function text({ content, x, y, size, fill }: Text): string {
     `font-size="${String(size)}" fill="${fill}" text-anchor="middle" ` +
     `dominant-baseline="central">${escapeXml(content)}</text>`
   );
+}
+
+function withResvg<T>(source: string, apply: (resvg: InstanceType<typeof Resvg>) => T): T {
+  const resvg = new Resvg(source, { font: FONT });
+  try {
+    return apply(resvg);
+  } finally {
+    resvg.free();
+  }
+}
+
+function render(source: string): Uint8Array {
+  return withResvg(source, (resvg) => resvg.render().asPng());
+}
+
+/**
+ * resvg samples an image drawn far below its size without filtering, which
+ * aliases the mark's thin lines, so this halves until one last step remains.
+ */
+function downscale(png: Uint8Array, from: number, to: number): Uint8Array {
+  let image = png;
+  for (let side = from; side > to;) {
+    side = side > 2 * to ? side / 2 : to;
+    const href = dataUri(image);
+    image = render(
+      svg(side, side, `<image href="${href}" width="${String(side)}" height="${String(side)}"/>`),
+    );
+  }
+  return image;
 }
 
 /** Inserts the environment's `iconSuffix` before the extension. */
@@ -125,139 +159,144 @@ function variant(name: string, suffix: string): string {
  * Geometry scales with the mark so one badge reads at 512px as a letter and at
  * 16px as a colored corner, which is all a browser tab needs it to be.
  */
-function badgedSvg(markHref: string, side: number, badge: Badge): string {
-  const radius = Math.round(side * 0.56) / 2;
-  const center = side - radius;
+function badgedMark(markHref: string, side: number, badge: Badge): Uint8Array {
+  const diameter = Math.round(side * BADGE_DIAMETER_RATIO);
+  const radius = diameter / 2;
+  const center = String(side - radius);
   // The halo cut out behind the disc keeps the badge from blending with the
   // copper it sits on at small sizes.
-  return (
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${String(side)}" height="${String(side)}">` +
-    `<mask id="halo"><rect width="100%" height="100%" fill="#fff"/>` +
-    `<circle cx="${String(center)}" cy="${String(center)}" r="${String(radius + 1)}" fill="#000"/></mask>` +
-    `<image href="${markHref}" width="${String(side)}" height="${String(side)}" mask="url(#halo)"/>` +
-    `<circle cx="${String(center)}" cy="${String(center)}" r="${String(radius)}" fill="${badge.color}"/>` +
-    text({
-      content: badge.glyph,
-      x: center,
-      y: center,
-      size: Math.round(radius * 2 * 0.78),
-      fill: '#ffffff',
-    }) +
-    `</svg>`
+  return render(
+    svg(
+      side,
+      side,
+      `<mask id="halo"><rect width="100%" height="100%" fill="#fff"/>` +
+        `<circle cx="${center}" cy="${center}" r="${String(radius + 1)}" fill="#000"/></mask>` +
+        `<image href="${markHref}" width="${String(side)}" height="${String(side)}" mask="url(#halo)"/>` +
+        `<circle cx="${center}" cy="${center}" r="${String(radius)}" fill="${badge.color}"/>` +
+        text({
+          content: badge.glyph,
+          x: side - radius,
+          y: side - radius,
+          size: Math.round(diameter * BADGE_GLYPH_RATIO),
+          fill: '#ffffff',
+        }),
+    ),
   );
+}
+
+function icoEntry(side: number, size: number, offset: number): Buffer {
+  const entry = Buffer.alloc(16);
+  entry.writeUInt8(side % 256, 0);
+  entry.writeUInt8(side % 256, 1);
+  entry.writeUInt16LE(1, 4);
+  entry.writeUInt16LE(32, 6);
+  entry.writeUInt32LE(size, 8);
+  entry.writeUInt32LE(offset, 12);
+  return entry;
 }
 
 /** A 6-byte header, then a 16-byte directory entry per PNG, then the PNGs. */
 function ico(images: { side: number; png: Uint8Array }[]): Uint8Array {
-  const header = Buffer.alloc(6 + 16 * images.length);
+  const header = Buffer.alloc(6);
   header.writeUInt16LE(1, 2);
   header.writeUInt16LE(images.length, 4);
-  let offset = header.length;
-  images.forEach(({ side, png }, index) => {
-    const entry = 6 + 16 * index;
-    header.writeUInt8(side % 256, entry);
-    header.writeUInt8(side % 256, entry + 1);
-    header.writeUInt16LE(1, entry + 4);
-    header.writeUInt16LE(32, entry + 6);
-    header.writeUInt32LE(png.length, entry + 8);
-    header.writeUInt32LE(offset, entry + 12);
+
+  let offset = header.length + 16 * images.length;
+  const entries = images.map(({ side, png }) => {
+    const entry = icoEntry(side, png.length, offset);
     offset += png.length;
+    return entry;
   });
-  return Buffer.concat([header, ...images.map(({ png }) => png)]);
+
+  return Buffer.concat([header, ...entries, ...images.map(({ png }) => png)]);
 }
 
-function* badgedIcons(): Generator<[string, Uint8Array]> {
-  const light = pngHref('icon-512x512.png');
-  const dark = pngHref('favicon-32x32-dark.png');
+function* badgedIcons(): Generator<Asset> {
+  const lightMark = dataUri(readFileSync(publicPath('icon-512x512.png')));
+  const darkMark = dataUri(readFileSync(publicPath('favicon-32x32-dark.png')));
 
   for (const badge of loadBadges()) {
-    const badgedLight = render(badgedSvg(light, LIGHT_SIDE, badge));
+    const badgedLight = badgedMark(lightMark, LIGHT_MARK_SIDE, badge);
 
-    yield [
-      variant('favicon-32x32.png', badge.suffix),
-      downscale(badgedLight, LIGHT_SIDE, FAVICON_SIDE),
-    ];
-    yield [
-      variant('favicon.ico', badge.suffix),
-      ico(ICO_SIZES.map((side) => ({ side, png: downscale(badgedLight, LIGHT_SIDE, side) }))),
-    ];
+    yield {
+      name: variant('favicon-32x32.png', badge.suffix),
+      data: downscale(badgedLight, LIGHT_MARK_SIDE, FAVICON_SIDE),
+    };
+    yield {
+      name: variant('favicon.ico', badge.suffix),
+      data: ico(
+        ICO_SIDES.map((side) => ({ side, png: downscale(badgedLight, LIGHT_MARK_SIDE, side) })),
+      ),
+    };
     // The dark mark exists only at its display size, so it is badged there.
-    yield [
-      variant('favicon-32x32-dark.png', badge.suffix),
-      render(badgedSvg(dark, FAVICON_SIDE, badge)),
-    ];
+    yield {
+      name: variant('favicon-32x32-dark.png', badge.suffix),
+      data: badgedMark(darkMark, FAVICON_SIDE, badge),
+    };
   }
 }
 
 function textWidth(content: string, size: number): number {
-  const resvg = new Resvg(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${String(OG_WIDTH)}" height="${String(OG_HEIGHT)}">` +
-      text({ content, x: OG_WIDTH / 2, y: OG_HEIGHT / 2, size, fill: '#000' }) +
-      `</svg>`,
-    { font: { fontBuffers: [fontBuffer], defaultFontFamily: FONT_FAMILY } },
+  const source = svg(
+    OG_WIDTH,
+    OG_HEIGHT,
+    text({ content, x: OG_WIDTH / 2, y: OG_HEIGHT / 2, size, fill: '#000' }),
   );
-  try {
-    return resvg.getBBox()?.width ?? 0;
-  } finally {
-    resvg.free();
-  }
+  return withResvg(source, (resvg) => resvg.getBBox()?.width ?? 0);
 }
 
 /** Shrinks until the line fits, so renaming the app cannot overflow the canvas. */
-function fitFontSize(content: string, size: number, maxWidth: number): number {
+function fitFontSize(content: string, size: number): number {
+  const maxWidth = OG_WIDTH - 2 * OG_MARGIN;
   let fitted = size;
-  while (fitted > 8 && textWidth(content, fitted) > maxWidth) {
-    fitted -= 2;
+  while (fitted > OG_MIN_FONT_SIZE && textWidth(content, fitted) > maxWidth) {
+    fitted -= OG_FONT_SIZE_STEP;
   }
   return fitted;
 }
 
-function centeredLine(content: string, baseline: number, size: number, fill: string): string {
-  return text({
-    content,
-    x: OG_WIDTH / 2,
-    y: baseline,
-    size: fitFontSize(content, size, OG_WIDTH - 2 * OG_MARGIN),
-    fill,
-  });
+function centeredLine({ content, y, size, fill }: Line): string {
+  return text({ content, x: OG_WIDTH / 2, y, size: fitFontSize(content, size), fill });
 }
 
 /** A link preview is read at thumbnail size, so it carries mark and name only. */
-function ogImage(): [string, Uint8Array] {
+function ogImage(): Asset {
+  const mark = dataUri(readFileSync(publicPath('icon-512x512.png')));
   const markLeft = (OG_WIDTH - OG_MARK_SIDE) / 2;
-  const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${String(OG_WIDTH)}" height="${String(OG_HEIGHT)}">` +
+  const source = svg(
+    OG_WIDTH,
+    OG_HEIGHT,
     `<rect width="100%" height="100%" fill="${BRAND_TEAL}"/>` +
-    `<image href="${pngHref('icon-512x512.png')}" x="${String(markLeft)}" y="${String(OG_MARK_TOP)}" ` +
-    `width="${String(OG_MARK_SIDE)}" height="${String(OG_MARK_SIDE)}"/>` +
-    centeredLine('Genshin Planner', 428, 88, '#ffffff') +
-    centeredLine('Plan your teams and manage your collection.', 518, 36, '#a8d5d1') +
-    `</svg>`;
-  return ['og-image.png', render(svg)];
+      `<image href="${mark}" x="${String(markLeft)}" y="${String(OG_MARK_TOP)}" ` +
+      `width="${String(OG_MARK_SIDE)}" height="${String(OG_MARK_SIDE)}"/>` +
+      centeredLine({ content: 'Genshin Planner', y: 428, size: 88, fill: '#ffffff' }) +
+      centeredLine({
+        content: 'Plan your teams and manage your collection.',
+        y: 518,
+        size: 36,
+        fill: '#a8d5d1',
+      }),
+  );
+  return { name: 'og-image.png', data: render(source) };
 }
 
-function committed(name: string): Buffer | null {
-  const path = PUBLIC + name;
-  return existsSync(path) ? readFileSync(path) : null;
+function isStale({ name, data }: Asset): boolean {
+  const path = publicPath(name);
+  return !existsSync(path) || !readFileSync(path).equals(data);
 }
 
 /** The hook fails on any rewrite, so this listing is what a contributor sees. */
 async function main(): Promise<void> {
-  if (!existsSync(FONT)) {
-    process.stderr.write(`${FONT} is missing; install the DejaVu fonts and retry\n`);
-    process.exit(1);
-  }
-  fontBuffer = readFileSync(FONT);
   const require = createRequire(import.meta.url);
   await initWasm(readFileSync(require.resolve('@resvg/resvg-wasm/index_bg.wasm')));
 
-  const stale = [...badgedIcons(), ogImage()].filter(
-    ([name, data]) => !committed(name)?.equals(data),
-  );
+  const stale = [...badgedIcons(), ogImage()].filter(isStale);
 
-  for (const [name, data] of stale) {
-    writeFileSync(PUBLIC + name, data);
-    process.stdout.write(`${relative(REPO, PUBLIC + name)} was stale and has been regenerated\n`);
+  for (const { name, data } of stale) {
+    writeFileSync(publicPath(name), data);
+    process.stdout.write(
+      `${relative(REPO, publicPath(name))} was stale and has been regenerated\n`,
+    );
   }
 
   if (stale.length > 0) {
