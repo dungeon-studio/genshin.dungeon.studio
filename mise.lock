@@ -3,14 +3,15 @@
 lockfile_version = 3
 
 [[tools."aqua:nektos/act"]]
-version = "0.2.94"
+version = "0.2.97"
 backend = "aqua:nektos/act"
-specifiers = ["0.2.94"]
+specifiers = ["0.2.97"]
 
 [tools."aqua:nektos/act"."platforms.linux-x64"]
-checksum = "sha256:33e6748e3c07affb6855f19fb7a28bc6c344c1d0888fae0564e6d34d4a71915a"
-url = "https://github.com/nektos/act/releases/download/v0.2.94/act_Linux_x86_64.tar.gz"
-url_api = "https://api.github.com/repos/nektos/act/releases/assets/696297200"
+checksum = "sha256:67b4976a56f33ea7870b798912e738ec44eef38e7578ae7b532f2def1c73a5ad"
+checksum_source = "mise-versions"
+url = "https://github.com/nektos/act/releases/download/v0.2.97/act_Linux_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/nektos/act/releases/assets/710157441"
 
 [[tools."aqua:vale-cli/vale"]]
 version = "3.24.0"
