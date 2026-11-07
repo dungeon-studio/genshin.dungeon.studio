@@ -223,15 +223,13 @@ repos:
           )
         pass_filenames: false
 
-      # Pillow matches the pin in the generator's script metadata.
       - id: brand-assets
         name: brand assets (regenerate from environments)
-        entry: python apps/web/scripts/generate-brand-assets.py
-        language: python
-        additional_dependencies: [pillow==13.0.0]
+        entry: pnpm --filter @genshin/web brand-assets
+        language: system
         files: |
           (?x)^apps/web/(
-            scripts/generate-brand-assets\.py|
+            scripts/generate-brand-assets\.ts|
             src/lib/environments\.json|
             public/(favicon|icon|og-image)[^/]*\.(png|ico)
           )$
