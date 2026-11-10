@@ -10,7 +10,7 @@
     // renovate: tag=1
     "ghcr.io/devcontainers-extra/features/mise@sha256:5c389ab1e3c8e44e5e0ff119f6868d54dbb781bc860bd8587dc66209cb8c4a8c": {},
     // renovate: tag=1
-    "ghcr.io/devcontainers/features/docker-outside-of-docker@sha256:698f5900fac471e046c6e9d4333fec88c0e8d952c713494fa0712dce80baeca0": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker@sha256:661b0fd4c57a7e0bd14d99701ab9bc824719678a9319118728f8d9c59441b7e4": {
       "moby": false
     },
     // renovate: tag=2
