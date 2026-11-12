@@ -5,9 +5,9 @@
 
 Any shared serialisation boundary is a version skew hazard: deployments are
 never instantaneous, caches outlive the pods that filled them, and rollback
-returns old readers to a store already touched by new writers. **Parseable is
-not the same as compatible.** This applies to Firestore documents, REST bodies,
-queue payloads, cache entries, and any future wire format.
+returns old readers to a store already touched by new writers. **Parseable
+isn't the same as compatible.** The hazard covers Firestore documents, REST
+bodies, queue payloads, cache entries, and any future wire format.
 
 For the boundaries, file layouts, and naming this repository uses, see
 [Schema versioning conventions](../reference/schema-versioning.md). To ship a
