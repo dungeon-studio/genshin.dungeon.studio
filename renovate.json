@@ -90,6 +90,11 @@
       "enabled": false
     },
     {
+      "description": "Skip genshin-db updates: a new release lands only with regenerated game data, which Renovate can't produce",
+      "matchPackageNames": ["genshin-db"],
+      "enabled": false
+    },
+    {
       "description": "Keep deploy-cloudrun majors manual: it has no dry-run mode, so no required check can exercise it before it deploys",
       "matchPackageNames": ["google-github-actions/deploy-cloudrun"],
       "matchUpdateTypes": ["major"],

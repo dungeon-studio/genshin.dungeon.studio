@@ -13,8 +13,8 @@
 import type { ValidationIssue } from '@genshin/validation';
 import { issue, prefixPaths } from '@genshin/validation';
 
-import type { CollectionTeamMembers, TeamSlot } from './collection-team.js';
 import { validateArtifactPlan } from '../artifact/artifact-plan-validation.js';
+import type { CollectionTeamMembers, TeamSlot } from './collection-team.js';
 
 export interface TeamValidationContext {
   ownedCharacterIds: ReadonlySet<string>;
