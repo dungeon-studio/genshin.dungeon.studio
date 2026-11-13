@@ -73,11 +73,6 @@
       "rebaseWhen": "conflicted"
     },
     {
-      "description": "Leave genshin-db to the game data refresh: a release needs the generators run alongside the pin, which Renovate can't do",
-      "matchPackageNames": ["genshin-db"],
-      "enabled": false
-    },
-    {
       "description": "Rebase pnpm updates when behind: a new pnpm rewrites pnpm-lock.yaml",
       "matchPackageNames": ["pnpm"],
       "rebaseWhen": "behind-base-branch"
@@ -92,6 +87,11 @@
       "description": "Leave devcontainer features to their annotations: on a digest-only feature the devcontainer manager follows the latest tag across majors",
       "matchManagers": ["devcontainer"],
       "matchDepTypes": ["feature"],
+      "enabled": false
+    },
+    {
+      "description": "Leave genshin-db to the game data refresh: a release needs the generators run alongside the pin, which Renovate can't do",
+      "matchPackageNames": ["genshin-db"],
       "enabled": false
     },
     {
