@@ -73,16 +73,15 @@
       "rebaseWhen": "conflicted"
     },
     {
-      "description": "Update stylelint and stylelint-config-standard majors in one pull request: each major drops or adds rules the other's previous major still references, so neither passes alone",
-      "matchPackageNames": ["stylelint", "stylelint-config-standard"],
-      "matchUpdateTypes": ["major"],
-      "groupName": "stylelint major",
-      "groupSlug": "stylelint-major"
-    },
-    {
       "description": "Rebase pnpm updates when behind: a new pnpm rewrites pnpm-lock.yaml",
       "matchPackageNames": ["pnpm"],
       "rebaseWhen": "behind-base-branch"
+    },
+    {
+      "description": "Update stylelint and stylelint-config-standard majors in one pull request: each major drops or adds rules the other's previous major still references, so neither passes alone",
+      "matchPackageNames": ["stylelint", "stylelint-config-standard"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "stylelint"
     },
     {
       "description": "Move engines and @types/node to a new Node.js major only once it reaches LTS",
