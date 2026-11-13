@@ -90,7 +90,7 @@
       "enabled": false
     },
     {
-      "description": "Leave genshin-db to the game data refresh: a release needs the generators run alongside the pin, which Renovate can't do",
+      "description": "Skip genshin-db updates: a new release lands only with regenerated game data, which Renovate can't produce",
       "matchPackageNames": ["genshin-db"],
       "enabled": false
     },
