@@ -78,7 +78,7 @@
       "rebaseWhen": "behind-base-branch"
     },
     {
-      "description": "Update stylelint and stylelint-config-standard majors in one pull request: each major drops or adds rules the other's previous major still references, so neither passes alone",
+      "description": "Update these majors in one pull request: a new stylelint removes rules the old config enables, and a new config enables rules the old stylelint lacks",
       "matchPackageNames": ["stylelint", "stylelint-config-standard"],
       "matchUpdateTypes": ["major"],
       "groupName": "stylelint"
