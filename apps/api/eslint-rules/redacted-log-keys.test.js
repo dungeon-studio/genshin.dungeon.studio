@@ -3,8 +3,8 @@
 
 import { RuleTester } from 'eslint';
 
-import { redactedLogKeys } from './redacted-log-keys.js';
 import { SENSITIVE_KEYS } from '../src/sensitive-keys.ts';
+import { redactedLogKeys } from './redacted-log-keys.js';
 
 const options = [{ keys: SENSITIVE_KEYS }];
 

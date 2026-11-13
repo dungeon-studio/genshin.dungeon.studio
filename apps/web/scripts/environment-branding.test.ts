@@ -3,8 +3,8 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { brandIndexHtml } from './environment-branding';
 import { ENVIRONMENT_NAMES, ENVIRONMENTS, PRODUCTION_ORIGIN } from '../src/lib/environments';
+import { brandIndexHtml } from './environment-branding';
 
 // The real document, so an index.html edit that moves a branded element out
 // from under the substitutions fails here rather than on a deployed site.

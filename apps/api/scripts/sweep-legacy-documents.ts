@@ -6,8 +6,8 @@
 
 import { parseArgs } from 'node:util';
 
-import { sweep } from './legacy-sweep.js';
 import { db } from '../src/firebase/firestore.js';
+import { sweep } from './legacy-sweep.js';
 
 const { values } = parseArgs({ options: { write: { type: 'boolean', default: false } } });
 
