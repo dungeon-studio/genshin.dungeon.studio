@@ -73,6 +73,13 @@
       "rebaseWhen": "conflicted"
     },
     {
+      "description": "Update genshin-db in its own pull request that waits for a human: a release needs regenerated game data, so a Renovate-only update stays red and would hold the non-major group back with it",
+      "matchPackageNames": ["genshin-db"],
+      "groupName": "genshin-db",
+      "groupSlug": "genshin-db",
+      "automerge": false
+    },
+    {
       "description": "Rebase pnpm updates when behind: a new pnpm rewrites pnpm-lock.yaml",
       "matchPackageNames": ["pnpm"],
       "rebaseWhen": "behind-base-branch"
