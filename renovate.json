@@ -78,6 +78,12 @@
       "rebaseWhen": "behind-base-branch"
     },
     {
+      "description": "Update these majors in one pull request: a new stylelint removes rules the old config enables, and a new config enables rules the old stylelint lacks",
+      "matchPackageNames": ["stylelint", "stylelint-config-standard"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "stylelint"
+    },
+    {
       "description": "Move engines and @types/node to a new Node.js major only once it reaches LTS",
       "matchDepNames": ["node", "@types/node"],
       "matchManagers": ["npm"],
