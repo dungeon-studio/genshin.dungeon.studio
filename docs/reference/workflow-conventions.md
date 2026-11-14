@@ -44,6 +44,7 @@ The `develop` ruleset is the authoritative list of checks that block a merge. A 
 - A path-gated workflow is never required.
 - The GitHub-managed `Analyze` runs aren't required. The ruleset gates code scanning and Code Quality findings through its own rules.
 - A workflow carrying a required check also triggers on `merge_group`, so the merge queue reruns the check on the pull request merged onto the current `develop`. A job that reads pull request metadata skips in a merge group, and the skip satisfies the required check.
+- A workflow that triggers on both `synchronize` and `edited` has no `cancel-in-progress` concurrency group. Renovate pushes and renames a pull request within seconds, and a cancelled run left on the head commit next to a successful one keeps the pull request `blocked` even when set to merge automatically.
 
 ## Push triggers
 

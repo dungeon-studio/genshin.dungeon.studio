@@ -4,7 +4,8 @@
 name: Labels
 
 # release-notes.yml groups the draft by the labels this applies; both read
-# their rules from .github/release-drafter.yml.
+# their rules from .github/release-drafter.yml. No concurrency group; see
+# docs/reference/workflow-conventions.md#required-checks.
 
 on:
   pull_request:
@@ -12,10 +13,6 @@ on:
 
 permissions:
   contents: read
-
-# No concurrency group: `synchronize` and `edited` fire seconds apart on one
-# head commit, and a cancelled run left beside the successful one holds the
-# pull request at `blocked`, auto-merge included.
 
 jobs:
   # Labels same-repo pull requests only; fork pull requests run with a
