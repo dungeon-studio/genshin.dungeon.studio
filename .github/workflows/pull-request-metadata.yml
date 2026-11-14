@@ -16,10 +16,6 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   # Squash is the only merge method enabled and the repository takes the squash
   # commit title from the pull request title, so this title is the commit
