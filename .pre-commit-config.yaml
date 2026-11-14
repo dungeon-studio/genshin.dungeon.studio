@@ -68,7 +68,7 @@ repos:
         args: [--write, -i, '2', -ci]
 
   - repo: https://github.com/vale-cli/vale
-    rev: v3.24.0
+    rev: v3.26.0
     hooks:
       - id: vale
         args: [--config=.vale.ini]

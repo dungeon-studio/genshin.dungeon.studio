@@ -8,7 +8,7 @@ lockfile_platforms = ["linux-x64"]
 [tools]
 "aqua:nektos/act" = "0.2.97"
 # Keep equal to the Vale pre-commit hook's rev.
-"aqua:vale-cli/vale" = "3.24.0"
+"aqua:vale-cli/vale" = "3.26.0"
 # github: for the static musl build, which has no glibc floor. aqua ships
 # only the gnu build.
 "github:lycheeverse/lychee" = { version = "0.24.2", version_prefix = "lychee-v", matching = "musl" }
