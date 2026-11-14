@@ -99,14 +99,18 @@ repos:
       - id: zizmor
         # Online audits need a token, so they run in ci.yml's workflows job.
         args: [--no-progress, --offline]
-  - repo: https://github.com/Mateusz-Grzelinski/actionlint-py
-    rev: v1.7.12.25
+  - repo: local
     hooks:
-      # actionlint skips shellcheck when it isn't on PATH. Renovate tracks
-      # additional_dependencies only on hooks that declare a language.
-      - id: actionlint
+      # The PyPI wheel ships a prebuilt binary; jdx/jactionlint's own hooks
+      # build from Go source. jactionlint skips shellcheck when it isn't on
+      # PATH.
+      - id: jactionlint
+        name: jactionlint
+        entry: jactionlint
         language: python
-        additional_dependencies: [shellcheck-py==0.11.0.1]
+        additional_dependencies: [jactionlint==2.6.0, shellcheck-py==0.11.0.1]
+        types: [yaml]
+        files: ^(\.github/workflows/|\.github/dependabot\.ya?ml$|(.*/)?action\.ya?ml$)
 
   - repo: https://github.com/AleksaC/hadolint-py
     rev: v2.15.1
