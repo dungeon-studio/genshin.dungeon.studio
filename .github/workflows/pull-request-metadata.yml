@@ -16,9 +16,9 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+# No concurrency group: `synchronize` and `edited` fire seconds apart on one
+# head commit, and a cancelled run left beside the successful one holds the
+# pull request at `blocked`, auto-merge included.
 
 jobs:
   # Squash is the only merge method enabled and the repository takes the squash
