@@ -101,12 +101,12 @@ repos:
         args: [--no-progress, --offline]
   - repo: local
     hooks:
-      # The PyPI wheel ships a prebuilt binary; jdx/jactionlint's own hooks
-      # build from Go source. jactionlint skips shellcheck when it isn't on
-      # PATH.
+      # The PyPI wheel ships a prebuilt binary, where upstream's hooks build
+      # from Go source. jactionlint checks `run:` scripts only when
+      # shellcheck is on PATH.
       #
-      # No file matcher: with no arguments jactionlint finds every file it
-      # lints, so the hook needn't copy upstream's list.
+      # No file matcher: run without arguments, jactionlint finds the files
+      # it lints.
       - id: jactionlint
         name: jactionlint
         entry: jactionlint
