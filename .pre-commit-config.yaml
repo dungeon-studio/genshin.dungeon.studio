@@ -104,13 +104,15 @@ repos:
       # The PyPI wheel ships a prebuilt binary; jdx/jactionlint's own hooks
       # build from Go source. jactionlint skips shellcheck when it isn't on
       # PATH.
+      #
+      # No file matcher: with no arguments jactionlint finds every file it
+      # lints, so the hook needn't copy upstream's list.
       - id: jactionlint
         name: jactionlint
         entry: jactionlint
         language: python
         additional_dependencies: [jactionlint==2.6.0, shellcheck-py==0.11.0.1]
-        types: [yaml]
-        files: ^(\.github/workflows/|\.github/dependabot\.ya?ml$|(.*/)?action\.ya?ml$)
+        pass_filenames: false
 
   - repo: https://github.com/AleksaC/hadolint-py
     rev: v2.15.1
