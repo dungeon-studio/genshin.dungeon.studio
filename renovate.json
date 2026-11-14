@@ -59,6 +59,15 @@
       "rebaseWhen": "behind-base-branch"
     },
     {
+      "description": "Hold minor and patch updates that Renovate marks breaking for review, each in its own pull request, as majors are. Placed after the minor and patch rule so these branches rebase as majors do",
+      "matchIsBreaking": true,
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": false,
+      "groupName": "{{packageName}}",
+      "groupSlug": "{{{replace '/' '-' packageName}}}",
+      "rebaseWhen": "auto"
+    },
+    {
       "description": "Update each of these dependencies in its own pull request that moves every pin at once, so develop never holds two versions of it. Placed after the minor and patch rule so these branches rebase only on conflict",
       "matchPackageNames": [
         "hashicorp/terraform",
