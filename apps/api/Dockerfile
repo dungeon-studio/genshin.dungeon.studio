@@ -4,7 +4,7 @@
 # renovate: datasource=npm depName=corepack
 ARG COREPACK_VERSION=0.36.0
 
-FROM node:24.22.0-slim@sha256:91acba91b842bec0bf7ea6f5e09c644c7ccad72c4996ed9616d861d1c7cd60d4 AS base
+FROM node:26.13.0-slim@sha256:5adad64f9a1fca2d51972caa65983634c8a774eb300d72b20f7f2a0f60368072 AS base
 
 # Build stage
 FROM base AS builder
