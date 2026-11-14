@@ -59,6 +59,15 @@
       "rebaseWhen": "behind-base-branch"
     },
     {
+      "description": "Leave updates from a 0.x version to a person, each in its own pull request: semver lets any 0.x release break, so these wait with the majors for required checks that catch breaking updates. Placed after the minor and patch rule so these branches rebase as major updates do",
+      "matchCurrentVersion": "/^v?0\\./",
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": false,
+      "groupName": "{{packageName}}",
+      "groupSlug": "{{{replace '/' '-' packageName}}}",
+      "rebaseWhen": "auto"
+    },
+    {
       "description": "Update each of these dependencies in its own pull request that moves every pin at once, so develop never holds two versions of it. Placed after the minor and patch rule so these branches rebase only on conflict",
       "matchPackageNames": [
         "hashicorp/terraform",
