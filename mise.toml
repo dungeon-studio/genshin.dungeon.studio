@@ -17,4 +17,4 @@ node = "24.22.2"
 # Keep equal to package.json's packageManager, which pnpm and the API image's
 # corepack read.
 pnpm = "12.18.0"
-terraform = "1.17.1"
+terraform = "1.17.2"
