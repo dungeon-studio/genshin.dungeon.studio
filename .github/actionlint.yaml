@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+---
+self-hosted-runner:
+  # GitHub-hosted labels newer than actionlint's built-in list. Not
+  # self-hosted: actionlint offers no other way to declare a known label.
+  labels:
+    - ubuntu-26.04
