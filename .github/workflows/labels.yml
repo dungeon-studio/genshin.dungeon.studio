@@ -4,8 +4,9 @@
 name: Labels
 
 # release-notes.yml groups the draft by the labels this applies; both read
-# their rules from .github/release-drafter.yml. No concurrency group; see
-# docs/reference/workflow-conventions.md#required-checks.
+# their rules from .github/release-drafter.yml.
+
+# Every run finishes; see docs/reference/workflow-conventions.md#required-checks.
 
 on:
   pull_request:
