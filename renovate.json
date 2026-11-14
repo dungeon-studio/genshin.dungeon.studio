@@ -59,8 +59,8 @@
       "rebaseWhen": "behind-base-branch"
     },
     {
-      "description": "Leave updates from a 0.x version to a person, each in its own pull request: semver lets any 0.x release break, so these wait with the majors for required checks that catch breaking updates. Placed after the minor and patch rule so these branches rebase as major updates do",
-      "matchCurrentVersion": "/^v?0\\./",
+      "description": "Leave breaking minor and patch updates, such as any update from a 0.x version, to a person, each in its own pull request, so they wait with the majors for required checks that catch breaking updates. Placed after the minor and patch rule so these branches rebase as major updates do",
+      "matchIsBreaking": true,
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": false,
       "groupName": "{{packageName}}",
