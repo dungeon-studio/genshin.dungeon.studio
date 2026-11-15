@@ -57,10 +57,9 @@ jobs:
           content-filepath: ./lychee-report.md
           labels: documentation
 
-  # The base image tag, feature majors, and the gcloud apt repository move
-  # upstream, where ci.yml's `Verify toolchain` diff can't see them. Building
-  # here surfaces that drift in a report issue instead of on an unrelated
-  # pull request. Never blocks.
+  # The image pulls floating upstream inputs that the `Verify toolchain` diff
+  # can't see, so their drift would otherwise fail an unrelated pull request.
+  # Never blocks.
   devcontainer-drift:
     name: Build devcontainer against upstream
     runs-on: ubuntu-24.04
@@ -89,9 +88,8 @@ jobs:
           cat > devcontainer-report.md <<EOF
           The scheduled devcontainer build failed on \`${GITHUB_SHA}\`.
 
-          No repository change triggered this run, so the likely cause is an
-          upstream input: the base image, a feature, or a package
-          \`postCreateCommand.sh\` installs. The log is on [the run](${RUN_URL}).
+          \`Verify toolchain\` builds every change to the image's inputs, so
+          the likely cause is upstream drift. See [the run](${RUN_URL}).
           EOF
 
       - name: Report the failed build

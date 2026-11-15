@@ -5,7 +5,7 @@
 name: Build the devcontainer
 description: Build the devcontainer image and verify its toolchain
 
-# Project-wide checks belong in .pre-commit-config.yaml, not here.
+# Project-wide checks belong in .pre-commit-config.yaml.
 
 runs:
   using: composite

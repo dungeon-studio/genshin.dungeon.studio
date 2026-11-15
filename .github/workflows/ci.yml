@@ -723,7 +723,8 @@ jobs:
 
   # A step skips the expensive devcontainer build unless an input changed, so
   # the check still reports on every pull request and a ruleset can require
-  # it. The inputs are the files the image build reads, plus this workflow.
+  # it. The inputs are the files the image build reads, plus the workflow and
+  # actions that run it.
   # `package.json` pins the package manager, engines, and firebase-tools;
   # `tools/e2e/package.json` pins the Playwright browsers.
   toolchain:
