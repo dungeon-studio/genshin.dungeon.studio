@@ -1,0 +1,21 @@
+---
+# SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
+# SPDX-License-Identifier: MIT
+
+name: Build the devcontainer
+description: Build the devcontainer image and verify its toolchain
+
+# Project-wide checks belong in .pre-commit-config.yaml, not here.
+
+runs:
+  using: composite
+
+  steps:
+    - name: Build the image and verify its toolchain
+      uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
+      with:
+        imageName: genshin-planner-devcontainer
+        push: never
+        # The action starts the container only when runCmd is set. Starting
+        # it runs postCreateCommand.sh, which verifies the toolchain.
+        runCmd: 'true'

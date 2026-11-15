@@ -79,13 +79,7 @@ jobs:
       - name: Build the image and verify its toolchain
         id: build
         continue-on-error: true
-        uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
-        with:
-          imageName: genshin-planner-devcontainer
-          push: never
-          # Starting the container runs postCreateCommand.sh, which verifies
-          # the toolchain.
-          runCmd: 'true'
+        uses: ./.github/actions/build-devcontainer
 
       - name: Summarise the failed build
         if: steps.build.outcome == 'failure'

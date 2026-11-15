@@ -750,19 +750,13 @@ jobs:
             mise.lock
             package.json
             tools/e2e/package.json
+            .github/actions/build-devcontainer
             .github/actions/diff-against-base
             .github/workflows/ci.yml
 
       - name: Build the image and verify its toolchain
         if: steps.diff.outputs.changed == 'true'
-        uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
-        with:
-          imageName: genshin-planner-devcontainer
-          push: never
-          # The action starts the container only when runCmd is set. Starting
-          # it runs postCreateCommand.sh, which verifies the toolchain.
-          # Project-wide checks belong in .pre-commit-config.yaml.
-          runCmd: 'true'
+        uses: ./.github/actions/build-devcontainer
 
   # release-notes.yml drafts only after merge, so a breaking release-drafter
   # has to fail here first.
