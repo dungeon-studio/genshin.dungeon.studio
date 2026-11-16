@@ -2,13 +2,13 @@
   // SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
   // SPDX-License-Identifier: MIT
   "name": "Genshin Planner",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:24@sha256:e1fd824e03c68d8f406ef45b574023a2d683a5acc98906743f8d60aaf78b0174",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
 
   "features": {
     // renovate: tag=1
     "ghcr.io/devcontainers/features/github-cli@sha256:bd7ab48a832228f633239277552c30b353867fef2e5b037e064b4e64f0b843f2": {},
-    // renovate: tag=1
-    "ghcr.io/devcontainers-extra/features/mise@sha256:5c389ab1e3c8e44e5e0ff119f6868d54dbb781bc860bd8587dc66209cb8c4a8c": {},
     // renovate: tag=1
     "ghcr.io/devcontainers/features/docker-outside-of-docker@sha256:661b0fd4c57a7e0bd14d99701ab9bc824719678a9319118728f8d9c59441b7e4": {
       "moby": false
