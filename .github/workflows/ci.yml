@@ -723,7 +723,8 @@ jobs:
 
   # A step skips the expensive devcontainer build unless an input changed, so
   # the check still reports on every pull request and a ruleset can require
-  # it. The inputs are the files the image build reads, plus this workflow.
+  # it. The inputs are the files the image build reads, plus the workflow and
+  # actions that run it.
   # `package.json` pins the package manager, engines, and firebase-tools;
   # `tools/e2e/package.json` pins the Playwright browsers.
   toolchain:
@@ -750,19 +751,13 @@ jobs:
             mise.lock
             package.json
             tools/e2e/package.json
+            .github/actions/build-devcontainer
             .github/actions/diff-against-base
             .github/workflows/ci.yml
 
       - name: Build the image and verify its toolchain
         if: steps.diff.outputs.changed == 'true'
-        uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
-        with:
-          imageName: genshin-planner-devcontainer
-          push: never
-          # The action starts the container only when runCmd is set. Starting
-          # it runs postCreateCommand.sh, which verifies the toolchain.
-          # Project-wide checks belong in .pre-commit-config.yaml.
-          runCmd: 'true'
+        uses: ./.github/actions/build-devcontainer
 
   # release-notes.yml drafts only after merge, so a breaking release-drafter
   # has to fail here first.

@@ -57,6 +57,49 @@ jobs:
           content-filepath: ./lychee-report.md
           labels: documentation
 
+  # The image pulls floating upstream inputs that the `Verify toolchain` diff
+  # can't see, so their drift would otherwise fail an unrelated pull request.
+  # Never blocks.
+  devcontainer-drift:
+    name: Build devcontainer against upstream
+    runs-on: ubuntu-24.04
+    # Headroom for a cold build.
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build the image and verify its toolchain
+        id: build
+        continue-on-error: true
+        uses: ./.github/actions/build-devcontainer
+
+      - name: Summarise the failed build
+        if: steps.build.outcome == 'failure'
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          cat > devcontainer-report.md <<EOF
+          The scheduled devcontainer build failed on \`${GITHUB_SHA}\`.
+
+          \`Verify toolchain\` builds every change to the image's inputs, so
+          the likely cause is upstream drift. See [the run](${RUN_URL}).
+          EOF
+
+      - name: Report the failed build
+        if: steps.build.outcome == 'failure'
+        uses: ./.github/actions/report-issue
+        with:
+          title: Devcontainer Build Report
+          content-filepath: ./devcontainer-report.md
+          labels: devcontainer
+
   # Stryker reruns the suite once per mutant, and the score shifts under
   # legitimate refactoring, so survivors update one report issue instead of
   # gating a pull request. Never blocks.
