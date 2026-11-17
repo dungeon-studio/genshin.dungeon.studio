@@ -14,14 +14,15 @@ url = "https://github.com/nektos/act/releases/download/v0.2.97/act_Linux_x86_64.
 url_api = "https://api.github.com/repos/nektos/act/releases/assets/710157441"
 
 [[tools."aqua:vale-cli/vale"]]
-version = "3.24.0"
+version = "3.27.0"
 backend = "aqua:vale-cli/vale"
-specifiers = ["3.24.0"]
+specifiers = ["3.27.0"]
 
 [tools."aqua:vale-cli/vale"."platforms.linux-x64"]
-checksum = "sha256:867534ddb678abca7f214bc4706ead0922bd5252ffe8035fc227013f66c8b214"
-url = "https://github.com/vale-cli/vale/releases/download/v3.24.0/vale_3.24.0_Linux_64-bit.tar.gz"
-url_api = "https://api.github.com/repos/vale-cli/vale/releases/assets/603879404"
+checksum = "sha256:c80d62f6bce87b81843ac5b512a26e63213927b957adba0a64fc594570da2000"
+checksum_source = "mise-versions"
+url = "https://github.com/vale-cli/vale/releases/download/v3.27.0/vale_3.27.0_Linux_64-bit.tar.gz"
+url_api = "https://api.github.com/repos/vale-cli/vale/releases/assets/740781554"
 
 [[tools."github:lycheeverse/lychee"]]
 version = "0.24.2"
