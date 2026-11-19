@@ -34,7 +34,7 @@
       "rebaseWhen": "behind-base-branch"
     },
     {
-      "description": "Give each minor or patch update that an earlier rule keeps out of automerge its own pull request, as majors get, so it doesn't stop the non-major group automerging. Placed after the minor and patch rule so these branches rebase as majors do, and before any rule that sets automerge on a minor or patch",
+      "description": "A group automerges only when all its updates can, so each held minor or patch update gets its own pull request. The match reads automerge as earlier rules set it, so a rule that enables automerge belongs before this one. Following the minor and patch rule makes these branches rebase as majors do",
       "matchJsonata": ["automerge = false"],
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "{{packageName}}",
