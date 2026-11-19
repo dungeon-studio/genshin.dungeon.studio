@@ -1,20 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:best-practices",
-    "security:openssf-scorecard",
-    "customManagers:githubActionsVersions",
+    "github>dungeon-studio/renovate-config",
+    "github>dungeon-studio/renovate-config:automerge-minor",
     "customManagers:dockerfileVersions",
-    ":automergeMinor",
-    ":automergeDigest",
     "group:allNonMajor"
   ],
-  "timezone": "Europe/London",
-  "labels": ["dependencies"],
-  "reviewers": ["alunduil"],
   "rangeStrategy": "pin",
-  "minimumReleaseAge": "3 days",
-  "osvVulnerabilityAlerts": true,
   "vulnerabilityAlerts": {
     "description": "Label vulnerability-driven pull requests security and merge them on green CI after a bake as long as pnpm's default release-age floor, so ecosystems outside npm get the same guard",
     "addLabels": ["security"],
@@ -25,24 +17,7 @@
     "description": "Open the lock file refresh past the concurrent limit, so transitive dependency fixes keep reaching develop",
     "prConcurrentLimit": 0
   },
-  "pre-commit": {
-    "enabled": true
-  },
   "packageRules": [
-    {
-      "description": "Exempt update types that carry no release timestamp from the minimum release-age bake, so their renovate/stability-days check can resolve under internalChecksFilter:strict",
-      "matchUpdateTypes": [
-        "pin",
-        "pinDigest",
-        "digest",
-        "lockFileMaintenance",
-        "lockfileUpdate",
-        "rollback",
-        "bump",
-        "replacement"
-      ],
-      "minimumReleaseAge": null
-    },
     {
       "description": "The release_versions endpoint Renovate reads carries no release timestamps, so a release-age bake here would never resolve its renovate/stability-days check under internalChecksFilter:strict",
       "matchDatasources": ["java-version"],
@@ -59,10 +34,26 @@
       "rebaseWhen": "behind-base-branch"
     },
     {
-      "description": "Hold minor and patch updates that Renovate marks breaking for review, each in its own pull request, as majors are. Placed after the minor and patch rule so these branches rebase as majors do",
+      "description": "Give each breaking minor or patch update its own pull request, as majors get, so the preset's review hold on it doesn't stop the non-major group automerging. Placed after the minor and patch rule so these branches rebase as majors do",
       "matchIsBreaking": true,
       "matchUpdateTypes": ["minor", "patch"],
-      "automerge": false,
+      "groupName": "{{packageName}}",
+      "groupSlug": "{{{replace '/' '-' packageName}}}",
+      "rebaseWhen": "auto"
+    },
+    {
+      "description": "Give each minor or patch update from a 0.x version its own pull request: the preset holds them for review even where the versioning scheme doesn't mark them breaking",
+      "matchCurrentVersion": "/^v?0\\./",
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "{{packageName}}",
+      "groupSlug": "{{{replace '/' '-' packageName}}}",
+      "rebaseWhen": "auto"
+    },
+    {
+      "description": "Give each minor or patch update to a composite action its own pull request: the preset holds updates under .github/actions for review",
+      "matchFileNames": [".github/actions/**"],
+      "matchDatasources": ["!github-runners"],
+      "matchUpdateTypes": ["minor", "patch"],
       "groupName": "{{packageName}}",
       "groupSlug": "{{{replace '/' '-' packageName}}}",
       "rebaseWhen": "auto"
