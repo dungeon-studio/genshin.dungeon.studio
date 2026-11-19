@@ -34,25 +34,8 @@
       "rebaseWhen": "behind-base-branch"
     },
     {
-      "description": "Give each breaking minor or patch update its own pull request, as majors get, so the preset's review hold on it doesn't stop the non-major group automerging. Placed after the minor and patch rule so these branches rebase as majors do",
-      "matchIsBreaking": true,
-      "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "{{packageName}}",
-      "groupSlug": "{{{replace '/' '-' packageName}}}",
-      "rebaseWhen": "auto"
-    },
-    {
-      "description": "Give each minor or patch update from a 0.x version its own pull request: the preset holds them for review even where the versioning scheme doesn't mark them breaking",
-      "matchCurrentVersion": "/^v?0\\./",
-      "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "{{packageName}}",
-      "groupSlug": "{{{replace '/' '-' packageName}}}",
-      "rebaseWhen": "auto"
-    },
-    {
-      "description": "Give each minor or patch update to a composite action its own pull request: the preset holds updates under .github/actions for review",
-      "matchFileNames": [".github/actions/**"],
-      "matchDatasources": ["!github-runners"],
+      "description": "Give each minor or patch update that an earlier rule keeps out of automerge its own pull request, as majors get, so it doesn't stop the non-major group automerging. Placed after the minor and patch rule so these branches rebase as majors do, and before any rule that sets automerge on a minor or patch",
+      "matchJsonata": ["automerge = false"],
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "{{packageName}}",
       "groupSlug": "{{{replace '/' '-' packageName}}}",
