@@ -8,3 +8,9 @@ FROM mcr.microsoft.com/devcontainers/typescript-node:24@sha256:e1fd824e03c68d8f4
 COPY --from=mise /usr/local/bin/mise /usr/local/bin/mise
 
 USER 1000
+
+# Claude Code keeps its settings and conversations here, on a named volume
+# from devcontainer.json. Docker gives a new volume the owner of the directory
+# it covers, so this directory must belong to node.
+ENV CLAUDE_CONFIG_DIR=/home/node/.claude
+RUN mkdir "${CLAUDE_CONFIG_DIR}"

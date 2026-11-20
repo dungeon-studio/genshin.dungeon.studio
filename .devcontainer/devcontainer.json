@@ -14,7 +14,9 @@
       "moby": false
     },
     // renovate: tag=2
-    "ghcr.io/devcontainers-extra/features/pre-commit@sha256:6e0bb2ce80caca1d94f44dab5d0653d88a1c00984e590adb7c6bce012d0ade6e": {}
+    "ghcr.io/devcontainers-extra/features/pre-commit@sha256:6e0bb2ce80caca1d94f44dab5d0653d88a1c00984e590adb7c6bce012d0ade6e": {},
+    // renovate: tag=1
+    "ghcr.io/anthropics/devcontainer-features/claude-code@sha256:cfc2e7d3e9fd3b9b01f8d5cb158508a884c8c0ede2e23ed10f32dea5d4ffe69a": {}
   },
 
   "customizations": {
@@ -84,12 +86,21 @@
     "MISE_TRUSTED_CONFIG_PATHS": "${containerWorkspaceFolder}"
   },
 
+  // Each worktree gets its own volume, so its conversations stay separate and
+  // `claude --continue` resumes them after a rebuild. Keep the target equal to
+  // the Dockerfile's CLAUDE_CONFIG_DIR: Docker mounts volumes before the
+  // container's environment exists.
+  "mounts": ["source=genshin-claude-${devcontainerId},target=/home/node/.claude,type=volume"],
+
   // The base image's login profile puts its own Node.js and pnpm first, so
   // only remoteEnv can put the shims ahead of them. This PATH replaces the
   // login shell's, so it re-adds the pre-commit feature's directory, which
   // only /etc/bash.bashrc adds.
   "remoteEnv": {
-    "PATH": "/home/node/.local/share/mise/shims:${containerEnv:PATH}:/usr/local/py-utils/bin"
+    "PATH": "/home/node/.local/share/mise/shims:${containerEnv:PATH}:/usr/local/py-utils/bin",
+    // Signs Claude Code in without a browser. When the host doesn't set the
+    // token, Claude Code offers its normal login.
+    "CLAUDE_CODE_OAUTH_TOKEN": "${localEnv:CLAUDE_CODE_OAUTH_TOKEN}"
   },
 
   // pnpm store configuration
