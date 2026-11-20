@@ -53,6 +53,7 @@ for_each_tool() {
   "${action}" "gh" gh --version
   "${action}" "gcloud" gcloud --version
   "${action}" "pre-commit" pre-commit --version
+  "${action}" "claude" claude --version
   "${action}" "firebase" pnpm exec firebase --version
   "${action}" "playwright" pnpm --filter @genshin/e2e exec playwright --version
 }

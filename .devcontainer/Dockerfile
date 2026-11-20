@@ -8,3 +8,7 @@ FROM mcr.microsoft.com/devcontainers/typescript-node:24@sha256:e1fd824e03c68d8f4
 COPY --from=mise /usr/local/bin/mise /usr/local/bin/mise
 
 USER 1000
+
+# A new named volume copies the ownership of the directory it mounts over, so
+# creating this as node keeps the Claude Code volume writable.
+RUN mkdir /home/node/.claude
