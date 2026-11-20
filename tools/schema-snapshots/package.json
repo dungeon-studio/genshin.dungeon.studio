@@ -23,7 +23,7 @@
     "schemas:check": "tsx src/check.ts"
   },
   "dependencies": {
-    "jsoncompat": "0.5.0",
+    "jsoncompat": "0.6.0",
     "zod": "4.6.7"
   },
   "devDependencies": {
