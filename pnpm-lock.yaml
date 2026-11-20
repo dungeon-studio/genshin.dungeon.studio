@@ -240,7 +240,7 @@ importers:
         version: 3.1.1
       firebase-admin:
         specifier: 14.5.1
-        version: 14.5.1(@firebase/app@0.16.5)(supports-color@10.2.2)
+        version: 14.5.1(@firebase/app@0.16.7)(supports-color@10.2.2)
       hono:
         specifier: 4.13.19
         version: 4.13.19
@@ -309,11 +309,11 @@ importers:
   apps/web:
     dependencies:
       '@firebase/app':
-        specifier: 0.16.5
-        version: 0.16.5
+        specifier: 0.16.7
+        version: 0.16.7
       '@firebase/auth':
         specifier: 1.13.10
-        version: 1.13.10(@firebase/app@0.16.5)
+        version: 1.13.10(@firebase/app@0.16.7)
       '@genshin/collection-json':
         specifier: workspace:*
         version: link:../../packages/collection-json
@@ -395,7 +395,7 @@ importers:
         version: 4.3.5
       '@testing-library/jest-dom':
         specifier: 7.0.1
-        version: 7.0.1(@opentelemetry/api@1.10.0)(@testing-library/dom@10.4.2)(vitest@5.1.0)
+        version: 7.0.1(@opentelemetry/api@1.10.0)(@testing-library/dom@10.4.2)(@vitest/coverage-v8@5.1.0)(vitest@5.1.0)
       '@testing-library/react':
         specifier: 16.3.3
         version: 16.3.3(@testing-library/dom@10.4.2)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -531,7 +531,7 @@ importers:
         version: 10.1.1(@types/node@24.19.2)
       '@stryker-mutator/vitest-runner':
         specifier: 10.1.1
-        version: 10.1.1(@opentelemetry/api@1.10.0)(@stryker-mutator/core@10.1.1(@types/node@24.19.2))(vitest@5.1.0)
+        version: 10.1.1(@opentelemetry/api@1.10.0)(@stryker-mutator/core@10.1.1(@types/node@24.19.2))(@vitest/coverage-v8@5.1.0)(vitest@5.1.0)
       '@typescript/native':
         specifier: npm:typescript@7.0.2
         version: typescript@7.0.2
@@ -555,7 +555,7 @@ importers:
         version: 10.0.1(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))
       '@vitest/eslint-plugin':
         specifier: 1.6.28
-        version: 1.6.28(@opentelemetry/api@1.10.0)(@typescript-eslint/eslint-plugin@8.73.0(@typescript-eslint/parser@8.73.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(vitest@5.1.0)
+        version: 1.6.28(@opentelemetry/api@1.10.0)(@typescript-eslint/eslint-plugin@8.73.0(@typescript-eslint/parser@8.73.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))(@typescript/typescript6@6.0.2)(@vitest/coverage-v8@5.1.0)(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(vitest@5.1.0)
       eslint:
         specifier: 10.15.0
         version: 10.15.0(jiti@2.7.0)(supports-color@10.2.2)
@@ -1471,8 +1471,8 @@ packages:
   '@firebase/app-types@0.9.6':
     resolution: {integrity: sha512-yPLahy7Esfu2w/yme3msVK4xTkDXQqq6szfQn8yVOQpCKiT5GVFjqNpLbuz6NkX0WuTwUidkmPewW3r4xkvpeg==}
 
-  '@firebase/app@0.16.5':
-    resolution: {integrity: sha512-hVFsDVHCD86RjS+e2IDujnB5oZ57DVKcvhZLs7GVBnFk3SuGA4XkGUma85bFyQkxJ1XZI60Zfj+JRkIkos7omg==}
+  '@firebase/app@0.16.7':
+    resolution: {integrity: sha512-XytLYWMxaONsP81WtCB7rhSD5gjjXTYKP3Cz6+NhQKXKL4sLXlHafBPsxnWSvK8o9bokuUoWCLnABCGU6/SJ3A==}
     engines: {node: '>=24.12.0'}
 
   '@firebase/auth-interop-types@0.2.6':
@@ -8472,7 +8472,7 @@ snapshots:
     dependencies:
       '@firebase/logger': 0.5.2
 
-  '@firebase/app@0.16.5':
+  '@firebase/app@0.16.7':
     dependencies:
       '@firebase/component': 0.7.5
       '@firebase/logger': 0.5.2
@@ -8482,9 +8482,9 @@ snapshots:
 
   '@firebase/auth-interop-types@0.2.6': {}
 
-  '@firebase/auth@1.13.10(@firebase/app@0.16.5)':
+  '@firebase/auth@1.13.10(@firebase/app@0.16.7)':
     dependencies:
-      '@firebase/app': 0.16.5
+      '@firebase/app': 0.16.7
       '@firebase/component': 0.7.5
       '@firebase/logger': 0.5.2
       '@firebase/util': 1.15.3
@@ -8495,7 +8495,7 @@ snapshots:
       '@firebase/util': 1.15.3
       tslib: 2.9.1
 
-  '@firebase/database-compat@2.1.8(@firebase/app@0.16.5)':
+  '@firebase/database-compat@2.1.8(@firebase/app@0.16.7)':
     dependencies:
       '@firebase/component': 0.7.5
       '@firebase/database': 1.1.6
@@ -8504,7 +8504,7 @@ snapshots:
       '@firebase/util': 1.15.3
       tslib: 2.9.1
     optionalDependencies:
-      '@firebase/app': 0.16.5
+      '@firebase/app': 0.16.7
 
   '@firebase/database-types@1.0.22':
     dependencies:
@@ -9704,7 +9704,7 @@ snapshots:
 
   '@stryker-mutator/util@10.1.1': {}
 
-  '@stryker-mutator/vitest-runner@10.1.1(@opentelemetry/api@1.10.0)(@stryker-mutator/core@10.1.1(@types/node@24.19.2))(vitest@5.1.0)':
+  '@stryker-mutator/vitest-runner@10.1.1(@opentelemetry/api@1.10.0)(@stryker-mutator/core@10.1.1(@types/node@24.19.2))(@vitest/coverage-v8@5.1.0)(vitest@5.1.0)':
     dependencies:
       '@stryker-mutator/api': 10.1.1
       '@stryker-mutator/core': 10.1.1(@types/node@24.19.2)
@@ -9714,6 +9714,7 @@ snapshots:
       vitest: 5.1.0(@opentelemetry/api@1.10.0)(@types/node@24.19.2)(@vitest/coverage-v8@5.1.0)(jsdom@30.1.3)(msw@3.0.6(@types/node@24.19.2)(@typescript/typescript6@6.0.2)(supports-color@10.2.2)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)))(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
     transitivePeerDependencies:
       - '@opentelemetry/api'
+      - '@vitest/coverage-v8'
 
   '@tailwindcss/node@4.3.5':
     dependencies:
@@ -9804,7 +9805,7 @@ snapshots:
       picocolors: 1.1.1
       pretty-format: 27.5.1
 
-  '@testing-library/jest-dom@7.0.1(@opentelemetry/api@1.10.0)(@testing-library/dom@10.4.2)(vitest@5.1.0)':
+  '@testing-library/jest-dom@7.0.1(@opentelemetry/api@1.10.0)(@testing-library/dom@10.4.2)(@vitest/coverage-v8@5.1.0)(vitest@5.1.0)':
     dependencies:
       '@adobe/css-tools': 4.5.0
       '@testing-library/dom': 10.4.2
@@ -9817,6 +9818,7 @@ snapshots:
       vitest: 5.1.0(@opentelemetry/api@1.10.0)(@types/node@24.19.2)(@vitest/coverage-v8@5.1.0)(jsdom@30.1.3)(msw@3.0.6(@types/node@24.19.2)(@typescript/typescript6@6.0.2)(supports-color@10.2.2)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)))(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
     transitivePeerDependencies:
       - '@opentelemetry/api'
+      - '@vitest/coverage-v8'
 
   '@testing-library/react@16.3.3(@testing-library/dom@10.4.2)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
@@ -10270,7 +10272,7 @@ snapshots:
       - '@opentelemetry/api'
     optional: true
 
-  '@vitest/eslint-plugin@1.6.28(@opentelemetry/api@1.10.0)(@typescript-eslint/eslint-plugin@8.73.0(@typescript-eslint/parser@8.73.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(vitest@5.1.0)':
+  '@vitest/eslint-plugin@1.6.28(@opentelemetry/api@1.10.0)(@typescript-eslint/eslint-plugin@8.73.0(@typescript-eslint/parser@8.73.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))(@typescript/typescript6@6.0.2)(@vitest/coverage-v8@5.1.0)(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(vitest@5.1.0)':
     dependencies:
       '@typescript-eslint/scope-manager': 8.72.2
       '@typescript-eslint/utils': 8.72.2(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
@@ -10281,6 +10283,7 @@ snapshots:
       vitest: 5.1.0(@opentelemetry/api@1.10.0)(@types/node@24.19.2)(@vitest/coverage-v8@5.1.0)(jsdom@30.1.3)(msw@3.0.6(@types/node@24.19.2)(@typescript/typescript6@6.0.2)(supports-color@10.2.2)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)))(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
     transitivePeerDependencies:
       - '@opentelemetry/api'
+      - '@vitest/coverage-v8'
       - supports-color
 
   '@vitest/istanbul-lib-coverage@2.1.0': {}
@@ -11876,10 +11879,10 @@ snapshots:
       locate-path: 6.0.0
       path-exists: 4.0.0
 
-  firebase-admin@14.5.1(@firebase/app@0.16.5)(supports-color@10.2.2):
+  firebase-admin@14.5.1(@firebase/app@0.16.7)(supports-color@10.2.2):
     dependencies:
       '@fastify/busboy': 3.2.5
-      '@firebase/database-compat': 2.1.8(@firebase/app@0.16.5)
+      '@firebase/database-compat': 2.1.8(@firebase/app@0.16.7)
       '@firebase/database-types': 1.0.22
       fast-deep-equal: 3.1.3
       google-auth-library: 11.3.4(supports-color@10.2.2)
