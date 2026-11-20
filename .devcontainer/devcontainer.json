@@ -86,10 +86,10 @@
     "MISE_TRUSTED_CONFIG_PATHS": "${containerWorkspaceFolder}"
   },
 
-  // One volume per container keeps each worktree's conversations apart and
-  // lets `claude --continue` resume them after a rebuild. The target is the
-  // Dockerfile's CLAUDE_CONFIG_DIR; mounts resolve before the container
-  // exists, so they can't read it.
+  // Each worktree gets its own volume, so its conversations stay separate and
+  // `claude --continue` resumes them after a rebuild. Keep the target equal to
+  // the Dockerfile's CLAUDE_CONFIG_DIR: Docker mounts volumes before the
+  // container's environment exists.
   "mounts": ["source=genshin-claude-${devcontainerId},target=/home/node/.claude,type=volume"],
 
   // The base image's login profile puts its own Node.js and pnpm first, so
@@ -98,8 +98,8 @@
   // only /etc/bash.bashrc adds.
   "remoteEnv": {
     "PATH": "/home/node/.local/share/mise/shims:${containerEnv:PATH}:/usr/local/py-utils/bin",
-    // Signs Claude Code in without a browser. Unset, it falls back to its
-    // normal login.
+    // Signs Claude Code in without a browser. When the host doesn't set the
+    // token, Claude Code offers its normal login.
     "CLAUDE_CODE_OAUTH_TOKEN": "${localEnv:CLAUDE_CODE_OAUTH_TOKEN}"
   },
 

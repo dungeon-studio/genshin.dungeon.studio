@@ -9,8 +9,8 @@ COPY --from=mise /usr/local/bin/mise /usr/local/bin/mise
 
 USER 1000
 
-# Claude Code's settings and conversations live on the named volume
-# devcontainer.json mounts here. A new volume copies the ownership of the
-# directory it covers, so creating it as node keeps it writable.
+# Claude Code keeps its settings and conversations here, on a named volume
+# from devcontainer.json. Docker gives a new volume the owner of the directory
+# it covers, so this directory must belong to node.
 ENV CLAUDE_CONFIG_DIR=/home/node/.claude
 RUN mkdir "${CLAUDE_CONFIG_DIR}"
