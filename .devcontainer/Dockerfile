@@ -9,6 +9,8 @@ COPY --from=mise /usr/local/bin/mise /usr/local/bin/mise
 
 USER 1000
 
-# A new named volume copies the ownership of the directory it mounts over, so
-# creating this as node keeps the Claude Code volume writable.
-RUN mkdir /home/node/.claude
+# Claude Code's settings and conversations live on the named volume
+# devcontainer.json mounts here. A new volume copies the ownership of the
+# directory it covers, so creating it as node keeps it writable.
+ENV CLAUDE_CONFIG_DIR=/home/node/.claude
+RUN mkdir "${CLAUDE_CONFIG_DIR}"

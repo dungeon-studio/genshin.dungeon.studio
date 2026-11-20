@@ -83,14 +83,13 @@
   "containerEnv": {
     "NODE_ENV": "development",
     // The container exists only to work on this checkout.
-    "MISE_TRUSTED_CONFIG_PATHS": "${containerWorkspaceFolder}",
-    // Inside the volume below, so Claude Code's settings file survives a
-    // rebuild along with its conversations.
-    "CLAUDE_CONFIG_DIR": "/home/node/.claude"
+    "MISE_TRUSTED_CONFIG_PATHS": "${containerWorkspaceFolder}"
   },
 
   // One volume per container keeps each worktree's conversations apart and
-  // lets `claude --continue` resume them after a rebuild.
+  // lets `claude --continue` resume them after a rebuild. The target is the
+  // Dockerfile's CLAUDE_CONFIG_DIR; mounts resolve before the container
+  // exists, so they can't read it.
   "mounts": ["source=genshin-claude-${devcontainerId},target=/home/node/.claude,type=volume"],
 
   // The base image's login profile puts its own Node.js and pnpm first, so
