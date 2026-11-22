@@ -18,7 +18,7 @@ Conventions for GitHub Actions workflows in `.github/workflows/` and the pre-com
 | Another revision            | Workflow job    | Coverage and schema compatibility, which compare with the base   |
 | The network or a credential | Workflow job    | Online workflow audits, verified secret scanning, external links |
 
-Adding a hook needs no workflow change.
+Adding a hook needs no workflow change. A hook from a third-party repository needs a canary under `tests/hook-canaries/`, a fixture the hook must flag. The header of `scripts/check-hook-canaries.sh` describes the layout.
 
 A tool whose checks fall on both sides runs in both places. zizmor audits offline in a hook and online in `ci.yml`. lychee checks internal links in a hook and external links in `weekly.yml`.
 
