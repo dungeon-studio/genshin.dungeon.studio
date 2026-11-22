@@ -106,3 +106,12 @@ path = "turbo/generators/templates/**"
 precedence = "override"
 SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
 SPDX-License-Identifier = "MIT"
+
+# Hook canary fixtures are built to fail the hooks, so they can't carry the
+# headers those hooks would check.
+
+[[annotations]]
+path = ["tests/hook-canaries/**/*.expect", "tests/hook-canaries/*/*/**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
+SPDX-License-Identifier = "MIT"

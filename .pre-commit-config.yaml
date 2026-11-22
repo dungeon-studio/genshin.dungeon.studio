@@ -5,7 +5,8 @@
 exclude: |
   (?x)^(
     \.styles/(?!config)|    # Vale syncs packages here; only config/ is ours
-    pnpm-lock\.yaml
+    pnpm-lock\.yaml|
+    tests/hook-canaries/[^/]+/[^/]+/  # fixtures built to fail the hooks
   )
 
 repos:
@@ -181,7 +182,7 @@ repos:
       # machines have.
       - id: lychee
         name: lychee (internal links)
-        entry: lychee --offline --no-progress
+        entry: lychee --offline --no-progress --include-fragments
         language: system
         types: [markdown]
 
@@ -207,6 +208,22 @@ repos:
         entry: pnpm vscode-extensions:check
         language: system
         files: ^(\.vscode/extensions\.json|\.devcontainer/devcontainer\.json)$
+        pass_filenames: false
+
+      # A hook update that narrows what it checks still passes a clean tree.
+      # Each hook reruns from this config on fixtures built to fail it.
+      - id: hook-canaries
+        name: hooks still flag their fixtures
+        entry: scripts/check-hook-canaries.sh
+        language: script
+        files: ^(\.pre-commit-config\.yaml|scripts/check-hook-canaries\.sh|tests/hook-canaries/.+)$
+        pass_filenames: false
+
+      - id: vale-pin
+        name: Vale hook and mise.toml versions in sync
+        entry: scripts/check-vale-pin.sh
+        language: script
+        files: ^(\.pre-commit-config\.yaml|mise\.toml)$
         pass_filenames: false
 
       - id: syncpack
