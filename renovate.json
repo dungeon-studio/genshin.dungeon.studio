@@ -34,6 +34,11 @@
       "rebaseWhen": "behind-base-branch"
     },
     {
+      "description": "Automerge pre-commit hook updates, 0.x and majors included: the pre-commit job runs every hook on every file, so a hook that crashes or flags new problems fails a required check",
+      "matchManagers": ["pre-commit"],
+      "automerge": true
+    },
+    {
       "description": "A group automerges only when all its updates can, so each held minor or patch update gets its own pull request. The match reads automerge as earlier rules set it, so a rule that enables automerge belongs before this one. Following the minor and patch rule makes these branches rebase as majors do",
       "matchJsonata": ["automerge = false"],
       "matchUpdateTypes": ["minor", "patch"],
