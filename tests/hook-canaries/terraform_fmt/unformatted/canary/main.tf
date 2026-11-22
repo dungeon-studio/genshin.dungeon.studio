@@ -1,3 +1,0 @@
-variable "a" {
-default="x"
-}

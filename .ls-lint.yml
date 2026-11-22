@@ -58,8 +58,6 @@ ignore:
   - .reuse
   - .styles
   - .vscode
-  # Hook canary fixtures mirror hook ids and the paths hooks expect:
-  - tests/hook-canaries
   # REUSE license texts use SPDX identifiers (MIT.txt, etc.):
   - LICENSES
   # Files with conventional upper-case names by ecosystem precedent:

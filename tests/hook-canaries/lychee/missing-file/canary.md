@@ -1,3 +1,0 @@
-# Canary
-
-[Missing](missing.md)

@@ -106,13 +106,3 @@ path = "turbo/generators/templates/**"
 precedence = "override"
 SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
 SPDX-License-Identifier = "MIT"
-
-# A header would break most canaries: JSON and TOML fixtures can't hold one,
-# the reuse fixture must lack one, and grep reads every line of an .expect file
-# as a pattern.
-
-[[annotations]]
-path = ["tests/hook-canaries/**/*.expect", "tests/hook-canaries/*/*/**"]
-precedence = "aggregate"
-SPDX-FileCopyrightText = "2026 Alex Brandt <alunduil@gmail.com>"
-SPDX-License-Identifier = "MIT"
