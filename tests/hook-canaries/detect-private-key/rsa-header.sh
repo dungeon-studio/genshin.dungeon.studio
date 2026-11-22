@@ -4,5 +4,5 @@
 
 set -euo pipefail
 
-# Built here so secret scanners don't flag the committed fixture.
+# Generated so secret scanners never see a private key header in the repository.
 printf -- '-----BEGIN %s-----\n' "RSA PRIVATE KEY" >canary.txt

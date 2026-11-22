@@ -4,7 +4,8 @@
 
 set -euo pipefail
 
-# Built here so the committed fixture carries no conflict markers.
+# Generated so no committed file holds markers that git tools and editors
+# would take for a real conflict.
 marker() { printf '%*s' 7 '' | tr ' ' "$1"; }
 printf '%s ours\none\n%s\ntwo\n%s theirs\n' "$(marker '<')" "$(marker '=')" "$(marker '>')" >canary.txt
 # The hook checks only while a merge is in progress.

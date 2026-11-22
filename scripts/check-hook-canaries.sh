@@ -2,15 +2,16 @@
 # SPDX-FileCopyrightText: 2026 Alex Brandt <alunduil@gmail.com>
 # SPDX-License-Identifier: MIT
 
-# Fails when a pre-commit hook passes a fixture it must flag. A hook update
-# that narrows what the hook checks still passes on a clean tree; it can't pass
-# on a tree built to fail it.
+# Fails when a pre-commit hook passes a fixture built to fail it, which catches
+# a hook update that narrows what the hook checks.
 #
-# Each case under tests/hook-canaries/<hook-id>/ is named by <case>.expect, an
-# extended regex the hook's output must match, so a hook failing for an
-# unrelated reason doesn't count. <case>/ is overlaid on a scratch copy of the
-# staged tree. <case>.sh runs in that copy, for fixtures git can't store or
-# that secret scanners would flag.
+# A case under tests/hook-canaries/<hook-id>/ has up to three parts:
+#
+#   <case>.expect  Required. An extended regex the hook's output must match,
+#                  so a failure for an unrelated reason doesn't count.
+#   <case>/        A tree overlaid on a scratch copy of the staged tree.
+#   <case>.sh      A script run in that copy, for fixtures git can't store or
+#                  secret scanners would flag.
 set -euo pipefail
 shopt -s inherit_errexit
 set -x
@@ -21,8 +22,6 @@ scratch=$(mktemp -d)
 trap 'rm -rf "${scratch}"' EXIT
 base="${scratch}/base"
 
-# Every hook from a third-party repository needs a canary, so a new hook can't
-# join without one.
 third_party_hook_ids() {
   awk '
     /^  - repo:/ { local = ($3 == "local") }
@@ -30,9 +29,9 @@ third_party_hook_ids() {
   ' "${root}/.pre-commit-config.yaml"
 }
 
-# Commits the staged tree as the base's only commit. That leaves only a case's
-# fixture staged, which is what `pre-commit run` checks, and gives hooks that
-# diff against HEAD a history.
+# Committing the snapshot leaves a case's fixture as the only staged change,
+# which is all `pre-commit run` checks. Hooks that diff against HEAD need the
+# commit too.
 snapshot_staged_tree() {
   git -C "${root}" checkout-index --all --prefix="${base}/"
 
@@ -88,6 +87,8 @@ case_failure() {
 snapshot_staged_tree
 
 failures=()
+
+# A third-party hook without a canary would go unchecked.
 while read -r id; do
   [[ -d "${canaries}/${id}" ]] || failures+=("${id}: no canary")
 done < <(third_party_hook_ids)

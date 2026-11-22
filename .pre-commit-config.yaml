@@ -210,8 +210,8 @@ repos:
         files: ^(\.vscode/extensions\.json|\.devcontainer/devcontainer\.json)$
         pass_filenames: false
 
-      # A hook update that narrows what it checks still passes a clean tree.
-      # Each hook reruns from this config on fixtures built to fail it.
+      # Each hook reruns on a fixture built to fail it, so an update that
+      # narrows what the hook checks fails here.
       - id: hook-canaries
         name: hooks still flag their fixtures
         entry: scripts/check-hook-canaries.sh
