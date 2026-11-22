@@ -34,7 +34,7 @@
       "rebaseWhen": "behind-base-branch"
     },
     {
-      "description": "Automerge pre-commit hook updates of every type, 0.x and majors included: the pre-commit job runs each hook on every file, so a hook that crashes or flags new problems fails a required check",
+      "description": "Automerge pre-commit hook updates, 0.x and majors included: the pre-commit job runs every hook on every file, so a hook that crashes or flags new problems fails a required check",
       "matchManagers": ["pre-commit"],
       "automerge": true
     },
