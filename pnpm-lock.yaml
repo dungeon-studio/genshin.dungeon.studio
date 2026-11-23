@@ -721,8 +721,8 @@ importers:
   tools/schema-snapshots:
     dependencies:
       jsoncompat:
-        specifier: 0.5.0
-        version: 0.5.0
+        specifier: 0.6.0
+        version: 0.6.0
       zod:
         specifier: 4.6.7
         version: 4.6.7
@@ -5442,8 +5442,8 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  jsoncompat@0.5.0:
-    resolution: {integrity: sha512-Zzl/uEAgnmT6YPsz1Oway0PJ00cSZsQlZoyDEkuNjy5r/+QlsTwMw/TMTHvZEBs04n9kd4y5uFQGn0RMH3pYcQ==}
+  jsoncompat@0.6.0:
+    resolution: {integrity: sha512-6V9IOJ8s/hJB7ct25uBgtuJi8i5LcMDkEgfGAeKzzdBd5FTFftfJQCSxCc9S6m5/4J7ewPlFmZPCqmOTLwSjVg==}
 
   jsonfile@6.2.1:
     resolution: {integrity: sha512-zwOTdL3rFQ/lRdBnntKVOX6k5cKJwEc1HdilT71BWEu7J41gXIB2MRp+vxduPSwZJPWBxEzv4yH1wYLJGUHX4Q==}
@@ -12731,7 +12731,7 @@ snapshots:
 
   json5@2.2.3: {}
 
-  jsoncompat@0.5.0: {}
+  jsoncompat@0.6.0: {}
 
   jsonfile@6.2.1:
     dependencies:
