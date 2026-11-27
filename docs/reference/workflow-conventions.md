@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 # Workflow conventions
 
-Conventions for GitHub Actions workflows in `.github/workflows/` and the pre-commit hooks they run. For why the conventions take this shape, see [Understanding workflow conventions](../explanation/understanding-workflow-conventions.md). To run a job without pushing, see [Run workflows locally](../how-tos/run-workflows-locally.md). For conventions covering the project's source, see [code conventions](code-conventions.md).
+Conventions for GitHub Actions workflows in `.github/workflows/` and the pre-commit hooks they run. For why the conventions take this shape, see [Understanding workflow conventions](../explanation/understanding-workflow-conventions.md). For conventions covering the project's source, see [code conventions](code-conventions.md).
 
 ---
 
