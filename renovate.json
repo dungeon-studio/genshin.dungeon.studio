@@ -39,7 +39,7 @@
       "automerge": true
     },
     {
-      "description": "Automerge workspace linter updates, 0.x and majors included: a linter that crashes or flags new problems fails a required check, and one that checks less changes no shipped code",
+      "description": "Automerge workspace linter updates, 0.x and majors included: a linter that crashes or reports new problems fails a required check",
       "extends": ["packages:linters"],
       "matchPackageNames": ["prettier-plugin-*", "knip", "syncpack", "@ls-lint/ls-lint"],
       "automerge": true
