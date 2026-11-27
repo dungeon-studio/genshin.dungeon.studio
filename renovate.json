@@ -39,6 +39,25 @@
       "automerge": true
     },
     {
+      "description": "Automerge workspace linter updates, 0.x and majors included: a linter that crashes or flags new problems fails a required check, and one that checks less changes no shipped code",
+      "matchPackageNames": [
+        "eslint",
+        "eslint-*",
+        "@eslint/*",
+        "@eslint-react/*",
+        "typescript-eslint",
+        "@vitest/eslint-plugin",
+        "stylelint",
+        "stylelint-*",
+        "prettier",
+        "prettier-plugin-*",
+        "knip",
+        "syncpack",
+        "@ls-lint/ls-lint"
+      ],
+      "automerge": true
+    },
+    {
       "description": "A group automerges only when all its updates can, so each held minor or patch update gets its own pull request. The match reads automerge as earlier rules set it, so a rule that enables automerge belongs before this one. Following the minor and patch rule makes these branches rebase as majors do",
       "matchJsonata": ["automerge = false"],
       "matchUpdateTypes": ["minor", "patch"],
