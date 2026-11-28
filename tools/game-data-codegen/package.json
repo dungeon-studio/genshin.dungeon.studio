@@ -23,11 +23,11 @@
     "@genshin/eslint-config": "workspace:*",
     "@genshin/tsconfig": "workspace:*",
     "@genshin/vitest-config": "workspace:*",
-    "@types/node": "24.19.2",
+    "@types/node": "24.19.3",
     "@typescript/native": "npm:typescript@7.0.2",
-    "@vitest/coverage-v8": "5.1.0",
+    "@vitest/coverage-v8": "5.1.1",
     "eslint": "10.15.0",
     "typescript": "npm:@typescript/typescript6@6.0.2",
-    "vitest": "5.1.0"
+    "vitest": "5.1.1"
   }
 }
