@@ -39,9 +39,18 @@
       "automerge": true
     },
     {
-      "description": "Automerge workspace linter updates, 0.x and majors included: a linter that crashes or reports new problems fails a required check",
+      "description": "Automerge updates to tools that run only inside required checks, 0.x and majors included: a broken release fails its check, and a passing one changes no deployed code",
       "extends": ["packages:linters"],
-      "matchPackageNames": ["prettier-plugin-*", "knip", "syncpack", "@ls-lint/ls-lint"],
+      "matchPackageNames": [
+        "prettier-plugin-*",
+        "knip",
+        "syncpack",
+        "@ls-lint/ls-lint",
+        "jsdom",
+        "@testing-library/*",
+        "jsoncompat",
+        "zizmorcore/zizmor-action"
+      ],
       "automerge": true
     },
     {
