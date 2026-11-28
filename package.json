@@ -36,7 +36,7 @@
   "devDependencies": {
     "@ls-lint/ls-lint": "2.3.2",
     "@turbo/gen": "2.11.13",
-    "@types/node": "24.19.3",
+    "@types/node": "24.19.4",
     "eslint": "10.15.0",
     "firebase-tools": "15.37.0",
     "knip": "6.48.0",
@@ -47,7 +47,7 @@
     "tsx": "4.23.15",
     "turbo": "2.11.13",
     "typescript": "npm:@typescript/typescript6@6.0.2",
-    "vitest": "5.1.1"
+    "vitest": "5.1.2"
   },
   "packageManager": "pnpm@12.23.0",
   "engines": {
