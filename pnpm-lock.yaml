@@ -576,8 +576,8 @@ importers:
         specifier: 4.18.1
         version: 4.18.1(@typescript-eslint/utils@8.73.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)
       eslint-plugin-sonarjs:
-        specifier: 4.2.2
-        version: 4.2.2(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))
+        specifier: 4.2.3
+        version: 4.2.3(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))
       eslint-plugin-tsdoc:
         specifier: 0.5.4
         version: 0.5.4(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)
@@ -4484,8 +4484,8 @@ packages:
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9.7
 
-  eslint-plugin-sonarjs@4.2.2:
-    resolution: {integrity: sha512-usNF9GfP89ibwhfxpZaCMW40sC7UEOusDgDCk7lyqAhh4AYdbBaAgLVL5Y/QS0jSed8eJ2ACGH6zzE8ezd/yZQ==}
+  eslint-plugin-sonarjs@4.2.3:
+    resolution: {integrity: sha512-yR0AflB1rmuHUYarKknnSi5Fc5uxwnkE/CdMiGLgQz2XnUt4Aj6oMyB9OfGkgZ+uhhbYxHFtReX0UpH1nZLn5A==}
     peerDependencies:
       eslint: ^8.0.0 || ^9.0.0 || ^10.0.0
 
@@ -11414,10 +11414,11 @@ snapshots:
       string.prototype.matchall: 4.1.0
       string.prototype.repeat: 1.0.0
 
-  eslint-plugin-sonarjs@4.2.2(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0)):
+  eslint-plugin-sonarjs@4.2.3(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0)):
     dependencies:
       '@eslint-community/regexpp': 4.12.3
       '@sonarsource/analyzer-commons-configurations': 2.31.0-5284
+      aria-query: 5.3.2
       builtin-modules: 3.3.0
       bytes: 3.1.2
       eslint: 10.15.0(jiti@2.7.0)(supports-color@7.2.0)
@@ -11425,7 +11426,7 @@ snapshots:
       globals: 17.14.0
       jsx-ast-utils-x: 0.1.0
       lodash.merge: 4.6.2
-      minimatch: 10.2.6
+      minimatch: 11.0.9
       scslre: 0.3.0
       semver: 7.8.6
       ts-api-utils: 2.5.0(typescript@6.0.3)
