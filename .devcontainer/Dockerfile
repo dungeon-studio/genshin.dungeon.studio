@@ -3,7 +3,7 @@
 
 FROM ghcr.io/jdx/mise:2026.11.14@sha256:7178a0bc7eb30d5090f81237fc0a7830f57e52126b9d8df656e24547437a1e53 AS mise
 
-FROM mcr.microsoft.com/devcontainers/typescript-node:24@sha256:d757292f5050d7b10bae4e0df80da615db98a68b6fdc412558caf24087452fd6
+FROM mcr.microsoft.com/devcontainers/typescript-node:26@sha256:fa6520fb01b8971e78312715c39672e7299f6abdb040e4b444b42ea0b7cd44d9
 
 COPY --from=mise /usr/local/bin/mise /usr/local/bin/mise
 
