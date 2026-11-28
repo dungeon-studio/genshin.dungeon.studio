@@ -39,7 +39,7 @@
       "automerge": true
     },
     {
-      "description": "Automerge updates to tools that run only inside a required check, 0.x and majors included: a release that crashes or misjudges its input fails that check, and one that passes changes nothing that deploys. Covers the workspace linters, the web test environment, jsoncompat, and zizmor-action",
+      "description": "Automerge updates to tools that run only inside required checks, 0.x and majors included: a broken release fails its check, and a passing one changes no deployed code",
       "extends": ["packages:linters"],
       "matchPackageNames": [
         "prettier-plugin-*",
